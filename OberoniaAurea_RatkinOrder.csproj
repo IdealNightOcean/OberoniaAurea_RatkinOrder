@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{47798880-5ADC-4A7F-A287-715B4BC53C16}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>OberoniaAurea.RatkinOrder</RootNamespace>
+    <AssemblyName>OberoniaAurea_RatkinOrder</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <LangVersion>12.0</LangVersion>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\1.5\Assemblies\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\1.5\Assemblies\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony">
+      <HintPath>..\..\RimWorldReference\1.5\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp">
+      <HintPath>..\..\RimWorldReference\1.5\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="OberoniaAurea_Frame">
+      <HintPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\Frame\1.5\Assemblies\OberoniaAurea_Frame.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
+    <Reference Include="UnityEngine.CoreModule">
+      <HintPath>..\..\RimWorldReference\1.5\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule">
+      <HintPath>..\..\RimWorldReference\1.5\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.TextRenderingModule">
+      <HintPath>..\..\RimWorldReference\1.5\UnityEngine.TextRenderingModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="BombardSupportMaker.cs" />
+    <Compile Include="BranchStat\BranchStatModifier.cs" />
+    <Compile Include="BranchStat\BranchStatPart_FacilityLevelToBuildingCeiling.cs" />
+    <Compile Include="BranchStat\BranchStatUtility.cs" />
+    <Compile Include="BranchStat\BranchStatWorker.cs" />
+    <Compile Include="BranchStat\BranchStatPart_FundToAffectRadius.cs" />
+    <Compile Include="BranchStat\BranchStatPart_FundToSquadMemberCeiling.cs" />
+    <Compile Include="BranchStat\BranchStatWorker_Transformer.cs" />
+    <Compile Include="Branch\Branch.cs" />
+    <Compile Include="Branch\BranchBuildingConstructChecker.cs" />
+    <Compile Include="Branch\BranchBuildingHandler.cs" />
+    <Compile Include="Branch\BranchBuildingMaker.cs" />
+    <Compile Include="Branch\BranchBuilding_Memorial.cs" />
+    <Compile Include="Branch\BranchFacilityDef.cs" />
+    <Compile Include="Branch\BranchFacilityLevel.cs" />
+    <Compile Include="Branch\BranchFacilityLevelStage.cs" />
+    <Compile Include="Branch\BranchManager.cs" />
+    <Compile Include="Branch\BranchResidentRecord.cs" />
+    <Compile Include="Branch\BranchUtility.cs" />
+    <Compile Include="Branch\BranchBuildingDef.cs" />
+    <Compile Include="Branch\BranchFacilityHandler.cs" />
+    <Compile Include="Branch\BranchResidentHandler.cs" />
+    <Compile Include="Branch\BranchBuilding.cs" />
+    <Compile Include="Branch\BranchType.cs" />
+    <Compile Include="Branch\BranchStoresReserveHandler.cs" />
+    <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
+    <Compile Include="Branch\WorldObjectComp_BranchSite.cs" />
+    <Compile Include="EsteemHandler.cs" />
+    <Compile Include="ModUtility.cs" />
+    <Compile Include="OrderInteractionUtility.cs" />
+    <Compile Include="OrderLetter\Building_OrderLetterBox.cs" />
+    <Compile Include="OrderLetter\OrderLetter.cs" />
+    <Compile Include="OrderLetter\OrderLetterBox.cs" />
+    <Compile Include="OrderLetter\OrderLetterUtility.cs" />
+    <Compile Include="OrderLetter\RimOrderLetter.cs" />
+    <Compile Include="OrderLetter\SpecialLetterManager.cs" />
+    <Compile Include="OrderLetter\Window_LetterBoxSetting.cs" />
+    <Compile Include="OrderLetter\Window_OrderLetterBox.cs" />
+    <Compile Include="Quest\QuestNode_CheckGroupPatrolStart.cs" />
+    <Compile Include="Quest\QuestNode_GetRatkinOrderOfFaction.cs" />
+    <Compile Include="Quest\QuestNode_Root_ChildrenCare.cs" />
+    <Compile Include="Quest\QuestNode_SetRatkinOrder.cs" />
+    <Compile Include="Quest\Quest_CheckSkillLevel.cs" />
+    <Compile Include="Quest\Quest_EsteemChange.cs" />
+    <Compile Include="Quest\Quest_EsteemChangeAllOrders.cs" />
+    <Compile Include="Quest\QuestPart_InvolvedRatkinOrders.cs" />
+    <Compile Include="Quest\Quest_OrderCrewAidDelay.cs" />
+    <Compile Include="RatkinOrderFactionExtension.cs" />
+    <Compile Include="BranchStat\BranchStatTransformerHandler.cs" />
+    <Compile Include="BranchStat\BranchStatDef.cs" />
+    <Compile Include="BranchStat\BranchStatTransformer.cs" />
+    <Compile Include="Branch\BranchBuildingDefOf.cs" />
+    <Compile Include="HarmonyPatch\Faction_RelationKindChanged_Patch.cs" />
+    <Compile Include="Reformation\OrderReformationDef.cs" />
+    <Compile Include="Reformation\OrderReformationWorker.cs" />
+    <Compile Include="ScenPart_InitialOrderRelationshipLevel.cs" />
+    <Compile Include="LordJob_AssistColony_NeverFleeOrder.cs" />
+    <Compile Include="IPostSquadCombatPawnGenerate.cs" />
+    <Compile Include="Squad\SquadCombatPawnUtility.cs" />
+    <Compile Include="LordJob_ExitMapBestForResident.cs" />
+    <Compile Include="HarmonyPatch\ResetStaticDataPre_Patch.cs" />
+    <Compile Include="OARO_ModDefOf.cs" />
+    <Compile Include="ITicks.cs" />
+    <Compile Include="MapComponent_BranchCache.cs" />
+    <Compile Include="Squad\SquadTask\SquadTask.cs" />
+    <Compile Include="Squad\SquadTask\SquadTaskStartChecker.cs" />
+    <Compile Include="Squad\SquadTask\SquadTask_GroupPatrol.cs" />
+    <Compile Include="Squad\SquadGroupPatrolManager.cs" />
+    <Compile Include="Squad\SquadSupplyContractManager.cs" />
+    <Compile Include="Squad\SquadSupportHandler.cs" />
+    <Compile Include="Squad\SquadTask\SquadTaskDef.cs" />
+    <Compile Include="Squad\SquadTask\SquadTaskHandler.cs" />
+    <Compile Include="Squad\SquadTask\SquadTask_JurisdictionDuty.cs" />
+    <Compile Include="LordJob_AssaultColony_NeverFleeOrder.cs" />
+    <Compile Include="Squad\SquadUtility.cs" />
+    <Compile Include="TagStrToValue\TagStrToBoolCountable.cs" />
+    <Compile Include="TagStrToValue\ITagStrToValue.cs" />
+    <Compile Include="IPostLoadInit.cs" />
+    <Compile Include="Squad\Squad.cs" />
+    <Compile Include="Squad\SquadManager.cs" />
+    <Compile Include="Squad\SquadStat.cs" />
+    <Compile Include="RatkinOrderGenerator.cs" />
+    <Compile Include="Reformation\ReformationManager.cs" />
+    <Compile Include="FundHandler.cs" />
+    <Compile Include="RatkinOrderDef.cs" />
+    <Compile Include="TagStrToValue\TagStrToFloat.cs" />
+    <Compile Include="TagStrToValue\TagStrToInt.cs" />
+    <Compile Include="ThoughtWorker_BranchChurch.cs" />
+    <Compile Include="UniqueIDManager.cs" />
+    <Compile Include="RatkinOrder.cs" />
+    <Compile Include="GameComponent_RatkinOrder.cs" />
+    <Compile Include="RatkinOrderManager.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="EsteemUtility.cs" />
+    <Compile Include="Worldobject\WorldObject_TemporaryEncampment.cs" />
+    <Compile Include="Worldobject\WorldObject_ApplianceRepair.cs" />
+    <Compile Include="Worldobject\WorldObject_PastureFlu.cs" />
+    <Compile Include="Worldobject\WorldObject_SlowMovingArtcraft.cs" />
+    <Compile Include="Worldobject\WorldObject_SquadAssociatedBase.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

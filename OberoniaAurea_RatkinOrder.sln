@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OberoniaAurea_RatkinOrder", "OberoniaAurea_RatkinOrder.csproj", "{47798880-5ADC-4A7F-A287-715B4BC53C16}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{47798880-5ADC-4A7F-A287-715B4BC53C16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{47798880-5ADC-4A7F-A287-715B4BC53C16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{47798880-5ADC-4A7F-A287-715B4BC53C16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{47798880-5ADC-4A7F-A287-715B4BC53C16}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {8DE25664-468A-4E79-8CD6-3822E6239CE2}
+	EndGlobalSection
+EndGlobal

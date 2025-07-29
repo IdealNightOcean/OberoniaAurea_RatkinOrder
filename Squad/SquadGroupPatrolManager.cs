@@ -1,0 +1,507 @@
+﻿using RimWorld;
+using RimWorld.QuestGen;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnityEngine;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class SquadGroupPatrolManager : IExposable, ITickHour
+{
+    public enum PatrolType
+    {
+        Popedom,
+        Kingdom,
+        Border
+    }
+    public enum PatrolEndType
+    {
+        Nothing,
+        Normal,
+        Friendly,
+        Accident,
+        Disaster
+    }
+    public static readonly PatrolEndType[] PatrolEndTypeArr = (PatrolEndType[])Enum.GetValues(typeof(PatrolEndType));
+    [Unsaved] private readonly List<(PatrolEndType, float)> patrolEndChances;
+    [Unsaved] private int nextEndChancesGetTick = -1;
+    public List<(PatrolEndType, float)> PatrolEndChances
+    {
+        get
+        {
+            if (Find.TickManager.TicksGame > nextEndChancesGetTick)
+            {
+                SetPatrolEndChances();
+            }
+            return patrolEndChances;
+        }
+    }
+
+    [Unsaved] public readonly SquadManager SquadManager;
+    public RatkinOrder RatkinOrder => SquadManager.RatkinOrder;
+
+    private bool isPatrolActived = false;
+    private bool isPatrolStarted = false;
+
+    private int tickToNextStage = 180000;
+    private int tickToNextCheck = 60000;
+
+    public bool IsPatrolActived => isPatrolActived;
+    public bool IsPatrolStarted => isPatrolStarted;
+
+    private int adjustCeiling;
+    private int adjustCount;
+    public int AdjustCeiling => adjustCeiling;
+    public int AdjustCount => adjustCount;
+
+    public PatrolType curPatrolType;
+    public HashSet<Squad> participants = [];
+
+    private int burdenSquadCount;
+    public int BurdenSquadCount => burdenSquadCount;
+
+    private float curReconnaissanceValue;
+    private float endReconnaissanceValue;
+    public float NeedReconnaissanceValue
+    {
+        get
+        {
+            return curPatrolType switch
+            {
+                PatrolType.Popedom => SquadManager.TotalMemberCount * 0.16f * 10f,
+                PatrolType.Kingdom => SquadManager.TotalMemberCount * 0.3f * 10f,
+                PatrolType.Border => SquadManager.TotalMemberCount * 0.44f * 10f,
+                _ => 0f,
+            };
+        }
+    }
+
+    public StringBuilder endResultText = new();
+    private int passedBySquadCount = 0;
+
+    public SquadGroupPatrolManager(SquadManager squadManager)
+    {
+        SquadManager = squadManager ?? throw new ArgumentNullException(nameof(squadManager));
+        patrolEndChances = new List<(PatrolEndType, float)>(PatrolEndTypeArr.Length)
+        {
+            [0] = (PatrolEndType.Nothing, 1f)
+        };
+        for (int i = 1; i < PatrolEndTypeArr.Length; i++)
+        {
+            patrolEndChances.Add((PatrolEndTypeArr[i], 0f));
+        }
+    }
+
+    // 只在 isPatrolActived == true 时才会被SquadManager调用
+    public void TickHour()
+    {
+        if ((tickToNextStage -= 2500) == 0)
+        {
+            if (!isPatrolStarted)
+            {
+                StartGroupPatrol();
+            }
+            return;
+        }
+
+        if ((tickToNextCheck -= 2500) == 0)
+        {
+            tickToNextCheck = 60000;
+            if (tickToNextStage > 60000
+                && passedBySquadCount < participants.Count
+                && RatkinOrder.Relationship >= EsteemHandler.RelationshipKind.Acquaintance)
+            {
+                SquadPassBy();
+            }
+        }
+    }
+
+    public bool TryStartPatrolPerp()
+    {
+        SetCurPatrolType();
+
+        return ChoiceParticipants() && StartPatrolPerp();
+    }
+
+    public void ChangeParticipant(IEnumerable<Squad> toAdd, IEnumerable<Squad> toRemove)
+    {
+        if (!isPatrolActived || isPatrolStarted)
+        {
+            return;
+        }
+
+        if (toRemove is not null)
+        {
+            foreach (Squad squad in toRemove)
+            {
+                participants.Remove(squad);
+                if (squad.TaskHandler.CurTask?.Def == OARO_ModDefOf.OARO_Squad_GroupPatrolPerp)
+                {
+                    squad.TaskHandler.EndCurrentTask(startRest: true);
+                }
+            }
+        }
+
+        if (toAdd is not null)
+        {
+            foreach (Squad squad in toAdd)
+            {
+                if (!participants.Contains(squad) && squad.TaskHandler.TrySwitchToTask(OARO_ModDefOf.OARO_Squad_GroupPatrolPerp))
+                {
+                    participants.Add(squad);
+                }
+            }
+        }
+
+        if (participants.Count == 0)
+        {
+            Reset();
+            return;
+        }
+
+    }
+
+    public void Notify_SquadPatrolEnd(Squad squad, float finalReconnaissance, StringBuilder squadResult)
+    {
+        if (isPatrolActived)
+        {
+            participants.Remove(squad);
+            endReconnaissanceValue += finalReconnaissance;
+            endResultText.AppendLineIfNotEmpty();
+            endResultText.Append(squadResult);
+            if (participants.Count == 0)
+            {
+                GroupPatrolEnd();
+            }
+        }
+    }
+
+    public (float fundGain, float reformProgressGain) GetGroupPatrolEndResult(float reconnaissanceValue)
+    {
+        if (!isPatrolStarted)
+        {
+            return (0f, 0f);
+        }
+
+        float reconnaissanceRate = Mathf.Clamp(reconnaissanceValue / NeedReconnaissanceValue, 0f, 2f);
+        float rewardMulti = curPatrolType switch
+        {
+            PatrolType.Popedom => 1f,
+            PatrolType.Kingdom => 2f,
+            PatrolType.Border => 4f,
+            _ => 1f,
+        };
+        float gainFund = 0f;
+        float gainReformProgress = 0f;
+        if (reconnaissanceRate < 0.5f)
+        {
+            gainFund = (reconnaissanceRate - 0.5f) * 0.002f * rewardMulti;
+        }
+        else if (reconnaissanceRate > 1f)
+        {
+            gainFund = (reconnaissanceRate - 1f) * 0.0005f * rewardMulti;
+            gainReformProgress = (reconnaissanceRate - 1f) * 0.0005f * rewardMulti;
+            reconnaissanceRate -= 1f;
+        }
+        gainReformProgress += 5f * (1f + rewardMulti) * reconnaissanceRate;
+
+        return (gainFund, gainReformProgress);
+    }
+
+    private void SetCurPatrolType()
+    {
+        try
+        {
+            (PatrolType, int)[] typeChance =
+            [
+                (PatrolType.Popedom, 300),
+                (PatrolType.Kingdom, 200 + (int)(RatkinOrder.FundHandler.Funds / 0.01f * 5f)),
+                (PatrolType.Border, 10 + (int)(RatkinOrder.FundHandler.Funds / 0.01f * 6f + RatkinOrder.ReformationManager.ReformationsCount * 10f)),
+            ];
+            curPatrolType = typeChance.RandomElementByWeight(r => r.Item2).Item1;
+        }
+        catch (Exception ex)
+        {
+            Log.Error("Failed to set group patrol type: " + ex);
+            curPatrolType = PatrolType.Popedom;
+        }
+    }
+
+    private bool ChoiceParticipants()
+    {
+        if (!RatkinOrder.ReformationManager.EffectTags.GetTagCount("", out short reformationTags))
+        {
+            reformationTags = 0;
+        }
+
+        float rate = 0.2f + (reformationTags * 0.05f);
+        int squadCount = Mathf.FloorToInt(SquadManager.AllSquadsCount * rate);
+        if (squadCount <= 0)
+        {
+            return false;
+        }
+        IEnumerable<Squad> tempEnumerables = SquadManager.AllSquads.Where(s => s.TaskHandler.CanSwitchToTask(OARO_ModDefOf.OARO_Squad_GroupPatrolPerp, resultOnly: true))
+                                                                   .Take(squadCount);
+
+        participants = [.. tempEnumerables];
+
+        if (participants is null || participants.Count == 0)
+        {
+            Reset();
+            return false;
+        }
+        return true;
+    }
+
+    private bool StartPatrolPerp()
+    {
+        foreach (Squad squad in participants)
+        {
+            squad.TaskHandler.TrySwitchToTask(OARO_ModDefOf.OARO_Squad_GroupPatrolPerp);
+        }
+        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != OARO_ModDefOf.OARO_Squad_GroupPatrolPerp);
+
+        if (participants.Count == 0)
+        {
+            Reset();
+            return false;
+        }
+
+        tickToNextStage = 180000;
+        isPatrolActived = true;
+        adjustCount = 0;
+        adjustCeiling = 0;
+        if (RatkinOrder.Relationship == EsteemHandler.RelationshipKind.Trustworthy)
+        {
+            adjustCeiling = RatkinOrder.ReformationManager.EffectTags.HasActiveTag("") ? 3 : 2;
+        }
+        else if (RatkinOrder.Relationship == EsteemHandler.RelationshipKind.Soulmate)
+        {
+            adjustCeiling = RatkinOrder.ReformationManager.EffectTags.HasActiveTag("") ? 6 : 4;
+        }
+
+        return true;
+    }
+
+    private void RecacheCurReconnaissanceValue()
+    {
+        curReconnaissanceValue = endReconnaissanceValue;
+        foreach (Squad squad in participants)
+        {
+            if (squad.TaskHandler.CurTask is SquadTask_GroupPatrol groupPatrol)
+            {
+                curReconnaissanceValue += groupPatrol.reconnaissanceValue;
+            }
+        }
+    }
+
+    private void StartGroupPatrol()
+    {
+        tickToNextStage = (int)(OARO_ModDefOf.OARO_Squad_GroupPatrol.taskDurationDays * 60000);
+        tickToNextCheck = 60000;
+        passedBySquadCount = 0;
+        isPatrolStarted = true;
+
+        foreach (Squad squad in participants)
+        {
+            if (squad.TaskHandler.CurTask?.Def == OARO_ModDefOf.OARO_Squad_GroupPatrolPerp)
+            {
+                squad.TaskHandler.FinishCurTask();
+            }
+        }
+
+        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != OARO_ModDefOf.OARO_Squad_GroupPatrol);
+        if (participants.Count == 0)
+        {
+            Reset();
+            return;
+        }
+
+        int overcap = participants.Count - burdenSquadCount;
+        if (overcap > 0)
+        {
+            RatkinOrder.FundHandler.AdjustFundsImmediately(overcap * 0.05f);
+        }
+        RecacheCurReconnaissanceValue();
+    }
+
+    private void GroupPatrolEnd()
+    {
+        (float fundGain, float reformProgressGain) = GetGroupPatrolEndResult(endReconnaissanceValue);
+        RatkinOrder.FundHandler.AdjustFundsImmediately(fundGain);
+
+        Reset();
+    }
+
+    private void SetPatrolEndChances()
+    {
+        nextEndChancesGetTick = Find.TickManager.TicksGame + 30000;
+        float preparedModify = 0.5f;
+
+        patrolEndChances.Clear();
+        switch (curPatrolType)
+        {
+            case PatrolType.Popedom:
+                patrolEndChances.Add((PatrolEndType.Nothing, 0.69f));
+                patrolEndChances.Add((PatrolEndType.Normal, 0.15f));
+                patrolEndChances.Add((PatrolEndType.Friendly, 0.08f));
+                patrolEndChances.Add((PatrolEndType.Accident, 0.07f * preparedModify));
+                patrolEndChances.Add((PatrolEndType.Disaster, 0.01f * preparedModify));
+                return;
+            case PatrolType.Kingdom:
+                patrolEndChances.Add((PatrolEndType.Nothing, 0.60f));
+                patrolEndChances.Add((PatrolEndType.Normal, 0.15f));
+                patrolEndChances.Add((PatrolEndType.Friendly, 0.1f));
+                patrolEndChances.Add((PatrolEndType.Accident, 0.12f * preparedModify));
+                patrolEndChances.Add((PatrolEndType.Disaster, 0.03f * preparedModify));
+                return;
+            case PatrolType.Border:
+                patrolEndChances.Add((PatrolEndType.Nothing, 0.52f));
+                patrolEndChances.Add((PatrolEndType.Normal, 0.16f));
+                patrolEndChances.Add((PatrolEndType.Friendly, 0.12f));
+                patrolEndChances.Add((PatrolEndType.Accident, 0.14f * preparedModify));
+                patrolEndChances.Add((PatrolEndType.Disaster, 0.06f * preparedModify));
+                return;
+            default:
+                patrolEndChances.Add((PatrolEndType.Nothing, 1f));
+                for (int i = 1; i < PatrolEndTypeArr.Length; i++)
+                {
+                    patrolEndChances.Add((PatrolEndTypeArr[i], 0f));
+                }
+                return;
+        }
+    }
+
+    private void SquadPassBy()
+    {
+        List<(Squad, float)> potentialPass = [];
+        foreach (Squad squad in participants)
+        {
+            if (squad.TaskHandler.CurTask is SquadTask_GroupPatrol groupPatrol && !groupPatrol.hadPassedBy)
+            {
+                potentialPass.Add((squad, squad.IsSquadOfType(BranchType.Friendly) ? 3f : 1f));
+            }
+        }
+
+        if (potentialPass.Count == 0)
+        {
+            return;
+        }
+
+        Squad targetSquad = potentialPass.RandomElementByWeight(s => s.Item2).Item1;
+        potentialPass = null;
+
+        (targetSquad.TaskHandler.CurTask as SquadTask_GroupPatrol).hadPassedBy = true;
+        passedBySquadCount++;
+
+        bool targetFriendly = targetSquad.IsSquadOfType(BranchType.Friendly);
+        int relationShipDiff = RatkinOrder.Relationship - EsteemHandler.RelationshipKind.Acquaintance;
+        List<(int, float)> passByTypeList =
+        [
+            (0, Mathf.Max(0f, 75f - (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) - (targetFriendly ? 50f : 0f))),
+            (1, Mathf.Max(0f, 20f + (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) + (targetFriendly ? 30f : 0f))),
+            (2, Mathf.Max(5f, 20f + (RatkinOrder.Relationship >= EsteemHandler.RelationshipKind.Soulmate ?  5f : 0f) + (targetFriendly ? 20f : 0f))),
+        ];
+
+        int passByType = passByTypeList.RandomElementByWeight(t => t.Item2).Item1;
+        passByTypeList = null;
+
+        switch (passByType)
+        {
+            case 0:
+                Messages.Message("OARO_Message_GroupPatrolPassBy".Translate(targetSquad.Name), MessageTypeDefOf.NeutralEvent, historical: true);
+                return;
+            case 1:
+                Slate slate = new();
+                slate.Set(ModUtility.RatkinOrderStoreAs, RatkinOrder);
+                slate.Set(ModUtility.SquadStoreAs, targetSquad);
+                if (OARO_ModDefOf.OARO_Quest_TemporaryEncampment.CanRun(slate))
+                {
+                    Quest quest = QuestUtility.GenerateQuestAndMakeAvailable(OARO_ModDefOf.OARO_Quest_TemporaryEncampment, slate);
+                    if (!quest.hidden && quest.root.sendAvailableLetter)
+                    {
+                        QuestUtility.SendLetterQuestAvailable(quest);
+                    }
+                    break;
+                }
+                else
+                {
+                    goto case 0;
+                }
+            case 2:
+                if (false)
+                {
+                    break;
+                }
+                else
+                {
+                    goto case 0;
+                }
+            default: goto case 0;
+        }
+    }
+
+    private void Reset()
+    {
+        adjustCeiling = 0;
+        adjustCount = 0;
+
+        isPatrolActived = false;
+        isPatrolStarted = false;
+        tickToNextStage = 180000;
+        tickToNextCheck = 60000;
+
+        curPatrolType = PatrolType.Popedom;
+        burdenSquadCount = 0;
+
+        endReconnaissanceValue = 0f;
+        curReconnaissanceValue = 0f;
+        endResultText.Clear();
+
+        passedBySquadCount = 0;
+
+        participants ??= [];
+        participants.Clear();
+
+        patrolEndChances[0] = (PatrolEndType.Nothing, 1f);
+        for (int i = 1; i < PatrolEndTypeArr.Length; i++)
+        {
+            patrolEndChances[i] = (PatrolEndTypeArr[i], 0f);
+        }
+    }
+
+    public void ExposeData()
+    {
+        string tempEndResultText = string.Empty;
+        if (Scribe.mode == LoadSaveMode.Saving)
+        {
+            tempEndResultText = endResultText.ToString();
+        }
+
+        Scribe_Values.Look(ref adjustCeiling, "adjustCeiling", 0);
+        Scribe_Values.Look(ref adjustCount, "adjustCount", 0);
+
+        Scribe_Values.Look(ref isPatrolActived, "isPatrolActived", defaultValue: false);
+        Scribe_Values.Look(ref isPatrolStarted, "isPatrolStarted", defaultValue: false);
+        Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
+        Scribe_Values.Look(ref tickToNextCheck, "tickToStart", 60000);
+
+        Scribe_Values.Look(ref curPatrolType, "curPatrolType", PatrolType.Popedom);
+        Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
+        Scribe_Values.Look(ref tempEndResultText, "tempEndResultText");
+
+        Scribe_Values.Look(ref curReconnaissanceValue, "curReconnaissanceValue", 0f);
+        Scribe_Values.Look(ref endReconnaissanceValue, "endReconnaissanceValue", 0f);
+
+        Scribe_Collections.Look(ref participants, "participants", LookMode.Reference);
+
+
+        if (Scribe.mode == LoadSaveMode.LoadingVars)
+        {
+            endResultText = new StringBuilder(tempEndResultText);
+        }
+    }
+}
