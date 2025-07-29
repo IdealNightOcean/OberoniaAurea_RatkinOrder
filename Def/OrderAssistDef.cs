@@ -1,0 +1,41 @@
+﻿using System;
+using System.Collections.Generic;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class OrderAssistanceDef : Def
+{
+    public Type workerClass;
+    private OrderAssistanceWorker worker;
+    public OrderAssistanceWorker Worker => worker ??= (OrderAssistanceWorker)Activator.CreateInstance(workerClass, this);
+    public string cdRecordKey;
+
+    public int cdDays;
+
+    public int needRecommendation;
+    public float needFund;
+
+    /// <summary>
+    /// 只在 needFund > 0f 时生效
+    /// needFund > 0f 时
+    /// 如有fundEventDef，则执行FundHandler.AddFundEvent(如有fundEventDef);
+    /// 如无如有fundEventDef，则执行FundHandler.AdjustFundsImmediately(needFund);
+    /// </summary>
+    public OrderFundEventDef fundEventDef;
+
+    public OrderRelationshipKind floorRelationship = OrderRelationshipKind.Stranger;
+    public int floorEsteem;
+
+    public override IEnumerable<string> ConfigErrors()
+    {
+        foreach (string error in base.ConfigErrors())
+        {
+            yield return error;
+        }
+        if (workerClass is null)
+        {
+            yield return $"{this} has a null workerClass.";
+        }
+    }
+}

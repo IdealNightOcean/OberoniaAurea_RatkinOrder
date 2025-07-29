@@ -1,5 +1,4 @@
-﻿using RimWorld.Planet;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Verse;
 using static OberoniaAurea.RatkinOrder.SquadStat;
 
@@ -8,25 +7,26 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructChecker
 {
     public override bool DoubleComfirm => true;
-    public override AcceptanceReport CanConstruct(Branch branch, BranchBuildingDef def, bool inSpecialSlot, bool byPlayer, Caravan caravan = null, bool resultOnly = false)
+    public override AcceptanceReport CanConstruct(BranchBuildingConstructParameter constructParam, bool resultOnly = false)
     {
-        BranchBuilding_MemorialExtension memorialExtension = def.GetModExtension<BranchBuilding_MemorialExtension>();
+        BranchBuilding_MemorialExtension memorialExtension = constructParam.buildingDef.GetModExtension<BranchBuilding_MemorialExtension>();
         if (memorialExtension is null)
         {
             return false;
         }
         else
         {
-            return memorialExtension.IsSatisfyRequirements(branch) ? true : (resultOnly ? false : "OARO_LackOfSquadMedal".Translate());
+            return memorialExtension.IsSatisfyRequirements(constructParam.branch) ? true : (resultOnly ? false : "OARO_Insufficient_SquadMedal".Translate());
         }
     }
 
-    public override void DoubleComfirmAction(Branch branch, BranchBuildingDef def, bool inSpecialSlot, Caravan caravan)
+    public override void DoubleComfirmAction(BranchBuildingConstructParameter constructParam)
     {
-        OberoniaAurea_Frame.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_ConstructionConfirmMemorial".Translate(),
+        constructParam.byPlayer = true;
+        OberoniaAurea_Frame.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_ConstructionConfirm_Memorial".Translate(),
                                                                          acceptAction: delegate
                                                                          {
-                                                                             branch.BuildingHandler.StartBuildingConstructionDirectly(def, inSpecialSlot, byPlayer: true, caravan);
+                                                                             constructParam.branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam);
                                                                          });
     }
 }

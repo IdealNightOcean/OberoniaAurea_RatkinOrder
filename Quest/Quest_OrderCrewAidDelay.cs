@@ -68,15 +68,15 @@ public class QuestPart_OrderCrewAidDelay : QuestPart_Delay
     {
         get
         {
-            if (ratkinOrder.Esteem >= 1.0f)
+            if (ratkinOrder.Esteem >= 100)
             {
                 return 3;
             }
-            else if (ratkinOrder.Esteem >= 0.7f)
+            else if (ratkinOrder.Esteem >= 70)
             {
                 return 2;
             }
-            else if (ratkinOrder.Esteem >= 0.3f)
+            else if (ratkinOrder.Esteem >= 30)
             {
                 return 1;
             }

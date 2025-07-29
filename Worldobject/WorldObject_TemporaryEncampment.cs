@@ -9,71 +9,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class WorldObject_TemporaryEncampment : WorldObject_SquadAssociatedBase
 {
-    private class ChoiceLetter_TemporaryEncampment : ChoiceLetter
-    {
-        public WorldObject_TemporaryEncampment temporaryEncampment;
-
-        private DiaOption Option_Accept => new("Accept".Translate())
-        {
-            action = delegate
-            {
-                Find.LetterStack.RemoveLetter(this);
-            },
-            resolveTree = true
-        };
-
-        private new DiaOption Option_Reject => new("RejectLetter".Translate())
-        {
-            action = delegate
-            {
-                temporaryEncampment?.RejectSupplyRequest();
-                Find.LetterStack.RemoveLetter(this);
-            },
-            resolveTree = true
-        };
-
-        public void SetWorldObject(WorldObject_TemporaryEncampment worldObject)
-        {
-            this.temporaryEncampment = worldObject;
-            lookTargets = worldObject;
-        }
-
-        public override IEnumerable<DiaOption> Choices
-        {
-            get
-            {
-                if (temporaryEncampment is null || !temporaryEncampment.hasSupplyRequest)
-                {
-                    yield return base.Option_Close;
-                }
-                else
-                {
-                    if (!base.ArchivedOnly)
-                    {
-                        yield return Option_Accept;
-                        yield return Option_Reject;
-                        yield return base.Option_Postpone;
-                    }
-
-                    if (lookTargets.IsValid())
-                    {
-                        yield return base.Option_JumpToLocationAndPostpone;
-                    }
-                    if (quest != null && !quest.hidden)
-                    {
-                        yield return Option_ViewInQuestsTab("ViewRelatedQuest", postpone: true);
-                    }
-                }
-            }
-        }
-
-        public override void ExposeData()
-        {
-            base.ExposeData();
-            Scribe_References.Look(ref temporaryEncampment, "temporaryEncampment");
-        }
-    }
-
     private static readonly Texture2D TradeCommandTex = ContentFinder<Texture2D>.Get("UI/Commands/FulfillTradeRequest");
     private static readonly ThingDef[] RequestThingDefsArr =
         [
@@ -81,6 +16,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_SquadAssociatedBase
             ThingDefOf.Pemmican,
             ThingDefOf.MealSimple,
             ThingDefOf.Kibble,
+
 
         ];
 
@@ -140,7 +76,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_SquadAssociatedBase
         }
         Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("CommandFulfillTradeOfferConfirm".Translate(GenLabel.ThingLabel(requestThingDef, null, requestCount)), delegate
         {
-            OAFrame_CaravanUtility.RemoveThings(caravan, requestThingDef, requestCount);
+            OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, requestThingDef, requestCount);
             QuestUtility.SendQuestTargetSignals(questTags, "TradeRequestFulfilled", this.Named("SUBJECT"), caravan.Named("CARAVAN"));
             hasSupplyRequest = false;
         }));
@@ -163,7 +99,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_SquadAssociatedBase
                                                                                                                  def: LetterDefOf.PositiveEvent,
                                                                                                                  lookTargets: this,
                                                                                                                  relatedFaction: RatkinOrder.Faction,
-                                                                                                                 quest: this.quest);
+                                                                                                                 quest: quest);
         choiceLetter.SetWorldObject(this);
         choiceLetter.StartTimeout(15000);
         Find.LetterStack.ReceiveLetter(choiceLetter);
@@ -180,4 +116,3 @@ public class WorldObject_TemporaryEncampment : WorldObject_SquadAssociatedBase
         }
     }
 }
-

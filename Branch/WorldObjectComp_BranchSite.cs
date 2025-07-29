@@ -6,6 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class WorldObjectCompProperties_BranchSite : WorldObjectCompProperties
 {
+    public bool independent;
     public WorldObjectCompProperties_BranchSite()
     {
         compClass = typeof(WorldObjectComp_BranchSite);
@@ -16,6 +17,8 @@ public class WorldObjectComp_BranchSite : WorldObjectComp
 {
     private Branch branch;
     public Branch Branch => branch;
+
+    public WorldObjectCompProperties_BranchSite Props => (WorldObjectCompProperties_BranchSite)props;
 
     public bool IsActive => branch is not null;
 
@@ -37,21 +40,20 @@ public class WorldObjectComp_BranchSite : WorldObjectComp
             return;
         }
 
-        branch.Destroy();
-        ClearBranch();
+        Branch preBranch = branch;
+        branch = null;
+        preBranch.BranchManager.DestoryBranch(preBranch);
     }
 
     public void Notify_BranchDestroyed()
     {
-        ClearBranch();
-    }
-
-    private void ClearBranch()
-    {
-        if (branch is null)
+        if (branch is not null)
         {
-            return;
+            branch = null;
+            if (Props.independent)
+            {
+                parent.Destroy();
+            }
         }
-        branch = null;
     }
 }

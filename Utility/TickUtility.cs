@@ -1,0 +1,25 @@
+﻿using System.Runtime.CompilerServices;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public static class TickUtility
+{
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int YearPassed() => Find.TickManager.TicksGame / 36000000;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int DayPassed() => Find.TickManager.TicksGame / 60000;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsHashIntervalTick(this RatkinOrder order, int interval)
+    {
+        return (Find.TickManager.TicksGame + order.TickHashOffset) % interval == 0;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsHashIntervalTick(this Branch branch, int interval)
+    {
+        return (Find.TickManager.TicksGame + branch.TickHashOffset) % interval == 0;
+    }
+}

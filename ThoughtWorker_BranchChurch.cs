@@ -23,7 +23,7 @@ public class ThoughtWorker_BranchChurch : ThoughtWorker
 
     private static short GetChurchCount(Map map)
     {
-        IEnumerable<Branch> branchesInRadius = map.GetComponent<MapComponent_BranchCache>()?.branchesInRadius;
+        IEnumerable<Branch> branchesInRadius = map.GetComponent<MapComponent_RatkinOrder>()?.branchesInRadius;
         if (branchesInRadius is null)
         {
             return 0;

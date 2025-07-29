@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -144,5 +145,21 @@ public class BranchStatTransformerHandler
                 branchStatTransformers = null;
             }
         }
+    }
+
+    public string GetDetailString()
+    {
+        if (branchStatTransformers.NullOrEmpty())
+        {
+            return "None";
+        }
+        StringBuilder sb = new();
+        foreach (KeyValuePair<BranchStatDef, BranchStatTransformer> kv in branchStatTransformers)
+        {
+            sb.AppendInNewLine(kv.Key.label);
+            sb.Append(":");
+            sb.AppendInNewLine(kv.Value.ToString());
+        }
+        return sb.ToString();
     }
 }

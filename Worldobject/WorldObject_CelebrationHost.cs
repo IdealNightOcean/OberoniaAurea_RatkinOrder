@@ -1,0 +1,62 @@
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using RimWorld.Planet;
+using System.Collections.Generic;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class WorldObject_CelebrationHost : WorldObject_InteractWithFixedCaravan_Village
+{
+    public override int TicksNeeded => 60000;
+    public override string FixedCaravanName => "OARO_FixedCaravan_CelebrationHost".Translate();
+    public override string FixedCaravanWorkDesc() => "OARO_CelebrationHost_TimeLeft".Translate(ticksRemaining.ToStringTicksToPeriod());
+
+    public override void Notify_CaravanArrived(Caravan caravan)
+    {
+        if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Social) < 0)
+        {
+            Messages.Message("OARO_NoOneCanDo".Translate(SkillDefOf.Social.label), MessageTypeDefOf.RejectInput, historical: false);
+            return;
+        }
+        base.Notify_CaravanArrived(caravan);
+    }
+
+    protected override void FinishWork()
+    {
+        if (associatedFixedCaravan is not null)
+        {
+            foreach (Pawn pawn in associatedFixedCaravan.PawnsListForReading)
+            {
+                pawn.needs.mood?.thoughts.memories.TryGainMemory(OARO_ModDefOf.OARO_Thought_CelebrationHost);
+            }
+
+            int count = associatedFixedCaravan.PawnsListForReading.Count * 10;
+            List<Thing> rewards = OAFrame_MiscUtility.TryGenerateThing(OARO_ThingDefOf.RK_StrawberryBeer, count);
+
+            OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
+
+            (Pawn maxSocialPawn, int maxSocialSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
+
+            maxSocialPawn ??= associatedFixedCaravan.PawnsListForReading.RandomElement();
+            maxSocialPawn.skills?.Learn(SkillDefOf.Social, 6000f);
+            string text = "OARO_CelebrationHost_Finish".Translate(maxSocialPawn, count) + "\n" + "OAFrame_PawnGainSkillXp".Translate(maxSocialPawn, SkillDefOf.Social.LabelCap, 6000);
+        }
+
+        SendWorkResolvedSignal();
+
+        if (!Destroyed)
+        {
+            Destroy();
+        }
+    }
+
+    protected override void InterruptWork()
+    {
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_CelebrationHost_Interrupt".Translate()));
+        if (!Destroyed)
+        {
+            Destroy();
+        }
+    }
+}

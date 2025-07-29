@@ -9,7 +9,6 @@ public static class BranchBuildingMaker
         BranchBuilding building = (BranchBuilding)Activator.CreateInstance(def.buildingClass);
         building.def = def;
 
-
         return building;
     }
 }

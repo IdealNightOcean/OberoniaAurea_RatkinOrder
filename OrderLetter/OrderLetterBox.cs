@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OberoniaAurea_Frame;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
@@ -33,9 +34,11 @@ public class OrderLetterBox : IExposable
 
     public OrderLetterBox()
     {
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
         specialLetterManager = new SpecialLetterManager();
     }
+    public static void ClearStaticCache() => Instance = null;
 
     public void LetterBoxDay()
     {

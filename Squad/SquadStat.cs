@@ -6,7 +6,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class SquadStat : IExposable
+public class SquadStat : IExposable, IDrawDevWindow
 {
     public enum SquadMedal : byte
     {
@@ -33,6 +33,7 @@ public class SquadStat : IExposable
         public void ExposeData()
         {
             Scribe_Values.Look(ref type, "type", defaultValue: SquadMedal.None);
+            Scribe_Values.Look(ref count, "count", (short)-1);
             Scribe_Values.Look(ref firstGotTick, "firstGotTick", -1);
         }
     }
@@ -112,6 +113,24 @@ public class SquadStat : IExposable
         }
     }
 
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label($"MemberCount: {memberCount:F2}");
+        listing_Rect.Label($"CommanderCount: {commanderCount:F2}");
+        listing_Rect.Label($"Supply: {Supply:F2}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"MemberCeiling: {memberCeiling:F2}");
+        listing_Rect.Label($"CommanderCeiling: {commanderCeiling:F2}");
+        listing_Rect.Label($"SupplyCeiling: {supplyCeiling:F2}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"PrimaryMedal: {PrimaryMedal}");
+        listing_Rect.Label("Medals:");
+        foreach (MedalRecord mr in medalRecords)
+        {
+            listing_Rect.SubLabel($"({mr.type}, {mr.count})", 0.8f);
+        }
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void UpdateCeiling(Squad squad, bool updateStatCache)
     {
@@ -128,7 +147,7 @@ public class SquadStat : IExposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public short GetMedalCount(SquadMedal medal)
+    public int GetMedalCount(SquadMedal medal)
     {
         for (int i = 0; i < medalRecords.Count; i++)
         {
@@ -138,6 +157,18 @@ public class SquadStat : IExposable
             }
         }
         return 0;
+    }
+
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public int TotalMedalCount()
+    {
+        int count = 0;
+        for (int i = 0; i < medalRecords.Count; i++)
+        {
+            count += medalRecords[i].count;
+        }
+        return count;
     }
 
     public void AddMedal(SquadMedal medal, short count = 1)

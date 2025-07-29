@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class SquadManager : IExposable, IPostLoadInit, ITickHour
+public class SquadManager : IExposable, IPostLoadInit
 {
 
     [Unsaved] public readonly RatkinOrder RatkinOrder;
@@ -61,12 +61,14 @@ public class SquadManager : IExposable, IPostLoadInit, ITickHour
         }
     }
 
-    public void TickHour()
+    public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_SquadManager(this));
+
+    public void TickLong()
     {
 
         if (groupPatrolManager.IsPatrolActived)
         {
-            groupPatrolManager.TickHour();
+            groupPatrolManager.TickLong();
         }
     }
 
@@ -77,6 +79,11 @@ public class SquadManager : IExposable, IPostLoadInit, ITickHour
         {
             TotalMemberCount += squad.SquadStat.MemberCountInt;
         }
+    }
+
+    public void Notify_MyOrderRemoved()
+    {
+        groupPatrolManager.Notify_MyOrderRemoved();
     }
 
     public void PostLoadInit()
@@ -92,6 +99,6 @@ public class SquadManager : IExposable, IPostLoadInit, ITickHour
 
     public void ExposeData()
     {
-
+        Scribe_Deep.Look(ref groupPatrolManager, "groupPatrolManager");
     }
 }

@@ -26,13 +26,13 @@ public class SquadSupportHandler(Squad squad) : IExposable
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
 
         }
-        if (Squad.RatkinOrder.Relationship < EsteemHandler.RelationshipKind.Friendly)
+        if (Squad.RatkinOrder.Relationship < OrderRelationshipKind.Friendly)
         {
-            return resultOnly ? false : "OARO_NeedRelationship".Translate(EsteemUtility.GetRelationshipKindLabel(EsteemHandler.RelationshipKind.Friendly));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(EsteemUtility.GetRelationshipKindLabel(OrderRelationshipKind.Friendly));
         }
         if (Squad.SquadStat.Supply < 0.25f)
         {
-            return resultOnly ? false : "OARO_InsufficientSupply".Translate("25%");
+            return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("25%");
         }
         if (Squad.Branch.EffectTags.HasActiveTag("blockBombard"))
         {
@@ -56,16 +56,16 @@ public class SquadSupportHandler(Squad squad) : IExposable
         {
             return resultOnly ? false : "OARO_SquadSupportBeBlocked".Translate();
         }
-        if (Squad.RatkinOrder.Relationship < EsteemHandler.RelationshipKind.Trustworthy)
+        if (Squad.RatkinOrder.Relationship < OrderRelationshipKind.Trustworthy)
         {
-            return resultOnly ? false : "OARO_NeedRelationship".Translate(EsteemUtility.GetRelationshipKindLabel(EsteemHandler.RelationshipKind.Trustworthy));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(EsteemUtility.GetRelationshipKindLabel(OrderRelationshipKind.Trustworthy));
         }
 
         SquadStat squadStat = Squad.SquadStat;
 
         if (squadStat.MemberPercentage < 0.5f)
         {
-            return resultOnly ? false : "OARO_InsufficientMemberPercentage".Translate("50%");
+            return resultOnly ? false : "OARO_Insufficient_MemberPercentage".Translate("50%");
         }
 
         switch (level)
@@ -73,25 +73,25 @@ public class SquadSupportHandler(Squad squad) : IExposable
             case SupportLevel.Quarter:
                 if (squadStat.Supply < 0.25f)
                 {
-                    return resultOnly ? false : "OARO_InsufficientSupply".Translate("25%");
+                    return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("25%");
                 }
                 break;
 
             case SupportLevel.Half:
                 if (squadStat.Supply < 0.4f)
                 {
-                    return resultOnly ? false : "OARO_InsufficientSupply".Translate("40%");
+                    return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("40%");
                 }
                 break;
 
             case SupportLevel.Entire:
                 if (squadStat.MemberPercentage < 0.9f)
                 {
-                    return resultOnly ? false : "OARO_InsufficientMemberPercentage".Translate("90%");
+                    return resultOnly ? false : "OARO_Insufficient_MemberPercentage".Translate("90%");
                 }
                 if (squadStat.Supply < 0.5f)
                 {
-                    return resultOnly ? false : "OARO_InsufficientSupply".Translate("50%");
+                    return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("50%");
                 }
                 break;
 
@@ -115,11 +115,11 @@ public class SquadSupportHandler(Squad squad) : IExposable
             return;
         }
 
-        if (OAFrame_MapUtility.ThreatsCountOfPlayerOnMap(map) <= 0)
+        if (map.ThreatsCountOfPlayer() <= 0)
         {
             return;
         }
-        BombardSupportMaker bombMaker = (BombardSupportMaker)ThingMaker.MakeThing(OARO_ModDefOf.OARO_BombardSupportMaker);
+        BombardSupportMaker bombMaker = (BombardSupportMaker)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_BombardSupportMaker);
         bombMaker.SetBombardCount(bombCount);
         GenPlace.TryPlaceThing(bombMaker, IntVec3.Zero, map, ThingPlaceMode.Near);
         Squad.SquadStat.Supply -= 0.25f;
@@ -127,7 +127,7 @@ public class SquadSupportHandler(Squad squad) : IExposable
 
     public void DoCombatSupport(SupportLevel level, Map map)
     {
-        if (OAFrame_MapUtility.ThreatsCountOfPlayerOnMap(map) <= 0)
+        if (map.ThreatsCountOfPlayer() <= 0)
         {
             return;
         }

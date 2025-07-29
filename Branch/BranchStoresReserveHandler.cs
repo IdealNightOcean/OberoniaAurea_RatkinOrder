@@ -18,14 +18,14 @@ public class BranchStoresReserve : IExposable
     {
         this.targetBuilding = targetBuilding;
         this.inSpecialSlot = inSpecialSlot;
-        this.targetFacility = null;
+        targetFacility = null;
         this.costRate = costRate;
     }
 
     public void SetReserve(BranchFacilityDef targetFacility, float costRate = 1f)
     {
-        this.targetBuilding = null;
-        this.inSpecialSlot = false;
+        targetBuilding = null;
+        inSpecialSlot = false;
         this.targetFacility = targetFacility;
         this.costRate = costRate;
     }
@@ -39,7 +39,7 @@ public class BranchStoresReserve : IExposable
     }
 }
 
-public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOfDay
+public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOfDay, IDrawDevWindow
 {
     [Unsaved] public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
 
@@ -52,9 +52,32 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
 
     public bool thoroughPreparation;
 
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label($"HasThoroughPreparation: {thoroughPreparation}");
+        listing_Rect.Label("StoresReserves:");
+        if (storesReserves.Count > 0)
+        {
+            foreach (BranchStoresReserve reserve in storesReserves)
+            {
+                if (reserve.targetBuilding is not null)
+                {
+                    listing_Rect.SubLabel($"{reserve.targetBuilding.label} | {reserve.inSpecialSlot} | {reserve.costRate}", 0.8f);
+                }
+                else
+                {
+                    listing_Rect.SubLabel($"{reserve.targetFacility.label} | {reserve.costRate}", 0.8f);
+                }
+            }
+        }
+        else
+        {
+            listing_Rect.SubLabel("None", 0.8f);
+        }
+    }
+
     public void SetPrimaryReserves(BranchBuildingDef def, bool inSpecialSlot)
     {
-
         if (storesReserves.NullOrEmpty())
         {
             storesReserves.Add(new BranchStoresReserve() { targetBuilding = def, inSpecialSlot = inSpecialSlot });
@@ -151,8 +174,9 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
         storesReserves.Add(new BranchStoresReserve() { targetFacility = def });
     }
 
-
-    // 只在分部无任何建设时执行
+    /// <summary>
+    /// 应该只在分部无任何建设时执行
+    /// </summary>
     public void TickHour(int hourOfDay)
     {
         if (hourOfDay == 5)
@@ -230,12 +254,21 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
             List<BranchBuildingDef> allDefs = DefDatabase<BranchBuildingDef>.AllDefsListForReading;
             int maxPotential = 10;
             int curPotential = 0;
+
+            BranchBuildingDef buildingDef;
+            BranchBuildingConstructParameter constructParam = new()
+            {
+                branch = Branch,
+                InSpecialSlot = false
+            };
+
             for (int i = 0; i < allDefs.Count; i++)
             {
-                BranchBuildingDef def = allDefs[i];
-                if (buildingHandler.CanConstructBuilding(def, inSpecialSlot: false, byPlayer: false, resultOnly: true))
+                buildingDef = allDefs[i];
+                constructParam.buildingDef = buildingDef;
+                if (buildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
                 {
-                    potentialDefs.Add(def);
+                    potentialDefs.Add(buildingDef);
                     curPotential++;
                     if (curPotential >= maxPotential)
                     {

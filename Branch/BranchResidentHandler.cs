@@ -9,7 +9,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IPawnRetentionHolder
+public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IPawnRetentionHolder, IDrawDevWindow
 {
     [Unsaved] public readonly Branch Branch;
 
@@ -35,6 +35,12 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
         {
             EnsureComponentsInit();
         }
+    }
+
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label($"residents: {residents.Count}");
+        listing_Rect.Label($"residentRecords: {residentRecords.Count}");
     }
 
     public bool AddResident(Pawn pawn, int daysDeployed, ResidencyWorker worker)
@@ -82,6 +88,12 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
         }
 
         ResidencyWorker_Deployment.ClearStaticCache();
+    }
+
+    public void ForceEndAllResidency()
+    {
+        residentRecords.Clear();
+        Caravan caravan = CaravanMaker.MakeCaravan(residents.InnerListForReading, Faction.OfPlayer, Branch.WorldObject.Tile, addToWorldPawnsIfNotAlready: true);
     }
 
     private void FinishResidency(IEnumerable<BranchResidentRecord> residentRecords)

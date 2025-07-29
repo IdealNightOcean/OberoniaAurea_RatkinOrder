@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -11,8 +10,8 @@ public class ScenPart_InitialOrderRelationshipLevel : ScenPart
     public const string OrderScenTag = "OARO_Order";
     public const string OrderScenPartTag = "OARO_Order_ScenPart";
 
-    private RelationshipKind initRelation = RelationshipKind.Stranger;
-    public RelationshipKind InitRelation => initRelation;
+    private OrderRelationshipKind initRelation = OrderRelationshipKind.Stranger;
+    public OrderRelationshipKind InitRelation => initRelation;
 
     public override void PostGameStart()
     {
@@ -42,7 +41,7 @@ public class ScenPart_InitialOrderRelationshipLevel : ScenPart
         List<FloatMenuOption> list = [];
         for (int i = 0; i < EsteemUtility.RelationshipKindArr.Length; i++)
         {
-            RelationshipKind selRelationship = EsteemUtility.RelationshipKindArr[i];
+            OrderRelationshipKind selRelationship = EsteemUtility.RelationshipKindArr[i];
             string selLabel = EsteemUtility.GetRelationshipKindLabel(selRelationship);
             list.Add(new FloatMenuOption(selLabel, delegate
             {
@@ -55,6 +54,6 @@ public class ScenPart_InitialOrderRelationshipLevel : ScenPart
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref initRelation, "initRelation", RelationshipKind.Stranger);
+        Scribe_Values.Look(ref initRelation, "initRelation", OrderRelationshipKind.Stranger);
     }
 }

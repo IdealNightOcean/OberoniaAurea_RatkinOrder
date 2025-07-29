@@ -36,8 +36,46 @@ public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     public SquadTaskHandler(Squad squad)
     {
-        this.Squad = squad ?? throw new ArgumentNullException(nameof(squad));
+        Squad = squad ?? throw new ArgumentNullException(nameof(squad));
         autoStartTaskChance = BaseAutoStartTaskChance;
+    }
+
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label("CurTask:");
+        if (HasTask)
+        {
+            listing_Rect.SubLabel(TaskState, 0.8f);
+            listing_Rect.SubLabel($"CurTaskStartTick: {curTaskStartTick}", 0.8f);
+            listing_Rect.SubLabel($"CurTaskTickLeft: {curTaskTickLeft}", 0.8f);
+
+            listing_Rect.Gap(3f);
+            listing_Rect.SubLabel($"BlockSupport: {BlockSupport}", 0.8f);
+            listing_Rect.SubLabel($"BlockRecover: {BlockRecover}", 0.8f);
+            listing_Rect.SubLabel($"BlockBombard: {BlockBombard}", 0.8f);
+        }
+        else
+        {
+            listing_Rect.SubLabel("None", 0.8f);
+        }
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"IsRestNow: {IsRestNow}");
+        listing_Rect.Label($"SquadRestEndTick: {squadRestEndTick}");
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label("AutoTargetTask:");
+        if (autoTargetTask is not null)
+        {
+            listing_Rect.SubLabel($"{autoTargetTask.label}", 0.8f);
+            listing_Rect.SubLabel($"AutoStartFailCount: {autoStartFailCount}", 0.8f);
+            listing_Rect.SubLabel($"AutoStartTaskChance: {autoStartTaskChance}", 0.8f);
+        }
+        else
+        {
+            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.SubLabel($"AutoStartTaskChance: {autoStartTaskChance}", 0.8f);
+        }
     }
 
     public void TickHour(int hourOfDay)
@@ -272,7 +310,7 @@ public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (autoStartFailCount >= 10 || autoTargetTask is null)
         {
-            autoTargetTask = DefDatabase<SquadTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen).RandomElementByWeightWithFallback(WeightSelector, OARO_ModDefOf.OARO_Squad_JurisdictionDutyPerp);
+            autoTargetTask = DefDatabase<SquadTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen).RandomElementByWeightWithFallback(WeightSelector, SquadTaskDefOf.OARO_Squad_JurisdictionDutyPerp);
         }
 
         if (Rand.Chance(usedChance) && autoTargetTask is not null)
@@ -287,10 +325,7 @@ public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
             }
         }
 
-        float WeightSelector(SquadTaskDef def)
-        {
-            return def.StartChecker?.RandomlyChosenWeight(Squad) ?? 0f;
-        }
+        float WeightSelector(SquadTaskDef def) => def.StartChecker?.RandomlyChosenWeight(Squad) ?? 0f;
     }
 
     public void ExposeData()

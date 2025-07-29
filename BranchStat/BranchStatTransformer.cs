@@ -44,7 +44,7 @@ public struct BranchStatTransformer
     public BranchStatTransformer(float offset, float factor, float fixedOffset)
     {
         this.offset = offset;
-        this.Factor = factor;
+        Factor = factor;
 
         this.fixedOffset = fixedOffset;
     }
@@ -167,6 +167,10 @@ public struct BranchStatTransformer
         hash = hash * 23 + factorUsed.GetHashCode();
         hash = hash * 23 + fixedOffset.GetHashCode();
         return hash;
+    }
+    public override readonly string ToString()
+    {
+        return $"offset: {offset}, factor: {factor}, factorUsed: {factorUsed}, fixedOffset: {fixedOffset}";
     }
 }
 

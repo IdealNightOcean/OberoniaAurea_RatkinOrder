@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.QuestGen;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class SquadGroupPatrolManager : IExposable, ITickHour
+public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
 {
     public enum PatrolType
     {
@@ -26,6 +27,7 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
         Disaster
     }
     public static readonly PatrolEndType[] PatrolEndTypeArr = (PatrolEndType[])Enum.GetValues(typeof(PatrolEndType));
+
     [Unsaved] private readonly List<(PatrolEndType, float)> patrolEndChances;
     [Unsaved] private int nextEndChancesGetTick = -1;
     public List<(PatrolEndType, float)> PatrolEndChances
@@ -54,15 +56,16 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
 
     private int adjustCeiling;
     private int adjustCount;
+    private int burdenSquadCount;
+
     public int AdjustCeiling => adjustCeiling;
     public int AdjustCount => adjustCount;
+    public int BurdenSquadCount => burdenSquadCount;
 
     public PatrolType curPatrolType;
     public HashSet<Squad> participants = [];
 
-    private int burdenSquadCount;
-    public int BurdenSquadCount => burdenSquadCount;
-
+    private int passedBySquadCount;
     private float curReconnaissanceValue;
     private float endReconnaissanceValue;
     public float NeedReconnaissanceValue
@@ -80,25 +83,45 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
     }
 
     public StringBuilder endResultText = new();
-    private int passedBySquadCount = 0;
 
     public SquadGroupPatrolManager(SquadManager squadManager)
     {
         SquadManager = squadManager ?? throw new ArgumentNullException(nameof(squadManager));
         patrolEndChances = new List<(PatrolEndType, float)>(PatrolEndTypeArr.Length)
         {
-            [0] = (PatrolEndType.Nothing, 1f)
+            (PatrolEndType.Nothing, 1f)
         };
+
         for (int i = 1; i < PatrolEndTypeArr.Length; i++)
         {
             patrolEndChances.Add((PatrolEndTypeArr[i], 0f));
         }
     }
 
-    // 只在 isPatrolActived == true 时才会被SquadManager调用
-    public void TickHour()
+    public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_SquadGroupPatrolManager(this));
+    public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        if ((tickToNextStage -= 2500) == 0)
+        listing_Rect.Label($"IsPatrolActived: {isPatrolActived}");
+        listing_Rect.Label($"IsPatrolStarted: {isPatrolStarted}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"TickToNextStage: {tickToNextStage}");
+        listing_Rect.Label($"TickToNextCheck: {tickToNextCheck}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"AdjustCeiling: {adjustCeiling}");
+        listing_Rect.Label($"AdjustCount: {adjustCount}");
+        listing_Rect.Label($"BurdenSquadCount: {burdenSquadCount}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"CurPatrolType: {curPatrolType}");
+        listing_Rect.Label($"passedBySquadCount: {passedBySquadCount}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"CurReconnaissanceValue: {curReconnaissanceValue}");
+        listing_Rect.Label($"EndReconnaissanceValue: {endReconnaissanceValue}");
+    }
+
+    // 只在 isPatrolActived == true 时才会被SquadManager调用
+    public void TickLong()
+    {
+        if ((tickToNextStage -= 1000) == 0)
         {
             if (!isPatrolStarted)
             {
@@ -107,12 +130,12 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
             return;
         }
 
-        if ((tickToNextCheck -= 2500) == 0)
+        if ((tickToNextCheck -= 1000) == 0)
         {
             tickToNextCheck = 60000;
             if (tickToNextStage > 60000
                 && passedBySquadCount < participants.Count
-                && RatkinOrder.Relationship >= EsteemHandler.RelationshipKind.Acquaintance)
+                && RatkinOrder.Relationship >= OrderRelationshipKind.Acquaintance)
             {
                 SquadPassBy();
             }
@@ -138,7 +161,7 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
             foreach (Squad squad in toRemove)
             {
                 participants.Remove(squad);
-                if (squad.TaskHandler.CurTask?.Def == OARO_ModDefOf.OARO_Squad_GroupPatrolPerp)
+                if (squad.TaskHandler.CurTask?.Def == SquadTaskDefOf.OARO_Squad_GroupPatrolPerp)
                 {
                     squad.TaskHandler.EndCurrentTask(startRest: true);
                 }
@@ -149,7 +172,7 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
         {
             foreach (Squad squad in toAdd)
             {
-                if (!participants.Contains(squad) && squad.TaskHandler.TrySwitchToTask(OARO_ModDefOf.OARO_Squad_GroupPatrolPerp))
+                if (!participants.Contains(squad) && squad.TaskHandler.TrySwitchToTask(SquadTaskDefOf.OARO_Squad_GroupPatrolPerp))
                 {
                     participants.Add(squad);
                 }
@@ -243,7 +266,7 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
         {
             return false;
         }
-        IEnumerable<Squad> tempEnumerables = SquadManager.AllSquads.Where(s => s.TaskHandler.CanSwitchToTask(OARO_ModDefOf.OARO_Squad_GroupPatrolPerp, resultOnly: true))
+        IEnumerable<Squad> tempEnumerables = SquadManager.AllSquads.Where(s => s.TaskHandler.CanSwitchToTask(SquadTaskDefOf.OARO_Squad_GroupPatrolPerp, resultOnly: true))
                                                                    .Take(squadCount);
 
         participants = [.. tempEnumerables];
@@ -260,9 +283,9 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
     {
         foreach (Squad squad in participants)
         {
-            squad.TaskHandler.TrySwitchToTask(OARO_ModDefOf.OARO_Squad_GroupPatrolPerp);
+            squad.TaskHandler.TrySwitchToTask(SquadTaskDefOf.OARO_Squad_GroupPatrolPerp);
         }
-        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != OARO_ModDefOf.OARO_Squad_GroupPatrolPerp);
+        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != SquadTaskDefOf.OARO_Squad_GroupPatrolPerp);
 
         if (participants.Count == 0)
         {
@@ -274,11 +297,11 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
         isPatrolActived = true;
         adjustCount = 0;
         adjustCeiling = 0;
-        if (RatkinOrder.Relationship == EsteemHandler.RelationshipKind.Trustworthy)
+        if (RatkinOrder.Relationship == OrderRelationshipKind.Trustworthy)
         {
             adjustCeiling = RatkinOrder.ReformationManager.EffectTags.HasActiveTag("") ? 3 : 2;
         }
-        else if (RatkinOrder.Relationship == EsteemHandler.RelationshipKind.Soulmate)
+        else if (RatkinOrder.Relationship == OrderRelationshipKind.Soulmate)
         {
             adjustCeiling = RatkinOrder.ReformationManager.EffectTags.HasActiveTag("") ? 6 : 4;
         }
@@ -300,20 +323,20 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
 
     private void StartGroupPatrol()
     {
-        tickToNextStage = (int)(OARO_ModDefOf.OARO_Squad_GroupPatrol.taskDurationDays * 60000);
+        tickToNextStage = (int)(SquadTaskDefOf.OARO_Squad_GroupPatrol.taskDurationDays * 60000);
         tickToNextCheck = 60000;
         passedBySquadCount = 0;
         isPatrolStarted = true;
 
         foreach (Squad squad in participants)
         {
-            if (squad.TaskHandler.CurTask?.Def == OARO_ModDefOf.OARO_Squad_GroupPatrolPerp)
+            if (squad.TaskHandler.CurTask?.Def == SquadTaskDefOf.OARO_Squad_GroupPatrolPerp)
             {
                 squad.TaskHandler.FinishCurTask();
             }
         }
 
-        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != OARO_ModDefOf.OARO_Squad_GroupPatrol);
+        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != SquadTaskDefOf.OARO_Squad_GroupPatrol);
         if (participants.Count == 0)
         {
             Reset();
@@ -398,12 +421,12 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
         passedBySquadCount++;
 
         bool targetFriendly = targetSquad.IsSquadOfType(BranchType.Friendly);
-        int relationShipDiff = RatkinOrder.Relationship - EsteemHandler.RelationshipKind.Acquaintance;
+        int relationShipDiff = RatkinOrder.Relationship - OrderRelationshipKind.Acquaintance;
         List<(int, float)> passByTypeList =
         [
             (0, Mathf.Max(0f, 75f - (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) - (targetFriendly ? 50f : 0f))),
             (1, Mathf.Max(0f, 20f + (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) + (targetFriendly ? 30f : 0f))),
-            (2, Mathf.Max(5f, 20f + (RatkinOrder.Relationship >= EsteemHandler.RelationshipKind.Soulmate ?  5f : 0f) + (targetFriendly ? 20f : 0f))),
+            (2, Mathf.Max(5f, 20f + (RatkinOrder.Relationship >= OrderRelationshipKind.Soulmate ?  5f : 0f) + (targetFriendly ? 20f : 0f))),
         ];
 
         int passByType = passByTypeList.RandomElementByWeight(t => t.Item2).Item1;
@@ -416,15 +439,10 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
                 return;
             case 1:
                 Slate slate = new();
-                slate.Set(ModUtility.RatkinOrderStoreAs, RatkinOrder);
-                slate.Set(ModUtility.SquadStoreAs, targetSquad);
-                if (OARO_ModDefOf.OARO_Quest_TemporaryEncampment.CanRun(slate))
+                slate.Set(KeyLibrary_SlateStoreAs.RatkinOrderStoreAs, RatkinOrder);
+                slate.Set(KeyLibrary_SlateStoreAs.SquadStoreAs, targetSquad);
+                if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_TemporaryEncampment, slate, forced: false))
                 {
-                    Quest quest = QuestUtility.GenerateQuestAndMakeAvailable(OARO_ModDefOf.OARO_Quest_TemporaryEncampment, slate);
-                    if (!quest.hidden && quest.root.sendAvailableLetter)
-                    {
-                        QuestUtility.SendLetterQuestAvailable(quest);
-                    }
                     break;
                 }
                 else
@@ -443,6 +461,8 @@ public class SquadGroupPatrolManager : IExposable, ITickHour
             default: goto case 0;
         }
     }
+
+    public void Notify_MyOrderRemoved() { }
 
     private void Reset()
     {

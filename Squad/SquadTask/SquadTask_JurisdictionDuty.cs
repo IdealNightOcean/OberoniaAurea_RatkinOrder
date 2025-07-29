@@ -9,11 +9,11 @@ public class SquadTaskStartChecker_JurisdictionDutyPerp : SquadTaskStartChecker
     {
         if (squad.SquadStat.MemberPercentage < 0.75f)
         {
-            return resultOnly ? false : "OARO_InsufficientMemberPercentage".Translate("75%");
+            return resultOnly ? false : "OARO_Insufficient_MemberPercentage".Translate("75%");
         }
         if (squad.SquadStat.Supply < 0.8f)
         {
-            return resultOnly ? false : "OARO_InsufficientSupply".Translate("80%"); ;
+            return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("80%"); ;
         }
         return true;
     }

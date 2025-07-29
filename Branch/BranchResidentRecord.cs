@@ -18,8 +18,8 @@ public class BranchResidentRecord : IExposable
     {
         this.resident = resident;
         this.totalDeployDays = totalDeployDays;
-        this.deployDaysLeft = totalDeployDays;
-        this.residencyWorker = worker;
+        deployDaysLeft = totalDeployDays;
+        residencyWorker = worker;
     }
 
     public void ExposeData()

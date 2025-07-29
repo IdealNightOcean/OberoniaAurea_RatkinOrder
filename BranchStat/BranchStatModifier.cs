@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public struct BranchStatModifier
+public class BranchStatModifier
 {
     public BranchStatDef statDef;
     public BranchStatTransformer statTransformer;

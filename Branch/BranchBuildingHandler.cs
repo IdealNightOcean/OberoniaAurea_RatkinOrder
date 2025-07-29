@@ -7,9 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
+public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay, IDrawDevWindow
 {
-    public static readonly BranchBuildingDef[] Memorials =
+    public static readonly BranchBuildingDef[] memorials =
     [
         BranchBuildingDefOf.OARO_GuardMemorial,
         BranchBuildingDefOf.OARO_PioneerMemorial,
@@ -44,6 +44,38 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: 1, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(Branch, immediateUpdate: true));
     }
 
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label("SpecialBuilding:");
+        if (specialBuilding is null)
+        {
+            listing_Rect.SubLabel("None", 0.8f);
+        }
+        else
+        {
+            listing_Rect.SubLabel(specialBuilding.def.label, 0.8f);
+        }
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"NormalBuildings: {buildings.Count}");
+        foreach (BranchBuilding building in buildings)
+        {
+            listing_Rect.SubLabel(building.def.label, 0.8f);
+        }
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label("UnderConstructionBuilding:");
+        if (underConstructionBuilding is null)
+        {
+            listing_Rect.SubLabel("None", 0.8f);
+        }
+        else
+        {
+            listing_Rect.SubLabel(underConstructionBuilding.label, 0.8f);
+        }
+        listing_Rect.Label($"BuildingTicksLeft: {buildingTicksLeft}");
+    }
+
     public void TickHour(int hourOfDay)
     {
         if (buildingTicksLeft > 0 && (buildingTicksLeft -= 2500) <= 0)
@@ -70,14 +102,12 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
     }
     public void TickDay()
     {
-        if (TickDayHandlers is null)
+        if (TickDayHandlers is not null)
         {
-            return;
-        }
-
-        for (int i = 0; i < TickDayHandlers.Count; i++)
-        {
-            TickDayHandlers[i].TickDay(Branch);
+            for (int i = 0; i < TickDayHandlers.Count; i++)
+            {
+                TickDayHandlers[i].TickDay(Branch);
+            }
         }
     }
 
@@ -124,64 +154,60 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         return (int)result;
     }
 
-    public AcceptanceReport CanConstructBuilding(BranchBuildingDef buildingDef, bool inSpecialSlot, bool byPlayer, Caravan caravan = null, bool resultOnly = false)
+    public AcceptanceReport CanConstructBuilding(BranchBuildingConstructParameter constructParam, bool resultOnly = false)
     {
-        if ((inSpecialSlot || buildingDef.isSpecial) && specialBuilding is not null)
+        if (constructParam.InSpecialSlot && specialBuilding is not null)
         {
             return resultOnly ? false : "OARO_AlreadyHasSpecialBuilding".Translate();
         }
-        if (buildingDef.isSpecial && !inSpecialSlot)
-        {
-            return resultOnly ? false : "OARO_SpecialBuildingOnlyInSpecialSlot".Translate();
-        }
-        else
-        {
-            if (buildings.Count >= BuildingCeiling)
-            {
-                return resultOnly ? false : "OARO_AlreadyReachedBuildingCeiling".Translate();
-            }
 
-            if (HasBuilding(buildingDef))
-            {
-                return resultOnly ? false : "OARO_HasSameBuilding".Translate();
-            }
+        BranchBuildingDef buildingDef = constructParam.buildingDef;
+
+        if (!HasUnusedNormalSlots)
+        {
+            return resultOnly ? false : "OARO_AlreadyReachedBuildingCeiling".Translate();
         }
 
-        if (byPlayer)
+        if (HasBuilding(buildingDef))
+        {
+            return resultOnly ? false : "OARO_HasSameBuilding".Translate();
+        }
+
+        if (constructParam.byPlayer)
         {
             int silverCost = GetBuildingSilverCost(buildingDef);
-            if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))
+            if (!CaravanInventoryUtility.HasThings(constructParam.caravan, ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OARO_NotEnoughSilver".Translate(silverCost);
             }
         }
 
-        return buildingDef.ConstructChecker.CanConstruct(Branch, buildingDef, inSpecialSlot, byPlayer, caravan, resultOnly);
+        return buildingDef.ConstructChecker.CanConstruct(constructParam, resultOnly);
     }
 
-    public void StartBuildingConstruction(BranchBuildingDef buildingDef, bool inSpecialSlot, bool byPlayer, Caravan caravan = null)
+    public void StartBuildingConstruction(BranchBuildingConstructParameter constructParam)
     {
-        if (byPlayer && buildingDef.ConstructChecker.DoubleComfirm)
+        if (constructParam.NeedDoubleConfirm)
         {
-            buildingDef.ConstructChecker.DoubleComfirmAction(Branch, buildingDef, inSpecialSlot, caravan);
+            constructParam.DoubleComfirm();
         }
         else
         {
-            StartBuildingConstructionDirectly(buildingDef, inSpecialSlot, byPlayer, caravan);
+            StartBuildingConstructionDirectly(constructParam);
         }
     }
 
-    public void StartBuildingConstructionDirectly(BranchBuildingDef buildingDef, bool inSpecialSlot, bool byPlayer, Caravan caravan = null)
+    public void StartBuildingConstructionDirectly(BranchBuildingConstructParameter constructParam)
     {
-        underConstructionBuilding = buildingDef;
-        this.inSpecialSlot = inSpecialSlot || buildingDef.isSpecial;
-        buildingTicksLeft = (int)(buildingDef.constructionDays * 60000);
-        if (byPlayer)
+        underConstructionBuilding = constructParam.buildingDef;
+
+        buildingTicksLeft = (int)(underConstructionBuilding.constructionDays * 60000);
+        if (constructParam.byPlayer)
         {
-            int silverCost = GetBuildingSilverCost(buildingDef);
-            OAFrame_CaravanUtility.RemoveThings(caravan, ThingDefOf.Silver, silverCost);
+            int silverCost = GetBuildingSilverCost(constructParam.buildingDef);
+            OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.caravan, ThingDefOf.Silver, silverCost);
         }
-        Branch.StoresReserveHandler.Notify_BuildingConstructStarted(buildingDef);
+        Branch.StoresReserveHandler.Notify_BuildingConstructStarted(underConstructionBuilding);
     }
 
     private void AddBuilding(BranchBuildingDef buildingDef, bool inSpecialSlot)
@@ -254,7 +280,6 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
     public void PostLoadInit()
     {
-
         if (specialBuilding is not null)
         {
             AddOrPostLoadBuilding(specialBuilding.def);
@@ -306,7 +331,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
     {
         if (Rand.Chance(0.08f))
         {
-            BranchBuildingDef specialBuildingDef = Memorials[Rand.Range(0, Memorials.Length)];
+            BranchBuildingDef specialBuildingDef = memorials[Rand.Range(0, memorials.Length)];
             AddBuilding(specialBuildingDef, inSpecialSlot: true);
             specialBuildingDef.GetModExtension<BranchBuilding_MemorialExtension>()?.CompleteRequirements(Branch);
         }

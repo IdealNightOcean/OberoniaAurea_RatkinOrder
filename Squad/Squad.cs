@@ -10,14 +10,16 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfDay, ITickDay
 {
-    protected const int StateDescUpdateInterval = 9;
     protected const int StatUpdateHour = 5;
 
     [Unsaved] public readonly Branch Branch;
-    [Unsaved] public readonly RatkinOrder RatkinOrder;
+
+    public RatkinOrder RatkinOrder => Branch.RatkinOrder;
     public SquadManager SquadManager => RatkinOrder.SquadManager;
+    public CooldownRecordManager CooldownManager => Branch.CooldownManager;
 
     protected int loadID = -1;
+    public int LoadID => loadID;
     protected string name;
     public string Name => name;
 
@@ -25,7 +27,6 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
 
     protected string stateStr = string.Empty;
     protected string TaskState => taskHandler.TaskState;
-    protected int lastStateHours;
 
     public string SquadState => TaskState ?? stateStr; //如果有固定状态，则使用固定状态，否则使用当前状态
 
@@ -43,7 +44,6 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
     private Squad(Branch branch, bool initConstruct)
     {
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        RatkinOrder = branch.RatkinOrder ?? throw new NullReferenceException(nameof(RatkinOrder));
 
         if (initConstruct)
         {
@@ -75,16 +75,34 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
             Log.Error($"Failed to create BranchSquad for branch {branch}. Returning null: " + ex);
             return null;
         }
-
         return squad;
+    }
+
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref loadID, "loadID", -1);
+
+        Scribe_Values.Look(ref name, "name");
+        Scribe_Values.Look(ref stateStr, "stateStr");
+
+        Scribe_Deep.Look(ref squadStat, "squadStat", ctorArgs: false);
+        Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
+        Scribe_Deep.Look(ref supportHandler, "supportHandler", ctorArgs: this);
+    }
+
+    public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Squad(this));
+
+    public void PostBranchGenerated()
+    {
+        name = SquadUtility.GenerateSquadName(Branch);
     }
 
     public void TickHour(int hourOfDay)
     {
-        if ((lastStateHours - hourOfDay + 24) % 24 == StateDescUpdateInterval)
+        if (!CooldownManager.IsInCooldown(KeyLibrary_CDRecord.SquadStateDesc))
         {
+            CooldownManager.RegisterRecord(KeyLibrary_CDRecord.SquadStateDesc, cdTicks: 9 * 2500);
             UpdateStateDesc(hourOfDay);
-            lastStateHours = hourOfDay;
         }
 
         if (hourOfDay == StatUpdateHour)
@@ -99,10 +117,7 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsSquadOfType(BranchType type)
-    {
-        return (SquadType & type) == type;
-    }
+    public bool IsSquadOfType(BranchType type) => (SquadType & type) == type;
 
     public void PostSquadCombatPawnGenerate(IEnumerable<Pawn> members, IEnumerable<Pawn> commanders, bool friendly)
     {
@@ -202,11 +217,11 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
         }
         if (hourOfDay <= 5 || hourOfDay >= 21)
         {
-            stateStr = "OARO_SquadStateRest".Translate();
+            stateStr = "OARO_SquadState_Rest".Translate();
             return;
         }
 
-        stateStr = "OARO_SquadStateIdle".Translate();
+        stateStr = "OARO_SquadState_Idle".Translate();
     }
 
     public void PostLoadInit()
@@ -214,7 +229,6 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
         EnsureComponentsInit();
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void EnsureComponentsInit()
     {
         squadStat ??= new SquadStat(initConstruct: true);
@@ -222,20 +236,5 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
         supportHandler ??= new SquadSupportHandler(this);
     }
 
-    public string GetUniqueLoadID()
-    {
-        return "Squad_" + loadID;
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Values.Look(ref loadID, "loadID", -1);
-
-        Scribe_Values.Look(ref stateStr, "stateStr");
-        Scribe_Values.Look(ref lastStateHours, "lastStateHours", 0);
-
-        Scribe_Deep.Look(ref squadStat, "squadStat", ctorArgs: false);
-        Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref supportHandler, "supportHandler", ctorArgs: this);
-    }
+    public string GetUniqueLoadID() => "Squad_" + loadID;
 }

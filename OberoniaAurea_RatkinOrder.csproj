@@ -18,7 +18,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\1.5\Assemblies\</OutputPath>
+    <OutputPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\1.6\Assemblies\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -26,22 +26,22 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\1.5\Assemblies\</OutputPath>
+    <OutputPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\1.6\Assemblies\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
-      <HintPath>..\..\RimWorldReference\1.5\0Harmony.dll</HintPath>
+      <HintPath>..\..\RimWorldReference\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\RimWorldReference\1.5\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\..\RimWorldReference\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="OberoniaAurea_Frame">
-      <HintPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Ratkin Knight Order\Frame\1.5\Assemblies\OberoniaAurea_Frame.dll</HintPath>
+      <HintPath>..\OberoniaAurea_Frame\Release\OberoniaAurea_Frame.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -53,23 +53,73 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine.CoreModule">
-      <HintPath>..\..\RimWorldReference\1.5\UnityEngine.CoreModule.dll</HintPath>
+      <HintPath>..\..\RimWorldReference\UnityEngine.CoreModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.IMGUIModule">
-      <HintPath>..\..\RimWorldReference\1.5\UnityEngine.IMGUIModule.dll</HintPath>
+      <HintPath>..\..\RimWorldReference\UnityEngine.IMGUIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.TextRenderingModule">
-      <HintPath>..\..\RimWorldReference\1.5\UnityEngine.TextRenderingModule.dll</HintPath>
+      <HintPath>..\..\RimWorldReference\UnityEngine.TextRenderingModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="BombardSupportMaker.cs" />
     <Compile Include="BranchStat\BranchStatModifier.cs" />
+    <Compile Include="BranchStat\BranchStatPart.cs" />
     <Compile Include="BranchStat\BranchStatPart_FacilityLevelToBuildingCeiling.cs" />
-    <Compile Include="BranchStat\BranchStatUtility.cs" />
+    <Compile Include="Branch\BranchBuildingConstructParameter.cs" />
+    <Compile Include="Branch\BranchDemand.cs" />
+    <Compile Include="Branch\BranchDemandType.cs" />
+    <Compile Include="DefOf\OrderFundEventDefOf.cs" />
+    <Compile Include="DefOf\PawnKindDefof.cs" />
+    <Compile Include="Def\BranchDemandDef.cs" />
+    <Compile Include="Branch\BranchDemandHandler.cs" />
+    <Compile Include="Components\TagStrToValue\TagStrToValue.cs" />
+    <Compile Include="DefOf\BranchStatDefOf.cs" />
+    <Compile Include="DefOf\BranchDemandDefOf.cs" />
+    <Compile Include="DefOf\QuestScriptDefOf.cs" />
+    <Compile Include="DefOf\ThingDefOf.cs" />
+    <Compile Include="DefOf\RimWorldDefOf.cs" />
+    <Compile Include="DefOf\SquadTaskDefOf.cs" />
+    <Compile Include="Def\OrderAssistDef.cs" />
+    <Compile Include="DevWindow\DevWindowBase.cs" />
+    <Compile Include="Dialog_NodeTreeWithRatkinOrderInfo.cs" />
+    <Compile Include="Fund\OrderFundEvent.cs" />
+    <Compile Include="Def\OrderFundEventDef.cs" />
+    <Compile Include="Interface\IOrderRelated.cs" />
+    <Compile Include="Interface\ITalkAction.cs" />
+    <Compile Include="Interface\IThingRequester.cs" />
+    <Compile Include="ModMain.cs" />
+    <Compile Include="OrderAssistanceWorker.cs" />
+    <Compile Include="OrderInteractionHandler.cs" />
+    <Compile Include="OrderRecommendation.cs" />
+    <Compile Include="IncidentWorker\IncidentWorker_Test.cs" />
+    <Compile Include="JobDriver_CommonTalkWith.cs" />
+    <Compile Include="Hediff_HelpSeeker.cs" />
+    <Compile Include="MercyQuestExtension.cs" />
+    <Compile Include="OrderRelationshipKind.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GiveToCaravan.cs" />
+    <Compile Include="Quest\Quest_ThingRequester.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_DemandType.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GetBranchFromSlate.cs" />
+    <Compile Include="Quest\Quest_BranchDemandWatcher.cs" />
+    <Compile Include="Quest\Reward_OrderRecommendation.cs" />
+    <Compile Include="Quest\Quest_OrderRecommendation.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GetBranchBase.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderBase.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderFromSlate.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_MercyQuestPre.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GetSubRatkinFaction.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_CriticalBranch.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_InvolvedBranches.cs" />
+    <Compile Include="Quest\Quest_MaterialSupply.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_CriticalRatkinOrder.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_LordJob_CommomTalk.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_LordJob_HelpSeeker.cs" />
+    <Compile Include="Utility\BranchStatUtility.cs" />
     <Compile Include="BranchStat\BranchStatWorker.cs" />
     <Compile Include="BranchStat\BranchStatPart_FundToAffectRadius.cs" />
     <Compile Include="BranchStat\BranchStatPart_FundToSquadMemberCeiling.cs" />
@@ -79,13 +129,13 @@
     <Compile Include="Branch\BranchBuildingHandler.cs" />
     <Compile Include="Branch\BranchBuildingMaker.cs" />
     <Compile Include="Branch\BranchBuilding_Memorial.cs" />
-    <Compile Include="Branch\BranchFacilityDef.cs" />
+    <Compile Include="Def\BranchFacilityDef.cs" />
     <Compile Include="Branch\BranchFacilityLevel.cs" />
     <Compile Include="Branch\BranchFacilityLevelStage.cs" />
     <Compile Include="Branch\BranchManager.cs" />
     <Compile Include="Branch\BranchResidentRecord.cs" />
-    <Compile Include="Branch\BranchUtility.cs" />
-    <Compile Include="Branch\BranchBuildingDef.cs" />
+    <Compile Include="Utility\BranchUtility.cs" />
+    <Compile Include="Def\BranchBuildingDef.cs" />
     <Compile Include="Branch\BranchFacilityHandler.cs" />
     <Compile Include="Branch\BranchResidentHandler.cs" />
     <Compile Include="Branch\BranchBuilding.cs" />
@@ -93,42 +143,69 @@
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Branch\WorldObjectComp_BranchSite.cs" />
+    <Compile Include="DevWindow\DevWindow_Squad.cs" />
+    <Compile Include="DevWindow\DevWindow_Branch.cs" />
+    <Compile Include="DevWindow\DevWindow_BranchManager.cs" />
+    <Compile Include="DevWindow\DevWindow_Order.cs" />
+    <Compile Include="DevWindow\DevWindow_AllOrders.cs" />
+    <Compile Include="DevWindow\DevWindow_SquadManager.cs" />
+    <Compile Include="DevWindow\DevWindow_SquadGroupPatrolManager.cs" />
     <Compile Include="EsteemHandler.cs" />
-    <Compile Include="ModUtility.cs" />
-    <Compile Include="OrderInteractionUtility.cs" />
+    <Compile Include="DebugRatkinOrders.cs" />
+    <Compile Include="Letter\ChoiceLetter_Apprentice_QuizStayIntention.cs" />
+    <Compile Include="HarmonyPatch\ModHarmonyPatch.cs" />
+    <Compile Include="Interface\IDevWindow.cs" />
+    <Compile Include="Letter\ChoiceLetter_TemporaryEncampment.cs" />
+    <Compile Include="Utility\BranchDemandUtility.cs" />
+    <Compile Include="Utility\TalkActionUtility.cs" />
+    <Compile Include="Utility\KeyLibrary_CDRecord.cs" />
+    <Compile Include="Utility\RecommendationUtility.cs" />
+    <Compile Include="Utility\KeyLibrary_SlateStoreAs.cs" />
+    <Compile Include="Utility\TickUtility.cs" />
+    <Compile Include="Utility\ModUtility.cs" />
+    <Compile Include="Utility\OrderInteractionUtility.cs" />
     <Compile Include="OrderLetter\Building_OrderLetterBox.cs" />
     <Compile Include="OrderLetter\OrderLetter.cs" />
     <Compile Include="OrderLetter\OrderLetterBox.cs" />
-    <Compile Include="OrderLetter\OrderLetterUtility.cs" />
+    <Compile Include="Utility\OrderLetterUtility.cs" />
     <Compile Include="OrderLetter\RimOrderLetter.cs" />
     <Compile Include="OrderLetter\SpecialLetterManager.cs" />
     <Compile Include="OrderLetter\Window_LetterBoxSetting.cs" />
     <Compile Include="OrderLetter\Window_OrderLetterBox.cs" />
-    <Compile Include="Quest\QuestNode_CheckGroupPatrolStart.cs" />
-    <Compile Include="Quest\QuestNode_GetRatkinOrderOfFaction.cs" />
-    <Compile Include="Quest\QuestNode_Root_ChildrenCare.cs" />
-    <Compile Include="Quest\QuestNode_SetRatkinOrder.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_TaxCollectorCome.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_TaxCollectorTreat.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_LordJob_TaxCollector.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_Apprentice_CheckSkill.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_Apprentice_QuizStayIntention.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_LittleApprentice.cs" />
+    <Compile Include="Quest\Quest_WolfDisasterWatcher.cs" />
+    <Compile Include="Quest\Reward_AllOrdersEsteem.cs" />
+    <Compile Include="Quest\Reward_OrderEsteem.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_CheckGroupPatrolStart.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderOfFaction.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_ChildrenCare.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_SetRatkinOrder.cs" />
     <Compile Include="Quest\Quest_CheckSkillLevel.cs" />
-    <Compile Include="Quest\Quest_EsteemChange.cs" />
-    <Compile Include="Quest\Quest_EsteemChangeAllOrders.cs" />
-    <Compile Include="Quest\QuestPart_InvolvedRatkinOrders.cs" />
+    <Compile Include="Quest\Quest_OrderEsteemChange.cs" />
+    <Compile Include="Quest\Quest_AllOrdersEsteemChange.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_InvolvedRatkinOrders.cs" />
     <Compile Include="Quest\Quest_OrderCrewAidDelay.cs" />
     <Compile Include="RatkinOrderFactionExtension.cs" />
     <Compile Include="BranchStat\BranchStatTransformerHandler.cs" />
-    <Compile Include="BranchStat\BranchStatDef.cs" />
+    <Compile Include="Def\BranchStatDef.cs" />
     <Compile Include="BranchStat\BranchStatTransformer.cs" />
-    <Compile Include="Branch\BranchBuildingDefOf.cs" />
+    <Compile Include="DefOf\BranchBuildingDefOf.cs" />
     <Compile Include="HarmonyPatch\Faction_RelationKindChanged_Patch.cs" />
     <Compile Include="Reformation\OrderReformationDef.cs" />
     <Compile Include="Reformation\OrderReformationWorker.cs" />
     <Compile Include="ScenPart_InitialOrderRelationshipLevel.cs" />
-    <Compile Include="LordJob_AssistColony_NeverFleeOrder.cs" />
-    <Compile Include="IPostSquadCombatPawnGenerate.cs" />
-    <Compile Include="Squad\SquadCombatPawnUtility.cs" />
-    <Compile Include="LordJob_ExitMapBestForResident.cs" />
-    <Compile Include="HarmonyPatch\ResetStaticDataPre_Patch.cs" />
-    <Compile Include="OARO_ModDefOf.cs" />
-    <Compile Include="ITicks.cs" />
+    <Compile Include="Lord\LordJob_AssistColony_NeverFleeOrder.cs" />
+    <Compile Include="Interface\IPostSquadCombatPawnGenerate.cs" />
+    <Compile Include="Utility\SquadCombatPawnUtility.cs" />
+    <Compile Include="Lord\LordJob_ExitMapBestForResident.cs" />
+    <Compile Include="HarmonyPatch\Game_ClearCaches_Patch.cs" />
+    <Compile Include="DefOf\ModDefOf.cs" />
+    <Compile Include="Interface\ITicks.cs" />
     <Compile Include="MapComponent_BranchCache.cs" />
     <Compile Include="Squad\SquadTask\SquadTask.cs" />
     <Compile Include="Squad\SquadTask\SquadTaskStartChecker.cs" />
@@ -136,30 +213,38 @@
     <Compile Include="Squad\SquadGroupPatrolManager.cs" />
     <Compile Include="Squad\SquadSupplyContractManager.cs" />
     <Compile Include="Squad\SquadSupportHandler.cs" />
-    <Compile Include="Squad\SquadTask\SquadTaskDef.cs" />
+    <Compile Include="Def\SquadTaskDef.cs" />
     <Compile Include="Squad\SquadTask\SquadTaskHandler.cs" />
     <Compile Include="Squad\SquadTask\SquadTask_JurisdictionDuty.cs" />
-    <Compile Include="LordJob_AssaultColony_NeverFleeOrder.cs" />
-    <Compile Include="Squad\SquadUtility.cs" />
-    <Compile Include="TagStrToValue\TagStrToBoolCountable.cs" />
-    <Compile Include="TagStrToValue\ITagStrToValue.cs" />
-    <Compile Include="IPostLoadInit.cs" />
+    <Compile Include="Lord\LordJob_AssaultColony_NeverFleeOrder.cs" />
+    <Compile Include="Utility\SquadUtility.cs" />
+    <Compile Include="Components\TagStrToValue\TagStrToBoolCountable.cs" />
+    <Compile Include="Interface\IPostLoadInit.cs" />
     <Compile Include="Squad\Squad.cs" />
     <Compile Include="Squad\SquadManager.cs" />
     <Compile Include="Squad\SquadStat.cs" />
     <Compile Include="RatkinOrderGenerator.cs" />
     <Compile Include="Reformation\ReformationManager.cs" />
-    <Compile Include="FundHandler.cs" />
-    <Compile Include="RatkinOrderDef.cs" />
-    <Compile Include="TagStrToValue\TagStrToFloat.cs" />
-    <Compile Include="TagStrToValue\TagStrToInt.cs" />
+    <Compile Include="Fund\FundHandler.cs" />
+    <Compile Include="Def\RatkinOrderDef.cs" />
+    <Compile Include="Components\TagStrToValue\TagStrToFloat.cs" />
+    <Compile Include="Components\TagStrToValue\TagStrToInt.cs" />
     <Compile Include="ThoughtWorker_BranchChurch.cs" />
     <Compile Include="UniqueIDManager.cs" />
     <Compile Include="RatkinOrder.cs" />
     <Compile Include="GameComponent_RatkinOrder.cs" />
     <Compile Include="RatkinOrderManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="EsteemUtility.cs" />
+    <Compile Include="Utility\EsteemUtility.cs" />
+    <Compile Include="Worldobject\WorldObject_ArmsOrderSite.cs" />
+    <Compile Include="Worldobject\WorldObject_Interactive_Village.cs" />
+    <Compile Include="Worldobject\WorldObject_InteractWithFixedCaravan_Village.cs" />
+    <Compile Include="Worldobject\WorldObject_ApprenticeHome.cs" />
+    <Compile Include="Worldobject\WorldObject_WolfDisasterGossipPoint.cs" />
+    <Compile Include="Worldobject\MapParent_WolfDisaster.cs" />
+    <Compile Include="Worldobject\WorldObject_WolfDisasterPoint.cs" />
+    <Compile Include="Worldobject\WorldObject_CelebrationHost.cs" />
+    <Compile Include="Worldobject\WorldObject_NonGerminatingSeeds.cs" />
     <Compile Include="Worldobject\WorldObject_TemporaryEncampment.cs" />
     <Compile Include="Worldobject\WorldObject_ApplianceRepair.cs" />
     <Compile Include="Worldobject\WorldObject_PastureFlu.cs" />

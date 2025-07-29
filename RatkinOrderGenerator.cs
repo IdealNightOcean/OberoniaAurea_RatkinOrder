@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using System;
+using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -68,21 +69,37 @@ public static class RatkinOrderGenerator
 
     public static RatkinOrder GenerateRatkinOrderForFaction(Faction faction, RatkinOrderDef forceOrderDef = null)
     {
+        RatkinOrder ratkinOrder = null;
+        RatkinOrderDef def = null;
         try
         {
-            RatkinOrderDef def = forceOrderDef ?? faction.def.GetModExtension<RatkinOrderFactionExtension>().ratkinOrderDef;
+            def = forceOrderDef ?? faction.def.GetModExtension<RatkinOrderFactionExtension>().ratkinOrderDef;
             if (def is null)
             {
                 Log.Error("Tried to create RatkinOrder for faction_" + faction.loadID + " but the faction has no RatkinOrderDef.");
                 return null;
             }
-            return new RatkinOrder(def, faction);
+            ratkinOrder = new RatkinOrder(def, faction);
         }
         catch (Exception ex)
         {
             Log.Error("Could not create RatkinOrder for faction_" + faction.loadID + ": " + ex);
             return null;
         }
+
+        ratkinOrder.Name = GenerateRatkinOrderName(def);
+
+        return ratkinOrder;
+    }
+
+    public static string GenerateRatkinOrderName(RatkinOrderDef def)
+    {
+        if (!def.fixedName.NullOrEmpty())
+        {
+            return def.fixedName;
+        }
+
+        return NameGenerator.GenerateName(def.nameMaker, RatkinOrderManager.Instance.AllRatkinOrders.Select(o => o.Name));
     }
 
 }

@@ -1,11 +1,13 @@
-﻿using System;
+﻿using OberoniaAurea_Frame;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ReformationManager : IExposable, IPostLoadInit
+public class ReformationManager : IExposable, IPostLoadInit, IDrawDevWindow
 {
     [Unsaved] public readonly RatkinOrder RatkinOrder;
 
@@ -26,10 +28,38 @@ public class ReformationManager : IExposable, IPostLoadInit
 
     public ReformationManager(RatkinOrder ratkinOrder, bool initConstruct)
     {
-        this.RatkinOrder = ratkinOrder;
+        RatkinOrder = ratkinOrder;
         if (initConstruct)
         {
 
+        }
+    }
+
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref reformProgress, "reformProgress", 0f);
+        Scribe_Values.Look(ref fixedReformProgressCost, "fixedReformProgressCost", -1f);
+
+        Scribe_Collections.Look(ref reformations, "reformations", LookMode.Def);
+    }
+
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label($"ReformProgress: {reformProgress}");
+        listing_Rect.Label($"ReformationsCount: {ReformationsCount}");
+        listing_Rect.Label($"FixedReformProgressCost: {fixedReformProgressCost}");
+
+        if (listing_Rect.ButtonText("Reformations", null, 0.8f))
+        {
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllActiveReformationString()));
+        }
+        if (listing_Rect.ButtonText("EffectTags", null, 0.8f))
+        {
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(EffectTags.GetDetailString()));
+        }
+        if (listing_Rect.ButtonText("StatTransformers", null, 0.8f))
+        {
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(TransformerHandler.GetDetailString()));
         }
     }
 
@@ -54,7 +84,7 @@ public class ReformationManager : IExposable, IPostLoadInit
         float reformProgressCost = fixedReformProgressCost > 0f ? fixedReformProgressCost : GetReformProgressCost(def);
         if (reformProgress < reformProgressCost)
         {
-            return resultOnly ? false : "OARO_InsufficienReformProgresst".Translate(reformProgressCost);
+            return resultOnly ? false : "OARO_Insufficien_ReformProgresst".Translate(reformProgressCost);
         }
 
         if (def.prerequisites is not null)
@@ -63,7 +93,7 @@ public class ReformationManager : IExposable, IPostLoadInit
             {
                 if (!reformations.Contains(preDef))
                 {
-                    return resultOnly ? false : "OARO_OmissionOfPreReformation".Translate();
+                    return resultOnly ? false : "OARO_Omission_PreReformation".Translate();
                 }
             }
         }
@@ -102,9 +132,20 @@ public class ReformationManager : IExposable, IPostLoadInit
         }
     }
 
-    public void ExposeData()
+    private string GetAllActiveReformationString()
     {
-        Scribe_Values.Look(ref reformProgress, "reformProgress", 0f);
-        Scribe_Collections.Look(ref reformations, "reformations", LookMode.Def);
+        if (reformations.NullOrEmpty())
+        {
+            return "None";
+        }
+
+        StringBuilder sb = new();
+        int i = 0;
+        foreach (OrderReformationDef item in reformations)
+        {
+            sb.AppendInNewLine($"{++i}. {item.label}");
+        }
+
+        return sb.ToString();
     }
 }

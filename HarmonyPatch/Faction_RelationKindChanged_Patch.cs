@@ -5,7 +5,7 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-[HarmonyPatch(typeof(Faction), "Notify_RelationKindChanged")]
+[HarmonyPatch(typeof(Faction), nameof(Faction.Notify_RelationKindChanged))]
 public class Faction_RelationKindChanged_Patch
 {
     [HarmonyPostfix]

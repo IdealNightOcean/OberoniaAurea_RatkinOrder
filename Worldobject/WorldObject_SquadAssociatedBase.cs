@@ -1,9 +1,8 @@
-﻿using OberoniaAurea_Frame;
-using Verse;
+﻿using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class WorldObject_SquadAssociatedBase : WorldObject_InteractWithFixedCarvanBase
+public abstract class WorldObject_SquadAssociatedBase : WorldObject_InteractWithFixedCaravan_Village
 {
     protected Squad squad;
     public Branch Branch => squad.Branch;

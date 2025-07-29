@@ -4,68 +4,78 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class EsteemHandler : IExposable, ITickDay
+public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
 {
-    public enum RelationshipKind : byte
-    {
-        Stranger = 0,
-        Acquaintance = 1,
-        Friendly = 2,
-        Trustworthy = 3,
-        Soulmate = 4
-    };
-
-    [Unsaved] public RatkinOrder RatkinOrder;
+    [Unsaved] public readonly RatkinOrder RatkinOrder;
 
     /*
     认可度
     */
-    protected float esteem;
-    public float Esteem
-    {
-        get
-        {
-            return esteem;
-        }
-        set
-        {
-            esteem = Mathf.Clamp(value, 0f, 1f);
-        }
-    }
+    protected int esteem;
+    public int Esteem => esteem;
+    private int lastEsteemChange;
+    private string lastEsteemChangeReason = string.Empty;
+
+    public int LastEsteemChange => lastEsteemChange;
+    public string LastEsteemChangeReason => lastEsteemChangeReason;
     public float CurEsteemSoftCap => EsteemUtility.GetEsteemSoftCap(relationship);
     /*
     关系
     */
-    private RelationshipKind relationship = RelationshipKind.Stranger; //当前关系
-    public RelationshipKind Relationship => relationship;
+    private OrderRelationshipKind relationship = OrderRelationshipKind.Stranger; //当前关系
+    public OrderRelationshipKind Relationship => relationship;
 
     public int lastRelationshipChangeTick = -1;
 
     private int totalRecommendation;
-    private int curRecommendation;
-
-    public int TotalRecommendation => totalRecommendation;
-    public int CurRecommendation
+    public int TotalRecommendation
     {
-        get { return curRecommendation; }
-        set { curRecommendation = Mathf.Max(0, value); }
+        get => totalRecommendation;
+        set => totalRecommendation += Mathf.Max(0, value);
     }
+
 
     public EsteemHandler(RatkinOrder ratkinOrder, bool initConstruct)
     {
-        this.RatkinOrder = ratkinOrder;
+        RatkinOrder = ratkinOrder;
         if (initConstruct)
         {
-            relationship = GameComponent_RatkinOrder.Instance?.InitOrderRelationship ?? RelationshipKind.Stranger;
+            relationship = GameComponent_RatkinOrder.Instance?.InitOrderRelationship ?? OrderRelationshipKind.Stranger;
             esteem = EsteemUtility.GetEsteemSoftCap(relationship);
         }
+    }
+
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref esteem, "esteem", 0);
+
+        Scribe_Values.Look(ref lastEsteemChange, "lastEsteemChange", 0);
+        Scribe_Values.Look(ref lastEsteemChangeReason, "lastEsteemChangeReason");
+
+        Scribe_Values.Look(ref relationship, "relationship", OrderRelationshipKind.Stranger);
+        Scribe_Values.Look(ref lastRelationshipChangeTick, "lastRelationshipChangeTick", -1);
+
+        Scribe_Values.Look(ref totalRecommendation, "totalRecommendation", 0);
+    }
+
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label($"Esteem: {esteem}");
+        listing_Rect.Label($"LastEsteemChange(by player): {lastEsteemChange}");
+        listing_Rect.Label($"lastEsteemChangeReason(by player): {lastEsteemChangeReason}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"Relationship: {relationship}");
+        listing_Rect.Label($"LastRelationshipChangeTick: {lastRelationshipChangeTick}");
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"TotalRecommendation: {totalRecommendation}");
+        // listing_Rect.Label($"CurRecommendation: {curRecommendation}");
     }
 
     public void TickDay()
     {
         if (esteem > CurEsteemSoftCap)
         {
-            esteem -= 0.01f;
+            esteem--;
         }
     }
 
@@ -73,37 +83,54 @@ public class EsteemHandler : IExposable, ITickDay
     {
         if (newRelation == FactionRelationKind.Hostile)
         {
-            RelationshipOffset(-1);
+            SetRelationship(relationship.RelationshipKindOffsetBy(-1));
         }
     }
 
-    public void RelationshipOffset(int offset)
+    public void AdjustEsteem(int change, bool byPlayer = false, bool showPlayerChangeMessage = true, string reason = null)
     {
-        if (offset == 0)
+        int trueChange = esteem;
+        esteem = Mathf.Clamp(esteem + change, 0, 100);
+
+        trueChange = esteem - trueChange;
+        if (trueChange != 0 && byPlayer)
         {
-            return;
+            lastEsteemChange = trueChange;
+            lastEsteemChangeReason = reason ?? string.Empty;
+            if (showPlayerChangeMessage)
+            {
+                if (trueChange > 0)
+                {
+                    if (reason is null)
+                    {
+                        Messages.Message("OARO_Message_EsteemIncreaseNoReason".Translate(RatkinOrder.Name, lastEsteemChange), MessageTypeDefOf.PositiveEvent);
+                    }
+                    else
+                    {
+                        Messages.Message("OARO_Message_EsteemIncrease".Translate(RatkinOrder.Name, lastEsteemChange, reason), MessageTypeDefOf.PositiveEvent);
+                    }
+
+                }
+                else
+                {
+                    if (reason is null)
+                    {
+                        Messages.Message("OARO_Message_EsteemDecreaseNoReason".Translate(RatkinOrder.Name, lastEsteemChange), MessageTypeDefOf.NegativeEvent);
+                    }
+                    else
+                    {
+                        Messages.Message("OARO_Message_EsteemDecrease".Translate(RatkinOrder.Name, lastEsteemChange), MessageTypeDefOf.NegativeEvent);
+                    }
+                }
+            }
         }
-        RelationshipKind newRelationship = EsteemUtility.RelationshipKindArr[Mathf.Clamp((int)relationship + offset, 0, EsteemUtility.RelationshipKindArr.Length - 1)];
-        SetRelationship(newRelationship);
     }
 
-    public void SetRelationship(RelationshipKind newRelationship)
+    public void SetRelationship(OrderRelationshipKind newRelationship)
     {
         if (newRelationship == relationship)
         {
             return;
         }
-
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Values.Look(ref esteem, "esteem", 0f);
-
-        Scribe_Values.Look(ref relationship, "relationship", RelationshipKind.Stranger);
-        Scribe_Values.Look(ref lastRelationshipChangeTick, "lastRelationshipChangeTick", -1);
-
-        Scribe_Values.Look(ref totalRecommendation, "totalRecommendation", 0);
-        Scribe_Values.Look(ref curRecommendation, "curRecommendation", 0);
     }
 }

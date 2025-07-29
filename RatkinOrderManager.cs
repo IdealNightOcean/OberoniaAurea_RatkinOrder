@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using Verse;
 
@@ -13,11 +14,31 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
 
     public RatkinOrderManager()
     {
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
+    }
+    public static void ClearStaticCache() => Instance = null;
+
+    public void OpenDevWindow()
+    {
+        Find.WindowStack.Add(new DevWindow_AllOrders());
+    }
+
+    public void Tick()
+    {
+        for (int i = 0; i < allRatkinOrders.Count; i++)
+        {
+            allRatkinOrders[i].Tick();
+        }
     }
 
     public bool IsFactionHasRatkinOrder(Faction faction)
     {
+        if (faction is null)
+        {
+            return false;
+        }
+
         for (int i = 0; i < allRatkinOrders.Count; i++)
         {
             if (allRatkinOrders[i].Faction == faction)
@@ -30,6 +51,11 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
 
     public RatkinOrder GetRatkinOrderForFaction(Faction faction)
     {
+        if (faction is null)
+        {
+            return null;
+        }
+
         for (int i = 0; i < allRatkinOrders.Count; i++)
         {
             if (allRatkinOrders[i].Faction == faction)
@@ -56,6 +82,11 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
         }
 
         allRatkinOrders.Remove(order);
+        order.Notify_Removed();
+
+        OrderInteractionHandler.Instance.Notify_RatkinOrderRemoved(order);
+        MapComponent_RatkinOrder.OnRatkinOrderRemoved(order);
+        Find.QuestManager.OnRatkinOrderRemoved(order);
     }
 
     public void PostLoadInit()
@@ -64,7 +95,10 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
         {
             Log.Error($"Some Ratkin Orders were null after loading and have been removed.");
         }
-        allRatkinOrders.ForEach(r => r.PostLoadInit());
+        for (int i = 0; i < allRatkinOrders.Count; i++)
+        {
+            allRatkinOrders[i].PostLoadInit();
+        }
     }
 
     public void ExposeData()

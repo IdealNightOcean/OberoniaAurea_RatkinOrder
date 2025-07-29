@@ -4,6 +4,7 @@ using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -26,6 +27,27 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
     public BranchFacilityHandler(Branch branch)
     {
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    }
+
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label($"TotalFacilityLevel: {totalFacilityLevel}");
+        foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> facility in facilities)
+        {
+            listing_Rect.SubLabel($"{facility.Key.label}: {facility.Value}", 0.8f);
+        }
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label("BuildingFacility");
+        if (buildingFacility is null)
+        {
+            listing_Rect.SubLabel("None", 0.8f);
+        }
+        else
+        {
+            listing_Rect.SubLabel(buildingFacility.label, 0.8f);
+        }
+        listing_Rect.Label($"BuildingTicksLeft: {buildingTicksLeft}");
     }
 
     public void TickHour()
@@ -77,7 +99,7 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
         if (byPlayer)
         {
             int silverCost = GetFacilitySilverCost(facilityDef);
-            OAFrame_CaravanUtility.RemoveThings(caravan, ThingDefOf.Silver, silverCost);
+            OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, silverCost);
         }
 
         Branch.StoresReserveHandler.Notify_FacilityConstructionStarted(facilityDef);
@@ -105,10 +127,10 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
         {
             return;
         }
-        StageUpgrade(facilityDef, oldLevelIndex: -1, newLevelIndex: 0, isPostInit: false);
+        ActiveStage(facilityDef, oldLevelIndex: -1, newLevelIndex: 0, isPostInit: false);
     }
 
-    public bool TryUpgradeFacility(BranchFacilityDef facilityDef)
+    public bool TryUpgradeFacility(BranchFacilityDef facilityDef, int upgrade = 1, bool addIfMiss = false)
     {
         if (facilityDef == null)
         {
@@ -116,19 +138,15 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
         }
 
         BranchFacilityLevel oldLevel = facilities.TryGetValue(facilityDef, fallback: BranchFacilityLevel.None);
-        if (oldLevel == BranchFacilityLevel.None || oldLevel == BranchFacilityLevel.Excellent)
+        if ((!addIfMiss && oldLevel == BranchFacilityLevel.None) || oldLevel == BranchFacilityLevel.Excellent)
         {
             return false;
         }
 
-        int oldLevelIndex = facilityDef.GetLevelStageIndex(oldLevel);
-        if (oldLevelIndex < 0 || oldLevelIndex >= facilityDef.levelStages.Count - 1)
-        {
-            return false;
-        }
-        int newLevelIndex = oldLevelIndex + 1;
+        int oldLevelIndex = oldLevel == BranchFacilityLevel.None ? -1 : facilityDef.GetLevelStageIndex(oldLevel);
+        int newLevelIndex = Mathf.Min(facilityDef.levelStages.Count - 1, oldLevelIndex + upgrade);
 
-        if (StageUpgrade(facilityDef, oldLevelIndex, newLevelIndex, isPostInit: false))
+        if (ActiveStage(facilityDef, oldLevelIndex, newLevelIndex, isPostInit: false))
         {
             facilities[facilityDef] = facilityDef.levelStages[newLevelIndex].level;
             IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
@@ -140,13 +158,14 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
         }
     }
 
-    private bool StageUpgrade(BranchFacilityDef facilityDef, int oldLevelIndex, int newLevelIndex, bool isPostInit = false)
+    private bool ActiveStage(BranchFacilityDef facilityDef, int oldLevelIndex, int newLevelIndex, bool isPostInit = false)
     {
         if (oldLevelIndex < -1 || newLevelIndex <= oldLevelIndex)
         {
             return false;
         }
 
+        newLevelIndex = Mathf.Min(facilityDef.levelStages.Count - 1, newLevelIndex);
         for (int i = oldLevelIndex + 1; i <= newLevelIndex; i++)
         {
             BranchFacilityLevelStage stage = facilityDef.levelStages[i];
@@ -154,14 +173,19 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
             Branch.TransformerHandler.AddStatModifiers(stage.statModifies);
             if (isPostInit)
             {
-                stage.PostActive(Branch);
+                stage.PostLoadInit(Branch);
             }
             else
             {
-                stage.PostLoadInit(Branch);
+                stage.PostActive(Branch);
             }
         }
-        totalFacilityLevel += (newLevelIndex - oldLevelIndex);
+
+        if (!isPostInit)
+        {
+            totalFacilityLevel += (newLevelIndex - oldLevelIndex);
+        }
+
         return true;
     }
 
@@ -172,9 +196,9 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
             Log.Error($"{Branch} has null or None facilities after loading, Removed.");
         }
 
-        foreach (var item in facilities)
+        foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> item in facilities)
         {
-            StageUpgrade(item.Key, oldLevelIndex: -1, item.Key.GetLevelStageIndex(item.Value), isPostInit: true);
+            ActiveStage(item.Key, oldLevelIndex: -1, item.Key.GetLevelStageIndex(item.Value), isPostInit: true);
         }
 
         IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
@@ -182,13 +206,19 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
 
     public void PostBranchGenerated()
     {
-
+        List<BranchFacilityDef> allFacilities = DefDatabase<BranchFacilityDef>.AllDefsListForReading;
+        for (int i = 0; i < allFacilities.Count; i++)
+        {
+            int initUpgrade = Rand.Chance(0.3f) ? 2 : 1;
+            TryUpgradeFacility(allFacilities[i], initUpgrade, addIfMiss: true);
+        }
     }
 
     public void ExposeData()
     {
         Scribe_Collections.Look(ref facilities, "facilities", LookMode.Def, LookMode.Value);
 
+        Scribe_Values.Look(ref totalFacilityLevel, "totalFacilityLevel", 0);
         Scribe_Defs.Look(ref buildingFacility, "buildingFacility");
         Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
     }

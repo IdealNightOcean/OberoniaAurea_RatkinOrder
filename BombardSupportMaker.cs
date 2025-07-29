@@ -24,16 +24,15 @@ public class BombardSupportMaker : ThingWithComps
 
     public void SetBombardCount(int count)
     {
-        this.bombardCount = count;
-        this.bombardCountRemaining = count;
+        bombardCount = count;
+        bombardCountRemaining = count;
     }
 
-    public override void Tick()
+    protected override void Tick()
     {
         base.Tick();
 
-        ticksToForceDestroy--;
-        if (ticksToForceDestroy < 0)
+        if (--ticksToForceDestroy < 0)
         {
             Destroy();
             return;
@@ -41,8 +40,7 @@ public class BombardSupportMaker : ThingWithComps
 
         if (bombStart)
         {
-            bombInterval--;
-            if (bombInterval == 0)
+            if (--bombInterval == 0)
             {
                 bombInterval = 15;
                 if (curRound < targetCells.Count)
@@ -63,8 +61,7 @@ public class BombardSupportMaker : ThingWithComps
         }
         else
         {
-            ticksToStart--;
-            if (ticksToStart == 0)
+            if (--ticksToStart == 0)
             {
                 StartBomb();
             }
@@ -73,7 +70,7 @@ public class BombardSupportMaker : ThingWithComps
 
     private void StartBomb()
     {
-        Map map = base.Map;
+        Map map = Map;
         if (map is null || bombardCount <= 0)
         {
             Destroy();
@@ -111,10 +108,9 @@ public class BombardSupportMaker : ThingWithComps
 
         for (int i = 0; i < bombardCount; i++)
         {
-            Projectile projectile = (Projectile)GenSpawn.Spawn(OARO_ModDefOf.Bullet_Shell_HighExplosive, shootLine.Source, map);
+            Projectile projectile = (Projectile)GenSpawn.Spawn(OARO_ThingDefOf.Bullet_Shell_HighExplosive, shootLine.Source, map);
             projectile.Launch(null, bombSource.ToVector3Shifted(), shootLine.Dest, cell, ProjectileHitFlags.NonTargetWorld, preventFriendlyFire: false, equipment: null);
         }
-
     }
 
     public override void ExposeData()

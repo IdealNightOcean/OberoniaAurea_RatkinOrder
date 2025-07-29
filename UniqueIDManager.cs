@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using OberoniaAurea_Frame;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -17,8 +18,10 @@ public class UniqueIDManager : IExposable
 
     public UniqueIDManager()
     {
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
     }
+    public static void ClearStaticCache() => Instance = null;
 
     public int GetUniqueID(string key)
     {
