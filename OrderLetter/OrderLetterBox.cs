@@ -49,7 +49,7 @@ public class OrderLetterBox : IExposable
     }
     public void ReceiveLetter(OrderLetter letter)
     {
-        letter.arrivalTick = Find.TickManager.TicksGame;
+        letter.ArrivalTick = Find.TickManager.TicksGame;
         unreadLetters.Add(letter);
     }
 
@@ -120,7 +120,7 @@ public class OrderLetterBox : IExposable
             int overCap = archivedLetters.Count - MaxLetterCount;
             if (overCap > 0)
             {
-                archivedLetters.SortBy(l => l.arrivalTick);
+                archivedLetters.SortBy(l => l.ArrivalTick);
                 archivedLetters.RemoveRange(0, overCap);
             }
         }

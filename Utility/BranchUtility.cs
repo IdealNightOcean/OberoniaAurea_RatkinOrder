@@ -178,19 +178,19 @@ public static class BranchUtility
 
     public static void OnBranchDestoryed(this QuestManager questManager, Branch branch)
     {
-        ConcurrentBag<IBranchRelated> ratkinOrderRelateds = [];
+        ConcurrentBag<IOnBranchDestoryed> ratkinOrderRelateds = [];
         questManager.ActiveQuestsListForReading
             .AsParallel()
             .ForAll(quest =>
             {
-                IEnumerable<IBranchRelated> relatedParts = quest.PartsListForReading.OfType<IBranchRelated>();
-                foreach (IBranchRelated relatedPartInner in relatedParts)
+                IEnumerable<IOnBranchDestoryed> relatedParts = quest.PartsListForReading.OfType<IOnBranchDestoryed>();
+                foreach (IOnBranchDestoryed relatedPartInner in relatedParts)
                 {
                     ratkinOrderRelateds.Add(relatedPartInner);
                 }
             });
 
-        foreach (IBranchRelated relatedPart in ratkinOrderRelateds)
+        foreach (IOnBranchDestoryed relatedPart in ratkinOrderRelateds)
         {
             relatedPart.Notify_BranchDestoryed(branch);
         }

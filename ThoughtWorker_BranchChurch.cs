@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ThoughtWorker_BranchChurch : ThoughtWorker
 {
-    private static SimpleMapCahce<short> MapCahce = new(60000, defaultValue: 0, onlyPlayerHome: true, GetChurchCount);
+    private static SimpleMapCahce<short> mapCahce = new(60000, defaultValue: 0, onlyPlayerHome: true, GetChurchCount);
 
     protected override ThoughtState CurrentStateInternal(Pawn p)
     {
@@ -16,14 +16,14 @@ public class ThoughtWorker_BranchChurch : ThoughtWorker
             return ThoughtState.Inactive;
         }
 
-        short count = MapCahce.GetCachedResult(p.Map);
+        short count = mapCahce.GetCachedResult(p.Map);
         return count > 0 ? ThoughtState.ActiveAtStage(count - 1) : ThoughtState.Inactive;
     }
 
 
     private static short GetChurchCount(Map map)
     {
-        IEnumerable<Branch> branchesInRadius = map.GetComponent<MapComponent_RatkinOrder>()?.branchesInRadius;
+        IEnumerable<Branch> branchesInRadius = map.GetComponent<MapComponent_RatkinOrder>()?.BranchesInRadius;
         if (branchesInRadius is null)
         {
             return 0;
@@ -42,6 +42,6 @@ public class ThoughtWorker_BranchChurch : ThoughtWorker
 
     public static void ClearStaticCache()
     {
-        MapCahce.Reset();
+        mapCahce.Reset();
     }
 }

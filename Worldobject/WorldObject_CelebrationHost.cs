@@ -6,7 +6,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_CelebrationHost : WorldObject_InteractWithFixedCaravan_Village
+/// <summary>
+/// 庆典村庄（特化类）
+/// </summary>
+public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedCaravan_Nameable
 {
     public override int TicksNeeded => 60000;
     public override string FixedCaravanName => "OARO_FixedCaravan_CelebrationHost".Translate();

@@ -13,17 +13,17 @@ public static class OrderLetterUtility
         Find.WindowStack.Add(new Window_OrderLetterBox());
     }
 
-    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, OrderLetter.LetterType letterType, RatkinOrder relatedOrder, string sender = null)
+    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, OrderLetterType letterType, RatkinOrder relatedOrder, string sender = null)
     {
         OrderLetter orderLetter = new()
         {
             Label = label,
             Text = text,
             Sender = sender ?? "OARO_Letter_UnkownSender",
-            letterType = letterType,
-            relatedOrder = relatedOrder,
+            LetterType = letterType,
+            RelatedOrder = relatedOrder,
             // relatedFaction = relatedOrder.Faction,
-            relatedFaction = relatedOrder.Faction
+            RelatedFaction = relatedOrder.Faction
         };
 
         return orderLetter;
@@ -31,28 +31,21 @@ public static class OrderLetterUtility
 
     public static void ReadLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
     {
-        if (!forceSlience && IsTransToRimLetter(letter.letterType))
+        if (!forceSlience && IsTransToRimLetter(letter.LetterType))
         {
-            Letter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.relatedLetterDef ?? LetterDefOf.NeutralEvent, lookTargets: null, letter.relatedFaction);
+            Letter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.RelatedLetterDef ?? LetterDefOf.NeutralEvent, lookTargets: null, letter.RelatedFaction);
             Find.LetterStack.ReceiveLetter(rimLetter);
         }
         letter.PostReaded(letterBox);
     }
 
-    private static RimOrderLetter MakerRimLetter(OrderLetter letter)
-    {
-        RimOrderLetter rimLetter = (RimOrderLetter)LetterMaker.MakeLetter(letter.Label, letter.Text, letter.relatedLetterDef ?? LetterDefOf.NeutralEvent, lookTargets: null, letter.relatedFaction);
-        // rimLetter.relatedOrder = letter.relatedOrder;
-        return rimLetter;
-    }
-
-    public static bool IsTransToRimLetter(OrderLetter.LetterType letterType)
+    public static bool IsTransToRimLetter(OrderLetterType letterType)
     {
         return letterType switch
         {
-            OrderLetter.LetterType.Normal => LetterBox.autoTransNormal,
-            OrderLetter.LetterType.Urgent => LetterBox.autoTransUrgent,
-            OrderLetter.LetterType.Official => LetterBox.autoTransOfficial,
+            OrderLetterType.Normal => LetterBox.autoTransNormal,
+            OrderLetterType.Urgent => LetterBox.autoTransUrgent,
+            OrderLetterType.Official => LetterBox.autoTransOfficial,
             _ => false,
         };
     }

@@ -7,7 +7,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedCaravan_Village
+/// <summary>
+/// 机械故障村庄（特化类）
+/// </summary>
+public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedCaravan_Nameable
 {
     private static readonly string[] faultName = ["OARO_ApplianceFault_line", "OARO_ApplianceFault_Component", "OARO_ApplianceFault_Linkage"];
     private static readonly string[] repairName = ["OARO_ApplianceRepair_line", "OARO_ApplianceRepair_Component", "OARO_ApplianceRepair_Linkage"];
@@ -18,7 +21,7 @@ public class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedCaravan_
     private int repairType;
     public int RepairType { get { return repairType; } set { repairType = Mathf.Clamp(value, 0, 2); } }
 
-    protected bool isReasonFound;
+    private bool isReasonFound;
     private float successChance;
 
     public override int TicksNeeded => isReasonFound ? 30000 : 20000;

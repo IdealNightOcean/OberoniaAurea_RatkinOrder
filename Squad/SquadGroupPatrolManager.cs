@@ -62,8 +62,8 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
     public int AdjustCount => adjustCount;
     public int BurdenSquadCount => burdenSquadCount;
 
-    public PatrolType curPatrolType;
-    public HashSet<Squad> participants = [];
+    public PatrolType CurPatrolType;
+    public HashSet<Squad> Participants = [];
 
     private int passedBySquadCount;
     private float curReconnaissanceValue;
@@ -72,7 +72,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
     {
         get
         {
-            return curPatrolType switch
+            return CurPatrolType switch
             {
                 PatrolType.Popedom => SquadManager.TotalMemberCount * 0.16f * 10f,
                 PatrolType.Kingdom => SquadManager.TotalMemberCount * 0.3f * 10f,
@@ -111,7 +111,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         listing_Rect.Label($"AdjustCount: {adjustCount}");
         listing_Rect.Label($"BurdenSquadCount: {burdenSquadCount}");
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"CurPatrolType: {curPatrolType}");
+        listing_Rect.Label($"CurPatrolType: {CurPatrolType}");
         listing_Rect.Label($"passedBySquadCount: {passedBySquadCount}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"CurReconnaissanceValue: {curReconnaissanceValue}");
@@ -134,7 +134,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         {
             tickToNextCheck = 60000;
             if (tickToNextStage > 60000
-                && passedBySquadCount < participants.Count
+                && passedBySquadCount < Participants.Count
                 && RatkinOrder.Relationship >= OrderRelationshipKind.Acquaintance)
             {
                 SquadPassBy();
@@ -160,7 +160,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         {
             foreach (Squad squad in toRemove)
             {
-                participants.Remove(squad);
+                Participants.Remove(squad);
                 if (squad.TaskHandler.CurTask?.Def == SquadTaskDefOf.OARO_Squad_GroupPatrolPerp)
                 {
                     squad.TaskHandler.EndCurrentTask(startRest: true);
@@ -172,14 +172,14 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         {
             foreach (Squad squad in toAdd)
             {
-                if (!participants.Contains(squad) && squad.TaskHandler.TrySwitchToTask(SquadTaskDefOf.OARO_Squad_GroupPatrolPerp))
+                if (!Participants.Contains(squad) && squad.TaskHandler.TrySwitchToTask(SquadTaskDefOf.OARO_Squad_GroupPatrolPerp))
                 {
-                    participants.Add(squad);
+                    Participants.Add(squad);
                 }
             }
         }
 
-        if (participants.Count == 0)
+        if (Participants.Count == 0)
         {
             Reset();
             return;
@@ -191,11 +191,11 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
     {
         if (isPatrolActived)
         {
-            participants.Remove(squad);
+            Participants.Remove(squad);
             endReconnaissanceValue += finalReconnaissance;
             endResultText.AppendLineIfNotEmpty();
             endResultText.Append(squadResult);
-            if (participants.Count == 0)
+            if (Participants.Count == 0)
             {
                 GroupPatrolEnd();
             }
@@ -210,7 +210,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         }
 
         float reconnaissanceRate = Mathf.Clamp(reconnaissanceValue / NeedReconnaissanceValue, 0f, 2f);
-        float rewardMulti = curPatrolType switch
+        float rewardMulti = CurPatrolType switch
         {
             PatrolType.Popedom => 1f,
             PatrolType.Kingdom => 2f,
@@ -244,12 +244,12 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
                 (PatrolType.Kingdom, 200 + (int)(RatkinOrder.FundHandler.Funds / 0.01f * 5f)),
                 (PatrolType.Border, 10 + (int)(RatkinOrder.FundHandler.Funds / 0.01f * 6f + RatkinOrder.ReformationManager.ReformationsCount * 10f)),
             ];
-            curPatrolType = typeChance.RandomElementByWeight(r => r.Item2).Item1;
+            CurPatrolType = typeChance.RandomElementByWeight(r => r.Item2).Item1;
         }
         catch (Exception ex)
         {
             Log.Error("Failed to set group patrol type: " + ex);
-            curPatrolType = PatrolType.Popedom;
+            CurPatrolType = PatrolType.Popedom;
         }
     }
 
@@ -269,9 +269,9 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         IEnumerable<Squad> tempEnumerables = SquadManager.AllSquads.Where(s => s.TaskHandler.CanSwitchToTask(SquadTaskDefOf.OARO_Squad_GroupPatrolPerp, resultOnly: true))
                                                                    .Take(squadCount);
 
-        participants = [.. tempEnumerables];
+        Participants = [.. tempEnumerables];
 
-        if (participants is null || participants.Count == 0)
+        if (Participants is null || Participants.Count == 0)
         {
             Reset();
             return false;
@@ -281,13 +281,13 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
 
     private bool StartPatrolPerp()
     {
-        foreach (Squad squad in participants)
+        foreach (Squad squad in Participants)
         {
             squad.TaskHandler.TrySwitchToTask(SquadTaskDefOf.OARO_Squad_GroupPatrolPerp);
         }
-        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != SquadTaskDefOf.OARO_Squad_GroupPatrolPerp);
+        Participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != SquadTaskDefOf.OARO_Squad_GroupPatrolPerp);
 
-        if (participants.Count == 0)
+        if (Participants.Count == 0)
         {
             Reset();
             return false;
@@ -312,7 +312,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
     private void RecacheCurReconnaissanceValue()
     {
         curReconnaissanceValue = endReconnaissanceValue;
-        foreach (Squad squad in participants)
+        foreach (Squad squad in Participants)
         {
             if (squad.TaskHandler.CurTask is SquadTask_GroupPatrol groupPatrol)
             {
@@ -328,7 +328,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         passedBySquadCount = 0;
         isPatrolStarted = true;
 
-        foreach (Squad squad in participants)
+        foreach (Squad squad in Participants)
         {
             if (squad.TaskHandler.CurTask?.Def == SquadTaskDefOf.OARO_Squad_GroupPatrolPerp)
             {
@@ -336,14 +336,14 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
             }
         }
 
-        participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != SquadTaskDefOf.OARO_Squad_GroupPatrol);
-        if (participants.Count == 0)
+        Participants.RemoveWhere(s => s.TaskHandler.CurTask?.Def != SquadTaskDefOf.OARO_Squad_GroupPatrol);
+        if (Participants.Count == 0)
         {
             Reset();
             return;
         }
 
-        int overcap = participants.Count - burdenSquadCount;
+        int overcap = Participants.Count - burdenSquadCount;
         if (overcap > 0)
         {
             RatkinOrder.FundHandler.AdjustFundsImmediately(overcap * 0.05f);
@@ -365,7 +365,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         float preparedModify = 0.5f;
 
         patrolEndChances.Clear();
-        switch (curPatrolType)
+        switch (CurPatrolType)
         {
             case PatrolType.Popedom:
                 patrolEndChances.Add((PatrolEndType.Nothing, 0.69f));
@@ -401,7 +401,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
     private void SquadPassBy()
     {
         List<(Squad, float)> potentialPass = [];
-        foreach (Squad squad in participants)
+        foreach (Squad squad in Participants)
         {
             if (squad.TaskHandler.CurTask is SquadTask_GroupPatrol groupPatrol && !groupPatrol.hadPassedBy)
             {
@@ -439,8 +439,8 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
                 return;
             case 1:
                 Slate slate = new();
-                slate.Set(KeyLibrary_SlateStoreAs.RatkinOrderStoreAs, RatkinOrder);
-                slate.Set(KeyLibrary_SlateStoreAs.SquadStoreAs, targetSquad);
+                slate.Set(KeyLibrary_SlateStoreAs.RatkinOrder, RatkinOrder);
+                slate.Set(KeyLibrary_SlateStoreAs.Squad, targetSquad);
                 if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_TemporaryEncampment, slate, forced: false))
                 {
                     break;
@@ -474,7 +474,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         tickToNextStage = 180000;
         tickToNextCheck = 60000;
 
-        curPatrolType = PatrolType.Popedom;
+        CurPatrolType = PatrolType.Popedom;
         burdenSquadCount = 0;
 
         endReconnaissanceValue = 0f;
@@ -483,8 +483,8 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
 
         passedBySquadCount = 0;
 
-        participants ??= [];
-        participants.Clear();
+        Participants ??= [];
+        Participants.Clear();
 
         patrolEndChances[0] = (PatrolEndType.Nothing, 1f);
         for (int i = 1; i < PatrolEndTypeArr.Length; i++)
@@ -509,14 +509,14 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
         Scribe_Values.Look(ref tickToNextCheck, "tickToStart", 60000);
 
-        Scribe_Values.Look(ref curPatrolType, "curPatrolType", PatrolType.Popedom);
+        Scribe_Values.Look(ref CurPatrolType, "CurPatrolType", PatrolType.Popedom);
         Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
         Scribe_Values.Look(ref tempEndResultText, "tempEndResultText");
 
         Scribe_Values.Look(ref curReconnaissanceValue, "curReconnaissanceValue", 0f);
         Scribe_Values.Look(ref endReconnaissanceValue, "endReconnaissanceValue", 0f);
 
-        Scribe_Collections.Look(ref participants, "participants", LookMode.Reference);
+        Scribe_Collections.Look(ref Participants, "Participants", LookMode.Reference);
 
 
         if (Scribe.mode == LoadSaveMode.LoadingVars)

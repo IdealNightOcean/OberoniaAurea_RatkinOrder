@@ -59,8 +59,8 @@ public class SquadTask_GroupPatrol : SquadTask
         if (isExploration)
         {
             int explorationCount = GetExpectedExplorationCount(squad).Item1;
-            OrderLetter letter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_SquadExplorationResult".Translate(), "OARO_Letter_SquadExplorationResult".Translate(), OrderLetter.LetterType.Official, squad.RatkinOrder, squad.Name);
-            letter.relatedThings = [new ThingDefCount(targetOre, explorationCount)];
+            OrderLetter letter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_SquadExplorationResult".Translate(), "OARO_Letter_SquadExplorationResult".Translate(), OrderLetterType.Official, squad.RatkinOrder, squad.Name);
+            letter.RelatedThings = [new ThingDefCount(targetOre, explorationCount)];
             OrderLetterBox.Instance.ReceiveLetter(letter);
         }
         GroupPatrolManager(squad).Notify_SquadPatrolEnd(squad, reconnaissanceValue, resultBuilder);

@@ -7,7 +7,7 @@ public static class BranchBuildingMaker
     public static BranchBuilding MakeBranchBuilding(BranchBuildingDef def)
     {
         BranchBuilding building = (BranchBuilding)Activator.CreateInstance(def.buildingClass);
-        building.def = def;
+        building.Def = def;
 
         return building;
     }

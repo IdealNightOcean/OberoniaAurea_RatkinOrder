@@ -36,8 +36,8 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
     {
         Reward_AllOrdersEsteem reward = new()
         {
-            amount = 2,
-            reason = "OARO_Childcare".Translate()
+            Amount = 2,
+            Reason = "OARO_Childcare".Translate()
         };
         choice.rewards.Add(reward);
     }

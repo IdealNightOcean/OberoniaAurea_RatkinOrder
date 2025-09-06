@@ -7,7 +7,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_PastureFlu : WorldObject_InteractWithFixedCaravan_Village
+/// <summary>
+/// 牧场流感种子村庄（特化类）
+/// </summary>
+public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCaravan_Nameable
 {
     public override int TicksNeeded => 30000;
     public override string FixedCaravanName => "OARO_FixedCaravan_PastureFlu".Translate();

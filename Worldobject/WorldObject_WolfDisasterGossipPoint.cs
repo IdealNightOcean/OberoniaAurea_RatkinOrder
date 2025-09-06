@@ -5,7 +5,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFixedCaravanBase
+/// <summary>
+/// 狼灾流言检查点（特化类）
+/// </summary>
+internal sealed class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFixedCaravanBase
 {
     public override int TicksNeeded => 7500;
     public override string FixedCaravanName => "OARO_FixedCaravan_WolfDisasterGossipPoint".Translate();

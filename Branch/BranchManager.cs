@@ -185,20 +185,20 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
             if (Rand.Chance(0.05f))
             {
                 bool successConstruct = false;
-                if (reserve.targetBuilding is not null)
+                if (reserve.TargetBuilding is not null)
                 {
-                    BranchBuildingConstructParameter constructParam = new(branch, reserve.targetBuilding, reserve.inSpecialSlot);
+                    BranchBuildingConstructParameter constructParam = new(branch, reserve.TargetBuilding, reserve.InSpecialSlot);
                     if (branch.BuildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
                     {
                         branch.BuildingHandler.StartBuildingConstruction(constructParam);
                         successConstruct = true;
                     }
                 }
-                else if (reserve.targetFacility is not null)
+                else if (reserve.TargetFacility is not null)
                 {
-                    if (branch.FacilityHandler.CanConstructFacility(reserve.targetFacility, byPlayer: false))
+                    if (branch.FacilityHandler.CanConstructFacility(reserve.TargetFacility, byPlayer: false))
                     {
-                        branch.FacilityHandler.StartFacilityConstruction(reserve.targetFacility, byPlayer: false);
+                        branch.FacilityHandler.StartFacilityConstruction(reserve.TargetFacility, byPlayer: false);
                         successConstruct = true;
                     }
                 }

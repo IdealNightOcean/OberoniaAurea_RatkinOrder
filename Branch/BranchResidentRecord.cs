@@ -4,29 +4,29 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchResidentRecord : IExposable
 {
-    public Pawn resident;
+    public Pawn Resident;
 
     private int totalDeployDays;
     public int TotalDeployDays => totalDeployDays;
 
-    public int deployDaysLeft;
+    public int DeployDaysLeft;
 
-    public ResidencyWorker residencyWorker;
+    public ResidencyWorker ResidencyWorker;
 
     public BranchResidentRecord() { }
     public BranchResidentRecord(Pawn resident, int totalDeployDays, ResidencyWorker worker)
     {
-        this.resident = resident;
+        Resident = resident;
         this.totalDeployDays = totalDeployDays;
-        deployDaysLeft = totalDeployDays;
-        residencyWorker = worker;
+        DeployDaysLeft = totalDeployDays;
+        ResidencyWorker = worker;
     }
 
     public void ExposeData()
     {
-        Scribe_References.Look(ref resident, "resident");
+        Scribe_References.Look(ref Resident, "Resident");
         Scribe_Values.Look(ref totalDeployDays, "totalDeployDays", 0);
-        Scribe_Values.Look(ref deployDaysLeft, "deployDaysLeft", 0);
-        Scribe_Deep.Look(ref residencyWorker, "residencyWorker");
+        Scribe_Values.Look(ref DeployDaysLeft, "DeployDaysLeft", 0);
+        Scribe_Deep.Look(ref ResidencyWorker, "ResidencyWorker");
     }
 }

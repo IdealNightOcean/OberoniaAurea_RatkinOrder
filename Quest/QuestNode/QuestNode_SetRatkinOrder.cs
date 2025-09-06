@@ -8,6 +8,6 @@ public class QuestNode_SetRatkinOrder : QuestNode_GetRatkinOrderBase
 
     protected override RatkinOrder GetRatkinOrder(Slate slate)
     {
-        return order.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrderStoreAs);
+        return order.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
     }
 }

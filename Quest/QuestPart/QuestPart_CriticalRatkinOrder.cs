@@ -3,34 +3,34 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_CriticalRatkinOrder : QuestPart, IRatkinOrderRelated
+public class QuestPart_CriticalRatkinOrder : QuestPart, IOnRatkinOrderRemoved
 {
-    public RatkinOrder order;
-    public bool endQuest = true;
-    public QuestEndOutcome endOutcome = QuestEndOutcome.Unknown;
+    public RatkinOrder RatkinOrder;
+    public bool EndQuest = true;
+    public QuestEndOutcome EndOutcome = QuestEndOutcome.Unknown;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref order, "order");
-        Scribe_Values.Look(ref endQuest, "endQuest", defaultValue: true);
-        Scribe_Values.Look(ref endOutcome, "endOutcome", QuestEndOutcome.Unknown);
+        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
+        Scribe_Values.Look(ref EndQuest, "EndQuest", defaultValue: true);
+        Scribe_Values.Look(ref EndOutcome, "EndOutcome", QuestEndOutcome.Unknown);
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        order = null;
-        endQuest = true;
-        endOutcome = QuestEndOutcome.Unknown;
+        RatkinOrder = null;
+        EndQuest = true;
+        EndOutcome = QuestEndOutcome.Unknown;
     }
 
-    public void Notify_RatkinOrderRemoved(RatkinOrder order)
+    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
     {
-        if (this.order == order)
+        if (RatkinOrder == ratkinOrder)
         {
-            this.order = null;
-            if (endQuest)
+            RatkinOrder = null;
+            if (EndQuest)
             {
                 if (quest?.State == QuestState.NotYetAccepted)
                 {
@@ -38,7 +38,7 @@ public class QuestPart_CriticalRatkinOrder : QuestPart, IRatkinOrderRelated
                 }
                 else if (quest?.State == QuestState.Ongoing)
                 {
-                    quest.End(endOutcome);
+                    quest.End(EndOutcome);
                 }
             }
         }

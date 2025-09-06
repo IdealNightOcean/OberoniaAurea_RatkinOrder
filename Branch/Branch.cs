@@ -170,7 +170,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         }
     }
 
-    public void SetFriendly(bool friendly, int durationTick = 40 * 60000)
+    public void SetFriendly(bool friendly, int durationTick = 40 * 60000, bool showMessage = true)
     {
         if (friendly)
         {

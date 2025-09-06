@@ -5,27 +5,27 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingConstructParameter : IExposable
 {
-    public Branch branch;
-    public BranchBuildingDef buildingDef;
+    public Branch Branch;
+    public BranchBuildingDef BuildingDef;
     private bool inSpecialSlot;
     public bool InSpecialSlot
     {
-        get { return buildingDef.isSpecial || inSpecialSlot; }
+        get { return BuildingDef.isSpecial || inSpecialSlot; }
         set { inSpecialSlot = value; }
     }
-    public bool byPlayer;
+    public bool ByPlayer;
     public Caravan caravan;
 
-    public bool NeedDoubleConfirm => byPlayer && buildingDef.ConstructChecker.DoubleComfirm;
-    public void DoubleComfirm() => buildingDef.ConstructChecker.DoubleComfirmAction(this);
+    public bool NeedDoubleConfirm => ByPlayer && BuildingDef.ConstructChecker.DoubleComfirm;
+    public void DoubleComfirm() => BuildingDef.ConstructChecker.DoubleComfirmAction(this);
 
     public void ExposeData()
     {
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Defs.Look(ref buildingDef, "buildingDef");
+        Scribe_References.Look(ref Branch, "Branch");
+        Scribe_Defs.Look(ref BuildingDef, "BuildingDef");
         Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
 
-        Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
+        Scribe_Values.Look(ref ByPlayer, "ByPlayer", defaultValue: false);
         Scribe_References.Look(ref caravan, "caravan");
     }
 
@@ -33,8 +33,8 @@ public class BranchBuildingConstructParameter : IExposable
 
     public BranchBuildingConstructParameter(Branch branch, BranchBuildingDef buildingDef, bool inSpecialSlot)
     {
-        this.branch = branch;
-        this.buildingDef = buildingDef;
+        Branch = branch;
+        BuildingDef = buildingDef;
         this.inSpecialSlot = inSpecialSlot;
     }
 }

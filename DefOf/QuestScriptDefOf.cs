@@ -13,6 +13,8 @@ public class OARO_QuestScriptDefOf
 
     public static QuestScriptDef OARO_Quest_TemporaryEncampment;
 
+    public static QuestScriptDef OARO_Quest_AroundKnightGroupVisit;
+
     static OARO_QuestScriptDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_QuestScriptDefOf));

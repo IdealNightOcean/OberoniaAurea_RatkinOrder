@@ -6,13 +6,16 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestNode_Root_TaxCollectorCome : QuestNode
+/// <summary>
+/// 
+/// </summary>
+internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
 {
     protected override bool TestRunInt(Slate slate)
     {
         return QuestGen_Get.GetMap() is not null;
     }
-    protected (Faction parentFaction, Faction subFaction) GetFactions()
+    private (Faction parentFaction, Faction subFaction) GetFactions()
     {
         Faction parentFaction = Find.FactionManager.FirstFactionOfDef(OARO_ModDefOf.Rakinia);
         if (parentFaction is null)
@@ -52,7 +55,7 @@ public class QuestNode_Root_TaxCollectorCome : QuestNode
         quest.ReserveFaction(subFaction);
 
         slate.Set("faction", parentFaction);
-        slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFactionStoreAs, subFaction);
+        slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, subFaction);
         slate.Set("map", map);
 
         //人物生成;
@@ -114,9 +117,9 @@ public class QuestNode_Root_TaxCollectorCome : QuestNode
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Fail = new()
         {
-            inSignalTrigger = outSignalExpired,
-            change = -1,
-            reason = "OARO_TaxCollectorCome_Fail".Translate()
+            InSignalTrigger = outSignalExpired,
+            Change = -1,
+            Reason = "OARO_TaxCollectorCome_Fail".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_Fail);
 
@@ -126,25 +129,25 @@ public class QuestNode_Root_TaxCollectorCome : QuestNode
         QuestPart_LordJob_TaxCollector questPart_LordJob_TaxCollector = new()
         {
             inSignal = inSignalPawnArrival,
-            inSignalTreat = inSignalTreat,
+            InSignalTreat = inSignalTreat,
             inSignalRemovePawn = inSignalRemovePawn,
-            outSignalQuestSuccess = outSignalTreatSuccess,
-            outSignalQuestFail = outSignalTreatFail,
+            OutSignalQuestSuccess = outSignalTreatSuccess,
+            OutSignalQuestFail = outSignalTreatFail,
 
-            talkWith = collector,
+            TalkWith = collector,
             mapOfPawn = collector,
 
             faction = parentFaction,
-            durationTicks = 20000, // 8小时
+            DurationTicks = 20000, // 8小时
         };
         questPart_LordJob_TaxCollector.pawns.AddRange(pawns);
         quest.AddPart(questPart_LordJob_TaxCollector);
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Suucess = new()
         {
-            inSignalTrigger = outSignalResolved,
-            change = 3,
-            reason = "OARO_PutOffTaxCollector".Translate()
+            InSignalTrigger = outSignalResolved,
+            Change = 3,
+            Reason = "OARO_PutOffTaxCollector".Translate()
         };
 
         quest.AddPart(questPart_AllOrdersEsteemChange_Suucess);

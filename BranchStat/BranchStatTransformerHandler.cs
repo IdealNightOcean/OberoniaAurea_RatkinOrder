@@ -23,7 +23,7 @@ public class BranchStatTransformerHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void AddStatModifier(BranchStatModifier modifier)
     {
-        AddStatTransformer(modifier.statDef, modifier.statTransformer);
+        AddStatTransformer(modifier.statDef, modifier.Transformer);
     }
     public void AddStatModifiers(IEnumerable<BranchStatModifier> modifiers)
     {
@@ -39,11 +39,11 @@ public class BranchStatTransformerHandler
             {
                 if (branchStatTransformers.TryGetValue(modifier.statDef, out BranchStatTransformer oldTransformer))
                 {
-                    branchStatTransformers[modifier.statDef] = BranchStatTransformer.Merge(oldTransformer, modifier.statTransformer);
+                    branchStatTransformers[modifier.statDef] = BranchStatTransformer.Merge(oldTransformer, modifier.Transformer);
                 }
                 else
                 {
-                    branchStatTransformers.Add(modifier.statDef, modifier.statTransformer);
+                    branchStatTransformers.Add(modifier.statDef, modifier.Transformer);
                 }
             }
             catch (System.Exception ex)
@@ -86,7 +86,7 @@ public class BranchStatTransformerHandler
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void RemoveStatModifier(BranchStatModifier modifier)
     {
-        RemoveStatTransformer(modifier.statDef, modifier.statTransformer);
+        RemoveStatTransformer(modifier.statDef, modifier.Transformer);
     }
     public void RemoveStatModifies(IEnumerable<BranchStatModifier> modifies)
     {
@@ -101,7 +101,7 @@ public class BranchStatTransformerHandler
             {
                 if (branchStatTransformers.TryGetValue(modify.statDef, out BranchStatTransformer oldTransformer))
                 {
-                    BranchStatTransformer newTransformer = BranchStatTransformer.Unmerge(oldTransformer, modify.statTransformer);
+                    BranchStatTransformer newTransformer = BranchStatTransformer.Unmerge(oldTransformer, modify.Transformer);
                     if (BranchStatTransformer.IsValid(newTransformer))
                     {
                         branchStatTransformers[modify.statDef] = newTransformer;

@@ -21,9 +21,9 @@ public class QuestNode_OrderCrewAidDelay : QuestNode_Delay
             inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? QuestGen.slate.Get<string>("inSignal"),
             inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisable.GetValue(slate)),
             reactivatable = reactivatable.GetValue(slate),
-            ratkinOrder = ratkinOrder.GetValue(slate)
+            RatkinOrder = ratkinOrder.GetValue(slate)
         };
-        questPart_OrderCrewAidDelay.pawns.AddRange(pawns.GetValue(slate));
+        questPart_OrderCrewAidDelay.Pawns.AddRange(pawns.GetValue(slate));
 
 
         if (!inspectStringTargets.GetValue(slate).EnumerableNullOrEmpty())
@@ -60,23 +60,22 @@ public class QuestNode_OrderCrewAidDelay : QuestNode_Delay
 
 public class QuestPart_OrderCrewAidDelay : QuestPart_Delay
 {
-    public RatkinOrder ratkinOrder;
+    public RatkinOrder RatkinOrder;
     protected int persuadeCount;
-    public List<Pawn> pawns = [];
-
+    public List<Pawn> Pawns = [];
     public int MaxPersuadeCount
     {
         get
         {
-            if (ratkinOrder.Esteem >= 100)
+            if (RatkinOrder.Esteem >= 100)
             {
                 return 3;
             }
-            else if (ratkinOrder.Esteem >= 70)
+            else if (RatkinOrder.Esteem >= 70)
             {
                 return 2;
             }
-            else if (ratkinOrder.Esteem >= 30)
+            else if (RatkinOrder.Esteem >= 30)
             {
                 return 1;
             }
@@ -86,9 +85,27 @@ public class QuestPart_OrderCrewAidDelay : QuestPart_Delay
             }
         }
     }
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
+        Scribe_Values.Look(ref persuadeCount, "persuadeCount", 0);
+        Scribe_Collections.Look(ref Pawns, "Pawns", LookMode.Reference);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            Pawns.RemoveAll(x => x is null);
+        }
+    }
+    public override void Cleanup()
+    {
+        RatkinOrder = null;
+        Pawns = null;
+    }
+
     protected override void DelayFinished()
     {
-        if (ratkinOrder is null || persuadeCount >= MaxPersuadeCount)
+        if (RatkinOrder is null || persuadeCount >= MaxPersuadeCount)
         {
             NotPersuadeToStay();
         }
@@ -96,7 +113,7 @@ public class QuestPart_OrderCrewAidDelay : QuestPart_Delay
         {
             enableTick = Find.TickManager.TicksGame;
             delayTicks = 60;
-            TaggedString treeText = "OARO_PersuadeToStayInfo".Translate(ratkinOrder.Name, ratkinOrder.Faction);
+            TaggedString treeText = "OARO_PersuadeToStayInfo".Translate(RatkinOrder.Name, RatkinOrder.Faction);
             Dialog_NodeTree persuadeTree = OberoniaAurea_Frame.OAFrame_DiaUtility.ConfirmDiaNodeTree(treeText,
                                                                                                      "OARO_PersuadeToStay".Translate(), PersuadeToStay,
                                                                                                      "OARO_NotPersuadeToStay".Translate(), NotPersuadeToStay);
@@ -112,30 +129,12 @@ public class QuestPart_OrderCrewAidDelay : QuestPart_Delay
     }
     public void NotPersuadeToStay()
     {
-        pawns.RemoveAll((Pawn x) => x is null);
-        foreach (Pawn p in pawns)
+        Pawns.RemoveAll(x => x is null);
+        foreach (Pawn p in Pawns)
         {
 
         }
         Complete();
-    }
-
-    public override void Cleanup()
-    {
-        ratkinOrder = null;
-        pawns = null;
-    }
-
-    public override void ExposeData()
-    {
-        base.ExposeData();
-        Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
-        Scribe_Values.Look(ref persuadeCount, "persuadeCount", 0);
-        Scribe_Collections.Look(ref pawns, "pawns", LookMode.Reference);
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
-        {
-            pawns.RemoveAll((Pawn x) => x is null);
-        }
     }
 }
 

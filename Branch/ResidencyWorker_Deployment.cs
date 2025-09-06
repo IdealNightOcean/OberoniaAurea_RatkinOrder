@@ -21,16 +21,21 @@ public class ResidencyWorker_Deployment : ResidencyWorker
     private static bool cachedInstinctTrain;
 
     public override int Priority => 500; //优先级，数值越大越优先
-    public SkillDef skill;
+    public SkillDef Skill;
+
+    public override void ExposeData()
+    {
+        Scribe_Defs.Look(ref Skill, "Skill");
+    }
 
     public override void ResidencyStart(Branch branch, Pawn resident, int residencyDays) { }
     public override void ResidencyEnd(Branch branch, Pawn resident, int residencyDays)
     {
         Recache(branch);
-        if (skill is not null && resident.skills is not null)
+        if (Skill is not null && resident.skills is not null)
         {
             float xpGain = cachedDailyXp * residencyDays;
-            resident.skills.GetSkill(skill).Learn(xpGain, direct: true);
+            resident.skills.GetSkill(Skill).Learn(xpGain, direct: true);
         }
         if (cachedSilverReward)
         {
@@ -38,7 +43,7 @@ public class ResidencyWorker_Deployment : ResidencyWorker
         }
         if (cachedInstinctTrain)
         {
-            resident.health.AddHediff(OARO_ModDefOf.OARO_Hediff_InstinctTrain);
+            resident.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_InstinctTrain);
         }
     }
 
@@ -60,10 +65,5 @@ public class ResidencyWorker_Deployment : ResidencyWorker
         cachedBranch = null;
         cachedDailyXp = 0f;
         cachedSilverReward = false;
-    }
-
-    public override void ExposeData()
-    {
-        Scribe_Defs.Look(ref skill, "skill");
     }
 }

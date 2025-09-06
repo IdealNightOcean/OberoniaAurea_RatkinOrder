@@ -3,31 +3,31 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_CriticalBranch : QuestPart, IBranchRelated
+public class QuestPart_CriticalBranch : QuestPart, IOnBranchDestoryed
 {
-    public Branch branch;
-    public bool endQuest = true;
-    public QuestEndOutcome endOutcome = QuestEndOutcome.Unknown;
+    public Branch Branch;
+    public bool EndQuest = true;
+    public QuestEndOutcome EndOutcome = QuestEndOutcome.Unknown;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref endQuest, "endQuest", defaultValue: true);
-        Scribe_Values.Look(ref endOutcome, "endOutcome", QuestEndOutcome.Unknown);
+        Scribe_References.Look(ref Branch, "Branch");
+        Scribe_Values.Look(ref EndQuest, "EndQuest", defaultValue: true);
+        Scribe_Values.Look(ref EndOutcome, "EndOutcome", QuestEndOutcome.Unknown);
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        branch = null;
-        endQuest = true;
-        endOutcome = QuestEndOutcome.Unknown;
+        Branch = null;
+        EndQuest = true;
+        EndOutcome = QuestEndOutcome.Unknown;
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)
     {
-        if (branch.RatkinOrder == order && endQuest)
+        if (Branch.RatkinOrder == order && EndQuest)
         {
             if (quest?.State == QuestState.NotYetAccepted)
             {
@@ -35,17 +35,17 @@ public class QuestPart_CriticalBranch : QuestPart, IBranchRelated
             }
             else if (quest?.State == QuestState.Ongoing)
             {
-                quest.End(endOutcome);
+                quest.End(EndOutcome);
             }
         }
     }
 
     public void Notify_BranchDestoryed(Branch branch)
     {
-        if (this.branch == branch)
+        if (Branch == branch)
         {
-            this.branch = null;
-            if (endQuest)
+            Branch = null;
+            if (EndQuest)
             {
                 if (quest?.State == QuestState.NotYetAccepted)
                 {
@@ -53,7 +53,7 @@ public class QuestPart_CriticalBranch : QuestPart, IBranchRelated
                 }
                 else if (quest?.State == QuestState.Ongoing)
                 {
-                    quest.End(endOutcome);
+                    quest.End(EndOutcome);
                 }
             }
         }

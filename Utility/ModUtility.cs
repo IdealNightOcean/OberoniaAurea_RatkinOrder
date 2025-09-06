@@ -1,7 +1,11 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using RimWorld.QuestGen;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -10,6 +14,12 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class ModUtility
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int GetSkillLevelOfPawn(this Pawn pawn, SkillDef skill)
+    {
+        return pawn.skills?.GetSkill(skill).GetLevel() ?? 0;
+    }
+
     public static bool AnyThingOfDef(Room room, ThingDef thingDef)
     {
         List<Region> regions = room.Regions;
@@ -54,19 +64,19 @@ public static class ModUtility
 
     public static void OnRatkinOrderRemoved(this QuestManager questManager, RatkinOrder order)
     {
-        ConcurrentBag<IRatkinOrderRelated> ratkinOrderRelateds = [];
+        ConcurrentBag<IOnRatkinOrderRemoved> ratkinOrderRelateds = [];
         questManager.ActiveQuestsListForReading
             .AsParallel()
             .ForAll(quest =>
             {
-                IEnumerable<IRatkinOrderRelated> relatedParts = quest.PartsListForReading.OfType<IRatkinOrderRelated>();
-                foreach (IRatkinOrderRelated relatedPartInner in relatedParts)
+                IEnumerable<IOnRatkinOrderRemoved> relatedParts = quest.PartsListForReading.OfType<IOnRatkinOrderRemoved>();
+                foreach (IOnRatkinOrderRemoved relatedPartInner in relatedParts)
                 {
                     ratkinOrderRelateds.Add(relatedPartInner);
                 }
             });
 
-        foreach (IRatkinOrderRelated relatedPart in ratkinOrderRelateds)
+        foreach (IOnRatkinOrderRemoved relatedPart in ratkinOrderRelateds)
         {
             relatedPart.Notify_RatkinOrderRemoved(order);
         }
@@ -109,5 +119,36 @@ public static class ModUtility
             PawnRelationUtility.Notify_PawnsSeenByPlayer_Letter(pawns, ref letterLabel, ref letterText, "LetterRelatedPawnsNeutralGroup".Translate(Faction.OfPlayer.def.pawnsPlural), informEvenIfSeenBefore: true);
         }
         return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Dialog_NodeTreeWithRatkinOrderInfo DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(TaggedString text, RatkinOrder ratkinOrder, Action acceptAction = null, Action rejectAction = null)
+    {
+        return new Dialog_NodeTreeWithRatkinOrderInfo(OAFrame_DiaUtility.ConfirmDiaNode(text, "Confirm".Translate(), acceptAction, "Close".Translate(), rejectAction), ratkinOrder);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Dialog_NodeTreeWithRatkinOrderInfo ConfirmDiaNodeTreeWithRatkinOrderInfo(TaggedString text, RatkinOrder ratkinOrder, string acceptText = null, Action acceptAction = null, string rejectText = null, Action rejectAction = null)
+    {
+        return new Dialog_NodeTreeWithRatkinOrderInfo(OAFrame_DiaUtility.ConfirmDiaNode(text, acceptText, acceptAction, rejectText, rejectAction), ratkinOrder);
+    }
+
+    public static void SetBasicOrderSlateVar(this Slate slate, RatkinOrder ratkinOrder)
+    {
+        slate.Set(KeyLibrary_SlateStoreAs.RatkinOrder, ratkinOrder);
+        slate.Set(KeyLibrary_SlateStoreAs.OrderName, ratkinOrder.Name);
+        slate.Set(KeyLibrary_SlateStoreAs.OrderFaction, ratkinOrder.Faction);
+
+        slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFaction, ratkinOrder.Faction);
+        slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFactionDef, ratkinOrder.Faction.def);
+    }
+
+    public static void SetBasicOrderSlateVar(this Slate slate, Branch branch)
+    {
+        slate.SetBasicOrderSlateVar(branch.RatkinOrder);
+
+        slate.Set(KeyLibrary_SlateStoreAs.Branch, branch);
+        slate.Set(KeyLibrary_SlateStoreAs.BranchName, branch.Name);
+        slate.Set(KeyLibrary_SlateStoreAs.BranchSite, branch.WorldObject);
     }
 }

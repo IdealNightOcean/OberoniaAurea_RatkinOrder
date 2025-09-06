@@ -10,7 +10,7 @@ public class QuestNode_CheckSkillLevel : QuestNode
     public SlateRef<string> outSignalSuccess;
     public SlateRef<string> outSignalFail;
     public SlateRef<SkillDef> skill;
-    public SlateRef<float> level;
+    public SlateRef<int> minLevel;
     public SlateRef<Pawn> pawn;
 
     protected override bool TestRunInt(Slate slate)
@@ -25,11 +25,11 @@ public class QuestNode_CheckSkillLevel : QuestNode
         {
             QuestPart_CheckSkillLevel questPart_CheckSkillLevel = new()
             {
-                inSignal = inSignal.GetValue(slate) ?? QuestGen.slate.Get<string>("inSignal"),
-                outSignalSuccess = outSignalFail.GetValue(slate),
-                outSignalFail = outSignalSuccess.GetValue(slate),
-                level = level.GetValue(slate),
-                pawn = pawn.GetValue(slate)
+                InSignal = inSignal.GetValue(slate) ?? QuestGen.slate.Get<string>("inSignal"),
+                OutSignalSuccess = outSignalFail.GetValue(slate),
+                OutSignalFail = outSignalSuccess.GetValue(slate),
+                MinLevel = minLevel.GetValue(slate),
+                Pawn = pawn.GetValue(slate)
             };
             QuestGen.quest.AddPart(questPart_CheckSkillLevel);
         }
@@ -38,42 +38,54 @@ public class QuestNode_CheckSkillLevel : QuestNode
 
 public class QuestPart_CheckSkillLevel : QuestPart
 {
-    public string inSignal;
-    public string outSignalSuccess;
-    public string outSignalFail;
-    public SkillDef skill;
-    public float level;
-    public Pawn pawn;
+    public string InSignal;
+    public string OutSignalSuccess;
+    public string OutSignalFail;
 
+    public SkillDef Skill;
+    public int MinLevel;
+    public Pawn Pawn;
 
-    public override void Notify_QuestSignalReceived(Signal signal)
+    public override void ExposeData()
     {
-        if (signal.tag == inSignal)
-        {
-            if (pawn is not null)
-            {
-                if (pawn.skills is null || pawn.skills.GetSkill(skill).GetLevel() < level)
-                {
-                    if (!outSignalFail.NullOrEmpty())
-                    {
-                        Find.SignalManager.SendSignal(new Signal(outSignalFail));
-                    }
-                }
-                else if (!outSignalSuccess.NullOrEmpty())
-                {
-                    Find.SignalManager.SendSignal(new Signal(outSignalSuccess));
-                }
-            }
-        }
+        base.ExposeData();
+        Scribe_Values.Look(ref InSignal, "InSignal");
+        Scribe_Values.Look(ref OutSignalSuccess, "OutSignalSuccess");
+        Scribe_Values.Look(ref OutSignalFail, "OutSignalFail");
+
+        Scribe_Defs.Look(ref Skill, "Skill");
+        Scribe_Values.Look(ref MinLevel, "MinLevel", 0);
+        Scribe_References.Look(ref Pawn, "Pawn");
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        inSignal = string.Empty;
-        outSignalSuccess = string.Empty;
-        outSignalFail = string.Empty;
-        skill = null;
-        pawn = null;
+        InSignal = null;
+        OutSignalSuccess = null;
+        OutSignalFail = null;
+        Skill = null;
+        Pawn = null;
+    }
+
+    public override void Notify_QuestSignalReceived(Signal signal)
+    {
+        if (signal.tag == InSignal)
+        {
+            if (Pawn is not null)
+            {
+                if (Pawn.skills is null || Pawn.skills.GetSkill(Skill).GetLevel() < MinLevel)
+                {
+                    if (!OutSignalFail.NullOrEmpty())
+                    {
+                        Find.SignalManager.SendSignal(new Signal(OutSignalFail));
+                    }
+                }
+                else if (!OutSignalSuccess.NullOrEmpty())
+                {
+                    Find.SignalManager.SendSignal(new Signal(OutSignalSuccess));
+                }
+            }
+        }
     }
 }

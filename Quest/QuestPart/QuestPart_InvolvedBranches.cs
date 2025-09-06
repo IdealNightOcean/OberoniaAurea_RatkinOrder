@@ -6,19 +6,19 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_InvolvedBranches : QuestPart, IBranchRelated
+public class QuestPart_InvolvedBranches : QuestPart, IOnBranchDestoryed
 {
-    public List<Branch> branches = [];
+    public List<Branch> Branches = [];
 
     public override IEnumerable<GlobalTargetInfo> QuestLookTargets
     {
         get
         {
-            if (branches is null)
+            if (Branches is null)
             {
                 yield break;
             }
-            foreach (Branch branch in branches)
+            foreach (Branch branch in Branches)
             {
                 if (branch?.WorldObject is not null)
                 {
@@ -31,49 +31,49 @@ public class QuestPart_InvolvedBranches : QuestPart, IBranchRelated
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Collections.Look(ref branches, "branches", LookMode.Reference);
+        Scribe_Collections.Look(ref Branches, "Branches", LookMode.Reference);
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        branches = null;
+        Branches = null;
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)
     {
-        branches?.RemoveAll(b => b.RatkinOrder == order);
+        Branches?.RemoveAll(b => b.RatkinOrder == order);
     }
 
     public void Notify_BranchDestoryed(Branch branch)
     {
-        branches?.Remove(branch);
+        Branches?.Remove(branch);
     }
 
     public static void AddInvolvedBranch(Quest quest, Branch branch)
     {
-        QuestPart_InvolvedBranches questPart_InvolvedBranches = quest.PartsListForReading.OfType<QuestPart_InvolvedBranches>().FirstOrFallback(null);
+        QuestPart_InvolvedBranches questPart_InvolvedBranches = quest.PartsListForReading.OfType<QuestPart_InvolvedBranches>()?.FirstOrFallback(null);
         if (questPart_InvolvedBranches is null)
         {
             questPart_InvolvedBranches = new QuestPart_InvolvedBranches();
-            questPart_InvolvedBranches.branches.Add(branch);
+            questPart_InvolvedBranches.Branches.Add(branch);
             quest.AddPart(questPart_InvolvedBranches);
         }
         else
         {
-            questPart_InvolvedBranches.branches.AddDistinct(branch);
+            questPart_InvolvedBranches.Branches.AddDistinct(branch);
         }
     }
 
     public static void AddInvolvedBranch(Quest quest, IEnumerable<Branch> branches)
     {
-        QuestPart_InvolvedBranches questPart_InvolvedBranches = quest.PartsListForReading.OfType<QuestPart_InvolvedBranches>().FirstOrFallback(null);
+        QuestPart_InvolvedBranches questPart_InvolvedBranches = quest.PartsListForReading.OfType<QuestPart_InvolvedBranches>()?.FirstOrFallback(null);
         if (questPart_InvolvedBranches is null)
         {
             questPart_InvolvedBranches = new QuestPart_InvolvedBranches();
             foreach (Branch branch in branches)
             {
-                questPart_InvolvedBranches.branches.AddDistinct(branch);
+                questPart_InvolvedBranches.Branches.AddDistinct(branch);
             }
             quest.AddPart(questPart_InvolvedBranches);
         }
@@ -81,7 +81,7 @@ public class QuestPart_InvolvedBranches : QuestPart, IBranchRelated
         {
             foreach (Branch branch in branches)
             {
-                questPart_InvolvedBranches.branches.AddDistinct(branch);
+                questPart_InvolvedBranches.Branches.AddDistinct(branch);
             }
         }
     }

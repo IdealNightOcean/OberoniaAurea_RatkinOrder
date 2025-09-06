@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-internal class ChoiceLetter_TemporaryEncampment : ChoiceLetter
+internal class ChoiceLetter_TemporaryEncampment : ChoiceLetter_RatkinOrder
 {
     public WorldObject_TemporaryEncampment temporaryEncampment;
 
@@ -37,7 +37,7 @@ internal class ChoiceLetter_TemporaryEncampment : ChoiceLetter
     {
         get
         {
-            if (temporaryEncampment is null || !temporaryEncampment.hasSupplyRequest)
+            if (temporaryEncampment is null || !temporaryEncampment.IsRequestActive)
             {
                 yield return Option_Close;
             }

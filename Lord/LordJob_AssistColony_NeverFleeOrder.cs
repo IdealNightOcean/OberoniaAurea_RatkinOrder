@@ -7,26 +7,29 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class LordJob_AssistColony_NeverFleeOrder : LordJob_AssistColony_NeverFlee
 {
-    private Squad squad;
+    private Branch branch;
     private bool isCommander;
+
+    private Squad Squad => branch.Squad;
+
     public LordJob_AssistColony_NeverFleeOrder() : base() { }
-    public LordJob_AssistColony_NeverFleeOrder(Faction faction, IntVec3 fallbackLocation, Squad squad, bool isCommander) : base(faction, fallbackLocation)
+    public LordJob_AssistColony_NeverFleeOrder(Faction faction, IntVec3 fallbackLocation, Branch branch, bool isCommander) : base(faction, fallbackLocation)
     {
-        this.squad = squad;
+        this.branch = branch;
         this.isCommander = isCommander;
     }
 
     public override void Notify_PawnLost(Pawn p, PawnLostCondition condition)
     {
-        if (condition == PawnLostCondition.ExitedMap && squad is not null)
+        if (condition == PawnLostCondition.ExitedMap && Squad is not null)
         {
             if (isCommander)
             {
-                squad.SquadStat.CommanderCount++;
+                Squad.SquadStat.CommanderCount++;
             }
             else
             {
-                squad.SquadStat.MemberCount++;
+                Squad.SquadStat.MemberCount++;
             }
         }
     }
@@ -34,7 +37,7 @@ public class LordJob_AssistColony_NeverFleeOrder : LordJob_AssistColony_NeverFle
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref squad, "squad");
+        Scribe_References.Look(ref branch, "branch");
         Scribe_Values.Look(ref isCommander, "isCommander");
     }
 }

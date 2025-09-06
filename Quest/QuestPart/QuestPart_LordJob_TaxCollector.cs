@@ -6,50 +6,53 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomTalk
+/// <summary>
+/// 征募队的 LordJob | TalkAction （内部特化类）
+/// </summary>
+internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomTalk
 {
-    public string inSignalTreat;
+    public string InSignalTreat;
 
-    public string outSignalQuestFail;
-    public string outSignalQuestSuccess;
+    public string OutSignalQuestFail;
+    public string OutSignalQuestSuccess;
 
-    public Faction subFaction;
+    public Faction SubFaction;
 
     private bool triggered;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref inSignalTreat, "inSignalTreat");
+        Scribe_Values.Look(ref InSignalTreat, "InSignalTreat");
 
-        Scribe_Values.Look(ref outSignalQuestFail, "outSignalQuestFail");
-        Scribe_Values.Look(ref outSignalQuestSuccess, "outSignalQuestSuccess");
+        Scribe_Values.Look(ref OutSignalQuestFail, "OutSignalQuestFail");
+        Scribe_Values.Look(ref OutSignalQuestSuccess, "OutSignalQuestSuccess");
 
         Scribe_Values.Look(ref triggered, "triggered", defaultValue: false);
 
-        Scribe_References.Look(ref subFaction, "subFaction");
+        Scribe_References.Look(ref SubFaction, "SubFaction");
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        inSignalTreat = null;
+        InSignalTreat = null;
 
-        outSignalQuestFail = null;
-        outSignalQuestSuccess = null;
+        OutSignalQuestFail = null;
+        OutSignalQuestSuccess = null;
 
-        subFaction = null;
+        SubFaction = null;
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         base.Notify_QuestSignalReceived(signal);
-        if (!triggered && signal.tag == inSignalTreat)
+        if (!triggered && signal.tag == InSignalTreat)
         {
             triggered = true;
             if (talkWith is not null && TryTriggerQuest())
             {
-                Find.SignalManager.SendSignal(new Signal(outSignalQuestSuccess));
+                Find.SignalManager.SendSignal(new Signal(OutSignalQuestSuccess));
             }
             else
             {
@@ -58,7 +61,7 @@ public class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomTalk
                                                textLetterDef: LetterDefOf.NegativeEvent,
                                                lookTargets: pawns);
 
-                Find.SignalManager.SendSignal(new Signal(outSignalQuestFail));
+                Find.SignalManager.SendSignal(new Signal(OutSignalQuestFail));
             }
         }
     }
@@ -71,7 +74,7 @@ public class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomTalk
 
             slate.Set("map", talkWith.MapHeld);
             slate.Set("faction", faction);
-            slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFactionStoreAs, subFaction);
+            slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, SubFaction);
 
             List<Pawn> slatePawns = [];
             slatePawns.AddRange(pawns);

@@ -7,11 +7,11 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class QuestNode_GetBranchBase : QuestNode
 {
     [NoTranslate]
-    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.BranchStoreAs;
+    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.Branch;
 
     public SlateRef<bool> storeRatkinOrder;
     [NoTranslate]
-    public SlateRef<string> storeRatkinOrderAs = KeyLibrary_SlateStoreAs.RatkinOrderStoreAs;
+    public SlateRef<string> storeRatkinOrderAs = KeyLibrary_SlateStoreAs.RatkinOrder;
 
     public SlateRef<bool> addRatkinOrderToQuest;
 
@@ -57,9 +57,9 @@ public abstract class QuestNode_GetBranchBase : QuestNode
         {
             QuestPart_CriticalBranch questPart_CriticalBranch = new()
             {
-                branch = branch,
-                endQuest = endQuestWhenOrderInvalid.GetValue(slate),
-                endOutcome = questEndOutcome.GetValue(slate)
+                Branch = branch,
+                EndQuest = endQuestWhenOrderInvalid.GetValue(slate),
+                EndOutcome = questEndOutcome.GetValue(slate)
             };
             quest.AddPart(questPart_CriticalBranch);
         }

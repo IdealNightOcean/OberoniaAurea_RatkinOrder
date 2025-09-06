@@ -17,4 +17,6 @@ public static class KeyLibrary_CDRecord
     public const string DemandFriendlyInform = "DemandFriendlyInform"; // 友好分部需求告知
 
     public const string SquadStateDesc = "SquadStateDesc"; // 分队状态更新
+
+    public const string KnightGroupProactiveVisit = "KnightGroupProactiveVisit";
 }

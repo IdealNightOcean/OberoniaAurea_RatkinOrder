@@ -18,7 +18,7 @@ public class ReformationManager : IExposable, IPostLoadInit, IDrawDevWindow
         set { reformProgress = value; }
     }
 
-    public float fixedReformProgressCost = -1f;
+    public float FixedReformProgressCost = -1f;
 
     private HashSet<OrderReformationDef> reformations = [];
     public int ReformationsCount => reformations.Count;
@@ -38,7 +38,7 @@ public class ReformationManager : IExposable, IPostLoadInit, IDrawDevWindow
     public void ExposeData()
     {
         Scribe_Values.Look(ref reformProgress, "reformProgress", 0f);
-        Scribe_Values.Look(ref fixedReformProgressCost, "fixedReformProgressCost", -1f);
+        Scribe_Values.Look(ref FixedReformProgressCost, "FixedReformProgressCost", -1f);
 
         Scribe_Collections.Look(ref reformations, "reformations", LookMode.Def);
     }
@@ -47,7 +47,7 @@ public class ReformationManager : IExposable, IPostLoadInit, IDrawDevWindow
     {
         listing_Rect.Label($"ReformProgress: {reformProgress}");
         listing_Rect.Label($"ReformationsCount: {ReformationsCount}");
-        listing_Rect.Label($"FixedReformProgressCost: {fixedReformProgressCost}");
+        listing_Rect.Label($"FixedReformProgressCost: {FixedReformProgressCost}");
 
         if (listing_Rect.ButtonText("Reformations", null, 0.8f))
         {
@@ -81,7 +81,7 @@ public class ReformationManager : IExposable, IPostLoadInit, IDrawDevWindow
             return resultOnly ? false : "OARO_HasSameReformation".Translate();
         }
 
-        float reformProgressCost = fixedReformProgressCost > 0f ? fixedReformProgressCost : GetReformProgressCost(def);
+        float reformProgressCost = FixedReformProgressCost > 0f ? FixedReformProgressCost : GetReformProgressCost(def);
         if (reformProgress < reformProgressCost)
         {
             return resultOnly ? false : "OARO_Insufficien_ReformProgresst".Translate(reformProgressCost);

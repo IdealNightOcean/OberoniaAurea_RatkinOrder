@@ -35,7 +35,7 @@ public class QuestNode_ThingRequester : QuestNode
 
         QuestPart_ThingRequester questPart_ThingRequester = new()
         {
-            thingRequester = thingRequester
+            ThingRequester = thingRequester
         };
         QuestGen.quest.AddPart(questPart_ThingRequester);
     }
@@ -43,16 +43,16 @@ public class QuestNode_ThingRequester : QuestNode
 
 public class QuestPart_ThingRequester : QuestPart
 {
-    public IThingRequester thingRequester;
+    public IThingRequester ThingRequester;
     public override void Cleanup()
     {
         base.Cleanup();
-        thingRequester?.DisableRequest();
-        thingRequester = null;
+        ThingRequester?.DisableRequest();
+        ThingRequester = null;
     }
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref thingRequester, "thingRequester");
+        Scribe_References.Look(ref ThingRequester, "ThingRequester");
     }
 }

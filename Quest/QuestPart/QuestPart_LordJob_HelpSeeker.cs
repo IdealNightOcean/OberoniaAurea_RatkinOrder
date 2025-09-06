@@ -6,56 +6,59 @@ using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
-internal class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
+/// <summary>
+/// 善行求助者的 LordJob | TalkAction
+/// </summary>
+public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 {
-    public string inSignalAccept;
-    public string ininSignalReject;
+    public string InSignalAccept;
+    public string IninSignalReject;
 
     private bool canTriggered = true;
 
-    public QuestScriptDef mercyQuestDef;
+    public QuestScriptDef MmercyQuestDef;
 
-    public Faction subFaction;
-    public Faction parentFaction;
-    public FactionDef parentFactionDef;
+    public Faction SubFaction;
+    public Faction ParentFaction;
+    public FactionDef ParentFactionDef;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref inSignalAccept, "inSignalAccept");
-        Scribe_Values.Look(ref ininSignalReject, "ininSignalReject");
+        Scribe_Values.Look(ref InSignalAccept, "InSignalAccept");
+        Scribe_Values.Look(ref IninSignalReject, "IninSignalReject");
 
         Scribe_Values.Look(ref canTriggered, "canTriggered", defaultValue: true);
 
-        Scribe_Defs.Look(ref mercyQuestDef, "mercyQuestDef");
+        Scribe_Defs.Look(ref MmercyQuestDef, "MmercyQuestDef");
 
-        Scribe_References.Look(ref subFaction, "subFaction");
-        Scribe_References.Look(ref parentFaction, "parentFaction");
-        Scribe_Defs.Look(ref parentFactionDef, "parentFactionDef");
+        Scribe_References.Look(ref SubFaction, "SubFaction");
+        Scribe_References.Look(ref ParentFaction, "ParentFaction");
+        Scribe_Defs.Look(ref ParentFactionDef, "ParentFactionDef");
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        inSignalAccept = null;
-        ininSignalReject = null;
+        InSignalAccept = null;
+        IninSignalReject = null;
 
-        mercyQuestDef = null;
+        MmercyQuestDef = null;
 
-        subFaction = null;
-        parentFaction = null;
-        parentFactionDef = null;
+        SubFaction = null;
+        ParentFaction = null;
+        ParentFactionDef = null;
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         base.Notify_QuestSignalReceived(signal);
-        if (canTriggered && signal.tag == inSignalAccept)
+        if (canTriggered && signal.tag == InSignalAccept)
         {
             canTriggered = false;
             TryTriggerQuest();
         }
-        else if (signal.tag == ininSignalReject)
+        else if (signal.tag == IninSignalReject)
         {
             canTriggered = false;
             this.DeregisterTalkAction();
@@ -67,20 +70,20 @@ internal class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
     {
         Slate slate = new();
 
-        if (subFaction is not null)
+        if (SubFaction is not null)
         {
-            slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFactionStoreAs, subFaction);
+            slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, SubFaction);
         }
-        if (parentFaction is not null)
+        if (ParentFaction is not null)
         {
-            slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFactionStoreAs, parentFaction);
+            slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFaction, ParentFaction);
         }
-        if (parentFactionDef is not null)
+        if (ParentFactionDef is not null)
         {
-            slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFactionDefStoreAs, parentFactionDef);
+            slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFactionDef, ParentFactionDef);
         }
 
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, mercyQuestDef, slate, forced: true);
+        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, MmercyQuestDef, slate, forced: true);
     }
 
     public override void TalkAction(Pawn talker, Pawn talkWith)
@@ -90,12 +93,12 @@ internal class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 
     private Dialog_NodeTree HelpQuizNodeTree(Pawn talkWith)
     {
-        DiaNode rootNode = new(GetTalkText(mercyQuestDef));
+        DiaNode rootNode = new(GetTalkText(MmercyQuestDef));
         DiaOption acceptOpt = new("OARO_TalkWithHelpSeeker_Accept".Translate())
         {
             action = delegate
             {
-                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "AcceptMercyQuest", talkWith.Named("SUBJECT"), mercyQuestDef.Named("QUEST"));
+                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "AcceptMercyQuest", talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST"));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -105,7 +108,7 @@ internal class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "RejectMercyQuest", talkWith.Named("SUBJECT"), mercyQuestDef.Named("QUEST"));
+                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "RejectMercyQuest", talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST"));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true

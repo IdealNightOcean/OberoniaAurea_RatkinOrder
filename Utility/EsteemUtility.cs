@@ -42,7 +42,7 @@ public static class EsteemUtility
                 }
                 else
                 {
-                    Messages.Message("OARO_Message_AllOrdersEsteemDecrease".Translate(change), MessageTypeDefOf.NegativeEvent);
+                    Messages.Message("OARO_Message_AllOrdersEsteemDecrease".Translate(change, reason), MessageTypeDefOf.NegativeEvent);
                 }
             }
         }
@@ -52,9 +52,20 @@ public static class EsteemUtility
     /// 关系类型枚举数组
     /// </summary>
     public static readonly OrderRelationshipKind[] RelationshipKindArr = (OrderRelationshipKind[])Enum.GetValues(typeof(OrderRelationshipKind));
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static OrderRelationshipKind RelationshipKindOffsetBy(this OrderRelationshipKind relationship, int offset)
     {
         return RelationshipKindArr[Mathf.Clamp((int)relationship + offset, 0, RelationshipKindArr.Length - 1)];
+    }
+
+    public static void RelationshipKindOffsetBy(this RatkinOrder order, int offset)
+    {
+        if (offset == 0)
+        {
+            return;
+        }
+        order.EsteemHandler.SetRelationship(order.Relationship.RelationshipKindOffsetBy(offset));
     }
 
     /// <summary>

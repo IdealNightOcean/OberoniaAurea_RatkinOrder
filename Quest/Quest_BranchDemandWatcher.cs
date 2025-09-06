@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.QuestGen;
+using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -19,49 +20,61 @@ public class QuestNode_BranchDemandWatcher : QuestNode
     {
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
-            branch = branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.BranchStoreAs),
-            demandType = demandType.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandTypeStoreAs)
+            Branch = branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            DemandType = demandType.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType)
         };
 
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
     }
 }
 
-public class QuestPart_BranchDemandWatcher : QuestPart, IBranchRelated
+public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestoryed
 {
 
-    public Branch branch;
-    public BranchDemandType demandType;
+    public Branch Branch;
+    public BranchDemandType DemandType;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref demandType, "demandType", default);
+        Scribe_References.Look(ref Branch, "Branch");
+        Scribe_Values.Look(ref DemandType, "DemandType", default);
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
 
-        OrderInteractionHandler.Instance.Notify_DemandQuestClean(quest);
-        demandType = default;
-        branch = null;
+        OrderInteractionHandler.AcceptedBranchDemandHandler.Notify_DemandQuestClean(quest);
+        DemandType = default;
+        Branch = null;
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)
     {
-        if (branch?.RatkinOrder == order)
+        if (Branch?.RatkinOrder == order)
         {
-            branch = null;
+            Branch = null;
         }
     }
 
     public void Notify_BranchDestoryed(Branch branch)
     {
-        if (this.branch == branch)
+        if (Branch == branch)
         {
-            this.branch = null;
+            Branch = null;
         }
+    }
+
+    public static (Branch branch, BranchDemandType demandType) GetBranchDemand(Quest quest)
+    {
+        QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = quest?.PartsListForReading.OfType<QuestPart_BranchDemandWatcher>()?.FirstOrFallback(null);
+
+        if (questPart_BranchDemandWatcher is null)
+        {
+            return (null, BranchDemandType.Normal);
+        }
+
+        return (questPart_BranchDemandWatcher.Branch, questPart_BranchDemandWatcher.DemandType);
     }
 }

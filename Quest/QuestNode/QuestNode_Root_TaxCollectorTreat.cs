@@ -6,31 +6,39 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeBase
+/// <summary>
+/// 招待征收官
+/// </summary>
+internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeBase
 {
     protected override Faction GetOrGenerateFaction()
     {
+        QuestGen.slate.Set("isMainFaction", true);
         return QuestGen.slate.Get<Faction>("faction");
     }
 
     protected override void InitQuestParameter()
     {
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubRatkinFactionStoreAs);
+        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubRatkinFaction);
         questParameter = new()
         {
             allowAssaultColony = false,
             allowBadThought = false,
             allowLeave = true,
+            allowFutureReward = false,
+            allowJoinOffer = false,
 
             LodgerCount = 7,
             ChildCount = 0,
 
-            goodwillSuccess = 12,
+            goodwillSuccess = 0,
             goodwillFailure = -12,
 
             questDurationTicks = 3 * 60000
         };
 
+        QuestGen.slate.Set("uniqueQuestDesc", true);
+        QuestGen.slate.Set("uniqueLeavingLetter", true);
         QuestPart_InvolvedFactions questPart_InvolvedFactions = new()
         {
             factions = [subFaction]
@@ -63,8 +71,8 @@ public class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeBase
         base.AddQuestAward(choice);
         Reward_AllOrdersEsteem reward = new()
         {
-            amount = 3,
-            reason = "OARO_PutOffTaxCollector".Translate()
+            Amount = 3,
+            Reason = "OARO_PutOffTaxCollector".Translate()
         };
         choice.rewards.Add(reward);
     }
@@ -91,9 +99,9 @@ public class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeBase
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange = new()
         {
-            inSignalTrigger = successSignal,
-            change = 3,
-            reason = "OARO_PutOffTaxCollector".Translate(),
+            InSignalTrigger = successSignal,
+            Change = 3,
+            Reason = "OARO_PutOffTaxCollector".Translate(),
         };
         quest.AddPart(questPart_AllOrdersEsteemChange);
         base.SetQuestEndComp(questPart_Interactions, failSignal, bigFailSignal, successSignal);

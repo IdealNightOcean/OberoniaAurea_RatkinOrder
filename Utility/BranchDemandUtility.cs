@@ -112,6 +112,7 @@ public static class BranchDemandUtility
 
         return true;
 
+        /*
         OrderRelationshipKind restrictedRelation = demand.Def.demandType switch
         {
             BranchDemandType.Important => OrderRelationshipKind.Trustworthy,
@@ -130,6 +131,7 @@ public static class BranchDemandUtility
         }
 
         return true;
+        */
     }
 
 
@@ -146,7 +148,7 @@ public static class BranchDemandUtility
 
             OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name),
                                                text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name, demandDef.label),
-                                               letterType: OrderLetter.LetterType.Official,
+                                               letterType: OrderLetterType.Official,
                                                relatedOrder: branch.RatkinOrder,
                                                sender: branch.Name);
         }

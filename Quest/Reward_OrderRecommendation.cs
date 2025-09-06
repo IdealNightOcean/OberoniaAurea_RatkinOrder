@@ -10,54 +10,53 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Reward_OrderRecommendation : Reward
 {
-    public int count;
-    public RatkinOrder order;
-    public MapParent mapParent;
-    public bool giveToCaravan;
+    public RatkinOrder RatkinOrder;
+    public int Count;
+    public MapParent MapParent;
+    public bool GiveToCaravan;
 
     public override IEnumerable<GenUI.AnonymousStackElement> StackElements
     {
         get
         {
-            Color color = order.Color;
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_OrderRecommendation".Translate(order.Name).Colorize(color) + " " + count.ToStringWithSign(),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_OrderRecommendation".Translate(RatkinOrder.Name) + " " + Count.ToStringWithSign(),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
                                                                             GUI.DrawTexture(r, null); //OARO_ThingDefOf.OARO_OrderRecommendation.uiIcon
                                                                             GUI.color = Color.white;
                                                                         },
-                                                                        tipGetter: () => "OARO_OrderRecommendationTip".Translate(order.Name).Resolve().Colorize(color));
+                                                                        tipGetter: () => "OARO_Reward_OrderRecommendationTip".Translate(RatkinOrder.Name).Resolve());
         }
     }
 
     public override void InitFromValue(float rewardValue, RewardsGeneratorParams parms, out float valueActuallyUsed)
     {
-        count = Mathf.Max(count, 0);
-        valueActuallyUsed = count;
+        Count = Mathf.Max(Count, 0);
+        valueActuallyUsed = Count;
     }
 
     public override IEnumerable<QuestPart> GenerateQuestParts(int index, RewardsGeneratorParams parms, string customLetterLabel, string customLetterText, RulePack customLetterLabelRules, RulePack customLetterTextRules)
     {
         yield return new QuestPart_OrderRecommendation()
         {
-            inSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-            order = order ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrderStoreAs),
-            count = count,
-            mapParent = mapParent,
-            giveToCaravan = giveToCaravan,
+            InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
+            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            Count = Count,
+            MapParent = MapParent,
+            GiveToCaravan = GiveToCaravan,
         };
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_OrderRecommendationTip".Translate(order.NameColored, count).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_OrderRecommendationDesc".Translate(RatkinOrder.Name, Count).Resolve();
 
-    public override string ToString() => $"{GetType().Name} (RatkinOrder={order.NameColored}, count={count})";
+    public override string ToString() => $"{GetType().Name} (RatkinOrder={RatkinOrder.NameColored}, count={Count})";
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref count, "count", 0);
-        Scribe_References.Look(ref order, "order");
-        Scribe_References.Look(ref mapParent, "mapParent");
-        Scribe_Values.Look(ref giveToCaravan, "giveToCaravan", defaultValue: false);
+        Scribe_Values.Look(ref Count, "Count", 0);
+        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
+        Scribe_References.Look(ref MapParent, "MapParent");
+        Scribe_Values.Look(ref GiveToCaravan, "GiveToCaravan", defaultValue: false);
     }
 }

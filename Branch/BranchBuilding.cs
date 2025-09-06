@@ -4,7 +4,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuilding : IExposable
 {
-    public BranchBuildingDef def;
+    public BranchBuildingDef Def;
 
     public virtual void PostAddBuilding(Branch branch) { } // 添加建筑时触发的事件
 
@@ -14,7 +14,7 @@ public class BranchBuilding : IExposable
 
     public virtual void ExposeData()
     {
-        Scribe_Defs.Look(ref def, "def");
+        Scribe_Defs.Look(ref Def, "Def");
     }
 
 }

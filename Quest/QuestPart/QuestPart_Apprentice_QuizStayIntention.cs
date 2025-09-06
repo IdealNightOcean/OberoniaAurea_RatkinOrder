@@ -3,86 +3,89 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_Apprentice_QuizStayIntention : QuestPart
+/// <summary>
+/// 询问小学徒加入意愿（内部特化类）
+/// </summary>
+internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
 {
-    public bool isNormalLeave;
+    public bool IsNormalLeave;
 
-    public string inSiganl;
-    public string inSignalSkillSuccess;
-    public string inSignalResolved;
+    public string InSiganl;
+    public string InSignalSkillSuccess;
+    public string InSignalResolved;
 
     private bool resolved;
     private bool sentOnce;
     private bool skillSuccess;
 
-    public string outSignalStay;
-    public string outSignalLeave;
+    public string OutSignalStay;
+    public string OutSignalLeave;
 
-    public Faction faction;
-    public Pawn apprentice;
+    public Faction Faction;
+    public Pawn Apprentice;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref isNormalLeave, "isNormalLeave", defaultValue: true);
+        Scribe_Values.Look(ref IsNormalLeave, "IsNormalLeave", defaultValue: true);
 
-        Scribe_Values.Look(ref inSiganl, "inSiganl");
-        Scribe_Values.Look(ref inSignalSkillSuccess, "inSignalSkillSuccess");
-        Scribe_Values.Look(ref inSignalResolved, "inSignalResolved");
+        Scribe_Values.Look(ref InSiganl, "InSiganl");
+        Scribe_Values.Look(ref InSignalSkillSuccess, "InSignalSkillSuccess");
+        Scribe_Values.Look(ref InSignalResolved, "InSignalResolved");
 
         Scribe_Values.Look(ref resolved, "resolved", defaultValue: false);
         Scribe_Values.Look(ref skillSuccess, "skillSuccess", defaultValue: false);
         Scribe_Values.Look(ref sentOnce, "sentOnce", defaultValue: false);
 
-        Scribe_Values.Look(ref outSignalStay, "outSignalStay");
-        Scribe_Values.Look(ref outSignalLeave, "outSignalLeave");
+        Scribe_Values.Look(ref OutSignalStay, "OutSignalStay");
+        Scribe_Values.Look(ref OutSignalLeave, "OutSignalLeave");
 
-        Scribe_References.Look(ref faction, "faction");
-        Scribe_References.Look(ref apprentice, "apprentice");
+        Scribe_References.Look(ref Faction, "Faction");
+        Scribe_References.Look(ref Apprentice, "Apprentice");
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        inSiganl = null;
-        inSignalSkillSuccess = null;
-        inSignalResolved = null;
+        InSiganl = null;
+        InSignalSkillSuccess = null;
+        InSignalResolved = null;
 
-        outSignalStay = null;
-        outSignalLeave = null;
+        OutSignalStay = null;
+        OutSignalLeave = null;
 
-        faction = null;
-        apprentice = null;
+        Faction = null;
+        Apprentice = null;
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         if (sentOnce) { return; }
 
-        if (!skillSuccess && signal.tag == inSignalSkillSuccess)
+        if (!skillSuccess && signal.tag == InSignalSkillSuccess)
         {
             skillSuccess = true;
         }
-        else if (!isNormalLeave && signal.tag == inSignalResolved)
+        else if (!IsNormalLeave && signal.tag == InSignalResolved)
         {
             resolved = true;
         }
-        else if (signal.tag == inSiganl)
+        else if (signal.tag == InSiganl)
         {
             sentOnce = true;
             TaggedString label;
             TaggedString text;
-            if (isNormalLeave)
+            if (IsNormalLeave)
             {
                 if (skillSuccess)
                 {
                     label = "OARO_Apprentice_QuizStayIntentionLabel_NS".Translate();
-                    text = "OARO_Apprentice_QuizStayIntention_NS".Translate(apprentice);
+                    text = "OARO_Apprentice_QuizStayIntention_NS".Translate(Apprentice);
                 }
                 else
                 {
                     label = "OARO_Apprentice_QuizStayIntentionLabel_NF".Translate();
-                    text = "OARO_Apprentice_QuizStayIntention_NF".Translate(apprentice);
+                    text = "OARO_Apprentice_QuizStayIntention_NF".Translate(Apprentice);
                 }
             }
             else
@@ -92,12 +95,12 @@ public class QuestPart_Apprentice_QuizStayIntention : QuestPart
                     if (skillSuccess)
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SRS".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SRS".Translate(apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SRS".Translate(Apprentice);
                     }
                     else
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SRF".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SRF".Translate(apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SRF".Translate(Apprentice);
                     }
                 }
                 else
@@ -105,12 +108,12 @@ public class QuestPart_Apprentice_QuizStayIntention : QuestPart
                     if (skillSuccess)
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SS".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SS".Translate(apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SS".Translate(Apprentice);
                     }
                     else
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SF".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SF".Translate(apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SF".Translate(Apprentice);
                     }
                 }
             }
@@ -118,12 +121,12 @@ public class QuestPart_Apprentice_QuizStayIntention : QuestPart
             ChoiceLetter_Apprentice_QuizStayIntention letter = (ChoiceLetter_Apprentice_QuizStayIntention)LetterMaker.MakeLetter(label: label,
                                                                                                                                  text: text,
                                                                                                                                  def: OARO_ModDefOf.OARO_Apprentice_QuizStayIntentionLetter,
-                                                                                                                                 lookTargets: apprentice,
-                                                                                                                                 relatedFaction: faction,
+                                                                                                                                 lookTargets: Apprentice,
+                                                                                                                                 relatedFaction: Faction,
                                                                                                                                  quest: quest);
-            letter.outSignalStay = outSignalStay;
-            letter.outSignalLeave = outSignalLeave;
-            letter.apprentice = apprentice;
+            letter.outSignalStay = OutSignalStay;
+            letter.outSignalLeave = OutSignalLeave;
+            letter.apprentice = Apprentice;
             letter.StartTimeout(60000);
             Find.LetterStack.ReceiveLetter(letter);
         }

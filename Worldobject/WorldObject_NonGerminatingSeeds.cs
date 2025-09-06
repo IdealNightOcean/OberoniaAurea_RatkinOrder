@@ -5,7 +5,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFixedCaravan_Village
+/// <summary>
+/// 不发芽种子村庄（特化类）
+/// </summary>
+public sealed class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFixedCaravan_Nameable
 {
     private static readonly SimpleCurve successCurve = new([new CurvePoint(4, 0), new CurvePoint(12, 1)]);
     public override int TicksNeeded => 180000;

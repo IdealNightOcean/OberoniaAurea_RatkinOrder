@@ -2,21 +2,22 @@
 
 public static class KeyLibrary_SlateStoreAs
 {
-    public const string RatkinOrderStoreAs = "ratkinOrder";
-    public const string OrderFactionStoreAs = "orderFaction";
-    public const string OrderNameStoreAs = "orderName";
-    public const string BranchStoreAs = "branch";
-    public const string BranchNameStoreAs = "branchName";
-    public const string BranchSiteStoreAs = "branchSite";
-    public const string SquadStoreAs = "squad";
+    public const string RatkinOrder = "ratkinOrder";
+    public const string OrderFaction = "orderFaction";
+    public const string OrderName = "orderName";
 
-    public const string MercyQuestStoreAs = "mercyQuest";
-    public const string SubRatkinFactionStoreAs = "subFaction";
-    public const string SubRatkinFactionDefStoreAs = "subFactionDef";
-    public const string ParentRatkinFactionStoreAs = "parentFaction";
-    public const string ParentRatkinFactionDefStoreAs = "parentFactionDef";
+    public const string Branch = "branch";
+    public const string BranchName = "branchName";
+    public const string BranchSite = "branchSite";
 
-    public const string DemandTypeStoreAs = "demandType";
-    public const string DemandDefStoreAs = "demandDef";
+    public const string Squad = "squad";
 
+    public const string SubRatkinFaction = "subFaction";
+    public const string SubRatkinFactionDef = "subFactionDef";
+    public const string ParentRatkinFaction = "parentFaction";
+    public const string ParentRatkinFactionDef = "parentFactionDef";
+
+    public const string MercyQuest = "mercyQuest";
+    public const string DemandType = "demandType";
+    public const string DemandDef = "demandDef";
 }

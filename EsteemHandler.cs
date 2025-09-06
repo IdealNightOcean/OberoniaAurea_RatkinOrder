@@ -25,7 +25,7 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
     private OrderRelationshipKind relationship = OrderRelationshipKind.Stranger; //当前关系
     public OrderRelationshipKind Relationship => relationship;
 
-    public int lastRelationshipChangeTick = -1;
+    public int LastRelationshipChangeTick = -1;
 
     private int totalRecommendation;
     public int TotalRecommendation
@@ -53,7 +53,7 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         Scribe_Values.Look(ref lastEsteemChangeReason, "lastEsteemChangeReason");
 
         Scribe_Values.Look(ref relationship, "relationship", OrderRelationshipKind.Stranger);
-        Scribe_Values.Look(ref lastRelationshipChangeTick, "lastRelationshipChangeTick", -1);
+        Scribe_Values.Look(ref LastRelationshipChangeTick, "LastRelationshipChangeTick", -1);
 
         Scribe_Values.Look(ref totalRecommendation, "totalRecommendation", 0);
     }
@@ -65,7 +65,7 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         listing_Rect.Label($"lastEsteemChangeReason(by player): {lastEsteemChangeReason}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"Relationship: {relationship}");
-        listing_Rect.Label($"LastRelationshipChangeTick: {lastRelationshipChangeTick}");
+        listing_Rect.Label($"LastRelationshipChangeTick: {LastRelationshipChangeTick}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"TotalRecommendation: {totalRecommendation}");
         // listing_Rect.Label($"CurRecommendation: {curRecommendation}");
@@ -119,7 +119,7 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
                     }
                     else
                     {
-                        Messages.Message("OARO_Message_EsteemDecrease".Translate(RatkinOrder.Name, lastEsteemChange), MessageTypeDefOf.NegativeEvent);
+                        Messages.Message("OARO_Message_EsteemDecrease".Translate(RatkinOrder.Name, lastEsteemChange, reason), MessageTypeDefOf.NegativeEvent);
                     }
                 }
             }
@@ -132,5 +132,6 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         {
             return;
         }
+        relationship = newRelationship;
     }
 }

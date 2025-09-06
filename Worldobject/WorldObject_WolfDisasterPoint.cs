@@ -5,7 +5,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFixedCaravan_Village
+/// <summary>
+/// 狼灾检查点（特化类）
+/// </summary>
+internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFixedCaravan_Nameable
 {
     private static readonly SimpleCurve successCurve = new([new CurvePoint(4, 0), new CurvePoint(15, 1)]);
 

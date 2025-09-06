@@ -1,0 +1,150 @@
+﻿using RimWorld;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public static class OrderHallUtility
+{
+    private static readonly int[] areaBoundaries = [int.MinValue, 40, 50, 60, 80, 120, 160];
+    private static readonly float[] impressivenessBoundaries = [float.MinValue, 80f, 90f, 120f, 140f, 160f, 190f];
+    private static OrderHallRestrictionExtension restrictionExtension;
+    private static OrderHallRestrictionExtension RestrictionExtension => restrictionExtension ??= OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
+
+    public static int GetOrderHallLevel(Room room)
+    {
+        if (room is null || room.Role != OARO_ModDefOf.OARO_RatkinOrderHall)
+        {
+            return 0;
+        }
+
+        int areaRestrict = Array.BinarySearch(areaBoundaries, room.CellCount);
+        areaRestrict = areaRestrict < 0 ? ~areaRestrict : areaRestrict + 1;
+        int impressivenessRestrict = Array.BinarySearch(impressivenessBoundaries, room.GetStat(RoomStatDefOf.Impressiveness));
+        impressivenessRestrict = impressivenessRestrict < 0 ? ~impressivenessRestrict : impressivenessRestrict + 1;
+
+        int maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, 7);
+        maxPotentialLevel = maxPotentialLevel < 1 ? 1 : maxPotentialLevel;
+
+        if (maxPotentialLevel <= 1) { return 1; }
+
+        maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
+        // 最高可能索引为0，只能是1级
+        if (maxPotentialLevel <= 1) { return 1; }
+
+        maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
+
+        return Mathf.Clamp(maxPotentialLevel, 1, 7);
+    }
+
+    private static int TerrainRestrict(Room room, int maxPotentialLevel)
+    {
+        Map map = room.Map;
+        foreach (IntVec3 cell in room.Cells)
+        {
+            List<string> terrainTags = cell.GetTerrain(map).tags;
+
+            // 无地板最高1级
+            if (terrainTags.NullOrEmpty())
+            {
+                return 1;
+            }
+
+            if (maxPotentialLevel <= 4)
+            {
+                // 无地板最高1级
+                if (!terrainTags.Contains("Floor"))
+                {
+                    return 1;
+                }
+            }
+            else if (maxPotentialLevel <= 6)
+            {
+                if (!terrainTags.Contains("FineFloor"))
+                {
+                    // 无精致地板，最高4级
+                    maxPotentialLevel = 4;
+                    if (!terrainTags.Contains("Floor"))
+                    {
+                        return 1;
+                    }
+                }
+            }
+            else
+            {
+                if (!terrainTags.Contains("OARO_OrderFloor"))
+                {
+                    // 无骑士团精致地板，最高6级
+                    maxPotentialLevel = 6;
+                    if (!terrainTags.Contains("FineFloor"))
+                    {
+                        // 无精致地板，最高4级
+                        maxPotentialLevel = 4;
+                        if (!terrainTags.Contains("Floor"))
+                        {
+                            // 无地板最高1级
+                            return 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        return maxPotentialLevel;
+    }
+
+    private static int BuildingRestrict(Room room, int maxPotentialLevel)
+    {
+        HashSet<string> forbiddenBuildingTags = RestrictionExtension.forbiddenBuildingTags;
+        Dictionary<ThingDef, int> orderHallBuildings = [];
+
+        foreach (Region region in room.Regions)
+        {
+            List<Thing> allThings = region.ListerThings.AllThings;
+            for (int i = 0; i < allThings.Count; i++)
+            {
+                ThingDef thingDef = allThings[i].def;
+                if (thingDef.building is null || thingDef.building.buildingTags is null)
+                {
+                    continue;
+                }
+
+                // 有禁用类型建筑最高 1级
+                foreach (string tag in thingDef.building.buildingTags)
+                {
+                    if (forbiddenBuildingTags.Contains(tag))
+                    {
+                        return 1;
+                    }
+                }
+
+                if (orderHallBuildings.TryGetValue(thingDef, out int count))
+                {
+                    orderHallBuildings[thingDef] = count + 1;
+                }
+                else if (thingDef.building.buildingTags.Contains("OARO_OrderHall"))
+                {
+                    orderHallBuildings[thingDef] = 1;
+                }
+            }
+        }
+
+
+        for (int i = maxPotentialLevel - 1; i >= 1; i--)
+        {
+            List<ThingDefCountClass> buildingRequirements = RestrictionExtension.buildingRequirements[i].buildings;
+            for (int j = 0; j < buildingRequirements.Count; j++)
+            {
+                if (!orderHallBuildings.TryGetValue(buildingRequirements[j].thingDef, out int count) || count < buildingRequirements[j].count)
+                {
+                    maxPotentialLevel = i;
+                    break;
+                }
+            }
+        }
+
+        return maxPotentialLevel;
+    }
+}

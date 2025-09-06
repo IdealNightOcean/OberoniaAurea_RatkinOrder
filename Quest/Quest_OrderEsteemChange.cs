@@ -9,7 +9,7 @@ public class QuestNode_OrderEsteemChange : QuestNode
 {
     public SlateRef<string> inSignal;
 
-    public SlateRef<RatkinOrder> order;
+    public SlateRef<RatkinOrder> ratkinOrder;
     public SlateRef<int> change;
     public SlateRef<string> reason;
     public SlateRef<bool> showPlayerChangeMessage = true;
@@ -34,11 +34,11 @@ public class QuestNode_OrderEsteemChange : QuestNode
 
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange = new()
         {
-            inSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
-            order = order.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrderStoreAs),
-            change = change.GetValue(slate),
-            showPlayerChangeMessage = showPlayerChangeMessage.GetValue(slate),
-            reason = reason.GetValue(slate)
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
+            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            Change = change.GetValue(slate),
+            ShowPlayerChangeMessage = showPlayerChangeMessage.GetValue(slate),
+            Reason = reason.GetValue(slate)
         };
 
         quest.AddPart(questPart_OrderEsteemChange);
@@ -48,16 +48,16 @@ public class QuestNode_OrderEsteemChange : QuestNode
             QuestPart_Choice questPart_Choice;
             Reward_OrderEsteem reward = new()
             {
-                order = order.GetValue(slate),
-                amount = change.GetValue(slate),
-                reason = reason.GetValue(slate)
+                RatkinOrder = questPart_OrderEsteemChange.RatkinOrder,
+                Amount = questPart_OrderEsteemChange.Change,
+                Reason = questPart_OrderEsteemChange.Reason
             };
 
             if (isSingleReward.GetValue(slate))
             {
                 questPart_Choice = new QuestPart_Choice()
                 {
-                    inSignalChoiceUsed = questPart_OrderEsteemChange.inSignalTrigger,
+                    inSignalChoiceUsed = questPart_OrderEsteemChange.InSignalTrigger,
                 };
 
                 questPart_Choice.choices.Add(new QuestPart_Choice.Choice() { rewards = [reward] });
@@ -78,38 +78,47 @@ public class QuestNode_OrderEsteemChange : QuestNode
     }
 }
 
-public class QuestPart_OrderEsteemChange : QuestPart
+public class QuestPart_OrderEsteemChange : QuestPart, IOnRatkinOrderRemoved
 {
-    public string inSignalTrigger;
-    public RatkinOrder order;
-    public int change;
-    public bool showPlayerChangeMessage = true;
-    public string reason;
+    public string InSignalTrigger;
+    public RatkinOrder RatkinOrder;
+    public int Change;
+    public bool ShowPlayerChangeMessage = true;
+    public string Reason;
     public override void Notify_QuestSignalReceived(Signal signal)
     {
-        if (signal.tag == inSignalTrigger)
+        if (signal.tag == InSignalTrigger)
         {
-            order?.EsteemHandler.AdjustEsteem(change, byPlayer: true, reason: reason);
+            RatkinOrder?.EsteemHandler.AdjustEsteem(Change, byPlayer: true, reason: Reason);
         }
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        inSignalTrigger = string.Empty;
-        order = null;
-        reason = null;
-        change = 0;
-        showPlayerChangeMessage = true;
+        InSignalTrigger = string.Empty;
+        RatkinOrder = null;
+        Reason = null;
+        Change = 0;
+        ShowPlayerChangeMessage = true;
     }
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref inSignalTrigger, "inSignalTrigger");
-        Scribe_References.Look(ref order, "order");
-        Scribe_Values.Look(ref change, "change", 0);
-        Scribe_Values.Look(ref showPlayerChangeMessage, "showPlayerChangeMessage", defaultValue: true);
-        Scribe_Values.Look(ref reason, "reason");
+        Scribe_Values.Look(ref InSignalTrigger, "InSignalTrigger");
+        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
+        Scribe_Values.Look(ref Change, "Change", 0);
+        Scribe_Values.Look(ref ShowPlayerChangeMessage, "ShowPlayerChangeMessage", defaultValue: true);
+        Scribe_Values.Look(ref Reason, "Reason");
     }
+
+    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
+    {
+        if (RatkinOrder == ratkinOrder)
+        {
+            RatkinOrder = null;
+        }
+    }
+
 }

@@ -9,7 +9,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay, IDrawDevWindow
 {
-    public static readonly BranchBuildingDef[] memorials =
+    private static readonly BranchBuildingDef[] memorials =
     [
         BranchBuildingDefOf.OARO_GuardMemorial,
         BranchBuildingDefOf.OARO_PioneerMemorial,
@@ -53,14 +53,14 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         }
         else
         {
-            listing_Rect.SubLabel(specialBuilding.def.label, 0.8f);
+            listing_Rect.SubLabel(specialBuilding.Def.label, 0.8f);
         }
 
         listing_Rect.Gap(6f);
         listing_Rect.Label($"NormalBuildings: {buildings.Count}");
         foreach (BranchBuilding building in buildings)
         {
-            listing_Rect.SubLabel(building.def.label, 0.8f);
+            listing_Rect.SubLabel(building.Def.label, 0.8f);
         }
 
         listing_Rect.Gap(6f);
@@ -113,14 +113,14 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
     public bool HasBuilding(BranchBuildingDef buildingDef)
     {
-        if (specialBuilding?.def == buildingDef)
+        if (specialBuilding?.Def == buildingDef)
         {
             return true;
         }
 
         for (int i = 0; i < buildings.Count; i++)
         {
-            if (buildings[i].def == buildingDef)
+            if (buildings[i].Def == buildingDef)
             {
                 return true;
             }
@@ -131,14 +131,14 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
     public (BranchBuilding building, bool inSpecialSlot) GetBuilding(BranchBuildingDef buildingDef)
     {
-        if (specialBuilding?.def == buildingDef)
+        if (specialBuilding?.Def == buildingDef)
         {
             return (specialBuilding, true);
         }
 
         for (int i = 0; i < buildings.Count; i++)
         {
-            if (buildings[i].def == buildingDef)
+            if (buildings[i].Def == buildingDef)
             {
                 return (buildings[i], false);
             }
@@ -161,7 +161,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             return resultOnly ? false : "OARO_AlreadyHasSpecialBuilding".Translate();
         }
 
-        BranchBuildingDef buildingDef = constructParam.buildingDef;
+        BranchBuildingDef buildingDef = constructParam.BuildingDef;
 
         if (!HasUnusedNormalSlots)
         {
@@ -173,7 +173,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             return resultOnly ? false : "OARO_HasSameBuilding".Translate();
         }
 
-        if (constructParam.byPlayer)
+        if (constructParam.ByPlayer)
         {
             int silverCost = GetBuildingSilverCost(buildingDef);
             if (!CaravanInventoryUtility.HasThings(constructParam.caravan, ThingDefOf.Silver, silverCost))
@@ -199,12 +199,12 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
     public void StartBuildingConstructionDirectly(BranchBuildingConstructParameter constructParam)
     {
-        underConstructionBuilding = constructParam.buildingDef;
+        underConstructionBuilding = constructParam.BuildingDef;
 
         buildingTicksLeft = (int)(underConstructionBuilding.constructionDays * 60000);
-        if (constructParam.byPlayer)
+        if (constructParam.ByPlayer)
         {
-            int silverCost = GetBuildingSilverCost(constructParam.buildingDef);
+            int silverCost = GetBuildingSilverCost(constructParam.BuildingDef);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.caravan, ThingDefOf.Silver, silverCost);
         }
         Branch.StoresReserveHandler.Notify_BuildingConstructStarted(underConstructionBuilding);
@@ -282,7 +282,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
     {
         if (specialBuilding is not null)
         {
-            AddOrPostLoadBuilding(specialBuilding.def);
+            AddOrPostLoadBuilding(specialBuilding.Def);
             specialBuilding.PostLoadInit(Branch);
         }
 
@@ -300,7 +300,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
         foreach (BranchBuilding building in buildings)
         {
-            AddOrPostLoadBuilding(building.def);
+            AddOrPostLoadBuilding(building.Def);
             building.PostLoadInit(Branch);
         }
         IsNormalBuildingFullyCompleted = buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;

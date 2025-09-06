@@ -136,11 +136,11 @@ public static class SquadCombatPawnUtility
         RCellFinder.TryFindRandomSpotJustOutsideColony(originCell, map, out IntVec3 result);
         Faction faction = squad.RatkinOrder.Faction;
 
-        LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad, isCommander: false), map, members);
+        LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: false), map, members);
 
         if (commanders is not null)
         {
-            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad, isCommander: true), map, commanders);
+            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: true), map, commanders);
         }
     }
 
@@ -150,11 +150,11 @@ public static class SquadCombatPawnUtility
         RCellFinder.TryFindRandomSpotJustOutsideColony(originCell, map, out IntVec3 result);
         Faction faction = squad.RatkinOrder.Faction;
 
-        LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad, isCommander: false), map, members);
+        LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: false), map, members);
 
         if (commanders is not null)
         {
-            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad, isCommander: true), map, commanders);
+            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: true), map, commanders);
         }
     }
 

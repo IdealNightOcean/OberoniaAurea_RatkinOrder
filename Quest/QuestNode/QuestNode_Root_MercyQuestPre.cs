@@ -9,7 +9,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 {
     protected override bool TestRunInt(Slate slate)
     {
-        return slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuestStoreAs, out QuestScriptDef _);
+        return slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuest, out QuestScriptDef _);
     }
 
     protected override void RunInt()
@@ -18,11 +18,11 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         Quest quest = QuestGen.quest;
         string rootInSignal = slate.Get<string>("inSignal");
 
-        slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuestStoreAs, out QuestScriptDef mercyQuest);
+        slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuest, out QuestScriptDef mercyQuest);
 
-        slate.TryGet(KeyLibrary_SlateStoreAs.SubRatkinFactionDefStoreAs, out FactionDef subFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.ParentRatkinFactionDefStoreAs, out FactionDef parentFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.ParentRatkinFactionStoreAs, out Faction parentFaction);
+        slate.TryGet(KeyLibrary_SlateStoreAs.SubRatkinFactionDef, out FactionDef subFactionDef);
+        slate.TryGet(KeyLibrary_SlateStoreAs.ParentRatkinFactionDef, out FactionDef parentFactionDef);
+        slate.TryGet(KeyLibrary_SlateStoreAs.ParentRatkinFaction, out Faction parentFaction);
 
         subFactionDef ??= OARO_ModDefOf.OARO_Rakinia_Sub;
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
@@ -39,7 +39,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             return;
         }
         slate.Set("map", map);
-        slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFactionStoreAs, subFaction);
+        slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, subFaction);
 
         Pawn helpSeeker = quest.GeneratePawn(OARO_PawnKindDefOf.RatkinColonist, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
         slate.Set("helpSeeker", helpSeeker);
@@ -48,28 +48,39 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("helpSeeker.AcceptMercyQuest");
         string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("helpSeeker.RejectMercyQuest");
 
+        float delayMulti = OrderInteractionHandler.OrderHallLevel switch
+        {
+            < 4 => 1f,
+            4 => 1.25f,
+            5 => 1.5f,
+            6 => 1.75f,
+            7 => 2f,
+            _ => 2f
+        };
+        int helpSeekerLeaveDelay = (int)GenMath.RoundTo(60000 * delayMulti, 2500);
+
         QuestPart_LordJob_HelpSeeker questPart_LordJob_HelpSeeker = new()
         {
             inSignal = rootInSignal,
-            inSignalAccept = inSignalAccept,
-            ininSignalReject = inSignalReject,
+            InSignalAccept = inSignalAccept,
+            IninSignalReject = inSignalReject,
 
-            subFaction = subFaction,
-            parentFaction = parentFaction,
-            parentFactionDef = parentFactionDef,
+            SubFaction = subFaction,
+            ParentFaction = parentFaction,
+            ParentFactionDef = parentFactionDef,
 
-            talkWith = helpSeeker,
+            TalkWith = helpSeeker,
             mapOfPawn = helpSeeker,
             pawns = [helpSeeker],
 
-            mercyQuestDef = mercyQuest,
-            durationTicks = 60000
+            MmercyQuestDef = mercyQuest,
+            DurationTicks = helpSeekerLeaveDelay
         };
         quest.AddPart(questPart_LordJob_HelpSeeker);
 
         string outSignalResolved = QuestGenUtility.HardcodedSignalWithQuestID("MercyQuest_Resolved");
         quest.SignalPassAny(inSignals: [inSignalAccept, inSignalReject], outSignal: outSignalResolved);
-        quest.Delay(delayTicks: 60000, inner: null, inSignalDisable: outSignalResolved, outSignalComplete: inSignalReject);
+        quest.Delay(delayTicks: helpSeekerLeaveDelay, inner: null, inSignalDisable: outSignalResolved, outSignalComplete: inSignalReject);
         quest.Alert(label: "OARO_HelpSeeker_Alert".Translate(),
                     explanation: "OARO_HelpSeeker_AlertExp".Translate(),
                     lookTargets: helpSeeker,
@@ -90,16 +101,16 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Reject = new()
         {
-            inSignalTrigger = inSignalReject,
-            change = -1,
-            reason = "OARO_RejctMercyQuest".Translate()
+            InSignalTrigger = inSignalReject,
+            Change = -1,
+            Reason = "OARO_RejctMercyQuest".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_Reject);
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_PawnNegative = new()
         {
-            inSignalTrigger = inSignalPawnNegative,
-            change = -10,
-            reason = "OARO_HarmingHelpSeeker".Translate()
+            InSignalTrigger = inSignalPawnNegative,
+            Change = -10,
+            Reason = "OARO_HarmingHelpSeeker".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_PawnNegative);
 

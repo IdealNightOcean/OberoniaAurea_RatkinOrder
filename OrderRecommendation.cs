@@ -5,20 +5,20 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderRecommendation : ThingWithComps
 {
-    private RatkinOrder order;
-    public RatkinOrder Order => order;
+    private RatkinOrder ratkinOrder;
+    public RatkinOrder RatkinOrder => ratkinOrder;
 
     public override string LabelNoCount
     {
         get
         {
-            if (order is null)
+            if (ratkinOrder is null)
             {
                 return $"{base.LabelNoCount} ({"Invalid".Translate()})";
             }
             else
             {
-                return $"{base.LabelNoCount} ({order.Name})";
+                return $"{base.LabelNoCount} ({ratkinOrder.Name})";
             }
         }
     }
@@ -26,33 +26,33 @@ public class OrderRecommendation : ThingWithComps
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref order, "order");
+        Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
     }
 
     public void SetRatkinOrder(RatkinOrder order)
     {
-        this.order = order;
+        ratkinOrder = order;
     }
 
     public void OnGiveToPlayer()
     {
-        if (order is not null)
+        if (ratkinOrder is not null)
         {
-            order.EsteemHandler.TotalRecommendation += stackCount;
+            ratkinOrder.EsteemHandler.TotalRecommendation += stackCount;
         }
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder removedOrder)
     {
-        if (removedOrder == order)
+        if (removedOrder == ratkinOrder)
         {
-            order = null;
+            ratkinOrder = null;
         }
     }
 
     public override bool CanStackWith(Thing other)
     {
-        if (other is not OrderRecommendation otherRe || otherRe.order != order)
+        if (other is not OrderRecommendation otherRe || otherRe.ratkinOrder != ratkinOrder)
         {
             return false;
         }

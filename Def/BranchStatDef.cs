@@ -48,7 +48,7 @@ public class BranchStatDef : Def
 
         baseValue = Mathf.Clamp(baseValue, minValue, maxValue);
 
-        statParts?.SortByDescending(part => part.priority);
+        statParts?.SortByDescending(part => part.Priority);
 
     }
 }

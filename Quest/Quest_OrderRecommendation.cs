@@ -11,7 +11,7 @@ public class QuestNode_OrderRecommendation : QuestNode
 {
     public SlateRef<string> inSignal;
 
-    public SlateRef<RatkinOrder> order;
+    public SlateRef<RatkinOrder> ratkinOrder;
     public SlateRef<int> count;
     public SlateRef<bool> giveToCaravan;
     public SlateRef<WorldObject> worldObject;
@@ -28,9 +28,9 @@ public class QuestNode_OrderRecommendation : QuestNode
     {
         Slate slate = QuestGen.slate;
 
-        RatkinOrder order = this.order.GetValue(slate);
+        RatkinOrder ratkinOrder = this.ratkinOrder.GetValue(slate);
         int recommendationCount = count.GetValue(slate);
-        if (order is null || recommendationCount <= 0)
+        if (ratkinOrder is null || recommendationCount <= 0)
         {
             return;
         }
@@ -39,12 +39,12 @@ public class QuestNode_OrderRecommendation : QuestNode
 
         QuestPart_OrderRecommendation questPart_OrderRecommendation = new()
         {
-            inSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
-            order = order ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrderStoreAs),
-            count = recommendationCount,
-            mapParent = slate.Get<Map>("map")?.Parent,
-            worldObject = worldObject.GetValue(slate),
-            giveToCaravan = giveToCaravan.GetValue(slate),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
+            RatkinOrder = ratkinOrder ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            Count = recommendationCount,
+            MapParent = slate.Get<Map>("map")?.Parent,
+            WorldObject = worldObject.GetValue(slate),
+            GiveToCaravan = giveToCaravan.GetValue(slate),
         };
 
         quest.AddPart(questPart_OrderRecommendation);
@@ -54,17 +54,17 @@ public class QuestNode_OrderRecommendation : QuestNode
             QuestPart_Choice questPart_Choice;
             Reward_OrderRecommendation reward = new()
             {
-                order = order,
-                count = recommendationCount,
-                mapParent = slate.Get<Map>("map")?.Parent,
-                giveToCaravan = giveToCaravan.GetValue(slate),
+                RatkinOrder = ratkinOrder,
+                Count = recommendationCount,
+                MapParent = questPart_OrderRecommendation.MapParent,
+                GiveToCaravan = questPart_OrderRecommendation.GiveToCaravan
             };
 
             if (isSingleReward.GetValue(slate))
             {
                 questPart_Choice = new QuestPart_Choice()
                 {
-                    inSignalChoiceUsed = questPart_OrderRecommendation.inSignalTrigger,
+                    inSignalChoiceUsed = questPart_OrderRecommendation.InSignalTrigger,
                 };
 
                 questPart_Choice.choices.Add(new QuestPart_Choice.Choice() { rewards = [reward] });
@@ -85,52 +85,52 @@ public class QuestNode_OrderRecommendation : QuestNode
     }
 }
 
-public class QuestPart_OrderRecommendation : QuestPart, IRatkinOrderRelated
+public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
 {
-    public string inSignalTrigger;
-    public RatkinOrder order;
-    public int count;
+    public string InSignalTrigger;
+    public RatkinOrder RatkinOrder;
+    public int Count;
 
-    public WorldObject worldObject;
-    public MapParent mapParent;
-    public bool giveToCaravan;
+    public WorldObject WorldObject;
+    public MapParent MapParent;
+    public bool GiveToCaravan;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref inSignalTrigger, "inSignalTrigger");
-        Scribe_References.Look(ref order, "order");
-        Scribe_Values.Look(ref count, "count", 0);
-        Scribe_References.Look(ref worldObject, "worldObject");
-        Scribe_References.Look(ref mapParent, "mapParent");
-        Scribe_Values.Look(ref giveToCaravan, "giveToCaravan", defaultValue: false);
+        Scribe_Values.Look(ref InSignalTrigger, "InSignalTrigger");
+        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
+        Scribe_Values.Look(ref Count, "Count", 0);
+        Scribe_References.Look(ref WorldObject, "WorldObject");
+        Scribe_References.Look(ref MapParent, "MapParent");
+        Scribe_Values.Look(ref GiveToCaravan, "GiveToCaravan", defaultValue: false);
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        inSignalTrigger = null;
-        order = null;
-        count = 0;
-        worldObject = null;
-        mapParent = null;
-        giveToCaravan = false;
+        InSignalTrigger = null;
+        RatkinOrder = null;
+        Count = 0;
+        WorldObject = null;
+        MapParent = null;
+        GiveToCaravan = false;
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
-        if (signal.tag == inSignalTrigger)
+        if (signal.tag == InSignalTrigger)
         {
-            if (order is null)
+            if (RatkinOrder is null)
             {
                 return;
             }
 
-            if (giveToCaravan && GetCaravan(signal, out Caravan caravan))
+            if (GiveToCaravan && GetCaravan(signal, out Caravan caravan))
             {
                 RecommendationUtility.GiveRecommendationsToPlayer(
-                    order: order,
-                    count: count,
+                    order: RatkinOrder,
+                    count: Count,
                     giveAction: delegate (Thing t)
                     {
                         CaravanInventoryUtility.GiveThing(caravan, t);
@@ -138,10 +138,10 @@ public class QuestPart_OrderRecommendation : QuestPart, IRatkinOrderRelated
             }
             else
             {
-                mapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, mapParent);
-                if (mapParent is not null)
+                MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
+                if (MapParent is not null)
                 {
-                    RecommendationUtility.GiveRecommendationsToPlayer_Map(order, count, mapParent.Map, spawnCell: null, drop: true);
+                    RecommendationUtility.GiveRecommendationsToPlayer_Map(RatkinOrder, Count, MapParent.Map, spawnCell: null, drop: true);
                 }
             }
         }
@@ -156,9 +156,9 @@ public class QuestPart_OrderRecommendation : QuestPart, IRatkinOrderRelated
             return true;
         }
 
-        if (worldObject is not null && worldObject.Spawned)
+        if (WorldObject is not null && WorldObject.Spawned)
         {
-            caravan = Find.WorldObjects.Caravans?.Where(c => c.Tile == worldObject.Tile).FirstOrFallback(null);
+            caravan = Find.WorldObjects.Caravans?.Where(c => c.Tile == WorldObject.Tile).FirstOrFallback(null);
             if (caravan is not null)
             {
                 return true;
@@ -169,11 +169,11 @@ public class QuestPart_OrderRecommendation : QuestPart, IRatkinOrderRelated
         return caravan is not null;
     }
 
-    public void Notify_RatkinOrderRemoved(RatkinOrder order)
+    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
     {
-        if (this.order == order)
+        if (RatkinOrder == ratkinOrder)
         {
-            this.order = null;
+            RatkinOrder = null;
         }
     }
 }

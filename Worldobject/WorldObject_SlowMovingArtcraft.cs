@@ -6,9 +6,12 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_SlowMovingArtcraft : WorldObject_Interactive_Village, IThingHolder
+/// <summary>
+/// 滞销工艺品村庄（特化类）
+/// </summary>
+public sealed class WorldObject_SlowMovingArtcraft : WorldObject_Interactive_Nameable, IThingHolder
 {
-    public ThingOwner<Thing> sculptures;
+    private ThingOwner<Thing> sculptures;
     private float totalMarkerValue;
     private int soldCount;
     private int totalCount;

@@ -19,13 +19,13 @@ public static class RecommendationUtility
             return false;
         }
 
-        return ((OrderRecommendation)t).Order == order;
+        return ((OrderRecommendation)t).RatkinOrder == order;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CurRecommendationOfMap(RatkinOrder order, Map map)
     {
-        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.Cast<OrderRecommendation>().Where(r => r.Order == order).Count() ?? 0;
+        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.Cast<OrderRecommendation>().Where(r => r.RatkinOrder == order).Count() ?? 0;
     }
 
     public static void GiveRecommendationsToPlayer(RatkinOrder order, int count, Action<Thing> giveAction)
@@ -81,7 +81,7 @@ public static class RecommendationUtility
             map: map,
             thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
             count: useCount,
-            validator: (t) => ((OrderRecommendation)t).Order == order,
+            validator: (t) => ((OrderRecommendation)t).RatkinOrder == order,
             actualTakeCount: out int actualTakeCount);
 
         if (recommendations.NullOrEmpty())
@@ -108,7 +108,7 @@ public static class RecommendationUtility
         return OAFrame_CaravanUtility.RemoveThingsOfDef(caravan: caravan,
                                                         thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
                                                         count: useCount,
-                                                        validator: (t) => ((OrderRecommendation)t).Order == order);
+                                                        validator: (t) => ((OrderRecommendation)t).RatkinOrder == order);
 
     }
 
@@ -123,6 +123,6 @@ public static class RecommendationUtility
         return OAFrame_FixedCaravanUtility.RemoveThingsOfDef(fixedCaravan: fixedCaravan,
                                                             thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
                                                             count: useCount,
-                                                            validator: (t) => ((OrderRecommendation)t).Order == order);
+                                                            validator: (t) => ((OrderRecommendation)t).RatkinOrder == order);
     }
 }

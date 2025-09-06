@@ -7,8 +7,10 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverFlee
 {
-    private Squad squad;
+    private Branch branch;
     private bool isCommander;
+
+    private Squad Squad => branch.Squad;
 
     public LordJob_AssaultColony_NeverFleeOrder() { }
 
@@ -18,9 +20,9 @@ public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverF
         : base(assaulterFaction, canKidnap, canTimeoutOrFlee, sappers, useAvoidGridSmart, canSteal, breachers, canPickUpOpportunisticWeapons)
     { }
 
-    public void SetSquadIdentity(Squad squad, bool isCommander)
+    public void SetSquadIdentity(Branch branch, bool isCommander)
     {
-        this.squad = squad;
+        this.branch = branch;
         this.isCommander = isCommander;
     }
 
@@ -28,15 +30,15 @@ public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverF
     {
         if (condition == PawnLostCondition.ExitedMap)
         {
-            if (squad is not null)
+            if (Squad is not null)
             {
                 if (isCommander)
                 {
-                    squad.SquadStat.CommanderCount++;
+                    Squad.SquadStat.CommanderCount++;
                 }
                 else
                 {
-                    squad.SquadStat.MemberCount++;
+                    Squad.SquadStat.MemberCount++;
                 }
             }
         }
@@ -45,7 +47,7 @@ public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverF
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref squad, "squad");
+        Scribe_References.Look(ref branch, "branch");
         Scribe_Values.Look(ref isCommander, "isCommander");
     }
 }

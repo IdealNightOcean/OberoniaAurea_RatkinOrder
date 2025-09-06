@@ -56,7 +56,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
             int insertIndex = residentRecords.Count;
             for (int i = 0; i < residentRecords.Count; i++)
             {
-                if (ResidencyInsertCompare(residentRecords[i].residencyWorker, worker) <= 0)
+                if (ResidencyInsertCompare(residentRecords[i].ResidencyWorker, worker) <= 0)
                 {
                     insertIndex = i;
                     break;
@@ -75,7 +75,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
 
         foreach (BranchResidentRecord record in residentRecords)
         {
-            if ((record.deployDaysLeft -= 1) <= 0)
+            if ((record.DeployDaysLeft -= 1) <= 0)
             {
                 expiredRecords.Add(record);
             }
@@ -83,7 +83,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
 
         if (expiredRecords.Count > 0)
         {
-            residentRecords.RemoveAll(r => r.deployDaysLeft <= 0);
+            residentRecords.RemoveAll(r => r.DeployDaysLeft <= 0);
             FinishResidency(expiredRecords);
         }
 
@@ -105,10 +105,10 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
 
         foreach (BranchResidentRecord record in residentRecords)
         {
-            record.residencyWorker?.ResidencyEnd(Branch, record.resident, record.TotalDeployDays);
+            record.ResidencyWorker?.ResidencyEnd(Branch, record.Resident, record.TotalDeployDays);
         }
 
-        List<Pawn> pawns = residentRecords.Select(rc => rc.resident)
+        List<Pawn> pawns = residentRecords.Select(rc => rc.Resident)
                                           .ToList();
         Map map = Find.AnyPlayerHomeMap;
         if (map is null)
@@ -136,7 +136,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
     {
         EnsureComponentsInit();
         residents.RemoveAll(p => p.DestroyedOrNull());
-        residentRecords.RemoveAll(rc => rc is null || rc.resident.DestroyedOrNull());
+        residentRecords.RemoveAll(rc => rc is null || rc.Resident.DestroyedOrNull());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

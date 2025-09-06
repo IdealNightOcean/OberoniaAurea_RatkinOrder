@@ -8,13 +8,16 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 军备订单交易点（特化类）
+/// </summary>
 public sealed class WorldObject_ArmsOrderSite : WorldObject_InteractiveBase, IThingRequester
 {
     private static readonly Texture2D FulfillIcon = ContentFinder<Texture2D>.Get("UI/Commands/FulfillTradeRequest");
 
-    public ThingDef requestDef;
-    public int requestCount = -1;
-    public int requestCountLeft = -1;
+    private ThingDef requestDef;
+    private int requestCount = -1;
+    private int requestCountLeft = -1;
 
     public bool IsRequestActive => requestCountLeft > 0 && requestDef is not null;
 

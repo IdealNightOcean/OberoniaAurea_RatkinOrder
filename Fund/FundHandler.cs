@@ -22,12 +22,13 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
     private float expectedChange;
     public float ExpectedChange => expectedChange;
 
-    public bool hasFortune;
-    public bool hasRestoration;
+    private bool hasFortune;
+    private bool hasRestoration;
 
     private int newOrderProtectDaysLeft = 180;
 
-    public List<OrderFundEvent> fundEvents = [];
+    private List<OrderFundEvent> fundEvents = [];
+    public IReadOnlyList<OrderFundEvent> FundEvents => fundEvents;
 
     public FundHandler(RatkinOrder ratkinOrder, bool initConstruct)
     {
@@ -97,7 +98,7 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
             else
             {
                 OrderFundEvent fundEvent = new(def);
-                expectedChange += fundEvent.todayChange;
+                expectedChange += fundEvent.TodayChange;
                 fundEvent.DayPassed();
                 fundEvents.Add(fundEvent);
             }
@@ -108,7 +109,7 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
     {
         for (int i = 0; i < fundEvents.Count; i++)
         {
-            if (fundEvents[i].def == def)
+            if (fundEvents[i].Def == def)
             {
                 return true;
             }
@@ -121,7 +122,7 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
         int indexToRemove = -1;
         for (int i = 0; i < fundEvents.Count; i++)
         {
-            if (fundEvents[i].def == def)
+            if (fundEvents[i].Def == def)
             {
                 indexToRemove = i;
                 break;
@@ -136,7 +137,7 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
 
     public void RemoveAllFundEventsOfDef(OrderFundEventDef def)
     {
-        fundEvents.RemoveAll(e => e.def == def);
+        fundEvents.RemoveAll(e => e.Def == def);
     }
 
     public void DailySpontaneousChange()
@@ -190,7 +191,7 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
             fundEvent.DayPassed();
             expectedChange += expectedChange;
 
-            if (fundEvent.daysLeft > 0)
+            if (fundEvent.DaysLeft > 0)
             {
                 if (i != newIndex)
                 {
@@ -205,7 +206,7 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
 
     public void PostLoadInit()
     {
-        fundEvents.RemoveAll(e => e.daysLeft <= 0);
+        fundEvents.RemoveAll(e => e.DaysLeft <= 0);
         newOrderProtectDaysLeft = Mathf.Max(newOrderProtectDaysLeft, 0);
     }
 

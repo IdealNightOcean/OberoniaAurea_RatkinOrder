@@ -1,0 +1,61 @@
+﻿using System.Collections.Generic;
+using System.Linq;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestoryed
+{
+    [Unsaved] public List<Branch> BranchesInRadius;
+    [Unsaved] private int nextCacheTick = -1;
+
+    public MapComponent_RatkinOrder(Map map) : base(map) { }
+
+    public override void ExposeData() { }
+
+    public void Notify_RatkinOrderRemoved(RatkinOrder order)
+    {
+        BranchesInRadius?.RemoveAll(b => b.RatkinOrder == order);
+    }
+
+    public void Notify_BranchDestoryed(Branch branch)
+    {
+        BranchesInRadius?.RemoveAll(b => b == branch);
+    }
+
+    public override void MapComponentTick()
+    {
+        if (Find.TickManager.TicksGame > nextCacheTick)
+        {
+            nextCacheTick = Find.TickManager.TicksGame + 60000;
+            if (map.IsPlayerHome)
+            {
+                BranchesInRadius = BranchUtility.GetAllAffectedBranchSite(map.Tile).ToList();
+            }
+        }
+    }
+
+    public static void OnRatkinOrderRemoved(RatkinOrder order)
+    {
+        List<Map> maps = Find.Maps;
+        for (int i = 0; i < maps.Count; i++)
+        {
+            if (maps[i].IsPlayerHome)
+            {
+                maps[i].GetComponent<MapComponent_RatkinOrder>()?.Notify_RatkinOrderRemoved(order);
+            }
+        }
+    }
+
+    public static void OnBranchDestoryed(Branch branch)
+    {
+        List<Map> maps = Find.Maps;
+        for (int i = 0; i < maps.Count; i++)
+        {
+            if (maps[i].IsPlayerHome)
+            {
+                maps[i].GetComponent<MapComponent_RatkinOrder>()?.Notify_BranchDestoryed(branch);
+            }
+        }
+    }
+}

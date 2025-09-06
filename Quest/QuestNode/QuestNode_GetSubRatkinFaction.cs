@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestNode_GetSubRatkinFaction : QuestNode
 {
     [NoTranslate]
-    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.SubRatkinFactionStoreAs;
+    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.SubRatkinFaction;
 
     public SlateRef<Faction> parentFaction;
     public SlateRef<FactionDef> parentFactionDef;
@@ -16,7 +16,7 @@ public class QuestNode_GetSubRatkinFaction : QuestNode
 
     protected override bool TestRunInt(Slate slate)
     {
-        return subFactionDef.GetValue(slate) is not null || slate.TryGet(storeAs.GetValue(slate), out Faction _);
+        return true;
     }
 
     protected override void RunInt()
@@ -25,8 +25,18 @@ public class QuestNode_GetSubRatkinFaction : QuestNode
 
         if (!slate.TryGet(storeAs.GetValue(slate), out Faction subFaction))
         {
-            FactionDef subFactionDef = this.subFactionDef.GetValue(slate) ?? OARO_ModDefOf.OARO_Rakinia_Sub;
-            subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef.GetValue(slate), parentFaction.GetValue(slate));
+            Faction parentFaction = this.parentFaction.GetValue(slate)
+                                    ?? slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentRatkinFaction);
+
+            FactionDef parentFactionDef = this.parentFactionDef.GetValue(slate)
+                                          ?? slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.ParentRatkinFactionDef)
+                                          ?? parentFaction?.def;
+
+            FactionDef subFactionDef = this.subFactionDef.GetValue(slate)
+                                       ?? slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.SubRatkinFactionDef)
+                                       ?? OARO_ModDefOf.OARO_Rakinia_Sub;
+
+            subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction);
             slate.Set(storeAs.GetValue(slate), subFaction);
         }
 

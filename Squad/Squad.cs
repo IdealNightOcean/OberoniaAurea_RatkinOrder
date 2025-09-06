@@ -8,7 +8,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfDay, ITickDay
+public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 {
     protected const int StatUpdateHour = 5;
 
@@ -181,7 +181,7 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
 
     private void AnnualRetirement()
     {
-        squadStat.MemberCount -= Mathf.CeilToInt(Rand.Range(0.05f, 0.1f) * squadStat.memberCeiling);
+        squadStat.MemberCount -= Mathf.CeilToInt(Rand.Range(0.05f, 0.1f) * squadStat.MemberCeiling);
     }
 
     private void TryRecovery()
@@ -193,17 +193,17 @@ public class Squad : IExposable, ILoadReferenceable, IPostLoadInit, ITickHourOfD
 
         if (Rand.Chance(0.1f))
         {
-            if (squadStat.CommanderCount < squadStat.commanderCeiling)
+            if (squadStat.CommanderCount < squadStat.CommanderCeiling)
             {
                 squadStat.CommanderCount += BranchStatUtility.GetStatValue(Branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate);
             }
         }
-        else if (squadStat.MemberCount < squadStat.memberCeiling)
+        else if (squadStat.MemberCount < squadStat.MemberCeiling)
         {
             squadStat.MemberCount += BranchStatUtility.GetStatValue(Branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate);
         }
 
-        if (squadStat.Supply < squadStat.supplyCeiling)
+        if (squadStat.Supply < squadStat.SupplyCeiling)
         {
             squadStat.Supply += BranchStatUtility.GetStatValue(Branch, BranchStatDefOf.OARO_SquadSupplyRecoveryRate);
         }

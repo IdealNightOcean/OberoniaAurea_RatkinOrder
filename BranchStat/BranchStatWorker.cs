@@ -7,22 +7,22 @@ namespace OberoniaAurea.RatkinOrder;
 
 public struct BranchStatCacheEnty : IEquatable<BranchStatCacheEnty>
 {
-    public float cacheValue; //缓存值
-    public int expiredTick; //缓存时间戳
+    public float CacheValue; //缓存值
+    public int ExpiredTick; //缓存时间戳
 
     public BranchStatCacheEnty(float cacheValue, int expiredTick)
     {
-        this.cacheValue = cacheValue;
-        this.expiredTick = expiredTick;
+        CacheValue = cacheValue;
+        ExpiredTick = expiredTick;
     }
     public override readonly string ToString()
     {
-        return $"BranchStatCacheEnty({cacheValue}, {expiredTick})";
+        return $"BranchStatCacheEnty({CacheValue}, {ExpiredTick})";
     }
 
     public override int GetHashCode()
     {
-        return cacheValue.GetHashCode() ^ expiredTick.GetHashCode();
+        return CacheValue.GetHashCode() ^ ExpiredTick.GetHashCode();
     }
     public override readonly bool Equals(object obj)
     {
@@ -30,7 +30,7 @@ public struct BranchStatCacheEnty : IEquatable<BranchStatCacheEnty>
     }
     public readonly bool Equals(BranchStatCacheEnty other)
     {
-        return cacheValue == other.cacheValue && expiredTick == other.expiredTick;
+        return CacheValue == other.CacheValue && ExpiredTick == other.ExpiredTick;
     }
     public static bool operator ==(BranchStatCacheEnty left, BranchStatCacheEnty right)
     {
@@ -65,22 +65,22 @@ public class BranchStatWorker(BranchStatDef stat)
         int ticksGame = Find.TickManager.TicksGame;
         if (temporaryStatCache.TryGetValue(branch, out BranchStatCacheEnty cacheEnty))
         {
-            if (immediateUpdate || cacheEnty.expiredTick < ticksGame)
+            if (immediateUpdate || cacheEnty.ExpiredTick < ticksGame)
             {
                 BranchStatCacheEnty newEnty = RecacheCacheEnty(Stat, branch, baseValueOverride, ticksGame);
                 temporaryStatCache[branch] = newEnty;
-                return newEnty.cacheValue;
+                return newEnty.CacheValue;
             }
             else
             {
-                return cacheEnty.cacheValue;
+                return cacheEnty.CacheValue;
             }
         }
         else
         {
             BranchStatCacheEnty newEnty = RecacheCacheEnty(Stat, branch, baseValueOverride, ticksGame);
             temporaryStatCache.Add(branch, newEnty);
-            return newEnty.cacheValue;
+            return newEnty.CacheValue;
         }
     }
 

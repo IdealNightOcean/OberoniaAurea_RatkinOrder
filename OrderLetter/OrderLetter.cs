@@ -6,31 +6,34 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+public enum OrderLetterType
+{
+    Normal,
+    Urgent,
+    Official,
+}
+
+
 [StaticConstructorOnStartup]
 public class OrderLetter : IExposable
 {
     public static readonly Texture2D Texture_Letter_Type_A = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_UI_LetterA", true);
     public static readonly Texture2D Texture_Letter_Type_B = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_UI_LetterB", true);
     public static readonly Texture2D Texture_Letter_Type_C = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_UI_LetterC", true);
-    public enum LetterType
+
+    public Texture2D Icon => LetterType switch
     {
-        Normal,
-        Urgent,
-        Official,
-    }
-    public Texture2D Icon => letterType switch
-    {
-        LetterType.Normal => Texture_Letter_Type_A,
-        LetterType.Urgent => Texture_Letter_Type_B,
-        LetterType.Official => Texture_Letter_Type_C,
+        OrderLetterType.Normal => Texture_Letter_Type_A,
+        OrderLetterType.Urgent => Texture_Letter_Type_B,
+        OrderLetterType.Official => Texture_Letter_Type_C,
         _ => Texture_Letter_Type_A,
     };
 
-    public Faction relatedFaction;
-    public RatkinOrder relatedOrder;
-    public int arrivalTick = -1;
-    public LetterType letterType = LetterType.Normal;
-    public LetterDef relatedLetterDef;
+    public Faction RelatedFaction;
+    public RatkinOrder RelatedOrder;
+    public int ArrivalTick = -1;
+    public OrderLetterType LetterType = OrderLetterType.Normal;
+    public LetterDef RelatedLetterDef;
 
     private TaggedString label;
     private TaggedString text;
@@ -70,11 +73,11 @@ public class OrderLetter : IExposable
         }
     }
 
-    public int expiredDays = 60;
-    public bool Expired => Find.TickManager.TicksGame - arrivalTick > expiredDays * 60000;
+    public int ExpiredDays = 60;
+    public bool Expired => Find.TickManager.TicksGame - ArrivalTick > ExpiredDays * 60000;
 
-    public List<ThingDefCount> relatedThings;
-    public bool HasRelatedThings => !relatedThings.NullOrEmpty();
+    public List<ThingDefCount> RelatedThings;
+    public bool HasRelatedThings => !RelatedThings.NullOrEmpty();
 
     public void PostReaded(Building_OrderLetterBox letterBox = null)
     {
@@ -90,11 +93,11 @@ public class OrderLetter : IExposable
         StringBuilder sb = new("OARO_Letter_LetterSender".Translate());
         sb.Append(sender.Translate());
         sb.AppendInNewLine("OARO_Letter_RelatedOrder".Translate());
-        sb.Append(relatedOrder is null ? "None".Translate() : relatedOrder.Name);
+        sb.Append(RelatedOrder is null ? "None".Translate() : RelatedOrder.Name);
         sb.AppendInNewLine("OARO_Letter_RelatedThings".Translate());
         if (HasRelatedThings)
         {
-            foreach (ThingDefCount thingDefCount in relatedThings)
+            foreach (ThingDefCount thingDefCount in RelatedThings)
             {
                 sb.AppendInNewLine($"   - {thingDefCount.ThingDef.LabelCap} × {thingDefCount.Count}");
             }
@@ -104,7 +107,7 @@ public class OrderLetter : IExposable
             sb.Append("None".Translate());
         }
         sb.AppendInNewLine("OARO_Letter_SendTime".Translate());
-        sb.Append(GenDate.DateFullStringAt(arrivalTick, Vector2.zero));
+        sb.Append(GenDate.DateFullStringAt(ArrivalTick, Vector2.zero));
         return sb.ToString();
     }
 
@@ -136,7 +139,7 @@ public class OrderLetter : IExposable
         }
         else
         {
-            foreach (ThingDefCount thingDefCount in relatedThings)
+            foreach (ThingDefCount thingDefCount in RelatedThings)
             {
                 Thing thing = ThingMaker.MakeThing(thingDefCount.ThingDef);
                 thing.stackCount = thingDefCount.Count;
@@ -144,21 +147,21 @@ public class OrderLetter : IExposable
             }
         }
 
-        relatedThings = null;
+        RelatedThings = null;
     }
 
     public virtual void ExposeData()
     {
-        Scribe_References.Look(ref relatedFaction, "relatedFaction");
-        // Scribe_References.Look(ref relatedOrder, "relatedOrder");
-        Scribe_Defs.Look(ref relatedLetterDef, "relatedLetterDef");
+        Scribe_References.Look(ref RelatedFaction, "RelatedFaction");
+        Scribe_References.Look(ref RelatedOrder, "RelatedOrder");
+        Scribe_Defs.Look(ref RelatedLetterDef, "RelatedLetterDef");
 
-        Scribe_Values.Look(ref arrivalTick, "arrivalTick", -1);
-        Scribe_Values.Look(ref letterType, "letterType", LetterType.Normal);
+        Scribe_Values.Look(ref ArrivalTick, "ArrivalTick", -1);
+        Scribe_Values.Look(ref LetterType, "LetterType", OrderLetterType.Normal);
         Scribe_Values.Look(ref label, "label");
         Scribe_Values.Look(ref text, "text");
         Scribe_Values.Look(ref sender, "sender");
 
-        Scribe_Collections.Look(ref relatedThings, "relatedThings", LookMode.Deep);
+        Scribe_Collections.Look(ref RelatedThings, "RelatedThings", LookMode.Deep);
     }
 }

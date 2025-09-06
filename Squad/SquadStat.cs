@@ -42,9 +42,9 @@ public class SquadStat : IExposable, IDrawDevWindow
     private float commanderCount; //分队骑士长数量
     private float supply; //分队补给数量
 
-    public float memberCeiling = 1f;
-    public float commanderCeiling = 1f;
-    public float supplyCeiling = 1f;
+    public float MemberCeiling = 1f;
+    public float CommanderCeiling = 1f;
+    public float SupplyCeiling = 1f;
 
     private List<MedalRecord> medalRecords = new(4);
     public SquadMedal PrimaryMedal => medalRecords[0].type;
@@ -54,14 +54,14 @@ public class SquadStat : IExposable, IDrawDevWindow
     public float MemberCount
     {
         get => memberCount;
-        set => memberCount = Mathf.Clamp(value, 0f, memberCeiling);
+        set => memberCount = Mathf.Clamp(value, 0f, MemberCeiling);
     }
     public int MemberCountInt => Mathf.FloorToInt(memberCount); //分队成员数量（整数）
 
     public float CommanderCount
     {
         get => commanderCount;
-        set => commanderCount = Mathf.Clamp(value, 0f, commanderCeiling);
+        set => commanderCount = Mathf.Clamp(value, 0f, CommanderCeiling);
     }
     public int CommanderCountInt => Mathf.FloorToInt(commanderCount); //分队骑士长数量（整数）
 
@@ -71,7 +71,7 @@ public class SquadStat : IExposable, IDrawDevWindow
     public float Supply
     {
         get => supply;
-        set => supply = Mathf.Clamp(value, 0f, supplyCeiling);
+        set => supply = Mathf.Clamp(value, 0f, SupplyCeiling);
     }
 
 
@@ -79,11 +79,11 @@ public class SquadStat : IExposable, IDrawDevWindow
     {
         get
         {
-            if (memberCeiling <= 0f)
+            if (MemberCeiling <= 0f)
             {
                 return 1f;
             }
-            return memberCount / memberCeiling;
+            return memberCount / MemberCeiling;
         }
     }
 
@@ -91,11 +91,11 @@ public class SquadStat : IExposable, IDrawDevWindow
     {
         get
         {
-            if (commanderCeiling <= 0f)
+            if (CommanderCeiling <= 0f)
             {
                 return 1f;
             }
-            return commanderCount / commanderCeiling;
+            return commanderCount / CommanderCeiling;
         }
     }
 
@@ -119,9 +119,9 @@ public class SquadStat : IExposable, IDrawDevWindow
         listing_Rect.Label($"CommanderCount: {commanderCount:F2}");
         listing_Rect.Label($"Supply: {Supply:F2}");
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"MemberCeiling: {memberCeiling:F2}");
-        listing_Rect.Label($"CommanderCeiling: {commanderCeiling:F2}");
-        listing_Rect.Label($"SupplyCeiling: {supplyCeiling:F2}");
+        listing_Rect.Label($"MemberCeiling: {MemberCeiling:F2}");
+        listing_Rect.Label($"CommanderCeiling: {CommanderCeiling:F2}");
+        listing_Rect.Label($"SupplyCeiling: {SupplyCeiling:F2}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"PrimaryMedal: {PrimaryMedal}");
         listing_Rect.Label("Medals:");
@@ -135,9 +135,9 @@ public class SquadStat : IExposable, IDrawDevWindow
     public void UpdateCeiling(Squad squad, bool updateStatCache)
     {
         Branch branch = squad.Branch;
-        memberCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberCeiling, immediateUpdate: updateStatCache);
-        commanderCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadCommanderCeiling, immediateUpdate: updateStatCache);
-        supplyCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadSupplyCeiling, immediateUpdate: updateStatCache);
+        MemberCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberCeiling, immediateUpdate: updateStatCache);
+        CommanderCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadCommanderCeiling, immediateUpdate: updateStatCache);
+        SupplyCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadSupplyCeiling, immediateUpdate: updateStatCache);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -202,9 +202,9 @@ public class SquadStat : IExposable, IDrawDevWindow
         Scribe_Values.Look(ref commanderCount, "commanderCount", 0f);
         Scribe_Values.Look(ref supply, "supply", 0f);
 
-        Scribe_Values.Look(ref memberCeiling, "memberCeiling", 0f);
-        Scribe_Values.Look(ref commanderCeiling, "commanderCeiling", 0f);
-        Scribe_Values.Look(ref supplyCeiling, "supplyCeiling", 0f);
+        Scribe_Values.Look(ref MemberCeiling, "MemberCeiling", 0f);
+        Scribe_Values.Look(ref CommanderCeiling, "CommanderCeiling", 0f);
+        Scribe_Values.Look(ref SupplyCeiling, "SupplyCeiling", 0f);
 
         Scribe_Collections.Look(ref medalRecords, "medalRecords", LookMode.Deep);
     }

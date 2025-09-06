@@ -15,7 +15,7 @@ public class QuestNode_DemandTypeSwitch : QuestNode
         {
             return true;
         }
-        BranchDemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandTypeStoreAs);
+        BranchDemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
         if (!demandType.HasValue)
         {
             return false;
@@ -34,7 +34,7 @@ public class QuestNode_DemandTypeSwitch : QuestNode
             return;
         }
         Slate slate = QuestGen.slate;
-        BranchDemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandTypeStoreAs);
+        BranchDemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
         if (!demandType.HasValue)
         {
             return;

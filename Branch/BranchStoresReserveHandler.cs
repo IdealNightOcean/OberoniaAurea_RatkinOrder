@@ -7,34 +7,34 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStoresReserve : IExposable
 {
-    public BranchBuildingDef targetBuilding;
-    public bool inSpecialSlot;
-    public BranchFacilityDef targetFacility;
+    public BranchBuildingDef TargetBuilding;
+    public bool InSpecialSlot;
+    public BranchFacilityDef TargetFacility;
 
     public float costRate = 1f;
 
 
     public void SetReserve(BranchBuildingDef targetBuilding, bool inSpecialSlot, float costRate = 1f)
     {
-        this.targetBuilding = targetBuilding;
-        this.inSpecialSlot = inSpecialSlot;
-        targetFacility = null;
+        TargetBuilding = targetBuilding;
+        InSpecialSlot = inSpecialSlot;
+        TargetFacility = null;
         this.costRate = costRate;
     }
 
     public void SetReserve(BranchFacilityDef targetFacility, float costRate = 1f)
     {
-        targetBuilding = null;
-        inSpecialSlot = false;
-        this.targetFacility = targetFacility;
+        TargetBuilding = null;
+        InSpecialSlot = false;
+        TargetFacility = targetFacility;
         this.costRate = costRate;
     }
 
     public void ExposeData()
     {
-        Scribe_Defs.Look(ref targetBuilding, "targetBuilding");
-        Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
-        Scribe_Defs.Look(ref targetFacility, "targetFacility");
+        Scribe_Defs.Look(ref TargetBuilding, "TargetBuilding");
+        Scribe_Values.Look(ref InSpecialSlot, "InSpecialSlot", defaultValue: false);
+        Scribe_Defs.Look(ref TargetFacility, "TargetFacility");
         Scribe_Values.Look(ref costRate, "costRate", 1f);
     }
 }
@@ -47,26 +47,32 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     private const int StoresReserveCeiling = 3;
 
     private List<BranchStoresReserve> storesReserves = new(StoresReserveCeiling);
+    public bool ThoroughPreparation;
+
     public BranchStoresReserve PrimaryReserves => storesReserves.FirstOrFallback(null);
     public float PrimaryCostRate => PrimaryReserves?.costRate ?? 1f;
 
-    public bool thoroughPreparation;
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref ThoroughPreparation, "ThoroughPreparation", defaultValue: false);
+        Scribe_Collections.Look(ref storesReserves, "storesReserves", LookMode.Deep);
+    }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"HasThoroughPreparation: {thoroughPreparation}");
+        listing_Rect.Label($"HasThoroughPreparation: {ThoroughPreparation}");
         listing_Rect.Label("StoresReserves:");
         if (storesReserves.Count > 0)
         {
             foreach (BranchStoresReserve reserve in storesReserves)
             {
-                if (reserve.targetBuilding is not null)
+                if (reserve.TargetBuilding is not null)
                 {
-                    listing_Rect.SubLabel($"{reserve.targetBuilding.label} | {reserve.inSpecialSlot} | {reserve.costRate}", 0.8f);
+                    listing_Rect.SubLabel($"{reserve.TargetBuilding.label} | {reserve.InSpecialSlot} | {reserve.costRate}", 0.8f);
                 }
                 else
                 {
-                    listing_Rect.SubLabel($"{reserve.targetFacility.label} | {reserve.costRate}", 0.8f);
+                    listing_Rect.SubLabel($"{reserve.TargetFacility.label} | {reserve.costRate}", 0.8f);
                 }
             }
         }
@@ -80,20 +86,20 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     {
         if (storesReserves.NullOrEmpty())
         {
-            storesReserves.Add(new BranchStoresReserve() { targetBuilding = def, inSpecialSlot = inSpecialSlot });
+            storesReserves.Add(new BranchStoresReserve() { TargetBuilding = def, InSpecialSlot = inSpecialSlot });
             return;
         }
 
-        if (storesReserves[0].targetBuilding == def)
+        if (storesReserves[0].TargetBuilding == def)
         {
-            storesReserves[0].inSpecialSlot = inSpecialSlot;
+            storesReserves[0].InSpecialSlot = inSpecialSlot;
         }
         else
         {
             bool exist = false;
             for (int i = 1; i < storesReserves.Count; i++)
             {
-                if (storesReserves[i].targetBuilding == def)
+                if (storesReserves[i].TargetBuilding == def)
                 {
                     storesReserves[0].SetReserve(def, inSpecialSlot, storesReserves[i].costRate);
                     storesReserves.RemoveAt(i);
@@ -113,16 +119,16 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     {
         if (storesReserves.NullOrEmpty())
         {
-            storesReserves.Add(new BranchStoresReserve() { targetFacility = def });
+            storesReserves.Add(new BranchStoresReserve() { TargetFacility = def });
             return;
         }
 
-        if (storesReserves[0].targetFacility != def)
+        if (storesReserves[0].TargetFacility != def)
         {
             bool exist = false;
             for (int i = 1; i < storesReserves.Count; i++)
             {
-                if (storesReserves[i].targetFacility == def)
+                if (storesReserves[i].TargetFacility == def)
                 {
                     storesReserves[0].SetReserve(def, storesReserves[i].costRate);
                     storesReserves.RemoveAt(i);
@@ -147,13 +153,13 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
 
         for (int i = 0; i < storesReserves.Count; i++)
         {
-            if (storesReserves[i].targetBuilding == def)
+            if (storesReserves[i].TargetBuilding == def)
             {
                 return;
             }
         }
 
-        storesReserves.Add(new BranchStoresReserve() { targetBuilding = def, inSpecialSlot = inSpecialSlot });
+        storesReserves.Add(new BranchStoresReserve() { TargetBuilding = def, InSpecialSlot = inSpecialSlot });
     }
 
     public void AddNewReserve(BranchFacilityDef def)
@@ -165,13 +171,13 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
 
         for (int i = 0; i < storesReserves.Count; i++)
         {
-            if (storesReserves[i].targetFacility == def)
+            if (storesReserves[i].TargetFacility == def)
             {
                 return;
             }
         }
 
-        storesReserves.Add(new BranchStoresReserve() { targetFacility = def });
+        storesReserves.Add(new BranchStoresReserve() { TargetFacility = def });
     }
 
     /// <summary>
@@ -181,8 +187,8 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     {
         if (hourOfDay == 5)
         {
-            float coseRateFloor = thoroughPreparation ? 0.6f : 0.7f;
-            float reduceMulti = thoroughPreparation ? 2f : 1f;
+            float coseRateFloor = ThoroughPreparation ? 0.6f : 0.7f;
+            float reduceMulti = ThoroughPreparation ? 2f : 1f;
             for (int i = 0; i < storesReserves.Count; i++)
             {
                 storesReserves[i].costRate = Mathf.Max(storesReserves[i].costRate - (CostRateReduceArr[Mathf.Min(i, 2)] * reduceMulti), coseRateFloor);
@@ -201,7 +207,7 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     {
         for (int i = 0; i < storesReserves.Count; i++)
         {
-            if (storesReserves[i].targetBuilding == def)
+            if (storesReserves[i].TargetBuilding == def)
             {
                 storesReserves.RemoveAt(i);
                 break;
@@ -213,7 +219,7 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     {
         for (int i = 0; i < storesReserves.Count; i++)
         {
-            if (storesReserves[i].targetFacility == def)
+            if (storesReserves[i].TargetFacility == def)
             {
                 storesReserves.RemoveAt(i);
                 break;
@@ -225,7 +231,7 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     {
         for (int i = 0; i < storesReserves.Count; i++)
         {
-            if (storesReserves[i].targetBuilding == def)
+            if (storesReserves[i].TargetBuilding == def)
             {
                 return storesReserves[i].costRate;
             }
@@ -237,7 +243,7 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
     {
         for (int i = 0; i < storesReserves.Count; i++)
         {
-            if (storesReserves[i].targetFacility == def)
+            if (storesReserves[i].TargetFacility == def)
             {
                 return storesReserves[i].costRate;
             }
@@ -258,14 +264,14 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
             BranchBuildingDef buildingDef;
             BranchBuildingConstructParameter constructParam = new()
             {
-                branch = Branch,
+                Branch = Branch,
                 InSpecialSlot = false
             };
 
             for (int i = 0; i < allDefs.Count; i++)
             {
                 buildingDef = allDefs[i];
-                constructParam.buildingDef = buildingDef;
+                constructParam.BuildingDef = buildingDef;
                 if (buildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
                 {
                     potentialDefs.Add(buildingDef);
@@ -294,13 +300,6 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
                 AddNewReserve(fDef);
             }
         }
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Values.Look(ref thoroughPreparation, "thoroughPreparation", defaultValue: false);
-
-        Scribe_Collections.Look(ref storesReserves, "storesReserves", LookMode.Deep);
     }
 }
 

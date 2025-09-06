@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_ApprenticeHome : WorldObject_Interactive_Village
+public class WorldObject_ApprenticeHome : WorldObject_Interactive_Nameable
 {
     public override void Notify_CaravanArrived(Caravan caravan)
     {

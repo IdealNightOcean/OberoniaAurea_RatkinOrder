@@ -6,15 +6,15 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchStatModifier
 {
     public BranchStatDef statDef;
-    public BranchStatTransformer statTransformer;
+    public BranchStatTransformer Transformer;
     public void LoadDataFromXmlCustom(XmlNode xmlRoot)
     {
         DirectXmlCrossRefLoader.RegisterObjectWantsCrossRef(this, "statDef", xmlRoot);
-        statTransformer = DirectXmlToObject.ObjectFromXml<BranchStatTransformer>(xmlRoot, doPostLoad: false);
+        Transformer = DirectXmlToObject.ObjectFromXml<BranchStatTransformer>(xmlRoot, doPostLoad: false);
     }
 
     public void PostLoad()
     {
-        statTransformer.EnsureFactorMinMagnitude();
+        Transformer.EnsureFactorMinMagnitude();
     }
 }

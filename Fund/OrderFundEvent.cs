@@ -4,40 +4,40 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderFundEvent : IExposable
 {
-    public OrderFundEventDef def; // 可为null
-    public float todayChange;
-    public int daysLeft;
+    public OrderFundEventDef Def; // 可为null
+    public float TodayChange;
+    public int DaysLeft;
 
     public OrderFundEvent() { }
 
     public OrderFundEvent(OrderFundEventDef def)
     {
-        this.def = def;
-        daysLeft = def.durationDays;
-        todayChange = def.changeRange.RandomInRange;
+        Def = def;
+        DaysLeft = def.durationDays;
+        TodayChange = def.changeRange.RandomInRange;
     }
 
     public OrderFundEvent(float change, int durationDays)
     {
-        daysLeft = durationDays;
-        todayChange = change;
+        DaysLeft = durationDays;
+        TodayChange = change;
     }
 
     public void ExposeData()
     {
-        Scribe_Defs.Look(ref def, "def");
-        Scribe_Values.Look(ref todayChange, "todayChange", 0f);
-        Scribe_Values.Look(ref daysLeft, "daysLeft", 1);
+        Scribe_Defs.Look(ref Def, "Def");
+        Scribe_Values.Look(ref TodayChange, "TodayChange", 0f);
+        Scribe_Values.Look(ref DaysLeft, "DaysLeft", 1);
     }
 
     public void DayPassed()
     {
-        daysLeft--;
-        todayChange = def?.changeRange.RandomInRange ?? todayChange;
+        DaysLeft--;
+        TodayChange = Def?.changeRange.RandomInRange ?? TodayChange;
     }
 
     public override string ToString()
     {
-        return $"todayChange: {todayChange}, daysLeft: {daysLeft}";
+        return $"todayChange: {TodayChange}, daysLeft: {DaysLeft}";
     }
 }

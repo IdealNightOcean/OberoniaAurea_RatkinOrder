@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-internal class Dialog_NodeTreeWithRatkinOrderInfo : Dialog_NodeTree
+public class Dialog_NodeTreeWithRatkinOrderInfo : Dialog_NodeTree
 {
     private readonly RatkinOrder ratkinOrder;
 

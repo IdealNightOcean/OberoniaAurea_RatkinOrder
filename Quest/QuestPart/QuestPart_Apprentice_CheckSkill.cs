@@ -3,73 +3,76 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_Apprentice_CheckSkill : QuestPart
+/// <summary>
+/// 小学徒技能判定（内部特化类）
+/// </summary>
+internal sealed class QuestPart_Apprentice_CheckSkill : QuestPart
 {
-    public string inSignalCheckSkill;
-    public string inSignalSuccessLeave;
-    public string inSignalStay;
+    public string InSignalCheckSkill;
+    public string InSignalSuccessLeave;
+    public string InSignalStay;
 
-    public string outSignalSuccess;
-    public string outSignalFail;
-    public string outSignalChecked;
+    public string OutSignalSuccess;
+    public string OutSignalFail;
+    public string OutSignalChecked;
 
-    public string outSignalSkillSuccessEnd;
-    public string outSignalSkillFailEnd;
+    public string OutSignalSkillSuccessEnd;
+    public string OutSignalSkillFailEnd;
 
     private bool skillSuccess;
     private bool skillChecked;
-    public Pawn apprentice;
+    public Pawn Apprentice;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref inSignalCheckSkill, "inSignalCheckSkill");
-        Scribe_Values.Look(ref inSignalSuccessLeave, "inSignalSuccessLeave");
-        Scribe_Values.Look(ref inSignalStay, "inSignalStay");
+        Scribe_Values.Look(ref InSignalCheckSkill, "InSignalCheckSkill");
+        Scribe_Values.Look(ref InSignalSuccessLeave, "InSignalSuccessLeave");
+        Scribe_Values.Look(ref InSignalStay, "InSignalStay");
 
-        Scribe_Values.Look(ref outSignalSuccess, "outSignalSuccess");
-        Scribe_Values.Look(ref outSignalFail, "outSignalFail");
-        Scribe_Values.Look(ref outSignalChecked, "outSignalChecked");
+        Scribe_Values.Look(ref OutSignalSuccess, "OutSignalSuccess");
+        Scribe_Values.Look(ref OutSignalFail, "OutSignalFail");
+        Scribe_Values.Look(ref OutSignalChecked, "OutSignalChecked");
 
-        Scribe_Values.Look(ref outSignalSkillSuccessEnd, "outSignalSkillSuccessEnd");
-        Scribe_Values.Look(ref outSignalSkillFailEnd, "outSignalSkillFailEnd");
+        Scribe_Values.Look(ref OutSignalSkillSuccessEnd, "OutSignalSkillSuccessEnd");
+        Scribe_Values.Look(ref OutSignalSkillFailEnd, "OutSignalSkillFailEnd");
 
         Scribe_Values.Look(ref skillSuccess, "skillSuccess", defaultValue: false);
         Scribe_Values.Look(ref skillChecked, "skillChecked", defaultValue: false);
-        Scribe_References.Look(ref apprentice, "apprentice");
+        Scribe_References.Look(ref Apprentice, "Apprentice");
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        inSignalCheckSkill = null;
-        inSignalSuccessLeave = null;
-        inSignalStay = null;
+        InSignalCheckSkill = null;
+        InSignalSuccessLeave = null;
+        InSignalStay = null;
 
-        outSignalSuccess = null;
-        outSignalFail = null;
-        outSignalChecked = null;
+        OutSignalSuccess = null;
+        OutSignalFail = null;
+        OutSignalChecked = null;
 
-        outSignalSkillSuccessEnd = null;
-        outSignalSkillFailEnd = null;
+        OutSignalSkillSuccessEnd = null;
+        OutSignalSkillFailEnd = null;
 
-        apprentice = null;
+        Apprentice = null;
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         base.Notify_QuestSignalReceived(signal);
 
-        if (signal.tag == inSignalSuccessLeave)
+        if (signal.tag == InSignalSuccessLeave)
         {
             SendEndSignal();
         }
-        else if (signal.tag == inSignalStay)
+        else if (signal.tag == InSignalStay)
         {
-            apprentice?.apparel.UnlockAll();
+            Apprentice?.apparel.UnlockAll();
             SendEndSignal();
         }
-        else if (!skillChecked && signal.tag == inSignalCheckSkill)
+        else if (!skillChecked && signal.tag == InSignalCheckSkill)
         {
             CheckApprenticeSkill();
         }
@@ -79,11 +82,11 @@ public class QuestPart_Apprentice_CheckSkill : QuestPart
     {
         if (skillSuccess)
         {
-            Find.SignalManager.SendSignal(new Signal(outSignalSkillSuccessEnd));
+            Find.SignalManager.SendSignal(new Signal(OutSignalSkillSuccessEnd));
         }
         else
         {
-            Find.SignalManager.SendSignal(new Signal(outSignalSkillFailEnd));
+            Find.SignalManager.SendSignal(new Signal(OutSignalSkillFailEnd));
         }
     }
 
@@ -91,9 +94,9 @@ public class QuestPart_Apprentice_CheckSkill : QuestPart
     {
         try
         {
-            if (apprentice is null || apprentice.skills is null)
+            if (Apprentice is null || Apprentice.skills is null)
             {
-                Find.SignalManager.SendSignal(new Signal(outSignalFail, apprentice.Named("SUBJECT")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalFail, Apprentice.Named("SUBJECT")));
             }
             else
             {
@@ -103,24 +106,24 @@ public class QuestPart_Apprentice_CheckSkill : QuestPart
                   || CheckSkill(SkillDefOf.Artistic))
                 {
                     skillSuccess = true;
-                    Find.SignalManager.SendSignal(new Signal(outSignalSuccess, apprentice.Named("SUBJECT")));
+                    Find.SignalManager.SendSignal(new Signal(OutSignalSuccess, Apprentice.Named("SUBJECT")));
                 }
                 else
                 {
                     skillSuccess = false;
-                    Find.SignalManager.SendSignal(new Signal(outSignalFail, apprentice.Named("SUBJECT")));
+                    Find.SignalManager.SendSignal(new Signal(OutSignalFail, Apprentice.Named("SUBJECT")));
                 }
             }
         }
         finally
         {
             skillChecked = true;
-            Find.SignalManager.SendSignal(new Signal(outSignalChecked, apprentice.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(OutSignalChecked, Apprentice.Named("SUBJECT")));
         }
     }
 
     private bool CheckSkill(SkillDef skill)
     {
-        return apprentice.skills.GetSkill(skill).GetLevel() >= 10;
+        return Apprentice.skills.GetSkill(skill).GetLevel() >= 10;
     }
 }

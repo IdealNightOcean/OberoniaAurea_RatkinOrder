@@ -10,7 +10,7 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
     public static RatkinOrderManager Instance { get; private set; }
 
     private List<RatkinOrder> allRatkinOrders = [];
-    public List<RatkinOrder> AllRatkinOrders => allRatkinOrders;
+    public IReadOnlyList<RatkinOrder> AllRatkinOrders => allRatkinOrders;
 
     public RatkinOrderManager()
     {

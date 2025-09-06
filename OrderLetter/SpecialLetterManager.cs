@@ -1,16 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class SpecialLetterManager : IExposable
 {
-    private static OrderLetterBox LetterBox => OrderLetterBox.Instance;
+    private static OrderLetterBox OrderLetterBox => OrderLetterBox.Instance;
 
     private bool helloLetterReceived;
+    protected HashSet<CertainDateLetterDef> recievedCertainDateLetters = [];
 
     private int curYear = 2025;
-    private bool childFestivalLetterReceived;
 
     public void Notify_GameStart()
     {
@@ -20,34 +21,34 @@ public class SpecialLetterManager : IExposable
             helloLetterReceived = true;
         }
 
-        if (curYear < DateTime.Now.Year)
+        DateTime todayDate = DateTime.Now.Date;
+
+        if (curYear != todayDate.Year)
         {
             ResetAllFestivalLetters();
-            curYear = DateTime.Now.Year;
+            curYear = todayDate.Year;
         }
 
-        int mouth = DateTime.Now.Month;
-        int day = DateTime.Now.Day;
-        if (mouth == 6)
+        foreach (CertainDateLetterDef def in DefDatabase<CertainDateLetterDef>.AllDefs)
         {
-            if (!childFestivalLetterReceived && day > 2 && day < 6)
+            if (!recievedCertainDateLetters.Contains(def) && todayDate >= def.EarliestDate && todayDate <= def.LatestDate)
             {
-                OrderLetter childFestivalLetter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_ChildFestival".Translate(), "OARO_Letter_ChildFestival".Translate(), OrderLetter.LetterType.Urgent, relatedOrder: null, sender: "OARO_MYG");
-                LetterBox.ReceiveLetter(childFestivalLetter);
-                childFestivalLetterReceived = true;
+                OrderLetter certainDateLetter = OrderLetterUtility.MakeOrderLetter(def.label, def.text, def.letterType, sender: def.sender, relatedOrder: null);
+                OrderLetterBox.ReceiveLetter(certainDateLetter);
+                recievedCertainDateLetters.Add(def);
             }
         }
     }
 
     private void ResetAllFestivalLetters()
     {
-        childFestivalLetterReceived = false;
+        recievedCertainDateLetters.Clear();
     }
 
     public static void TryMakeHelloLetter()
     {
-        OrderLetter helloLetter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_HelloLetter".Translate(), "OARO_Letter_HelloLetter".Translate(), OrderLetter.LetterType.Urgent, relatedOrder: null, sender: "OARO_MYG");
-        LetterBox.ReceiveLetter(helloLetter);
+        OrderLetter helloLetter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_HelloLetter".Translate(), "OARO_Letter_HelloLetter".Translate(), OrderLetterType.Urgent, sender: "OARO_MYG", relatedOrder: null);
+        OrderLetterBox.ReceiveLetter(helloLetter);
     }
 
     public void ExposeData()
@@ -57,6 +58,11 @@ public class SpecialLetterManager : IExposable
 
         Scribe_Values.Look(ref curYear, "curYear", 2025);
 
-        Scribe_Values.Look(ref childFestivalLetterReceived, "childFestivalLetterReceivedTemp", defaultValue: false);
+        Scribe_Collections.Look(ref recievedCertainDateLetters, "recievedCertainDateLetters", LookMode.Def);
+
+        if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
+        {
+            recievedCertainDateLetters.RemoveWhere(d => d is null);
+        }
     }
 }
