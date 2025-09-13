@@ -10,7 +10,7 @@ public static class OARO_ThingDefOf
     public static ThingDef Ratkin_Su;
 
     public static ThingDef OARO_OrderRecommendation; //推荐信
-    public static ThingDef OARO_OrderCodePedestal; //
+    public static ThingDef OARO_OrderCodePedestal; // 骑士团团规台
 
     public static ThingDef OARO_BombardSupportMaker;
     public static ThingDef RK_StrawberryBeer; //草莓精酿

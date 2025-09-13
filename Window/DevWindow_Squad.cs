@@ -48,7 +48,6 @@ public class DevWindow_Squad : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label($"ID: {squad.LoadID}");
         listing_Rect.Label($"Name: {squad.Name}");
         Text.Font = GameFont.Small;
 

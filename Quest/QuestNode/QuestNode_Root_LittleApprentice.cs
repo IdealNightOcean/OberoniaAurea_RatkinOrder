@@ -17,6 +17,9 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
     private string skillSuccessSignal;
     private string skillCheckedSignal;
 
+    public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.OARO_RatkinVillageChild;
+    protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_ChildrenCare;
+
     protected override Faction GetOrGenerateFaction()
     {
         return ModUtility.GenerateSubRatkinFaction(OARO_ModDefOf.OARO_Rakinia_Sub, OARO_ModDefOf.Rakinia);
@@ -34,11 +37,11 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
             goodwillSuccess = 20,
             rewardValueRange = new FloatRange(1000, 2000),
 
-            questDurationTicks = Rand.RangeInclusive(8 * 60000, 12 * 60000),
-
-            fixedPawnKind = PawnKindDefOf.Villager,
-            //addMemory = ModDefOf.OARO_Thought_ChildrenCare
+            questDurationTicks = Rand.RangeInclusive(8 * 60000, 12 * 60000)
         };
+
+        QuestGen.slate.Set("uniqueQuestDesc", true);
+        QuestGen.slate.Set("uniqueLeavingLetter", true);
 
         normalLeave = false;
         durationEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("durationEnd");

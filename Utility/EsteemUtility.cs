@@ -1,4 +1,6 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using RimWorld.QuestGen;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -59,13 +61,13 @@ public static class EsteemUtility
         return RelationshipKindArr[Mathf.Clamp((int)relationship + offset, 0, RelationshipKindArr.Length - 1)];
     }
 
-    public static void RelationshipKindOffsetBy(this RatkinOrder order, int offset)
+    public static void RelationshipKindOffsetBy(this RatkinOrder ratkinOrder, int offset)
     {
         if (offset == 0)
         {
             return;
         }
-        order.EsteemHandler.SetRelationship(order.Relationship.RelationshipKindOffsetBy(offset));
+        ratkinOrder.EsteemHandler.SetRelationship(ratkinOrder.Relationship.RelationshipKindOffsetBy(offset));
     }
 
     /// <summary>
@@ -122,7 +124,7 @@ public static class EsteemUtility
         (string, Color) esteemTitle = EsteemTitles[index];
         return esteemTitle.Item1.Translate().Colorize(esteemTitle.Item2);
     }
-    public static string GetEsteemDesc(this RatkinOrder order, int esteem)
+    public static string GetEsteemDesc(this RatkinOrder ratkinOrder, int esteem)
     {
         int index = esteem switch
         {
@@ -136,7 +138,7 @@ public static class EsteemUtility
         };
 
         (string, Color) esteemDesc = EsteemDescs[index];
-        return esteemDesc.Item1.Translate(order.Name).Colorize(esteemDesc.Item2);
+        return esteemDesc.Item1.Translate(ratkinOrder.Name).Colorize(esteemDesc.Item2);
     }
 
     /// <summary>
@@ -185,19 +187,19 @@ public static class EsteemUtility
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetRelationshipKindDesc(RatkinOrder order, OrderRelationshipKind relationship)
+    public static string GetRelationshipKindDesc(RatkinOrder ratkinOrder, OrderRelationshipKind relationship)
     {
         int index = Mathf.Clamp((int)relationship, 0, RelationshipKindDescs.Length - 1);
         (string, Color) relationshipLabel = RelationshipKindDescs[index];
-        return relationshipLabel.Item1.Translate(order.Name).Colorize(relationshipLabel.Item2);
+        return relationshipLabel.Item1.Translate(ratkinOrder.Name).Colorize(relationshipLabel.Item2);
     }
 
     /// <summary>
     /// 能否提升关系类型等级
     /// </summary>
-    public static AcceptanceReport CanUpgradeRelationship(this RatkinOrder order, bool byPlayer, bool resultOnly)
+    public static AcceptanceReport CanUpgradeRelationship(this RatkinOrder ratkinOrder, Map map, bool byPlayer, bool resultOnly)
     {
-        OrderRelationshipKind curRelationship = order.Relationship;
+        OrderRelationshipKind curRelationship = ratkinOrder.Relationship;
         if (curRelationship == OrderRelationshipKind.Soulmate)
         {
             return resultOnly ? false : "OARO_Max_OrderRelationship".Translate();
@@ -205,18 +207,18 @@ public static class EsteemUtility
 
         if (byPlayer)
         {
-            if (order.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.RelationshipUpgraded))
+            if (ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.RelationshipUpgraded))
             {
                 return resultOnly ? false : "OARO_Cooling_RelationshipUpgraded".Translate();
             }
         }
         else
         {
-            if (order.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.AutoRelationshipUpgraded))
+            if (ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.AutoRelationshipUpgraded))
             {
                 return resultOnly ? false : "OARO_Cooling_AutoRelationshipUpgraded".Translate();
             }
-            if (order.Faction.HostileTo(Faction.OfPlayer))
+            if (ratkinOrder.Faction.HostileTo(Faction.OfPlayer))
             {
                 return resultOnly ? false : "OARO_OrderFaction_Hostile".Translate();
             }
@@ -231,34 +233,39 @@ public static class EsteemUtility
             case OrderRelationshipKind.Friendly:
                 return ValidateRelationshipRequirement(esteem: 30, totalRecommendation: 3);
             case OrderRelationshipKind.Trustworthy:
-                if (order.BranchManager.NormalDemandFulfillCount < 2)
+                if (ratkinOrder.BranchManager.NormalDemandFulfillCount < 2)
                 {
                     return resultOnly ? false : "OARO_Insufficient_NormalDemandFulfill".Translate(2);
                 }
-                return ValidateRelationshipRequirement(esteem: 40, totalRecommendation: 6, friendlyBranchesCount: 1);
+                return ValidateRelationshipRequirement(esteem: 40, totalRecommendation: 6, curRecommendation: 1, friendlyBranchesCount: 1);
+
             case OrderRelationshipKind.Soulmate:
-                if (order.BranchManager.CriticalDemandFulfillCount < 2)
+                if (ratkinOrder.BranchManager.CriticalDemandFulfillCount < 2)
                 {
                     return resultOnly ? false : "OARO_Insufficient_CriticalDemandFulfill".Translate(2);
                 }
-                return ValidateRelationshipRequirement(esteem: 50, totalRecommendation: 12, friendlyBranchesCount: 3);
+                return ValidateRelationshipRequirement(esteem: 50, totalRecommendation: 12, curRecommendation: 2, friendlyBranchesCount: 3);
             default:
                 return true;
         }
 
-        AcceptanceReport ValidateRelationshipRequirement(int esteem, int totalRecommendation, int friendlyBranchesCount = -1)
+        AcceptanceReport ValidateRelationshipRequirement(int esteem, int totalRecommendation, int curRecommendation = -1, int friendlyBranchesCount = -1)
         {
-            if (!byPlayer && order.Esteem < esteem)
+            if (!byPlayer && ratkinOrder.Esteem < esteem)
             {
                 return resultOnly ? false : "OARO_Insufficient_Esteem".Translate(esteem);
             }
-            if (order.EsteemHandler.TotalRecommendation < totalRecommendation)
+            if (ratkinOrder.EsteemHandler.TotalRecommendation < totalRecommendation)
             {
                 return resultOnly ? false : "OARO_Insufficient_TotalRecommendation".Translate(totalRecommendation);
             }
-            if (friendlyBranchesCount > 0 && order.BranchManager.FriendlyBranchesCount < friendlyBranchesCount)
+            if (friendlyBranchesCount > 0 && ratkinOrder.BranchManager.FriendlyBranchesCount < friendlyBranchesCount)
             {
                 return resultOnly ? false : "OARO_Insufficient_FriendlyBranches".Translate(friendlyBranchesCount);
+            }
+            if (!byPlayer && curRecommendation > 0 && RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < curRecommendation)
+            {
+                return resultOnly ? false : "OARO_Insufficient_Recommendation".Translate(curRecommendation);
             }
             return true;
         }
@@ -267,25 +274,47 @@ public static class EsteemUtility
     /// <summary>
     /// 提升骑士团关系（玩家）
     /// </summary>
-    public static void UpgradeRelationship(RatkinOrder order)
+    public static void UpgradeRelationship(RatkinOrder ratkinOrder, Map map)
     {
-        if (order.Relationship == OrderRelationshipKind.Soulmate)
+        if (ratkinOrder.Relationship == OrderRelationshipKind.Soulmate)
         {
             return;
         }
 
-        order.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
-        throw new NotImplementedException();
+        if (ratkinOrder.Relationship < OrderRelationshipKind.Friendly)
+        {
+            ratkinOrder.EsteemHandler.SetRelationship(ratkinOrder.Relationship.RelationshipKindOffsetBy(1));
+            ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
+        }
+        else if (TryTriggerRelationshipQuest(ratkinOrder, map))
+        {
+            ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
+
+            int recommendationNeed = ratkinOrder.Relationship switch
+            {
+                OrderRelationshipKind.Friendly => 1,
+                OrderRelationshipKind.Trustworthy => 2,
+                _ => 0
+            };
+            if (recommendationNeed > 0)
+            {
+                RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
+            }
+        }
+        else
+        {
+
+        }
     }
 
     /// <summary>
     /// 骑士团主动提升关系概率
     /// </summary>
-    public static float GetChanceOfAutoUpgradeRelationship(this RatkinOrder order, bool resultOnly, out string explain)
+    public static float GetChanceOfAutoUpgradeRelationship(this RatkinOrder ratkinOrder, bool resultOnly, out string explain)
     {
         explain = string.Empty;
 
-        AcceptanceReport acceptanceReport = CanUpgradeRelationship(order, byPlayer: false, resultOnly: resultOnly);
+        AcceptanceReport acceptanceReport = CanUpgradeRelationship(ratkinOrder, map: null, byPlayer: false, resultOnly: resultOnly);
         if (!acceptanceReport)
         {
             if (!resultOnly)
@@ -295,69 +324,66 @@ public static class EsteemUtility
             return 0f;
         }
 
-        float chance = 1f;
-        float curStepChange;
+        float curChance = 1f;
         StringBuilder sb = resultOnly ? null : new StringBuilder();
 
         //认可度
-        curStepChange = (order.Esteem * 0.01f * 0.2f);
-        chance *= curStepChange;
-        if (!resultOnly)
-        {
-            sb.Append("OARO_AutoUpgradeRelation_Esteem".Translate(curStepChange.ToStringPercentSigned()));
-        }
+        AddExplain((ratkinOrder.Esteem * 0.01f * 0.2f), "OARO_ChangeFactor_Esteem");
 
         //关系
-        curStepChange = 1f / ((int)order.Relationship + 1f);
-        chance *= curStepChange;
-        if (!resultOnly)
-        {
-            sb.Append("OARO_AutoUpgradeRelation_Relationship".Translate(GetRelationshipKindLabel(order.Relationship), curStepChange.ToStringPercentSigned()));
-        }
+        AddExplain(1f / ((int)ratkinOrder.Relationship + 1f), "OARO_ChangeFactor_Relationship");
 
         //派系关系
-        if (order.Faction.PlayerRelationKind == FactionRelationKind.Ally)
+        if (ratkinOrder.Faction.PlayerRelationKind == FactionRelationKind.Ally)
         {
-            curStepChange = 1.2f;
-            chance *= curStepChange;
-            if (!resultOnly)
-            {
-                sb.Append("OARO_AutoUpgradeRelation_FactionAlly".Translate(curStepChange.ToStringPercentSigned()).Colorize(Color.green));
-            }
+            AddExplain(1.2f, "OARO_AutoUpgradeRelation_FactionAlly");
         }
 
         //友好分部
-        int friendlyBranchCount = order.BranchManager.FriendlyBranchesCount;
+        int friendlyBranchCount = ratkinOrder.BranchManager.FriendlyBranchesCount;
         if (friendlyBranchCount > 0)
         {
-            curStepChange = 1f + friendlyBranchCount * 0.1f;
-            chance *= curStepChange;
-            if (!resultOnly)
-            {
-                sb.Append("OARO_AutoUpgradeRelation_FriendlyBranch".Translate(friendlyBranchCount, curStepChange.ToStringPercentSigned()).Colorize(Color.green));
-            }
+            AddExplain(1f + friendlyBranchCount * 0.1f, "OARO_ChangeFactor_FriendlyBranchesCount");
         }
 
         if (!resultOnly)
         {
             explain = sb.ToString();
         }
-        chance = Mathf.Clamp01(chance);
+        curChance = Mathf.Clamp01(curChance);
 
-        return chance;
+        return curChance;
+
+        void AddExplain(float change, string reason)
+        {
+            curChance *= change;
+            if (!resultOnly)
+            {
+                sb.Append(reason.Translate(change.ToStringPercent("F2")).Colorize(change < 1f ? ColorLibrary.Red : Color.green));
+            }
+        }
     }
 
     /// <summary>
     /// 骑士团主动提升关系
     /// </summary>
-    public static void AutoUpgradeRelationship(this RatkinOrder order)
+    public static void AutoUpgradeRelationship(this RatkinOrder ratkinOrder)
     {
-        if (order.Relationship == OrderRelationshipKind.Soulmate)
+        if (ratkinOrder.Relationship == OrderRelationshipKind.Soulmate)
         {
             return;
         }
 
-        order.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AutoRelationshipUpgraded, cdTicks: 10 * 60000, shouldRemoveWhenExpired: true);
+        ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AutoRelationshipUpgraded, cdTicks: 10 * 60000, shouldRemoveWhenExpired: true);
         throw new NotImplementedException();
+    }
+
+    public static bool TryTriggerRelationshipQuest(RatkinOrder ratkinOrder, Map map)
+    {
+        Slate slate = new();
+        slate.SetBasicOrderSlateVar(ratkinOrder);
+        slate.Set(KeyLibrary_SlateStoreAs.OrderRelationship, ratkinOrder.Relationship);
+
+        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, null, slate, forced: false);
     }
 }

@@ -15,7 +15,7 @@ public static class OrderHallUtility
 
     public static int GetOrderHallLevel(Room room)
     {
-        if (room is null || room.Role != OARO_ModDefOf.OARO_RatkinOrderHall)
+        if (room is null || room != OrderInteractionHandler.MainOrderCodePedestal?.CachedRoom)
         {
             return 0;
         }
@@ -30,10 +30,12 @@ public static class OrderHallUtility
 
         if (maxPotentialLevel <= 1) { return 1; }
 
+        Log.Message($"before terrain: {maxPotentialLevel}");
         maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
         // 最高可能索引为0，只能是1级
         if (maxPotentialLevel <= 1) { return 1; }
 
+        Log.Message($"before building: {maxPotentialLevel}");
         maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
 
         return Mathf.Clamp(maxPotentialLevel, 1, 7);
@@ -97,7 +99,7 @@ public static class OrderHallUtility
 
     private static int BuildingRestrict(Room room, int maxPotentialLevel)
     {
-        HashSet<string> forbiddenBuildingTags = RestrictionExtension.forbiddenBuildingTags;
+        HashSet<string> forbiddenBuildingTags = RestrictionExtension.ForbiddenBuildingTags;
         Dictionary<ThingDef, int> orderHallBuildings = [];
 
         foreach (Region region in room.Regions)
@@ -106,27 +108,43 @@ public static class OrderHallUtility
             for (int i = 0; i < allThings.Count; i++)
             {
                 ThingDef thingDef = allThings[i].def;
+
+                // 有祭坛最高1级
+                if (thingDef.isAltar)
+                {
+                    return 1;
+                }
+
                 if (thingDef.building is null || thingDef.building.buildingTags is null)
                 {
                     continue;
                 }
 
-                // 有禁用类型建筑最高 1级
+                bool isPotentialBuilding = false;
                 foreach (string tag in thingDef.building.buildingTags)
                 {
+                    // 有禁用类型建筑最高 1级
                     if (forbiddenBuildingTags.Contains(tag))
                     {
                         return 1;
                     }
+
+                    if (tag == "OARO_OrderHall")
+                    {
+                        isPotentialBuilding = true;
+                    }
                 }
 
-                if (orderHallBuildings.TryGetValue(thingDef, out int count))
+                if (isPotentialBuilding)
                 {
-                    orderHallBuildings[thingDef] = count + 1;
-                }
-                else if (thingDef.building.buildingTags.Contains("OARO_OrderHall"))
-                {
-                    orderHallBuildings[thingDef] = 1;
+                    if (orderHallBuildings.TryGetValue(thingDef, out int count))
+                    {
+                        orderHallBuildings[thingDef] = count + 1;
+                    }
+                    else
+                    {
+                        orderHallBuildings[thingDef] = 1;
+                    }
                 }
             }
         }
@@ -135,13 +153,19 @@ public static class OrderHallUtility
         for (int i = maxPotentialLevel - 1; i >= 1; i--)
         {
             List<ThingDefCountClass> buildingRequirements = RestrictionExtension.buildingRequirements[i].buildings;
+            bool allMet = true;
             for (int j = 0; j < buildingRequirements.Count; j++)
             {
                 if (!orderHallBuildings.TryGetValue(buildingRequirements[j].thingDef, out int count) || count < buildingRequirements[j].count)
                 {
                     maxPotentialLevel = i;
+                    allMet = false;
                     break;
                 }
+            }
+            if (allMet)
+            {
+                break;
             }
         }
 

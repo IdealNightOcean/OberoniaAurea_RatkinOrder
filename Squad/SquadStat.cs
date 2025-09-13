@@ -119,6 +119,19 @@ public class SquadStat : IExposable, IDrawDevWindow
         listing_Rect.Label($"CommanderCount: {commanderCount:F2}");
         listing_Rect.Label($"Supply: {Supply:F2}");
         listing_Rect.Gap(6f);
+        if (listing_Rect.ButtonText("Member +1", widthPct: 0.6f))
+        {
+            MemberCount += 1f;
+        }
+        if (listing_Rect.ButtonText("Commander +1", widthPct: 0.6f))
+        {
+            CommanderCount += 1f;
+        }
+        if (listing_Rect.ButtonText("Supply +10%", widthPct: 0.6f))
+        {
+            Supply += 0.1f;
+        }
+        listing_Rect.Gap(6f);
         listing_Rect.Label($"MemberCeiling: {MemberCeiling:F2}");
         listing_Rect.Label($"CommanderCeiling: {CommanderCeiling:F2}");
         listing_Rect.Label($"SupplyCeiling: {SupplyCeiling:F2}");

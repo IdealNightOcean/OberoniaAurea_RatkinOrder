@@ -31,13 +31,21 @@ public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
 
     public DiaOption Option_Accept => new("Accept".Translate())
     {
-        action = delegate
-        {
-            OrderInteractionHandler.AroundKnightGroupsManager.TriggerVisitQuest(knightGroup);
-            Find.LetterStack.RemoveLetter(this);
-        },
+        action = ProactiveVisit,
         resolveTree = true
     };
+
+    private void ProactiveVisit()
+    {
+        Find.LetterStack.RemoveLetter(this);
+
+        Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+        if (map is null || !OrderInteractionHandler.AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
+        {
+            OrderInteractionHandler.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
+            OrderInteractionUtility.AroundKnightGroupVisitInvalid(knightGroup.Branch, isProactive: true);
+        }
+    }
 
     public override void Removed()
     {

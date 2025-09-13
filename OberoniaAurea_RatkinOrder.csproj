@@ -92,6 +92,7 @@
     <Compile Include="DefModExtension\FermentingBarrelExtension.cs" />
     <Compile Include="DefOf\HediffDefOf.cs" />
     <Compile Include="DefOf\JobDefOf.cs" />
+    <Compile Include="DefOf\ThoughtDefOf.cs" />
     <Compile Include="Def\CertainDateLetterDef.cs" />
     <Compile Include="Job\JobDriver_BookcaseReading.cs" />
     <Compile Include="Job\JobDriver_FillFermentingBarrel.cs" />
@@ -99,6 +100,7 @@
     <Compile Include="Job\JobDriver_TakeProductOutOfFermentingBarrel.cs" />
     <Compile Include="OrderLetter\SpecialLetterManager.cs" />
     <Compile Include="PlaceWorker_MultiCellWindow.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_KnightsVisit.cs" />
     <Compile Include="Thing\Building_OrderFermentingBarrel.cs" />
     <Compile Include="Thing\Building_OrderLetterBox.cs" />
     <Compile Include="Thing\Bullet_Banner.cs" />
@@ -121,9 +123,10 @@
     <Compile Include="DefOf\SquadTaskDefOf.cs" />
     <Compile Include="Def\OrderAssistDef.cs" />
     <Compile Include="Def\ResidentKnightRoleDef.cs" />
+    <Compile Include="Thought\Thought_VisitingKnight.cs" />
     <Compile Include="Window\DevWindowBase.cs" />
     <Compile Include="Dialog_NodeTreeWithRatkinOrderInfo.cs" />
-    <Compile Include="Hediff\HediffComp_ResidentKnight.cs" />
+    <Compile Include="Hediff\Hediff_ResidentKnight.cs" />
     <Compile Include="Hediff\Hediff_ByResidentKnight.cs" />
     <Compile Include="Letter\ChoiceLetter_RatkinOrder.cs" />
     <Compile Include="Letter\ChoiceLetter_KnightGroupProactiveVisit.cs" />
@@ -182,7 +185,7 @@
     <Compile Include="Quest\QuestPart\QuestPart_LordJob_CommomTalk.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_LordJob_HelpSeeker.cs" />
     <Compile Include="Thing\ShieldAllowShoot.cs" />
-    <Compile Include="ThoughtWorker_WineDisplayShelf.cs" />
+    <Compile Include="Thought\ThoughtWorker_WineDisplayShelf.cs" />
     <Compile Include="Utility\BranchStatUtility.cs" />
     <Compile Include="BranchStat\BranchStatWorker.cs" />
     <Compile Include="BranchStat\BranchStatPart_FundToAffectRadius.cs" />
@@ -207,6 +210,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Branch\WorldObjectComp_BranchSite.cs" />
+    <Compile Include="Window\DevWindow_OrderInteractHandler.cs" />
     <Compile Include="Window\DevWindow_Squad.cs" />
     <Compile Include="Window\DevWindow_Branch.cs" />
     <Compile Include="Window\DevWindow_BranchManager.cs" />
@@ -292,7 +296,7 @@
     <Compile Include="Def\RatkinOrderDef.cs" />
     <Compile Include="Components\TagStrToValue\TagStrToFloat.cs" />
     <Compile Include="Components\TagStrToValue\TagStrToInt.cs" />
-    <Compile Include="ThoughtWorker_BranchChurch.cs" />
+    <Compile Include="Thought\ThoughtWorker_BranchChurch.cs" />
     <Compile Include="UniqueIDManager.cs" />
     <Compile Include="RatkinOrder.cs" />
     <Compile Include="GameComponent_RatkinOrder.cs" />

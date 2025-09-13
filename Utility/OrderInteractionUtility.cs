@@ -41,6 +41,9 @@ public static class OrderInteractionUtility
 
     }
 
+    /// <summary>
+    /// 能否招募骑士
+    /// </summary>
     public static AcceptanceReport CanRecruitKnight(RatkinOrder order, Map map, bool resultOnly)
     {
         if (order.Relationship < OrderRelationshipKind.Trustworthy)
@@ -62,6 +65,71 @@ public static class OrderInteractionUtility
         return true;
     }
 
+    public static int SeasonInvitationLimit()
+    {
+        return OrderInteractionHandler.OrderHallLevel switch
+        {
+            < 2 => 0,
+            2 => 1,
+            < 5 => 2,
+            5 => 3,
+            _ => 4
+        };
+    }
+
+    public static AcceptanceReport CanInviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
+    {
+        if (knightGroup is null)
+        {
+            return false;
+        }
+
+        if (knightGroup.RatkinOrder.Relationship <= OrderRelationshipKind.Stranger)
+        {
+            return false;
+        }
+
+        if (OrderInteractionHandler.AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())
+        {
+            if (RecommendationUtility.CurRecommendationOfMap(knightGroup.RatkinOrder, map) < 1)
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    public static void InviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
+    {
+        float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
+        if (Rand.Chance(chance) && OrderInteractionHandler.AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
+        {
+            OrderInteractionHandler.AroundKnightGroupsManager.SeasonInvitationUsed++;
+            if (OrderInteractionHandler.AroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
+            {
+                RecommendationUtility.UseRecommendationOfMap(knightGroup.RatkinOrder, map, 1);
+            }
+        }
+        else
+        {
+            OrderInteractionHandler.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
+            AroundKnightGroupVisitInvalid(knightGroup.Branch, isProactive: false);
+        }
+    }
+
+    public static void AroundKnightGroupVisitInvalid(Branch branch, bool isProactive)
+    {
+        if (isProactive)
+        {
+
+        }
+        else
+        {
+
+        }
+    }
+
     /// <summary>
     /// 邀请附近骑士小组到访成功率
     /// </summary>
@@ -77,9 +145,8 @@ public static class OrderInteractionUtility
         StringBuilder sb = resultOnly ? null : new();
         RatkinOrder ratkinOrder = knights.RatkinOrder;
 
-        ApplyStepChange((int)ratkinOrder.Relationship * 0.04f, "OARO_AroundKnights_Relationship");
-
-        ApplyStepChange(ratkinOrder.Esteem * 0.01f, "OARO_AroundKnights_Esteem");
+        ApplyStepChange((int)ratkinOrder.Relationship * 0.04f, "OARO_ChangeOffset_Relationship");
+        ApplyStepChange(ratkinOrder.Esteem * 0.01f, "OARO_ChangeOffset_Esteem");
 
         float stepChange = knights.CurBusyLevel switch
         {
@@ -88,35 +155,42 @@ public static class OrderInteractionUtility
             AroundKnightGroup.BusyLevel.VeryBusy => -0.6f,
             _ => 0f
         };
-        ApplyStepChange(stepChange, "OARO_AroundKnights_BusyLevel");
-
+        curChance += stepChange;
+        if (stepChange != 0f && !resultOnly)
+        {
+            sb.AppendInNewLine($"OARO_AroundKnights_{knights.CurBusyLevel}_Offset".Translate().Colorize(Color.green));
+        }
 
         if (knights.TravelTicks >= 60000)
         {
-            stepChange = -0.15f;
-            ApplyStepChange(stepChange, "OARO_AroundKnights_TravelTimeTooLong");
-
+            ApplyStepChange(-0.15f, "OARO_AroundKnights_TravelTimeTooLong");
         }
         else if (knights.TravelTicks <= 30000)
         {
-            stepChange = -0.15f;
-            ApplyStepChange(stepChange, "OARO_AroundKnights_TravelTimeShort");
+            ApplyStepChange(0.1f, "OARO_AroundKnights_TravelTimeShort");
         }
 
         stepChange = (OrderInteractionHandler.OrderHallLevel - 2) * 0.05f;
-        stepChange = stepChange > 0f ? stepChange : 0f;
-        ApplyStepChange(stepChange, "OARO_AroundKnights_OrderHallLevel");
+        if (stepChange > 0f)
+        {
+            ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");
+        }
 
         if (ratkinOrder.ReformationManager.HasReformation(null))
         {
-            ApplyStepChange(0.2f, "OARO_AroundKnights_Reformation");
+            curChance += 0.2f;
+            if (!resultOnly)
+            {
+                sb.AppendInNewLine("OARO_ChangeOffset_Reformation".Translate().Colorize(Color.green));
+            }
         }
 
         if (knights.Branch.IsBranchOfType(BranchType.Friendly))
         {
-            ApplyStepChange(0.25f, "OARO_AroundKnights_FriendlyBranch");
+            ApplyStepChange(0.25f, "OARO_ChangeOffset_FriendlyBranch");
+
             curChance *= 1.25f;
-            sb.AppendInNewLine("OARO_AroundKnights_FriendlyBranch_Multi".Translate(1.25f.ToStringPercent("F2")).Colorize(Color.green));
+            sb.AppendInNewLine("OARO_ChangeFactor_FriendlyBranch".Translate(1.25f.ToStringPercent("F2")).Colorize(Color.green));
         }
 
         if (!resultOnly)
@@ -127,11 +201,6 @@ public static class OrderInteractionUtility
 
         void ApplyStepChange(float change, string reason)
         {
-            if (change == 0f)
-            {
-                return;
-            }
-
             curChance += change;
             if (!resultOnly)
             {

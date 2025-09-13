@@ -8,7 +8,7 @@ public class OrderCodePedestal : ThingWithComps
     private bool isMainPedestal;
 
     [Unsaved] private Room cachedRoom;
-    [Unsaved] private int cachedOrderHallLevel;
+    private int cachedOrderHallLevel = -1;
 
     [Unsaved] private int ticksToNextRoomCheck;
     [Unsaved] private int nextLevelCheckTick;
@@ -35,6 +35,7 @@ public class OrderCodePedestal : ThingWithComps
     {
         base.ExposeData();
         Scribe_Values.Look(ref isMainPedestal, "isMainPedestal", defaultValue: false);
+        Scribe_Values.Look(ref cachedOrderHallLevel, "cachedOrderHallLevel", -1);
     }
 
     public override void SpawnSetup(Map map, bool respawningAfterLoad)
@@ -110,12 +111,16 @@ public class OrderCodePedestal : ThingWithComps
         {
             Command_Action command_UnsetAsMain = new()
             {
+                defaultLabel = "OARO_CodePedestal_Unset".Translate(),
+                defaultDesc = "OARO_CodePedestal_UnsetDesc".Translate(),
                 action = delegate { TryUnsetAsMainPedestal(); }
             };
             yield return command_UnsetAsMain;
 
             Command_Action command_RecheckHallLevel = new()
             {
+                defaultLabel = "OARO_CodePedestal_RecheckHallLevel".Translate(),
+                defaultDesc = "OARO_CodePedestal_RecheckHallLevelDesc".Translate(),
                 action = delegate
                 {
                     GetNewestHallLevel();
@@ -127,11 +132,15 @@ public class OrderCodePedestal : ThingWithComps
         {
             Command_Action command_SetAsMain = new()
             {
+                defaultLabel = "OARO_CodePedestal_SetAsMain".Translate(),
+                defaultDesc = "OARO_CodePedestal_SetAsMainDesc".Translate(),
                 action = delegate { TrySetAsMainPedestal(replaceCur: false); }
             };
 
             Command_Action command_SetAsOrReplaceMain = new()
             {
+                defaultLabel = "OARO_CodePedestal_ForceSetAsMain".Translate(),
+                defaultDesc = "OARO_CodePedestal_ForceSetAsMainDesc".Translate(),
                 action = delegate { TrySetAsMainPedestal(replaceCur: true); }
             };
 

@@ -1,4 +1,5 @@
 ﻿using LudeonTK;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,6 +23,21 @@ public static class DebugRatkinOrders
         }
 
         Find.WindowStack.Add(new Dialog_DebugOptionListLister(menuOptions));
+    }
+
+    [DebugAction(category: "OberoniaAurea",
+                 name: "Dev-Win OrderInteractionHandler",
+                 displayPriority: 0,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.Playing)]
+    private static void OpenOrderInteractionDevWindow()
+    {
+        if (OrderInteractionHandler.Instance is null)
+        {
+            Messages.Message("OrderInteractionHandler is null", MessageTypeDefOf.RejectInput, historical: false);
+            return;
+        }
+        OrderInteractionHandler.OpenDevWindow();
     }
 
     [DebugAction(category: "OberoniaAurea",

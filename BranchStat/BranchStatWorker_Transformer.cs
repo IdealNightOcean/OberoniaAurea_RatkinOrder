@@ -42,16 +42,14 @@ public struct BranchStatTransCacheEnty : IEquatable<BranchStatTransCacheEnty>
     }
 }
 
-public class BranchStatWorker_Transformer(BranchStatDef stat) : BranchStatWorker(stat)
+public class BranchStatWorker_Transformer : BranchStatWorker
 {
-    private Dictionary<Branch, BranchStatTransCacheEnty> temporaryStatCache;
+    private new Dictionary<Branch, BranchStatTransCacheEnty> temporaryStatCache;
 
-    public override void InitCacheability()
+    public BranchStatWorker_Transformer(BranchStatDef stat) : base(stat)
     {
-        if (Stat.cacheable)
-        {
-            temporaryStatCache = [];
-        }
+        temporaryStatCache = stat.cacheable ? [] : null;
+        base.temporaryStatCache = null;
     }
 
     public override float GetValue(Branch branch, float? baseValueOverride = null, bool immediateUpdate = false)

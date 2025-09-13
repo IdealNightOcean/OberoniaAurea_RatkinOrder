@@ -14,28 +14,47 @@ public class OrderInteractionHandler : IExposable, IOnRatkinOrderRemoved, IOnBra
     public static ResidentKnightHandler ResidentKnightHandler => Instance.residentKnightHandler;
     public static AroundKnightGroupsManager AroundKnightGroupsManager => Instance.aroundKnightGroupsManager;
 
+    public static void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_OrderInteractHandler());
+
 
     [Unsaved] private OrderCodePedestal mainOrderCodePedestal;
-    private CooldownRecordManager cooldownManager = new();
+    private CooldownRecordManager cooldownManager;
 
-    private AcceptedBranchDemandHandler acceptedBranchDemandHandler = new();
-    private ResidentKnightHandler residentKnightHandler = new();
-    private AroundKnightGroupsManager aroundKnightGroupsManager = new();
-
+    private AcceptedBranchDemandHandler acceptedBranchDemandHandler;
+    private ResidentKnightHandler residentKnightHandler;
+    private AroundKnightGroupsManager aroundKnightGroupsManager;
 
     public OrderInteractionHandler()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
+
+        EnsureComponentsInit();
     }
 
     public static void ClearStaticCache() => Instance = null;
 
+    private void EnsureComponentsInit()
+    {
+        cooldownManager ??= new();
+
+        acceptedBranchDemandHandler ??= new();
+        residentKnightHandler ??= new();
+        aroundKnightGroupsManager ??= new();
+    }
+
     public void ExposeData()
     {
+        Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
+
         Scribe_Deep.Look(ref acceptedBranchDemandHandler, "acceptedBranchDemandHandler");
         Scribe_Deep.Look(ref residentKnightHandler, "residentKnightHandler");
         Scribe_Deep.Look(ref aroundKnightGroupsManager, "aroundKnightGroupsManager");
+
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            EnsureComponentsInit();
+        }
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)

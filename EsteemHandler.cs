@@ -133,5 +133,7 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
             return;
         }
         relationship = newRelationship;
+
+        LastRelationshipChangeTick = Find.TickManager.TicksGame;
     }
 }

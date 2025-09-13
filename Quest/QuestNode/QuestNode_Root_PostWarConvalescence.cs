@@ -19,6 +19,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
     private string outSigalMoodFailed;
     private HediffDef specialHediff;
 
+    public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.RatkinKnight;
     protected override Faction GetOrGenerateFaction()
     {
         QuestGen.slate.Set("isMainFaction", true);
@@ -36,8 +37,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
             goodwillSuccess = 22,
             goodwillFailure = -22,
 
-            questDurationTicks = 12 * 60000,
-            fixedPawnKind = OARO_PawnKindDefOf.RatkinKnight
+            questDurationTicks = 12 * 60000
         };
 
         Slate slate = QuestGen.slate;

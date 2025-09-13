@@ -35,15 +35,15 @@ public class BranchStatDef : Def
             maxValue = Mathf.Round(maxValue);
         }
 
-        if (minValue > maxValue)
-        {
-            (minValue, maxValue) = (maxValue, minValue);
-        }
-
         if (nonNegative)
         {
             minValue = Mathf.Max(minValue, 0f);
             maxValue = Mathf.Max(maxValue, 0f);
+        }
+
+        if (minValue > maxValue)
+        {
+            (minValue, maxValue) = (maxValue, minValue);
         }
 
         baseValue = Mathf.Clamp(baseValue, minValue, maxValue);

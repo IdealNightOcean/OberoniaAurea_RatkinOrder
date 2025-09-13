@@ -2,16 +2,14 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class HediffComp_ResidentKnight : HediffComp, ISingleRatkinOrderRelated
+public class Hediff_ResidentKnight : HediffWithComps, ISingleRatkinOrderRelated
 {
-    private Map residentMap;
     private RatkinOrder ratkinOrder;
     public RatkinOrder RatkinOrder => ratkinOrder;
 
-    public override void CompExposeData()
+    public override void ExposeData()
     {
-        base.CompExposeData();
-        Scribe_References.Look(ref residentMap, "residentMap");
+        base.ExposeData();
         Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
     }
 
@@ -30,18 +28,17 @@ public class HediffComp_ResidentKnight : HediffComp, ISingleRatkinOrderRelated
 
     public override void Notify_PawnKilled()
     {
-        OrderInteractionHandler.ResidentKnightHandler.RemoveResidentKnight(parent.pawn);
+        OrderInteractionHandler.ResidentKnightHandler.RemoveResidentKnight(pawn);
     }
 
     public override void Notify_Spawned()
     {
-        OrderInteractionHandler.ResidentKnightHandler.AddNewResidentKnight(parent.pawn, ratkinOrder);
+        OrderInteractionHandler.ResidentKnightHandler.AddNewResidentKnight(pawn, ratkinOrder);
     }
 
-    public override void CompPostPostRemoved()
+    public override void PostRemoved()
     {
-        base.CompPostPostRemoved();
-        OrderInteractionHandler.ResidentKnightHandler.RemoveResidentKnight(parent.pawn);
-        residentMap = null;
+        base.PostRemoved();
+        OrderInteractionHandler.ResidentKnightHandler.RemoveResidentKnight(pawn);
     }
 }

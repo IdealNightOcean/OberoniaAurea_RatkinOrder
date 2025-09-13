@@ -15,10 +15,6 @@ public static class OARO_ModDefOf
     public static LetterDef OARO_Apprentice_QuizStayIntentionLetter;
     public static LetterDef OARO_KnightGroupProactiveVisitLetter;
 
-    public static ThoughtDef OARO_Thought_ChildrenCare;
-    public static ThoughtDef OARO_Thought_CelebrationHost;
-    public static ThoughtDef OARO_Thought_FamineVillagetFeast;
-
     public static RulePackDef OARO_NamerOrderSquad;
 
     public static RoomRoleDef OARO_RatkinOrderHall;

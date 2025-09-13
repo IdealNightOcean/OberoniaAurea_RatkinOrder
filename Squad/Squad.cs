@@ -18,8 +18,6 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
     public SquadManager SquadManager => RatkinOrder.SquadManager;
     public CooldownRecordManager CooldownManager => Branch.CooldownManager;
 
-    protected int loadID = -1;
-    public int LoadID => loadID;
     protected string name;
     public string Name => name;
 
@@ -48,7 +46,6 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
         if (initConstruct)
         {
             EnsureComponentsInit();
-            loadID = UniqueIDManager.Instance.GetUniqueID("Squad");
         }
     }
 
@@ -80,8 +77,6 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref loadID, "loadID", -1);
-
         Scribe_Values.Look(ref name, "name");
         Scribe_Values.Look(ref stateStr, "stateStr");
 
@@ -235,6 +230,4 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
         taskHandler ??= new SquadTaskHandler(this);
         supportHandler ??= new SquadSupportHandler(this);
     }
-
-    public string GetUniqueLoadID() => "Squad_" + loadID;
 }

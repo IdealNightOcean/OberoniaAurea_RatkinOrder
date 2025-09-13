@@ -31,7 +31,7 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
         {
             foreach (Pawn pawn in associatedFixedCaravan.PawnsListForReading)
             {
-                pawn.needs.mood?.thoughts.memories.TryGainMemory(OARO_ModDefOf.OARO_Thought_CelebrationHost);
+                pawn.needs.mood?.thoughts.memories.TryGainMemory(OARO_ThoughtDefOf.OARO_Thought_CelebrationHost);
             }
 
             int count = associatedFixedCaravan.PawnsListForReading.Count * 10;

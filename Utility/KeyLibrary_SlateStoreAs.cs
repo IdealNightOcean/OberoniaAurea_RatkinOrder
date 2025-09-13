@@ -5,6 +5,7 @@ public static class KeyLibrary_SlateStoreAs
     public const string RatkinOrder = "ratkinOrder";
     public const string OrderFaction = "orderFaction";
     public const string OrderName = "orderName";
+    public const string OrderRelationship = "orderRelationship";
 
     public const string Branch = "branch";
     public const string BranchName = "branchName";
@@ -20,4 +21,8 @@ public static class KeyLibrary_SlateStoreAs
     public const string MercyQuest = "mercyQuest";
     public const string DemandType = "demandType";
     public const string DemandDef = "demandDef";
+
+    public const string VisitingKnightsDelay = "visitingKnightsDelay";
+    public const string VisitingKnightsDuration = "visitingKnightsDuration";
+    public const string VisitingKnightsCount = "visitingKnightsCount";
 }

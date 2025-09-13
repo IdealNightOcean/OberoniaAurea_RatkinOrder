@@ -266,7 +266,11 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                 {
                     foreach (Pawn p in associatedFixedCaravan.PawnsListForReading)
                     {
-                        p.needs?.mood.thoughts.memories.TryGainMemory(OARO_ModDefOf.OARO_Thought_FamineVillagetFeast);
+                        p.needs?.mood.thoughts.memories.TryGainMemory(OARO_ThoughtDefOf.OARO_Thought_FamineVillagetFeast);
+                        if (p.needs?.food is not null)
+                        {
+                            p.needs.food.CurLevelPercentage += 1f;
+                        }
                     }
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_FeastFinished".Translate(), Faction));
                     if (!Destroyed) { Destroy(); }
@@ -334,7 +338,11 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
             {
                 foreach (Pawn p in associatedFixedCaravan.PawnsListForReading)
                 {
-                    p.needs?.mood.thoughts.memories.TryGainMemory(OARO_ModDefOf.OARO_Thought_FamineVillagetFeast);
+                    p.needs?.mood.thoughts.memories.TryGainMemory(OARO_ThoughtDefOf.OARO_Thought_FamineVillagetFeast);
+                    if (p.needs?.food is not null)
+                    {
+                        p.needs.food.CurLevelPercentage += 1f;
+                    }
                 }
             }
             if (!Destroyed) { Destroy(); }

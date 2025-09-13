@@ -40,9 +40,11 @@ public class JobDriver_FillFermentingBarrel : JobDriver
         yield return Toils_Haul.StartCarryThing(RawInd, putRemainderInQueue: false, subtractNumTakenFromJobCount: true).FailOnDestroyedNullOrForbidden(RawInd);
         yield return Toils_Haul.CheckForGetOpportunityDuplicate(reserveWort, RawInd, TargetIndex.None, takeFromValidStorage: true);
         yield return Toils_Goto.GotoThing(BarrelInd, PathEndMode.Touch);
-        yield return Toils_General.Wait(Duration).FailOnDestroyedNullOrForbidden(RawInd).FailOnDestroyedNullOrForbidden(BarrelInd)
-            .FailOnCannotTouch(BarrelInd, PathEndMode.Touch)
-            .WithProgressBarToilDelay(BarrelInd);
+        yield return Toils_General.Wait(Duration)
+                                  .FailOnDestroyedNullOrForbidden(RawInd)
+                                  .FailOnDestroyedNullOrForbidden(BarrelInd)
+                                  .FailOnCannotTouch(BarrelInd, PathEndMode.Touch)
+                                  .WithProgressBarToilDelay(BarrelInd);
         Toil toil = ToilMaker.MakeToil("MakeNewToils");
         toil.initAction = delegate
         {

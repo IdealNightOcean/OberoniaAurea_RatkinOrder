@@ -11,7 +11,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
 
     public void ExposeData()
     {
-        Scribe_Deep.Look(ref acceptedBranchDemands, "acceptedBranchDemands", LookMode.Deep);
+        Scribe_Collections.Look(ref acceptedBranchDemands, "acceptedBranchDemands", LookMode.Deep);
         if (acceptedBranchDemands.RemoveAll(ac => ac is null || ac.Branch is null) > 0)
         {
             Log.Error($"Some AcceptedBranchDemand were null or invalided after loading and have been removed.");

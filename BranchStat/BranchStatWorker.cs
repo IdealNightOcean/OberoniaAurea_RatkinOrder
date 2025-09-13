@@ -46,14 +46,7 @@ public class BranchStatWorker(BranchStatDef stat)
 {
     public readonly BranchStatDef Stat = stat ?? throw new ArgumentNullException(nameof(stat));
 
-    private Dictionary<Branch, BranchStatCacheEnty> temporaryStatCache;
-    public virtual void InitCacheability()
-    {
-        if (Stat.cacheable)
-        {
-            temporaryStatCache = [];
-        }
-    }
+    protected Dictionary<Branch, BranchStatCacheEnty> temporaryStatCache = stat.cacheable ? [] : null;
 
     public virtual float GetValue(Branch branch, float? baseValueOverride = null, bool immediateUpdate = false)
     {

@@ -13,7 +13,7 @@ public class OARO_QuestScriptDefOf
 
     public static QuestScriptDef OARO_Quest_TemporaryEncampment;
 
-    public static QuestScriptDef OARO_Quest_AroundKnightGroupVisit;
+    public static QuestScriptDef OARO_Quest_KnightsVisit;
 
     static OARO_QuestScriptDefOf()
     {

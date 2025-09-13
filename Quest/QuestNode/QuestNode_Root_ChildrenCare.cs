@@ -7,8 +7,12 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
 {
+    public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.OARO_RatkinVillageChild;
+    protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_ChildrenCare;
+
     protected override Faction GetOrGenerateFaction()
     {
+        QuestGen.slate.Set("isMainFaction", true);
         return ModUtility.GenerateSubRatkinFaction(OARO_ModDefOf.OARO_Rakinia_Sub, OARO_ModDefOf.Rakinia);
     }
 
@@ -25,11 +29,11 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
             goodwillSuccess = 20,
             rewardValueRange = new FloatRange(1000, 2000),
 
-            questDurationTicks = Rand.RangeInclusive(8 * 60000, 12 * 60000),
-
-            fixedPawnKind = OARO_PawnKindDefOf.OARO_RatkinVillageChild,
-            addMemory = OARO_ModDefOf.OARO_Thought_ChildrenCare
+            questDurationTicks = Rand.RangeInclusive(8 * 60000, 12 * 60000)
         };
+
+        QuestGen.slate.Set("uniqueQuestDesc", true);
+        QuestGen.slate.Set("uniqueLeavingLetter", true);
     }
 
     protected override void AddQuestAward(QuestPart_Choice.Choice choice)

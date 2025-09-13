@@ -5,12 +5,14 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderHallRestrictionExtension : DefModExtension
 {
-    public HashSet<string> forbiddenBuildingTags = [];
+    private List<string> forbiddenBuildingTags = [];
+    public HashSet<string> ForbiddenBuildingTags = [];
 
     public List<OrderHallBuildingRequirements> buildingRequirements = [];
 
     public override IEnumerable<string> ConfigErrors()
     {
+        ForbiddenBuildingTags = [.. forbiddenBuildingTags];
         buildingRequirements.SortBy(r => r.level);
         return base.ConfigErrors();
     }
