@@ -28,7 +28,7 @@ public class SquadSupportHandler(Squad squad) : IExposable
         }
         if (Squad.RatkinOrder.Relationship < OrderRelationshipKind.Friendly)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(EsteemUtility.GetRelationshipKindLabel(OrderRelationshipKind.Friendly));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(OrderRelationshipKind.Friendly));
         }
         if (Squad.SquadStat.Supply < 0.25f)
         {
@@ -58,7 +58,7 @@ public class SquadSupportHandler(Squad squad) : IExposable
         }
         if (Squad.RatkinOrder.Relationship < OrderRelationshipKind.Trustworthy)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(EsteemUtility.GetRelationshipKindLabel(OrderRelationshipKind.Trustworthy));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(OrderRelationshipKind.Trustworthy));
         }
 
         SquadStat squadStat = Squad.SquadStat;

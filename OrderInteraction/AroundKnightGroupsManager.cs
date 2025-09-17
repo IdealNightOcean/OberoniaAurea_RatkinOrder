@@ -87,15 +87,11 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
 
     public bool TriggerVisitQuest(AroundKnightGroup knightGroup, Map map)
     {
-        if (knightGroup is null)
-        {
-            return false;
-        }
-
         aroundKnightGroups.Remove(knightGroup);
 
         Slate slate = new();
         slate.SetBasicOrderSlateVar(knightGroup.Branch);
+        slate.Set("map", map);
         slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsCount, knightGroup.MemberCount);
         slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsDelay, knightGroup.TravelTicks);
         int duration = knightGroup.CurBusyLevel switch
@@ -107,7 +103,6 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
         };
         slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsDuration, duration);
 
-        slate.Set("map", map);
         return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
     }
 
@@ -182,16 +177,15 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
     private void QuizAutoVisit(AroundKnightGroup knightGroup)
     {
         ChoiceLetter_KnightGroupProactiveVisit letter = (ChoiceLetter_KnightGroupProactiveVisit)LetterMaker.MakeLetter(
-            label: "OARO_KnightGroupProactiveVisit_QuizLetterLabel".Translate(knightGroup.Branch.Name),
-            text: "OARO_AroundKnightGroup_ProactiveVisitQuizLetter".Translate(knightGroup.Branch.Name),
-            def: OARO_ModDefOf.OARO_KnightGroupProactiveVisitLetter,
+            label: "OARO_AroundKnightGroup_ProactiveVisitQuizLabel".Translate(),
+            text: "OARO_AroundKnightGroup_ProactiveVisitQuizText".Translate(knightGroup.Branch.Name),
+            def: OARO_LetterDefOf.OARO_KnightGroupProactiveVisitLetter,
             relatedFaction: knightGroup.RatkinOrder.Faction);
 
         letter.relatedOrder = knightGroup.RatkinOrder;
         letter.StartTimeout(30000);
         Find.LetterStack.ReceiveLetter(letter);
     }
-
 
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
     {

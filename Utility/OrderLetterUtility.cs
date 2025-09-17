@@ -22,7 +22,6 @@ public static class OrderLetterUtility
             Sender = sender ?? "OARO_Letter_UnkownSender",
             LetterType = letterType,
             RelatedOrder = relatedOrder,
-            // relatedFaction = relatedOrder.Faction,
             RelatedFaction = relatedOrder.Faction
         };
 

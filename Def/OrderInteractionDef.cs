@@ -4,11 +4,11 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class OrderAssistanceDef : Def
+public class OrderInteractionDef : Def
 {
     public Type workerClass;
-    private OrderAssistanceWorker worker;
-    public OrderAssistanceWorker Worker => worker ??= (OrderAssistanceWorker)Activator.CreateInstance(workerClass, this);
+    private OrderInteractionWorker worker;
+    public OrderInteractionWorker Worker => worker ??= (OrderInteractionWorker)Activator.CreateInstance(workerClass, this);
     public string cdRecordKey;
 
     public int cdDays;

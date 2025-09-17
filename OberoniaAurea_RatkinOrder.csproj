@@ -70,9 +70,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AroundKnightGroup.cs" />
-    <Compile Include="AroundKnightGroupsManager.cs" />
-    <Compile Include="BombardSupportMaker.cs" />
+    <Compile Include="DefOf\LetterDefOf.cs" />
+    <Compile Include="Letter\ChoiceLetter_AutoUpgradeRelationship.cs" />
+    <Compile Include="OrderInteraction\AroundKnightGroup.cs" />
+    <Compile Include="OrderInteraction\AroundKnightGroupsManager.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_SetBranchForWorldObject.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_SetRatkinOrderForWorldObject.cs" />
+    <Compile Include="Thing\BombardSupportMaker.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemand.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemandHandler.cs" />
     <Compile Include="BranchDemand\BranchDemandWeighter.cs" />
@@ -90,6 +94,7 @@
     <Compile Include="DefModExtension\BranchBuilding_MemorialExtension.cs" />
     <Compile Include="DefModExtension\EncampmentSupplyExtension.cs" />
     <Compile Include="DefModExtension\FermentingBarrelExtension.cs" />
+    <Compile Include="DefModExtension\MercyQuestFlag.cs" />
     <Compile Include="DefOf\HediffDefOf.cs" />
     <Compile Include="DefOf\JobDefOf.cs" />
     <Compile Include="DefOf\ThoughtDefOf.cs" />
@@ -98,9 +103,16 @@
     <Compile Include="Job\JobDriver_FillFermentingBarrel.cs" />
     <Compile Include="Job\JobDriver_ReceiveLetter.cs" />
     <Compile Include="Job\JobDriver_TakeProductOutOfFermentingBarrel.cs" />
+    <Compile Include="OrderInteraction\MercyQuestHandler.cs" />
     <Compile Include="OrderLetter\SpecialLetterManager.cs" />
     <Compile Include="PlaceWorker_MultiCellWindow.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightsVisit.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_KinghtVisitWatcher.cs" />
+    <Compile Include="Quest\Quest_MercyQuestWatcher.cs" />
+    <Compile Include="OrderInteraction\ResidentKnight\ResidentKnightRoleWorker_Clerk.cs" />
+    <Compile Include="OrderInteraction\ResidentKnight\ResidentKnightRoleWorker_Orderly.cs" />
+    <Compile Include="OrderInteraction\ResidentKnight\ResidentKnightRoleWorker_Patrol.cs" />
+    <Compile Include="OrderInteraction\ResidentKnight\ResidentKnightRoleWorker_Sentry.cs" />
     <Compile Include="Thing\Building_OrderFermentingBarrel.cs" />
     <Compile Include="Thing\Building_OrderLetterBox.cs" />
     <Compile Include="Thing\Bullet_Banner.cs" />
@@ -121,11 +133,14 @@
     <Compile Include="DefOf\ThingDefOf.cs" />
     <Compile Include="DefOf\RimWorldDefOf.cs" />
     <Compile Include="DefOf\SquadTaskDefOf.cs" />
-    <Compile Include="Def\OrderAssistDef.cs" />
+    <Compile Include="Def\OrderInteractionDef.cs" />
     <Compile Include="Def\ResidentKnightRoleDef.cs" />
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
+    <Compile Include="Utility\RelationshipUtility.cs" />
+    <Compile Include="Utility\KeyLibrary_InteractRecord.cs" />
+    <Compile Include="Utility\MercyQuestDataBase.cs" />
     <Compile Include="Window\DevWindowBase.cs" />
-    <Compile Include="Dialog_NodeTreeWithRatkinOrderInfo.cs" />
+    <Compile Include="Window\Dialog_NodeTreeWithRatkinOrderInfo.cs" />
     <Compile Include="Hediff\Hediff_ResidentKnight.cs" />
     <Compile Include="Hediff\Hediff_ByResidentKnight.cs" />
     <Compile Include="Letter\ChoiceLetter_RatkinOrder.cs" />
@@ -134,9 +149,9 @@
     <Compile Include="DefModExtension\OrderHallRestrictionExtension.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_ResidentKnight.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_ResidentKnightWatcher.cs" />
-    <Compile Include="ResidentKnight\ResidentKnight.cs" />
-    <Compile Include="ResidentKnight\ResidentKnightHandler.cs" />
-    <Compile Include="ResidentKnight\ResidentKnightRoleWorker.cs" />
+    <Compile Include="OrderInteraction\ResidentKnight\ResidentKnight.cs" />
+    <Compile Include="OrderInteraction\ResidentKnight\ResidentKnightsManager.cs" />
+    <Compile Include="OrderInteraction\ResidentKnight\ResidentKnightRoleWorker.cs" />
     <Compile Include="Thing\OrderCodePedestal.cs" />
     <Compile Include="Fund\OrderFundEvent.cs" />
     <Compile Include="Def\OrderFundEventDef.cs" />
@@ -147,10 +162,10 @@
     <Compile Include="Job\JobDriver_CheckHowitzer.cs" />
     <Compile Include="Job\JobDriver_RepairHowitzer.cs" />
     <Compile Include="ModMain.cs" />
-    <Compile Include="OrderAssistanceWorker.cs" />
+    <Compile Include="OrderInteractionWorker.cs" />
     <Compile Include="OrderHall\RoomRoleWorker_RatkinOrderHall.cs" />
-    <Compile Include="OrderInteractionHandler.cs" />
-    <Compile Include="OrderRecommendation.cs" />
+    <Compile Include="OrderInteraction\OrderInteractionHandler.cs" />
+    <Compile Include="Thing\OrderRecommendation.cs" />
     <Compile Include="IncidentWorker\IncidentWorker_Test.cs" />
     <Compile Include="Job\JobDriver_CommonTalkWith.cs" />
     <Compile Include="DefModExtension\MercyQuestExtension.cs" />
@@ -168,7 +183,7 @@
     <Compile Include="Quest\QuestNode\QuestNode_Root_PostWarConvalescence.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_AvaerageMood.cs" />
     <Compile Include="Quest\Quest_ThingRequester.cs" />
-    <Compile Include="Quest\QuestNode\QuestNode_DemandType.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_DemandTypeSwitch.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetBranchFromSlate.cs" />
     <Compile Include="Quest\Quest_BranchDemandWatcher.cs" />
     <Compile Include="Quest\Reward_OrderRecommendation.cs" />
@@ -219,7 +234,7 @@
     <Compile Include="Window\DevWindow_SquadManager.cs" />
     <Compile Include="Window\DevWindow_SquadGroupPatrolManager.cs" />
     <Compile Include="EsteemHandler.cs" />
-    <Compile Include="DebugRatkinOrders.cs" />
+    <Compile Include="Utility\DebugRatkinOrders.cs" />
     <Compile Include="Letter\ChoiceLetter_Apprentice_QuizStayIntention.cs" />
     <Compile Include="HarmonyPatch\ModHarmonyPatch.cs" />
     <Compile Include="Interface\IDevWindow.cs" />
@@ -251,7 +266,6 @@
     <Compile Include="Quest\QuestNode\QuestNode_CheckGroupPatrolStart.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderOfFaction.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_ChildrenCare.cs" />
-    <Compile Include="Quest\QuestNode\QuestNode_SetRatkinOrder.cs" />
     <Compile Include="Quest\Quest_CheckSkillLevel.cs" />
     <Compile Include="Quest\Quest_OrderEsteemChange.cs" />
     <Compile Include="Quest\Quest_AllOrdersEsteemChange.cs" />
@@ -309,6 +323,7 @@
     <Compile Include="Work\WorkGiver_FillFermentingBarrel_Order.cs" />
     <Compile Include="Work\WorkGiver_RecieveOrderLetter.cs" />
     <Compile Include="Work\WorkGiver_TakeProductOutOfFermentingBarrel.cs" />
+    <Compile Include="Worldobject\WorldObject_OrderRelationshipUpgrade.cs" />
     <Compile Include="Worldobject\WorldObejct_SupplyDepotConstruction.cs" />
     <Compile Include="Worldobject\WorldObject_FieldSurvey.cs" />
     <Compile Include="Worldobject\WorldObject_ArmsOrderSite.cs" />

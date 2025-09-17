@@ -1,0 +1,48 @@
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using System.Collections.Generic;
+using System.Linq;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class ResidentKnightRoleWorker(ResidentKnightRoleDef def)
+{
+    public readonly ResidentKnightRoleDef Def = def;
+
+    /// <summary>
+    /// 根据该职位的【Pawn】提供不同的Stat修正
+    /// 修正是针对殖民者的，而非担任该职位的Pawn
+    /// </summary>
+    /// <param name="pawn">担任该职位的Pawn</param>
+    public virtual IEnumerable<StatModifier> RoleStatOffsets(Pawn rolePawn) { return Enumerable.Empty<StatModifier>(); }
+    public virtual IEnumerable<StatModifier> RoleStatFactors(Pawn rolePawn) { return Enumerable.Empty<StatModifier>(); }
+
+    public virtual void PostActiveRole(Pawn rolePawn)
+    {
+        if (Def.roleAbility is not null)
+        {
+            rolePawn.abilities.GainAbility(Def.roleAbility);
+        }
+        if (Def.roleHediff is not null)
+        {
+            rolePawn.health.AddHediff(Def.roleHediff);
+        }
+
+        QuestUtility.SendQuestTargetSignals(rolePawn.questTags, "AssignedRole", rolePawn.Named("SUBJECT"), Def.Named("ROLE"));
+    }
+
+    public virtual void PostDeactiveRole(Pawn rolePawn)
+    {
+        if (Def.roleAbility is not null)
+        {
+            rolePawn.abilities.RemoveAbility(Def.roleAbility);
+        }
+        if (Def.roleHediff is not null)
+        {
+            rolePawn.RemoveFirstHediffOfDef(Def.roleHediff);
+        }
+
+        QuestUtility.SendQuestTargetSignals(rolePawn.questTags, "UnassignedRole", rolePawn.Named("SUBJECT"), Def.Named("ROLE"));
+    }
+}

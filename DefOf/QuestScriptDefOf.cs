@@ -14,6 +14,9 @@ public class OARO_QuestScriptDefOf
     public static QuestScriptDef OARO_Quest_TemporaryEncampment;
 
     public static QuestScriptDef OARO_Quest_KnightsVisit;
+    public static QuestScriptDef OARO_Quest_ResidentKnight;
+
+    public static QuestScriptDef OARO_Quest_OrderRelationshipUpgrade;
 
     static OARO_QuestScriptDefOf()
     {

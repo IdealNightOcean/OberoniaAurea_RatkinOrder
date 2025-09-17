@@ -15,4 +15,3 @@ public class CompEdgeSwordFightBack : CompMeleeFightBack
         return Rand.Chance(Props.baseFightBackChance + skillDiff * 0.05f);
     }
 }
-

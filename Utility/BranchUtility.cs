@@ -136,7 +136,7 @@ public static class BranchUtility
 
     public static bool InviteBranchCreation(this RatkinOrder order, Map map, WorldObject worldObject)
     {
-        return false;
+        throw new NotImplementedException();
     }
 
     public static void InviteBranchCreationForNewWorldObject(this RatkinOrder order, Map map, WorldObjectDef worldObjectDef, PlanetTile tile)

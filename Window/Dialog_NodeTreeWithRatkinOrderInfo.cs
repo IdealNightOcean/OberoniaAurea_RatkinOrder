@@ -40,9 +40,9 @@ public class Dialog_NodeTreeWithRatkinOrderInfo : Dialog_NodeTree
         Rect textRect = new(rect.x, curY, rect.width, Text.CalcHeight(text, rect.width));
         Widgets.Label(textRect, text);
         curY += textRect.height;
-        GUI.color = orderRelationship.GetRelationshipColor();
+        GUI.color = orderRelationship.GetColor();
         Rect rect3 = new(textRect.x, curY - 7f, textRect.width, 25f);
-        Widgets.Label(rect3, orderRelationship.GetRelationshipKindLabel());
+        Widgets.Label(rect3, orderRelationship.GetLabel());
         curY += rect3.height;
         GUI.color = Color.white;
         GenUI.ResetLabelAlign();

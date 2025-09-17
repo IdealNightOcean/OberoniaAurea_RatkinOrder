@@ -23,6 +23,7 @@ public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
             }
             else
             {
+                yield return Option_Accept;
                 yield return Option_Reject;
                 yield return Option_Postpone;
             }

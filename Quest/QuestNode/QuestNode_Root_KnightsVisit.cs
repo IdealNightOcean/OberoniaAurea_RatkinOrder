@@ -54,6 +54,12 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeBase
 
         QuestGen.quest.AddPart(questPart_CriticalBranch);
         QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, branch.RatkinOrder);
+
+        QuestPart_KnightVisitWatcher questPart_KnightVisitWatcher = new()
+        {
+            KnightCount = questParameter.LodgerCount
+        };
+        QuestGen.quest.AddPart(questPart_KnightVisitWatcher);
     }
 
     protected override Faction GetOrGenerateFaction()

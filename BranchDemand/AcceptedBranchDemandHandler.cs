@@ -60,6 +60,15 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
                 acceptedDemand.Branch.DemandHandler.Notify_DemandQuestClean(acceptedDemand.IsCritical);
                 if (quest?.State == QuestState.EndedSuccess)
                 {
+                    OrderInteractionHandler.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchDemandCompleted, 1, addIfMiss: true);
+                    if (acceptedDemand.IsCritical)
+                    {
+                        OrderInteractionHandler.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.CriticalDemandCompleted, 1, addIfMiss: true);
+                    }
+                    else
+                    {
+                        OrderInteractionHandler.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.NormalDemandCompleted, 1, addIfMiss: true);
+                    }
                     acceptedDemand.Branch.BranchManager.Notify_DemandQuestCompleted(acceptedDemand.IsCritical);
                 }
 

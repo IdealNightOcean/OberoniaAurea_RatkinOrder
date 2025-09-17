@@ -19,6 +19,7 @@ public static class KeyLibrary_SlateStoreAs
     public const string ParentRatkinFactionDef = "parentFactionDef";
 
     public const string MercyQuest = "mercyQuest";
+
     public const string DemandType = "demandType";
     public const string DemandDef = "demandDef";
 

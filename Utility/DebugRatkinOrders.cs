@@ -11,23 +11,27 @@ public static class DebugRatkinOrders
 {
     [DebugAction(category: "OberoniaAurea",
                  name: "Dev-Win RatkinOrder",
-                 displayPriority: 0,
+                 displayPriority: 500,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
     private static void OpenOrderDevWindow()
     {
-        List<DebugMenuOption> menuOptions = [];
-        foreach (RatkinOrder order in RatkinOrderManager.Instance.AllRatkinOrders)
-        {
-            menuOptions.Add(new DebugMenuOption(order.Name, DebugMenuOptionMode.Action, order.OpenDevWindow));
-        }
-
-        Find.WindowStack.Add(new Dialog_DebugOptionListLister(menuOptions));
+        RatkinOrderOptions((order) => order.OpenDevWindow());
     }
 
     [DebugAction(category: "OberoniaAurea",
-                 name: "Dev-Win OrderInteractionHandler",
-                 displayPriority: 0,
+             name: "Dev-Win BranchManager",
+             displayPriority: 490,
+             actionType = DebugActionType.Action,
+             allowedGameStates = AllowedGameStates.Playing)]
+    private static void OpenBranchManagerDevWindow()
+    {
+        RatkinOrderOptions((order) => order.BranchManager.OpenDevWindow());
+    }
+
+    [DebugAction(category: "OberoniaAurea",
+                 name: "Dev-Win OrderInteraction",
+                 displayPriority: 480,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
     private static void OpenOrderInteractionDevWindow()
@@ -42,34 +46,12 @@ public static class DebugRatkinOrders
 
     [DebugAction(category: "OberoniaAurea",
              name: "Add new branch demand",
-             displayPriority: 0,
+             displayPriority: 470,
              actionType = DebugActionType.Action,
              allowedGameStates = AllowedGameStates.Playing)]
     private static void GenerateBranchDemand()
     {
-        List<DebugMenuOption> orderOptions = [];
-        foreach (RatkinOrder order in RatkinOrderManager.Instance.AllRatkinOrders)
-        {
-            DebugMenuOption orderOption = new(order.Name,
-                                              DebugMenuOptionMode.Action,
-                                              method: delegate { SelectBranch(order); });
-
-            orderOptions.Add(orderOption);
-        }
-        Find.WindowStack.Add(new Dialog_DebugOptionListLister(orderOptions));
-
-        void SelectBranch(RatkinOrder order)
-        {
-            List<DebugMenuOption> branchOptions = [];
-            foreach (Branch branch in order.BranchManager.AllBranches)
-            {
-                DebugMenuOption branchOption = new(branch.Name,
-                                                   DebugMenuOptionMode.Action,
-                                                   method: delegate { SelectDemandType(branch); });
-                branchOptions.Add(branchOption);
-            }
-            Find.WindowStack.Add(new Dialog_DebugOptionListLister(branchOptions));
-        }
+        OrderBranchOptions(SelectDemandType);
 
         void SelectDemandType(Branch branch)
         {
@@ -112,6 +94,62 @@ public static class DebugRatkinOrders
                 demandOptions.Add(demandOption);
             }
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(demandOptions));
+        }
+    }
+
+    [DebugAction(category: "OberoniaAurea",
+             name: "Add a new resident knight",
+             displayPriority: 460,
+             actionType = DebugActionType.Action,
+             allowedGameStates = AllowedGameStates.PlayingOnMap)]
+    private static void ApplyNewResidentKnight()
+    {
+        RatkinOrderOptions(delegate (RatkinOrder order)
+        {
+            OrderInteractionUtility.ApplyResidentKnight(
+                ratkinOrder: order,
+                map: MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
+        });
+    }
+
+    private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)
+    {
+        List<DebugMenuOption> orderOptions = [];
+        foreach (RatkinOrder order in RatkinOrderManager.Instance.AllRatkinOrders)
+        {
+            DebugMenuOption orderOption = new(order.Name,
+                                              DebugMenuOptionMode.Action,
+                                              method: () => orderAction(order));
+
+            orderOptions.Add(orderOption);
+        }
+        Find.WindowStack.Add(new Dialog_DebugOptionListLister(orderOptions));
+    }
+
+    private static void OrderBranchOptions(Action<Branch> branchAction)
+    {
+        List<DebugMenuOption> orderOptions = [];
+        foreach (RatkinOrder order in RatkinOrderManager.Instance.AllRatkinOrders)
+        {
+            DebugMenuOption orderOption = new(order.Name,
+                                              DebugMenuOptionMode.Action,
+                                              method: delegate { SelectBranch(order); });
+
+            orderOptions.Add(orderOption);
+        }
+        Find.WindowStack.Add(new Dialog_DebugOptionListLister(orderOptions));
+
+        void SelectBranch(RatkinOrder order)
+        {
+            List<DebugMenuOption> branchOptions = [];
+            foreach (Branch branch in order.BranchManager.AllBranches)
+            {
+                DebugMenuOption branchOption = new(branch.Name,
+                                                   DebugMenuOptionMode.Action,
+                                                   method: () => branchAction(branch));
+                branchOptions.Add(branchOption);
+            }
+            Find.WindowStack.Add(new Dialog_DebugOptionListLister(branchOptions));
         }
     }
 }

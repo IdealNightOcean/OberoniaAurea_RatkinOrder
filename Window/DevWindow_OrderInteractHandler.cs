@@ -33,7 +33,14 @@ internal class DevWindow_OrderInteractHandler : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("AroundKnightGroups:");
+        listing_Rect.Label("Resident Knights:");
+        Text.Font = GameFont.Small;
+        OrderInteractionHandler.ResidentKnightsManager.DrawDevWindow(listing_Rect);
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label("————————————————");
+        Text.Font = GameFont.Medium;
+        listing_Rect.Label("Around Knight Groups:");
         Text.Font = GameFont.Small;
         OrderInteractionHandler.AroundKnightGroupsManager.DrawDevWindow(listing_Rect);
 

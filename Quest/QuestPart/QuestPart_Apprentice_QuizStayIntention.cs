@@ -118,12 +118,13 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
                 }
             }
 
-            ChoiceLetter_Apprentice_QuizStayIntention letter = (ChoiceLetter_Apprentice_QuizStayIntention)LetterMaker.MakeLetter(label: label,
-                                                                                                                                 text: text,
-                                                                                                                                 def: OARO_ModDefOf.OARO_Apprentice_QuizStayIntentionLetter,
-                                                                                                                                 lookTargets: Apprentice,
-                                                                                                                                 relatedFaction: Faction,
-                                                                                                                                 quest: quest);
+            ChoiceLetter_Apprentice_QuizStayIntention letter = (ChoiceLetter_Apprentice_QuizStayIntention)LetterMaker.MakeLetter(
+                label: label,
+                text: text,
+                def: OARO_LetterDefOf.OARO_Apprentice_QuizStayIntentionLetter,
+                lookTargets: Apprentice,
+                relatedFaction: Faction,
+                quest: quest);
             letter.outSignalStay = OutSignalStay;
             letter.outSignalLeave = OutSignalLeave;
             letter.apprentice = Apprentice;

@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class TagStrToFloat : TagStrToValue<float>
 {
     public TagStrToFloat() : base() { }
-    public TagStrToFloat(int defaultValue, bool removeWhenDefault) : base(defaultValue, removeWhenDefault, LookMode.Value) { }
+    public TagStrToFloat(float defaultValue, bool removeWhenDefault) : base(defaultValue, removeWhenDefault, LookMode.Value) { }
 
     public override void OffsetTagValueBy(string tag, float offset, bool addIfMiss)
     {

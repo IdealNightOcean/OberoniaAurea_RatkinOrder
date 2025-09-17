@@ -4,5 +4,5 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Hediff_ByResidentKnight : HediffWithComps
 {
-    public override HediffStage CurStage => OrderInteractionHandler.ResidentKnightHandler.BuffHediffStage;
+    public override HediffStage CurStage => OrderInteractionHandler.ResidentKnightsManager.BuffHediffStage;
 }

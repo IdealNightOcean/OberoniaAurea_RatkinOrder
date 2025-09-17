@@ -1,13 +1,28 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ResidentKnightHandler : IExposable, IOnRatkinOrderRemoved
+public class ResidentKnightsManager : IExposable, IOnRatkinOrderRemoved
 {
     private List<ResidentKnight> residentKnights = [];
     public IReadOnlyList<ResidentKnight> ResidentKnights => residentKnights;
+
+    private int residentLimit;
+    public int ResidentLimit
+    {
+        get
+        {
+            return residentLimit + OrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel;
+        }
+        set
+        {
+            residentLimit = Mathf.Max(0, value - OrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel);
+        }
+    }
 
     public IEnumerable<Pawn> NoRoleKnights
     {
@@ -23,27 +38,53 @@ public class ResidentKnightHandler : IExposable, IOnRatkinOrderRemoved
         }
     }
 
-    [Unsaved] private readonly List<StatModifier> statOffsets;
-    [Unsaved] private readonly List<StatModifier> statFactors;
+
+    [Unsaved] private readonly Dictionary<StatDef, float> statOffsets;
+    [Unsaved] private readonly Dictionary<StatDef, float> statFactors;
 
     [Unsaved] private readonly HediffStage buffHediffStage;
-    public HediffStage BuffHediffStage => buffHediffStage;
+    [Unsaved] private bool buffStageDirty;
 
-    public ResidentKnightHandler()
+    public HediffStage BuffHediffStage
+    {
+        get
+        {
+            if (buffStageDirty)
+            {
+                EstablishBuffStageStatModifier();
+            }
+            return buffHediffStage;
+        }
+    }
+
+    public ResidentKnightsManager()
     {
         statOffsets = [];
         statFactors = [];
 
-        buffHediffStage = new HediffStage()
+        buffHediffStage = new HediffStage();
+    }
+
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label("ResidentKnights:");
+        if (residentKnights.NullOrEmpty())
         {
-            statOffsets = statOffsets,
-            statFactors = statFactors
-        };
+            listing_Rect.SubLabel("None", widthPct: 0.8f);
+        }
+        else
+        {
+            foreach (ResidentKnight rk in residentKnights)
+            {
+                listing_Rect.SubLabel(rk.ToString(), widthPct: 0.8f);
+            }
+        }
     }
 
     public void ExposeData()
     {
         Scribe_Collections.Look(ref residentKnights, "residentKnights", LookMode.Deep);
+        Scribe_Values.Look(ref residentLimit, "residentLimit", 0);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
@@ -151,7 +192,7 @@ public class ResidentKnightHandler : IExposable, IOnRatkinOrderRemoved
             else
             {
                 pawnRecord.ChangePosition(roleDef);
-                ActiveNewResident(roleDef);
+                ActiveNewResident(pawnRecord);
             }
             return true;
         }
@@ -174,61 +215,63 @@ public class ResidentKnightHandler : IExposable, IOnRatkinOrderRemoved
         {
             if (resident.IsActive)
             {
-                ActiveNewResident(resident.RoleDef);
+                ActiveNewResident(resident);
             }
         }
+
+        buffStageDirty = true;
     }
 
-    private void ActiveNewResident(ResidentKnightRoleDef roleDef)
+    private void ActiveNewResident(ResidentKnight resident)
     {
-        if (roleDef is null)
+        if (resident is null || resident.RoleDef is null)
         {
             return;
         }
 
-        if (roleDef.statOffsets is not null)
-        {
-            foreach (StatModifier offset in roleDef.statOffsets)
-            {
-                bool merged = false;
-                for (int i = 0; i < statOffsets.Count; i++)
-                {
-                    if (statOffsets[i].stat == offset.stat)
-                    {
-                        statOffsets[i].value += offset.value;
-                        merged = true;
-                        break;
-                    }
-                }
+        AddStatModifier(resident.RoleDef.statOffsets, isFactor: false);
+        AddStatModifier(resident.RoleDef.RoleWorker.RoleStatOffsets(resident.Pawn), isFactor: false);
 
-                if (!merged)
+        AddStatModifier(resident.RoleDef.statFactors, isFactor: true);
+        AddStatModifier(resident.RoleDef.RoleWorker.RoleStatFactors(resident.Pawn), isFactor: true);
+
+        void AddStatModifier(IEnumerable<StatModifier> modifiers, bool isFactor)
+        {
+            if (modifiers is null)
+            {
+                return;
+            }
+
+            Dictionary<StatDef, float> target = isFactor ? statFactors : statOffsets;
+            buffStageDirty = true;
+
+            foreach (StatModifier modifier in modifiers)
+            {
+                if (target.TryGetValue(modifier.stat, out float curValue))
                 {
-                    statOffsets.Add(new StatModifier() { stat = offset.stat, value = offset.value });
+                    if (isFactor)
+                    {
+                        target[modifier.stat] = curValue * modifier.value;
+                    }
+                    else
+                    {
+                        target[modifier.stat] = curValue + modifier.value;
+                    }
+
+                }
+                else
+                {
+                    target[modifier.stat] = modifier.value;
                 }
             }
         }
+    }
 
-        if (roleDef.statFactors is not null)
-        {
-            foreach (StatModifier factor in roleDef.statFactors)
-            {
-                bool merged = false;
-                for (int i = 0; i < statOffsets.Count; i++)
-                {
-                    if (statOffsets[i].stat == factor.stat)
-                    {
-                        statOffsets[i].value *= factor.value;
-                        merged = true;
-                        break;
-                    }
-                }
-
-                if (!merged)
-                {
-                    statOffsets.Add(new StatModifier() { stat = factor.stat, value = factor.value });
-                }
-            }
-        }
+    private void EstablishBuffStageStatModifier()
+    {
+        buffHediffStage.statOffsets = statOffsets.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
+        buffHediffStage.statFactors = statFactors.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
+        buffStageDirty = false;
     }
 
     private static bool ValidateResidentKnight(ResidentKnight k)

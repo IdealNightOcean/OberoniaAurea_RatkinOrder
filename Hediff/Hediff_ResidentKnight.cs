@@ -28,17 +28,17 @@ public class Hediff_ResidentKnight : HediffWithComps, ISingleRatkinOrderRelated
 
     public override void Notify_PawnKilled()
     {
-        OrderInteractionHandler.ResidentKnightHandler.RemoveResidentKnight(pawn);
+        OrderInteractionHandler.ResidentKnightsManager.RemoveResidentKnight(pawn);
     }
 
     public override void Notify_Spawned()
     {
-        OrderInteractionHandler.ResidentKnightHandler.AddNewResidentKnight(pawn, ratkinOrder);
+        OrderInteractionHandler.ResidentKnightsManager.AddNewResidentKnight(pawn, ratkinOrder);
     }
 
     public override void PostRemoved()
     {
         base.PostRemoved();
-        OrderInteractionHandler.ResidentKnightHandler.RemoveResidentKnight(pawn);
+        OrderInteractionHandler.ResidentKnightsManager.RemoveResidentKnight(pawn);
     }
 }

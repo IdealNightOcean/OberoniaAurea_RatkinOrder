@@ -18,5 +18,7 @@ public static class KeyLibrary_CDRecord
 
     public const string SquadStateDesc = "SquadStateDesc"; // 分队状态更新
 
-    public const string KnightGroupProactiveVisit = "KnightGroupProactiveVisit";
+    public const string KnightGroupProactiveVisit = "KnightGroupProactiveVisit"; //骑士小组拜访
+
+    public const string MercyQuestTryTriggered = "MercyQuestTryTriggered"; //善行任务触发
 }

@@ -57,6 +57,11 @@ public class ResidentKnight : IExposable, IEquatable<ResidentKnight>
         lastPositionChangeTick = Find.TickManager.TicksGame;
     }
 
+    public override string ToString()
+    {
+        return $"{pawn.Name} - {ratkinOrder.Name} - {roleDef?.label ?? "None"}";
+    }
+
     public override bool Equals(object obj)
     {
         if (ReferenceEquals(this, obj))

@@ -23,9 +23,13 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
     关系
     */
     private OrderRelationshipKind relationship = OrderRelationshipKind.Stranger; //当前关系
-    public OrderRelationshipKind Relationship => relationship;
+    private int lastRelationshipChangeTick = -1;
+    private string lastRelationshipChangeReason = string.Empty;
 
-    public int LastRelationshipChangeTick = -1;
+    public OrderRelationshipKind Relationship => relationship;
+    public int LastRelationshipChangeTick => lastRelationshipChangeTick;
+    public string LastRelationshipChangeReason => lastRelationshipChangeReason;
+
 
     private int totalRecommendation;
     public int TotalRecommendation
@@ -33,7 +37,6 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         get => totalRecommendation;
         set => totalRecommendation += Mathf.Max(0, value);
     }
-
 
     public EsteemHandler(RatkinOrder ratkinOrder, bool initConstruct)
     {
@@ -50,10 +53,11 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         Scribe_Values.Look(ref esteem, "esteem", 0);
 
         Scribe_Values.Look(ref lastEsteemChange, "lastEsteemChange", 0);
-        Scribe_Values.Look(ref lastEsteemChangeReason, "lastEsteemChangeReason");
+        Scribe_Values.Look(ref lastEsteemChangeReason, "lastEsteemChangeReason", string.Empty);
 
         Scribe_Values.Look(ref relationship, "relationship", OrderRelationshipKind.Stranger);
-        Scribe_Values.Look(ref LastRelationshipChangeTick, "LastRelationshipChangeTick", -1);
+        Scribe_Values.Look(ref lastRelationshipChangeTick, "lastRelationshipChangeTick", -1);
+        Scribe_Values.Look(ref lastRelationshipChangeReason, "lastRelationshipChangeReason", string.Empty);
 
         Scribe_Values.Look(ref totalRecommendation, "totalRecommendation", 0);
     }
@@ -65,10 +69,10 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         listing_Rect.Label($"lastEsteemChangeReason(by player): {lastEsteemChangeReason}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"Relationship: {relationship}");
-        listing_Rect.Label($"LastRelationshipChangeTick: {LastRelationshipChangeTick}");
+        listing_Rect.Label($"LastRelationshipChangeTick: {lastRelationshipChangeTick}");
+        listing_Rect.Label($"LastRelationshipChangeReason: {lastRelationshipChangeReason}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"TotalRecommendation: {totalRecommendation}");
-        // listing_Rect.Label($"CurRecommendation: {curRecommendation}");
     }
 
     public void TickDay()
@@ -83,7 +87,7 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
     {
         if (newRelation == FactionRelationKind.Hostile)
         {
-            SetRelationship(relationship.RelationshipKindOffsetBy(-1));
+            SetRelationship(relationship.RelationshipKindOffsetBy(-1), reason: "OARO_OrderFaction_Hostile".Translate(), sendLetter: true);
         }
     }
 
@@ -126,14 +130,22 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         }
     }
 
-    public void SetRelationship(OrderRelationshipKind newRelationship)
+    public void SetRelationship(OrderRelationshipKind newRelationship, string reason, bool sendLetter)
     {
         if (newRelationship == relationship)
         {
             return;
         }
+        OrderRelationshipKind oldRelationship = relationship;
+
         relationship = newRelationship;
 
-        LastRelationshipChangeTick = Find.TickManager.TicksGame;
+        lastRelationshipChangeReason = reason ?? string.Empty;
+        lastRelationshipChangeTick = Find.TickManager.TicksGame;
+
+        if (sendLetter)
+        {
+            RelationshipUtility.SendNewRelationshipLetter(RatkinOrder, oldRelationship, newRelationship);
+        }
     }
 }

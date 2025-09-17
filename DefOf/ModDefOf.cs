@@ -12,14 +12,13 @@ public static class OARO_ModDefOf
     public static FactionDef Rakinia;
     public static FactionDef OARO_Rakinia_Sub;
 
-    public static LetterDef OARO_Apprentice_QuizStayIntentionLetter;
-    public static LetterDef OARO_KnightGroupProactiveVisitLetter;
-
     public static RulePackDef OARO_NamerOrderSquad;
 
     public static RoomRoleDef OARO_RatkinOrderHall;
 
     public static WorldObjectDef OARO_WO_ApprenticeHome;
+
+    public static ResidentKnightRoleDef OARO_Orderly;
 
     static OARO_ModDefOf()
     {

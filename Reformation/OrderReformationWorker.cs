@@ -8,4 +8,3 @@ public class OrderReformationWorker(OrderReformationDef def)
 
     public virtual void PostInit() { }
 }
-

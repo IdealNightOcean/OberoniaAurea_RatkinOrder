@@ -26,23 +26,23 @@ public class ScenPart_InitialOrderRelationshipLevel : ScenPart
     {
         if (tag == OrderScenTag)
         {
-            yield return "OARO_InitialOrderRelationshipLevel".Translate(EsteemUtility.GetRelationshipKindLabel(initRelation));
+            yield return "OARO_InitialOrderRelationshipLevel".Translate(RelationshipUtility.GetLabel(initRelation));
         }
     }
 
     public override void DoEditInterface(Listing_ScenEdit listing)
     {
         Rect scenPartRect = listing.GetScenPartRect(this, RowHeight);
-        string label = EsteemUtility.GetRelationshipKindLabel(initRelation);
+        string label = RelationshipUtility.GetLabel(initRelation);
         if (!Widgets.ButtonText(scenPartRect, label))
         {
             return;
         }
         List<FloatMenuOption> list = [];
-        for (int i = 0; i < EsteemUtility.RelationshipKindArr.Length; i++)
+        for (int i = 0; i < RelationshipUtility.RelationshipKindCount; i++)
         {
-            OrderRelationshipKind selRelationship = EsteemUtility.RelationshipKindArr[i];
-            string selLabel = EsteemUtility.GetRelationshipKindLabel(selRelationship);
+            OrderRelationshipKind selRelationship = (OrderRelationshipKind)i;
+            string selLabel = RelationshipUtility.GetLabel(selRelationship);
             list.Add(new FloatMenuOption(selLabel, delegate
             {
                 initRelation = selRelationship;

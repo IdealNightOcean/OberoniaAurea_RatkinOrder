@@ -11,6 +11,9 @@ public class QuestNode_RatkinOrderRelationshipChange : QuestNode
 
     public SlateRef<RatkinOrder> ratkinOrder;
     public SlateRef<int> offset;
+    public SlateRef<bool> sendLetter;
+    [MustTranslate]
+    public SlateRef<string> reason;
 
     protected override bool TestRunInt(Slate slate)
     {
@@ -24,7 +27,8 @@ public class QuestNode_RatkinOrderRelationshipChange : QuestNode
         {
             InSiganl = QuestGenUtility.HardcodedSignalWithQuestID(inSiganl.GetValue(slate)) ?? slate.Get<string>("inSiganl"),
             RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
-            Offset = offset.GetValue(slate)
+            Offset = offset.GetValue(slate),
+            SendLetter = sendLetter.GetValue(slate)
         };
         QuestGen.quest.AddPart(questPart_RatkinOrderRelationshipChange);
     }
@@ -35,6 +39,8 @@ public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrder
     public string InSiganl;
     public RatkinOrder RatkinOrder;
     public int Offset;
+    public bool SendLetter = true;
+    public string Reason;
 
     public override void ExposeData()
     {
@@ -42,6 +48,8 @@ public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrder
         Scribe_Values.Look(ref InSiganl, "InSiganl");
         Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
         Scribe_Values.Look(ref Offset, "Offset", 0);
+        Scribe_Values.Look(ref SendLetter, "SendLetter", defaultValue: true);
+        Scribe_Values.Look(ref Reason, "Reason");
     }
 
     public override void Cleanup()
@@ -50,6 +58,8 @@ public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrder
         InSiganl = null;
         RatkinOrder = null;
         Offset = 0;
+        SendLetter = true;
+        Reason = null;
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
@@ -65,7 +75,7 @@ public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrder
         base.Notify_QuestSignalReceived(signal);
         if (signal.tag == InSiganl)
         {
-            RatkinOrder?.RelationshipKindOffsetBy(Offset);
+            RatkinOrder?.RelationshipKindOffsetBy(Offset, Reason, SendLetter);
         }
     }
 }

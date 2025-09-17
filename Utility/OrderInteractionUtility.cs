@@ -1,4 +1,6 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using RimWorld.QuestGen;
 using System;
 using System.Text;
 using UnityEngine;
@@ -8,63 +10,139 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class OrderInteractionUtility
 {
-    public static void SponsorOrder(RatkinOrder order)
-    {
 
-        FundHandler fundHandler = order.FundHandler;
+    /// <summary>
+    /// 赞助骑士团
+    /// </summary>
+    public static void SponsorOrder(RatkinOrder ratkinOrder, Map map)
+    {
+        FundHandler fundHandler = ratkinOrder.FundHandler;
         fundHandler.AddFundEvent(OrderFundEventDefOf.OARO_PlayerSponsor_Immediate);
         fundHandler.AddFundEvent(OrderFundEventDefOf.OARO_PlayerSponsor_ShortTerm);
         fundHandler.AddFundEvent(OrderFundEventDefOf.OARO_PlayerSponsor_LongTerm);
 
-        if (!order.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.AnnualFirstSponsor))
+        if (!ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.AnnualFirstSponsor))
         {
-            order.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AnnualFirstSponsor,
-                                                 cdTicks: (60 - GenDate.DayOfYear(GenTicks.TicksAbs, 0) * 60000),
-                                                 shouldRemoveWhenExpired: true);
+            ratkinOrder.CooldownManager.RegisterRecord(key: KeyLibrary_CDRecord.AnnualFirstSponsor,
+                                                       cdTicks: (60 - GenDate.DayOfYear(GenTicks.TicksAbs, 0) * 60000),
+                                                       shouldRemoveWhenExpired: true);
+
+            RecommendationUtility.GiveRecommendationsToPlayer_Map(ratkinOrder, 1, map, spawnCell: null, drop: true);
+
         }
 
+        OrderInteractionHandler.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.SponsoredSilver, 5000, addIfMiss: true);
+
         throw new NotImplementedException();
-    }
-
-    public static void RecruitmentKnight(RatkinOrder order, Map map, Pawn pawn)
-    {
-        int needRecommendation = order.Esteem switch
-        {
-            < 30 => 5,
-            < 70 => 4,
-            < 90 => 3,
-            _ => 2
-        };
-
-        RecommendationUtility.UseRecommendationOfMap(order, map, needRecommendation);
-        throw new NotImplementedException();
-
     }
 
     /// <summary>
     /// 能否招募骑士
     /// </summary>
-    public static AcceptanceReport CanRecruitKnight(RatkinOrder order, Map map, bool resultOnly)
+    public static AcceptanceReport CanRecruitKnight(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
-        if (order.Relationship < OrderRelationshipKind.Trustworthy)
+        if (OrderInteractionHandler.RatkinOrderHall is null)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(EsteemUtility.GetRelationshipKindLabel(OrderRelationshipKind.Trustworthy));
+            return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
 
-        int needRecommendation = order.Esteem switch
+        if (ratkinOrder.Relationship < OrderRelationshipKind.Trustworthy)
+        {
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(OrderRelationshipKind.Trustworthy));
+        }
+
+        int needRecommendation = ratkinOrder.Esteem switch
         {
             < 30 => 5,
             < 70 => 4,
             < 90 => 3,
             _ => 2
         };
-        if (RecommendationUtility.CurRecommendationOfMap(order, map) < needRecommendation)
+        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < needRecommendation)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(needRecommendation);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(needRecommendation, ratkinOrder.Name);
         }
         return true;
     }
 
+    /// <summary>
+    /// 招募骑士
+    /// </summary>
+    public static void RecruitmentKnight(RatkinOrder ratkinOrder, Map map, Pawn pawn)
+    {
+        int needRecommendation = ratkinOrder.Esteem switch
+        {
+            < 30 => 5,
+            < 70 => 4,
+            < 90 => 3,
+            _ => 2
+        };
+
+        RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, needRecommendation);
+        throw new NotImplementedException();
+
+    }
+
+    /// <summary>
+    /// 能否申请新的常驻骑士
+    /// </summary>
+    public static AcceptanceReport CanApplyResidentKnight(RatkinOrder ratkinOrder, Map map, bool resultOnly)
+    {
+        if (map is null || ratkinOrder is null)
+        {
+            return false;
+        }
+
+        if (OrderInteractionHandler.RatkinOrderHall is null)
+        {
+            return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
+        }
+
+        if (ratkinOrder.Relationship < OrderRelationshipKind.Friendly)
+        {
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(OrderRelationshipKind.Friendly.GetLabel());
+        }
+
+        if (OrderInteractionHandler.ResidentKnightsManager.ResidentKnights.Count >= OrderInteractionHandler.ResidentKnightsManager.ResidentLimit)
+        {
+            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(OrderInteractionHandler.ResidentKnightsManager.ResidentLimit);
+        }
+
+        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < 1)
+        {
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, ratkinOrder.Name);
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    /// 申请新的常驻骑士
+    /// </summary>
+    public static void ApplyResidentKnight(RatkinOrder ratkinOrder, Map map)
+    {
+        Slate slate = new();
+        slate.SetBasicOrderSlateVar(ratkinOrder);
+        slate.Set("map", map);
+
+        OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnight, slate, forced: false);
+    }
+
+    /// <summary>
+    /// 常驻骑士额外上限 - 骑士团大厅
+    /// </summary>
+    public static int ExtraResidentKnightLimit_OrderHallLevel => OrderInteractionHandler.OrderHallLevel switch
+    {
+        < 2 => 0,
+        2 => 1,
+        < 5 => 2,
+        5 => 3,
+        _ => 4
+    };
+
+    /// <summary>
+    /// 当前季度无花费邀请骑士小组上限
+    /// </summary>
     public static int SeasonInvitationLimit()
     {
         return OrderInteractionHandler.OrderHallLevel switch
@@ -77,29 +155,40 @@ public static class OrderInteractionUtility
         };
     }
 
-    public static AcceptanceReport CanInviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
+    /// <summary>
+    /// 能否邀请附近骑士小组到访
+    /// </summary>
+    public static AcceptanceReport CanInviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map, bool resultOnly)
     {
-        if (knightGroup is null)
+        if (knightGroup is null || map is null)
         {
             return false;
         }
 
+        if (OrderInteractionHandler.RatkinOrderHall is null)
+        {
+            return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
+        }
+
         if (knightGroup.RatkinOrder.Relationship <= OrderRelationshipKind.Stranger)
         {
-            return false;
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(OrderRelationshipKind.Friendly.GetLabel());
         }
 
         if (OrderInteractionHandler.AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())
         {
             if (RecommendationUtility.CurRecommendationOfMap(knightGroup.RatkinOrder, map) < 1)
             {
-                return false;
+                return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, knightGroup.RatkinOrder.Name);
             }
         }
 
         return true;
     }
 
+    /// <summary>
+    /// 玩家邀请附近骑士小组到访
+    /// </summary>
     public static void InviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
     {
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
@@ -118,6 +207,11 @@ public static class OrderInteractionUtility
         }
     }
 
+    /// <summary>
+    /// 小组到访失败行为
+    /// 包括邀请失败和任务触发失败
+    /// </summary>
+    /// <param name="isProactive">是否为骑士小组主动</param>
     public static void AroundKnightGroupVisitInvalid(Branch branch, bool isProactive)
     {
         if (isProactive)
@@ -208,4 +302,5 @@ public static class OrderInteractionUtility
             }
         }
     }
+
 }
