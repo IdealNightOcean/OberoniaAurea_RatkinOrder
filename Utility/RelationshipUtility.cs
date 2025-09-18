@@ -67,6 +67,10 @@ public static class RelationshipUtility
         {
             return resultOnly ? false : "OARO_ReachMax_OrderRelationship".Translate();
         }
+        if (ratkinOrder.Faction.HostileTo(Faction.OfPlayer))
+        {
+            return resultOnly ? false : "OARO_OrderFaction_Hostile".Translate();
+        }
 
         if (byPlayer)
         {
@@ -80,10 +84,6 @@ public static class RelationshipUtility
             if (ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.AutoRelationshipUpgraded))
             {
                 return resultOnly ? false : "OARO_Cooling_AutoRelationshipUpgraded".Translate();
-            }
-            if (ratkinOrder.Faction.HostileTo(Faction.OfPlayer))
-            {
-                return resultOnly ? false : "OARO_OrderFaction_Hostile".Translate();
             }
         }
 

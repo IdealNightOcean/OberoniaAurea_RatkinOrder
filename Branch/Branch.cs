@@ -191,7 +191,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         }
     }
 
-    public void RecacheIsHonor() => SetBranchType(BranchType.Honor, EffectTags.HasActiveTag("HonorBranch"));
+    public void RecacheIsHonor() => SetBranchType(BranchType.Honor, EffectTags.HasActiveTag(KeyLibrary_EffectTag.HonorBranch));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsInAffectedRange(PlanetTile tile)

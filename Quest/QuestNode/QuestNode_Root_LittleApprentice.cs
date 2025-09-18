@@ -111,7 +111,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         quest.Leave(questParameter.pawns, inSignal: leaveSignal, sendStandardLetter: true, leaveOnCleanup: false, inSignalRemovePawn: inSignalRemovePawnNew, wakeUp: true);
     }
 
-    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string bigFailSignal, string successSignal)
+    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         Quest quest = QuestGen.quest;
         quest.Delay(questParameter.questDurationTicks, inner: null, inSignalEnable: null, inSignalDisable: null, outSignalComplete: durationEndSignal, isQuestTimeout: false, expiryInfoPart: "GuestsDepartsIn".Translate(), expiryInfoPartTip: "GuestsDepartsOn".Translate(), debugLabel: "QuestDelay");
@@ -148,14 +148,14 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         quest.End(QuestEndOutcome.Fail, 0, null, skillFailEndSignal);
 
 
-        QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_BigFail = new()
+        QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_DelayFail = new()
         {
-            InSignalTrigger = bigFailSignal,
+            InSignalTrigger = delayFailSignal,
             Change = -20,
             Reason = "OARO_HarmingChildren".Translate()
         };
-        quest.AddPart(questPart_AllOrdersEsteemChange_BigFail);
+        quest.AddPart(questPart_AllOrdersEsteemChange_DelayFail);
 
-        base.SetQuestEndComp(questPart_Interactions, failSignal, bigFailSignal, successSignal);
+        base.SetQuestEndComp(questPart_Interactions, failSignal, delayFailSignal, successSignal);
     }
 }

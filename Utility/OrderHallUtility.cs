@@ -15,7 +15,7 @@ public static class OrderHallUtility
 
     public static int GetOrderHallLevel(Room room)
     {
-        if (room is null || room != OrderInteractionHandler.MainOrderCodePedestal?.CachedRoom)
+        if (room is null || room != GlobalOrderInteractionManager.MainOrderCodePedestal?.CachedRoom)
         {
             return 0;
         }

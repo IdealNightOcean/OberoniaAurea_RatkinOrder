@@ -18,7 +18,7 @@ public class ResidencyWorker_Deployment : ResidencyWorker
     protected static Branch cachedBranch;
     private static float cachedDailyXp;
     private static bool cachedSilverReward;
-    private static bool cachedInstinctTrain;
+    private static bool cachedIntensiveTrain;
 
     public override int Priority => 500; //优先级，数值越大越优先
     public SkillDef Skill;
@@ -41,9 +41,9 @@ public class ResidencyWorker_Deployment : ResidencyWorker
         {
 
         }
-        if (cachedInstinctTrain)
+        if (cachedIntensiveTrain)
         {
-            resident.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_InstinctTrain);
+            resident.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_IntensiveTrain);
         }
     }
 
@@ -56,7 +56,7 @@ public class ResidencyWorker_Deployment : ResidencyWorker
         cachedBranch = branch;
         cachedDailyXp = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_DeployeeDailyXp, null, immediateUpdate: true);
         cachedSilverReward = branch.EffectTags.HasActiveTag("InstinctTrain");
-        cachedInstinctTrain = branch.EffectTags.HasActiveTag("InstinctTrain");
+        cachedIntensiveTrain = branch.EffectTags.HasActiveTag(KeyLibrary_EffectTag.IntensiveTrain);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

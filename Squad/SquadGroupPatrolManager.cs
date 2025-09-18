@@ -299,11 +299,11 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         adjustCeiling = 0;
         if (RatkinOrder.Relationship == OrderRelationshipKind.Trustworthy)
         {
-            adjustCeiling = RatkinOrder.ReformationManager.EffectTags.HasActiveTag("") ? 3 : 2;
+            adjustCeiling = RatkinOrder.ReformationManager.HasReformation(null) ? 3 : 2;
         }
         else if (RatkinOrder.Relationship == OrderRelationshipKind.Soulmate)
         {
-            adjustCeiling = RatkinOrder.ReformationManager.EffectTags.HasActiveTag("") ? 6 : 4;
+            adjustCeiling = RatkinOrder.ReformationManager.HasReformation(null) ? 6 : 4;
         }
 
         return true;

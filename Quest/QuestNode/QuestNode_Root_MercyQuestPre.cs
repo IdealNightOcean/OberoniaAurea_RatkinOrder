@@ -48,7 +48,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("helpSeeker.AcceptMercyQuest");
         string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("helpSeeker.RejectMercyQuest");
 
-        float delayMulti = OrderInteractionHandler.OrderHallLevel switch
+        float delayMulti = GlobalOrderInteractionManager.OrderHallLevel switch
         {
             < 4 => 1f,
             4 => 1.25f,

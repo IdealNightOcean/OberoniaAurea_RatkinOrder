@@ -14,7 +14,9 @@ public class GameComponent_RatkinOrder : GameComponent
 
     private RatkinOrderManager ratkinOrderManager;
     private OrderLetterBox orderLetterBox;
-    private OrderInteractionHandler orderInteractionHandler;
+    private GlobalOrderInteractionManager globalOrderInteractionManager;
+
+    [Unsaved] public HashSet<Pawn> KnightPawns = [];
 
     [Unsaved] public Dictionary<Pawn, ITalkAction> TalkActionHandler = [];
 
@@ -74,12 +76,12 @@ public class GameComponent_RatkinOrder : GameComponent
 
         try
         {
-            orderInteractionHandler ??= new OrderInteractionHandler();
+            globalOrderInteractionManager ??= new GlobalOrderInteractionManager();
         }
         catch
         {
-            OrderInteractionHandler.ClearStaticCache();
-            orderInteractionHandler = new OrderInteractionHandler();
+            GlobalOrderInteractionManager.ClearStaticCache();
+            globalOrderInteractionManager = new GlobalOrderInteractionManager();
         }
     }
 
@@ -90,11 +92,6 @@ public class GameComponent_RatkinOrder : GameComponent
         ratkinOrderManager.PostLoadInit();
     }
 
-    public override void GameComponentOnGUI()
-    {
-        base.GameComponentOnGUI();
-    }
-
     public override void ExposeData()
     {
         base.ExposeData();
@@ -103,7 +100,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
         Scribe_Deep.Look(ref ratkinOrderManager, "ratkinOrderManager");
         Scribe_Deep.Look(ref orderLetterBox, "orderLetterBox");
-        Scribe_Deep.Look(ref orderInteractionHandler, "orderInteractionHandler");
+        Scribe_Deep.Look(ref globalOrderInteractionManager, "globalOrderInteractionManager");
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {

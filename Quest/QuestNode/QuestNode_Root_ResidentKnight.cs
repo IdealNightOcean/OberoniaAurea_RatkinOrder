@@ -1,11 +1,9 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
-using RimWorld.QuestGen;
+﻿using RimWorld.QuestGen;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestNode_Root_ResidentKnight : QuestNode_Root_RefugeeBase
+public class QuestNode_Root_ResidentKnight : QuestNode_Root_RefugeeKnightBase
 {
     protected override void InitQuestParameter()
     {
@@ -25,20 +23,11 @@ public class QuestNode_Root_ResidentKnight : QuestNode_Root_RefugeeBase
             questDurationTicks = 60 * 60000
         };
 
-        RatkinOrder ratkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
+        InitRatkinOrder();
         if (ratkinOrder.ReformationManager.HasReformation(null))
         {
             questParameter.questDurationTicks = 120 * 60000;
         }
-
-        QuestPart_CriticalRatkinOrder questPart_CriticalRatkinOrder = new()
-        {
-            RatkinOrder = ratkinOrder,
-            EndQuest = true,
-            EndOutcome = QuestEndOutcome.Unknown
-        };
-        QuestGen.quest.AddPart(questPart_CriticalRatkinOrder);
-        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, ratkinOrder);
     }
 
     protected override void PostPawnGenerated(Pawn pawn)

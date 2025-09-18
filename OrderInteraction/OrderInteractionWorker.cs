@@ -1,19 +1,15 @@
 ﻿using RimWorld;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
-/// 骑士团团级协助的功能类，必须实现一个只接受OrderAssistanceDef参数的构造函数
+/// 骑士团团级交互的功能类，必须实现一个只接受OrderInteractionDef参数的构造函数
 /// </summary>
-public abstract class OrderInteractionWorker
+public abstract class OrderInteractionWorker(OrderInteractionDef def)
 {
-    public readonly OrderInteractionDef Def;
-
-    public OrderInteractionWorker(OrderInteractionDef def)
-    {
-        Def = def;
-    }
+    public readonly OrderInteractionDef Def = def ?? throw new ArgumentNullException(nameof(def));
 
     public virtual AcceptanceReport CanUseInteraction(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {

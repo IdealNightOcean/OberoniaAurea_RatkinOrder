@@ -163,7 +163,7 @@ public class OrderCodePedestal : ThingWithComps
 
     public bool TrySetAsMainPedestal(bool replaceCur)
     {
-        if (OrderInteractionHandler.Instance.SetMainOrderCodePedestal(this, replaceCur))
+        if (GlobalOrderInteractionManager.Instance.SetMainOrderCodePedestal(this, replaceCur))
         {
             isMainPedestal = true;
             cachedRoom = this.GetRoom();
@@ -186,7 +186,7 @@ public class OrderCodePedestal : ThingWithComps
     private void TryUnsetAsMainPedestal()
     {
         UnsetAsMainPedestal();
-        OrderInteractionHandler.Instance.Notify_MainOrderCodePedestalUnset(this);
+        GlobalOrderInteractionManager.Instance.Notify_MainOrderCodePedestalUnset(this);
     }
 
     private void UnsetAsMainPedestal()

@@ -1,5 +1,8 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using Verse;
 
+namespace OberoniaAurea.RatkinOrder;
+
+[StaticConstructorOnStartup]
 public static class KeyLibrary_CDRecord
 {
     public const string RelationshipUpgraded = "RelationshipUpgraded"; // 骑士团关系提升（Player）

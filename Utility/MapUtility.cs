@@ -33,7 +33,7 @@ public static class MapUtility
             return map;
         }
 
-        map = OrderInteractionHandler.MainOrderCodePedestal?.MapHeld;
+        map = GlobalOrderInteractionManager.MainOrderCodePedestal?.MapHeld;
         if (map is not null && map.IsPlayerHome && (canBeSpace || !map.Tile.LayerDef.isSpace))
         {
             return map;

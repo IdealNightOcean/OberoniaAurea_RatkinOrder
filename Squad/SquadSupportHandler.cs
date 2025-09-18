@@ -34,7 +34,7 @@ public class SquadSupportHandler(Squad squad) : IExposable
         {
             return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("25%");
         }
-        if (Squad.Branch.EffectTags.HasActiveTag("blockBombard"))
+        if (Squad.Branch.EffectTags.HasActiveTag(KeyLibrary_EffectTag.BlockBombard))
         {
             return resultOnly ? false : "OARO_BranchBlockBombard".Translate();
         }

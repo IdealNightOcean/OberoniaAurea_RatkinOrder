@@ -32,9 +32,9 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
             listing_Rect.SubLabel(normalDemand.CurState.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (OrderInteractionHandler.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, normalDemand))
+                if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, normalDemand))
                 {
-                    OrderInteractionHandler.AcceptedBranchDemandHandler.AcceptDemand(Branch, normalDemand);
+                    GlobalOrderInteractionManager.AcceptedBranchDemandHandler.AcceptDemand(Branch, normalDemand);
                 }
             }
         }
@@ -50,9 +50,9 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
             listing_Rect.SubLabel(criticalDemand.CurState.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (OrderInteractionHandler.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, criticalDemand))
+                if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, criticalDemand))
                 {
-                    OrderInteractionHandler.AcceptedBranchDemandHandler.AcceptDemand(Branch, criticalDemand);
+                    GlobalOrderInteractionManager.AcceptedBranchDemandHandler.AcceptDemand(Branch, criticalDemand);
                 }
             }
         }

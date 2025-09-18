@@ -5,7 +5,7 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public static class ModHarmonyPatch
+internal static class ModHarmonyPatch
 {
     private static Harmony harmonyInstance;
 

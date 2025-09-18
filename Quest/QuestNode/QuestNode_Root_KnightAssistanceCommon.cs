@@ -1,0 +1,118 @@
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using RimWorld.QuestGen;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnightBase
+{
+    public SlateRef<PawnKindDef> fixedPawnKind;
+    public SlateRef<ThoughtDef> thoughtToAdd;
+
+    private PawnKindDef _fixedPawnKind;
+    private ThoughtDef _thoughtToAdd;
+
+    public override PawnKindDef FixedPawnKind => _fixedPawnKind;
+    protected override ThoughtDef ThoughtToAdd => _thoughtToAdd;
+
+    protected override void InitQuestParameter()
+    {
+        questParameter = new()
+        {
+            allowAssaultColony = false,
+            allowBadThought = true,
+            allowLeave = false,
+            allowFutureReward = false,
+            allowJoinOffer = false,
+
+            LodgerCount = 1,
+            ChildCount = 0,
+
+            goodwillSuccess = 0,
+            goodwillFailure = -25,
+        };
+
+        Slate slate = QuestGen.slate;
+        _fixedPawnKind = fixedPawnKind.GetValue(slate);
+        _thoughtToAdd = thoughtToAdd.GetValue(slate);
+
+        slate.Set(UniqueQuestDescSlate, true);
+        slate.Set(UniqueLeavingLetterSlate, true);
+
+        InitRatkinOrder();
+    }
+
+    protected override void ClearQuestParameter()
+    {
+        base.ClearQuestParameter();
+        _fixedPawnKind = null;
+        _thoughtToAdd = null;
+    }
+
+    protected override void SetPawnsLeaveComp(string lodgerArrivalSignal, string inSignalRemovePawn)
+    {
+        Quest quest = QuestGen.quest;
+
+        string outSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_MakeLeave");
+        QuestPart_AssistKnighWatcher questPart_AssistKnighWatcher = new()
+        {
+            inSignalEnable = lodgerArrivalSignal,
+            outSignalsCompleted = [outSignalMakePawnsLeave],
+            delayTicks = 5 * 60000,
+
+            InsignalRemovePawn = inSignalRemovePawn,
+            ThoughtToAdd = ThoughtToAdd,
+            RatkinOrder = ratkinOrder,
+
+            expiryInfoPart = "GuestsDepartsIn".Translate(),
+            expiryInfoPartTip = "GuestsDepartsOn".Translate(),
+            debugLabel = "QuestDelay"
+        };
+        questPart_AssistKnighWatcher.Pawns ??= [];
+        questPart_AssistKnighWatcher.Pawns.AddRange(questParameter.pawns);
+        quest.AddPart(questPart_AssistKnighWatcher);
+
+        quest.Letter(
+            letterDef: LetterDefOf.PositiveEvent,
+            inSignal: outSignalMakePawnsLeave,
+            relatedFaction: questParameter.faction,
+            signalListenMode: QuestPart.SignalListenMode.OngoingOnly,
+            lookTargets: questParameter.pawns,
+            filterDeadPawnsFromLookTargets: true,
+            text: "[lodgersLeavingLetterText]",
+            label: "[lodgersLeavingLetterLabel]");
+
+        quest.Leave(
+            pawns: questParameter.pawns,
+            inSignal: outSignalMakePawnsLeave,
+            leaveOnCleanup: true,
+            inSignalRemovePawn: inSignalRemovePawn,
+            wakeUp: true);
+    }
+
+    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
+    {
+        Quest quest = QuestGen.quest;
+
+        string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_Negative");
+        QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
+        {
+            negativeSiganls = QuestNode_PawnNegativeSiganl.GetCommonNegativeSiganls(addTag: true, tagToAdd: "lodgers"),
+            outSignal = inSignalPawnNegative,
+            outOnlyOnce = false
+        };
+        quest.AddPart(questPart_PawnNegativeSiganl);
+
+        QuestPart_OrderEsteemChange questPart_OrderEsteemChangePawnNegative = new()
+        {
+            InSignalTrigger = inSignalPawnNegative,
+            RatkinOrder = ratkinOrder,
+            Change = -20,
+            Reason = "OARO_Harming_AssisrKnight".Translate()
+        };
+        quest.AddPart(questPart_OrderEsteemChangePawnNegative);
+
+        base.SetQuestEndComp(questPart_Interactions, failSignal, delayFailSignal, successSignal);
+    }
+}

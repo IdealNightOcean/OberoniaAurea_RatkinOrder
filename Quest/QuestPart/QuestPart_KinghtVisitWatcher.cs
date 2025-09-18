@@ -18,7 +18,7 @@ public class QuestPart_KnightVisitWatcher : QuestPart
         base.Cleanup();
         if (quest.State == QuestState.EndedSuccess)
         {
-            OrderInteractionHandler.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.EntertainedKnights, KnightCount, addIfMiss: true);
+            GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.EntertainedKnights, KnightCount, addIfMiss: true);
         }
     }
 }

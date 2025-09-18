@@ -123,7 +123,7 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
     }
     public void AddFacility(BranchFacilityDef facilityDef)
     {
-        if (facilityDef == null || facilities.ContainsKey(facilityDef))
+        if (facilityDef is null || facilities.ContainsKey(facilityDef))
         {
             return;
         }
@@ -132,7 +132,7 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
 
     public bool TryUpgradeFacility(BranchFacilityDef facilityDef, int upgrade = 1, bool addIfMiss = false)
     {
-        if (facilityDef == null)
+        if (facilityDef is null)
         {
             return false;
         }

@@ -1,7 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
-using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -9,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 /// <summary>
 /// 任务实现：战后疗养（内部特化类）
 /// </summary>
-internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_RefugeeBase
+internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_RefugeeKnightBase
 {
     private Branch branch;
     private BranchDemandType demandType;
@@ -20,11 +19,6 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
     private HediffDef specialHediff;
 
     public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.RatkinKnight;
-    protected override Faction GetOrGenerateFaction()
-    {
-        QuestGen.slate.Set("isMainFaction", true);
-        return QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.OrderFaction);
-    }
 
     protected override void InitQuestParameter()
     {
@@ -41,7 +35,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         };
 
         Slate slate = QuestGen.slate;
-        slate.Set("uniqueLeavingLetter", true);
+        slate.Set(UniqueLeavingLetterSlate, true);
 
         giveNormalRecommendation = Rand.Chance(0.25f);
         demandType = slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
@@ -79,6 +73,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
     protected override void PostPawnGenerated(Pawn pawn)
     {
+        base.PostPawnGenerated(pawn);
         OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
 
         if (demandType == BranchDemandType.Supplementary || specialHediff is null)
@@ -179,13 +174,13 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         DefaultDelayLeaveComp(lodgerArrivalSignal, outSigalMoodFailed, inSignalRemovePawn);
     }
 
-    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string bigFailSignal, string successSignal)
+    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         Quest quest = QuestGen.quest;
 
         // 因心情问题提前离开导致的失败
         string inSignalFailAny = QuestGenUtility.HardcodedSignalWithQuestID("Quest_FailAny");
-        quest.AnySignal(inSignals: [failSignal, bigFailSignal, outSigalMoodFailed], outSignals: [inSignalFailAny]);
+        quest.AnySignal(inSignals: [failSignal, delayFailSignal, outSigalMoodFailed], outSignals: [inSignalFailAny]);
 
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange_Fail = new()
         {
@@ -260,81 +255,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
             inSignalDisable: outSigalPerfecState,
             inSignal: successSignal);
 
-        base.SetQuestEndComp(questPart_Interactions, failSignal, bigFailSignal, successSignal);
+        base.SetQuestEndComp(questPart_Interactions, failSignal, delayFailSignal, successSignal);
     }
 
-}
-
-public class QuestPart_AnyPawnHasSpecialHediff : QuestPart
-{
-    public string inSignalCheck;
-    public string inSignalRemovePawn;
-
-    public string outSignalHas;
-    public string outSignalNoOneHas;
-
-    public HediffDef hediffDef;
-    public List<Pawn> pawns = [];
-
-    public override void ExposeData()
-    {
-        base.ExposeData();
-        Scribe_Values.Look(ref inSignalCheck, "inSignalCheck");
-        Scribe_Values.Look(ref inSignalRemovePawn, "inSignalRemovePawn");
-
-        Scribe_Values.Look(ref outSignalHas, "outSignalHas");
-        Scribe_Values.Look(ref outSignalNoOneHas, "outSignalNoOneHas");
-
-        Scribe_Defs.Look(ref hediffDef, "hediffDef");
-        Scribe_Collections.Look(ref pawns, "pawns", LookMode.Reference);
-
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
-        {
-            pawns?.RemoveAll(p => p is null);
-        }
-    }
-
-    public override void Cleanup()
-    {
-        base.Cleanup();
-        inSignalCheck = null;
-        inSignalRemovePawn = null;
-
-        outSignalHas = null;
-        outSignalNoOneHas = null;
-
-        hediffDef = null;
-        pawns = null;
-    }
-
-    public override void Notify_QuestSignalReceived(Signal signal)
-    {
-        base.Notify_QuestSignalReceived(signal);
-        if (!pawns.NullOrEmpty() && signal.tag == inSignalRemovePawn)
-        {
-            if (signal.args.TryGetArg("SUBJECT", out Pawn p))
-            {
-                pawns?.Remove(p);
-            }
-        }
-        if (signal.tag == inSignalCheck)
-        {
-            if (hediffDef is null || pawns.NullOrEmpty())
-            {
-                Find.SignalManager.SendSignal(new Signal(outSignalNoOneHas));
-            }
-            else
-            {
-                foreach (Pawn p in pawns)
-                {
-                    if (p.health.hediffSet.HasHediff(hediffDef))
-                    {
-                        Find.SignalManager.SendSignal(new Signal(outSignalHas, p.Named("SUBJECT")));
-                        return;
-                    }
-                }
-                Find.SignalManager.SendSignal(new Signal(outSignalNoOneHas));
-            }
-        }
-    }
 }

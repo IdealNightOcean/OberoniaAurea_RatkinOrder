@@ -30,9 +30,9 @@ public class QuestPart_MercyQuestWatcher : QuestPart
 
     private static void SendSucceedRatkinOrderLetter()
     {
-        OrderInteractionHandler.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
+        GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
         float letterChance = 0.2f;
-        ResidentKnight residentKnight = OrderInteractionHandler.ResidentKnightsManager.GetResidentKnightOfRole(OARO_ModDefOf.OARO_Orderly);
+        ResidentKnight residentKnight = GlobalOrderInteractionManager.ResidentKnightsManager.GetResidentKnightOfRole(OARO_ModDefOf.OARO_Orderly);
         if (residentKnight is not null)
         {
             letterChance += (residentKnight.RoleDef.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(residentKnight.Pawn);

@@ -61,8 +61,8 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
                     Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
                     if (map is null || !TriggerVisitQuest(knightGroup, map))
                     {
-                        OrderInteractionHandler.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
-                        OrderInteractionUtility.AroundKnightGroupVisitInvalid(knightGroup.Branch, isProactive: false);
+                        GlobalOrderInteractionManager.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
+                        GlobalOrderInteractionUtility.AroundKnightGroupVisitInvalid(knightGroup.Branch, isProactive: false);
                     }
                     break;
                 }
@@ -155,7 +155,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
             return;
         }
 
-        if (!OrderInteractionHandler.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.KnightGroupProactiveVisit)
+        if (!GlobalOrderInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.KnightGroupProactiveVisit)
            && !Find.QuestManager.ActiveQuestsListForReading.Any(q => q.root == OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit))
         {
             AroundKnightGroup knightGroup = aroundKnightGroups.GetRange(
@@ -166,7 +166,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
 
             if (knightGroup is not null)
             {
-                OrderInteractionHandler.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.KnightGroupProactiveVisit, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
+                GlobalOrderInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.KnightGroupProactiveVisit, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
                 QuizAutoVisit(knightGroup);
             }
         }

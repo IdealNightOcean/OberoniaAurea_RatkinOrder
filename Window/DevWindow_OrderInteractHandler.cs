@@ -19,15 +19,15 @@ internal class DevWindow_OrderInteractHandler : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Main Order Code Pedestal:");
         Text.Font = GameFont.Small;
-        if (OrderInteractionHandler.MainOrderCodePedestal is null)
+        if (GlobalOrderInteractionManager.MainOrderCodePedestal is null)
         {
             listing_Rect.Label("None");
         }
         else
         {
-            listing_Rect.Label($"Thing: {OrderInteractionHandler.MainOrderCodePedestal}");
-            listing_Rect.Label($"Map: {OrderInteractionHandler.MainOrderCodePedestal.MapHeld}");
-            listing_Rect.Label($"OrderHallLevel: {OrderInteractionHandler.OrderHallLevel}");
+            listing_Rect.Label($"Thing: {GlobalOrderInteractionManager.MainOrderCodePedestal}");
+            listing_Rect.Label($"Map: {GlobalOrderInteractionManager.MainOrderCodePedestal.MapHeld}");
+            listing_Rect.Label($"OrderHallLevel: {GlobalOrderInteractionManager.OrderHallLevel}");
         }
 
         listing_Rect.Gap(6f);
@@ -35,14 +35,14 @@ internal class DevWindow_OrderInteractHandler : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Resident Knights:");
         Text.Font = GameFont.Small;
-        OrderInteractionHandler.ResidentKnightsManager.DrawDevWindow(listing_Rect);
+        GlobalOrderInteractionManager.ResidentKnightsManager.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Around Knight Groups:");
         Text.Font = GameFont.Small;
-        OrderInteractionHandler.AroundKnightGroupsManager.DrawDevWindow(listing_Rect);
+        GlobalOrderInteractionManager.AroundKnightGroupsManager.DrawDevWindow(listing_Rect);
 
         if (Event.current.type == EventType.Layout)
         {

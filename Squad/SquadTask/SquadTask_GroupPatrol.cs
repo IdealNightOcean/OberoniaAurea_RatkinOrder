@@ -83,7 +83,7 @@ public class SquadTask_GroupPatrol : SquadTask
     private (int, bool) GetExpectedExplorationCount(Squad squad)
     {
         float rewardValue = squad.SquadStat.MemberCount * 50f * Rand.Range(0.5f, 1.75f)
-                            * (squad.RatkinOrder.ReformationManager.EffectTags.HasActiveTag("") ? 1.5f : 1f)
+                            * (squad.RatkinOrder.ReformationManager.HasReformation(null) ? 1.5f : 1f)
                             * (squad.IsSquadOfType(BranchType.Friendly) ? 1.2f : 1f);
 
         Map map = Find.AnyPlayerHomeMap;

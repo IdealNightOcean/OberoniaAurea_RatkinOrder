@@ -152,7 +152,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         // 骑士团移除（所有分部销毁）时应由骑士团进行骑士团移除通知 （Notify_RatkinOrderRemoved | OnRatkinOrderRemoved）
         if (branch == normalMobileBranch) { normalMobileBranch = null; }
         if (branch == honorMobileBranch) { honorMobileBranch = null; }
-        OrderInteractionHandler.Instance.Notify_BranchDestoryed(branch);
+        GlobalOrderInteractionManager.Instance.Notify_BranchDestoryed(branch);
         MapComponent_RatkinOrder.OnBranchDestoryed(branch);
         Find.QuestManager.OnBranchDestoryed(branch);
     }

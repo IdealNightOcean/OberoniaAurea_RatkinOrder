@@ -4,9 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class OrderInteractionHandler : IExposable, IOnRatkinOrderRemoved, IOnBranchDestoryed
+public class GlobalOrderInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBranchDestoryed
 {
-    public static OrderInteractionHandler Instance { get; private set; }
+    public static GlobalOrderInteractionManager Instance { get; private set; }
     public static OrderCodePedestal MainOrderCodePedestal => Instance.mainOrderCodePedestal;
     public static Room RatkinOrderHall => Instance.mainOrderCodePedestal?.CachedRoom;
     public static int OrderHallLevel => Instance.mainOrderCodePedestal?.CachedOrderHallLevel ?? 0;
@@ -30,7 +30,7 @@ public class OrderInteractionHandler : IExposable, IOnRatkinOrderRemoved, IOnBra
     private MercyQuestHandler mercyQuestHandler;
 
 
-    public OrderInteractionHandler()
+    public GlobalOrderInteractionManager()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;

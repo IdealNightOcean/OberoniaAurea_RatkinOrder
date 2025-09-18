@@ -30,18 +30,18 @@ public static class DebugRatkinOrders
     }
 
     [DebugAction(category: "OberoniaAurea",
-                 name: "Dev-Win OrderInteraction",
+                 name: "Dev-Win GlobalOrderInteraction",
                  displayPriority: 480,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
     private static void OpenOrderInteractionDevWindow()
     {
-        if (OrderInteractionHandler.Instance is null)
+        if (GlobalOrderInteractionManager.Instance is null)
         {
-            Messages.Message("OrderInteractionHandler is null", MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("GlobalOrderInteractionManager is null", MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
-        OrderInteractionHandler.OpenDevWindow();
+        GlobalOrderInteractionManager.OpenDevWindow();
     }
 
     [DebugAction(category: "OberoniaAurea",
@@ -106,7 +106,7 @@ public static class DebugRatkinOrders
     {
         RatkinOrderOptions(delegate (RatkinOrder order)
         {
-            OrderInteractionUtility.ApplyResidentKnight(
+            GlobalOrderInteractionUtility.ApplyResidentKnight(
                 ratkinOrder: order,
                 map: MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
         });

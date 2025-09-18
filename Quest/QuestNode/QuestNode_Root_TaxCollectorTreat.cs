@@ -13,7 +13,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 {
     protected override Faction GetOrGenerateFaction()
     {
-        QuestGen.slate.Set("isMainFaction", true);
+        QuestGen.slate.Set(IsMainFactionSlate, true);
         return QuestGen.slate.Get<Faction>("faction");
     }
 
@@ -37,8 +37,8 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
             questDurationTicks = 3 * 60000
         };
 
-        QuestGen.slate.Set("uniqueQuestDesc", true);
-        QuestGen.slate.Set("uniqueLeavingLetter", true);
+        QuestGen.slate.Set(IsMainFactionSlate, true);
+        QuestGen.slate.Set(UniqueLeavingLetterSlate, true);
         QuestPart_InvolvedFactions questPart_InvolvedFactions = new()
         {
             factions = [subFaction]
@@ -77,7 +77,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
         choice.rewards.Add(reward);
     }
 
-    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string bigFailSignal, string successSignal)
+    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         Quest quest = QuestGen.quest;
 
@@ -104,6 +104,6 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
             Reason = "OARO_PutOffTaxCollector".Translate(),
         };
         quest.AddPart(questPart_AllOrdersEsteemChange);
-        base.SetQuestEndComp(questPart_Interactions, failSignal, bigFailSignal, successSignal);
+        base.SetQuestEndComp(questPart_Interactions, failSignal, delayFailSignal, successSignal);
     }
 }

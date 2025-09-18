@@ -22,7 +22,7 @@ public static class MercyQuestDataBase
 
     public static void Add(QuestScriptDef def)
     {
-        if (def == null)
+        if (def is null)
         {
             Log.Error("Tried to add null QuestScriptDef to MercyQuestDataBase.");
             return;

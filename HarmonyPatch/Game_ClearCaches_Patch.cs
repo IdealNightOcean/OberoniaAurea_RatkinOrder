@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
 [HarmonyPatch(typeof(Game), nameof(Game.ClearCaches))]
-public static class Game_ClearCaches_Patch
+internal static class Game_ClearCaches_Patch
 {
     [HarmonyPostfix]
     public static void Postfix()
@@ -14,9 +14,11 @@ public static class Game_ClearCaches_Patch
 
         RatkinOrderManager.ClearStaticCache();
         OrderLetterBox.ClearStaticCache();
-        OrderInteractionHandler.ClearStaticCache();
+        GlobalOrderInteractionManager.ClearStaticCache();
 
         ResidencyWorker_Deployment.ClearStaticCache();
+
+        Thought_VisitingKnight.ClearStaticCache();
         ThoughtWorker_BranchChurch.ClearStaticCache();
     }
 }

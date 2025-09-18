@@ -46,12 +46,12 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
         choice.rewards.Add(reward);
     }
 
-    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string bigFailSignal, string successSignal)
+    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         Quest quest = QuestGen.quest;
         quest.FactionHostileToOtherFaction(questParameter.faction, Faction.OfPlayer, outSignal: failSignal);
         quest.AddPart(new QuestPart_AllOrdersEsteemChange(failSignal, -20, reason: "OARO_HarmingChildren".Translate()));
-        quest.AddPart(new QuestPart_AllOrdersEsteemChange(bigFailSignal, -20, reason: "OARO_HarmingChildren".Translate()));
+        quest.AddPart(new QuestPart_AllOrdersEsteemChange(delayFailSignal, -20, reason: "OARO_HarmingChildren".Translate()));
         quest.AddPart(new QuestPart_AllOrdersEsteemChange(successSignal, 2, reason: "OARO_Childcare".Translate()));
     }
 }

@@ -14,12 +14,6 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class ModUtility
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetSkillLevelOfPawn(this Pawn pawn, SkillDef skill)
-    {
-        return pawn.skills?.GetSkill(skill).GetLevel() ?? 0;
-    }
-
     public static bool AnyThingOfDef(Room room, ThingDef thingDef)
     {
         List<Region> regions = room.Regions;

@@ -20,7 +20,7 @@ public class OrderInteractionDef : Def
     /// 只在 needFund > 0f 时生效
     /// needFund > 0f 时
     /// 如有fundEventDef，则执行FundHandler.AddFundEvent(如有fundEventDef);
-    /// 如无如有fundEventDef，则执行FundHandler.AdjustFundsImmediately(needFund);
+    /// 如无fundEventDef，则执行FundHandler.AdjustFundsImmediately(needFund);
     /// </summary>
     public OrderFundEventDef fundEventDef;
 

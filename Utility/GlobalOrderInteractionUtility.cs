@@ -8,40 +8,14 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class OrderInteractionUtility
+public static class GlobalOrderInteractionUtility
 {
-
-    /// <summary>
-    /// 赞助骑士团
-    /// </summary>
-    public static void SponsorOrder(RatkinOrder ratkinOrder, Map map)
-    {
-        FundHandler fundHandler = ratkinOrder.FundHandler;
-        fundHandler.AddFundEvent(OrderFundEventDefOf.OARO_PlayerSponsor_Immediate);
-        fundHandler.AddFundEvent(OrderFundEventDefOf.OARO_PlayerSponsor_ShortTerm);
-        fundHandler.AddFundEvent(OrderFundEventDefOf.OARO_PlayerSponsor_LongTerm);
-
-        if (!ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.AnnualFirstSponsor))
-        {
-            ratkinOrder.CooldownManager.RegisterRecord(key: KeyLibrary_CDRecord.AnnualFirstSponsor,
-                                                       cdTicks: (60 - GenDate.DayOfYear(GenTicks.TicksAbs, 0) * 60000),
-                                                       shouldRemoveWhenExpired: true);
-
-            RecommendationUtility.GiveRecommendationsToPlayer_Map(ratkinOrder, 1, map, spawnCell: null, drop: true);
-
-        }
-
-        OrderInteractionHandler.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.SponsoredSilver, 5000, addIfMiss: true);
-
-        throw new NotImplementedException();
-    }
-
     /// <summary>
     /// 能否招募骑士
     /// </summary>
     public static AcceptanceReport CanRecruitKnight(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
-        if (OrderInteractionHandler.RatkinOrderHall is null)
+        if (GlobalOrderInteractionManager.RatkinOrderHall is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -93,7 +67,7 @@ public static class OrderInteractionUtility
             return false;
         }
 
-        if (OrderInteractionHandler.RatkinOrderHall is null)
+        if (GlobalOrderInteractionManager.RatkinOrderHall is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -103,9 +77,9 @@ public static class OrderInteractionUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(OrderRelationshipKind.Friendly.GetLabel());
         }
 
-        if (OrderInteractionHandler.ResidentKnightsManager.ResidentKnights.Count >= OrderInteractionHandler.ResidentKnightsManager.ResidentLimit)
+        if (GlobalOrderInteractionManager.ResidentKnightsManager.ResidentKnights.Count >= GlobalOrderInteractionManager.ResidentKnightsManager.ResidentLimit)
         {
-            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(OrderInteractionHandler.ResidentKnightsManager.ResidentLimit);
+            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(GlobalOrderInteractionManager.ResidentKnightsManager.ResidentLimit);
         }
 
         if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < 1)
@@ -131,7 +105,7 @@ public static class OrderInteractionUtility
     /// <summary>
     /// 常驻骑士额外上限 - 骑士团大厅
     /// </summary>
-    public static int ExtraResidentKnightLimit_OrderHallLevel => OrderInteractionHandler.OrderHallLevel switch
+    public static int ExtraResidentKnightLimit_OrderHallLevel => GlobalOrderInteractionManager.OrderHallLevel switch
     {
         < 2 => 0,
         2 => 1,
@@ -145,7 +119,7 @@ public static class OrderInteractionUtility
     /// </summary>
     public static int SeasonInvitationLimit()
     {
-        return OrderInteractionHandler.OrderHallLevel switch
+        return GlobalOrderInteractionManager.OrderHallLevel switch
         {
             < 2 => 0,
             2 => 1,
@@ -165,7 +139,7 @@ public static class OrderInteractionUtility
             return false;
         }
 
-        if (OrderInteractionHandler.RatkinOrderHall is null)
+        if (GlobalOrderInteractionManager.RatkinOrderHall is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -175,7 +149,7 @@ public static class OrderInteractionUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(OrderRelationshipKind.Friendly.GetLabel());
         }
 
-        if (OrderInteractionHandler.AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())
+        if (GlobalOrderInteractionManager.AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())
         {
             if (RecommendationUtility.CurRecommendationOfMap(knightGroup.RatkinOrder, map) < 1)
             {
@@ -192,17 +166,17 @@ public static class OrderInteractionUtility
     public static void InviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
     {
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
-        if (Rand.Chance(chance) && OrderInteractionHandler.AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
+        if (Rand.Chance(chance) && GlobalOrderInteractionManager.AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
         {
-            OrderInteractionHandler.AroundKnightGroupsManager.SeasonInvitationUsed++;
-            if (OrderInteractionHandler.AroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
+            GlobalOrderInteractionManager.AroundKnightGroupsManager.SeasonInvitationUsed++;
+            if (GlobalOrderInteractionManager.AroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
             {
                 RecommendationUtility.UseRecommendationOfMap(knightGroup.RatkinOrder, map, 1);
             }
         }
         else
         {
-            OrderInteractionHandler.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
+            GlobalOrderInteractionManager.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
             AroundKnightGroupVisitInvalid(knightGroup.Branch, isProactive: false);
         }
     }
@@ -264,7 +238,7 @@ public static class OrderInteractionUtility
             ApplyStepChange(0.1f, "OARO_AroundKnights_TravelTimeShort");
         }
 
-        stepChange = (OrderInteractionHandler.OrderHallLevel - 2) * 0.05f;
+        stepChange = (GlobalOrderInteractionManager.OrderHallLevel - 2) * 0.05f;
         if (stepChange > 0f)
         {
             ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");

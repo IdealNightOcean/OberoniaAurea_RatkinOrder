@@ -47,11 +47,12 @@ public static class SquadCombatPawnUtility
         for (int i = 0; i < memberCount; i++)
         {
             PawnKindDef pawnKind = groupMaker.guards.RandomElementByWeight(g => g.selectionWeight).kind; //改为Default
-            PawnGenerationRequest request = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction);
+            PawnGenerationRequest request = PawnUtility.DefaultKnightGenerationRequest(pawnKind, faction, forceNew: false);
             request.FixedIdeo = ideo;
             request.Tile = tile;
 
             Pawn pawn = PawnGenerator.GeneratePawn(request);
+            pawn.SetRatkinOrder(squad.RatkinOrder);
 
             members.Add(pawn);
         }

@@ -5,7 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeBase
+public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
 {
     public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.RatkinKnight;
     protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_VisitingKnight;
@@ -28,8 +28,7 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeBase
         };
 
         Slate slate = QuestGen.slate;
-        //slate.Set("uniqueQuestDesc", true);
-        slate.Set("uniqueLeavingLetter", true);
+        slate.Set(UniqueLeavingLetterSlate, true);
 
         if (slate.TryGet(KeyLibrary_SlateStoreAs.VisitingKnightsDelay, out int visitDelay))
         {
@@ -45,15 +44,14 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeBase
         }
 
         Branch branch = slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, branch.RatkinOrder);
         QuestPart_CriticalBranch questPart_CriticalBranch = new()
         {
             Branch = branch,
             EndQuest = true,
             EndOutcome = QuestEndOutcome.Fail
         };
-
         QuestGen.quest.AddPart(questPart_CriticalBranch);
-        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, branch.RatkinOrder);
 
         QuestPart_KnightVisitWatcher questPart_KnightVisitWatcher = new()
         {
@@ -68,20 +66,26 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeBase
         return QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.OrderFaction);
     }
 
-    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string bigFailSignal, string successSignal)
+    protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
-        string inSignalHostile = QuestGenUtility.HardcodedSignalWithQuestID("faction.BecameHostileToPlayer");
-        QuestGen.quest.End(QuestEndOutcome.Fail, questParameter.goodwillFailure, questParameter.faction, inSignalHostile, sendStandardLetter: true, playSound: true);
-
-        QuestPart_OrderEsteemChange questPart_OrderEsteemChangeKill = new()
+        string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_Negative");
+        QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            InSignalTrigger = questPart_Interactions.inSignalDestroyed,
+            negativeSiganls = QuestNode_PawnNegativeSiganl.GetCommonNegativeSiganls(addTag: true, tagToAdd: "lodgers"),
+            outSignal = inSignalPawnNegative,
+            outOnlyOnce = false
+        };
+        QuestGen.quest.AddPart(questPart_PawnNegativeSiganl);
+
+        QuestPart_OrderEsteemChange questPart_OrderEsteemChangePawnNegative = new()
+        {
+            InSignalTrigger = inSignalPawnNegative,
             RatkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
             Change = -10,
             Reason = "OARO_VisitingKnightKilled".Translate(),
         };
-        QuestGen.quest.AddPart(questPart_OrderEsteemChangeKill);
+        QuestGen.quest.AddPart(questPart_OrderEsteemChangePawnNegative);
 
-        base.SetQuestEndComp(questPart_Interactions, failSignal, bigFailSignal, successSignal);
+        base.SetQuestEndComp(questPart_Interactions, failSignal, delayFailSignal, successSignal);
     }
 }

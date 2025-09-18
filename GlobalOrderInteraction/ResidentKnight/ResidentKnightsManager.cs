@@ -16,11 +16,11 @@ public class ResidentKnightsManager : IExposable, IOnRatkinOrderRemoved
     {
         get
         {
-            return residentLimit + OrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel;
+            return residentLimit + GlobalOrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel;
         }
         set
         {
-            residentLimit = Mathf.Max(0, value - OrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel);
+            residentLimit = Mathf.Max(0, value - GlobalOrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel);
         }
     }
 

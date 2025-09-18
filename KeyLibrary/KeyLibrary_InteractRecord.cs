@@ -1,5 +1,8 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using Verse;
 
+namespace OberoniaAurea.RatkinOrder;
+
+[StaticConstructorOnStartup]
 public static class KeyLibrary_InteractRecord
 {
     public static string SponsoredSilver = "SponsoredSilver"; //总赞助白银

@@ -1,5 +1,8 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using Verse;
 
+namespace OberoniaAurea.RatkinOrder;
+
+[StaticConstructorOnStartup]
 public static class KeyLibrary_SlateStoreAs
 {
     public const string RatkinOrder = "ratkinOrder";
@@ -26,4 +29,5 @@ public static class KeyLibrary_SlateStoreAs
     public const string VisitingKnightsDelay = "visitingKnightsDelay";
     public const string VisitingKnightsDuration = "visitingKnightsDuration";
     public const string VisitingKnightsCount = "visitingKnightsCount";
+
 }

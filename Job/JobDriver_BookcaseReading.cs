@@ -59,7 +59,7 @@ public class JobDriver_BookcaseReading : JobDriver_WatchBuilding
         watch.defaultCompleteMode = ToilCompleteMode.Delay;
         watch.defaultDuration = job.def.joyDuration;
         watch.handlingFacing = true;
-        if (TargetA.Thing.def.building != null && TargetA.Thing.def.building.effectWatching is not null)
+        if (TargetA.Thing.def.building is not null && TargetA.Thing.def.building.effectWatching is not null)
         {
             watch.WithEffect(() => TargetA.Thing.def.building.effectWatching, EffectTargetGetter);
         }

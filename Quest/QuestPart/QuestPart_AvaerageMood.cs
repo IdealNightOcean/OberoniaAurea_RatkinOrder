@@ -45,7 +45,7 @@ public class QuestPart_AvaerageMood : QuestPartActivable
             int availablePawnCount = 0;
             for (int i = 0; i < Pawns.Count; i++)
             {
-                if (Pawns[i].needs != null && Pawns[i].needs.mood != null)
+                if (Pawns[i].needs is not null && Pawns[i].needs.mood is not null)
                 {
                     averagePercent += Pawns[i].needs.mood.CurLevelPercentage;
                     availablePawnCount++;

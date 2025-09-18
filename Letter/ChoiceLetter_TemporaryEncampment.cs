@@ -54,7 +54,7 @@ internal class ChoiceLetter_TemporaryEncampment : ChoiceLetter_RatkinOrder
                 {
                     yield return Option_JumpToLocationAndPostpone;
                 }
-                if (quest != null && !quest.hidden)
+                if (quest is not null && !quest.hidden)
                 {
                     yield return Option_ViewInQuestsTab("ViewRelatedQuest", postpone: true);
                 }

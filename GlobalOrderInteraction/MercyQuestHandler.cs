@@ -18,12 +18,12 @@ public class MercyQuestHandler : IExposable
 
     public void PeriodicTriggerMercyQuest()
     {
-        if (OrderInteractionHandler.RatkinOrderHall is null || OrderInteractionHandler.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
+        if (GlobalOrderInteractionManager.RatkinOrderHall is null || GlobalOrderInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
         {
             return;
         }
 
-        OrderInteractionHandler.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, shouldRemoveWhenExpired: true);
+        GlobalOrderInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, shouldRemoveWhenExpired: true);
 
         Map map;
         if (Rand.Chance(1f - GetMercyQuestChance()) || (map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false)) is null)
@@ -52,7 +52,7 @@ public class MercyQuestHandler : IExposable
     private float GetMercyQuestChance()
     {
         float chance = mercyQuestBaseChance;
-        ResidentKnight orderly = OrderInteractionHandler.ResidentKnightsManager.GetResidentKnightOfRole(OARO_ModDefOf.OARO_Orderly);
+        ResidentKnight orderly = GlobalOrderInteractionManager.ResidentKnightsManager.GetResidentKnightOfRole(OARO_ModDefOf.OARO_Orderly);
         if (orderly is not null)
         {
             chance *= (orderly.RoleDef.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(orderly.Pawn) ?? 1f;

@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
 [HarmonyPatch(typeof(Faction), nameof(Faction.Notify_RelationKindChanged))]
-public class Faction_RelationKindChanged_Patch
+internal class Faction_RelationKindChanged_Patch
 {
     [HarmonyPostfix]
     public static void Postfix(Faction __instance, Faction other)
