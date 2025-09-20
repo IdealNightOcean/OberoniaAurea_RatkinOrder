@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -69,6 +70,20 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
         }
     }
 
+    public override void DoDebugWindowContents(Rect innerRect, ref float curY)
+    {
+        if (State == QuestPartState.Enabled)
+        {
+            Rect rect = new(innerRect.x, curY, 500f, 25f);
+            if (Widgets.ButtonText(rect, "End " + ToString()))
+            {
+                DelayFinished();
+            }
+
+            curY += rect.height + 4f;
+        }
+    }
+
     protected override void DelayFinished()
     {
         if (CanRetain)
@@ -80,6 +95,8 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
                 acceptAction: DelayLeave,
                 rejectText: "OARO_AssistKnight_SeeOff ".Translate(),
                 rejectAction: base.DelayFinished);
+
+            Find.WindowStack.Add(nodeTree);
         }
         else
         {
@@ -126,4 +143,5 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
             }
         }
     }
+
 }

@@ -32,7 +32,7 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
         }
     }
 
-    public bool IsFactionHasRatkinOrder(Faction faction)
+    public bool FactionHasRatkinOrder(Faction faction)
     {
         if (faction is null)
         {

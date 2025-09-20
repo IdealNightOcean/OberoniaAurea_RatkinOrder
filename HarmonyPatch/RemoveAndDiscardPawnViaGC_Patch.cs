@@ -9,8 +9,8 @@ namespace OberoniaAurea.RatkinOrder;
 internal static class RemoveAndDiscardPawnViaGC_Patch
 {
     [HarmonyPostfix]
-    public static void Postfix(Pawn pawn)
+    public static void Postfix(Pawn p)
     {
-        GameComponent_RatkinOrder.Instance?.KnightPawns.Remove(pawn);
+        GameComponent_RatkinOrder.Instance?.KnightPawns.Remove(p);
     }
 }
