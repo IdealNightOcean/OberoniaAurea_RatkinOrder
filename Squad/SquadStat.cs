@@ -113,6 +113,19 @@ public class SquadStat : IExposable, IDrawDevWindow
         }
     }
 
+    public int TotalMedalCount
+    {
+        get
+        {
+            int count = 0;
+            for (int i = 0; i < medalRecords.Count; i++)
+            {
+                count += medalRecords[i].count;
+            }
+            return count;
+        }
+    }
+
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         listing_Rect.Label($"MemberCount: {memberCount:F2}");
@@ -170,18 +183,6 @@ public class SquadStat : IExposable, IDrawDevWindow
             }
         }
         return 0;
-    }
-
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int TotalMedalCount()
-    {
-        int count = 0;
-        for (int i = 0; i < medalRecords.Count; i++)
-        {
-            count += medalRecords[i].count;
-        }
-        return count;
     }
 
     public void AddMedal(SquadMedal medal, short count = 1)

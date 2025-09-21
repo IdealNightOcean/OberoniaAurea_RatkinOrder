@@ -82,6 +82,10 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_AssistanceQuest.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
+    <Compile Include="Quest\QuestClique\QuestClique.cs" />
+    <Compile Include="Quest\QuestClique\QuestNode_AddBranchClique.cs" />
+    <Compile Include="Quest\QuestClique\QuestNode_AddGeneralClique.cs" />
+    <Compile Include="Quest\QuestClique\QuestPart_CliquesManager.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistance.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistanceCommon.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_RefugeeKnightBase.cs" />
@@ -192,7 +196,7 @@
     <Compile Include="Quest\QuestPart\QuestPart_CollectionTeam_SupplyDepot.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_CollectionTeam_MaterialSupply.cs" />
     <Compile Include="Quest\Quest_SetBranchToFriendly.cs" />
-    <Compile Include="Quest\Reward_FriendlyBranch.cs" />
+    <Compile Include="Quest\Reward\Reward_FriendlyBranch.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GiveToCaravan.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_PostWarConvalescence.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_AvaerageMood.cs" />
@@ -200,7 +204,7 @@
     <Compile Include="Quest\QuestNode\QuestNode_DemandTypeSwitch.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetBranchFromSlate.cs" />
     <Compile Include="Quest\Quest_BranchDemandWatcher.cs" />
-    <Compile Include="Quest\Reward_OrderRecommendation.cs" />
+    <Compile Include="Quest\Reward\Reward_OrderRecommendation.cs" />
     <Compile Include="Quest\Quest_OrderRecommendation.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetBranchBase.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderBase.cs" />
@@ -275,8 +279,8 @@
     <Compile Include="Quest\QuestPart\QuestPart_Apprentice_QuizStayIntention.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_LittleApprentice.cs" />
     <Compile Include="Quest\Quest_WolfDisasterWatcher.cs" />
-    <Compile Include="Quest\Reward_AllOrdersEsteem.cs" />
-    <Compile Include="Quest\Reward_OrderEsteem.cs" />
+    <Compile Include="Quest\Reward\Reward_AllOrdersEsteem.cs" />
+    <Compile Include="Quest\Reward\Reward_OrderEsteem.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_CheckGroupPatrolStart.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderOfFaction.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_ChildrenCare.cs" />

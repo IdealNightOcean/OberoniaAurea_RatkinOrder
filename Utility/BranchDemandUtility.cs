@@ -68,7 +68,7 @@ public static class BranchDemandUtility
             ("OARO_BranchCriticalDemandAdd_Base", () => 0.05f),
             ("OARO_ChangeOffset_HonorBranch", () => branch.IsBranchOfType(BranchType.Honor) ? 0.02f : 0f),
             ("OARO_BranchCriticalDemandAdd_Facility", () => branch.FacilityHandler.TotalFacilityLevel * 0.005f),
-            ("OARO_BranchCriticalDemandAdd_Medal", () => branch.Squad.SquadStat.TotalMedalCount() * 0.005f),
+            ("OARO_BranchCriticalDemandAdd_Medal", () => branch.Squad.SquadStat.TotalMedalCount * 0.005f),
             ("OARO_BranchCriticalDemandAdd_Member", () => (1f - branch.Squad.SquadStat.MemberPercentage) * 0.05f),
             ("OARO_BranchCriticalDemandAdd_Fund", () => (1f - branch.RatkinOrder.Funds) * 0.1f),
         ];
