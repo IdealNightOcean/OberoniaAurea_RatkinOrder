@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -13,7 +14,11 @@ public class QuestPart_CliquesManager : QuestPartActivable, IOnBranchDestoryed
     public string OutSignalOutPotency;
 
     private float totalPotency;
-    public float TotalPotency => totalPotency;
+    public float TotalPotency
+    {
+        get => totalPotency;
+        private set => totalPotency = Mathf.Max(0f, value);
+    }
 
     private int ticksToNextCheck = 1000;
 
@@ -128,6 +133,10 @@ public class QuestPart_CliquesManager : QuestPartActivable, IOnBranchDestoryed
         {
             return false;
         }
+        if (clique.IsBranchClique && clique.RelatedBranch.Squad.SquadStat.Supply < 0.25f)
+        {
+            return false;
+        }
         return clique.Willingness > 0.999f;
     }
 
@@ -152,10 +161,31 @@ public class QuestPart_CliquesManager : QuestPartActivable, IOnBranchDestoryed
         return true;
     }
 
+    public bool ActiveBranchClique(Branch branch, int activeDelayTicksOverride = -1)
+    {
+        if (branch is null)
+        {
+            Log.Error("Branch is null.");
+            return false;
+        }
+
+        int delayTicks = activeDelayTicksOverride;
+        if (delayTicks < 0)
+        {
+            delayTicks = branch.IsBranchOfType(BranchType.Friendly) ? -1 : Rand.RangeInclusive(12000, 24000);
+        }
+
+        return ActiveClique(QuestClique.GetBranchCliqueKey(branch), delayTicks);
+    }
+
     private void ActiveClique(QuestClique clique)
     {
         clique.IsActive = true;
         clique.TicksToActive = -1;
+        if (clique.IsBranchClique)
+        {
+            clique.RelatedBranch.Squad.SquadStat.Supply -= 0.25f;
+        }
         totalPotency += clique.Potency;
     }
 
@@ -172,6 +202,23 @@ public class QuestPart_CliquesManager : QuestPartActivable, IOnBranchDestoryed
             totalPotency -= clique.Potency;
         }
         return true;
+    }
+
+    public void AdjustCliquePotency(string cliqueKey, float change)
+    {
+        if (allCliques?.TryGetValue(cliqueKey, out QuestClique clique) ?? false)
+        {
+            if (clique.IsActive)
+            {
+                TotalPotency -= clique.Potency;
+                clique.Potency += change;
+                TotalPotency += clique.Potency;
+            }
+            else
+            {
+                clique.Potency += change;
+            }
+        }
     }
 
     public void AdjustCliqueWillingness(string cliqueKey, float change)

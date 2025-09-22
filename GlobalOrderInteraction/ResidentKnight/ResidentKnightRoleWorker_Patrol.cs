@@ -9,7 +9,7 @@ public class ResidentKnightRoleWorker_Patrol(ResidentKnightRoleDef def) : Reside
 {
     public override IEnumerable<StatModifier> RoleStatOffsets(Pawn rolePawn)
     {
-        float offest = 0.01f + rolePawn.GetSkillLevelOfPawn(SkillDefOf.Shooting) * 0.003f + rolePawn.GetSkillLevelOfPawn(SkillDefOf.Intellectual) * 0.003f;
+        float offest = 0.01f + rolePawn.GetSkillLevel(SkillDefOf.Shooting) * 0.003f + rolePawn.GetSkillLevel(SkillDefOf.Intellectual) * 0.003f;
         yield return new StatModifier()
         {
             stat = StatDefOf.PainShockThreshold,
@@ -19,7 +19,7 @@ public class ResidentKnightRoleWorker_Patrol(ResidentKnightRoleDef def) : Reside
 
     public override IEnumerable<StatModifier> RoleStatFactors(Pawn rolePawn)
     {
-        float factor = 1.02f + rolePawn.GetSkillLevelOfPawn(SkillDefOf.Shooting) * 0.005f + rolePawn.GetSkillLevelOfPawn(SkillDefOf.Melee) * 0.005f;
+        float factor = 1.02f + rolePawn.GetSkillLevel(SkillDefOf.Shooting) * 0.005f + rolePawn.GetSkillLevel(SkillDefOf.Melee) * 0.005f;
         yield return new StatModifier()
         {
             stat = StatDefOf.MeleeDamageFactor,

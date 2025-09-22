@@ -7,7 +7,7 @@ public class ResidentKnightRoleWorker_Clerk(ResidentKnightRoleDef def) : Residen
 {
     public int KnightMoodOffset(Pawn rolePawn)
     {
-        int offset = 1 + rolePawn.GetSkillLevelOfPawn(SkillDefOf.Social) / 4;
+        int offset = 1 + rolePawn.GetSkillLevel(SkillDefOf.Social) / 4;
         return offset > 6 ? 6 : offset;
     }
 }

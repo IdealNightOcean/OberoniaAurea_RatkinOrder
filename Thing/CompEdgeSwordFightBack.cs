@@ -7,7 +7,7 @@ public class CompEdgeSwordFightBack : CompMeleeFightBack
 {
     protected override bool CanFightBack(Pawn instigator)
     {
-        int skillDiff = parentPawn.GetSkillLevelOfPawn(SkillDefOf.Melee) - instigator.GetSkillLevelOfPawn(SkillDefOf.Melee);
+        int skillDiff = parentPawn.GetSkillLevel(SkillDefOf.Melee) - instigator.GetSkillLevel(SkillDefOf.Melee);
         if (skillDiff < 0)
         {
             return false;

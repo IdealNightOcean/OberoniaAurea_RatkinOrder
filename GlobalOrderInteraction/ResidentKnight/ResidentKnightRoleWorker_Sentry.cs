@@ -9,7 +9,7 @@ public class ResidentKnightRoleWorker_Sentry(ResidentKnightRoleDef def) : Reside
 {
     public override IEnumerable<StatModifier> RoleStatOffsets(Pawn pawn)
     {
-        float offest = 0.05f + pawn.GetSkillLevelOfPawn(SkillDefOf.Shooting) * 0.01f + pawn.GetSkillLevelOfPawn(SkillDefOf.Intellectual) * 0.01f;
+        float offest = 0.05f + pawn.GetSkillLevel(SkillDefOf.Shooting) * 0.01f + pawn.GetSkillLevel(SkillDefOf.Intellectual) * 0.01f;
         yield return new StatModifier()
         {
             stat = StatDefOf.MoveSpeed,

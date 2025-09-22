@@ -8,13 +8,13 @@ public class ResidentKnightRoleWorker_Orderly(ResidentKnightRoleDef def) : Resid
 {
     public float MercyQuestChaceFactor(Pawn rolePawn)
     {
-        float factor = 1.05f + (rolePawn.GetSkillLevelOfPawn(SkillDefOf.Social) + rolePawn.GetSkillLevelOfPawn(SkillDefOf.Intellectual)) * 0.005f;
+        float factor = 1.05f + (rolePawn.GetSkillLevel(SkillDefOf.Social) + rolePawn.GetSkillLevel(SkillDefOf.Intellectual)) * 0.005f;
         return Mathf.Min(1.2f, factor);
     }
 
     public float ExtraMercyQuestLetterChance(Pawn rolePawn)
     {
-        float offset = 0.02f + (rolePawn.GetSkillLevelOfPawn(SkillDefOf.Social) + rolePawn.GetSkillLevelOfPawn(SkillDefOf.Intellectual)) * 0.01f;
+        float offset = 0.02f + (rolePawn.GetSkillLevel(SkillDefOf.Social) + rolePawn.GetSkillLevel(SkillDefOf.Intellectual)) * 0.01f;
         return Mathf.Min(0.32f, offset);
     }
 }

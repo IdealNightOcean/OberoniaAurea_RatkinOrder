@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Verse;
 
@@ -8,7 +9,7 @@ namespace OberoniaAurea.RatkinOrder;
 public static class PawnUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetSkillLevelOfPawn(this Pawn pawn, SkillDef skill)
+    public static int GetSkillLevel(this Pawn pawn, SkillDef skill)
     {
         return pawn.skills?.GetSkill(skill).GetLevel() ?? 0;
     }
@@ -43,5 +44,21 @@ public static class PawnUtility
     {
         Hediff_Knight knightHediff = (Hediff_Knight)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_OrderKnight);
         knightHediff.InitRatkinOrder(ratkinOrder);
+    }
+
+    public static int GetTotalSkillLevelOf(IEnumerable<Pawn> pawns, SkillDef skill)
+    {
+        if (pawns is null)
+        {
+            return 0;
+        }
+
+        int totalLevel = 0;
+        foreach (Pawn pawn in pawns)
+        {
+            totalLevel += pawn.GetSkillLevel(skill);
+        }
+
+        return totalLevel;
     }
 }

@@ -11,6 +11,6 @@ public class CompRapierCombo : CompMeleeAttackCombo
         {
             return false;
         }
-        return caster.GetSkillLevelOfPawn(SkillDefOf.Melee) >= pawn.GetSkillLevelOfPawn(SkillDefOf.Melee);
+        return caster.GetSkillLevel(SkillDefOf.Melee) >= pawn.GetSkillLevel(SkillDefOf.Melee);
     }
 }

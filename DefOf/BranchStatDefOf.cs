@@ -6,6 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 public static class BranchStatDefOf
 {
     public static BranchStatDef OARO_AffectRadius;
+    public static BranchStatDef OARO_NaturalPopulationCeiling; // 自然人口上限
     public static BranchStatDef OARO_BuildingCeiling;
     public static BranchStatDef OARO_DeployeeDailyXp;
 

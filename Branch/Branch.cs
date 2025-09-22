@@ -29,6 +29,15 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     private BranchType curType = BranchType.Normal;
     public BranchType BranchType => curType;
 
+
+    private int population;
+    private int NaturalPopulationCeiling => (int)this.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
+    public int Population
+    {
+        get => population;
+        set => population = Math.Max(0, value);
+    }
+
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
     [Unsaved] public readonly SimpleUniqueList<IPostSquadCombatPawnGenerate> PostSquadCombatPawnGenerate = new(innerListLookMode: LookMode.Reference);
@@ -148,6 +157,8 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     private void TickDay()
     {
+
+
         buildingHandler.TickDay();
         residentHandler.TickDay();
         demandHandler.TickDay();
@@ -217,6 +228,18 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     {
         residentHandler.ForceEndAllResidency();
         worldObject?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed();
+    }
+
+    /// <summary>
+    /// 每日人口变化
+    /// </summary>
+    private int GetDailyPopulationDecline()
+    {
+        int naturalPopulationCeiling = NaturalPopulationCeiling;
+        float populationRatio = population / (float)naturalPopulationCeiling;
+
+
+        return 0;
     }
 
     private void PostGenerated()

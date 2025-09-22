@@ -75,17 +75,21 @@
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
     <Compile Include="Hediff\Hediff_Knight.cs" />
+    <Compile Include="KeyLibrary\KeyLibrary_QuestEffectTag.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_EffectTag.cs" />
+    <Compile Include="KeyLibrary\KeyLibrary_QuestCliqueKey.cs" />
     <Compile Include="Letter\ChoiceLetter_AutoUpgradeRelationship.cs" />
     <Compile Include="GlobalOrderInteraction\AroundKnightGroup.cs" />
     <Compile Include="GlobalOrderInteraction\AroundKnightGroupsManager.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_AssistanceQuest.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_EffectTags.cs" />
     <Compile Include="Quest\QuestClique\QuestClique.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_AddBranchClique.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_AddGeneralClique.cs" />
     <Compile Include="Quest\QuestClique\QuestPart_CliquesManager.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_AddEffectTag.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistance.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistanceCommon.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_RefugeeKnightBase.cs" />
@@ -152,6 +156,7 @@
     <Compile Include="DefOf\SquadTaskDefOf.cs" />
     <Compile Include="Def\OrderInteractionDef.cs" />
     <Compile Include="Def\ResidentKnightRoleDef.cs" />
+    <Compile Include="Thing\CompPlagueSample.cs" />
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
     <Compile Include="Utility\RelationshipUtility.cs" />
@@ -341,6 +346,7 @@
     <Compile Include="Work\WorkGiver_FillFermentingBarrel_Order.cs" />
     <Compile Include="Work\WorkGiver_RecieveOrderLetter.cs" />
     <Compile Include="Work\WorkGiver_TakeProductOutOfFermentingBarrel.cs" />
+    <Compile Include="Worldobject\Worldobject_PlagueVillage.cs" />
     <Compile Include="Worldobject\WorldObject_OrderRelationshipUpgrade.cs" />
     <Compile Include="Worldobject\WorldObejct_SupplyDepotConstruction.cs" />
     <Compile Include="Worldobject\WorldObject_FieldSurvey.cs" />
