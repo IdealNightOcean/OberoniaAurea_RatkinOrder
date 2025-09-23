@@ -10,7 +10,7 @@ public class CompPlagueSample : CompInteractWithThing
     private Quest quest;
     public Quest AssociatedQuest => quest;
 
-    private Worldobject_PlagueVillage plagueVillage;
+    private WorldObject_PlagueVillage plagueVillage;
 
     private bool isStrangePlague;
     public float MaxSamplePoints => isStrangePlague ? 800f : 400f;
@@ -27,7 +27,7 @@ public class CompPlagueSample : CompInteractWithThing
         Scribe_Values.Look(ref samplePoints, "samplePoints", 0f);
     }
 
-    public void InitSample(Quest quest, Worldobject_PlagueVillage plagueVillage, bool isStrangePlague)
+    public void InitSample(Quest quest, WorldObject_PlagueVillage plagueVillage, bool isStrangePlague)
     {
         this.quest = quest;
         this.plagueVillage = plagueVillage;
@@ -45,20 +45,24 @@ public class CompPlagueSample : CompInteractWithThing
 
     public override void InteractionResult(Pawn pawn)
     {
+        QuestUtility.SendQuestTargetSignals(parent.questTags, "");
+
         int medicineSkillLevel = pawn.GetSkillLevel(SkillDefOf.Medicine);
         if (quest is not null && plagueVillage is not null)
         {
+            plagueVillage.CliquesManager?.AdjustCliqueWillingness(KeyLibrary_QuestCliqueKey.Doctor, 0.05f);
             float controlGain = 20f + 2f * medicineSkillLevel;
             if (isStrangePlague)
             {
                 controlGain *= 2f;
             }
-            plagueVillage.PlagueControl += Mathf.RoundToInt(controlGain);
             Messages.Message("OARO_PlagueSample_Result".Translate(Mathf.RoundToInt(controlGain)), MessageTypeDefOf.PositiveEvent);
+            plagueVillage?.AdjustPlagueControl(controlGain);
         }
 
         if (medicineSkillLevel < 10 && Rand.Chance(0.75f))
         {
+            pawn.health.AddHediff(HediffDefOf.Plague);
             Messages.Message("OARO_PlagueSample_InfectioPlague".Translate(pawn), MessageTypeDefOf.NegativeEvent);
         }
 

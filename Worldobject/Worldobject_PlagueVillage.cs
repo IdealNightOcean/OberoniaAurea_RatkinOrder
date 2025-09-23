@@ -8,14 +8,14 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Nameable, ISingleBranchRelated
+public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Nameable, ISingleBranchRelated
 {
     public override int TicksNeeded => 30000;
 
     private int branchPolicy; // 1:秩序管控，2:样本收集，3:调查协助
     private int workType; // 1:协助救治，2:协助隔离
 
-    [Unsaved] private bool settled;
+    [Unsaved] private bool hasSettled;
 
     private int nextPlagueSpreadTick = -1;
     private int nextPeriodicCheckTick = -1;
@@ -32,21 +32,36 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
 
     private float maxPlagueControl = 600f;
     private float plagueControl;
-    public float PlagueControl
-    {
-        get => plagueControl;
-        set => plagueControl = Mathf.Clamp(value, 0f, maxPlagueControl);
-    }
 
     private Branch branch;
     public Branch Branch => branch;
 
     [Unsaved] QuestPart_EffectTags effectTags;
-    private QuestPart_EffectTags EffectTags => effectTags ?? (QuestPart_EffectTags.TryGetEffectTags(quest, addPartIfMiss: false, out effectTags) ? effectTags : null);
+    public QuestPart_EffectTags EffectTags => effectTags ?? (QuestPart_EffectTags.TryGetEffectTags(quest, addPartIfMiss: false, out effectTags) ? effectTags : null);
 
     [Unsaved] QuestPart_CliquesManager cliquesManager;
-    private QuestPart_CliquesManager CliquesManager => cliquesManager ?? (QuestPart_CliquesManager.TryGetCliquesManager(quest, addPartIfMiss: false, out cliquesManager) ? cliquesManager : null);
+    public QuestPart_CliquesManager CliquesManager => cliquesManager ?? (QuestPart_CliquesManager.TryGetCliquesManager(quest, addPartIfMiss: false, out cliquesManager) ? cliquesManager : null);
     private float TotalPotency => CliquesManager?.TotalPotency ?? 0f;
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_Values.Look(ref branchPolicy, "branchPolicy", 0);
+        Scribe_Values.Look(ref workType, "workType", 0);
+
+        Scribe_Values.Look(ref nextPlagueSpreadTick, "nextPlagueSpreadTick", -1);
+        Scribe_Values.Look(ref nextPeriodicCheckTick, "nextPeriodicCheckTick", -1);
+
+        Scribe_Values.Look(ref originalPopulation, "originalPopulation", 0);
+        Scribe_Values.Look(ref population, "population", 0);
+
+        Scribe_Values.Look(ref plagueSpread, "plagueSpread", 0f);
+
+        Scribe_Values.Look(ref maxPlagueControl, "maxPlagueControl", 600f);
+        Scribe_Values.Look(ref plagueControl, "plagueControl", 0f);
+
+        Scribe_References.Look(ref branch, "branch");
+    }
 
     public override void PostAdd()
     {
@@ -54,7 +69,7 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
         population = originalPopulation;
 
         PlagueSpread = Rand.Range(0.3f, 0.45f);
-        PlagueControl = 0;
+        plagueControl = 0f;
 
         nextPeriodicCheckTick = Find.TickManager.TicksGame + 15000;
         nextPlagueSpreadTick = Find.TickManager.TicksGame + 60000;
@@ -63,7 +78,7 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
         {
             if (effectTags.HasTag(KeyLibrary_QuestEffectTag.Panic))
             {
-
+                PlagueSpread += 0.1f;
             }
 
             if (effectTags.HasTag(KeyLibrary_QuestEffectTag.ResponsibleDoctor))
@@ -113,6 +128,15 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
         OpenStartDialog(caravan);
     }
 
+    public void AdjustPlagueControl(float change)
+    {
+        plagueControl = Mathf.Clamp(plagueControl + change, 0f, maxPlagueControl);
+        if (plagueControl >= maxPlagueControl)
+        {
+            PlagueResolved();
+        }
+    }
+
     protected override void FinishWork()
     {
         if (associatedFixedCaravan is not null)
@@ -128,17 +152,19 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                         {
                             controlAdd *= 0.5f;
                         }
-                        PlagueControl += controlAdd;
-                        break;
+                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_CureResult".Translate(controlAdd.ToString("F2"))));
+                        AdjustPlagueControl(controlAdd);
+                        return;
                     }
                 case 2:
                     {
                         int totalSocialLevel = PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
                         float spreadReduce = totalSocialLevel * 0.00025f;
                         PlagueSpread -= spreadReduce;
-                        break;
+                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_IsolationResult".Translate(spreadReduce.ToStringPercent("F2"))));
+                        return;
                     }
-                default: break;
+                default: return;
             }
         }
     }
@@ -148,21 +174,13 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
     protected override void TickInterval(int delta)
     {
         base.TickInterval(delta);
-        if (settled)
-        {
-            return;
-        }
 
-        if (Find.TickManager.TicksGame >= nextPeriodicCheckTick)
+        if (!hasSettled && Find.TickManager.TicksGame >= nextPeriodicCheckTick)
         {
             nextPeriodicCheckTick = Find.TickManager.TicksGame + 15000;
             PeriodicCheck();
-            if (settled)
-            {
-                return;
-            }
 
-            if (Find.TickManager.TicksGame >= nextPlagueSpreadTick)
+            if (!hasSettled && Find.TickManager.TicksGame >= nextPlagueSpreadTick)
             {
                 nextPlagueSpreadTick = Find.TickManager.TicksGame + 60000;
                 DailySpreadPlague();
@@ -243,6 +261,10 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
 
         void DispatchResult(ThingDef thingDef, float spreadChange)
         {
+            if (EffectTags?.HasTag(KeyLibrary_QuestEffectTag.ResponsibleDoctor) ?? false)
+            {
+                spreadChange *= 1.25f;
+            }
             PlagueSpread -= spreadChange;
             caravan.RemoveThingsOfDef(thingDef, 25);
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_DispatchResult".Translate(spreadChange.ToString("F2"))));
@@ -305,24 +327,25 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                     {
                         controlAdd *= 0.5f;
                     }
-                    PlagueControl += controlAdd;
                     Messages.Message("OARO_PlagueVillage_OrderControlResult".Translate(plagueSpreadReduce.ToStringPercent("F2"), controlAdd.ToString("F2")), MessageTypeDefOf.PositiveEvent, historical: true);
-
-                    if (PlagueControl >= maxPlagueControl)
-                    {
-                        PlagueResolved();
-                        return;
-                    }
+                    AdjustPlagueControl(controlAdd);
+                    break;
                 }
-
-
-                break;
             case 2:
-                if (Rand.Chance(TotalPotency * 0.6f))
                 {
+                    if (Rand.Chance(TotalPotency * 0.6f))
+                    {
+                        Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
+                        if (map is not null)
+                        {
+                            Thing thing = ThingMaker.MakeThing(OARO_ThingDefOf.OARO_PlagueSample);
+                            thing.TryGetComp<CompPlagueSample>()?.InitSample(quest, this, EffectTags?.HasTag(KeyLibrary_QuestEffectTag.StrangePlague) ?? false);
+                            OAFrame_DropPodUtility.DefaultDropSingleThing(thing, map, branch?.RatkinOrder?.Faction, sendLetter: false);
 
+                        }
+                    }
+                    break;
                 }
-                break;
             case 3:
                 {
                     float controlAdd = 2 + TotalPotency * 12f;
@@ -330,21 +353,15 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                     {
                         controlAdd *= 0.5f;
                     }
-                    PlagueControl += controlAdd;
                     Messages.Message("OARO_PlagueVillage_SurveyAssistanceResult".Translate(controlAdd.ToString("F2")), MessageTypeDefOf.PositiveEvent, historical: true);
-
-                    if (PlagueControl >= maxPlagueControl)
-                    {
-                        PlagueResolved();
-                        return;
-                    }
+                    AdjustPlagueControl(controlAdd);
                     break;
                 }
             default:
                 break;
         }
 
-        if (!settled && Find.TickManager.TicksGame >= nextPeriodicCheckTick)
+        if (!hasSettled && Find.TickManager.TicksGame >= nextPeriodicCheckTick)
         {
             nextPlagueSpreadTick = Find.TickManager.TicksGame + 60000;
             DailySpreadPlague();
@@ -386,8 +403,8 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                 else
                 {
                     int plagueImpact = Mathf.FloorToInt(15 * plagueSpread);
-                    PlagueControl -= plagueImpact;
                     Messages.Message("OARO_PlagueVillage_PanickedPlagueImpact".Translate(plagueImpact), MessageTypeDefOf.NegativeEvent, historical: true);
+                    AdjustPlagueControl(-plagueImpact);
                 }
             }
         }
@@ -397,12 +414,8 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
 
     private void PlagueResolved()
     {
-        settled = true;
+        hasSettled = true;
         SendWorkResolvedSignal();
-        if (isWorking)
-        {
-            EndWork(interrupt: true, convertToCaravan: true);
-        }
         if (!Destroyed)
         {
             Destroy();
@@ -411,11 +424,7 @@ public class Worldobject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
 
     private void PlagueOutOfControl()
     {
-        settled = true;
-        if (isWorking)
-        {
-            EndWork(interrupt: true, convertToCaravan: true);
-        }
+        hasSettled = true;
 
         if (!Destroyed)
         {

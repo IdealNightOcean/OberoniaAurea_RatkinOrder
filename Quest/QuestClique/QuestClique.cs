@@ -6,19 +6,29 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestClique : IExposable
 {
     public string Name = "UNKNOWN";
-    public float Potency;
+    public string ActiveDesc = string.Empty;
+    public string InactiveDesc = string.Empty;
 
-    public string PotencyDesc = string.Empty;
-    public string FullPotencyDesc => (PotencyDesc + ": " + Potency.ToString("F2")).Colorize(Potency > 0f ? Color.green : ColorLibrary.RedReadable);
+    public string Description => IsActive ? FullActiveDesc : InactiveDesc;
+    public string FullActiveDesc => (ActiveDesc + ": " + Potency.ToStringWithSign("F2")).Colorize(Potency < 0f ? ColorLibrary.RedReadable : Color.green);
 
-    private float willingness;
+    private float potency; // 效能，-1~1
+    private float willingness; // 参与意愿，0~1
+    private float lastWillingnessChange;
+
+    public float Potency
+    {
+        get => potency;
+        set => potency = Mathf.Clamp(value, -1f, 1f);
+    }
     public float Willingness
     {
         get => willingness;
-        set => willingness = Mathf.Clamp01(value);
     }
+    public float LastWillingnessChange => lastWillingnessChange;
 
     public bool IsActive;
+    public bool CanBribable;
     public int TicksToActive = -1;
 
     private Branch relatedBranch;
@@ -44,12 +54,28 @@ public class QuestClique : IExposable
     public void ExposeData()
     {
         Scribe_Values.Look(ref Name, "Name", "UNKNOWN");
-        Scribe_Values.Look(ref Potency, "Potency", 0f);
-        Scribe_Values.Look(ref PotencyDesc, "PotencyDesc", string.Empty);
+        Scribe_Values.Look(ref ActiveDesc, "ActiveDesc", string.Empty);
+        Scribe_Values.Look(ref InactiveDesc, "InactiveDesc", string.Empty);
+
+        Scribe_Values.Look(ref potency, "potency", 0f);
         Scribe_Values.Look(ref willingness, "willingness", 0f);
+        Scribe_Values.Look(ref lastWillingnessChange, "lastWillingnessChange", 0f);
 
         Scribe_Values.Look(ref IsActive, "IsActive", defaultValue: false);
+        Scribe_Values.Look(ref CanBribable, "CanBribable", defaultValue: false);
+        Scribe_Values.Look(ref TicksToActive, "TicksToActive", -1);
+
         Scribe_References.Look(ref relatedBranch, "relatedBranch");
+    }
+
+    public void AdjustCliqueWillingness(float delta, bool record = true)
+    {
+        if (delta != 0f)
+        {
+            willingness = Mathf.Clamp01(willingness + delta);
+            if (record)
+            { lastWillingnessChange = delta; }
+        }
     }
 
     /// <summary>

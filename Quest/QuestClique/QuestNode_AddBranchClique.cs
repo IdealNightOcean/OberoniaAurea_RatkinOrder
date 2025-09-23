@@ -6,6 +6,8 @@ public class QuestNode_AddBranchClique : QuestNode
 {
     public SlateRef<Branch> branch;
     public SlateRef<float> initWillingness;
+    public SlateRef<bool> canBribable;
+
     public SlateRef<bool> defaultActive;
 
     public SlateRef<bool> replaceCur;
@@ -31,8 +33,9 @@ public class QuestNode_AddBranchClique : QuestNode
 
         QuestClique questClique = new(branch)
         {
-            Willingness = initWillingness.GetValue(slate)
+            CanBribable = canBribable.GetValue(slate)
         };
+        questClique.AdjustCliqueWillingness(initWillingness.GetValue(slate), record: false);
 
         string cliqueKey = QuestClique.GetBranchCliqueKey(branch);
         if (questPart_CliquesManager.AddClique(cliqueKey, questClique, replaceCur.GetValue(slate)))

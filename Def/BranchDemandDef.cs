@@ -38,4 +38,9 @@ public class BranchDemandDef : Def
             yield return $"{defName} should has a positive durationnDays.";
         }
     }
+
+    public BranchDemand MakeBranchDemand()
+    {
+        return (BranchDemand)Activator.CreateInstance(demandClass, this);
+    }
 }

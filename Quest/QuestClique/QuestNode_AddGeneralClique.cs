@@ -6,13 +6,19 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestNode_AddGeneralClique : QuestNode
 {
     [NoTranslate]
-    public SlateRef<string> cliqueKey;
+    public SlateRef<string> cliqueKey = "UNKOWN";
 
+    [MustTranslate]
     public SlateRef<string> cliqueName;
     public SlateRef<float> initPotency;
-    [MayTranslate]
-    public SlateRef<string> initPotencyDesc;
+
+    [MustTranslate]
+    public SlateRef<string> activeDesc;
+    [MustTranslate]
+    public SlateRef<string> inactiveDesc;
+
     public SlateRef<float> initWillingness;
+    public SlateRef<bool> canBribable;
     public SlateRef<bool> defaultActive;
 
     public SlateRef<bool> replaceCur;
@@ -38,11 +44,13 @@ public class QuestNode_AddGeneralClique : QuestNode
 
         QuestClique questClique = new()
         {
-            Name = cliqueName.GetValue(slate) ?? "UNKOWN",
+            Name = cliqueName.GetValue(slate),
             Potency = initPotency.GetValue(slate),
-            PotencyDesc = initPotencyDesc.GetValue(slate) ?? string.Empty,
-            Willingness = initWillingness.GetValue(slate)
+            ActiveDesc = activeDesc.GetValue(slate) ?? string.Empty,
+            InactiveDesc = inactiveDesc.GetValue(slate) ?? string.Empty,
+            CanBribable = canBribable.GetValue(slate)
         };
+        questClique.AdjustCliqueWillingness(initWillingness.GetValue(slate), record: false);
 
         if (questPart_CliquesManager.AddClique(cliqueKey, questClique, replaceCur.GetValue(slate)))
         {

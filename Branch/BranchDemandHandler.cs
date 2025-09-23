@@ -109,13 +109,13 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
     {
         if (demandDef.IsCriticalDemand)
         {
-            criticalDemand = new BranchDemand(demandDef);
+            criticalDemand = demandDef.MakeBranchDemand();
             criticalDemand.PostAddToBranch(Branch);
             Branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandAdd, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
         }
         else
         {
-            normalDemand = new BranchDemand(demandDef);
+            normalDemand = demandDef.MakeBranchDemand();
             normalDemand.PostAddToBranch(Branch);
             Branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandAdd, cdTicks: 20 * 60000, shouldRemoveWhenExpired: true);
         }

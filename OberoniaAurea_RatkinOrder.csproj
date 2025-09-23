@@ -71,6 +71,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ability\AbilityComp_GiveRatkinHediff.cs" />
+    <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
+    <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
@@ -84,17 +86,19 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_AssistanceQuest.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_SetBranchForObject.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_SetPresetEffectTags.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_HasQuestEffectTag.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_EffectTags.cs" />
     <Compile Include="Quest\QuestClique\QuestClique.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_AddBranchClique.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_AddGeneralClique.cs" />
     <Compile Include="Quest\QuestClique\QuestPart_CliquesManager.cs" />
-    <Compile Include="Quest\QuestNode\QuestNode_AddEffectTag.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_AddEffectTags.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistance.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistanceCommon.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_RefugeeKnightBase.cs" />
-    <Compile Include="Quest\QuestNode\QuestNode_SetBranchForWorldObject.cs" />
-    <Compile Include="Quest\QuestNode\QuestNode_SetRatkinOrderForWorldObject.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_SetRatkinOrderForObject.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_AnyPawnHasSpecialHediff.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_AssistKnighWatcher.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
@@ -346,7 +350,7 @@
     <Compile Include="Work\WorkGiver_FillFermentingBarrel_Order.cs" />
     <Compile Include="Work\WorkGiver_RecieveOrderLetter.cs" />
     <Compile Include="Work\WorkGiver_TakeProductOutOfFermentingBarrel.cs" />
-    <Compile Include="Worldobject\Worldobject_PlagueVillage.cs" />
+    <Compile Include="Worldobject\WorldObject_PlagueVillage.cs" />
     <Compile Include="Worldobject\WorldObject_OrderRelationshipUpgrade.cs" />
     <Compile Include="Worldobject\WorldObejct_SupplyDepotConstruction.cs" />
     <Compile Include="Worldobject\WorldObject_FieldSurvey.cs" />

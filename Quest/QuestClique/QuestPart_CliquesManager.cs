@@ -1,6 +1,8 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -221,11 +223,11 @@ public class QuestPart_CliquesManager : QuestPartActivable, IOnBranchDestoryed
         }
     }
 
-    public void AdjustCliqueWillingness(string cliqueKey, float change)
+    public void AdjustCliqueWillingness(string cliqueKey, float change, bool record = true)
     {
         if (allCliques?.TryGetValue(cliqueKey, out QuestClique clique) ?? false)
         {
-            clique.Willingness += change;
+            clique.AdjustCliqueWillingness(change, record);
         }
     }
 
@@ -258,9 +260,48 @@ public class QuestPart_CliquesManager : QuestPartActivable, IOnBranchDestoryed
         questPart_CliquesManager = quest.PartsListForReading.OfType<QuestPart_CliquesManager>()?.FirstOrFallback(null);
         if (addPartIfMiss && questPart_CliquesManager is null)
         {
-            questPart_CliquesManager = new QuestPart_CliquesManager();
+            questPart_CliquesManager = new QuestPart_CliquesManager
+            {
+                inSignalEnable = quest.InitiateSignal
+            };
             quest.AddPart(questPart_CliquesManager);
         }
         return questPart_CliquesManager is not null;
+    }
+
+    public override void DoDebugWindowContents(Rect innerRect, ref float curY)
+    {
+        if (State == QuestPartState.Enabled)
+        {
+            Rect rect = new(innerRect.x, curY, 500f, 25f);
+            if (Widgets.ButtonText(rect, "Show All Cliques"))
+            {
+                ShowAllCliques();
+            }
+
+            curY += rect.height + 4f;
+        }
+    }
+
+    private void ShowAllCliques()
+    {
+        if (allCliques.NullOrEmpty())
+        {
+            Messages.Message("No cliques in this quest.", MessageTypeDefOf.RejectInput, historical: false);
+            return;
+        }
+        StringBuilder sb = new();
+        int i = 0;
+        foreach (KeyValuePair<string, QuestClique> kv in allCliques)
+        {
+            QuestClique clique = kv.Value;
+            sb.AppendInNewLine((i++).ToString());
+            sb.AppendInNewLine($"Key: {kv.Key}, Name:{clique.Name}, IsActive:{clique.IsActive} ({clique.TicksToActive})");
+            sb.AppendInNewLine($"Potency: {clique.Potency}, Willingness:{clique.Willingness}");
+            sb.AppendInNewLine($"CanBribable: {clique.CanBribable}");
+            sb.AppendInNewLine($"IsBranchClique: {clique.IsBranchClique}, RelatedBranch: {clique.RelatedBranch?.Name ?? "NULL"}");
+            sb.AppendInNewLine("------------");
+        }
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(sb.ToTaggedString()));
     }
 }

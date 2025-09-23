@@ -67,9 +67,17 @@ public class BranchDemand : IExposable
         appearTick = Find.TickManager.TicksGame;
     }
 
-    public virtual void Notify_Accepted(Branch branch)
+    public virtual void OnAccepted(Branch branch)
     {
-        curState = TryGenerateQuestAndMakeAvailable(branch) ? DemandState.Ongoing : DemandState.Invalid;
+        Slate slate = TryGenerateQuestSlate(branch);
+        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out relatedQuest, def.relatedQuestDef, slate, forced: true))
+        {
+            curState = DemandState.Ongoing;
+        }
+        else
+        {
+            curState = DemandState.Invalid;
+        }
     }
 
     protected virtual Slate TryGenerateQuestSlate(Branch branch)
@@ -88,9 +96,4 @@ public class BranchDemand : IExposable
         return slate;
     }
 
-    protected virtual bool TryGenerateQuestAndMakeAvailable(Branch branch)
-    {
-        Slate slate = TryGenerateQuestSlate(branch);
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out relatedQuest, def.relatedQuestDef, slate, forced: true);
-    }
 }

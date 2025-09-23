@@ -26,6 +26,9 @@ public static class KeyLibrary_SlateStoreAs
     public const string DemandType = "demandType";
     public const string DemandDef = "demandDef";
 
+    public const string PreSetQuestEffectTags = "PreSetQuestEffectTags";
+    public const string QuestEffectTags = "QuestEffectTags";
+
     public const string VisitingKnightsDelay = "visitingKnightsDelay";
     public const string VisitingKnightsDuration = "visitingKnightsDuration";
     public const string VisitingKnightsCount = "visitingKnightsCount";

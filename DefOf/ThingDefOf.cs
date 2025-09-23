@@ -23,6 +23,8 @@ public static class OARO_ThingDefOf
     public static ThingDef OARO_OrderLetterBox; //骑士团信箱
     public static ThingDef OARO_WineDisplayShelf; //骑士团酒架
 
+    public static ThingDef OARO_PlagueSample; //瘟疫样本
+
     static OARO_ThingDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ThingDefOf));
