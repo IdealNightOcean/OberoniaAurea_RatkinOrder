@@ -77,6 +77,7 @@
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
     <Compile Include="Hediff\Hediff_Knight.cs" />
+    <Compile Include="Job\JobDriver_PlagueSample.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_QuestEffectTag.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_EffectTag.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_QuestCliqueKey.cs" />
@@ -93,7 +94,7 @@
     <Compile Include="Quest\QuestClique\QuestClique.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_AddBranchClique.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_AddGeneralClique.cs" />
-    <Compile Include="Quest\QuestClique\QuestPart_CliquesManager.cs" />
+    <Compile Include="Quest\QuestClique\Quest_CliquesManager.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_AddEffectTags.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistance.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistanceCommon.cs" />

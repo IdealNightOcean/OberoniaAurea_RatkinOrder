@@ -3,6 +3,7 @@ using RimWorld;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -122,6 +123,97 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
             PlagueOutOfControl();
         }
     }
+
+    public override string GetInspectString()
+    {
+        StringBuilder sb = new(base.GetInspectString());
+        sb.AppendInNewLine("OARO_PlagueVillage_CurPolicy".Translate());
+        sb.Append(": ");
+        if (branchPolicy >= 1 && branchPolicy <= 3)
+        {
+            sb.Append($"OARO_PlagueVillage_Policy{branchPolicy}".Translate());
+        }
+        else
+        {
+            sb.Append("None".Translate());
+        }
+
+        Color PopulationColor = population switch
+        {
+            > 1000 => Color.white,
+            > 800 => Color.yellow,
+            > 600 => ColorLibrary.Orange,
+            _ => ColorLibrary.RedReadable
+        };
+        sb.AppendInNewLine("OARO_PlagueVillage_Population".Translate(population, originalPopulation).Colorize(PopulationColor));
+        sb.AppendInNewLine("OARO_PlagueVillage_Control".Translate(plagueControl.ToString("F2"), maxPlagueControl.ToString("F2")));
+
+        Color SpreadColor = plagueSpread switch
+        {
+            < 0.5f => Color.green,
+            < 1f => Color.white,
+            < 1.5f => Color.yellow,
+            < 1.8f => ColorLibrary.Orange,
+            _ => ColorLibrary.RedReadable
+        };
+        sb.AppendInNewLine("OARO_PlagueVillage_PlagueSpread".Translate(plagueSpread.ToStringPercent("F2")).Colorize(SpreadColor));
+
+        return sb.ToString();
+    }
+
+    public override IEnumerable<Gizmo> GetGizmos()
+    {
+        foreach (Gizmo gizmo in base.GetGizmos())
+        {
+            yield return gizmo;
+        }
+
+        if (!DebugSettings.ShowDevGizmos)
+        {
+            yield break;
+        }
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Add 100 Control",
+            action = delegate
+            {
+                AdjustPlagueControl(100);
+            }
+        };
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Add 20% Spread",
+            action = delegate
+            {
+                PlagueSpread += 0.2f;
+            }
+        };
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Reduce 20% Spread",
+            action = delegate
+            {
+                PlagueSpread -= 0.2f;
+            }
+        };
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Reduce 500 Population",
+            action = delegate
+            {
+                population -= 500;
+            }
+        };
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Reduce 100 Population",
+            action = delegate
+            {
+                population -= 100;
+            }
+        };
+    }
+
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
@@ -342,6 +434,13 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                             thing.TryGetComp<CompPlagueSample>()?.InitSample(quest, this, EffectTags?.HasTag(KeyLibrary_QuestEffectTag.StrangePlague) ?? false);
                             OAFrame_DropPodUtility.DefaultDropSingleThing(thing, map, branch?.RatkinOrder?.Faction, sendLetter: false);
 
+                            Find.LetterStack.ReceiveLetter(
+                                label: "OARO_PlagueVillage_SpecimenCollectionLabel".Translate(),
+                                text: "OARO_PlagueVillage_SpecimenCollectionText".Translate(),
+                                textLetterDef: LetterDefOf.PositiveEvent,
+                                lookTargets: thing,
+                                relatedFaction: branch?.RatkinOrder.Faction,
+                                quest: quest);
                         }
                     }
                     break;

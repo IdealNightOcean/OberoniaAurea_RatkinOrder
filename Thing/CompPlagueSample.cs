@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -25,6 +24,11 @@ public class CompPlagueSample : CompInteractWithThing
 
         Scribe_Values.Look(ref isStrangePlague, "isStrangePlague", defaultValue: false);
         Scribe_Values.Look(ref samplePoints, "samplePoints", 0f);
+    }
+
+    public override string CompInspectStringExtra()
+    {
+        return "OARO_PlagueSample_Points".Translate(samplePoints.ToString("F2"), MaxSamplePoints.ToString("F2"));
     }
 
     public void InitSample(Quest quest, WorldObject_PlagueVillage plagueVillage, bool isStrangePlague)
@@ -56,7 +60,7 @@ public class CompPlagueSample : CompInteractWithThing
             {
                 controlGain *= 2f;
             }
-            Messages.Message("OARO_PlagueSample_Result".Translate(Mathf.RoundToInt(controlGain)), MessageTypeDefOf.PositiveEvent);
+            Messages.Message("OARO_PlagueSample_Result".Translate(controlGain.ToString("F2")), MessageTypeDefOf.PositiveEvent);
             plagueVillage?.AdjustPlagueControl(controlGain);
         }
 
@@ -70,27 +74,5 @@ public class CompPlagueSample : CompInteractWithThing
         {
             parent.Destroy();
         }
-    }
-}
-
-public class JobDriver_PlagueSample : JobDriver_InteractWithThing
-{
-    [Unsaved] private CompPlagueSample sampleComp;
-    private CompPlagueSample SampleComp => sampleComp ??= job.targetA.Thing?.TryGetComp<CompPlagueSample>();
-
-    protected override float GetTotalWorkAmount(float baseWorkAmount)
-    {
-        return SampleComp?.SamplePoints ?? 1f;
-    }
-
-    protected override void JobTickIntervalAction(int delta)
-    {
-        SampleComp?.AddSamplePoints(tickWorkAmount * delta);
-        base.JobTickIntervalAction(delta);
-    }
-
-    protected override void InteractionResult(Pawn pawn)
-    {
-        SampleComp?.InteractionResult(pawn);
     }
 }

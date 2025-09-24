@@ -28,7 +28,9 @@ public class QuestClique : IExposable
     public float LastWillingnessChange => lastWillingnessChange;
 
     public bool IsActive;
-    public bool CanBribable;
+    public bool IsCommunicable;
+    public bool IsBribable;
+    public int BriberyCost = -1;
     public int TicksToActive = -1;
 
     private Branch relatedBranch;
@@ -62,7 +64,9 @@ public class QuestClique : IExposable
         Scribe_Values.Look(ref lastWillingnessChange, "lastWillingnessChange", 0f);
 
         Scribe_Values.Look(ref IsActive, "IsActive", defaultValue: false);
-        Scribe_Values.Look(ref CanBribable, "CanBribable", defaultValue: false);
+        Scribe_Values.Look(ref IsCommunicable, "IsCommunicable", defaultValue: false);
+        Scribe_Values.Look(ref IsBribable, "IsBribable", defaultValue: false);
+        Scribe_Values.Look(ref BriberyCost, "BriberyCost", -1);
         Scribe_Values.Look(ref TicksToActive, "TicksToActive", -1);
 
         Scribe_References.Look(ref relatedBranch, "relatedBranch");

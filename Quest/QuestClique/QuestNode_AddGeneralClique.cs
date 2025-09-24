@@ -18,7 +18,10 @@ public class QuestNode_AddGeneralClique : QuestNode
     public SlateRef<string> inactiveDesc;
 
     public SlateRef<float> initWillingness;
-    public SlateRef<bool> canBribable;
+    public SlateRef<bool> isCommunicable;
+    public SlateRef<bool> isBribable;
+    public SlateRef<int> briberyCost = -1;
+
     public SlateRef<bool> defaultActive;
 
     public SlateRef<bool> replaceCur;
@@ -48,7 +51,10 @@ public class QuestNode_AddGeneralClique : QuestNode
             Potency = initPotency.GetValue(slate),
             ActiveDesc = activeDesc.GetValue(slate) ?? string.Empty,
             InactiveDesc = inactiveDesc.GetValue(slate) ?? string.Empty,
-            CanBribable = canBribable.GetValue(slate)
+
+            IsCommunicable = isCommunicable.GetValue(slate),
+            IsBribable = isBribable.GetValue(slate),
+            BriberyCost = briberyCost.GetValue(slate)
         };
         questClique.AdjustCliqueWillingness(initWillingness.GetValue(slate), record: false);
 
@@ -56,7 +62,7 @@ public class QuestNode_AddGeneralClique : QuestNode
         {
             if (defaultActive.GetValue(slate))
             {
-                questPart_CliquesManager.ActiveClique(cliqueKey);
+                questPart_CliquesManager.ActiveClique(cliqueKey, directly: true);
             }
         }
     }

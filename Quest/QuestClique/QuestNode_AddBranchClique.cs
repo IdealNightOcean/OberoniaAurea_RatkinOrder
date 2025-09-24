@@ -6,7 +6,9 @@ public class QuestNode_AddBranchClique : QuestNode
 {
     public SlateRef<Branch> branch;
     public SlateRef<float> initWillingness;
-    public SlateRef<bool> canBribable;
+    public SlateRef<bool> isCommunicable;
+    public SlateRef<bool> isBribable;
+    public SlateRef<int> briberyCost = -1;
 
     public SlateRef<bool> defaultActive;
 
@@ -33,7 +35,9 @@ public class QuestNode_AddBranchClique : QuestNode
 
         QuestClique questClique = new(branch)
         {
-            CanBribable = canBribable.GetValue(slate)
+            IsCommunicable = isCommunicable.GetValue(slate),
+            IsBribable = isBribable.GetValue(slate),
+            BriberyCost = briberyCost.GetValue(slate)
         };
         questClique.AdjustCliqueWillingness(initWillingness.GetValue(slate), record: false);
 
@@ -42,7 +46,7 @@ public class QuestNode_AddBranchClique : QuestNode
         {
             if (defaultActive.GetValue(slate))
             {
-                questPart_CliquesManager.ActiveClique(cliqueKey);
+                questPart_CliquesManager.ActiveClique(cliqueKey, directly: true);
             }
         }
     }
