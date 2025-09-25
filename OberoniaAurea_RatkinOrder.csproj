@@ -87,9 +87,11 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_AssistanceQuest.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_LostItemsOfTrader.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetBranchForObject.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetPresetEffectTags.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_HasQuestEffectTag.cs" />
+    <Compile Include="Quest\QuestPart\QuestPart_TriggerMercyQuest.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_EffectTags.cs" />
     <Compile Include="Quest\QuestClique\QuestClique.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_AddBranchClique.cs" />
@@ -102,6 +104,7 @@
     <Compile Include="Quest\QuestNode\QuestNode_SetRatkinOrderForObject.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_AnyPawnHasSpecialHediff.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_AssistKnighWatcher.cs" />
+    <Compile Include="Quest\Quest_AllRatkinFactionsGoogwillChange.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemand.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemandHandler.cs" />
@@ -167,7 +170,7 @@
     <Compile Include="Utility\RelationshipUtility.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_InteractRecord.cs" />
     <Compile Include="Utility\MercyQuestDataBase.cs" />
-    <Compile Include="Window\DevWindowBase.cs" />
+    <Compile Include="Window\DevWindow\DevWindowBase.cs" />
     <Compile Include="Window\Dialog_NodeTreeWithRatkinOrderInfo.cs" />
     <Compile Include="Hediff\Hediff_ResidentKnight.cs" />
     <Compile Include="Hediff\Hediff_ByResidentKnight.cs" />
@@ -253,14 +256,14 @@
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Branch\WorldObjectComp_BranchSite.cs" />
-    <Compile Include="Window\DevWindow_OrderInteractHandler.cs" />
-    <Compile Include="Window\DevWindow_Squad.cs" />
-    <Compile Include="Window\DevWindow_Branch.cs" />
-    <Compile Include="Window\DevWindow_BranchManager.cs" />
-    <Compile Include="Window\DevWindow_Order.cs" />
-    <Compile Include="Window\DevWindow_AllOrders.cs" />
-    <Compile Include="Window\DevWindow_SquadManager.cs" />
-    <Compile Include="Window\DevWindow_SquadGroupPatrolManager.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_GlobalOrderInteractHandler.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_Squad.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_Branch.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_BranchManager.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_Order.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_AllOrders.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_SquadManager.cs" />
+    <Compile Include="Window\DevWindow\DevWindow_SquadGroupPatrolManager.cs" />
     <Compile Include="EsteemHandler.cs" />
     <Compile Include="Utility\DebugRatkinOrders.cs" />
     <Compile Include="Letter\ChoiceLetter_Apprentice_QuizStayIntention.cs" />
@@ -368,7 +371,7 @@
     <Compile Include="Worldobject\WorldObject_TemporaryEncampment.cs" />
     <Compile Include="Worldobject\WorldObject_ApplianceRepair.cs" />
     <Compile Include="Worldobject\WorldObject_PastureFlu.cs" />
-    <Compile Include="Worldobject\WorldObject_SlowMovingArtcraft.cs" />
+    <Compile Include="Worldobject\WorldObject_UnsalableArtcraft.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

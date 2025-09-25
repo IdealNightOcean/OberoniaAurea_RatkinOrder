@@ -69,7 +69,7 @@ public class BranchDemand : IExposable
 
     public virtual void OnAccepted(Branch branch)
     {
-        Slate slate = TryGenerateQuestSlate(branch);
+        Slate slate = GenerateQuestSlate(branch);
         if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out relatedQuest, def.relatedQuestDef, slate, forced: true))
         {
             curState = DemandState.Ongoing;
@@ -80,7 +80,7 @@ public class BranchDemand : IExposable
         }
     }
 
-    protected virtual Slate TryGenerateQuestSlate(Branch branch)
+    protected virtual Slate GenerateQuestSlate(Branch branch)
     {
         Slate slate = new();
         slate.SetBasicOrderSlateVar(branch);

@@ -214,7 +214,6 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
         };
     }
 
-
     public override void Notify_CaravanArrived(Caravan caravan)
     {
         OpenStartDialog(caravan);
@@ -319,6 +318,8 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
             resolveTree = true
         };
         rootNode.options.Add(isolationOpt);
+
+        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
 
         Dialog_NodeTree dialog = new(rootNode);
         Find.WindowStack.Add(dialog);

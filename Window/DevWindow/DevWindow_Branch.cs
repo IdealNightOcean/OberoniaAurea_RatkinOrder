@@ -47,6 +47,14 @@ public class DevWindow_Branch : DevWindowBase
         Text.Font = GameFont.Small;
 
         listing_Rect.Gap(6f);
+        if (branch.WorldObject is not null)
+        {
+            listing_Rect.Label($"RelatedWorldObject: {branch.WorldObject}");
+            if (listing_Rect.ButtonText("Jump to", widthPct: 0.4f))
+            {
+                CameraJumper.TryJumpAndSelect(branch.WorldObject);
+            }
+        }
         if (listing_Rect.ButtonText("EffectTags", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(branch.EffectTags.GetDetailString()));

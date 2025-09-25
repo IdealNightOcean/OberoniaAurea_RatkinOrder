@@ -10,7 +10,6 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-
 [StaticConstructorOnStartup]
 public static class ModUtility
 {

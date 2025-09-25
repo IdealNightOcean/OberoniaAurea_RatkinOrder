@@ -9,9 +9,9 @@ namespace OberoniaAurea.RatkinOrder;
 public static class PawnUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetSkillLevel(this Pawn pawn, SkillDef skill)
+    public static bool IsRatkin(this Pawn pawn)
     {
-        return pawn.skills?.GetSkill(skill).GetLevel() ?? 0;
+        return pawn.def == OARO_ThingDefOf.Ratkin || pawn.def == OARO_ThingDefOf.Ratkin_Su;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -22,6 +22,12 @@ public static class PawnUtility
             return false;
         }
         return GameComponent_RatkinOrder.Instance.KnightPawns.Contains(pawn);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static int GetSkillLevel(this Pawn pawn, SkillDef skill)
+    {
+        return pawn.skills?.GetSkill(skill).GetLevel() ?? 0;
     }
 
     public static Pawn GenerateOrderKnight(PawnKindDef pawnKind, RatkinOrder ratkinOrder, bool forceNew)

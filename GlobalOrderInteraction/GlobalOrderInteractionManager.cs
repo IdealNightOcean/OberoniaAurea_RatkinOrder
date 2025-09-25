@@ -17,7 +17,7 @@ public class GlobalOrderInteractionManager : IExposable, IOnRatkinOrderRemoved, 
     public static AroundKnightGroupsManager AroundKnightGroupsManager => Instance.aroundKnightGroupsManager;
     public static MercyQuestHandler MercyQuestHandler => Instance.mercyQuestHandler;
 
-    public static void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_OrderInteractHandler());
+    public static void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_GlobalOrderInteractHandler());
 
 
     [Unsaved] private OrderCodePedestal mainOrderCodePedestal;

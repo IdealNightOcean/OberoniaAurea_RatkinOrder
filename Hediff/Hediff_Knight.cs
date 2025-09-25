@@ -14,7 +14,7 @@ public class Hediff_Knight : HediffWithComps, ISingleRatkinOrderRelated
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (ratkinOrder is null)
+            if (ratkinOrder is null || !pawn.RaceProps.Humanlike)
             {
                 pawn.health.RemoveHediff(this);
             }
@@ -29,7 +29,7 @@ public class Hediff_Knight : HediffWithComps, ISingleRatkinOrderRelated
     {
         this.ratkinOrder = ratkinOrder;
         Log.Message($"Hediff_Knight InitRatkinOrder {pawn.Name}");
-        if (ratkinOrder is null)
+        if (ratkinOrder is null || !pawn.RaceProps.Humanlike)
         {
             pawn.health.RemoveHediff(this);
         }
@@ -45,11 +45,6 @@ public class Hediff_Knight : HediffWithComps, ISingleRatkinOrderRelated
         {
             pawn.health.RemoveHediff(this);
         }
-    }
-
-    public override void Notify_PawnKilled()
-    {
-        base.Notify_PawnKilled();
     }
 
     override public void PostRemoved()

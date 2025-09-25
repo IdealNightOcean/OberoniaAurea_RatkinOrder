@@ -223,6 +223,22 @@ public static class DebugRatkinOrders
         });
     }
 
+    /// <summary>
+    /// 触发善行任务（实际前置任务）
+    /// </summary>
+    private static void TriggerMercyQuest()
+    {
+        List<DebugMenuOption> questOptions = [];
+        foreach (QuestScriptDef scriptDef in MercyQuestDataBase.AllDefsListForReading)
+        {
+            DebugMenuOption orderOption = new(label: scriptDef.defName,
+                                              mode: DebugMenuOptionMode.Action,
+                                              method: () => GlobalOrderInteractionUtility.TryTriggerMercyQuest(scriptDef));
+
+            questOptions.Add(orderOption);
+        }
+    }
+
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)
     {
         List<DebugMenuOption> orderOptions = [];

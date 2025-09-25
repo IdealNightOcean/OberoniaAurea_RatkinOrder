@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-internal class DevWindow_OrderInteractHandler : DevWindowBase
+internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
 {
     public override void DoWindowContents(Rect inRect)
     {
@@ -28,6 +28,10 @@ internal class DevWindow_OrderInteractHandler : DevWindowBase
             listing_Rect.Label($"Thing: {GlobalOrderInteractionManager.MainOrderCodePedestal}");
             listing_Rect.Label($"Map: {GlobalOrderInteractionManager.MainOrderCodePedestal.MapHeld}");
             listing_Rect.Label($"OrderHallLevel: {GlobalOrderInteractionManager.OrderHallLevel}");
+            if (listing_Rect.ButtonText("Jump to", widthPct: 0.4f))
+            {
+                CameraJumper.TryJumpAndSelect(GlobalOrderInteractionManager.MainOrderCodePedestal);
+            }
         }
 
         listing_Rect.Gap(6f);

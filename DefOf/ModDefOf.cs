@@ -12,6 +12,9 @@ public static class OARO_ModDefOf
     public static FactionDef Rakinia;
     public static FactionDef OARO_Rakinia_Sub;
 
+    [MayRequire("OARK.RatkinFaction.GeneExpand")]
+    public static FactionDef Rakinia_TravelRatkin; //旅鼠派系
+
     public static HistoryEventDef OARO_OrderMediateFactionRelation;
 
     public static RulePackDef OARO_NamerOrderSquad;

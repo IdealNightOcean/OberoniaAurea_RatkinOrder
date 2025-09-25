@@ -277,4 +277,37 @@ public static class GlobalOrderInteractionUtility
         }
     }
 
+    /// <summary>
+    /// 触发善行任务（实际前置任务）
+    /// </summary>
+    /// <param name="scriptDef">善行任务本体</param>
+    /// <returns>是否成功触发</returns>
+    public static bool TryTriggerMercyQuest(QuestScriptDef scriptDef)
+    {
+        Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+        if (map is null)
+        {
+            return false;
+        }
+
+        Slate slate = new();
+        slate.Set("map", map);
+        slate.Set(KeyLibrary_SlateStoreAs.MercyQuest, scriptDef);
+
+        MercyQuestExtension mercyQuestExtension = scriptDef.GetModExtension<MercyQuestExtension>();
+        if (mercyQuestExtension is null)
+        {
+            slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFactionDef, OARO_ModDefOf.OARO_Rakinia_Sub);
+            slate.Set(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind, OARO_PawnKindDefOf.RatkinColonist);
+        }
+        else if (!mercyQuestExtension.TrySetQuestSlateValue(slate))
+        {
+            return false;
+        }
+
+        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(quest: out _,
+                                                                     scriptDef: mercyQuestExtension?.preQuestDef ?? OARO_QuestScriptDefOf.OARO_MercyPre_HelpSeeker,
+                                                                     slate: slate,
+                                                                     forced: true);
+    }
 }

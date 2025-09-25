@@ -17,7 +17,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
         string rootInSignal = slate.Get<string>("inSignal");
-
+        Map map = slate.Get<Map>("map") ?? QuestGen_Get.GetMap();
+        if (map is null)
+        {
+            quest.End(QuestEndOutcome.Unknown, inSignal: null);
+            return;
+        }
+        slate.Set("map", map);
         slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuest, out QuestScriptDef mercyQuest);
 
         slate.TryGet(KeyLibrary_SlateStoreAs.SubRatkinFactionDef, out FactionDef subFactionDef);
@@ -26,22 +32,16 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         subFactionDef ??= OARO_ModDefOf.OARO_Rakinia_Sub;
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
-        Map map = QuestGen_Get.GetMap();
-        if (map is null)
-        {
-            quest.End(QuestEndOutcome.Unknown, 0, null, null, sendStandardLetter: false);
-            return;
-        }
-
         if (subFaction is null)
         {
-            quest.End(QuestEndOutcome.Unknown, 0, null, null, sendStandardLetter: false);
+            quest.End(QuestEndOutcome.Unknown, inSignal: null);
             return;
         }
-        slate.Set("map", map);
+
         slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, subFaction);
 
-        Pawn helpSeeker = quest.GeneratePawn(OARO_PawnKindDefOf.RatkinColonist, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
+        PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind) ?? OARO_PawnKindDefOf.RatkinColonist;
+        Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
         slate.Set("helpSeeker", helpSeeker);
         quest.PawnsArrive([helpSeeker], inSignal: rootInSignal, map.Parent, arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn);
 
@@ -62,12 +62,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         QuestPart_LordJob_HelpSeeker questPart_LordJob_HelpSeeker = new()
         {
             inSignal = rootInSignal,
-            InSignalAccept = inSignalAccept,
-            IninSignalReject = inSignalReject,
 
-            SubFaction = subFaction,
-            ParentFaction = parentFaction,
-            ParentFactionDef = parentFactionDef,
 
             TalkWith = helpSeeker,
             mapOfPawn = helpSeeker,
@@ -77,6 +72,8 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             DurationTicks = helpSeekerLeaveDelay
         };
         quest.AddPart(questPart_LordJob_HelpSeeker);
+
+        TriggerMercyQuestPart(inSignalAccept, inSignalReject, subFaction, parentFaction, helpSeeker);
 
         string outSignalResolved = QuestGenUtility.HardcodedSignalWithQuestID("MercyQuest_Resolved");
         quest.SignalPassAny(inSignals: [inSignalAccept, inSignalReject], outSignal: outSignalResolved);
@@ -115,5 +112,20 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         quest.AddPart(questPart_AllOrdersEsteemChange_PawnNegative);
 
         quest.End(QuestEndOutcome.Fail, inSignal: inSignalPawnNegative);
+    }
+
+    protected virtual void TriggerMercyQuestPart(string acceptSignal, string rejectSignal, Faction subFaction, Faction parentFaction, Pawn helpSeeker)
+    {
+        QuestPart_TriggerMercyQuest questPart_TriggerMercyQuest = new()
+        {
+            InSignalAccept = acceptSignal,
+            InSignalReject = rejectSignal,
+
+            SubFaction = subFaction,
+            ParentFaction = parentFaction,
+
+            HelpSeeker = helpSeeker
+        };
+        QuestGen.quest.AddPart(questPart_TriggerMercyQuest);
     }
 }
