@@ -6,7 +6,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class PawnUtility
+public static class OARO_PawnUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsRatkin(this Pawn pawn)
@@ -30,14 +30,14 @@ public static class PawnUtility
         return pawn.skills?.GetSkill(skill).GetLevel() ?? 0;
     }
 
-    public static Pawn GenerateOrderKnight(PawnKindDef pawnKind, RatkinOrder ratkinOrder, bool forceNew)
+    public static Pawn GenerateOrderKnight(PawnKindDef pawnKind, RatkinOrder ratkinOrder, bool forceNew = false)
     {
         Pawn pawn = PawnGenerator.GeneratePawn(DefaultKnightGenerationRequest(pawnKind, ratkinOrder.Faction, forceNew: forceNew));
         pawn.SetRatkinOrder(ratkinOrder);
         return pawn;
     }
 
-    public static PawnGenerationRequest DefaultKnightGenerationRequest(PawnKindDef pawnKind, Faction faction, bool forceNew)
+    public static PawnGenerationRequest DefaultKnightGenerationRequest(PawnKindDef pawnKind, Faction faction, bool forceNew = false)
     {
         PawnGenerationRequest generationRequest = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, forceNew: forceNew);
         generationRequest.ForcedTraits = [OARO_ModDefOf.OARO_OrderKnight];

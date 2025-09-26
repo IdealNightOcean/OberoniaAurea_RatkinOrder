@@ -37,7 +37,7 @@ public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
     private void AcctptAction()
     {
         Find.LetterStack.RemoveLetter(this);
-        Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
         if (map is not null && RelationshipUtility.TryTriggerRelationshipQuest(relatedOrder, map))
         {
             ModUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_Triggered".Translate(relatedOrder.Name), relatedOrder);

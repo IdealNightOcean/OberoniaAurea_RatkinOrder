@@ -237,7 +237,7 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                 case 1:
                     {
                         int maxMedicineLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
-                        int totalMedicineLevel = PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
+                        int totalMedicineLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
                         float controlAdd = maxMedicineLevel + totalMedicineLevel * 0.2f;
                         if (EffectTags?.HasTag(KeyLibrary_QuestEffectTag.StrangePlague) ?? false)
                         {
@@ -249,7 +249,7 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                     }
                 case 2:
                     {
-                        int totalSocialLevel = PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
+                        int totalSocialLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
                         float spreadReduce = totalSocialLevel * 0.00025f;
                         PlagueSpread -= spreadReduce;
                         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_IsolationResult".Translate(spreadReduce.ToStringPercent("F2"))));
@@ -428,7 +428,7 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
                 {
                     if (Rand.Chance(TotalPotency * 0.6f))
                     {
-                        Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
+                        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
                         if (map is not null)
                         {
                             Thing thing = ThingMaker.MakeThing(OARO_ThingDefOf.OARO_PlagueSample);

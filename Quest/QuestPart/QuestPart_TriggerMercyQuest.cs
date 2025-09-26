@@ -64,25 +64,24 @@ public class QuestPart_TriggerMercyQuest : QuestPart
         }
     }
 
-    protected Slate GenerateQuestSlate()
+    protected bool TryTriggerQuest()
+    {
+        Slate slate = GenerateQuestSlate();
+        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, MmercyQuestDef, slate, forced: true);
+    }
+
+    protected virtual Slate GenerateQuestSlate()
     {
         Slate slate = new();
 
-        if (SubFaction is not null)
-        {
-            slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, SubFaction);
-        }
+        slate.Set(KeyLibrary_SlateStoreAs.HelpSeeker, HelpSeeker);
+        slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, SubFaction);
+
         if (ParentFaction is not null)
         {
             slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFaction, ParentFaction);
         }
 
         return slate;
-    }
-
-    private bool TryTriggerQuest()
-    {
-        Slate slate = GenerateQuestSlate();
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, MmercyQuestDef, slate, forced: true);
     }
 }

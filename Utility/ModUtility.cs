@@ -1,8 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.QuestGen;
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -44,7 +42,7 @@ public static class ModUtility
         }
         Faction faction = FactionGenerator.NewGeneratedFaction(parms);
         faction.temporary = true;
-        if (ModsConfig.IdeologyActive && parentFaction?.ideos?.PrimaryIdeo is not null)
+        if (ModsConfig.IdeologyActive && parentFaction is not null && parentFaction.ideos?.PrimaryIdeo is not null)
         {
             faction.ideos?.SetPrimary(parentFaction.ideos.PrimaryIdeo);
         }
@@ -53,26 +51,6 @@ public static class ModUtility
             Find.FactionManager.Add(faction);
         }
         return faction;
-    }
-
-    public static void OnRatkinOrderRemoved(this QuestManager questManager, RatkinOrder order)
-    {
-        ConcurrentBag<IOnRatkinOrderRemoved> ratkinOrderRelateds = [];
-        questManager.ActiveQuestsListForReading
-            .AsParallel()
-            .ForAll(quest =>
-            {
-                IEnumerable<IOnRatkinOrderRemoved> relatedParts = quest.PartsListForReading.OfType<IOnRatkinOrderRemoved>();
-                foreach (IOnRatkinOrderRemoved relatedPartInner in relatedParts)
-                {
-                    ratkinOrderRelateds.Add(relatedPartInner);
-                }
-            });
-
-        foreach (IOnRatkinOrderRemoved relatedPart in ratkinOrderRelateds)
-        {
-            relatedPart.Notify_RatkinOrderRemoved(order);
-        }
     }
 
     public static bool TryMakePawnArrival(List<Pawn> pawns, IncidentParms arrivalParms, PawnsArrivalModeDef arrivalMode, bool sendStandardLetter = true)
@@ -124,24 +102,5 @@ public static class ModUtility
     public static Dialog_NodeTreeWithRatkinOrderInfo ConfirmDiaNodeTreeWithRatkinOrderInfo(TaggedString text, RatkinOrder ratkinOrder, string acceptText = null, Action acceptAction = null, string rejectText = null, Action rejectAction = null)
     {
         return new Dialog_NodeTreeWithRatkinOrderInfo(OAFrame_DiaUtility.ConfirmDiaNode(text, acceptText, acceptAction, rejectText, rejectAction), ratkinOrder);
-    }
-
-    public static void SetBasicOrderSlateVar(this Slate slate, RatkinOrder ratkinOrder)
-    {
-        slate.Set(KeyLibrary_SlateStoreAs.RatkinOrder, ratkinOrder);
-        slate.Set(KeyLibrary_SlateStoreAs.OrderName, ratkinOrder.Name);
-        slate.Set(KeyLibrary_SlateStoreAs.OrderFaction, ratkinOrder.Faction);
-
-        slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFaction, ratkinOrder.Faction);
-        slate.Set(KeyLibrary_SlateStoreAs.ParentRatkinFactionDef, ratkinOrder.Faction.def);
-    }
-
-    public static void SetBasicOrderSlateVar(this Slate slate, Branch branch)
-    {
-        slate.SetBasicOrderSlateVar(branch.RatkinOrder);
-
-        slate.Set(KeyLibrary_SlateStoreAs.Branch, branch);
-        slate.Set(KeyLibrary_SlateStoreAs.BranchName, branch.Name);
-        slate.Set(KeyLibrary_SlateStoreAs.BranchSite, branch.WorldObject);
     }
 }

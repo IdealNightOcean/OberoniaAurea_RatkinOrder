@@ -132,7 +132,7 @@ public static class DebugRatkinOrders
 
         void SelectInteraction(RatkinOrder order)
         {
-            Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+            Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
             List<DebugMenuOption> interactionOptions = [];
             foreach (OrderInteractionDef interactionDef in DefDatabase<OrderInteractionDef>.AllDefs)
             {
@@ -154,10 +154,10 @@ public static class DebugRatkinOrders
     /// 添加分部需求
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-             name: "Add new branch demand",
-             displayPriority: 440,
-             actionType = DebugActionType.Action,
-             allowedGameStates = AllowedGameStates.Playing)]
+                 name: "Add new branch demand",
+                 displayPriority: 440,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.Playing)]
     private static void GenerateBranchDemand()
     {
         OrderBranchOptions(SelectDemandType);
@@ -210,22 +210,27 @@ public static class DebugRatkinOrders
     /// 添加常驻骑士
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-             name: "Add a new resident knight",
-             displayPriority: 430,
-             actionType = DebugActionType.Action,
-             allowedGameStates = AllowedGameStates.PlayingOnMap)]
+                 name: "Add a new resident knight",
+                 displayPriority: 430,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
     private static void ApplyNewResidentKnight()
     {
         RatkinOrderOptions(delegate (RatkinOrder ratkinOrder)
         {
             GlobalOrderInteractionUtility.ApplyResidentKnight(ratkinOrder: ratkinOrder,
-                                                              map: MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
+                                                              map: OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
         });
     }
 
     /// <summary>
     /// 触发善行任务（实际前置任务）
     /// </summary>
+    [DebugAction(category: "OberoniaAurea",
+                 name: "Trigger MercyQuest",
+                 displayPriority: 430,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
     private static void TriggerMercyQuest()
     {
         List<DebugMenuOption> questOptions = [];
@@ -237,6 +242,7 @@ public static class DebugRatkinOrders
 
             questOptions.Add(orderOption);
         }
+        Find.WindowStack.Add(new Dialog_DebugOptionListLister(questOptions));
     }
 
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)

@@ -26,7 +26,7 @@ public class MercyQuestHandler : IExposable
         GlobalOrderInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, shouldRemoveWhenExpired: true);
 
         Map map;
-        if (Rand.Chance(1f - GetMercyQuestChance()) || (map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false)) is null)
+        if (Rand.Chance(1f - GetMercyQuestChance()) || (map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false)) is null)
         {
             mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.1f, 0.8f);
             return;

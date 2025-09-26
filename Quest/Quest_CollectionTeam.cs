@@ -5,6 +5,7 @@ using RimWorld.QuestGen;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using Verse;
 using Verse.AI.Group;
 
@@ -18,16 +19,19 @@ public sealed class QuestNode_CollectionTeam : QuestNode
     public SlateRef<Type> questPartClass = typeof(QuestPart_CollectionTeam);
 
     public SlateRef<Branch> branch;
+    public SlateRef<Faction> faction;
     public SlateRef<BranchDemandType?> demandType;
 
     public SlateRef<IEnumerable<ThingDefCountClass>> requestThingDefCounts;
 
     [NoTranslate]
-    public SlateRef<string> inSignal;
+    public SlateRef<string> inSignalEnable;
+    [NoTranslate]
+    public SlateRef<string> inSignalDisable = "CollectionTeam_Disable";
     [NoTranslate]
     public SlateRef<string> inSignalDisablePawnsArrival = "CollectionTeam_DisableArrival";
     [NoTranslate]
-    public SlateRef<string> inSignalPawnsLeave = "CollectionTeam_PawnsLeave";
+    public SlateRef<string> inSignalPawnsLeave = "CollectionTeam_MakePawnsLeave";
     [NoTranslate]
     public SlateRef<string> inSignalRemovePawn = "CollectionTeam_Negative";
     [NoTranslate]
@@ -40,12 +44,21 @@ public sealed class QuestNode_CollectionTeam : QuestNode
     [NoTranslate]
     public SlateRef<string> outSignalRejectGive = "CollectionTeam_RejectGive";
     [NoTranslate]
+    public SlateRef<string> outSignalDecided = "CollectionTeam_Decided";
+    [NoTranslate]
+    public SlateRef<string> outSignalGiveExpired = "CollectionTeam_GiveExpired";
+    [NoTranslate]
     public SlateRef<string> outSignalAllLeftMap = "CollectionTeam_AllLeft";
     [NoTranslate]
     public SlateRef<string> outSignalAllLeftMapAndGive = "CollectionTeam_AllLeftAndGive";
+    [NoTranslate]
+    public SlateRef<string> outSignalFailureToCollect = "CollectionTeam_FailureToCollect";
 
     [NoTranslate]
     public SlateRef<string> pawnsTag = "collectionTeam";
+
+    [MustTranslate]
+    public SlateRef<string> talkText;
 
     public SlateRef<int> durationTicks = 30000;
 
@@ -75,22 +88,27 @@ public sealed class QuestNode_CollectionTeam : QuestNode
 
         questPart_CollectionTeam.Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
         questPart_CollectionTeam.DemandType = demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        questPart_CollectionTeam.Faction = faction.GetValue(slate) ?? questPart_CollectionTeam.Branch?.RatkinOrder.Faction;
 
-        questPart_CollectionTeam.InSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>("inSignal");
+        questPart_CollectionTeam.inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? slate.Get<string>("inSignal");
+        questPart_CollectionTeam.inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisable.GetValue(slate)) ?? slate.Get<string>("inSignal");
         questPart_CollectionTeam.InSignalDisablePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisablePawnsArrival.GetValue(slate));
-        questPart_CollectionTeam.InSignalPawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID(inSignalPawnsLeave.GetValue(slate));
+        questPart_CollectionTeam.InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID(inSignalPawnsLeave.GetValue(slate));
         questPart_CollectionTeam.InSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID(inSignalRemovePawn.GetValue(slate));
         questPart_CollectionTeam.InSignalLeftMap = QuestGenUtility.HardcodedSignalWithQuestID(inSignalLeftMap.GetValue(slate));
 
         questPart_CollectionTeam.OutSignalPawnsArrived = QuestGenUtility.HardcodedSignalWithQuestID(outSignalPawnsArrived.GetValue(slate));
         questPart_CollectionTeam.OutSignalGive = QuestGenUtility.HardcodedSignalWithQuestID(outSignalGive.GetValue(slate));
         questPart_CollectionTeam.OutSignalRejectGive = QuestGenUtility.HardcodedSignalWithQuestID(outSignalRejectGive.GetValue(slate));
+        questPart_CollectionTeam.OutSignalDecided = QuestGenUtility.HardcodedSignalWithQuestID(outSignalDecided.GetValue(slate));
         questPart_CollectionTeam.OutSignalAllLeftMap = QuestGenUtility.HardcodedSignalWithQuestID(outSignalAllLeftMap.GetValue(slate));
         questPart_CollectionTeam.OutSignalAllLeftMapAndGive = QuestGenUtility.HardcodedSignalWithQuestID(outSignalAllLeftMapAndGive.GetValue(slate));
+        questPart_CollectionTeam.OutSignalFailureToCollect = QuestGenUtility.HardcodedSignalWithQuestID(outSignalFailureToCollect.GetValue(slate));
 
         questPart_CollectionTeam.PawnsTag = QuestGenUtility.HardcodedTargetQuestTagWithQuestID(pawnsTag.GetValue(slate));
 
         questPart_CollectionTeam.DurationTicks = durationTicks.GetValue(slate);
+        questPart_CollectionTeam.TalkText = talkText.GetValue(slate);
 
         questPart_CollectionTeam.MapParent = mapParent.GetValue(slate) ?? slate.Get<Map>("map")?.Parent;
         questPart_CollectionTeam.PawnGroupMakerDef = isolatedPawnGroupMakerDef.GetValue(slate);
@@ -104,24 +122,32 @@ public sealed class QuestNode_CollectionTeam : QuestNode
 /// <summary>
 /// 物资收集补给队 QuestPart（可继承）
 /// </summary>
-public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkAction
+public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestoryed, ITalkAction
 {
     protected List<ThingDefCountClass> requestThingDefCounts;
 
     public Branch Branch;
-    public BranchDemandType DemandType;
+    public Faction Faction;
+    public MapParent MapParent;
+    public IsolatedPawnGroupMakerDef PawnGroupMakerDef;
 
-    public string InSignal;
+    public BranchDemandType? DemandType;
+
+    public int DurationTicks = 30000;
+    public string TalkText;
+
     public string InSignalDisablePawnsArrival;
-    public string InSignalPawnsLeave;
+    public string InSignalMakePawnsLeave;
     public string InSignalRemovePawn;
     public string InSignalLeftMap;
 
     public string OutSignalPawnsArrived;
     public string OutSignalGive;
     public string OutSignalRejectGive;
+    public string OutSignalDecided;
     public string OutSignalAllLeftMap;
     public string OutSignalAllLeftMapAndGive;
+    public string OutSignalFailureToCollect;
 
     public string PawnsTag;
 
@@ -129,18 +155,119 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
     protected bool hasLeft;
     protected bool hasFulfilled;
 
-    public int DurationTicks = 30000;
+    protected bool CanMakeLeave => !hasLeft && pawns is not null;
 
-    public MapParent MapParent;
     public RatkinOrder RatkinOrder => Branch?.RatkinOrder;
-    public Faction Faction => RatkinOrder?.Faction;
-    public IsolatedPawnGroupMakerDef PawnGroupMakerDef;
+    public Faction RelatedFaction => Faction ??= RatkinOrder?.Faction;
 
     protected Pawn talkWith;
     protected List<Pawn> pawns;
     public Pawn TalkWith => talkWith;
 
     public QuestPart_CollectionTeam() { }
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_Collections.Look(ref requestThingDefCounts, "requestThingDefCounts", LookMode.Deep);
+
+        Scribe_References.Look(ref Branch, "Branch");
+        Scribe_References.Look(ref Faction, "Faction");
+        Scribe_References.Look(ref MapParent, "MapParent");
+        Scribe_Defs.Look(ref PawnGroupMakerDef, "PawnGroupMakerDef");
+        Scribe_Values.Look(ref DemandType, "DemandType");
+
+        Scribe_Values.Look(ref DurationTicks, "DurationTicks", 30000);
+        Scribe_Values.Look(ref TalkText, "TalkText");
+
+        Scribe_Values.Look(ref InSignalDisablePawnsArrival, "InSignalDisablePawnsArrival");
+        Scribe_Values.Look(ref InSignalMakePawnsLeave, "InSignalMakePawnsLeave");
+        Scribe_Values.Look(ref InSignalRemovePawn, "InSignalRemovePawn");
+        Scribe_Values.Look(ref InSignalLeftMap, "InSignalLeftMap");
+
+        Scribe_Values.Look(ref OutSignalPawnsArrived, "OutSignalPawnsArrived");
+        Scribe_Values.Look(ref OutSignalGive, "OutSignalGive");
+        Scribe_Values.Look(ref OutSignalRejectGive, "OutSignalRejectGive");
+        Scribe_Values.Look(ref OutSignalDecided, "OutSignalDecided");
+        Scribe_Values.Look(ref OutSignalAllLeftMap, "OutSignalAllLeftMap");
+        Scribe_Values.Look(ref OutSignalAllLeftMapAndGive, "OutSignalAllLeftMapAndGive");
+        Scribe_Values.Look(ref OutSignalFailureToCollect, "OutSignalFailureToCollect");
+
+        Scribe_Values.Look(ref PawnsTag, "PawnsTag");
+
+        Scribe_Values.Look(ref canTryArrival, "canTryArrival", defaultValue: true);
+        Scribe_Values.Look(ref hasLeft, "hasLeft", defaultValue: false);
+        Scribe_Values.Look(ref hasFulfilled, "hasFulfilled", defaultValue: false);
+
+
+        Scribe_References.Look(ref talkWith, "talkWith");
+        Scribe_Collections.Look(ref pawns, "pawns", LookMode.Reference);
+
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            requestThingDefCounts?.RemoveAll(item => item.thingDef is null || item.count <= 0);
+            if (quest?.State == QuestState.Ongoing)
+            {
+                this.RegisterTalkAction();
+            }
+        }
+    }
+
+    public override void Cleanup()
+    {
+        base.Cleanup();
+
+        MakeLeave();
+        this.DeregisterTalkAction();
+
+        talkWith = null;
+        pawns = null;
+        requestThingDefCounts = null;
+
+        Branch = null;
+        Faction = null;
+        MapParent = null;
+        PawnGroupMakerDef = null;
+        DemandType = default;
+
+        DurationTicks = 30000;
+        TalkText = null;
+
+        InSignalDisablePawnsArrival = null;
+        InSignalMakePawnsLeave = null;
+        InSignalRemovePawn = null;
+        InSignalLeftMap = null;
+
+        OutSignalGive = null;
+        OutSignalRejectGive = null;
+        OutSignalDecided = null;
+        OutSignalAllLeftMap = null;
+        OutSignalAllLeftMapAndGive = null;
+        OutSignalFailureToCollect = null;
+
+        PawnsTag = null;
+    }
+
+    public void InitWithDefaultSignal()
+    {
+        inSignalEnable = QuestGen.slate.Get<string>("inSignal");
+        inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Disable");
+        InSignalDisablePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_DisableArrival");
+        InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsLeave");
+        InSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Negative");
+        InSignalLeftMap = QuestGenUtility.HardcodedSignalWithQuestID("collectionTeam.LeftMap");
+
+        OutSignalPawnsArrived = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Arrived");
+        OutSignalGive = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Give");
+        OutSignalRejectGive = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_RejectGive");
+        OutSignalPawnsArrived = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Arrived");
+        OutSignalDecided = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Decided");
+        OutSignalAllLeftMap = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_AllLeft");
+        OutSignalAllLeftMapAndGive = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_AllLeftAndGive");
+        OutSignalFailureToCollect = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_FailureToCollect");
+
+        PawnsTag = QuestGenUtility.HardcodedTargetQuestTagWithQuestID("collectionTeam");
+    }
 
     public virtual void InitRequestThingDefCounts(IEnumerable<ThingDefCountClass> thingDefCounts)
     {
@@ -205,98 +332,16 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
         }
     }
 
-    public override void ExposeData()
-    {
-        base.ExposeData();
-        Scribe_Collections.Look(ref requestThingDefCounts, "requestThingDefCounts", LookMode.Deep);
-
-        Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Values.Look(ref DemandType, "DemandType");
-
-        Scribe_Values.Look(ref InSignal, "InSignal");
-        Scribe_Values.Look(ref InSignalDisablePawnsArrival, "InSignalDisablePawnsArrival");
-        Scribe_Values.Look(ref InSignalPawnsLeave, "InSignalPawnsLeave");
-        Scribe_Values.Look(ref InSignalRemovePawn, "InSignalRemovePawn");
-        Scribe_Values.Look(ref InSignalLeftMap, "InSignalLeftMap");
-
-        Scribe_Values.Look(ref OutSignalPawnsArrived, "OutSignalPawnsArrived");
-        Scribe_Values.Look(ref OutSignalGive, "OutSignalGive");
-        Scribe_Values.Look(ref OutSignalRejectGive, "OutSignalRejectGive");
-        Scribe_Values.Look(ref OutSignalAllLeftMap, "OutSignalAllLeftMap");
-        Scribe_Values.Look(ref OutSignalAllLeftMapAndGive, "OutSignalAllLeftMapAndGive");
-
-        Scribe_Values.Look(ref PawnsTag, "PawnsTag");
-
-        Scribe_Values.Look(ref canTryArrival, "canTryArrival", defaultValue: true);
-        Scribe_Values.Look(ref hasLeft, "hasLeft", defaultValue: false);
-        Scribe_Values.Look(ref hasFulfilled, "hasFulfilled", defaultValue: false);
-        Scribe_Values.Look(ref DurationTicks, "DurationTicks", 30000);
-
-        Scribe_References.Look(ref MapParent, "MapParent");
-
-        Scribe_Defs.Look(ref PawnGroupMakerDef, "PawnGroupMakerDef");
-
-        Scribe_References.Look(ref talkWith, "talkWith");
-        Scribe_Collections.Look(ref pawns, "pawns", LookMode.Reference);
-
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
-        {
-            requestThingDefCounts?.RemoveAll(item => item.thingDef is null || item.count <= 0);
-            if (quest?.State == QuestState.Ongoing)
-            {
-                this.RegisterTalkAction();
-            }
-        }
-    }
-
-    public override void Cleanup()
-    {
-        base.Cleanup();
-        requestThingDefCounts = null;
-
-        Branch = null;
-        DemandType = default;
-
-        InSignal = null;
-        InSignalDisablePawnsArrival = null;
-        InSignalPawnsLeave = null;
-        InSignalRemovePawn = null;
-        InSignalLeftMap = null;
-
-        OutSignalGive = null;
-        OutSignalRejectGive = null;
-        OutSignalAllLeftMap = null;
-        OutSignalAllLeftMapAndGive = null;
-
-        PawnsTag = null;
-
-        DurationTicks = 30000;
-
-        MapParent = null;
-        PawnGroupMakerDef = null;
-
-        MakeLeave();
-        this.DeregisterTalkAction();
-        talkWith = null;
-        pawns = null;
-    }
-
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         base.Notify_QuestSignalReceived(signal);
-        if (canTryArrival)
+
+        if (State != QuestPartState.Enabled && signal.tag == InSignalDisablePawnsArrival)
         {
-            if (signal.tag == InSignal)
-            {
-                canTryArrival = false;
-                CaravanArrival();
-            }
-            else if (signal.tag == InSignalDisablePawnsArrival)
-            {
-                canTryArrival = false;
-            }
+            canTryArrival = false;
         }
-        else if (pawns is not null)
+
+        if (pawns is not null)
         {
             if (signal.tag == InSignalRemovePawn)
             {
@@ -304,10 +349,6 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
                 {
                     pawns.Remove(p);
                 }
-            }
-            else if (!hasLeft && signal.tag == InSignalPawnsLeave)
-            {
-                MakeLeave();
             }
             else if (signal.tag == InSignalLeftMap)
             {
@@ -326,7 +367,50 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
         }
     }
 
-    protected virtual void CaravanArrival()
+    protected override void ProcessQuestSignal(Signal signal)
+    {
+        base.ProcessQuestSignal(signal);
+        if (CanMakeLeave && signal.tag == InSignalMakePawnsLeave)
+        {
+            Disable();
+        }
+    }
+
+    protected override void Enable(SignalArgs receivedArgs)
+    {
+        if (canTryArrival)
+        {
+            canTryArrival = false;
+            base.Enable(receivedArgs);
+            if (!TryGetTeamArrive())
+            {
+                Log.Error($"Failed to get team arrival in {nameof(QuestPart_CollectionTeam)}.");
+                Disable();
+                quest.End(QuestEndOutcome.Unknown, sendLetter: false, playSound: false);
+            }
+        }
+    }
+
+    protected override void Disable()
+    {
+        base.Disable();
+        canTryArrival = false;
+        if (CanMakeLeave)
+        {
+            MakeLeave();
+        }
+        hasLeft = true;
+    }
+
+    public override void QuestPartTick()
+    {
+        if (!hasLeft && Find.TickManager.TicksGame > enableTick + DurationTicks)
+        {
+            Disable();
+        }
+    }
+
+    protected virtual bool TryGetTeamArrive()
     {
         MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
         if (MapParent is null)
@@ -337,21 +421,19 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
         pawns = GenerateCaravanMembers();
         if (pawns.NullOrEmpty())
         {
-            quest.End(QuestEndOutcome.Unknown, sendLetter: false, playSound: false);
-            return;
+            return false;
         }
 
         IncidentParms arrivalParms = new()
         {
             target = map,
-            faction = Faction,
+            faction = RelatedFaction,
             quest = quest
         };
 
         if (!ModUtility.TryMakePawnArrival(pawns, arrivalParms, PawnsArrivalModeDefOf.EdgeWalkIn))
         {
-            quest.End(QuestEndOutcome.Unknown, sendLetter: false, playSound: false);
-            return;
+            return false;
         }
 
         Find.SignalManager.SendSignal(new Signal(OutSignalPawnsArrived));
@@ -359,11 +441,13 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
         talkWith = SetTalkPawn();
         IntVec3 wanderCell = this.GetTalkPawnWanderCenterCell(nearOrderHall: true);
 
-        LordJob_VisitColonyTalkable lordJob = new(Faction, wanderCell, DurationTicks);
+        LordJob_VisitColonyTalkable lordJob = new(RelatedFaction, wanderCell, DurationTicks);
         lordJob.SetTalkAction(talkWith, OARO_JobDefOf.OARO_Job_CommonTalkWith, initTalkActive: true);
-        LordMaker.MakeNewLord(Faction, lordJob, map, pawns);
+        LordMaker.MakeNewLord(RelatedFaction, lordJob, map, pawns);
 
         this.RegisterTalkAction();
+
+        return true;
     }
 
     protected virtual Pawn SetTalkPawn()
@@ -373,6 +457,12 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
 
     public virtual void TalkAction(Pawn talker, Pawn talkWith)
     {
+        if (State != QuestPartState.Enabled)
+        {
+            Messages.Message("OARO_CollectionTeam_Leaving".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+            return;
+        }
+
         Map map = talkWith?.Map ?? this.talkWith?.Map;
         if (map is null || requestThingDefCounts.NullOrEmpty())
         {
@@ -383,7 +473,7 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
 
     protected virtual List<Pawn> GenerateCaravanMembers()
     {
-        if (Faction is null)
+        if (RelatedFaction is null)
         {
             return null;
         }
@@ -395,14 +485,22 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
         }
 
         List<Pawn> pawns = [];
+        bool isKnight = Branch is not null;
         for (int i = 0; i < groupMaker.options.Count; i++)
         {
             PawnKindDef pawnKind = groupMaker.options[i].kind;
             int pawnCount = (int)groupMaker.options[i].selectionWeight;
             for (int j = 0; j < pawnCount; j++)
             {
-                PawnGenerationRequest request = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, Faction, forceNew: true);
-                Pawn pawn = PawnGenerator.GeneratePawn(request);
+                Pawn pawn;
+                if (isKnight)
+                {
+                    pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, RatkinOrder);
+                }
+                else
+                {
+                    pawn = PawnGenerator.GeneratePawn(OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, RelatedFaction));
+                }
                 QuestUtility.AddQuestTag(pawn, PawnsTag);
                 if (!pawn.IsWorldPawn())
                 {
@@ -427,12 +525,17 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
             return;
         }
 
+        if (!hasFulfilled)
+        {
+            Find.SignalManager.SendSignal(new Signal(OutSignalFailureToCollect));
+        }
         TalkActionUtility.DisableLordJobTalk(TalkWith);
         if (pawns is not null)
         {
             foreach (Pawn pawn in pawns)
             {
-                pawn.pather.StopDead();
+                // pawn.pather.StopDead();
+                pawn.GetLord()?.Notify_PawnLost(pawn, PawnLostCondition.ForcedByQuest);
             }
             LeaveQuestPartUtility.MakePawnsLeave(pawns, sendLetter: true, quest, wakeUp: true);
         }
@@ -441,17 +544,19 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)
     {
-        if (RatkinOrder == order)
+        if (Branch?.RatkinOrder is not null && RatkinOrder == order)
         {
             Branch = null;
+            canTryArrival = false;
         }
     }
 
     public void Notify_BranchDestoryed(Branch branch)
     {
-        if (Branch == branch)
+        if (Branch is not null && Branch == branch)
         {
             Branch = null;
+            canTryArrival = false;
         }
     }
 
@@ -477,7 +582,11 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
 
     protected virtual TaggedString GetTalkNodeText(Pawn talker, Pawn talkWith)
     {
-        throw new NotImplementedException();
+        if (TalkText.NullOrEmpty())
+        {
+            return "OARO_CollectionTeam_DefaultTalkText".Translate(talker.Named("TALKER"), talkWith.Named("TALKWITH")) + "\n\n" + RequestThingsSummary();
+        }
+        return TalkText.Formatted(talker.Named("TALKER"), talkWith.Named("TALKWITH")) + "\n\n" + RequestThingsSummary();
     }
 
     protected Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talker, Pawn talkWith, Map map)
@@ -503,7 +612,7 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
             action = delegate
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalRejectGive));
-                MakeLeave();
+                PostMakeDecision();
             },
             resolveTree = true,
         };
@@ -533,7 +642,26 @@ public class QuestPart_CollectionTeam : QuestPart, IOnBranchDestoryed, ITalkActi
         }
         requestThingDefCounts.Clear();
         Find.SignalManager.SendSignal(new Signal(OutSignalGive));
-        MakeLeave();
+        PostMakeDecision();
+    }
+
+    protected void PostMakeDecision()
+    {
+        Find.SignalManager.SendSignal(new Signal(OutSignalDecided));
+        Disable();
+    }
+
+    public override void DoDebugWindowContents(Rect innerRect, ref float curY)
+    {
+        if (State == QuestPartState.Enabled)
+        {
+            Rect rect = new(innerRect.x, curY, 500f, 25f);
+            if (Widgets.ButtonText(rect, "End " + ToString()))
+            {
+                Disable();
+            }
+            curY += rect.height + 4f;
+        }
     }
 
     protected string RequestThingsSummary()

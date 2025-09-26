@@ -13,12 +13,10 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
 {
     private string outSignalRepaired;
     private string outSignalPerfectRepaired;
-    private string outSignalNonRepaired;
     public override void InitRequestThingDefCounts(IEnumerable<ThingDefCountClass> thingDefCounts)
     {
         outSignalRepaired ??= QuestGenUtility.HardcodedSignalWithQuestID("Howitzer_Repaired");
         outSignalPerfectRepaired ??= QuestGenUtility.HardcodedSignalWithQuestID("Howitzer_PerfectRepaired");
-        outSignalNonRepaired ??= QuestGenUtility.HardcodedSignalWithQuestID("Howitzer_NonRepaired");
         requestThingDefCounts = [new ThingDefCountClass(OARO_ThingDefOf.OARO_Turret_OrderSuperHeavyHowitzer, 2)];
     }
 
@@ -27,7 +25,6 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         base.ExposeData();
         Scribe_Values.Look(ref outSignalRepaired, "outSignalRepaired");
         Scribe_Values.Look(ref outSignalPerfectRepaired, "outSignalPerfectRepaired");
-        Scribe_Values.Look(ref outSignalNonRepaired, "outSignalNonRepaired");
     }
 
     public override void Cleanup()
@@ -35,7 +32,6 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         base.Cleanup();
         outSignalRepaired = null;
         outSignalPerfectRepaired = null;
-        outSignalNonRepaired = null;
     }
 
     public override void TalkAction(Pawn talker, Pawn talkWith)
@@ -174,12 +170,11 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
                 Find.SignalManager.SendSignal(new Signal(outSignalPerfectRepaired));
             }
             Find.SignalManager.SendSignal(new Signal(outSignalRepaired));
-            Find.SignalManager.SendSignal(new Signal(OutSignalGive));
         }
         else
         {
             hasFulfilled = false;
-            Find.SignalManager.SendSignal(new Signal(outSignalNonRepaired));
+            Find.SignalManager.SendSignal(new Signal(OutSignalFailureToCollect));
         }
 
         foreach (Thing t in takeThings)
@@ -189,6 +184,6 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
 
         requestThingDefCounts.Clear();
         Find.SignalManager.SendSignal(new Signal(OutSignalGive));
-        MakeLeave();
+        PostMakeDecision();
     }
 }

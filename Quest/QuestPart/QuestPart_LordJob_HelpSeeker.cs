@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System.Collections.Generic;
 using Verse;
 using Verse.Grammar;
 
@@ -9,18 +10,33 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 {
+    public string OutSignalAccept;
+    public string OutSignalReject;
+
     public QuestScriptDef MmercyQuestDef;
+    public Faction SubFaction;
+    public Faction ParentFaction;
 
     public override void ExposeData()
     {
         base.ExposeData();
+        Scribe_Values.Look(ref OutSignalAccept, "OutSignalAccept");
+        Scribe_Values.Look(ref OutSignalReject, "OutSignalReject");
+
         Scribe_Defs.Look(ref MmercyQuestDef, "MmercyQuestDef");
+
+        Scribe_References.Look(ref SubFaction, "SubFaction");
+        Scribe_References.Look(ref ParentFaction, "ParentFaction");
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
+        OutSignalAccept = null;
+        OutSignalReject = null;
         MmercyQuestDef = null;
+        SubFaction = null;
+        ParentFaction = null;
     }
 
     public override void TalkAction(Pawn talker, Pawn talkWith)
@@ -35,7 +51,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "AcceptMercyQuest", talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST"));
+                Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -45,7 +61,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "RejectMercyQuest", talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST"));
+                Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -62,31 +78,52 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         return new Dialog_NodeTreeWithFactionInfo(rootNode, talkWith.Faction);
     }
 
-    private static TaggedString GetTalkText(QuestScriptDef mercyQuest)
+    private TaggedString GetTalkText(QuestScriptDef mercyQuest)
     {
         TaggedString talkText;
         MercyQuestExtension mercyQuestExtension = mercyQuest.GetModExtension<MercyQuestExtension>();
         if (mercyQuestExtension is null)
         {
-            talkText = "OARK_RatkinMercyQuest_HelpSeekDefault".Translate();
+            talkText = "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
         }
         else
         {
             if (mercyQuestExtension.fixedQuestDesc is not null)
             {
-                talkText = mercyQuestExtension.fixedQuestDesc;
+                talkText = mercyQuestExtension.fixedQuestDesc.Formatted(TextNamedArguments());
             }
             else if (mercyQuestExtension.questDescMaker is null)
             {
-                talkText = "OARK_RatkinMercyQuest_HelpSeekDefault".Translate();
+                talkText = "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
             }
             else
             {
                 GrammarRequest grammarRequest = new();
                 grammarRequest.Includes.Add(mercyQuestExtension.questDescMaker);
+                grammarRequest.Rules.AddRange(GrammarUtility.RulesForPawn("HELPSEEKER", TalkWith));
+                grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("SUBFACTION", SubFaction));
+                if (ParentFaction is not null)
+                {
+                    grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("PARENTFACTION", ParentFaction));
+                }
                 talkText = GrammarResolver.Resolve("r_text", grammarRequest);
             }
         }
         return talkText;
+    }
+
+    private NamedArgument[] TextNamedArguments()
+    {
+        List<NamedArgument> arguments =
+        [
+            new NamedArgument(TalkWith, "HELPSEEKER"),
+            new NamedArgument(SubFaction, "SUBFACTION")
+        ];
+
+        if (ParentFaction is not null)
+        {
+            arguments.Add(new NamedArgument(ParentFaction, "PARENTFACTION"));
+        }
+        return arguments.ToArray();
     }
 }

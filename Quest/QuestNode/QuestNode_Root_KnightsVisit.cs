@@ -71,7 +71,7 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_Negative");
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            negativeSiganls = QuestNode_PawnNegativeSiganl.GetCommonNegativeSiganls(addTag: true, tagToAdd: "lodgers"),
+            negativeSiganls = OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "lodgers"),
             outSignal = inSignalPawnNegative,
             outOnlyOnce = false
         };

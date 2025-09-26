@@ -1,7 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
-using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -22,11 +21,7 @@ public class MercyQuestExtension : DefModExtension
     {
         if (parentFactionDef is not null)
         {
-            FactionValidationParams validationParams = new()
-            {
-                AllyHostile = false
-            };
-            Faction parentFaction = Find.FactionManager.AllFactionsListForReading.Where(f => f.def == parentFactionDef && validationParams.ValidateFaction(f)).FirstOrFallback(null);
+            Faction parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(parentFactionDef, OAFrame_FactionUtility.NonHostileNormalFactionParams);
             if (parentFaction is null)
             {
                 return false;

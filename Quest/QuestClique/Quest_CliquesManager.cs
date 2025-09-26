@@ -269,7 +269,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique) && clique.IsBribable)
         {
-            Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
+            Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
             if (map is null || !map.HasEnoughThingsOfDef(ThingDefOf.Silver, clique.BriberyCost))
             {
 

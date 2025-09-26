@@ -42,11 +42,11 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind) ?? OARO_PawnKindDefOf.RatkinColonist;
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
-        slate.Set("helpSeeker", helpSeeker);
+        slate.Set(KeyLibrary_SlateStoreAs.HelpSeeker, helpSeeker);
         quest.PawnsArrive([helpSeeker], inSignal: rootInSignal, map.Parent, arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn);
 
-        string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("helpSeeker.AcceptMercyQuest");
-        string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("helpSeeker.RejectMercyQuest");
+        string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("AcceptMercyQuest");
+        string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest");
 
         float delayMulti = GlobalOrderInteractionManager.OrderHallLevel switch
         {
@@ -62,14 +62,18 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         QuestPart_LordJob_HelpSeeker questPart_LordJob_HelpSeeker = new()
         {
             inSignal = rootInSignal,
+            OutSignalAccept = inSignalAccept,
+            OutSignalReject = inSignalReject,
 
-
-            TalkWith = helpSeeker,
             mapOfPawn = helpSeeker,
             pawns = [helpSeeker],
 
+            TalkWith = helpSeeker,
+            DurationTicks = helpSeekerLeaveDelay,
+
             MmercyQuestDef = mercyQuest,
-            DurationTicks = helpSeekerLeaveDelay
+            SubFaction = subFaction,
+            ParentFaction = parentFaction
         };
         quest.AddPart(questPart_LordJob_HelpSeeker);
 
@@ -87,7 +91,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            negativeSiganls = QuestNode_PawnNegativeSiganl.GetCommonNegativeSiganls(addTag: true, tagToAdd: "helpSeeker"),
+            negativeSiganls = OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "helpSeeker"),
             outSignal = inSignalPawnNegative,
             outOnlyOnce = true
         };
@@ -120,6 +124,8 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         {
             InSignalAccept = acceptSignal,
             InSignalReject = rejectSignal,
+
+            MmercyQuestDef = QuestGen.slate.Get<QuestScriptDef>(KeyLibrary_SlateStoreAs.MercyQuest),
 
             SubFaction = subFaction,
             ParentFaction = parentFaction,

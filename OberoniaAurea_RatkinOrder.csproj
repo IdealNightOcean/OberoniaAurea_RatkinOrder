@@ -167,6 +167,7 @@
     <Compile Include="Thing\CompPlagueSample.cs" />
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
+    <Compile Include="Utility\QuestUtility.cs" />
     <Compile Include="Utility\RelationshipUtility.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_InteractRecord.cs" />
     <Compile Include="Utility\MercyQuestDataBase.cs" />
@@ -206,7 +207,6 @@
     <Compile Include="Quest\QuestNode\QuestNode_GetFactionName.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetWorldObjectName.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_CollectionTeam_SuperHeavyHowitzer.cs" />
-    <Compile Include="Quest\QuestPart\QuestPart_CollectionTeam_SupplyDepot.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_CollectionTeam_MaterialSupply.cs" />
     <Compile Include="Quest\Quest_SetBranchToFriendly.cs" />
     <Compile Include="Quest\Reward\Reward_FriendlyBranch.cs" />

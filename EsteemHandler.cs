@@ -84,7 +84,7 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
 
         if (Rand.Value < RatkinOrder.GetChanceOfAutoUpgradeRelationship(resultOnly: true, out _))
         {
-            Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+            Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
             if (map is not null)
             {
                 RatkinOrder.AutoUpgradeRelationship(map);

@@ -46,7 +46,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         for (int i = 0; i < questParameter.LodgerCount; i++)
         {
             DevelopmentalStage developmentalStages = i < adultCount ? DevelopmentalStage.Adult : DevelopmentalStage.Child;
-            PawnGenerationRequest generationRequest = PawnUtility.DefaultKnightGenerationRequest(fixedPawnKind, questParameter.faction, forceNew: true);
+            PawnGenerationRequest generationRequest = OARO_PawnUtility.DefaultKnightGenerationRequest(fixedPawnKind, questParameter.faction, forceNew: true);
             generationRequest.AllowedDevelopmentalStages = developmentalStages;
             Pawn pawn = quest.GeneratePawn(generationRequest);
 

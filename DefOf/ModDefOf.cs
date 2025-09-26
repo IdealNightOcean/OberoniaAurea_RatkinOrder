@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -16,6 +17,8 @@ public static class OARO_ModDefOf
     public static FactionDef Rakinia_TravelRatkin; //旅鼠派系
 
     public static HistoryEventDef OARO_OrderMediateFactionRelation;
+
+    public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader; //丢东西的旅行商人
 
     public static RulePackDef OARO_NamerOrderSquad;
 

@@ -6,7 +6,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class MapUtility
+public static class OARO_MapUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MapComponent_RatkinOrder GetOrderMapComp(this Map map)

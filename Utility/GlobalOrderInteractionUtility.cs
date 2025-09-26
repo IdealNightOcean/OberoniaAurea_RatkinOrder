@@ -284,7 +284,7 @@ public static class GlobalOrderInteractionUtility
     /// <returns>是否成功触发</returns>
     public static bool TryTriggerMercyQuest(QuestScriptDef scriptDef)
     {
-        Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
         if (map is null)
         {
             return false;

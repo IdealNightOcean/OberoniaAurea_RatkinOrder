@@ -47,7 +47,7 @@ public static class SquadCombatPawnUtility
         for (int i = 0; i < memberCount; i++)
         {
             PawnKindDef pawnKind = groupMaker.guards.RandomElementByWeight(g => g.selectionWeight).kind; //改为Default
-            PawnGenerationRequest request = PawnUtility.DefaultKnightGenerationRequest(pawnKind, faction, forceNew: false);
+            PawnGenerationRequest request = OARO_PawnUtility.DefaultKnightGenerationRequest(pawnKind, faction, forceNew: false);
             request.FixedIdeo = ideo;
             request.Tile = tile;
 

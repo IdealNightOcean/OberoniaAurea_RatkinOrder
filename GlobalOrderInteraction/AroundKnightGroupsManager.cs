@@ -58,7 +58,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
                 listing_Rect.Label(knightGroup.ToString());
                 if (listing_Rect.ButtonText("Trigger", widthPct: 0.4f))
                 {
-                    Map map = MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+                    Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
                     if (map is null || !TriggerVisitQuest(knightGroup, map))
                     {
                         GlobalOrderInteractionManager.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);

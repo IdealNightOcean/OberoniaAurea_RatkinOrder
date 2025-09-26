@@ -99,7 +99,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         string inSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID("Pawns_RemovePawn");
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            negativeSiganls = QuestNode_PawnNegativeSiganl.GetCommonNegativeSiganls(addTag: true, tagToAdd: "pawns"),
+            negativeSiganls = OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "pawns"),
             outOnlyOnce = false,
             outSignal = inSignalRemovePawn
         };
