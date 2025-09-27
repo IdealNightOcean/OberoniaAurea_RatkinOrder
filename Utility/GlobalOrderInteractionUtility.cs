@@ -297,7 +297,7 @@ public static class GlobalOrderInteractionUtility
         MercyQuestExtension mercyQuestExtension = scriptDef.GetModExtension<MercyQuestExtension>();
         if (mercyQuestExtension is null)
         {
-            slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFactionDef, OARO_ModDefOf.OARO_Rakinia_Sub);
+            slate.Set(KeyLibrary_SlateStoreAs.SubFactionDef, OARO_ModDefOf.OARO_Rakinia_Sub);
             slate.Set(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind, OARO_PawnKindDefOf.RatkinColonist);
         }
         else if (!mercyQuestExtension.TrySetQuestSlateValue(slate))

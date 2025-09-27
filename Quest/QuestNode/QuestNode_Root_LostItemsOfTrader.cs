@@ -21,25 +21,32 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
+        Quest quest = QuestGen.quest;
+
         Map map = slate.Get<Map>("map") ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
         if (map is null)
         {
-            Log.Message("yes");
-            QuestGen.quest.End(QuestEndOutcome.Unknown, inSignal: null);
+            quest.End(QuestEndOutcome.Unknown, inSignal: null);
             return;
         }
 
         slate.Set("map", map);
 
-        Faction parentRatkinFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentRatkinFaction);
-        if (parentRatkinFaction is null)
+        Faction parentFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentFaction);
+        if (parentFaction is null)
         {
             FactionValidationParams validationParams = new()
             {
                 AllyHostile = false
             };
-            parentRatkinFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, validationParams);
+            parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, validationParams);
         }
+
+        QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
+        {
+            ParentFaction = parentFaction
+        };
+        quest.AddPart(questPart_MercyQuestWatcher);
 
         IntVec3? spawnCell = null;
         if (slate.TryGet(KeyLibrary_SlateStoreAs.HelpSeeker, out Pawn helpSeeker))
@@ -49,15 +56,15 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         int silverCount = SilverCountRange.RandomInRange;
         Thing silverLost = ThingMaker.MakeThing(ThingDefOf.Silver);
         silverLost.stackCount = silverCount;
-        QuestGen.quest.SpawnThing(map, silverLost, cell: spawnCell, lookForSafeSpot: true, questLookTarget: false);
+        quest.SpawnThing(map, silverLost, cell: spawnCell, lookForSafeSpot: true, questLookTarget: false);
 
-        if (parentRatkinFaction is null)//|| Rand.Chance(0.5f)
+        if (parentFaction is null)//|| Rand.Chance(0.5f)
         {
             NoFurtherAction();
         }
         else
         {
-            FollowUpAction(map, parentRatkinFaction, silverCount);
+            FollowUpAction(map, parentFaction, silverCount);
         }
     }
 
@@ -74,7 +81,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             });
     }
 
-    private void FollowUpAction(Map map, Faction travelRatkin, int silverCount)
+    private void FollowUpAction(Map map, Faction parentFaction, int silverCount)
     {
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
@@ -93,7 +100,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 
         QuestPart_CollectionTeam questPart_CollectionTeam = new()
         {
-            Faction = travelRatkin,
+            Faction = parentFaction,
             MapParent = map.Parent,
             PawnGroupMakerDef = OARO_ModDefOf.OARO_LostItemsOfTrader,
 
@@ -121,7 +128,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             Reason = "OARO_LostItemsOfTrader_Success".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_Success);
-        quest.End(outcome: QuestEndOutcome.Fail, 50, travelRatkin, inSignal: inSignalTeamSuccess, sendStandardLetter: true, playSound: true);
+        quest.End(outcome: QuestEndOutcome.Fail, 50, parentFaction, inSignal: inSignalTeamSuccess, sendStandardLetter: true, playSound: true);
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Fail = new()
         {
@@ -131,7 +138,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             Reason = "OARO_LostItemsOfTrader_Fail".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_Fail);
-        quest.End(outcome: QuestEndOutcome.Fail, -50, travelRatkin, inSignal: questPart_CollectionTeam.OutSignalFailureToCollect, sendStandardLetter: true, playSound: true);
+        quest.End(outcome: QuestEndOutcome.Fail, -50, parentFaction, inSignal: questPart_CollectionTeam.OutSignalFailureToCollect, sendStandardLetter: true, playSound: true);
 
         quest.SignalPassActivable(
             action: delegate

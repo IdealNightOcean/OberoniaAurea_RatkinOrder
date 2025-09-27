@@ -223,7 +223,7 @@
     <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderBase.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetRatkinOrderFromSlate.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_MercyQuestPre.cs" />
-    <Compile Include="Quest\QuestNode\QuestNode_GetSubRatkinFaction.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_GetOrGenerateSubFaction.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_CriticalBranch.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_InvolvedBranches.cs" />
     <Compile Include="Quest\Quest_CollectionTeam.cs" />

@@ -26,9 +26,9 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         slate.Set("map", map);
         slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuest, out QuestScriptDef mercyQuest);
 
-        slate.TryGet(KeyLibrary_SlateStoreAs.SubRatkinFactionDef, out FactionDef subFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.ParentRatkinFactionDef, out FactionDef parentFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.ParentRatkinFaction, out Faction parentFaction);
+        slate.TryGet(KeyLibrary_SlateStoreAs.SubFactionDef, out FactionDef subFactionDef);
+        slate.TryGet(KeyLibrary_SlateStoreAs.ParentFactionDef, out FactionDef parentFactionDef);
+        slate.TryGet(KeyLibrary_SlateStoreAs.ParentFaction, out Faction parentFaction);
 
         subFactionDef ??= OARO_ModDefOf.OARO_Rakinia_Sub;
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
@@ -38,7 +38,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             return;
         }
 
-        slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, subFaction);
+        slate.Set(KeyLibrary_SlateStoreAs.SubFaction, subFaction);
 
         PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind) ?? OARO_PawnKindDefOf.RatkinColonist;
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);

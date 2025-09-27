@@ -13,13 +13,20 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 {
     protected override Faction GetOrGenerateFaction()
     {
+        QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
+        {
+            SubFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction),
+            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentFaction),
+        };
+        QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
+
         QuestGen.slate.Set(IsMainFactionSlate, true);
         return QuestGen.slate.Get<Faction>("faction");
     }
 
     protected override void InitQuestParameter()
     {
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubRatkinFaction);
+        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction);
         questParameter = new()
         {
             allowAssaultColony = false,

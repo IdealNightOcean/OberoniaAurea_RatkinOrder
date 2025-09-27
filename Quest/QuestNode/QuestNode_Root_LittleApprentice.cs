@@ -22,7 +22,16 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
 
     protected override Faction GetOrGenerateFaction()
     {
-        return ModUtility.GenerateSubRatkinFaction(OARO_ModDefOf.OARO_Rakinia_Sub, OARO_ModDefOf.Rakinia);
+        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction);
+        QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
+        {
+            SubFaction = subFaction,
+            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentFaction)
+        };
+        QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
+
+        QuestGen.slate.Set(IsMainFactionSlate, true);
+        return subFaction;
     }
 
     protected override void InitQuestParameter()

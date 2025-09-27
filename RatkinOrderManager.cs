@@ -5,7 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class RatkinOrderManager : IExposable, IPostLoadInit
+public class RatkinOrderManager : IExposable
 {
     public static RatkinOrderManager Instance { get; private set; }
 
@@ -89,7 +89,7 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
         Find.QuestManager.OnRatkinOrderRemoved(order);
     }
 
-    public void PostLoadInit()
+    private void PostLoadInit()
     {
         if (allRatkinOrders.RemoveAll(r => r is null) > 0)
         {
@@ -104,5 +104,9 @@ public class RatkinOrderManager : IExposable, IPostLoadInit
     public void ExposeData()
     {
         Scribe_Collections.Look(ref allRatkinOrders, "allRatkinOrders", LookMode.Deep);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            PostLoadInit();
+        }
     }
 }

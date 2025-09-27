@@ -16,10 +16,10 @@ public static class KeyLibrary_SlateStoreAs
 
     public const string Squad = "squad";
 
-    public const string SubRatkinFaction = "subFaction";
-    public const string SubRatkinFactionDef = "subFactionDef";
-    public const string ParentRatkinFaction = "parentFaction";
-    public const string ParentRatkinFactionDef = "parentFactionDef";
+    public const string SubFaction = "subFaction";
+    public const string SubFactionDef = "subFactionDef";
+    public const string ParentFaction = "parentFaction";
+    public const string ParentFactionDef = "parentFactionDef";
 
     public const string MercyQuest = "mercyQuest";
     public const string HelpSeeker = "helpSeeker";

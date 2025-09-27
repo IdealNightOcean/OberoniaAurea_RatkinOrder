@@ -4,10 +4,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestNode_GetSubRatkinFaction : QuestNode
+public class QuestNode_GetOrGenerateSubFaction : QuestNode
 {
     [NoTranslate]
-    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.SubRatkinFaction;
+    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.SubFaction;
 
     public SlateRef<Faction> parentFaction;
     public SlateRef<FactionDef> parentFactionDef;
@@ -26,14 +26,13 @@ public class QuestNode_GetSubRatkinFaction : QuestNode
         if (!slate.TryGet(storeAs.GetValue(slate), out Faction subFaction))
         {
             Faction parentFaction = this.parentFaction.GetValue(slate)
-                                    ?? slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentRatkinFaction);
+                                    ?? slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentFaction);
 
             FactionDef parentFactionDef = this.parentFactionDef.GetValue(slate)
-                                          ?? slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.ParentRatkinFactionDef)
-                                          ?? parentFaction?.def;
+                                          ?? slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.ParentFactionDef);
 
             FactionDef subFactionDef = this.subFactionDef.GetValue(slate)
-                                       ?? slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.SubRatkinFactionDef)
+                                       ?? slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.SubFactionDef)
                                        ?? OARO_ModDefOf.OARO_Rakinia_Sub;
 
             subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction);

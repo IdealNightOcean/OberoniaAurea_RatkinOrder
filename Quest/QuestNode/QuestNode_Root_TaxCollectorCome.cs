@@ -55,7 +55,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         quest.ReserveFaction(subFaction);
 
         slate.Set("faction", parentFaction);
-        slate.Set(KeyLibrary_SlateStoreAs.SubRatkinFaction, subFaction);
+        slate.Set(KeyLibrary_SlateStoreAs.SubFaction, subFaction);
         slate.Set("map", map);
 
         //人物生成;
