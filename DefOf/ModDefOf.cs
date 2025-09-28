@@ -20,7 +20,7 @@ public static class OARO_ModDefOf
 
     public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader; //丢东西的旅行商人
 
-    public static RulePackDef OARO_NamerOrderSquad;
+    public static RulePackDef OARO_Dialog_AroundKnightGroupVisitInvalid;
 
     public static RoomRoleDef OARO_RatkinOrderHall;
 

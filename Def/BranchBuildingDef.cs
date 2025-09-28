@@ -18,6 +18,7 @@ public class BranchBuildingDef : Def
     public int silverCost; //白银花费
     public float constructionDays; //建造所需天数
     public bool isSpecial;
+    public bool isHonorSymbol; //荣誉象征建筑，用于这种建筑的分部为荣誉分部
 
     public List<string> effectFlags; //效果标志列表
     public List<BranchStatModifier> branchStatModifies; //属性修正列表

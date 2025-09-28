@@ -28,7 +28,7 @@ public class QuestNode_BranchDemandWatcher : QuestNode
     }
 }
 
-public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestoryed
+public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
 {
 
     public Branch Branch;
@@ -58,7 +58,7 @@ public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestoryed
         }
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (Branch == branch)
         {

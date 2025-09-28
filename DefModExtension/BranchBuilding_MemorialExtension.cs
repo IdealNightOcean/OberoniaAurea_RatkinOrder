@@ -1,30 +1,24 @@
 ﻿using System.Collections.Generic;
 using Verse;
-using static OberoniaAurea.RatkinOrder.SquadStat;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuilding_MemorialExtension : DefModExtension
 {
-    public SquadMedal medalType = SquadMedal.None;
+    public BranchMedalType medalType = BranchMedalType.None;
     public bool requireAllTypesOfMedals = false;
     public short medalCount = 1;
 
     public bool IsSatisfyRequirements(Branch branch)
     {
-        if (branch?.Squad is null)
-        {
-            return false;
-        }
-
         if (requireAllTypesOfMedals)
         {
-            IReadOnlyList<MedalRecord> medalRecords = branch.Squad.SquadStat.MedalRecords;
-            if (medalRecords.Count < SquadMedalArr.Length - 1) // -1是因为有None这个Type
+            IReadOnlyList<BranchMedalRecord> medalRecords = branch.MedalHandler.MedalRecords;
+            if (medalRecords.Count < BranchUtility.BranchMedalsArr.Length - 1) // -1是因为有None这个Type
             {
                 return false;
             }
-            foreach (MedalRecord record in medalRecords)
+            foreach (BranchMedalRecord record in medalRecords)
             {
                 if (record.count < medalCount)
                 {
@@ -35,35 +29,30 @@ public class BranchBuilding_MemorialExtension : DefModExtension
         }
         else
         {
-            return branch.Squad.SquadStat.GetMedalCount(medalType) > medalCount;
+            return branch.MedalHandler.GetMedalCount(medalType) > medalCount;
         }
     }
 
     public void CompleteRequirements(Branch branch)
     {
-        if (branch?.Squad is null)
-        {
-            return;
-        }
-
-        SquadStat squadStat = branch.Squad.SquadStat;
+        BranchMedalHandler medalHandler = branch.MedalHandler;
         if (requireAllTypesOfMedals)
         {
-            for (int i = 1; i < SquadMedalArr.Length; i++) // 从1开始，因为0是None
+            for (int i = 1; i < BranchUtility.BranchMedalsArr.Length; i++) // 从1开始，因为0是None
             {
-                short count = (short)(medalCount - squadStat.GetMedalCount(SquadMedalArr[i]));
+                short count = (short)(medalCount - medalHandler.GetMedalCount(BranchUtility.BranchMedalsArr[i]));
                 if (count > 0)
                 {
-                    squadStat.AddMedal(SquadMedalArr[i], count);
+                    medalHandler.AddMedal(BranchUtility.BranchMedalsArr[i], count);
                 }
             }
         }
         else
         {
-            short count = (short)(medalCount - squadStat.GetMedalCount(medalType));
+            short count = (short)(medalCount - medalHandler.GetMedalCount(medalType));
             if (count > 0)
             {
-                squadStat.AddMedal(medalType, count);
+                medalHandler.AddMedal(medalType, count);
             }
         }
     }

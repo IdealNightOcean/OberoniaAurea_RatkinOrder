@@ -1,43 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using UnityEngine;
+﻿using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class SquadStat : IExposable, IDrawDevWindow
 {
-    public enum SquadMedal : byte
-    {
-        None,
-        Tenacity,
-        Courage,
-        Intervene,
-        Justice
-    }
-    public static readonly SquadMedal[] SquadMedalArr = (SquadMedal[])Enum.GetValues(typeof(SquadMedal));
-    public struct MedalRecord : IExposable
-    {
-        public SquadMedal type;
-        public short count;
-        public int firstGotTick;
-
-        public MedalRecord()
-        {
-            type = SquadMedal.None;
-            count = 1;
-            firstGotTick = -1;
-        }
-
-        public void ExposeData()
-        {
-            Scribe_Values.Look(ref type, "type", defaultValue: SquadMedal.None);
-            Scribe_Values.Look(ref count, "count", (short)-1);
-            Scribe_Values.Look(ref firstGotTick, "firstGotTick", -1);
-        }
-    }
-
     private float memberCount; //分队成员数量
     private float commanderCount; //分队骑士长数量
     private float supply; //分队补给数量
@@ -46,10 +13,16 @@ public class SquadStat : IExposable, IDrawDevWindow
     public float CommanderCeiling = 1f;
     public float SupplyCeiling = 1f;
 
-    private List<MedalRecord> medalRecords = new(4);
-    public SquadMedal PrimaryMedal => medalRecords[0].type;
-    public int MedalTypeCount => medalRecords.Count;
-    public IReadOnlyList<MedalRecord> MedalRecords => medalRecords;
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref memberCount, "memberCount", 0f);
+        Scribe_Values.Look(ref commanderCount, "commanderCount", 0f);
+        Scribe_Values.Look(ref supply, "supply", 0f);
+
+        Scribe_Values.Look(ref MemberCeiling, "MemberCeiling", 0f);
+        Scribe_Values.Look(ref CommanderCeiling, "CommanderCeiling", 0f);
+        Scribe_Values.Look(ref SupplyCeiling, "SupplyCeiling", 0f);
+    }
 
     public float MemberCount
     {
@@ -73,7 +46,6 @@ public class SquadStat : IExposable, IDrawDevWindow
         get => supply;
         set => supply = Mathf.Clamp(value, 0f, SupplyCeiling);
     }
-
 
     public float MemberPercentage
     {
@@ -99,32 +71,7 @@ public class SquadStat : IExposable, IDrawDevWindow
         }
     }
 
-    public SquadStat(bool initConstruct)
-    {
-        if (initConstruct)
-        {
-            SquadMedal primaryMedal = SquadMedalArr[Rand.Range(1, SquadMedalArr.Length)];
-            medalRecords.Add(new MedalRecord()
-            {
-                type = primaryMedal,
-                firstGotTick = 0,
-                count = 1
-            });
-        }
-    }
-
-    public int TotalMedalCount
-    {
-        get
-        {
-            int count = 0;
-            for (int i = 0; i < medalRecords.Count; i++)
-            {
-                count += medalRecords[i].count;
-            }
-            return count;
-        }
-    }
+    public SquadStat() { }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
@@ -148,78 +95,13 @@ public class SquadStat : IExposable, IDrawDevWindow
         listing_Rect.Label($"MemberCeiling: {MemberCeiling:F2}");
         listing_Rect.Label($"CommanderCeiling: {CommanderCeiling:F2}");
         listing_Rect.Label($"SupplyCeiling: {SupplyCeiling:F2}");
-        listing_Rect.Gap(6f);
-        listing_Rect.Label($"PrimaryMedal: {PrimaryMedal}");
-        listing_Rect.Label("Medals:");
-        foreach (MedalRecord mr in medalRecords)
-        {
-            listing_Rect.SubLabel($"({mr.type}, {mr.count})", 0.8f);
-        }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void UpdateCeiling(Squad squad, bool updateStatCache)
     {
         Branch branch = squad.Branch;
         MemberCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberCeiling, immediateUpdate: updateStatCache);
         CommanderCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadCommanderCeiling, immediateUpdate: updateStatCache);
         SupplyCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadSupplyCeiling, immediateUpdate: updateStatCache);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasMedal(SquadMedal medal)
-    {
-        return GetMedalCount(medal) > 0;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public int GetMedalCount(SquadMedal medal)
-    {
-        for (int i = 0; i < medalRecords.Count; i++)
-        {
-            if (medalRecords[i].type == medal)
-            {
-                return medalRecords[i].count;
-            }
-        }
-        return 0;
-    }
-
-    public void AddMedal(SquadMedal medal, short count = 1)
-    {
-        if (medal == SquadMedal.None)
-        {
-            return;
-        }
-
-        for (int i = 0; i < medalRecords.Count; i++)
-        {
-            MedalRecord record = medalRecords[i];
-            if (record.type == medal)
-            {
-                record.count += count;
-                medalRecords[i] = record;
-                return;
-            }
-        }
-        medalRecords.Add(new MedalRecord()
-        {
-            type = medal,
-            count = count,
-            firstGotTick = Find.TickManager.TicksGame
-        });
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Values.Look(ref memberCount, "memberCount", 0f);
-        Scribe_Values.Look(ref commanderCount, "commanderCount", 0f);
-        Scribe_Values.Look(ref supply, "supply", 0f);
-
-        Scribe_Values.Look(ref MemberCeiling, "MemberCeiling", 0f);
-        Scribe_Values.Look(ref CommanderCeiling, "CommanderCeiling", 0f);
-        Scribe_Values.Look(ref SupplyCeiling, "SupplyCeiling", 0f);
-
-        Scribe_Collections.Look(ref medalRecords, "medalRecords", LookMode.Deep);
     }
 }

@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Verse;
+using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -90,6 +91,48 @@ public static class ModUtility
             PawnRelationUtility.Notify_PawnsSeenByPlayer_Letter(pawns, ref letterLabel, ref letterText, "LetterRelatedPawnsNeutralGroup".Translate(Faction.OfPlayer.def.pawnsPlural), informEvenIfSeenBefore: true);
         }
         return true;
+    }
+
+    public static IEnumerable<Rule> RulesForRatkinOrder(string prefix, RatkinOrder ratkinOrder)
+    {
+        if (!prefix.NullOrEmpty())
+        {
+            prefix += "_";
+        }
+        if (ratkinOrder is null)
+        {
+            yield return new Rule_String(prefix + "name", "OARO_RatkinOrderUnaffiliated".Translate());
+            yield break;
+        }
+        yield return new Rule_String(prefix + "name", ratkinOrder.NameColored);
+    }
+
+    public static IEnumerable<Rule> RulesForBranch(string prefix, Branch branch, bool alsoAddOrderRule)
+    {
+
+        if (!prefix.NullOrEmpty())
+        {
+            prefix += "_";
+        }
+        if (branch is null)
+        {
+            yield return new Rule_String(prefix + "name", "OARO_BranchUnaffiliated".Translate());
+            yield break;
+        }
+        RatkinOrder ratkinOrder = branch.RatkinOrder;
+        if (alsoAddOrderRule)
+        {
+            foreach (Rule orderObjRule in RulesForRatkinOrder(prefix + "Order", ratkinOrder))
+            {
+                yield return orderObjRule;
+            }
+        }
+        yield return new Rule_String(prefix + "name", branch.Name.Colorize(ratkinOrder.Color));
+        yield return new Rule_String(prefix + "nameFull", branch.NameFull.Colorize(ratkinOrder.Color));
+        foreach (Rule worldObjRule in GrammarUtility.RulesForWorldObject(prefix + "Site", branch.WorldObject))
+        {
+            yield return worldObjRule;
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

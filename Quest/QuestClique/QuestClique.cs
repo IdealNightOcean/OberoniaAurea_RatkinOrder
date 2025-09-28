@@ -88,7 +88,7 @@ public class QuestClique : IExposable
     public static float GetBranchPotency(Branch branch)
     {
         float branchPotency = (branch.Squad.SquadStat.MemberCount + branch.Squad.SquadStat.CommanderCount) * 10f
-                            * (1f + (branch.FacilityHandler.TotalFacilityLevel + branch.Squad.SquadStat.TotalMedalCount) * 0.04f);
+                            * (1f + (branch.FacilityHandler.TotalFacilityLevel + branch.MedalHandler.TotalMedalCount) * 0.04f);
 
         if (branch.IsBranchOfType(BranchType.Honor))
         {

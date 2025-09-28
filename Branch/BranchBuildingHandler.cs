@@ -44,6 +44,16 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: 1, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(Branch, immediateUpdate: true));
     }
 
+    public void ExposeData()
+    {
+        Scribe_Collections.Look(ref buildings, "buildings", LookMode.Deep);
+        Scribe_Deep.Look(ref specialBuilding, "specialBuilding");
+
+        Scribe_Defs.Look(ref underConstructionBuilding, "underConstructionBuilding");
+        Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
+        Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
+    }
+
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         listing_Rect.Label("SpecialBuilding:");
@@ -148,7 +158,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
     public int GetBuildingSilverCost(BranchBuildingDef buildingDef)
     {
-        float result = BranchStatDefOf.OARO_BuildingCost.Worker.GetValue(Branch, buildingDef.silverCost);
+        float result = Branch.GetStatValue(BranchStatDefOf.OARO_BuildingCost, baseValueOverride: buildingDef.silverCost);
         result *= Branch.StoresReserveHandler.GetBuildingCostReduce(buildingDef);
 
         return (int)result;
@@ -237,9 +247,8 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             IsNormalBuildingFullyCompleted = buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
         }
 
-        AddOrPostLoadBuilding(buildingDef);
-        newBuilding.PostAddBuilding(Branch);
-
+        newBuilding.InitActive(Branch);
+        ActiveBuilding(newBuilding);
     }
 
     public void RemoveBuilding(BranchBuildingDef buildingDef)
@@ -282,8 +291,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
     {
         if (specialBuilding is not null)
         {
-            AddOrPostLoadBuilding(specialBuilding.Def);
-            specialBuilding.PostLoadInit(Branch);
+            ActiveBuilding(specialBuilding);
         }
 
         if (buildings is null)
@@ -300,16 +308,19 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
         foreach (BranchBuilding building in buildings)
         {
-            AddOrPostLoadBuilding(building.Def);
-            building.PostLoadInit(Branch);
+            ActiveBuilding(building);
         }
         IsNormalBuildingFullyCompleted = buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
     }
 
-    private void AddOrPostLoadBuilding(BranchBuildingDef building)
+    private void ActiveBuilding(BranchBuilding building)
     {
-        Branch.EffectTags.IncrementTagsValue(building.effectFlags, addIfMiss: true);
-        Branch.TransformerHandler.AddStatModifiers(building.branchStatModifies);
+        Branch.EffectTags.IncrementTagsValue(building.Def.effectFlags, addIfMiss: true);
+        Branch.TransformerHandler.AddStatModifiers(building.Def.branchStatModifies);
+        if (building.Def.isHonorSymbol)
+        {
+            Branch.SetBranchType(BranchType.Honor, active: true);
+        }
 
         if (building is ITickHour<Branch> tickLong)
         {
@@ -325,6 +336,8 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         {
             Branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
         }
+
+        building.PostActive(Branch);
     }
 
     public void PostBranchGenerated()
@@ -335,15 +348,5 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             AddBuilding(specialBuildingDef, inSpecialSlot: true);
             specialBuildingDef.GetModExtension<BranchBuilding_MemorialExtension>()?.CompleteRequirements(Branch);
         }
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Collections.Look(ref buildings, "buildings", LookMode.Deep);
-        Scribe_Deep.Look(ref specialBuilding, "specialBuilding");
-
-        Scribe_Defs.Look(ref underConstructionBuilding, "underConstructionBuilding");
-        Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
-        Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
     }
 }

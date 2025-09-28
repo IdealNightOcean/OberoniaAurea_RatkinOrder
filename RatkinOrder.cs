@@ -83,9 +83,9 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
         Scribe_Values.Look(ref name, "name");
 
         Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
-        Scribe_Deep.Look(ref esteemHandler, "esteemHandler", ctorArgs: [this, false]);
-        Scribe_Deep.Look(ref fundHandler, "fundHandler", ctorArgs: [this, false]);
-        Scribe_Deep.Look(ref reformationManager, "reformationManager", ctorArgs: [this, false]);
+        Scribe_Deep.Look(ref esteemHandler, "esteemHandler", ctorArgs: this);
+        Scribe_Deep.Look(ref fundHandler, "fundHandler", ctorArgs: this);
+        Scribe_Deep.Look(ref reformationManager, "reformationManager", ctorArgs: this);
         Scribe_Deep.Look(ref branchManager, "branchManager", ctorArgs: this);
         Scribe_Deep.Look(ref squadManager, "squadManager", ctorArgs: [this, false]);
     }
@@ -113,10 +113,17 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
         }
     }
 
-    public void Notify_Removed()
+    public void OnRemoved()
     {
         branchManager.Notify_MyOrderRemoved();
         squadManager.Notify_MyOrderRemoved();
+    }
+
+    public void PostGenerated()
+    {
+        esteemHandler.PostOrderGenerated();
+        fundHandler.PostOrderGenerated();
+        reformationManager.PostOrderGenerated();
     }
 
     public void PostLoadInit()
@@ -132,9 +139,9 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
     private void EnsureComponentsInit()
     {
         cooldownManager ??= new();
-        esteemHandler ??= new EsteemHandler(this, initConstruct: true);
-        fundHandler ??= new FundHandler(this, initConstruct: true);
-        reformationManager ??= new ReformationManager(this, initConstruct: true);
+        esteemHandler ??= new EsteemHandler(this);
+        fundHandler ??= new FundHandler(this);
+        reformationManager ??= new ReformationManager(this);
         branchManager ??= new BranchManager(this);
         squadManager ??= new SquadManager(this, initConstruct: true);
     }

@@ -1,12 +1,13 @@
 ﻿using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
+public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IDrawDevWindow
 {
-    [Unsaved] public readonly RatkinOrder RatkinOrder;
+    [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
 
     /*
     认可度
@@ -38,14 +39,10 @@ public class EsteemHandler : IExposable, ITickDay, IDrawDevWindow
         set => totalRecommendation += Mathf.Max(0, value);
     }
 
-    public EsteemHandler(RatkinOrder ratkinOrder, bool initConstruct)
+    public void PostOrderGenerated()
     {
-        RatkinOrder = ratkinOrder;
-        if (initConstruct)
-        {
-            relationship = GameComponent_RatkinOrder.Instance?.InitOrderRelationship ?? OrderRelationshipKind.Stranger;
-            esteem = EsteemUtility.GetEsteemSoftCap(relationship);
-        }
+        relationship = GameComponent_RatkinOrder.Instance?.InitOrderRelationship ?? OrderRelationshipKind.Stranger;
+        esteem = EsteemUtility.GetEsteemSoftCap(relationship);
     }
 
     public void ExposeData()

@@ -38,7 +38,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         this.branch = branch;
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (this.branch == branch)
         {

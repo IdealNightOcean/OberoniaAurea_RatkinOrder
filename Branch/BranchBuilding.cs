@@ -6,11 +6,20 @@ public class BranchBuilding : IExposable
 {
     public BranchBuildingDef Def;
 
-    public virtual void PostAddBuilding(Branch branch) { } // 添加建筑时触发的事件
+    /// <summary>
+    /// 仅在添加建筑时触发
+    /// </summary>
+    public virtual void InitActive(Branch branch) { }
 
-    public virtual void PostRemoveBuilding(Branch branch) { } // 移除建筑时触发的事件
+    /// <summary>
+    ///  添加建筑和加载存档时触发
+    /// </summary>
+    public virtual void PostActive(Branch branch) { }
 
-    public virtual void PostLoadInit(Branch branch) { } // 加载建筑时触发的事件
+    /// <summary>
+    /// 移除建筑时触发
+    /// </summary>
+    public virtual void PostRemoveBuilding(Branch branch) { }
 
     public virtual void ExposeData()
     {

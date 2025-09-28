@@ -5,6 +5,7 @@ using System;
 using System.Text;
 using UnityEngine;
 using Verse;
+using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -177,7 +178,7 @@ public static class GlobalOrderInteractionUtility
         else
         {
             GlobalOrderInteractionManager.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
-            AroundKnightGroupVisitInvalid(knightGroup.Branch, isProactive: false);
+            AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
         }
     }
 
@@ -186,16 +187,18 @@ public static class GlobalOrderInteractionUtility
     /// 包括邀请失败和任务触发失败
     /// </summary>
     /// <param name="isProactive">是否为骑士小组主动</param>
-    public static void AroundKnightGroupVisitInvalid(Branch branch, bool isProactive)
+    public static void AroundKnightGroupVisitInvalidDialog(Branch branch, bool isProactive)
     {
-        if (isProactive)
+        GrammarRequest grammarRequest = new()
         {
+            Includes = { OARO_ModDefOf.OARO_Dialog_AroundKnightGroupVisitInvalid }
+        };
+        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ratkinOrder", branch.RatkinOrder));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch("branch", branch, alsoAddOrderRule: false));
+        grammarRequest.Constants.Add("isProactive", isProactive.ToString());
+        TaggedString talkText = GrammarResolver.Resolve("r_text", grammarRequest);
 
-        }
-        else
-        {
-
-        }
+        Find.WindowStack.Add(ModUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(talkText, branch.RatkinOrder));
     }
 
     /// <summary>

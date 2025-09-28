@@ -83,6 +83,7 @@ public static class RatkinOrderGenerator
             {
                 Name = GenerateRatkinOrderName(ratkinOrderDef)
             };
+            ratkinOrder.PostGenerated();
         }
         catch (Exception ex)
         {

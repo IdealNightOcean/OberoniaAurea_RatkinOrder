@@ -24,7 +24,7 @@ public class SquadTask_JurisdictionDutyPerp : SquadTask
 
     public override int SquadRestTick(Squad squad, bool interrupt)
     {
-        return (int)(base.SquadRestTick(squad, interrupt) * (squad.IsSquadOfType(BranchType.Mobile) ? 0.25f : 1f));
+        return (int)(base.SquadRestTick(squad, interrupt) * (squad.IsBranchSquadOfType(BranchType.Mobile) ? 0.25f : 1f));
     }
 
     public override void TaskStart(Squad squad)
@@ -32,7 +32,7 @@ public class SquadTask_JurisdictionDutyPerp : SquadTask
         Map map = Find.AnyPlayerHomeMap;
         if (squad.Branch.IsInAffectedRange(map.Tile))
         {
-            if (squad.IsSquadOfType(BranchType.Friendly))
+            if (squad.IsBranchSquadOfType(BranchType.Friendly))
             {
                 Messages.Message("OARO_Message_JurisdictionDutyStart".Translate(squad.Name), MessageTypeDefOf.NeutralEvent, historical: false);
             }

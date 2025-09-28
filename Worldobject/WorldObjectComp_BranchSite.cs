@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.Planet;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -13,7 +14,7 @@ public class WorldObjectCompProperties_BranchSite : WorldObjectCompProperties
     }
 }
 
-public class WorldObjectComp_BranchSite : WorldObjectComp
+public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
 {
     private Branch branch;
     public Branch Branch => branch;
@@ -22,15 +23,26 @@ public class WorldObjectComp_BranchSite : WorldObjectComp
 
     public bool IsActive => branch is not null;
 
-    public bool SetBranch(Branch newBranch)
+    public override void PostExposeData()
+    {
+        base.PostExposeData();
+        Scribe_References.Look(ref branch, "branch");
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            if (branch is null && Props.independent)
+            {
+                parent.Destroy();
+            }
+        }
+    }
+
+    public void InitOrderBranch(Branch newBranch)
     {
         if (branch is not null)
         {
-            Log.Error($"WorldObjectComp_BranchSite already has a branch assigned: {branch}. Cannot assign a new one.");
-            return false;
+            throw new InvalidOperationException($"{nameof(branch)} has already been set and cannot be assigned again.");
         }
         branch = newBranch;
-        return true;
     }
 
     public override void PostDestroy()
@@ -45,9 +57,21 @@ public class WorldObjectComp_BranchSite : WorldObjectComp
         preBranch.BranchManager.DestoryBranch(preBranch);
     }
 
-    public void Notify_BranchDestroyed()
+    public void Notify_BranchDestroyed(Branch branch)
     {
-        if (branch is not null)
+        if (this.branch == branch)
+        {
+            this.branch = null;
+            if (Props.independent)
+            {
+                parent.Destroy();
+            }
+        }
+    }
+
+    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
+    {
+        if (branch?.RatkinOrder == ratkinOrder)
         {
             branch = null;
             if (Props.independent)

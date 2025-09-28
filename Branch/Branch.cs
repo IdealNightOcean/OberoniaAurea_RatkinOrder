@@ -45,6 +45,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     public CooldownRecordManager CooldownManager => cooldownManager;
 
     private Squad squad;
+    private BranchMedalHandler medalHandler;
     private BranchFacilityHandler facilityHandler;
     private BranchBuildingHandler buildingHandler;
     private BranchDemandHandler demandHandler;
@@ -52,6 +53,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     private BranchStoresReserveHandler storesReserveHandler;
 
     public Squad Squad => squad;
+    public BranchMedalHandler MedalHandler => medalHandler;
     public BranchFacilityHandler FacilityHandler => facilityHandler;
     public BranchBuildingHandler BuildingHandler => buildingHandler;
     public BranchDemandHandler DemandHandler => demandHandler;
@@ -66,14 +68,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     private Branch(RatkinOrder order, WorldObject worldObject) : this(order.BranchManager)
     {
-        if (worldObject?.GetComponent<WorldObjectComp_BranchSite>()?.SetBranch(this) is true)
-        {
-            this.worldObject = worldObject;
-        }
-        else
-        {
-            throw new ArgumentException("WorldObjectComp_BranchSite already has a branch assigned.", nameof(worldObject));
-        }
+        worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(this);
 
         EnsureComponentsInit();
 
@@ -91,7 +86,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         try
         {
             branch = new(order, worldObject);
-            branch?.PostGenerated();
+            branch.PostGenerated();
         }
         catch (Exception ex)
         {
@@ -111,16 +106,15 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
 
         Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
-        Scribe_Deep.Look(ref squad, "squad", ctorArgs: [this, false]);
+        Scribe_Deep.Look(ref squad, "squad", ctorArgs: this);
         Scribe_Deep.Look(ref facilityHandler, "facilityHandler", ctorArgs: this);
         Scribe_Deep.Look(ref buildingHandler, "buildingHandler", ctorArgs: this);
         Scribe_Deep.Look(ref demandHandler, "demandHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref residentHandler, "residentHandler", ctorArgs: [this, false]);
+        Scribe_Deep.Look(ref residentHandler, "residentHandler", ctorArgs: this);
         Scribe_Deep.Look(ref storesReserveHandler, "storesReserveHandler", ctorArgs: this);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Branch(this));
-
 
     public void Tick()
     {
@@ -157,8 +151,6 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     private void TickDay()
     {
-
-
         buildingHandler.TickDay();
         residentHandler.TickDay();
         demandHandler.TickDay();
@@ -202,8 +194,6 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         }
     }
 
-    public void RecacheIsHonor() => SetBranchType(BranchType.Honor, EffectTags.HasActiveTag(KeyLibrary_EffectTag.HonorBranch));
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsInAffectedRange(PlanetTile tile)
     {
@@ -227,7 +217,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     public void Destroy()
     {
         residentHandler.ForceEndAllResidency();
-        worldObject?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed();
+        worldObject?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
     }
 
     /// <summary>
@@ -246,9 +236,11 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     {
         name = BranchUtility.GenerateBranchName(RatkinOrder);
 
+        squad.PostBranchGenerated();
+        medalHandler.PostBranchGenerated();
         facilityHandler.PostBranchGenerated();
         buildingHandler.PostBranchGenerated();
-        squad.PostBranchGenerated();
+        residentHandler.PostBranchGenerated();
     }
 
     public void PostLoadInit()
@@ -259,8 +251,6 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         buildingHandler.PostLoadInit();
         residentHandler.PostLoadInit();
         squad.PostLoadInit();
-
-        RecacheIsHonor();
     }
 
     private void EnsureComponentsInit()
@@ -269,10 +259,11 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
         squad ??= Squad.GenerateSquadForBranch(this) ?? throw new NullReferenceException(nameof(squad));
 
+        medalHandler ??= new();
         facilityHandler ??= new(this);
         buildingHandler ??= new(this);
         demandHandler ??= new(this);
-        residentHandler ??= new(this, initConstruct: true);
+        residentHandler ??= new(this);
         storesReserveHandler ??= new(this);
     }
 

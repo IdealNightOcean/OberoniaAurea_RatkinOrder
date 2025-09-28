@@ -122,7 +122,7 @@ public sealed class QuestNode_CollectionTeam : QuestNode
 /// <summary>
 /// 物资收集补给队 QuestPart（可继承）
 /// </summary>
-public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestoryed, ITalkAction
+public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, ITalkAction
 {
     protected List<ThingDefCountClass> requestThingDefCounts;
 
@@ -551,7 +551,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestoryed, 
         }
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (Branch is not null && Branch == branch)
         {
@@ -593,7 +593,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestoryed, 
     {
         DiaNode rootNode = new(GetTalkNodeText(talker, talkWith));
 
-        DiaOption giveOpt = new("OARO_GiveRequestThings".Translate())
+        DiaOption giveOpt = new("OARO_CollectionTeam_GiveRequestThings".Translate())
         {
             action = delegate
             {
@@ -607,7 +607,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestoryed, 
             giveOpt.Disable(acceptanceReport.Reason);
         }
 
-        DiaOption rejectOpt = new("OARO_RejectGive".Translate())
+        DiaOption rejectOpt = new("OARO_CollectionTeam_RejectGive".Translate())
         {
             action = delegate
             {

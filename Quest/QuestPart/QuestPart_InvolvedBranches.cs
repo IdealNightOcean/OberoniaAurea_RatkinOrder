@@ -6,7 +6,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_InvolvedBranches : QuestPart, IOnBranchDestoryed
+public class QuestPart_InvolvedBranches : QuestPart, IOnBranchDestroyed
 {
     public List<Branch> Branches = [];
 
@@ -45,7 +45,7 @@ public class QuestPart_InvolvedBranches : QuestPart, IOnBranchDestoryed
         Branches?.RemoveAll(b => b.RatkinOrder == order);
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         Branches?.Remove(branch);
     }

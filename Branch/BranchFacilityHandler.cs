@@ -9,9 +9,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchFacilityHandler : IExposable, IPostLoadInit
+public class BranchFacilityHandler(Branch branch) : IExposable, IPostLoadInit
 {
-    [Unsaved] public readonly Branch Branch;
+    [Unsaved] public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
 
     private Dictionary<BranchFacilityDef, BranchFacilityLevel> facilities = [];
     [Unsaved] private int totalFacilityLevel;
@@ -24,9 +24,13 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
     private int buildingTicksLeft = -1;
     public bool IsBusy => buildingFacility is not null;
 
-    public BranchFacilityHandler(Branch branch)
+    public void ExposeData()
     {
-        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        Scribe_Collections.Look(ref facilities, "facilities", LookMode.Def, LookMode.Value);
+
+        Scribe_Values.Look(ref totalFacilityLevel, "totalFacilityLevel", 0);
+        Scribe_Defs.Look(ref buildingFacility, "buildingFacility");
+        Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -212,14 +216,5 @@ public class BranchFacilityHandler : IExposable, IPostLoadInit
             int initUpgrade = Rand.Chance(0.3f) ? 2 : 1;
             TryUpgradeFacility(allFacilities[i], initUpgrade, addIfMiss: true);
         }
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Collections.Look(ref facilities, "facilities", LookMode.Def, LookMode.Value);
-
-        Scribe_Values.Look(ref totalFacilityLevel, "totalFacilityLevel", 0);
-        Scribe_Defs.Look(ref buildingFacility, "buildingFacility");
-        Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
     }
 }

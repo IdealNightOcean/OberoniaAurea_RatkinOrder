@@ -28,16 +28,3 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
                                                                          });
     }
 }
-
-public class BranchBuilding_Memorial : BranchBuilding
-{
-    public override void PostAddBuilding(Branch branch)
-    {
-        branch.RecacheIsHonor();
-    }
-
-    public override void PostRemoveBuilding(Branch branch)
-    {
-        branch.RecacheIsHonor();
-    }
-}

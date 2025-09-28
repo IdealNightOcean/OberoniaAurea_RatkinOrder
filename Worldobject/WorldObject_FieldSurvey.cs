@@ -191,7 +191,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
         }
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (this.branch == branch)
         {

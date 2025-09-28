@@ -58,7 +58,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         silverLost.stackCount = silverCount;
         quest.SpawnThing(map, silverLost, cell: spawnCell, lookForSafeSpot: true, questLookTarget: false);
 
-        if (parentFaction is null)//|| Rand.Chance(0.5f)
+        if (parentFaction is null || Rand.Chance(0.5f))
         {
             NoFurtherAction();
         }

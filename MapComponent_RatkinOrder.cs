@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestoryed
+public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestroyed
 {
     [Unsaved] public List<Branch> BranchesInRadius;
     [Unsaved] private int nextCacheTick = -1;
@@ -18,7 +18,7 @@ public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestoryed
         BranchesInRadius?.RemoveAll(b => b.RatkinOrder == order);
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         BranchesInRadius?.RemoveAll(b => b == branch);
     }
@@ -47,15 +47,12 @@ public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestoryed
         }
     }
 
-    public static void OnBranchDestoryed(Branch branch)
+    public static void OnBranchDestroyed(Branch branch)
     {
         List<Map> maps = Find.Maps;
         for (int i = 0; i < maps.Count; i++)
         {
-            if (maps[i].IsPlayerHome)
-            {
-                maps[i].GetComponent<MapComponent_RatkinOrder>()?.Notify_BranchDestoryed(branch);
-            }
+            maps[i].GetOrderMapComp()?.Notify_BranchDestroyed(branch);
         }
     }
 }

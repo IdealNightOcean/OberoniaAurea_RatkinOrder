@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestPart_CriticalBranch : QuestPart, IOnBranchDestoryed
+public class QuestPart_CriticalBranch : QuestPart, IOnBranchDestroyed
 {
     public Branch Branch;
     public bool EndQuest = true;
@@ -40,7 +40,7 @@ public class QuestPart_CriticalBranch : QuestPart, IOnBranchDestoryed
         }
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (Branch == branch)
         {

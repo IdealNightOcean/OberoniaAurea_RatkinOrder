@@ -10,9 +10,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 
 
-public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
+public class FundHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
 {
-    [Unsaved] public readonly RatkinOrder RatkinOrder;
+    [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
 
     private float funds;
     public float Funds => funds;
@@ -30,14 +30,10 @@ public class FundHandler : IExposable, ITickDay, IPostLoadInit, IDrawDevWindow
     private List<OrderFundEvent> fundEvents = [];
     public IReadOnlyList<OrderFundEvent> FundEvents => fundEvents;
 
-    public FundHandler(RatkinOrder ratkinOrder, bool initConstruct)
+    public void PostOrderGenerated()
     {
-        RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        if (initConstruct)
-        {
-            funds = Rand.Range(40f, 60f);
-            AddFundEvent(OrderFundEventDefOf.OARO_NewOrderSubsidy);
-        }
+        funds = Rand.Range(40f, 60f);
+        AddFundEvent(OrderFundEventDefOf.OARO_NewOrderSubsidy);
     }
 
     public void ExposeData()

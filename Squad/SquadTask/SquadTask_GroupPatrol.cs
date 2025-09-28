@@ -47,9 +47,9 @@ public class SquadTask_GroupPatrol : SquadTask
     private void RecacheReconnaissance(Squad squad)
     {
         reconnaissanceValue = (squad.SquadStat.MemberCount * 10f)
-            * (1f + squad.SquadStat.MedalRecords.Count * 0.1f)
+            * (1f + squad.Branch.MedalHandler.MedalTypeCount * 0.1f)
             * (1f + squad.Branch.FacilityHandler.TotalFacilityLevel * 0.02f)
-            * (squad.IsSquadOfType(BranchType.Honor) ? 1.2f : 1f);
+            * (squad.IsBranchSquadOfType(BranchType.Honor) ? 1.2f : 1f);
     }
 
     public override void TaskEnd(Squad squad, bool interrupt)
@@ -84,7 +84,7 @@ public class SquadTask_GroupPatrol : SquadTask
     {
         float rewardValue = squad.SquadStat.MemberCount * 50f * Rand.Range(0.5f, 1.75f)
                             * (squad.RatkinOrder.ReformationManager.HasReformation(null) ? 1.5f : 1f)
-                            * (squad.IsSquadOfType(BranchType.Friendly) ? 1.2f : 1f);
+                            * (squad.IsBranchSquadOfType(BranchType.Friendly) ? 1.2f : 1f);
 
         Map map = Find.AnyPlayerHomeMap;
         if (map is null)

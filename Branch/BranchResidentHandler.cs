@@ -9,9 +9,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IPawnRetentionHolder, IDrawDevWindow
+public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IPostLoadInit, IPawnRetentionHolder, IDrawDevWindow
 {
-    [Unsaved] public readonly Branch Branch;
+    [Unsaved] public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
 
     private ThingOwner<Pawn> residents;
     private List<BranchResidentRecord> residentRecords = [];
@@ -28,13 +28,9 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPostLoadInit, IP
         }
     }
 
-    public BranchResidentHandler(Branch branch, bool initConstruct)
+    public void PostBranchGenerated()
     {
-        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        if (initConstruct)
-        {
-            EnsureComponentsInit();
-        }
+        EnsureComponentsInit();
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

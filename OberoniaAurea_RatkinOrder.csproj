@@ -72,6 +72,9 @@
   <ItemGroup>
     <Compile Include="Ability\AbilityComp_GiveRatkinHediff.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
+    <Compile Include="Branch\BranchMedalRecord.cs" />
+    <Compile Include="Branch\BranchMedalHandler.cs" />
+    <Compile Include="Branch\BranchMedalType.cs" />
     <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
@@ -241,7 +244,7 @@
     <Compile Include="Branch\BranchBuildingConstructChecker.cs" />
     <Compile Include="Branch\BranchBuildingHandler.cs" />
     <Compile Include="Branch\BranchBuildingMaker.cs" />
-    <Compile Include="Branch\BranchBuilding_Memorial.cs" />
+    <Compile Include="Branch\BranchBuildingConstructChecker_Memorial.cs" />
     <Compile Include="Def\BranchFacilityDef.cs" />
     <Compile Include="Branch\BranchFacilityLevel.cs" />
     <Compile Include="Branch\BranchFacilityLevelStage.cs" />
@@ -255,7 +258,7 @@
     <Compile Include="Branch\BranchType.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
-    <Compile Include="Branch\WorldObjectComp_BranchSite.cs" />
+    <Compile Include="Worldobject\WorldObjectComp_BranchSite.cs" />
     <Compile Include="Window\DevWindow\DevWindow_GlobalOrderInteractHandler.cs" />
     <Compile Include="Window\DevWindow\DevWindow_Squad.cs" />
     <Compile Include="Window\DevWindow\DevWindow_Branch.cs" />
@@ -335,7 +338,7 @@
     <Compile Include="Squad\Squad.cs" />
     <Compile Include="Squad\SquadManager.cs" />
     <Compile Include="Squad\SquadStat.cs" />
-    <Compile Include="Utility\RatkinOrderGenerator.cs" />
+    <Compile Include="RatkinOrderGenerator.cs" />
     <Compile Include="Reformation\ReformationManager.cs" />
     <Compile Include="Fund\FundHandler.cs" />
     <Compile Include="Def\RatkinOrderDef.cs" />

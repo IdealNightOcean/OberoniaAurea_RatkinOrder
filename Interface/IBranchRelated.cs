@@ -2,12 +2,12 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public interface IOnBranchDestoryed : IOnRatkinOrderRemoved
+public interface IOnBranchDestroyed : IOnRatkinOrderRemoved
 {
-    void Notify_BranchDestoryed(Branch branch);
+    void Notify_BranchDestroyed(Branch branch);
 }
 
-public interface ISingleBranchRelated : IOnBranchDestoryed
+public interface ISingleBranchRelated : IOnBranchDestroyed
 {
     Branch Branch { get; }
     void InitOrderBranch(Branch branch);

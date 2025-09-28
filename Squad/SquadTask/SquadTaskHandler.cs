@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
 {
-    private float BaseAutoStartTaskChance => Squad.IsSquadOfType(BranchType.Mobile) ? 0.05f : 0.02f;
+    private float BaseAutoStartTaskChance => Squad.IsBranchSquadOfType(BranchType.Mobile) ? 0.05f : 0.02f;
 
     [Unsaved] public readonly Squad Squad;
 
@@ -301,7 +301,7 @@ public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     private void TryAutoStartNewTask()
     {
-        autoStartTaskChance += Squad.IsSquadOfType(BranchType.Mobile) ? 0.01f : 0.005f;
+        autoStartTaskChance += Squad.IsBranchSquadOfType(BranchType.Mobile) ? 0.01f : 0.005f;
         float usedChance = autoStartTaskChance;
         if (Squad.SquadStat.MemberPercentage >= 1f && Squad.SquadStat.Supply >= 1f)
         {

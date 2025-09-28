@@ -302,7 +302,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         this.branch = branch;
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (this.branch == branch)
         {
@@ -377,9 +377,9 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             QuestClique clique = kv.Value;
             sb.AppendInNewLine((i++).ToString());
-            sb.AppendInNewLine($"Key: {kv.Key}, Name:{clique.Name}, IsActive:{clique.IsActive} ({clique.TicksToActive})");
-            sb.AppendInNewLine($"Potency: {clique.Potency}, Willingness:{clique.Willingness}");
-            sb.AppendInNewLine($"CanBribable: {clique.IsBribable}");
+            sb.AppendInNewLine($"Key: {kv.Key},  Name:{clique.Name},  IsActive:{clique.IsActive} ({clique.TicksToActive})");
+            sb.AppendInNewLine($"Potency: {clique.Potency:F2},  Willingness:{clique.Willingness:F2}");
+            sb.AppendInNewLine($"IsBribable: {clique.IsBribable},  IsCommunicable: {clique.IsCommunicable}");
             sb.AppendInNewLine($"IsBranchClique: {clique.IsBranchClique}, RelatedBranch: {clique.RelatedBranch?.Name ?? "NULL"}");
             sb.AppendInNewLine("------------");
         }

@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IOnBranchDestoryed
+public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IOnBranchDestroyed
 {
     private List<AcceptedBranchDemand> acceptedBranchDemands = new(2);
     public IReadOnlyList<AcceptedBranchDemand> AcceptedBranchDemands => acceptedBranchDemands;
@@ -23,7 +23,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
         acceptedBranchDemands.RemoveAll(ac => ac.Branch is null || ac.Branch.RatkinOrder == order);
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         acceptedBranchDemands.RemoveAll(ac => ac.Branch is null || ac.Branch == branch);
     }

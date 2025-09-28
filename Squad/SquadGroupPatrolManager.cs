@@ -405,7 +405,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         {
             if (squad.TaskHandler.CurTask is SquadTask_GroupPatrol groupPatrol && !groupPatrol.hadPassedBy)
             {
-                potentialPass.Add((squad, squad.IsSquadOfType(BranchType.Friendly) ? 3f : 1f));
+                potentialPass.Add((squad, squad.IsBranchSquadOfType(BranchType.Friendly) ? 3f : 1f));
             }
         }
 
@@ -420,7 +420,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         (targetSquad.TaskHandler.CurTask as SquadTask_GroupPatrol).hadPassedBy = true;
         passedBySquadCount++;
 
-        bool targetFriendly = targetSquad.IsSquadOfType(BranchType.Friendly);
+        bool targetFriendly = targetSquad.IsBranchSquadOfType(BranchType.Friendly);
         int relationShipDiff = RatkinOrder.Relationship - OrderRelationshipKind.Acquaintance;
         List<(int, float)> passByTypeList =
         [

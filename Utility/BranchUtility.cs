@@ -12,6 +12,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchUtility
 {
+    public static readonly BranchMedalType[] BranchMedalsArr = (BranchMedalType[])Enum.GetValues(typeof(BranchMedalType));
+
     public static bool InitBranchForNewOrder(this RatkinOrder order)
     {
         if (order is null || order.Faction is null || order.BranchManager is null)
@@ -176,23 +178,23 @@ public static class BranchUtility
         }
     }
 
-    public static void OnBranchDestoryed(this QuestManager questManager, Branch branch)
+    public static void OnBranchDestroyed(this QuestManager questManager, Branch branch)
     {
-        ConcurrentBag<IOnBranchDestoryed> ratkinOrderRelateds = [];
+        ConcurrentBag<IOnBranchDestroyed> ratkinOrderRelateds = [];
         questManager.ActiveQuestsListForReading
             .AsParallel()
             .ForAll(quest =>
             {
-                IEnumerable<IOnBranchDestoryed> relatedParts = quest.PartsListForReading.OfType<IOnBranchDestoryed>();
-                foreach (IOnBranchDestoryed relatedPartInner in relatedParts)
+                IEnumerable<IOnBranchDestroyed> relatedParts = quest.PartsListForReading.OfType<IOnBranchDestroyed>();
+                foreach (IOnBranchDestroyed relatedPartInner in relatedParts)
                 {
                     ratkinOrderRelateds.Add(relatedPartInner);
                 }
             });
 
-        foreach (IOnBranchDestoryed relatedPart in ratkinOrderRelateds)
+        foreach (IOnBranchDestroyed relatedPart in ratkinOrderRelateds)
         {
-            relatedPart.Notify_BranchDestoryed(branch);
+            relatedPart.Notify_BranchDestroyed(branch);
         }
     }
 }

@@ -39,14 +39,15 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
     public SquadTaskHandler TaskHandler => taskHandler;
     public SquadSupportHandler SupportHandler => supportHandler;
 
-    private Squad(Branch branch, bool initConstruct)
+    private Squad(Branch branch)
     {
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    }
 
-        if (initConstruct)
-        {
-            EnsureComponentsInit();
-        }
+    public void PostBranchGenerated()
+    {
+        name = "OARO_BranchSquadName".Translate(Branch.Name.Named("branchName"));
+        EnsureComponentsInit();
     }
 
     public static Squad GenerateSquadForBranch(Branch branch)
@@ -65,7 +66,7 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 
         try
         {
-            squad = new(branch, initConstruct: true);
+            squad = new(branch);
         }
         catch (Exception ex)
         {
@@ -80,17 +81,12 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
         Scribe_Values.Look(ref name, "name");
         Scribe_Values.Look(ref stateStr, "stateStr");
 
-        Scribe_Deep.Look(ref squadStat, "squadStat", ctorArgs: false);
+        Scribe_Deep.Look(ref squadStat, "squadStat");
         Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
         Scribe_Deep.Look(ref supportHandler, "supportHandler", ctorArgs: this);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Squad(this));
-
-    public void PostBranchGenerated()
-    {
-        name = SquadUtility.GenerateSquadName(Branch);
-    }
 
     public void TickHour(int hourOfDay)
     {
@@ -112,12 +108,12 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsSquadOfType(BranchType type) => (SquadType & type) == type;
+    public bool IsBranchSquadOfType(BranchType type) => (SquadType & type) == type;
 
     public void PostSquadCombatPawnGenerate(IEnumerable<Pawn> members, IEnumerable<Pawn> commanders, bool friendly)
     {
         if (members is null) { return; }
-        List<(HediffDef, float)> medalHediffs = SquadUtility.GetSquadMedalHediffsToApply(this);
+        IReadOnlyList<(HediffDef, float)> medalHediffs = Branch.MedalHandler.MedalHediffs;
         bool hasMedalHediffs = medalHediffs is not null;
 
         SimpleUniqueList<IPostSquadCombatPawnGenerate> postSquadCombat = Branch.PostSquadCombatPawnGenerate;
@@ -226,7 +222,7 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 
     private void EnsureComponentsInit()
     {
-        squadStat ??= new SquadStat(initConstruct: true);
+        squadStat ??= new SquadStat();
         taskHandler ??= new SquadTaskHandler(this);
         supportHandler ??= new SquadSupportHandler(this);
     }

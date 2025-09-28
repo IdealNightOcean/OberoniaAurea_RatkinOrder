@@ -80,6 +80,13 @@ public class DevWindow_Branch : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
+        listing_Rect.Label("Medal:");
+        Text.Font = GameFont.Small;
+        branch.MedalHandler.DrawDevWindow(listing_Rect);
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label("————————————————");
+        Text.Font = GameFont.Medium;
         listing_Rect.Label("Facility:");
         Text.Font = GameFont.Small;
         branch.FacilityHandler.DrawDevWindow(listing_Rect);

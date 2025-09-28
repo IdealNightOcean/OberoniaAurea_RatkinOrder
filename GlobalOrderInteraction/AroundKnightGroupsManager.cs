@@ -9,7 +9,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
+public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 {
     private static readonly SimpleCurve newGroupChaceCurve = new(
     [
@@ -44,7 +44,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
     {
         if (listing_Rect.ButtonText("Create NewKnight Groups", widthPct: 0.6f))
         {
-            CreateNewKnightGroups(force: true);
+            CreateNewKnightGroups();
         }
         if (aroundKnightGroups.NullOrEmpty())
         {
@@ -56,13 +56,29 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
             foreach (AroundKnightGroup knightGroup in aroundKnightGroups)
             {
                 listing_Rect.Label(knightGroup.ToString());
-                if (listing_Rect.ButtonText("Trigger", widthPct: 0.4f))
+                //按规则邀请
+                if (listing_Rect.ButtonText("Invite", widthPct: 0.4f))
+                {
+                    Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+                    AcceptanceReport acceptanceReport = GlobalOrderInteractionUtility.CanInviteAroundKnightGroup(knightGroup, map, resultOnly: false);
+                    if (acceptanceReport)
+                    {
+                        GlobalOrderInteractionUtility.InviteAroundKnightGroup(knightGroup, map);
+                    }
+                    else
+                    {
+                        Messages.Message(acceptanceReport.Reason, MessageTypeDefOf.RejectInput, historical: false);
+                    }
+                    break;
+                }
+                //直接触发邀请任务
+                if (listing_Rect.ButtonText("Trigger Directly", widthPct: 0.4f))
                 {
                     Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
                     if (map is null || !TriggerVisitQuest(knightGroup, map))
                     {
                         GlobalOrderInteractionManager.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
-                        GlobalOrderInteractionUtility.AroundKnightGroupVisitInvalid(knightGroup.Branch, isProactive: false);
+                        GlobalOrderInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
                     }
                     break;
                 }
@@ -79,7 +95,11 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
             SeasonInvitationUsed = 0;
         }
 
-        CreateNewKnightGroups();
+        if (Rand.Chance(newGroupChaceCurve.Evaluate(aroundKnightGroups.Count)))
+        {
+            CreateNewKnightGroups();
+        }
+
         RemoveExpiredKnightGroups();
     }
 
@@ -106,32 +126,28 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
         return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
     }
 
-    private void CreateNewKnightGroups(bool force = false)
+    private void CreateNewKnightGroups()
     {
-        float chance = force ? 1f : newGroupChaceCurve.Evaluate(aroundKnightGroups.Count);
-        if (Rand.Chance(chance))
+        HashSet<Branch> curBranch = aroundKnightGroups.Select(r => r.Branch).ToHashSet();
+        ConcurrentBag<Branch> potentialBranches = [];
+        RatkinOrderManager.Instance.AllRatkinOrders.AsParallel().ForAll((r) =>
         {
-            HashSet<Branch> curBranch = aroundKnightGroups.Select(r => r.Branch).ToHashSet();
-            ConcurrentBag<Branch> potentialBranches = [];
-            RatkinOrderManager.Instance.AllRatkinOrders.AsParallel().ForAll((r) =>
+            IEnumerable<Branch> affectedBranches = r.BranchManager.AllBranches.Where(b => !curBranch.Contains(b));
+            foreach (Branch branch in affectedBranches)
             {
-                IEnumerable<Branch> affectedBranches = r.BranchManager.AllBranches.Where(b => !curBranch.Contains(b));
-                foreach (Branch branch in affectedBranches)
-                {
-                    potentialBranches.Add(branch);
-                }
-            });
-            if (potentialBranches.Count == 0)
-            {
-                return;
+                potentialBranches.Add(branch);
             }
-            int takeCount = Rand.RangeInclusive(1, 2) + (aroundKnightGroups.Count == 0 ? 1 : 0);
-            takeCount = Mathf.Min(takeCount, potentialBranches.Count);
-            List<Branch> targetBranch = potentialBranches.TakeRandomDistinct(takeCount);
-            foreach (Branch branch in targetBranch)
-            {
-                aroundKnightGroups.Add(new AroundKnightGroup(branch));
-            }
+        });
+        if (potentialBranches.Count == 0)
+        {
+            return;
+        }
+        int takeCount = Rand.RangeInclusive(1, 2) + (aroundKnightGroups.Count == 0 ? 1 : 0);
+        takeCount = Mathf.Min(takeCount, potentialBranches.Count);
+        List<Branch> targetBranch = potentialBranches.TakeRandomDistinct(takeCount);
+        foreach (Branch branch in targetBranch)
+        {
+            aroundKnightGroups.Add(new AroundKnightGroup(branch));
         }
     }
 
@@ -156,13 +172,12 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
         }
 
         if (!GlobalOrderInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.KnightGroupProactiveVisit)
-           && !Find.QuestManager.ActiveQuestsListForReading.Any(q => q.root == OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit))
+            && !Find.QuestManager.ActiveQuestsListForReading.Any(q => q.root == OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit))
         {
-            AroundKnightGroup knightGroup = aroundKnightGroups.GetRange(
-                firstIndexToRemove,
-                aroundKnightGroups.Count - firstIndexToRemove)?.Where(g => g.CurBusyLevel == AroundKnightGroup.BusyLevel.Leisure
-                                                                           && g.Branch.IsBranchOfType(BranchType.Friendly))
-                                                              .RandomElementWithFallback(null);
+            List<AroundKnightGroup> toRemoveGroups = aroundKnightGroups.GetRange(firstIndexToRemove, aroundKnightGroups.Count - firstIndexToRemove);
+            AroundKnightGroup knightGroup = toRemoveGroups?.Where(g => g.CurBusyLevel == AroundKnightGroup.BusyLevel.Leisure
+                                                                       && g.Branch.IsBranchOfType(BranchType.Friendly))
+                                                           .RandomElementWithFallback(null);
 
             if (knightGroup is not null)
             {
@@ -191,7 +206,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestoryed
     {
         aroundKnightGroups.RemoveAll(g => !AroundKnightGroup.Validate(g) || g.Branch.RatkinOrder == ratkinOrder);
     }
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         aroundKnightGroups.RemoveAll(g => !AroundKnightGroup.Validate(g) || g.Branch == branch);
     }

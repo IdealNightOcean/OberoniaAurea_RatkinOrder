@@ -114,7 +114,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         }
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (this.branch == branch)
         {

@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class GlobalOrderInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBranchDestoryed
+public class GlobalOrderInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBranchDestroyed
 {
     public static GlobalOrderInteractionManager Instance { get; private set; }
     public static OrderCodePedestal MainOrderCodePedestal => Instance.mainOrderCodePedestal;
@@ -81,10 +81,10 @@ public class GlobalOrderInteractionManager : IExposable, IOnRatkinOrderRemoved, 
         aroundKnightGroupsManager.Notify_RatkinOrderRemoved(order);
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
-        acceptedBranchDemandHandler.Notify_BranchDestoryed(branch);
-        aroundKnightGroupsManager.Notify_BranchDestoryed(branch);
+        acceptedBranchDemandHandler.Notify_BranchDestroyed(branch);
+        aroundKnightGroupsManager.Notify_BranchDestroyed(branch);
     }
 
     public bool SetMainOrderCodePedestal(OrderCodePedestal codePedestal, bool replaceCur)

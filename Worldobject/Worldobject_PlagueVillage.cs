@@ -116,7 +116,7 @@ public class WorldObject_PlagueVillage : WorldObject_InteractWithFixedCaravan_Na
         }
     }
 
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (this.branch == branch)
         {

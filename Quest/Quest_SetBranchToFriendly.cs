@@ -75,7 +75,7 @@ public class QuestNode_SetBranchToFriendly : QuestNode
     }
 }
 
-public class QuestPart_SetBranchToFriendly : QuestPart, IOnBranchDestoryed
+public class QuestPart_SetBranchToFriendly : QuestPart, IOnBranchDestroyed
 {
     public string InSignalTrigger;
     public Branch Branch;
@@ -114,7 +114,7 @@ public class QuestPart_SetBranchToFriendly : QuestPart, IOnBranchDestoryed
             Branch = null;
         }
     }
-    public void Notify_BranchDestoryed(Branch branch)
+    public void Notify_BranchDestroyed(Branch branch)
     {
         if (Branch == branch)
         {

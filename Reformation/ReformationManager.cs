@@ -7,9 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ReformationManager : IExposable, IPostLoadInit, IDrawDevWindow
+public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoadInit, IDrawDevWindow
 {
-    [Unsaved] public readonly RatkinOrder RatkinOrder;
+    [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
 
     private float reformProgress;
     public float ReformProgress
@@ -26,14 +26,7 @@ public class ReformationManager : IExposable, IPostLoadInit, IDrawDevWindow
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
 
-    public ReformationManager(RatkinOrder ratkinOrder, bool initConstruct)
-    {
-        RatkinOrder = ratkinOrder;
-        if (initConstruct)
-        {
-
-        }
-    }
+    public void PostOrderGenerated() { }
 
     public void ExposeData()
     {

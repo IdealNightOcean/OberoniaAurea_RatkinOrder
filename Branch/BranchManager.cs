@@ -138,6 +138,10 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         allBranches.Clear();
     }
 
+    /// <summary>
+    /// 只有单个分部销毁的时候使用
+    /// 骑士团移除（所有分部销毁）时应由骑士团进行骑士团移除通知 （Notify_RatkinOrderRemoved | OnRatkinOrderRemoved）
+    /// </summary>
     public void DestoryBranch(Branch branch)
     {
         if (!allBranches.Remove(branch))
@@ -148,13 +152,11 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
 
         branch.Destroy();
 
-        // 理论上，只有单个分部销毁的时候使用下列通知
-        // 骑士团移除（所有分部销毁）时应由骑士团进行骑士团移除通知 （Notify_RatkinOrderRemoved | OnRatkinOrderRemoved）
         if (branch == normalMobileBranch) { normalMobileBranch = null; }
         if (branch == honorMobileBranch) { honorMobileBranch = null; }
-        GlobalOrderInteractionManager.Instance.Notify_BranchDestoryed(branch);
-        MapComponent_RatkinOrder.OnBranchDestoryed(branch);
-        Find.QuestManager.OnBranchDestoryed(branch);
+        GlobalOrderInteractionManager.Instance.Notify_BranchDestroyed(branch);
+        MapComponent_RatkinOrder.OnBranchDestroyed(branch);
+        Find.QuestManager.OnBranchDestroyed(branch);
     }
 
     public void Notify_DemandQuestCompleted(bool isCritical)
