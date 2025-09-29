@@ -15,9 +15,6 @@ public class WorldObject_ApprenticeHome : WorldObject_Interactive_Nameable
                                        lookTargets: this);
 
         QuestUtility.SendQuestTargetSignals(questTags, "Resolved");
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
 }

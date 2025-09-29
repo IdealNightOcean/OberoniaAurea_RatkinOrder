@@ -10,12 +10,12 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestPart_EffectTags : QuestPart
 {
-    private HashSet<string> tags;
+    private Dictionary<string, QuestEffectTag> tags;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Collections.Look(ref tags, "tags", LookMode.Value);
+        Scribe_Collections.Look(ref tags, "tags", LookMode.Value, LookMode.Deep);
     }
 
     public override void Cleanup()
@@ -24,21 +24,22 @@ public class QuestPart_EffectTags : QuestPart
         tags = null;
     }
 
-    public bool HasTag(string tag) => tags?.Contains(tag) ?? false;
+    public bool HasTag(string tagKey) => tags?.ContainsKey(tagKey) ?? false;
 
-    public void AddTag(string tag)
+    public void AddTag(QuestEffectTag tag)
     {
         if (tags is null)
         {
-            tags = [tag];
+            tags = new Dictionary<string, QuestEffectTag> { { tag.Key, tag } };
+
         }
         else
         {
-            tags.Add(tag);
+            tags.Add(tag.Key, tag);
         }
     }
 
-    public void AddTags(IEnumerable<string> tagsToAdd)
+    public void AddTags(IEnumerable<QuestEffectTag> tagsToAdd)
     {
         if (tagsToAdd is null)
         {
@@ -46,13 +47,16 @@ public class QuestPart_EffectTags : QuestPart
         }
 
         tags ??= [];
-        foreach (string t in tagsToAdd)
+        foreach (QuestEffectTag t in tagsToAdd)
         {
-            tags.Add(t);
+            tags.Add(t.Key, t);
         }
     }
 
-    public void RemoveTag(string tag) => tags?.Remove(tag);
+    public void RemoveTag(string tagKey)
+    {
+        tags?.Remove(tagKey);
+    }
 
     public static bool TryGetEffectTags(Quest quest, bool addPartIfMiss, out QuestPart_EffectTags questPart_EffectTags)
     {
@@ -84,9 +88,9 @@ public class QuestPart_EffectTags : QuestPart
             return;
         }
         StringBuilder sb = new();
-        foreach (string tag in tags)
+        foreach (QuestEffectTag tag in tags.Values)
         {
-            sb.AppendInNewLine(tag);
+            sb.AppendInNewLine(tag.ToString());
         }
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(sb.ToTaggedString()));
     }

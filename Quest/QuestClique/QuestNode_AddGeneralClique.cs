@@ -6,21 +6,24 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestNode_AddGeneralClique : QuestNode
 {
     [NoTranslate]
-    public SlateRef<string> cliqueKey = "UNKOWN";
+    public SlateRef<string> cliqueKey;
 
     [MustTranslate]
-    public SlateRef<string> cliqueName;
+    public SlateRef<string> cliqueName = string.Empty;
     public SlateRef<float> initPotency;
 
     [MustTranslate]
-    public SlateRef<string> activeDesc;
+    public SlateRef<string> activeDesc = string.Empty;
     [MustTranslate]
-    public SlateRef<string> inactiveDesc;
+    public SlateRef<string> inactiveDesc = string.Empty;
 
     public SlateRef<float> initWillingness;
+
+    public SlateRef<bool> isActivatable = true;
     public SlateRef<bool> isCommunicable;
     public SlateRef<bool> isBribable;
     public SlateRef<int> briberyCost = -1;
+    public SlateRef<BranchBuildingDef> preferredBuilding;
 
     public SlateRef<bool> defaultActive;
 
@@ -34,7 +37,7 @@ public class QuestNode_AddGeneralClique : QuestNode
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
-        string cliqueKey = this.cliqueKey.GetValue(slate);
+        string cliqueKey = GetCliqueKey();
         if (cliqueKey.NullOrEmpty())
         {
             return;
@@ -45,25 +48,35 @@ public class QuestNode_AddGeneralClique : QuestNode
             return;
         }
 
+        QuestClique questClique = GenerateClique();
+
+        questPart_CliquesManager.TryAddClique(cliqueKey, questClique, replaceCur.GetValue(slate), defaultActive.GetValue(slate));
+    }
+
+    protected virtual string GetCliqueKey()
+    {
+        return cliqueKey.GetValue(QuestGen.slate);
+    }
+
+    protected virtual QuestClique GenerateClique()
+    {
+        Slate slate = QuestGen.slate;
         QuestClique questClique = new()
         {
             Name = cliqueName.GetValue(slate),
-            Potency = initPotency.GetValue(slate),
-            ActiveDesc = activeDesc.GetValue(slate) ?? string.Empty,
-            InactiveDesc = inactiveDesc.GetValue(slate) ?? string.Empty,
+            ActiveDesc = activeDesc.GetValue(slate),
+            InactiveDesc = inactiveDesc.GetValue(slate),
 
+            Potency = initPotency.GetValue(slate),
+            Willingness = initWillingness.GetValue(slate),
+
+            IsActivatable = isActivatable.GetValue(slate),
             IsCommunicable = isCommunicable.GetValue(slate),
             IsBribable = isBribable.GetValue(slate),
-            BriberyCost = briberyCost.GetValue(slate)
-        };
-        questClique.AdjustCliqueWillingness(initWillingness.GetValue(slate), record: false);
+            BriberyCost = briberyCost.GetValue(slate),
 
-        if (questPart_CliquesManager.AddClique(cliqueKey, questClique, replaceCur.GetValue(slate)))
-        {
-            if (defaultActive.GetValue(slate))
-            {
-                questPart_CliquesManager.ActiveClique(cliqueKey, directly: true);
-            }
-        }
+            PreferredBuilding = preferredBuilding.GetValue(slate)
+        };
+        return questClique;
     }
 }

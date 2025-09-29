@@ -7,6 +7,10 @@ public class QuestNode_HasQuestEffectTag : QuestNode
 {
     [NoTranslate]
     public SlateRef<string> tag;
+
+    /// <summary>
+    /// 这是用于TestRun的tag列表
+    /// </summary>
     [NoTranslate]
     public SlateRef<string> tagsListForTestRun = KeyLibrary_SlateStoreAs.QuestEffectTags;
 
@@ -15,7 +19,7 @@ public class QuestNode_HasQuestEffectTag : QuestNode
 
     protected override bool TestRunInt(Slate slate)
     {
-        if (!slate.TryGet(tagsListForTestRun.GetValue(slate), out string tagToCheck))
+        if (!slate.TryGet(tag.GetValue(slate), out string tagToCheck))
         {
             return false;
         }

@@ -91,22 +91,19 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             }
             foreach (QuestClique clique in allCliques.Values)
             {
-                if (!clique.IsActive && clique.TicksToActive > 0 && (clique.TicksToActive -= 1000) <= 0)
+                if (clique.TicksToActive > 0 && (clique.TicksToActive -= 1000) <= 0)
                 {
-                    ActiveClique(clique, directly: true);
+                    TryActiveClique(clique, directly: true);
                 }
             }
         }
     }
 
-    public bool HasClique(string cliqueKey)
-    {
-        return allCliques?.ContainsKey(cliqueKey) ?? false;
-    }
+    public bool HasClique(string cliqueKey) => allCliques?.ContainsKey(cliqueKey) ?? false;
 
     public bool TryGetClique(string cliqueKey, out QuestClique clique, bool showErrorIfMiss = true)
     {
-        if (allCliques?.TryGetValue(cliqueKey, out clique) ?? false)
+        if (allCliques is not null && allCliques.TryGetValue(cliqueKey, out clique))
         {
             return true;
         }
@@ -119,28 +116,50 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         return false;
     }
 
-    public bool AddClique(string cliqueKey, QuestClique clique, bool replaceCur)
+    public bool TryAddClique(string cliqueKey, QuestClique clique, bool replaceCur = false, bool defaultActive = false)
     {
+        bool added = false;
         if (allCliques is null)
         {
             allCliques = new Dictionary<string, QuestClique> { { cliqueKey, clique } };
-            return true;
+            added = true;
         }
-        if (replaceCur || !allCliques.ContainsKey(cliqueKey))
+        else if (allCliques.TryGetValue(cliqueKey, out QuestClique oldClique))
         {
-            allCliques[cliqueKey] = clique;
-            return true;
+            if (replaceCur)
+            {
+                DeactiveClique(oldClique);
+                allCliques[cliqueKey] = clique;
+                added = true;
+            }
+            else
+            {
+                Log.Warning($"Clique ({cliqueKey}) already exists in quest.");
+                added = false;
+            }
         }
         else
         {
-            Log.Warning("Clique already exists in quest.");
-            return false;
+            allCliques[cliqueKey] = clique;
+            added = true;
         }
+
+        if (added)
+        {
+            clique.IsActive = false;
+            if (defaultActive)
+            {
+                TryActiveClique(clique, directly: true);
+            }
+            return true;
+        }
+
+        return false;
     }
 
     public void RemoveClique(string cliqueKey)
     {
-        if (allCliques?.TryGetValue(cliqueKey, out QuestClique clique) ?? false)
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
             allCliques.Remove(cliqueKey);
             if (clique.IsActive)
@@ -152,25 +171,33 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public bool IsCliqueActive(string cliqueKey)
     {
-        if (allCliques?.TryGetValue(cliqueKey, out QuestClique clique) ?? false)
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
             return clique.IsActive;
         }
         return false;
     }
 
-    public bool CanActiveClique(string cliqueKey)
+    public bool CanActiveClique(string cliqueKey, bool directly = false)
     {
-        if (allCliques is null || !allCliques.TryGetValue(cliqueKey, out QuestClique clique))
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
             return false;
         }
-        return CanActiveClique(clique);
+        return CanActiveClique(clique, directly);
     }
 
-    private bool CanActiveClique(QuestClique clique)
+    private bool CanActiveClique(QuestClique clique, bool directly = false)
     {
-        if (clique.IsActive || clique.TicksToActive > 0)
+        if (!clique.IsActivatable || clique.IsActive)
+        {
+            return false;
+        }
+        if (directly)
+        {
+            return true;
+        }
+        if (clique.TicksToActive > 0)
         {
             return false;
         }
@@ -181,27 +208,26 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         return clique.Willingness > 0.999f;
     }
 
-    public bool ActiveClique(string cliqueKey, bool directly, int activeDelayTicks = -1)
+    public bool TryActiveClique(string cliqueKey, bool directly = false)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique))
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
-            ActiveClique(clique, directly, activeDelayTicks);
-            return true;
+            return false;
         }
-        return false;
+        return TryActiveClique(clique, directly);
     }
 
-    private void ActiveClique(QuestClique clique, bool directly, int activeDelayTicks = -1)
+    private bool TryActiveClique(QuestClique clique, bool directly = false, int activeDelayTicks = -1)
     {
-        if (clique.IsActive)
+        if (!CanActiveClique(clique, directly))
         {
-            return;
+            return false;
         }
 
         if (directly)
         {
             Active();
-            return;
+            return true;
         }
 
         int delayTicks = activeDelayTicks > 0 ? activeDelayTicks
@@ -220,6 +246,8 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             Active();
         }
 
+        return true;
+
         void Active()
         {
             clique.IsActive = true;
@@ -228,21 +256,35 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
     }
 
-    public bool DeactiveClique(string cliqueKey)
+    public void DeactiveClique(string cliqueKey)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique) && clique.IsActive)
+        if (TryGetClique(cliqueKey, out QuestClique clique))
+        {
+            DeactiveClique(clique);
+        }
+    }
+
+    private void DeactiveClique(QuestClique clique)
+    {
+        if (clique.IsActive)
         {
             clique.IsActive = false;
             totalPotency -= clique.Potency;
-            return true;
         }
-
-        return false;
     }
 
-    public void AdjustCliquePotency(string cliqueKey, float change)
+    public float GetCliquePotency(string cliqueKey, bool showErrorIfMiss = false)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique))
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
+        {
+            return clique.Potency;
+        }
+        return 0f;
+    }
+
+    public void AdjustCliquePotency(string cliqueKey, float change, bool showErrorIfMiss = true)
+    {
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
         {
             if (clique.IsActive)
             {
@@ -257,42 +299,85 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
     }
 
-    public void AdjustCliqueWillingness(string cliqueKey, float change, bool record = true)
+    public float GetCliqueWillingness(string cliqueKey, bool showErrorIfMiss = false)
+    {
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
+        {
+            return clique.IsActive ? 1f : clique.Willingness;
+        }
+        return 0f;
+    }
+
+    public void AdjustCliqueWillingness(string cliqueKey, float change, bool showMessage = true, bool showErrorIfMiss = false)
+    {
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
+        {
+            clique.Willingness += change;
+            if (showMessage)
+            {
+                if (change > 0f)
+                {
+                    Messages.Message("OARO_CliqueWillingness_Increase".Translate(clique.Name, change.ToString("F2")), MessageTypeDefOf.PositiveEvent);
+                }
+                else
+                {
+                    Messages.Message("OARO_CliqueWillingness_Decrease".Translate(clique.Name, (-change).ToString("F2")), MessageTypeDefOf.NegativeEvent);
+                }
+            }
+        }
+    }
+
+    public bool CanBriberyClique(string cliqueKey, Map map)
+    {
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        {
+            return false;
+        }
+        if (!clique.IsBribable || clique.IsActive)
+        {
+            return false;
+        }
+
+        if (map is null || !map.HasEnoughThingsOfDef(ThingDefOf.Silver, clique.BriberyCost))
+        {
+            return false;
+        }
+
+        return true;
+    }
+
+    public void BriberyClique(string cliqueKey, Map map)
+    {
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        {
+            map.DestoryThingsOfDef(ThingDefOf.Silver, clique.BriberyCost);
+            clique.Willingness += (1f - clique.Willingness);
+
+            if (CanActiveClique(clique))
+            {
+                TryActiveClique(clique, directly: false);
+            }
+        }
+    }
+
+    public void TryCommunicateWithClique(string cliqueKey, Pawn negotiant)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique))
         {
-            clique.AdjustCliqueWillingness(change, record);
-        }
-    }
-
-    public void BriberyClique(string cliqueKey)
-    {
-        if (TryGetClique(cliqueKey, out QuestClique clique) && clique.IsBribable)
-        {
-            Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
-            if (map is null || !map.HasEnoughThingsOfDef(ThingDefOf.Silver, clique.BriberyCost))
+            if (!clique.IsCommunicable)
             {
-
+                Log.Error($"Trying to commiunicate with an incommunicable clique {clique.Name}.");
                 return;
             }
-            map.DestoryThingsOfDef(ThingDefOf.Silver, clique.BriberyCost);
-            clique.AdjustCliqueWillingness(1f - clique.Willingness, record: true);
 
-            if (CanActiveClique(clique))
+            if (clique.PreferredBuilding is not null && branch.BuildingHandler.HasBuilding(clique.PreferredBuilding))
             {
-                ActiveClique(clique, directly: false);
+
             }
-        }
-    }
-
-    public void CommunicateClique(string cliqueKey, Pawn negotiant)
-    {
-        if (TryGetClique(cliqueKey, out QuestClique clique) && clique.IsCommunicable)
-        {
 
             if (CanActiveClique(clique))
             {
-                ActiveClique(clique, directly: false);
+                TryActiveClique(clique, directly: false);
             }
         }
     }
@@ -308,7 +393,6 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             this.branch = null;
         }
-
         List<string> keysToRemove = allCliques?.Where(kv => kv.Value.RelatedBranch == branch).Select(kv => kv.Key).ToList();
         if (keysToRemove is not null)
         {

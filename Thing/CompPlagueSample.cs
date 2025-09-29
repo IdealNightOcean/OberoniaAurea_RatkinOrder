@@ -70,9 +70,6 @@ public class CompPlagueSample : CompInteractWithThing
             Messages.Message("OARO_PlagueSample_InfectioPlague".Translate(pawn), MessageTypeDefOf.NegativeEvent);
         }
 
-        if (!parent.Destroyed)
-        {
-            parent.Destroy();
-        }
+        parent.SafeDestroy();
     }
 }

@@ -24,7 +24,7 @@ public class MercyQuestExtension : DefModExtension
         {
             if (needParentFaction)
             {
-                Faction parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(parentFactionDef, OAFrame_FactionUtility.NonHostileNormalFactionParams);
+                Faction parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(parentFactionDef, FactionValidationParams.NonHostileNormalFaction);
                 if (parentFaction is null)
                 {
                     return false;

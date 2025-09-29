@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,6 +13,24 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class ModUtility
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void SafeDestroy(this Thing thing)
+    {
+        if (thing is not null && !thing.Destroyed)
+        {
+            thing.Destroy();
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void SafeDestroy(this WorldObject worldObject)
+    {
+        if (worldObject is not null && !worldObject.Destroyed)
+        {
+            worldObject.Destroy();
+        }
+    }
+
     public static bool AnyThingOfDef(Room room, ThingDef thingDef)
     {
         List<Region> regions = room.Regions;

@@ -128,10 +128,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         {
             remainingMarkerValue = 0f;
             purchasedCount = totalCount;
-            if (!Destroyed)
-            {
-                Destroy();
-            }
+            this.SafeDestroy();
         }
         else
         {

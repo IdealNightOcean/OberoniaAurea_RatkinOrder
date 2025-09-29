@@ -39,10 +39,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_Discovered".Translate(maxAnimalsPawn)));
             QuestUtility.SendQuestTargetSignals(questTags, "DiscoveredWolf", this.Named("SUBJECT"));
 
-            if (!Destroyed)
-            {
-                Destroy();
-            }
+            this.SafeDestroy();
         }
         else
         {
@@ -52,10 +49,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
                 Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_Succeess".Translate(maxAnimalsPawn)));
                 QuestUtility.SendQuestTargetSignals(questTags, "SucceessAdvancePoint", this.Named("SUBJECT"));
 
-                if (!Destroyed)
-                {
-                    Destroy();
-                }
+                this.SafeDestroy();
             }
             else
             {
@@ -63,10 +57,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
                 {
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_Fail".Translate()));
                     QuestUtility.SendQuestTargetSignals(questTags, "FailAdvancePoint", this.Named("SUBJECT"));
-                    if (!Destroyed)
-                    {
-                        Destroy();
-                    }
+                    this.SafeDestroy();
                 }
                 else
                 {

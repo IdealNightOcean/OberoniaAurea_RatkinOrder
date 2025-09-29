@@ -44,10 +44,7 @@ internal sealed class WorldObject_WolfDisasterGossipPoint : WorldObject_Interact
             QuestUtility.SendQuestTargetSignals(questTags, "ReducePoint", this.Named("SUBJECT"));
         }
 
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
     protected override void InterruptWork()
     {

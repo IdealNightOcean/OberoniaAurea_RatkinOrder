@@ -1,17 +1,24 @@
 ﻿using RimWorld.QuestGen;
 using System.Collections.Generic;
 using System.Linq;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_AddEffectTags : QuestNode
 {
+    /// <summary>
+    /// 这是用于TestRun的tag列表
+    /// </summary>
+    [NoTranslate]
     public SlateRef<string> addToTestList = KeyLibrary_SlateStoreAs.QuestEffectTags;
-    public SlateRef<IEnumerable<string>> tagsToAdd;
+
+    [NoTranslate]
+    public SlateRef<IEnumerable<QuestEffectTag>> tagsToAdd;
 
     protected override bool TestRunInt(Slate slate)
     {
-        IEnumerable<string> tagsToAdd = this.tagsToAdd.GetValue(slate);
+        IEnumerable<string> tagsToAdd = this.tagsToAdd.GetValue(slate)?.Select(t => t.Key);
         if (tagsToAdd is not null)
         {
             QuestGenUtility.AddRangeToOrMakeList(slate: slate,
@@ -23,14 +30,9 @@ public class QuestNode_AddEffectTags : QuestNode
 
     protected override void RunInt()
     {
-        if (!QuestPart_EffectTags.TryGetEffectTags(QuestGen.quest, addPartIfMiss: true, out QuestPart_EffectTags questPart_EffectTags))
+        if (QuestPart_EffectTags.TryGetEffectTags(QuestGen.quest, addPartIfMiss: true, out QuestPart_EffectTags questPart_EffectTags))
         {
-            return;
-        }
-        IEnumerable<string> tagsToAdd = this.tagsToAdd.GetValue(QuestGen.slate);
-        if (tagsToAdd is not null)
-        {
-            questPart_EffectTags.AddTags(tagsToAdd);
+            questPart_EffectTags.AddTags(tagsToAdd.GetValue(QuestGen.slate));
         }
     }
 }

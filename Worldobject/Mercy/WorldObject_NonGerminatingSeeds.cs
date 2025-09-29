@@ -43,18 +43,12 @@ public sealed class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFi
             }
         }
 
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
 
     protected override void InterruptWork()
     {
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_NonGerminatingSeeds_Interrupt".Translate()));
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
 }

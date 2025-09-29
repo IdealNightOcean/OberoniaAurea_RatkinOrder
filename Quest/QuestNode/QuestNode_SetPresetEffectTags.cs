@@ -7,20 +7,23 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_SetPresetEffectTags : QuestNode
 {
+    /// <summary>
+    /// 这是用于TestRun的tagKey列表
+    /// </summary>
     public SlateRef<string> addToTestList = KeyLibrary_SlateStoreAs.QuestEffectTags;
 
     protected override bool TestRunInt(Slate slate)
     {
-        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.PreSetQuestEffectTags, out List<string> preSetQuestEffectTags))
+        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.PreSetQuestEffectTags, out List<QuestEffectTag> preSetQuestEffectTags))
         {
             if (preSetQuestEffectTags.NullOrEmpty())
             {
                 return true;
             }
-
+            List<object> preSetQuestEffectTagKeys = preSetQuestEffectTags.Select(t => t.Key).Cast<object>().ToList();
             QuestGenUtility.AddRangeToOrMakeList(slate: slate,
                                                  name: addToTestList.GetValue(slate),
-                                                 objs: preSetQuestEffectTags.Cast<object>().ToList());
+                                                 objs: preSetQuestEffectTagKeys);
         }
         return true;
     }
@@ -32,12 +35,9 @@ public class QuestNode_SetPresetEffectTags : QuestNode
             return;
         }
 
-        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.PreSetQuestEffectTags, out List<string> preSetQuestEffectTags))
+        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.PreSetQuestEffectTags, out List<QuestEffectTag> preSetQuestEffectTags))
         {
-            if (!preSetQuestEffectTags.NullOrEmpty())
-            {
-                questPart_EffectTags.AddTags(preSetQuestEffectTags);
-            }
+            questPart_EffectTags.AddTags(preSetQuestEffectTags);
         }
     }
 }

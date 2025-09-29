@@ -6,13 +6,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class DemandPreSetQuestEffectTags : DefModExtension
 {
-    public List<string> fixedTags;
-    public List<string> randomTags;
+    public List<QuestEffectTag> fixedTags;
+    public List<QuestEffectTag> randomTags;
     public IntRange randomTagsSelectCount = IntRange.One;
 
-    public List<string> GetEffectTags()
+    public List<QuestEffectTag> GetEffectTags()
     {
-        List<string> tags = [];
+        List<QuestEffectTag> tags = [];
         if (!fixedTags.NullOrEmpty())
         {
             tags.AddRange(fixedTags);
@@ -22,7 +22,7 @@ public class DemandPreSetQuestEffectTags : DefModExtension
             int selCount = Mathf.Min(randomTagsSelectCount.RandomInRange, randomTags.Count);
             if (selCount > 0)
             {
-                List<string> selTags = randomTags.TakeRandomDistinct(selCount);
+                List<QuestEffectTag> selTags = randomTags.TakeRandomDistinct(selCount);
                 tags.AddRange(selTags);
             }
         }

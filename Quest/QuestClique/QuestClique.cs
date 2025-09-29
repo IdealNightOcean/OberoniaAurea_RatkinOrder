@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestClique : IExposable
 {
-    public string Name = "UNKNOWN";
+    public string Name = string.Empty;
     public string ActiveDesc = string.Empty;
     public string InactiveDesc = string.Empty;
 
@@ -24,12 +24,14 @@ public class QuestClique : IExposable
     public float Willingness
     {
         get => willingness;
+        set => willingness = Mathf.Clamp01(value);
     }
-    public float LastWillingnessChange => lastWillingnessChange;
 
     public bool IsActive;
+    public bool IsActivatable;
     public bool IsCommunicable;
     public bool IsBribable;
+    public BranchBuildingDef PreferredBuilding;
     public int BriberyCost = -1;
     public int TicksToActive = -1;
 
@@ -41,16 +43,27 @@ public class QuestClique : IExposable
 
     public QuestClique() { }
 
-    public QuestClique(Branch branch)
-    {
-        InitForBranch(branch);
-    }
-
-    public void InitForBranch(Branch branch)
+    public void InitForBranch(Branch branch, bool initWithBranchPotency = true)
     {
         relatedBranch = branch;
-        Name = branch.Name;
-        Potency = BranchPotencyToCliquePotency(GetBranchPotency(branch));
+        if (Name.NullOrEmpty())
+        {
+            Name = branch.Name;
+        }
+
+        if (ActiveDesc.NullOrEmpty())
+        {
+            ActiveDesc = "OARO_QuestClique_DefaultBranchActive".Translate(relatedBranch.Name);
+        }
+        if (InactiveDesc.NullOrEmpty())
+        {
+            InactiveDesc = "OARO_QuestClique_DefaultBranchInactive".Translate(relatedBranch.Name);
+        }
+
+        if (initWithBranchPotency)
+        {
+            Potency = BranchPotencyToCliquePotency(GetBranchPotency(branch));
+        }
     }
 
     public void ExposeData()
@@ -70,16 +83,6 @@ public class QuestClique : IExposable
         Scribe_Values.Look(ref TicksToActive, "TicksToActive", -1);
 
         Scribe_References.Look(ref relatedBranch, "relatedBranch");
-    }
-
-    public void AdjustCliqueWillingness(float delta, bool record = true)
-    {
-        if (delta != 0f)
-        {
-            willingness = Mathf.Clamp01(willingness + delta);
-            if (record)
-            { lastWillingnessChange = delta; }
-        }
     }
 
     /// <summary>
@@ -112,6 +115,10 @@ public class QuestClique : IExposable
 
     public static string GetBranchCliqueKey(Branch branch)
     {
+        if (branch is null)
+        {
+            return null;
+        }
         return "BranchClique_" + branch.GetUniqueLoadID();
     }
 }

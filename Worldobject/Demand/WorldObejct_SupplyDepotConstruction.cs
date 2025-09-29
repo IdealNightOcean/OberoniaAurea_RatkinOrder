@@ -27,7 +27,7 @@ public sealed class WorldObejct_SupplyDepotConstruction : WorldObject_InteractWi
                     SendWorkResolvedSignal();
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_FinallyAutoFinished".Translate(), Faction));
                     PlanetTile tile = Tile;
-                    if (!Destroyed) { Destroy(); }
+                    this.SafeDestroy();
                 }
             }
         }
@@ -54,8 +54,7 @@ public sealed class WorldObejct_SupplyDepotConstruction : WorldObject_InteractWi
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_FinallyFinished".Translate(), Faction));
 
             PlanetTile tile = Tile;
-            if (!Destroyed) { Destroy(); }
-
+            this.SafeDestroy();
         }
         else
         {

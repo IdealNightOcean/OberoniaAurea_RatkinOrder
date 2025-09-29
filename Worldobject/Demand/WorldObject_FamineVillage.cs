@@ -256,9 +256,9 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
             case WorkType.Precise:
                 {
                     FulfillRequest(associatedFixedCaravan);
-                    if (!hasFeastLater && requestCountLeft <= 0 && !Destroyed)
+                    if (!hasFeastLater && requestCountLeft <= 0)
                     {
-                        Destroy();
+                        this.SafeDestroy();
                     }
                     return;
                 }
@@ -273,7 +273,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                         }
                     }
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_FeastFinished".Translate(), Faction));
-                    if (!Destroyed) { Destroy(); }
+                    this.SafeDestroy();
                     return;
                 }
             default: return;
@@ -345,7 +345,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                     }
                 }
             }
-            if (!Destroyed) { Destroy(); }
+            this.SafeDestroy();
         }
         else
         {
@@ -367,6 +367,6 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         caravan.RemoveThingsOfDef(requestDef, requestCountLeft);
         requestCountLeft = 0;
         QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named("SUBJECT"), caravan.Named("CARAVAN"));
-        if (!Destroyed) { Destroy(); }
+        this.SafeDestroy();
     }
 }

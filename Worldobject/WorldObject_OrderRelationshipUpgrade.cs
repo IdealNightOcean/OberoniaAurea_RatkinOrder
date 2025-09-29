@@ -32,17 +32,11 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
         //ratkinOrder.RelationshipKindOffsetBy(1, sendLetter: true);
 
         SendWorkResolvedSignal();
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
 
     protected override void InterruptWork()
     {
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
 }

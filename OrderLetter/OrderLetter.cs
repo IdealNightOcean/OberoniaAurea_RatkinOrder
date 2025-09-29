@@ -6,29 +6,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public enum OrderLetterType
-{
-    Normal,
-    Urgent,
-    Official,
-}
-
-
 [StaticConstructorOnStartup]
 public class OrderLetter : IExposable
 {
-    public static readonly Texture2D Texture_Letter_Type_A = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_UI_LetterA", true);
-    public static readonly Texture2D Texture_Letter_Type_B = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_UI_LetterB", true);
-    public static readonly Texture2D Texture_Letter_Type_C = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_UI_LetterC", true);
-
-    public Texture2D Icon => LetterType switch
-    {
-        OrderLetterType.Normal => Texture_Letter_Type_A,
-        OrderLetterType.Urgent => Texture_Letter_Type_B,
-        OrderLetterType.Official => Texture_Letter_Type_C,
-        _ => Texture_Letter_Type_A,
-    };
-
     public Faction RelatedFaction;
     public RatkinOrder RelatedOrder;
     public int ArrivalTick = -1;

@@ -255,10 +255,7 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
         {
             foreach (WorldObject point in DisasterPoints)
             {
-                if (point is not null && !point.Destroyed)
-                {
-                    point.Destroy();
-                }
+                point.SafeDestroy();
             }
             DisasterPoints = null;
         }
@@ -267,10 +264,7 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
         {
             foreach (WorldObject_WolfDisasterGossipPoint gossipPoint in gossipPoints)
             {
-                if (gossipPoint is not null && !gossipPoint.Destroyed)
-                {
-                    gossipPoint.Destroy();
-                }
+                gossipPoint.SafeDestroy();
             }
             gossipPoints = null;
         }

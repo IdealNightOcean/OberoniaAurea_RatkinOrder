@@ -75,6 +75,7 @@
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchMedalType.cs" />
+    <Compile Include="Components\QuestEffectTag.cs" />
     <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_AssistanceQuest.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
+    <Compile Include="OrderLetter\OrderLetterType.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_LostItemsOfTrader.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetBranchForObject.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetPresetEffectTags.cs" />
@@ -258,6 +260,8 @@
     <Compile Include="Branch\BranchType.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
+    <Compile Include="Window\Window_OrderLetterBox.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_RefugeeInflux.cs" />
     <Compile Include="Worldobject\WorldObjectComp_BranchSite.cs" />
     <Compile Include="Window\DevWindow\DevWindow_GlobalOrderInteractHandler.cs" />
     <Compile Include="Window\DevWindow\DevWindow_Squad.cs" />
@@ -287,7 +291,6 @@
     <Compile Include="OrderLetter\OrderLetterBox.cs" />
     <Compile Include="Utility\OrderLetterUtility.cs" />
     <Compile Include="Window\Window_LetterBoxSetting.cs" />
-    <Compile Include="Window\Window_OrderLetterBox.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_TaxCollectorCome.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_TaxCollectorTreat.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_LordJob_TaxCollector.cs" />
@@ -357,24 +360,25 @@
     <Compile Include="Work\WorkGiver_FillFermentingBarrel_Order.cs" />
     <Compile Include="Work\WorkGiver_RecieveOrderLetter.cs" />
     <Compile Include="Work\WorkGiver_TakeProductOutOfFermentingBarrel.cs" />
-    <Compile Include="Worldobject\WorldObject_PlagueVillage.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_PlagueVillage.cs" />
+    <Compile Include="Worldobject\WorldObject_BranchDemand.cs" />
     <Compile Include="Worldobject\WorldObject_OrderRelationshipUpgrade.cs" />
-    <Compile Include="Worldobject\WorldObejct_SupplyDepotConstruction.cs" />
-    <Compile Include="Worldobject\WorldObject_FieldSurvey.cs" />
-    <Compile Include="Worldobject\WorldObject_ArmsOrderSite.cs" />
-    <Compile Include="Worldobject\WorldObject_FamineVillage.cs" />
+    <Compile Include="Worldobject\Demand\WorldObejct_SupplyDepotConstruction.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_FieldSurvey.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_ArmsOrderSite.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_FamineVillage.cs" />
     <Compile Include="Worldobject\WorldObject_Interactive_Nameable.cs" />
     <Compile Include="Worldobject\WorldObject_InteractWithFixedCaravan_Nameable.cs" />
-    <Compile Include="Worldobject\WorldObject_ApprenticeHome.cs" />
-    <Compile Include="Worldobject\WorldObject_WolfDisasterGossipPoint.cs" />
-    <Compile Include="Worldobject\MapParent_WolfDisaster.cs" />
-    <Compile Include="Worldobject\WorldObject_WolfDisasterPoint.cs" />
-    <Compile Include="Worldobject\WorldObject_CelebrationHost.cs" />
-    <Compile Include="Worldobject\WorldObject_NonGerminatingSeeds.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_ApprenticeHome.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_WolfDisasterGossipPoint.cs" />
+    <Compile Include="Worldobject\Mercy\MapParent_WolfDisaster.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_WolfDisasterPoint.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_CelebrationHost.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_NonGerminatingSeeds.cs" />
     <Compile Include="Worldobject\WorldObject_TemporaryEncampment.cs" />
-    <Compile Include="Worldobject\WorldObject_ApplianceRepair.cs" />
-    <Compile Include="Worldobject\WorldObject_PastureFlu.cs" />
-    <Compile Include="Worldobject\WorldObject_UnsalableArtcraft.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_ApplianceRepair.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_PastureFlu.cs" />
+    <Compile Include="Worldobject\Mercy\WorldObject_UnsalableArtcraft.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

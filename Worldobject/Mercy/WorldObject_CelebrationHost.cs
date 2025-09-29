@@ -48,18 +48,12 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
 
         SendWorkResolvedSignal();
 
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
 
     protected override void InterruptWork()
     {
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_CelebrationHost_Interrupt".Translate()));
-        if (!Destroyed)
-        {
-            Destroy();
-        }
+        this.SafeDestroy();
     }
 }
