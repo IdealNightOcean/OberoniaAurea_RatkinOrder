@@ -7,7 +7,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public sealed class WorldObejct_SupplyDepotConstruction : WorldObject_InteractWithFixedCaravan_Nameable
+public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWithFixedCaravan_Nameable
 {
     private float constricProgress = 0f;
     private bool autoCotrInofrmed;

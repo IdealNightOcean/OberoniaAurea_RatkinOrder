@@ -43,7 +43,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
         AcceptedBranchDemand acceptedDemand = new(branch, demand);
         demand.OnAccepted(branch);
 
-        if (demand.CurState == BranchDemand.DemandState.Ongoing)
+        if (demand.IsOngoing)
         {
             acceptedBranchDemands.Add(acceptedDemand);
         }

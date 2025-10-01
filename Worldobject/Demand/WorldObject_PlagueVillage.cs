@@ -11,6 +11,18 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class WorldObject_PlagueVillage : WorldObject_BranchDemand
 {
+    private enum PolicyType : byte
+    {
+        OrderControl,
+        SampleCollection,
+        SurveyAssistance
+    }
+    private enum WorkType : byte
+    {
+        Cure,
+        Isolation
+    }
+
     //多次使用的 QuestEffectTag
     private const string ResponsibleDoctor = "ResponsibleDoctor"; //尽责医生
     private const string MedicalInfusion = "MedicalInfusion"; //医疗充盈
@@ -18,8 +30,8 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
 
     public override int TicksNeeded => 30000;
 
-    private int branchPolicy; // 1:秩序管控，2:样本收集，3:调查协助
-    private int workType; // 1:协助救治，2:协助隔离
+    private PolicyType curPolicy;
+    private WorkType curWork;
 
     private int nextPlagueSpreadTick = -1;
     private int nextPeriodicCheckTick = -1;
@@ -40,8 +52,8 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref branchPolicy, "branchPolicy", 0);
-        Scribe_Values.Look(ref workType, "workType", 0);
+        Scribe_Values.Look(ref curPolicy, "curPolicy");
+        Scribe_Values.Look(ref curWork, "curWork");
 
         Scribe_Values.Look(ref nextPlagueSpreadTick, "nextPlagueSpreadTick", -1);
         Scribe_Values.Look(ref nextPeriodicCheckTick, "nextPeriodicCheckTick", -1);
@@ -97,15 +109,15 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
     public override string GetInspectString()
     {
         StringBuilder sb = new(base.GetInspectString());
-        sb.AppendInNewLine("OARO_PlagueVillage_CurPolicy".Translate());
+        sb.AppendInNewLine("OARO_WorldObejct_CurPolicy".Translate());
         sb.Append(": ");
-        if (branchPolicy >= 1 && branchPolicy <= 3)
+        sb.Append($"OARO_PlagueVillage_{curPolicy}".Translate());
+
+        if (isWorking)
         {
-            sb.Append($"OARO_PlagueVillage_Policy{branchPolicy}".Translate());
-        }
-        else
-        {
-            sb.Append("None".Translate());
+            sb.AppendInNewLine("OARO_WorldObejct_CurWork".Translate());
+            sb.Append(": ");
+            sb.Append($"OARO_PlagueVillage_{curWork}".Translate());
         }
 
         Color PopulationColor = population switch
@@ -115,7 +127,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
             > 600 => ColorLibrary.Orange,
             _ => ColorLibrary.RedReadable
         };
-        sb.AppendInNewLine("OARO_PlagueVillage_Population".Translate(population, originalPopulation).Colorize(PopulationColor));
+        sb.AppendInNewLine("OARO_WorldObejct_PopulationInfo".Translate(population, originalPopulation).Colorize(PopulationColor));
         sb.AppendInNewLine("OARO_PlagueVillage_Control".Translate(plagueControl.ToString("F2"), maxPlagueControl.ToString("F2")));
 
         Color SpreadColor = plagueSpread switch
@@ -171,7 +183,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
             defaultLabel = "DEV: Reduce 500 Population",
             action = delegate
             {
-                population -= 500;
+                AdjustPopulation(-500);
             }
         };
         yield return new Command_Action()
@@ -179,14 +191,14 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
             defaultLabel = "DEV: Reduce 100 Population",
             action = delegate
             {
-                population -= 100;
+                AdjustPopulation(-100);
             }
         };
     }
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        OpenArrivedDialog(caravan);
+        Find.WindowStack.Add(new Dialog_NodeTree(ArrivedDiaNode(caravan)));
     }
 
     public void AdjustPlagueControl(float change)
@@ -202,9 +214,9 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
     {
         if (associatedFixedCaravan is not null)
         {
-            switch (workType)
+            switch (curWork)
             {
-                case 1:
+                case WorkType.Cure:
                     {
                         int maxMedicineLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
                         int totalMedicineLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
@@ -213,16 +225,16 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
                         {
                             controlAdd *= 0.5f;
                         }
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_CureResult".Translate(controlAdd.ToString("F2"))));
+                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(controlAdd.ToString("F2"))));
                         AdjustPlagueControl(controlAdd);
                         return;
                     }
-                case 2:
+                case WorkType.Isolation:
                     {
                         int totalSocialLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
                         float spreadReduce = totalSocialLevel * 0.00025f;
                         PlagueSpread -= spreadReduce;
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_IsolationResult".Translate(spreadReduce.ToStringPercent("F2"))));
+                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(spreadReduce.ToStringPercent("F2"))));
                         return;
                     }
                 default: return;
@@ -249,7 +261,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         }
     }
 
-    private void OpenArrivedDialog(Caravan caravan)
+    private DiaNode ArrivedDiaNode(Caravan caravan)
     {
         DiaNode rootNode = new("OARO_PlagueVillage_ArrivalInfo".Translate());
 
@@ -271,7 +283,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         {
             action = delegate
             {
-                workType = 1;
+                curWork = WorkType.Cure;
                 base.StartWork(caravan);
             },
             resolveTree = true
@@ -282,7 +294,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         {
             action = delegate
             {
-                workType = 2;
+                curWork = WorkType.Isolation;
                 base.StartWork(caravan);
             },
             resolveTree = true
@@ -290,9 +302,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         rootNode.options.Add(isolationOpt);
 
         rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
-
-        Dialog_NodeTree dialog = new(rootNode);
-        Find.WindowStack.Add(dialog);
+        return rootNode;
     }
 
     private DiaNode DispatchNode(Caravan caravan)
@@ -378,9 +388,9 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
 
     private void PeriodicCheck()
     {
-        switch (branchPolicy)
+        switch (curPolicy)
         {
-            case 1:
+            case PolicyType.OrderControl:
                 {
                     float plagueSpreadReduce = 0.002f + TotalPotency * 0.01f;
                     plagueSpread -= plagueSpreadReduce;
@@ -394,7 +404,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
                     AdjustPlagueControl(controlAdd);
                     break;
                 }
-            case 2:
+            case PolicyType.SampleCollection:
                 {
                     if (Rand.Chance(TotalPotency * 0.6f))
                     {
@@ -406,8 +416,8 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
                             OAFrame_DropPodUtility.DefaultDropSingleThing(thing, map, branch?.RatkinOrder?.Faction, sendLetter: false);
 
                             Find.LetterStack.ReceiveLetter(
-                                label: "OARO_PlagueVillage_SpecimenCollectionLabel".Translate(),
-                                text: "OARO_PlagueVillage_SpecimenCollectionText".Translate(),
+                                label: "OARO_PlagueVillage_SampleCollectionLabel".Translate(),
+                                text: "OARO_PlagueVillage_SampleCollectionText".Translate(),
                                 textLetterDef: LetterDefOf.PositiveEvent,
                                 lookTargets: thing,
                                 relatedFaction: branch?.RatkinOrder.Faction,
@@ -416,7 +426,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
                     }
                     break;
                 }
-            case 3:
+            case PolicyType.SurveyAssistance:
                 {
                     float controlAdd = 2 + TotalPotency * 12f;
                     if (HasStrangePlagueTag)
@@ -445,10 +455,11 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         {
             spreadCount *= 0.8f;
         }
-        population = Math.Max(0, population - Mathf.FloorToInt(spreadCount));
-        if (population < 500)
+
+        AdjustPopulation(Mathf.FloorToInt(spreadCount));
+
+        if (Destroyed)
         {
-            this.SafeDestroy();
             return;
         }
 
@@ -480,6 +491,15 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         }
 
         PlagueSpread += (0.02f + PlagueSpread * 0.05f);
+    }
+
+    private void AdjustPopulation(int change)
+    {
+        population = Math.Max(0, population - change);
+        if (population < 500)
+        {
+            this.SafeDestroy();
+        }
     }
 
     private void PlagueResolved()

@@ -105,7 +105,7 @@ public static class BranchDemandUtility
 
     public static bool CanAcceptDemand(Branch branch, BranchDemand demand)
     {
-        if (branch is null || demand is null || demand.CurState != BranchDemand.DemandState.NotAccepted)
+        if (branch is null || demand is null || demand.HasAccepted)
         {
             return false;
         }

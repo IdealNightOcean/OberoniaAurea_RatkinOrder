@@ -30,7 +30,7 @@ public class QuestNode_AddEffectTags : QuestNode
 
     protected override void RunInt()
     {
-        if (QuestPart_EffectTags.TryGetEffectTags(QuestGen.quest, addPartIfMiss: true, out QuestPart_EffectTags questPart_EffectTags))
+        if (QuestPart_EffectTags.TryGetEffectTagsPart(QuestGen.quest, addPartIfMiss: true, out QuestPart_EffectTags questPart_EffectTags))
         {
             questPart_EffectTags.AddTags(tagsToAdd.GetValue(QuestGen.slate));
         }

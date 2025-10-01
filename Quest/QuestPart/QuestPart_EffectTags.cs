@@ -58,7 +58,7 @@ public class QuestPart_EffectTags : QuestPart
         tags?.Remove(tagKey);
     }
 
-    public static bool TryGetEffectTags(Quest quest, bool addPartIfMiss, out QuestPart_EffectTags questPart_EffectTags)
+    public static bool TryGetEffectTagsPart(Quest quest, bool addPartIfMiss, out QuestPart_EffectTags questPart_EffectTags)
     {
         questPart_EffectTags = quest.PartsListForReading.OfType<QuestPart_EffectTags>()?.FirstOrFallback(null);
         if (addPartIfMiss && questPart_EffectTags is null)

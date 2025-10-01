@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchDemand : IExposable
 {
-    public enum DemandState
+    private enum DemandState : byte
     {
         NotAccepted,
         Ongoing,
@@ -20,8 +20,8 @@ public class BranchDemand : IExposable
     private Quest relatedQuest;
 
     public BranchDemandDef Def => def;
-
-    public DemandState CurState => curState;
+    public bool HasAccepted => curState != DemandState.NotAccepted;
+    public bool IsOngoing => curState == DemandState.Ongoing;
     public BranchDemandType DemandType => def.demandType;
     public Quest RelatedQuest => relatedQuest;
 
@@ -96,4 +96,8 @@ public class BranchDemand : IExposable
         return slate;
     }
 
+    public override string ToString()
+    {
+        return def.defName + "-" + curState.ToString();
+    }
 }

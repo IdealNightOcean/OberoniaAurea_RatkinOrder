@@ -28,8 +28,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
         }
         else
         {
-            listing_Rect.SubLabel(normalDemand.Def.label, 0.8f);
-            listing_Rect.SubLabel(normalDemand.CurState.ToString(), 0.8f);
+            listing_Rect.SubLabel(normalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
                 if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, normalDemand))
@@ -47,7 +46,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
         else
         {
             listing_Rect.SubLabel(criticalDemand.Def.label, 0.8f);
-            listing_Rect.SubLabel(criticalDemand.CurState.ToString(), 0.8f);
+            listing_Rect.SubLabel(criticalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
                 if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, criticalDemand))
@@ -134,7 +133,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
             {
                 if (replaceCur)
                 {
-                    return criticalDemand.CurState != BranchDemand.DemandState.Ongoing
+                    return !criticalDemand.IsOngoing
                         && (ignoreCD || !Branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.CriticalDemandAdd));
                 }
                 else
@@ -153,7 +152,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
             {
                 if (replaceCur)
                 {
-                    return normalDemand.CurState != BranchDemand.DemandState.Ongoing
+                    return !normalDemand.IsOngoing
                         && (ignoreCD || Branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd));
                 }
                 else

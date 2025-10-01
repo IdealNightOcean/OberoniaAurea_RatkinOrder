@@ -15,7 +15,7 @@ public abstract class WorldObject_BranchDemand : WorldObject_InteractWithFixedCa
         {
             if (effectTags is null)
             {
-                QuestPart_EffectTags.TryGetEffectTags(quest, addPartIfMiss: false, out effectTags);
+                QuestPart_EffectTags.TryGetEffectTagsPart(quest, addPartIfMiss: false, out effectTags);
             }
             return effectTags;
         }

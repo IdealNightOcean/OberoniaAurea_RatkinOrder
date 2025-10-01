@@ -12,13 +12,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
 {
-    public enum PatrolType
+    public enum PatrolType : byte
     {
         Popedom,
         Kingdom,
         Border
     }
-    public enum PatrolEndType
+    public enum PatrolEndType : byte
     {
         Nothing,
         Normal,

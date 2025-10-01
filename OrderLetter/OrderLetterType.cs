@@ -1,6 +1,6 @@
 ﻿namespace OberoniaAurea.RatkinOrder;
 
-public enum OrderLetterType
+public enum OrderLetterType : byte
 {
     Normal,
     Urgent,

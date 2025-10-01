@@ -1,6 +1,6 @@
 ﻿namespace OberoniaAurea.RatkinOrder;
 
-public enum BranchFacilityLevel
+public enum BranchFacilityLevel : byte
 {
     None = 0,
     Poor = 1,

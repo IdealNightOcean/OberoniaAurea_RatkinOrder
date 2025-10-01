@@ -1,13 +1,29 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
+using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 难民潮 - 难民营地
+/// </summary>
 public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
 {
+    private enum PolicyType : byte
+    {
+        FocusPacify,
+        ImproveDist,
+    }
+    private enum WorkType : byte
+    {
+        AssistPacify,
+        Hunting
+    }
+
     private bool HasDisorderlyMilitaryTag => HasQuestEffectTag("DisorderlyMilitary");
     public string RefugeeCliqueKey => "Refugee_" + ID;
     public string RoyalArmyCliqueKey => "RoyalArmy_" + ID;
@@ -16,19 +32,20 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
 
     private bool onMilitarySupervision;
 
-    private int branchPolicy; // 0: 安抚难民，1: 改善配给
-    private int workType; // 0: 就近狩猎，1: 安抚难民
+    private PolicyType curPolicy;
+    private WorkType curWork;
 
+    private int originalPopulation;
     private int population;
-    private float lastPopulationChange;
+    private float yestPopulationChange;
 
     private float distEfficiency;
     private float extraFixeddistEfficiency;
-    private float lastDistEfficiencyChange;
+    private float yestDistEfficiencyChange;
     private bool forceDist;
 
     private float famineRisk;
-    private float lastFamineRiskChange;
+    private float yestFamineRiskChange;
 
     private int ticksToNextCheck;
 
@@ -48,7 +65,7 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         {
             float oldDistEfficiency = distEfficiency;
             distEfficiency = Mathf.Clamp01(value);
-            lastDistEfficiencyChange += (distEfficiency - oldDistEfficiency);
+            yestDistEfficiencyChange += (distEfficiency - oldDistEfficiency);
         }
     }
     private float FamineRisk
@@ -58,7 +75,7 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         {
             float oldFamineRisk = famineRisk;
             famineRisk = Mathf.Clamp01(value);
-            lastFamineRiskChange += (famineRisk - oldFamineRisk);
+            yestFamineRiskChange += (famineRisk - oldFamineRisk);
         }
     }
     private int FamineRiskLevel => famineRisk switch
@@ -74,19 +91,19 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         base.ExposeData();
         Scribe_Values.Look(ref onMilitarySupervision, "onMilitarySupervision", defaultValue: false);
 
-        Scribe_Values.Look(ref branchPolicy, "branchPolicy", 0);
-        Scribe_Values.Look(ref workType, "workType", 0);
+        Scribe_Values.Look(ref curPolicy, "curPolicy");
+        Scribe_Values.Look(ref curWork, "curWork");
 
         Scribe_Values.Look(ref population, "population", 0);
-        Scribe_Values.Look(ref lastPopulationChange, "lastPopulationChange", 0f);
+        Scribe_Values.Look(ref yestPopulationChange, "yestPopulationChange", 0f);
 
         Scribe_Values.Look(ref distEfficiency, "distEfficiency", 0f);
         Scribe_Values.Look(ref extraFixeddistEfficiency, "extraFixeddistEfficiency", 0f);
-        Scribe_Values.Look(ref lastDistEfficiencyChange, "lastDistEfficiencyChange", 0f);
+        Scribe_Values.Look(ref yestDistEfficiencyChange, "yestDistEfficiencyChange", 0f);
         Scribe_Values.Look(ref forceDist, "forceDist", defaultValue: false);
 
         Scribe_Values.Look(ref famineRisk, "famineRisk", 0f);
-        Scribe_Values.Look(ref lastFamineRiskChange, "lastFamineRiskChange", 0f);
+        Scribe_Values.Look(ref yestFamineRiskChange, "yestFamineRiskChange", 0f);
 
         Scribe_Values.Look(ref ticksToNextCheck, "ticksToNextCheck", 0);
 
@@ -96,7 +113,8 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
     public override void PostAdd()
     {
         base.PostAdd();
-        population = Rand.RangeInclusive(1000, 1500);
+        originalPopulation = Rand.RangeInclusive(1000, 1500);
+        population = originalPopulation;
         distEfficiency = 0.5f;
         famineRisk = 0f;
         ticksToNextCheck = 2500;
@@ -135,6 +153,38 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
 
         CliquesManager.TryAddClique(RefugeeCliqueKey, refugeeClique);
         CliquesManager.TryAddClique(RefugeeCliqueKey, royalArmyClique);
+    }
+
+    public override string GetInspectString()
+    {
+        StringBuilder sb = new(base.GetInspectString());
+        sb.AppendInNewLine("OARO_WorldObejct_CurPolicy".Translate());
+        sb.Append(": ");
+        sb.Append($"OARO_RefugeeInflux_{curPolicy}".Translate());
+
+        if (isWorking)
+        {
+            sb.AppendInNewLine("OARO_WorldObejct_CurWork".Translate());
+            sb.Append(": ");
+            sb.Append($"OARO_RefugeeInflux_{curWork}".Translate());
+        }
+
+        sb.AppendInNewLine("OARO_WorldObejct_PopulationInfo".Translate(population, originalPopulation));
+
+        sb.AppendInNewLine("OARO_RefugeeInflux_DistEfficiency".Translate(distEfficiency.ToStringPercent("F2")));
+        sb.AppendInNewLine("OARO_RefugeeInflux_DistEfficiencyDesc".Translate());
+
+        Color famineRiskColor = FamineRiskLevel switch
+        {
+            0 => Color.green,
+            1 => Color.yellow,
+            2 => ColorLibrary.Orange,
+            _ => ColorLibrary.RedReadable,
+        };
+        sb.AppendInNewLine("OARO_RefugeeInflux_FamineRisk".Translate(famineRisk.ToStringPercent("F2")).Colorize(famineRiskColor));
+        sb.AppendInNewLine($"OARO_RefugeeInflux_FamineRiskDesc_{FamineRiskLevel}".Translate().Colorize(famineRiskColor));
+
+        return sb.ToString();
     }
 
     public override void Notify_CaravanArrived(Caravan caravan)
@@ -181,18 +231,18 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
                 {
                     action = delegate
                     {
-                        workType = 0;
+                        curWork = WorkType.Hunting;
                         base.Notify_CaravanArrived(caravan);
                     },
                     resolveTree = true
                 };
                 rootNode.options.Add(huntingOpt);
 
-                DiaOption pacifyOpt = new("OARO_RefugeeInflux_Pacify".Translate())
+                DiaOption pacifyOpt = new("OARO_RefugeeInflux_AssistPacify".Translate())
                 {
                     action = delegate
                     {
-                        workType = 1;
+                        curWork = WorkType.AssistPacify;
                         base.Notify_CaravanArrived(caravan);
                     },
                     resolveTree = true
@@ -220,59 +270,39 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
 
     /// <summary>
     /// 60000Tick (24小时)一周期
+    /// 先检测饥荒削减人口，未导致失败再进行后继行为
     /// </summary>
     private void PeriodicCheck(int nextCheckDelay)
     {
-        if (cooldownManager.IsInCooldown("PeriodicCheck"))
-        {
-            return;
-        }
-
-        cooldownManager.RegisterRecord("PeriodicCheck", cdTicks: nextCheckDelay, shouldRemoveWhenExpired: true);
-        FrameCheck();
+        FamineCheck();
         if (Destroyed)
         {
             return;
         }
 
-        lastDistEfficiencyChange = 0f;
-        lastFamineRiskChange = 0f;
-        lastPopulationChange = 0f;
+        yestDistEfficiencyChange = 0f;
+        yestFamineRiskChange = 0f;
+        yestPopulationChange = 0f;
 
         RecacheExtraFixeddistEfficiency();
 
-        float famineRiskChange = Rand.Range(0.08f, 0.16f);
-
-        if (cooldownManager.IsInCooldown("GrainArrival"))
+        if (!onMilitarySupervision && curPolicy == PolicyType.FocusPacify)
         {
-            cooldownManager.RegisterRecord("GrainArrival", cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
-            TaggedString label;
-            TaggedString text;
-            LetterDef letterDef = LetterDefOf.NeutralEvent;
-            float chance = Rand.Value;
-
-            if (chance < 0.6f || CliquesManager.IsCliqueActive("WholesaleTrader"))
-            {
-                famineRiskChange -= 0.75f;
-            }
-            else if (chance < 0.9f)
-            {
-                famineRiskChange -= 0.55f;
-                AdjuestRefugeeWillingness(-0.05f);
-            }
-            else
-            {
-                famineRiskChange -= 0.25f;
-                AdjuestRefugeeWillingness(-0.2f);
-            }
-            Find.LetterStack.ReceiveLetter(label, text, letterDef, lookTargets: this, quest: quest);
+            AdjuestRefugeeWillingness(0.05f + TotalPotency * 0.1f);
         }
 
+
+        float famineRiskChange = Rand.Range(0.08f, 0.16f);
         famineRiskChange += (1f - DistEfficiency);
         FamineRisk += famineRiskChange;
+
+        if (!cooldownManager.IsInCooldown("GrainArrival"))
+        {
+            GrainArrival();
+        }
     }
 
-    private void FrameCheck()
+    private void FamineCheck()
     {
         switch (FamineRiskLevel)
         {
@@ -297,18 +327,81 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         }
     }
 
+    /// <summary>
+    /// 运粮队到达
+    /// </summary>
+    private void GrainArrival()
+    {
+        int grainCdTicks = HasQuestEffectTag("RemoteArea") ? 6 * 60000 : 5 * 60000;
+        cooldownManager.RegisterRecord("GrainArrival", cdTicks: grainCdTicks, shouldRemoveWhenExpired: true);
+
+        int corruptionLevel;
+        if (cliquesManager.IsCliqueActive("WholesaleTrader"))
+        {
+            corruptionLevel = 0;
+        }
+        else
+        {
+            List<(int corruptionLevel, float chance)> corruption = [(0, 0.6f), (1, 0.3f), (2, 0.1f)];
+            if (onMilitarySupervision)
+            {
+                corruption[0] = (0, corruption[0].chance - 0.3f);
+                corruption[1] = (1, corruption[1].chance + 0.2f);
+                corruption[2] = (2, corruption[2].chance + 0.1f);
+            }
+            if (HasDisorderlyMilitaryTag)
+            {
+                corruption[0] = (0, corruption[0].chance - 0.1f);
+                corruption[1] = (1, corruption[1].chance + 0.05f);
+                corruption[2] = (2, corruption[2].chance + 0.05f);
+            }
+            if (HasQuestEffectTag("Integrity"))
+            {
+                corruption[0] = (0, corruption[0].chance - 0.2f);
+                corruption[1] = (1, corruption[1].chance - 0.1f);
+                corruption[2] = (2, corruption[2].chance - 0.1f);
+            }
+            corruptionLevel = corruption.RandomElementByWeight(t => t.chance).corruptionLevel;
+        }
+
+        TaggedString text;
+        LetterDef letterDef;
+        if (corruptionLevel <= 0)
+        {
+            FamineRisk -= 0.75f;
+            letterDef = LetterDefOf.PositiveEvent;
+            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.75f.ToStringPercent("F2"));
+        }
+        else if (corruptionLevel == 1)
+        {
+            FamineRisk -= 0.55f;
+            AdjuestRefugeeWillingness(-0.05f);
+            letterDef = LetterDefOf.NeutralEvent;
+            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.55f.ToStringPercent("F2"), 0.05f.ToStringPercent("f2"));
+        }
+        else
+        {
+            FamineRisk -= 0.25f;
+            AdjuestRefugeeWillingness(-0.2f);
+            letterDef = LetterDefOf.NegativeEvent;
+            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.25f.ToStringPercent("F2"), 0.2f.ToStringPercent("f2"));
+        }
+
+        Find.LetterStack.ReceiveLetter("OARO_RefugeeInflux_GrainArrivalLabel".Translate(Name), text, letterDef, lookTargets: this, quest: quest);
+    }
+
     private void RecacheExtraFixeddistEfficiency()
     {
         extraFixeddistEfficiency = 0f;
         forceDist = !cooldownManager.IsInCooldown("ForceDist");
 
-        if (branchPolicy == 1)
+        if (curPolicy == PolicyType.ImproveDist)
         {
             extraFixeddistEfficiency += (0.05f + TotalPotency * 0.2f);
         }
         if (onMilitarySupervision)
         {
-            extraFixeddistEfficiency += 0.2f;
+            extraFixeddistEfficiency += HasDisorderlyMilitaryTag ? 0.1f : 0.2f;
         }
         else
         {
@@ -322,18 +415,22 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
 
     protected override void FinishWork()
     {
-        switch (workType)
+        switch (curWork)
         {
-            case 0:
+            case WorkType.Hunting:
                 {
                     int maxAnimalsLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
                     int totalShootingLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Shooting);
-                    float famineRiskChange = maxAnimalsLevel * 0.002f + totalShootingLevel * 0.0001f * Rand.Range(0.5f, 1.5f);
+                    float famineRiskChange = (maxAnimalsLevel * 0.002f + totalShootingLevel * 0.0001f) * Rand.Range(0.5f, 1.5f);
+                    if (HasQuestEffectTag("HuntingGround"))
+                    {
+                        famineRiskChange *= 1.5f;
+                    }
                     FamineRisk -= famineRiskChange;
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_HuntingResult".Translate(famineRiskChange.ToStringPercent("F2"))));
                     break;
                 }
-            case 1:
+            case WorkType.AssistPacify:
                 {
                     float willingnessChange = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social) * 0.001f;
                     AdjuestRefugeeWillingness(willingnessChange);
@@ -349,7 +446,7 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
     private void AdjustPopulation(int change)
     {
         population -= change;
-        lastFamineRiskChange = change;
+        yestFamineRiskChange = change;
         if (population < 300)
         {
             this.SafeDestroy();
@@ -371,6 +468,10 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         onMilitarySupervision = true;
         CliquesManager.RemoveClique(RefugeeCliqueKey);
         CliquesManager.TryActiveClique(RoyalArmyCliqueKey, directly: true);
+        if (isWorking)
+        {
+            EndWork(interrupt: true);
+        }
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_MilitarySupervisionResult".Translate()));
     }
 
@@ -428,11 +529,11 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         }
     }
 
-    private void AdjuestRefugeeWillingness(float change)
+    private void AdjuestRefugeeWillingness(float change, bool showMessage = true)
     {
         if (!onMilitarySupervision)
         {
-            CliquesManager.AdjustCliqueWillingness(RefugeeCliqueKey, change);
+            CliquesManager.AdjustCliqueWillingness(RefugeeCliqueKey, change, showMessage);
         }
     }
 }

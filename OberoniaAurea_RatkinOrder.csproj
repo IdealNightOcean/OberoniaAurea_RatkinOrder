@@ -75,6 +75,8 @@
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchMedalType.cs" />
+    <Compile Include="Components\TrackedIntValue.cs" />
+    <Compile Include="Components\TrackedFloatValue.cs" />
     <Compile Include="Components\QuestEffectTag.cs" />
     <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
@@ -92,6 +94,7 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
     <Compile Include="OrderLetter\OrderLetterType.cs" />
+    <Compile Include="Quest\Quest_NobilityTerritory_TypeSelecter.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_LostItemsOfTrader.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetBranchForObject.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetPresetEffectTags.cs" />
@@ -261,6 +264,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_NobilityTerritory.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_RefugeeInflux.cs" />
     <Compile Include="Worldobject\WorldObjectComp_BranchSite.cs" />
     <Compile Include="Window\DevWindow\DevWindow_GlobalOrderInteractHandler.cs" />
@@ -363,7 +367,7 @@
     <Compile Include="Worldobject\Demand\WorldObject_PlagueVillage.cs" />
     <Compile Include="Worldobject\WorldObject_BranchDemand.cs" />
     <Compile Include="Worldobject\WorldObject_OrderRelationshipUpgrade.cs" />
-    <Compile Include="Worldobject\Demand\WorldObejct_SupplyDepotConstruction.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_SupplyDepotConstruction.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_FieldSurvey.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_ArmsOrderSite.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_FamineVillage.cs" />

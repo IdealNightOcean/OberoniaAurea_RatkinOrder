@@ -13,7 +13,7 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCaravan_Nameable, IThingRequester, ISingleBranchRelated
 {
-    private enum WorkType
+    private enum WorkType : byte
     {
         Direct,
         GainTrust,

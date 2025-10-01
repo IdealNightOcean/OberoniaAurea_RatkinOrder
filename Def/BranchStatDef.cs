@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatDef : Def
 {
-    public enum StatType
+    public enum StatType : byte
     {
         Float,
         Percent,
