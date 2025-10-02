@@ -116,6 +116,15 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         return false;
     }
 
+    public string GetCliqueName(string cliqueKey, bool showErrorIfMiss = false)
+    {
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
+        {
+            return "UNKOWN";
+        }
+        return clique.Name;
+    }
+
     public bool TryAddClique(string cliqueKey, QuestClique clique, bool replaceCur = false, bool defaultActive = false)
     {
         bool added = false;
@@ -208,13 +217,13 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         return clique.Willingness > 0.999f;
     }
 
-    public bool TryActiveClique(string cliqueKey, bool directly = false)
+    public bool TryActiveClique(string cliqueKey, bool directly = false, int activeDelayTicks = -1)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
             return false;
         }
-        return TryActiveClique(clique, directly);
+        return TryActiveClique(clique, directly, activeDelayTicks);
     }
 
     private bool TryActiveClique(QuestClique clique, bool directly = false, int activeDelayTicks = -1)

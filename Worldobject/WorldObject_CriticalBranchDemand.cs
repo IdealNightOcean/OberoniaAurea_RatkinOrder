@@ -2,11 +2,14 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class WorldObject_BranchDemand : WorldObject_InteractWithFixedCaravan_Nameable, ISingleBranchRelated
+public abstract class WorldObject_CriticalBranchDemand : WorldObject_InteractWithFixedCaravan_Nameable, ISingleBranchRelated
 {
     protected Branch branch;
     public Branch Branch => branch;
     protected virtual bool DestroyWhenBranchRemoved => true;
+    protected virtual int PeriodicCheckInterval => 60000;
+
+    protected int nextCheckTick;
 
     [Unsaved] protected QuestPart_EffectTags effectTags;
     public QuestPart_EffectTags EffectTags
@@ -37,6 +40,19 @@ public abstract class WorldObject_BranchDemand : WorldObject_InteractWithFixedCa
 
     public float TotalPotency => CliquesManager?.TotalPotency ?? 0f;
 
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_References.Look(ref branch, "branch");
+        Scribe_Values.Look(ref nextCheckTick, "nextCheckTick");
+    }
+
+    public override void PostAdd()
+    {
+        base.PostAdd();
+        nextCheckTick = Find.TickManager.TicksGame + PeriodicCheckInterval;
+    }
+
     public void InitOrderBranch(Branch branch)
     {
         this.branch = branch;
@@ -56,6 +72,18 @@ public abstract class WorldObject_BranchDemand : WorldObject_InteractWithFixedCa
         }
     }
 
+    protected override void TickInterval(int delta)
+    {
+        base.TickInterval(delta);
+        if (!Destroyed && Find.TickManager.TicksGame > nextCheckTick)
+        {
+            nextCheckTick = Find.TickManager.TicksGame + PeriodicCheckInterval;
+            PeriodicCheck();
+        }
+    }
+
+    protected abstract void PeriodicCheck();
+
     public void Notify_BranchDestroyed(Branch branch)
     {
         if (this.branch == branch)
@@ -66,11 +94,5 @@ public abstract class WorldObject_BranchDemand : WorldObject_InteractWithFixedCa
                 this.SafeDestroy();
             }
         }
-    }
-
-    public override void ExposeData()
-    {
-        base.ExposeData();
-        Scribe_References.Look(ref branch, "branch");
     }
 }

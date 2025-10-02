@@ -264,6 +264,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
+    <Compile Include="Worldobject\Demand\GenStep_NobilityTerritoryPawns.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_NobilityTerritory.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_RefugeeInflux.cs" />
     <Compile Include="Worldobject\WorldObjectComp_BranchSite.cs" />
@@ -365,7 +366,7 @@
     <Compile Include="Work\WorkGiver_RecieveOrderLetter.cs" />
     <Compile Include="Work\WorkGiver_TakeProductOutOfFermentingBarrel.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_PlagueVillage.cs" />
-    <Compile Include="Worldobject\WorldObject_BranchDemand.cs" />
+    <Compile Include="Worldobject\WorldObject_CriticalBranchDemand.cs" />
     <Compile Include="Worldobject\WorldObject_OrderRelationshipUpgrade.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_SupplyDepotConstruction.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_FieldSurvey.cs" />

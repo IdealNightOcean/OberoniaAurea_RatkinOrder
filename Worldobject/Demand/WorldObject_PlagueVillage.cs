@@ -9,7 +9,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_PlagueVillage : WorldObject_BranchDemand
+public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
 {
     private enum PolicyType : byte
     {
@@ -29,12 +29,12 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
     private bool HasStrangePlagueTag => HasQuestEffectTag("StrangePlague");
 
     public override int TicksNeeded => 30000;
+    protected override int PeriodicCheckInterval => 15000;
 
     private PolicyType curPolicy;
     private WorkType curWork;
 
     private int nextPlagueSpreadTick = -1;
-    private int nextPeriodicCheckTick = -1;
 
     private int originalPopulation;
     private int population;
@@ -56,7 +56,6 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         Scribe_Values.Look(ref curWork, "curWork");
 
         Scribe_Values.Look(ref nextPlagueSpreadTick, "nextPlagueSpreadTick", -1);
-        Scribe_Values.Look(ref nextPeriodicCheckTick, "nextPeriodicCheckTick", -1);
 
         Scribe_Values.Look(ref originalPopulation, "originalPopulation", 0);
         Scribe_Values.Look(ref population, "population", 0);
@@ -75,7 +74,6 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         PlagueSpread = Rand.Range(0.3f, 0.45f);
         plagueControl = 0f;
 
-        nextPeriodicCheckTick = Find.TickManager.TicksGame + 15000;
         nextPlagueSpreadTick = Find.TickManager.TicksGame + 60000;
 
         if (EffectTags is not null)
@@ -87,8 +85,8 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
 
             if (effectTags.HasTag(ResponsibleDoctor))
             {
-                CliquesManager?.AdjustCliqueWillingness(KeyLibrary_QuestCliqueKey.Doctor, 0.1f);
-                CliquesManager?.AdjustCliquePotency(KeyLibrary_QuestCliqueKey.Doctor, 0.15f);
+                CliquesManager.AdjustCliqueWillingness(KeyLibrary_QuestCliqueKey.Doctor, 0.1f);
+                CliquesManager.AdjustCliquePotency(KeyLibrary_QuestCliqueKey.Doctor, 0.15f);
             }
 
             if (effectTags.HasTag("LargeTown"))
@@ -244,23 +242,6 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
 
     protected override void InterruptWork() { }
 
-    protected override void TickInterval(int delta)
-    {
-        base.TickInterval(delta);
-
-        if (!Destroyed && Find.TickManager.TicksGame >= nextPeriodicCheckTick)
-        {
-            nextPeriodicCheckTick = Find.TickManager.TicksGame + 15000;
-            PeriodicCheck();
-
-            if (!Destroyed && Find.TickManager.TicksGame >= nextPlagueSpreadTick)
-            {
-                nextPlagueSpreadTick = Find.TickManager.TicksGame + 60000;
-                DailySpreadPlague();
-            }
-        }
-    }
-
     private DiaNode ArrivedDiaNode(Caravan caravan)
     {
         DiaNode rootNode = new("OARO_PlagueVillage_ArrivalInfo".Translate());
@@ -386,7 +367,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
         }
     }
 
-    private void PeriodicCheck()
+    protected override void PeriodicCheck()
     {
         switch (curPolicy)
         {
@@ -441,7 +422,7 @@ public class WorldObject_PlagueVillage : WorldObject_BranchDemand
                 break;
         }
 
-        if (!Destroyed && Find.TickManager.TicksGame >= nextPeriodicCheckTick)
+        if (!Destroyed && Find.TickManager.TicksGame >= nextPlagueSpreadTick)
         {
             nextPlagueSpreadTick = Find.TickManager.TicksGame + 60000;
             DailySpreadPlague();

@@ -11,7 +11,7 @@ namespace OberoniaAurea.RatkinOrder;
 /// <summary>
 /// 难民潮 - 难民营地
 /// </summary>
-public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
+public class WorldObject_RefugeeInflux : WorldObject_CriticalBranchDemand
 {
     private enum PolicyType : byte
     {
@@ -29,6 +29,7 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
     public string RoyalArmyCliqueKey => "RoyalArmy_" + ID;
 
     public override int TicksNeeded => 30000;
+    protected override int PeriodicCheckInterval => 60000;
 
     private bool onMilitarySupervision;
 
@@ -46,8 +47,6 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
 
     private float famineRisk;
     private float yestFamineRiskChange;
-
-    private int ticksToNextCheck;
 
     private CooldownRecordManager cooldownManager = new();
 
@@ -105,8 +104,6 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         Scribe_Values.Look(ref famineRisk, "famineRisk", 0f);
         Scribe_Values.Look(ref yestFamineRiskChange, "yestFamineRiskChange", 0f);
 
-        Scribe_Values.Look(ref ticksToNextCheck, "ticksToNextCheck", 0);
-
         Scribe_Deep.Look(ref cooldownManager, "cooldownManager", 0);
     }
 
@@ -117,15 +114,14 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         population = originalPopulation;
         distEfficiency = 0.5f;
         famineRisk = 0f;
-        ticksToNextCheck = 2500;
         cooldownManager.RegisterRecord("PeriodicCheck", cdTicks: 30000, shouldRemoveWhenExpired: true);
         cooldownManager.RegisterRecord("GrainArrival", cdTicks: 5 * 30000, shouldRemoveWhenExpired: true);
 
         QuestClique refugeeClique = new()
         {
-            Name = "OARO_Name_RefugeeClique".Translate(Name),
-            ActiveDesc = "OARO_ActiveDesc_RefugeeClique".Translate(),
-            InactiveDesc = "OARO_InactiveDesc_RefugeeClique".Translate(),
+            Name = "OARO_CliqueName_Refugee".Translate(Name),
+            ActiveDesc = "OARO_CliqueActiveDesc_Refugee".Translate(),
+            InactiveDesc = "OARO_CliqueInactiveDesc_Refugee".Translate(),
             Potency = 0.2f,
             Willingness = Rand.Range(0.15f, 0.25f),
             IsActivatable = true,
@@ -137,9 +133,9 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
 
         QuestClique royalArmyClique = new()
         {
-            Name = "OARO_Name_RoyalArmyClique".Translate(Name),
-            ActiveDesc = "OARO_ActiveDesc_RoyalArmyClique".Translate(),
-            InactiveDesc = "OARO_InactiveDesc_RoyalArmyClique".Translate(),
+            Name = "OARO_CliqueName_RoyalArmy".Translate(Name),
+            ActiveDesc = "OARO_CliqueActiveDesc_RoyalArmy".Translate(),
+            InactiveDesc = "OARO_CliqueInactiveDesc_RoyalArmy".Translate(),
             Potency = -0.35f,
             IsActivatable = true,
             IsCommunicable = false,
@@ -255,24 +251,10 @@ public class WorldObject_RefugeeInflux : WorldObject_BranchDemand
         return rootNode;
     }
 
-    protected override void TickInterval(int delta)
-    {
-        base.TickInterval(delta);
-        if (!Destroyed && (ticksToNextCheck -= delta) <= 0)
-        {
-            ticksToNextCheck = 2500;
-            if (!cooldownManager.IsInCooldown("PeriodicCheck"))
-            {
-                PeriodicCheck(60000);
-            }
-        }
-    }
-
     /// <summary>
-    /// 60000Tick (24小时)一周期
     /// 先检测饥荒削减人口，未导致失败再进行后继行为
     /// </summary>
-    private void PeriodicCheck(int nextCheckDelay)
+    protected override void PeriodicCheck()
     {
         FamineCheck();
         if (Destroyed)
