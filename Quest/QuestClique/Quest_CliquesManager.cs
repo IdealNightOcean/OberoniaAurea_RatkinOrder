@@ -30,6 +30,11 @@ public class QuestNode_CliquesManager : QuestNode
 
 public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 {
+    public string SignalCliqueAdded => $"Quest{quest.id}.CliqueAdded";
+    public string SignalCliqueRemoved => $"Quest{quest.id}.CliqueRemoved";
+    public string SignalCliqueActived => $"Quest{quest.id}.CliqueActived";
+    public string SignalCliqueDeactived => $"Quest{quest.id}.CliqueDeactived";
+
     private Branch branch;
     public Branch Branch => branch;
 
@@ -137,7 +142,10 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             if (replaceCur)
             {
-                DeactiveClique(oldClique);
+                if (oldClique.IsActive)
+                {
+                    DeactiveClique(oldClique);
+                }
                 allCliques[cliqueKey] = clique;
                 added = true;
             }
@@ -160,6 +168,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 TryActiveClique(clique, directly: true);
             }
+            Find.SignalManager.SendSignal(new Signal(SignalCliqueAdded, clique.Named("SUBJECT")));
             return true;
         }
 
@@ -168,12 +177,12 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public void RemoveClique(string cliqueKey)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false) && allCliques.Remove(cliqueKey))
         {
-            allCliques.Remove(cliqueKey);
+            Find.SignalManager.SendSignal(new Signal(SignalCliqueRemoved, clique.Named("SUBJECT")));
             if (clique.IsActive)
             {
-                totalPotency -= clique.Potency;
+                DeactiveClique(clique);
             }
         }
     }
@@ -262,6 +271,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             clique.IsActive = true;
             clique.TicksToActive = -1;
             totalPotency += clique.Potency;
+            Find.SignalManager.SendSignal(new Signal(SignalCliqueActived, clique.Named("SUBJECT")));
         }
     }
 
@@ -269,17 +279,18 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique))
         {
-            DeactiveClique(clique);
+            if (clique.IsActive)
+            {
+                DeactiveClique(clique);
+            }
         }
     }
 
     private void DeactiveClique(QuestClique clique)
     {
-        if (clique.IsActive)
-        {
-            clique.IsActive = false;
-            totalPotency -= clique.Potency;
-        }
+        clique.IsActive = false;
+        totalPotency -= clique.Potency;
+        Find.SignalManager.SendSignal(new Signal(SignalCliqueDeactived, clique.Named("SUBJECT")));
     }
 
     public float GetCliquePotency(string cliqueKey, bool showErrorIfMiss = false)

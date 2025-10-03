@@ -35,8 +35,6 @@ public class QuestNode_OrderRecommendation : QuestNode
             return;
         }
 
-        Quest quest = QuestGen.quest;
-
         QuestPart_OrderRecommendation questPart_OrderRecommendation = new()
         {
             InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
@@ -47,7 +45,7 @@ public class QuestNode_OrderRecommendation : QuestNode
             GiveToCaravan = giveToCaravan.GetValue(slate),
         };
 
-        quest.AddPart(questPart_OrderRecommendation);
+        QuestGen.quest.AddPart(questPart_OrderRecommendation);
 
         if (isReward.GetValue(slate))
         {
@@ -68,11 +66,11 @@ public class QuestNode_OrderRecommendation : QuestNode
                 };
 
                 questPart_Choice.choices.Add(new QuestPart_Choice.Choice() { rewards = [reward] });
-                quest.AddPart(questPart_Choice);
+                QuestGen.quest.AddPart(questPart_Choice);
             }
             else
             {
-                questPart_Choice = quest.PartsListForReading.OfType<QuestPart_Choice>().FirstOrFallback(null);
+                questPart_Choice = QuestGen.quest.PartsListForReading.OfType<QuestPart_Choice>().FirstOrFallback(null);
                 if (questPart_Choice is not null)
                 {
                     foreach (QuestPart_Choice.Choice singelChoice in questPart_Choice.choices)
@@ -141,7 +139,7 @@ public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
                 MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
                 if (MapParent is not null)
                 {
-                    RecommendationUtility.GiveRecommendationsToPlayer_Map(RatkinOrder, Count, MapParent.Map, spawnCell: null, drop: true);
+                    RecommendationUtility.GiveRecommendationsToPlayer_Map(RatkinOrder, Count, MapParent.Map, dropPod: true);
                 }
             }
         }

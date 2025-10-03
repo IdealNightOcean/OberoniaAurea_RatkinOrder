@@ -46,16 +46,27 @@ public static class RecommendationUtility
 
     }
 
-    public static void GiveRecommendationsToPlayer_Map(RatkinOrder order, int count, Map map, IntVec3? spawnCell, bool drop = false)
+    public static void GiveRecommendationsToPlayer_Map(RatkinOrder ratkinOrder, int count, Map map, bool sendStandLetter = true, IntVec3? spawnCell = null, bool dropPod = false)
     {
-        GiveRecommendationsToPlayer(order, count, MapGiveAction);
+        GiveRecommendationsToPlayer(ratkinOrder, count, MapGiveAction);
 
         void MapGiveAction(Thing recommendations)
         {
-            if (drop)
+            if (dropPod)
             {
                 spawnCell ??= DropCellFinder.TradeDropSpot(map);
-                DropPodUtility.DropThingsNear(spawnCell.Value, map, [recommendations], allowFogged: false, faction: order.Faction);
+                DropPodUtility.DropThingsNear(spawnCell.Value, map, [recommendations], allowFogged: false, faction: ratkinOrder.Faction);
+                if (sendStandLetter)
+                {
+                    ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+                        label: "OARO_LetterLabel_GetRecommendation_DropPod".Translate(),
+                        text: "OARO_Letter_GetRecommendation_DropPod".Translate(ratkinOrder.Name, count),
+                        def: OARO_LetterDefOf.OARO_RatkinOrderPositiveLetter,
+                        lookTargets: new LookTargets(spawnCell.Value, map),
+                        relatedFaction: ratkinOrder.Faction);
+                    letter.relatedOrder = ratkinOrder;
+                    Find.LetterStack.ReceiveLetter(letter);
+                }
             }
             else
             {
@@ -65,6 +76,17 @@ public static class RecommendationUtility
                     spawnCell = cell;
                 }
                 GenPlace.TryPlaceThing(recommendations, spawnCell.Value, map, ThingPlaceMode.Near);
+                if (sendStandLetter)
+                {
+                    ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+                        label: "OARO_LetterLabel_GetRecommendation_Map".Translate(),
+                        text: "OARO_Letter_GetRecommendation_Map".Translate(ratkinOrder.Name, count),
+                        def: OARO_LetterDefOf.OARO_RatkinOrderPositiveLetter,
+                        lookTargets: new LookTargets(spawnCell.Value, map),
+                        relatedFaction: ratkinOrder.Faction);
+                    letter.relatedOrder = ratkinOrder;
+                    Find.LetterStack.ReceiveLetter(letter);
+                }
             }
         }
     }

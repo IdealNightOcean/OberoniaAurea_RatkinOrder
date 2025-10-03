@@ -33,7 +33,7 @@ public class QuestNode_GetOrGenerateSubFaction : QuestNode
 
             FactionDef subFactionDef = this.subFactionDef.GetValue(slate)
                                        ?? slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.SubFactionDef)
-                                       ?? OARO_ModDefOf.OARO_Rakinia_Sub;
+                                       ?? OARO_ModDefOf.OARO_SubRakinia_Neutral;
 
             subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction);
             slate.Set(storeAs.GetValue(slate), subFaction);

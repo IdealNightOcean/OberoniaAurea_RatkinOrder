@@ -22,7 +22,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         {
             return (null, null);
         }
-        Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef: OARO_ModDefOf.OARO_Rakinia_Sub,
+        Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef: OARO_ModDefOf.OARO_SubRakinia_Neutral,
                                                                  parentFactionDef: parentFaction?.def,
                                                                  parentFaction: parentFaction);
         return (parentFaction, subFaction);

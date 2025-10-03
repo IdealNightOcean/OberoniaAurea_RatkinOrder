@@ -295,6 +295,10 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             action = () => DispatchResult(ThingDefOf.MedicineHerbal, Rand.Range(0.02f, 0.03f)),
             resolveTree = true
         };
+        if (CaravanInventoryUtility.HasThings(caravan, ThingDefOf.MedicineHerbal, 25))
+        {
+            herbalOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.MedicineHerbal.label, 25));
+        }
         dispatchNode.options.Add(herbalOpt);
 
         DiaOption industrialOpt = new($"{ThingDefOf.MedicineIndustrial.label} x 25")
@@ -302,6 +306,10 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             action = () => DispatchResult(ThingDefOf.MedicineIndustrial, Rand.Range(0.035f, 0.05f)),
             resolveTree = true
         };
+        if (CaravanInventoryUtility.HasThings(caravan, ThingDefOf.MedicineIndustrial, 25))
+        {
+            industrialOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.MedicineIndustrial.label, 25));
+        }
         dispatchNode.options.Add(industrialOpt);
 
         DiaOption utratechOpt = new($"{ThingDefOf.MedicineUltratech.label} x 25")
@@ -309,6 +317,10 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             action = () => DispatchResult(ThingDefOf.MedicineUltratech, Rand.Range(0.1f, 0.16f)),
             resolveTree = true
         };
+        if (CaravanInventoryUtility.HasThings(caravan, ThingDefOf.MedicineUltratech, 25))
+        {
+            utratechOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.MedicineUltratech.label, 25));
+        }
         dispatchNode.options.Add(utratechOpt);
 
         return dispatchNode;
@@ -485,7 +497,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
 
     private void PlagueResolved()
     {
-        SendWorkResolvedSignal();
+        SendWorkResolvedSignal([population.Named("POPULATION")]);
         this.SafeDestroy();
     }
 }

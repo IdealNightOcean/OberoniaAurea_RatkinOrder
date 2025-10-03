@@ -10,7 +10,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
 {
     public override int SeedPart => 233548778;
 
-    private IEnumerable<Pawn> GenerateFighters(MapParent_NobilityTerritory nobilityTerritory)
+    private IEnumerable<Pawn> GenerateEnemies(MapParent_NobilityTerritory nobilityTerritory)
     {
         return [];
     }
@@ -21,7 +21,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
         if (!MapGenerator.TryGetVar("RectOfInterest", out CellRect interestRect))
         {
             baseCenter = interestRect.CenterCell;
-            Log.Error("No rect of interest set when running GenStep_WorkSitePawns!");
+            Log.Error($"No rect of interest set when running {nameof(GenStep_NobilityTerritoryPawns)}!");
         }
         else
         {
@@ -38,7 +38,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
 
         if (map?.Parent is MapParent_NobilityTerritory nobilityTerritory)
         {
-            IEnumerable<Pawn> fighters = GenerateFighters(nobilityTerritory);
+            IEnumerable<Pawn> fighters = GenerateEnemies(nobilityTerritory);
             foreach (Pawn p in fighters)
             {
                 ResolveParams pawnResolveParams = resolveParams;
@@ -46,9 +46,6 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
                 BaseGen.symbolStack.Push("pawn", pawnResolveParams);
             }
         }
-
-
-
 
         BaseGen.globalSettings.map = map;
         BaseGen.Generate();

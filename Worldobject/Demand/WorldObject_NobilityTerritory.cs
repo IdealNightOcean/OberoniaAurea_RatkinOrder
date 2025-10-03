@@ -2,20 +2,19 @@
 using RimWorld;
 using RimWorld.Planet;
 using System;
-using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.Grammar;
-using Verse.Utility;
 
 namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
 /// 叛乱镇压 - 贵族领地
 /// </summary>
-internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDemand
+public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDemand
 {
-    internal enum NobilityType : byte
+    public enum NobilityType : byte
     {
         None,
         Deceitful, //狡诈
@@ -28,9 +27,9 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
 
     private enum WorkType : byte
     {
-        Infiltrate,
-        Communication,
-        Negotiate
+        Infiltrate, //尝试渗透
+        Communication, //突袭营地
+        Negotiate //与贵族交流
     }
 
     public override int TicksNeeded => curWork switch
@@ -42,18 +41,18 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
     };
     protected override int PeriodicCheckInterval => 60000;
 
-    internal string NobilityCliqueKey => "Nobility_" + ID;
-    internal string NobilityBureaucratCliqueKey => "NobilityBureaucrat_" + ID;
-    internal string NobilityCivilianCliqueKey => "NobilityCivilian_" + ID;
+    public string NobilityCliqueKey => "Nobility_" + ID;
+    public string NobilityBureaucratCliqueKey => "NobilityBureaucrat_" + ID;
+    public string NobilityCivilianCliqueKey => "NobilityCivilian_" + ID;
 
     private string nobilityName;
     private NobilityType nobilityType;
-    internal string NobilityName => nobilityName;
-    internal NobilityType TypeOfNobility => nobilityType;
+    public string NobilityName => nobilityName;
+    public NobilityType TypeOfNobility => nobilityType;
 
     private WorkType curWork;
     private int troops;
-    internal int Troops => troops;
+    public int Troops => troops;
     private int TroopsExposed => GenMath.RoundTo(troops, 10);
 
     private bool hasExposeType;
@@ -61,17 +60,18 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
     private bool hasNegotiated;
     private bool hasMapObject;
     private bool hasYield;
+    public bool HasYield => hasYield;
 
     private int ransomPlayer = -1;
 
     private float osmolity;
-    internal float Osmolity
+    public float Osmolity
     {
         get => osmolity;
         private set => osmolity = Mathf.Clamp01(osmolity);
     }
 
-    [Unsaved] private (bool assault, bool playerInitiated) assaultAfterWork = (false, false);
+    [Unsaved] private bool beAssaultedAfterWork = false;
 
     public override void ExposeData()
     {
@@ -92,6 +92,12 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         Scribe_Values.Look(ref osmolity, "osmolity", 0f);
     }
 
+    public void InitNobilityType(NobilityType nobilityType, bool hasExposed)
+    {
+        this.nobilityType = nobilityType;
+        hasExposeType = hasExposed;
+    }
+
     public override void PostAdd()
     {
         base.PostAdd();
@@ -102,17 +108,6 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         };
         nobilityName = GrammarResolver.Resolve("r_text", namerRequest);
         Name = nobilityName;
-
-        QuestPart_NobilityTerritory_TypeSelecter questPart_NobilityTerritory_TypeSelecter = quest?.GetFirstPartOfType<QuestPart_NobilityTerritory_TypeSelecter>();
-        if (questPart_NobilityTerritory_TypeSelecter is null)
-        {
-            (nobilityType, hasExposeType) = questPart_NobilityTerritory_TypeSelecter.PopAlternative();
-        }
-        if (nobilityType == NobilityType.None)
-        {
-            nobilityType = EnumUtility.GetValues<NobilityType>().Where(nt => nt != NobilityType.None).RandomElement();
-            hasExposeType = false;
-        }
 
         Osmolity = HasQuestEffectTag("WordGetsAround") ? 0.2f : 0f;
         troops = Rand.RangeInclusive(20, 80);
@@ -165,7 +160,38 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         }
     }
 
-    internal void Notify_AssaultEnd(bool success)
+    public override string GetInspectString()
+    {
+        StringBuilder sb = new(base.GetInspectString());
+
+        if (hasYield)
+        {
+            sb.AppendInNewLine("OARO_NobilityTerritory_HasYield".Translate(nobilityName));
+            return sb.ToString();
+        }
+
+        if (hasExposeType)
+        {
+            sb.Append($"OARO_NobilityTerritory_NobilityType".Translate());
+            sb.Append(": ");
+            sb.Append($"OARO_NobilityTerritory_{nobilityType}".Translate());
+        }
+        if (hasExposeTroops)
+        {
+            sb.Append($"OARO_NobilityTerritory_Troops".Translate(troops));
+        }
+        sb.AppendInNewLine("OARO_NobilityTerritory_Osmolity".Translate(osmolity.ToStringPercent("F2")));
+        if (isWorking)
+        {
+            sb.AppendInNewLine("OARO_WorldObejct_CurWork".Translate());
+            sb.Append(": ");
+            sb.Append($"OARO_NobilityTerritory_{curWork}".Translate());
+        }
+
+        return sb.ToString();
+    }
+
+    public void Notify_AssaultEnd(bool success)
     {
         if (success)
         {
@@ -181,7 +207,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
                 textLetterDef: LetterDefOf.PositiveEvent,
                 lookTargets: this,
                 quest: quest);
-            QuestUtility.SendQuestTargetSignals(questTags, "AssaultSucceed");
+            SendWorkResolvedSignal([false.Named("YIELD")]);
             this.SafeDestroy();
         }
         else
@@ -192,7 +218,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
                 textLetterDef: LetterDefOf.PositiveEvent,
                 lookTargets: this,
                 quest: quest);
-            QuestUtility.SendQuestTargetSignals(questTags, "AssaultFailed");
+            QuestUtility.SendQuestTargetSignals(questTags, "AssaultFailed", this.Named("SUBJECT"));
             this.SafeDestroy();
         }
     }
@@ -201,12 +227,12 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
     {
         if (hasMapObject)
         {
-            Messages.Message("OARO_NobilityTerritory_Assaulting".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OARO_NobilityTerritory_AssaultingMess".Translate(), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         if (hasYield)
         {
-            Messages.Message("OARO_NobilityTerritory_HasYield".Translate(), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OARO_NobilityTerritory_HasYieldMess".Translate(), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         Find.WindowStack.Add(new Dialog_NodeTree(ArrivedDiaNode(caravan)));
@@ -258,11 +284,8 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         {
             DiaOption assaultOpt = new("OARO_NobilityTerritory_Assault".Translate())
             {
-                action = delegate
-                {
-                    Assault(caravan, playerInitiated: true);
-                },
-                resolveTree = true
+                linkLateBind = () => AssaultNode(caravan),
+                resolveTree = false
             };
             rootNode.options.Add(assaultOpt);
         }
@@ -280,9 +303,9 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
 
         if (hasNegotiated)
         {
-            DiaOption secondRoundNegotiateOpt = new("OARO_NobilityTerritory_SecondRoundNegotiate".Translate())
+            DiaOption secondRoundNegotiateOpt = new("OARO_NobilityTerritory_RansomOpt".Translate())
             {
-                linkLateBind = () => SecondRoundNegotiateDiaNode(caravan),
+                linkLateBind = () => RansomDiaNode(caravan),
                 resolveTree = false
             };
             rootNode.options.Add(secondRoundNegotiateOpt);
@@ -349,7 +372,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
 
         Osmolity += osmolityGain;
 
-        if (!hasExposeType && Osmolity >= 0.2f)
+        if (!hasExposeType && osmolity >= 0.2f)
         {
             hasExposeType = true;
             Find.LetterStack.ReceiveLetter(
@@ -360,7 +383,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
                 relatedFaction: Faction,
                 quest: quest);
         }
-        if (!hasExposeTroops && Osmolity >= 0.5f)
+        if (!hasExposeTroops && osmolity >= 0.5f)
         {
             hasExposeTroops = true;
             Find.LetterStack.ReceiveLetter(
@@ -375,7 +398,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
 
     private void CommunicationResult()
     {
-        assaultAfterWork = (assault: false, playerInitiated: false);
+        beAssaultedAfterWork = false;
         if (CliquesManager.GetCliqueWillingness(NobilityCliqueKey) < 0.3f)
         {
             CliquesManager.AdjustCliqueWillingness(NobilityCliqueKey, 0.1f);
@@ -387,7 +410,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         {
             if (nobilityType == NobilityType.Tyrannical)
             {
-                assaultAfterWork = (assault: true, playerInitiated: false);
+                beAssaultedAfterWork = true;
                 return;
             }
 
@@ -467,9 +490,9 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         {
             case WorkType.Communication:
                 {
-                    if (assaultAfterWork.assault)
+                    if (beAssaultedAfterWork)
                     {
-                        Assault(caravan, assaultAfterWork.playerInitiated);
+                        Assault(caravan, playerInitiated: false, branchJoin: true);
                     }
                     return;
                 }
@@ -477,7 +500,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
                 {
                     if (hasNegotiated && ransomPlayer > 0)
                     {
-                        Find.WindowStack.Add(new Dialog_NodeTree(FirstRoundNegotiateDiaNode(caravan)));
+                        Find.WindowStack.Add(new Dialog_NodeTree(NegotiateDiaNode(caravan)));
                     }
                     return;
                 }
@@ -485,23 +508,42 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         }
     }
 
-    private void Assault(Caravan caravan, bool playerInitiated)
+    private DiaNode AssaultNode(Caravan caravan)
+    {
+        DiaNode diaNode = new("OARO_NobilityTerritory_AssaultInfo".Translate(nobilityName, osmolity.ToStringPercent("F2"), troops));
+        DiaOption jointOpt = new("OARO_NobilityTerritory_Assault_Joint".Translate())
+        {
+            action = () => Assault(caravan, playerInitiated: true, branchJoin: true),
+            resolveTree = true
+        };
+        diaNode.options.Add(jointOpt);
+
+        DiaOption independentOpt = new("OARO_NobilityTerritory_Assault_Independent".Translate())
+        {
+            action = () => Assault(caravan, playerInitiated: true, branchJoin: false),
+            resolveTree = true
+        };
+        diaNode.options.Add(independentOpt);
+
+        diaNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+
+        return diaNode;
+    }
+
+    private void Assault(Caravan caravan, bool playerInitiated, bool branchJoin)
     {
         MapParent_NobilityTerritory mapParent_NobilityTerritory = (MapParent_NobilityTerritory)WorldObjectMaker.MakeWorldObject(OARO_ModDefOf.OARO_Map_NobilityTerritory);
         mapParent_NobilityTerritory.SetFaction(Faction);
         mapParent_NobilityTerritory.Tile = Tile;
-        mapParent_NobilityTerritory.InitRaidInfo(this, troops, playerInitiated);
+        mapParent_NobilityTerritory.InitRaidInfo(this, troops, playerInitiated, branchJoin);
         Find.WorldObjects.Add(mapParent_NobilityTerritory);
         new CaravanArrivalAction_GenerateAndEnter().Arrived(caravan);
         hasMapObject = true;
     }
 
-    /// <summary>
-    /// 首次谈判结果界面（需要遣散费）
-    /// </summary>
-    private DiaNode FirstRoundNegotiateDiaNode(Caravan caravan)
+    private DiaNode NegotiateDiaNode(Caravan caravan)
     {
-        DiaNode diaNode = new("OARO_NobilityTerritory_FirstNegotiateResult_Info".Translate(nobilityName, ransomPlayer * 10, ransomPlayer));
+        DiaNode diaNode = new("OARO_NobilityTerritory_NegotiateResult_Info".Translate(nobilityName, ransomPlayer * 10, ransomPlayer));
 
         DiaOption payOpt = new("OARO_NobilityTerritory_NegotiateResult_Pay".Translate())
         {
@@ -527,10 +569,10 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         return diaNode;
     }
 
-    private DiaNode SecondRoundNegotiateDiaNode(Caravan caravan)
+    private DiaNode RansomDiaNode(Caravan caravan)
     {
-        DiaNode diaNode = new("OARO_NobilityTerritory_SecondNegotiateResult_Info".Translate(nobilityName, ransomPlayer * 10, ransomPlayer));
-        DiaOption payOpt = new("OARO_NobilityTerritory_NegotiateResult_Pay".Translate())
+        DiaNode diaNode = new("OARO_NobilityTerritory_RansomInfo".Translate(nobilityName, ransomPlayer * 10, ransomPlayer));
+        DiaOption payOpt = new("OARO_NobilityTerritory_Ransom_Pay".Translate())
         {
             action = delegate
             {
@@ -546,7 +588,7 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
 
         diaNode.options.Add(payOpt);
 
-        DiaOption waitOpt = new("OARO_NobilityTerritory_SecondNegotiateResult_Wait".Translate())
+        DiaOption waitOpt = new("OARO_NobilityTerritory_Ransom_Wait".Translate())
         {
             resolveTree = true
         };
@@ -567,13 +609,13 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
         {
             EndWork(interrupt: true);
         }
-        QuestUtility.SendQuestTargetSignals(questTags, "NobilityYield");
+        SendWorkResolvedSignal([true.Named("YIELD")]);
     }
 
     protected override void Reset()
     {
         base.Reset();
-        assaultAfterWork = (false, false);
+        beAssaultedAfterWork = false;
     }
 
 }
@@ -581,9 +623,9 @@ internal sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranch
 /// <summary>
 /// 叛乱镇压 - 贵族领地 攻击时的地图
 /// </summary>
-internal sealed class MapParent_NobilityTerritory : MapParent
+public sealed class MapParent_NobilityTerritory : MapParent
 {
-    internal enum AssaultType
+    public enum AssaultType
     {
         BePounced,
         Normal,
@@ -591,14 +633,16 @@ internal sealed class MapParent_NobilityTerritory : MapParent
         DeadlyPounce
     }
 
-    internal WorldObject_NobilityTerritory Parent;
-    internal AssaultType TypeOfAssault;
+    public WorldObject_NobilityTerritory Parent;
+    public AssaultType TypeOfAssault;
+    public bool BranchJoin;
 
     private bool succeeded;
 
-    internal void InitRaidInfo(WorldObject_NobilityTerritory parent, int troops, bool playerInitiated)
+    public void InitRaidInfo(WorldObject_NobilityTerritory parent, int troops, bool playerInitiated, bool branchJoin)
     {
         Parent = parent;
+        BranchJoin = branchJoin;
         if (playerInitiated)
         {
             TypeOfAssault = parent.Osmolity > 0.999f ? AssaultType.DeadlyPounce : Rand.Chance(parent.Osmolity) ? AssaultType.Pounce : AssaultType.Normal;
@@ -639,6 +683,7 @@ internal sealed class MapParent_NobilityTerritory : MapParent
         base.ExposeData();
         Scribe_References.Look(ref Parent, "Parent");
         Scribe_Values.Look(ref TypeOfAssault, "TypeOfAssault");
+        Scribe_Values.Look(ref BranchJoin, "BranchJoin");
 
         Scribe_Values.Look(ref succeeded, "succeeded", defaultValue: false);
     }

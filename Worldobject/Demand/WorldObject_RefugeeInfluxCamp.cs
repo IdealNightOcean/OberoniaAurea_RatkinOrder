@@ -11,7 +11,7 @@ namespace OberoniaAurea.RatkinOrder;
 /// <summary>
 /// 难民潮 - 难民营地
 /// </summary>
-public class WorldObject_RefugeeInflux : WorldObject_CriticalBranchDemand
+public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
 {
     private enum PolicyType : byte
     {
@@ -67,10 +67,10 @@ public class WorldObject_RefugeeInflux : WorldObject_CriticalBranchDemand
             yestDistEfficiencyChange += (distEfficiency - oldDistEfficiency);
         }
     }
-    private float FamineRisk
+    public float FamineRisk
     {
         get => famineRisk;
-        set
+        private set
         {
             float oldFamineRisk = famineRisk;
             famineRisk = Mathf.Clamp01(value);
@@ -517,5 +517,14 @@ public class WorldObject_RefugeeInflux : WorldObject_CriticalBranchDemand
         {
             CliquesManager.AdjustCliqueWillingness(RefugeeCliqueKey, change, showMessage);
         }
+    }
+
+    public override void Destroy()
+    {
+        if (!onMilitarySupervision)
+        {
+            QuestUtility.SendQuestTargetSignals(questTags, "PopulationSettled", this.Named("SUBJECT"), population.Named("POPULATION"));
+        }
+        base.Destroy();
     }
 }

@@ -30,7 +30,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         slate.TryGet(KeyLibrary_SlateStoreAs.ParentFactionDef, out FactionDef parentFactionDef);
         slate.TryGet(KeyLibrary_SlateStoreAs.ParentFaction, out Faction parentFaction);
 
-        subFactionDef ??= OARO_ModDefOf.OARO_Rakinia_Sub;
+        subFactionDef ??= OARO_ModDefOf.OARO_SubRakinia_Neutral;
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
         if (subFaction is null)
         {

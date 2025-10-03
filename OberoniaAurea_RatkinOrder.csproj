@@ -94,7 +94,7 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
     <Compile Include="OrderLetter\OrderLetterType.cs" />
-    <Compile Include="Quest\Quest_NobilityTerritory_TypeSelecter.cs" />
+    <Compile Include="Quest\Quest_NobilityTerritoryWatcher.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_LostItemsOfTrader.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetBranchForObject.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetPresetEffectTags.cs" />
@@ -113,6 +113,8 @@
     <Compile Include="Quest\QuestPart\QuestPart_AnyPawnHasSpecialHediff.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_AssistKnighWatcher.cs" />
     <Compile Include="Quest\Quest_AllRatkinFactionsGoogwillChange.cs" />
+    <Compile Include="Quest\Quest_BranchPopulationChange.cs" />
+    <Compile Include="Quest\Reward\Reward_BranchPopulation.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemand.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemandHandler.cs" />
@@ -266,7 +268,7 @@
     <Compile Include="Window\Window_OrderLetterBox.cs" />
     <Compile Include="Worldobject\Demand\GenStep_NobilityTerritoryPawns.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_NobilityTerritory.cs" />
-    <Compile Include="Worldobject\Demand\WorldObject_RefugeeInflux.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_RefugeeInfluxCamp.cs" />
     <Compile Include="Worldobject\WorldObjectComp_BranchSite.cs" />
     <Compile Include="Window\DevWindow\DevWindow_GlobalOrderInteractHandler.cs" />
     <Compile Include="Window\DevWindow\DevWindow_Squad.cs" />

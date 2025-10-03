@@ -35,7 +35,7 @@ public class MercyQuestExtension : DefModExtension
             slate.Set(KeyLibrary_SlateStoreAs.ParentFactionDef, parentFactionDef);
         }
 
-        slate.Set(KeyLibrary_SlateStoreAs.SubFactionDef, subFactionDef ?? OARO_ModDefOf.OARO_Rakinia_Sub);
+        slate.Set(KeyLibrary_SlateStoreAs.SubFactionDef, subFactionDef ?? OARO_ModDefOf.OARO_SubRakinia_Neutral);
         slate.Set(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind, helpSeekerPawnKind ?? OARO_PawnKindDefOf.RatkinColonist);
         return true;
     }

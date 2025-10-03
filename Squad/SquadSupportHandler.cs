@@ -170,8 +170,6 @@ public class SquadSupportHandler(Squad squad) : IExposable
         }
     }
 
-
-
     public void ExposeData()
     {
         Scribe_Values.Look(ref supportAuthority, "supportAuthority", defaultValue: false);

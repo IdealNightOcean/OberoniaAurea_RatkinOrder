@@ -17,13 +17,13 @@ public class QuestNode_SetBranchForObject : QuestNode
     {
         Slate slate = QuestGen.slate;
         object target = this.target.GetValue(slate);
-        if (target is null)
+        if (target is null || target is not ISingleBranchRelated branchRelated)
         {
             return;
         }
 
         Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        if (branch is not null && target is ISingleBranchRelated branchRelated)
+        if (branch is not null)
         {
             branchRelated.InitOrderBranch(branch);
             if (alsoSetRatkinOrder.GetValue(slate) && target is ISingleRatkinOrderRelated orderRelated)

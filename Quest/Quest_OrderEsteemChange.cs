@@ -30,8 +30,6 @@ public class QuestNode_OrderEsteemChange : QuestNode
             return;
         }
 
-        Quest quest = QuestGen.quest;
-
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange = new()
         {
             InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
@@ -41,7 +39,7 @@ public class QuestNode_OrderEsteemChange : QuestNode
             Reason = reason.GetValue(slate)
         };
 
-        quest.AddPart(questPart_OrderEsteemChange);
+        QuestGen.quest.AddPart(questPart_OrderEsteemChange);
 
         if (isReward.GetValue(slate))
         {
@@ -61,11 +59,11 @@ public class QuestNode_OrderEsteemChange : QuestNode
                 };
 
                 questPart_Choice.choices.Add(new QuestPart_Choice.Choice() { rewards = [reward] });
-                quest.AddPart(questPart_Choice);
+                QuestGen.quest.AddPart(questPart_Choice);
             }
             else
             {
-                questPart_Choice = quest.PartsListForReading.OfType<QuestPart_Choice>().FirstOrFallback(null);
+                questPart_Choice = QuestGen.quest.PartsListForReading.OfType<QuestPart_Choice>().FirstOrFallback(null);
                 if (questPart_Choice is not null)
                 {
                     foreach (QuestPart_Choice.Choice singelChoice in questPart_Choice.choices)

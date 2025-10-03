@@ -11,7 +11,7 @@ public static class OARO_ModDefOf
     public static BackstoryDef Ratkin_KnightCommander;
 
     public static FactionDef Rakinia;
-    public static FactionDef OARO_Rakinia_Sub;
+    public static FactionDef OARO_SubRakinia_Neutral;
 
     [MayRequire("OARK.RatkinFaction.GeneExpand")]
     public static FactionDef Rakinia_TravelRatkin; //旅鼠派系
