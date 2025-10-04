@@ -48,9 +48,9 @@ public class QuestNode_AddGeneralClique : QuestNode
             return;
         }
 
-        QuestClique questClique = GenerateClique();
+        QuestClique questClique = GenerateClique(cliqueKey);
 
-        questPart_CliquesManager.TryAddClique(cliqueKey, questClique, replaceCur.GetValue(slate), defaultActive.GetValue(slate));
+        questPart_CliquesManager.TryAddClique(questClique, replaceCur.GetValue(slate), defaultActive.GetValue(slate));
     }
 
     protected virtual string GetCliqueKey()
@@ -58,10 +58,10 @@ public class QuestNode_AddGeneralClique : QuestNode
         return cliqueKey.GetValue(QuestGen.slate);
     }
 
-    protected virtual QuestClique GenerateClique()
+    protected virtual QuestClique GenerateClique(string cliqueKey)
     {
         Slate slate = QuestGen.slate;
-        QuestClique questClique = new()
+        QuestClique questClique = new(cliqueKey)
         {
             Name = cliqueName.GetValue(slate),
             ActiveDesc = activeDesc.GetValue(slate),

@@ -10,7 +10,7 @@ using static OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory;
 namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
-/// 一个特化的用于叛乱镇压 - 贵族领地 贵族类型初始化的类
+/// 一个特化的用于叛乱镇压 - 贵族领地管理的特化类
 /// 应该在QuestEffectTag后使用，否则强制贵族类型不会生效
 /// </summary>
 internal sealed class QuestNode_NobilityTerritoryWatcher : QuestNode
@@ -23,10 +23,7 @@ internal sealed class QuestNode_NobilityTerritoryWatcher : QuestNode
     [NoTranslate]
     public SlateRef<string> outSignalsAllResolved;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return true;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
@@ -84,7 +81,17 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
             Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
             if (map is not null)
             {
-                RecommendationUtility.GiveRecommendationsToPlayer_Map(Branch.RatkinOrder, extraRecommendation, map, sendStandLetter: false, dropPod: true);
+                IntVec3 spawnCell = DropCellFinder.TradeDropSpot(map);
+                RecommendationUtility.GiveRecommendationsToPlayer_Map(Branch.RatkinOrder, extraRecommendation, map, sendStandLetter: false, spawnCell: spawnCell, dropPod: true);
+                ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+                    label: "OARO_NobilityTerritory_ExtraRecommendationLabel".Translate(),
+                    text: "OARO_NobilityTerritory_ExtraRecommendationText".Translate(Branch?.RatkinOrder.Name, extraRecommendation),
+                    def: OARO_LetterDefOf.OARO_RatkinOrderPositiveLetter,
+                    lookTargets: new LookTargets(spawnCell, map),
+                    relatedFaction: Branch?.RatkinOrder.Faction,
+                    quest: quest);
+                letter.relatedOrder = Branch?.RatkinOrder;
+                Find.LetterStack.ReceiveLetter(letter);
             }
         }
     }
@@ -154,6 +161,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
             alternatives.Push((type, false));
         }
 
+        allTypes = EnumUtility.GetValues<NobilityType>().Where(nt => nt != NobilityType.None).ToList();
         foreach (WorldObject_NobilityTerritory territory in nobilityTerritories)
         {
             (NobilityType type, bool hasExposed) = (NobilityType.None, false);
@@ -163,7 +171,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
             }
             else
             {
-                type = EnumUtility.GetValues<NobilityType>().Where(nt => nt != NobilityType.None).RandomElement();
+                type = allTypes.RandomElement();
                 hasExposed = false;
             }
             territory.InitNobilityType(type, hasExposed);

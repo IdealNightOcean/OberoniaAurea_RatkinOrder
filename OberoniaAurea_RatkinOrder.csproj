@@ -94,6 +94,7 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
     <Compile Include="OrderLetter\OrderLetterType.cs" />
+    <Compile Include="Quest\Quest_TownUnderConstructionWatcher.cs" />
     <Compile Include="Quest\Quest_NobilityTerritoryWatcher.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_LostItemsOfTrader.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetBranchForObject.cs" />
@@ -266,6 +267,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
+    <Compile Include="Worldobject\Demand\WorldObject_TownUnderConstruction.cs" />
     <Compile Include="Worldobject\Demand\GenStep_NobilityTerritoryPawns.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_NobilityTerritory.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_RefugeeInfluxCamp.cs" />

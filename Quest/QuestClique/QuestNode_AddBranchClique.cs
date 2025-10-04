@@ -12,9 +12,9 @@ public class QuestNode_AddBranchClique : QuestNode_AddGeneralClique
         return cliqueKey.GetValue(QuestGen.slate) ?? QuestClique.GetBranchCliqueKey(branch.GetValue(QuestGen.slate));
     }
 
-    protected override QuestClique GenerateClique()
+    protected override QuestClique GenerateClique(string cliqueKey)
     {
-        QuestClique questClique = base.GenerateClique();
+        QuestClique questClique = base.GenerateClique(cliqueKey);
         questClique.InitForBranch(branch.GetValue(QuestGen.slate), initWithBranchPotency.GetValue(QuestGen.slate));
         return questClique;
     }

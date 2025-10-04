@@ -5,6 +5,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestClique : IExposable
 {
+    private string key;
+    public string Key => key;
+
     public string Name = string.Empty;
     public string ActiveDesc = string.Empty;
     public string InactiveDesc = string.Empty;
@@ -42,6 +45,7 @@ public class QuestClique : IExposable
     public bool IsFriendlyBranchClique => relatedBranch is not null && relatedBranch.IsBranchOfType(BranchType.Friendly);
 
     public QuestClique() { }
+    public QuestClique(string key) { this.key = key; }
 
     public void InitForBranch(Branch branch, bool initWithBranchPotency = true)
     {
@@ -68,6 +72,8 @@ public class QuestClique : IExposable
 
     public void ExposeData()
     {
+        Scribe_Values.Look(ref key, "key", "UNKNOWN");
+
         Scribe_Values.Look(ref Name, "Name", "UNKNOWN");
         Scribe_Values.Look(ref ActiveDesc, "ActiveDesc", string.Empty);
         Scribe_Values.Look(ref InactiveDesc, "InactiveDesc", string.Empty);

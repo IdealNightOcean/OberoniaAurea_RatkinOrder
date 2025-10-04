@@ -116,7 +116,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             troops += 20;
         }
 
-        QuestClique nobilityClique = new()
+        QuestClique nobilityClique = new(NobilityCliqueKey)
         {
             Name = nobilityName,
             ActiveDesc = "OARO_CliqueActiveDesc_Nobility".Translate(),
@@ -128,9 +128,9 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             IsBribable = false,
             IsCommunicable = false
         };
-        CliquesManager.TryAddClique(NobilityCliqueKey, nobilityClique);
+        CliquesManager.TryAddClique(nobilityClique);
 
-        QuestClique bureaucratClique = new()
+        QuestClique bureaucratClique = new(NobilityBureaucratCliqueKey)
         {
             Name = "OARO_CliqueName_NobilityBureaucrat".Translate(Name),
             ActiveDesc = "OARO_CliqueActiveDesc_NobilityBureaucrat".Translate(),
@@ -141,11 +141,11 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             IsBribable = false,
             IsCommunicable = false
         };
-        CliquesManager.TryAddClique(NobilityBureaucratCliqueKey, bureaucratClique, defaultActive: true);
+        CliquesManager.TryAddClique(bureaucratClique, defaultActive: true);
 
         if (nobilityType == NobilityType.Kindness)
         {
-            QuestClique civilianClique = new()
+            QuestClique civilianClique = new(NobilityCivilianCliqueKey)
             {
                 Name = "OARO_CliqueName_NobilityCivilian".Translate(Name),
                 ActiveDesc = "OARO_CliqueActiveDesc_NobilityCivilian".Translate(),
@@ -156,7 +156,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
                 IsBribable = false,
                 IsCommunicable = false
             };
-            CliquesManager.TryAddClique(NobilityCivilianCliqueKey, civilianClique, defaultActive: true);
+            CliquesManager.TryAddClique(civilianClique, defaultActive: true);
         }
     }
 

@@ -7,6 +7,7 @@ public abstract class WorldObject_CriticalBranchDemand : WorldObject_InteractWit
     protected Branch branch;
     public Branch Branch => branch;
     protected virtual bool DestroyWhenBranchRemoved => true;
+
     protected virtual int PeriodicCheckInterval => 60000;
 
     protected int nextCheckTick;

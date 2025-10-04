@@ -117,7 +117,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         cooldownManager.RegisterRecord("PeriodicCheck", cdTicks: 30000, shouldRemoveWhenExpired: true);
         cooldownManager.RegisterRecord("GrainArrival", cdTicks: 5 * 30000, shouldRemoveWhenExpired: true);
 
-        QuestClique refugeeClique = new()
+        QuestClique refugeeClique = new(RefugeeCliqueKey)
         {
             Name = "OARO_CliqueName_Refugee".Translate(Name),
             ActiveDesc = "OARO_CliqueActiveDesc_Refugee".Translate(),
@@ -131,7 +131,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             PreferredBuilding = BranchBuildingDefOf.OARO_Church
         };
 
-        QuestClique royalArmyClique = new()
+        QuestClique royalArmyClique = new(RoyalArmyCliqueKey)
         {
             Name = "OARO_CliqueName_RoyalArmy".Translate(Name),
             ActiveDesc = "OARO_CliqueActiveDesc_RoyalArmy".Translate(),
@@ -147,8 +147,8 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             royalArmyClique.Potency = -0.5f;
         }
 
-        CliquesManager.TryAddClique(RefugeeCliqueKey, refugeeClique);
-        CliquesManager.TryAddClique(RefugeeCliqueKey, royalArmyClique);
+        CliquesManager.TryAddClique(refugeeClique);
+        CliquesManager.TryAddClique(royalArmyClique);
     }
 
     public override string GetInspectString()
