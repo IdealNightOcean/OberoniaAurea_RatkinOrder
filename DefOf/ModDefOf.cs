@@ -25,6 +25,8 @@ public static class OARO_ModDefOf
 
     public static RoomRoleDef OARO_RatkinOrderHall;
 
+    public static TraderKindDef OARO_TownUnderConstruction_Trader;
+
     public static WorldObjectDef OARO_WO_ApprenticeHome;
     public static WorldObjectDef OARO_Map_NobilityTerritory; //叛乱镇压 - 贵族领地 攻击时的地图
 

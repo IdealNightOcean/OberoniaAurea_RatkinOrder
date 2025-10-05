@@ -12,6 +12,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
 
     public BranchDemand NormalDemand => normalDemand;
     public BranchDemand CriticalDemand => criticalDemand;
+    public bool HasDemand => normalDemand is not null || criticalDemand is not null;
 
     public void ExposeData()
     {

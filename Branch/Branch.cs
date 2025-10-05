@@ -66,18 +66,15 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
     }
 
-    private Branch(RatkinOrder order, WorldObject worldObject) : this(order.BranchManager)
+    private Branch(RatkinOrder ratkinOrder) : this(ratkinOrder.BranchManager)
     {
-        worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(this);
-
         EnsureComponentsInit();
-
         loadID = UniqueIDManager.Instance.GetUniqueID("Branch");
     }
 
-    public static Branch GenerateBranchFor(RatkinOrder order, WorldObject worldObject)
+    public static Branch GenerateBranchFor(RatkinOrder ratkinOrder, WorldObject worldObject, bool addToManager = true)
     {
-        if (!BranchUtility.CanBeSiteForNewBranch(order, worldObject))
+        if (!BranchUtility.CanBeSiteForNewBranch(ratkinOrder, worldObject))
         {
             return null;
         }
@@ -85,14 +82,20 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         Branch branch;
         try
         {
-            branch = new(order, worldObject);
+            branch = new(ratkinOrder);
+            worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(branch);
             branch.PostGenerated();
+            if (addToManager)
+            {
+                ratkinOrder.BranchManager.AddBranch(branch);
+            }
         }
         catch (Exception ex)
         {
-            Log.Error($"Failed to create a new branch for {order} at {worldObject}: " + ex);
+            Log.Error($"Failed to create a new branch for {ratkinOrder} at {worldObject}: " + ex);
             return null;
         }
+
         return branch;
     }
 

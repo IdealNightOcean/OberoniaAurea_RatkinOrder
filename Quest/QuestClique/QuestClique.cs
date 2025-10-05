@@ -50,6 +50,11 @@ public class QuestClique : IExposable
     public void InitForBranch(Branch branch, bool initWithBranchPotency = true)
     {
         relatedBranch = branch;
+
+        if (key.NullOrEmpty())
+        {
+            key = GetBranchCliqueKey(branch);
+        }
         if (Name.NullOrEmpty())
         {
             Name = branch.Name;

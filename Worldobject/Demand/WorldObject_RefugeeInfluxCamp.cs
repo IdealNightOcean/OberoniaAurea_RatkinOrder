@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using Verse;
+using Verse.Utility;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -41,7 +42,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
     private float yestPopulationChange;
 
     private float distEfficiency;
-    private float extraFixeddistEfficiency;
+    private float extraFixedDistEfficiency;
     private float yestDistEfficiencyChange;
     private bool forceDist;
 
@@ -97,7 +98,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         Scribe_Values.Look(ref yestPopulationChange, "yestPopulationChange", 0f);
 
         Scribe_Values.Look(ref distEfficiency, "distEfficiency", 0f);
-        Scribe_Values.Look(ref extraFixeddistEfficiency, "extraFixeddistEfficiency", 0f);
+        Scribe_Values.Look(ref extraFixedDistEfficiency, "extraFixedDistEfficiency", 0f);
         Scribe_Values.Look(ref yestDistEfficiencyChange, "yestDistEfficiencyChange", 0f);
         Scribe_Values.Look(ref forceDist, "forceDist", defaultValue: false);
 
@@ -124,9 +125,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             InactiveDesc = "OARO_CliqueInactiveDesc_Refugee".Translate(),
             Potency = 0.2f,
             Willingness = Rand.Range(0.15f, 0.25f),
-            IsActivatable = true,
             IsCommunicable = true,
-            IsBribable = false,
 
             PreferredBuilding = BranchBuildingDefOf.OARO_Church
         };
@@ -137,9 +136,6 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             ActiveDesc = "OARO_CliqueActiveDesc_RoyalArmy".Translate(),
             InactiveDesc = "OARO_CliqueInactiveDesc_RoyalArmy".Translate(),
             Potency = -0.35f,
-            IsActivatable = true,
-            IsCommunicable = false,
-            IsBribable = false,
         };
 
         if (HasDisorderlyMilitaryTag)
@@ -188,6 +184,57 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         Find.WindowStack.Add(new Dialog_NodeTree(ArrivedDiaNode(caravan)));
     }
 
+    public override IEnumerable<Gizmo> GetGizmos()
+    {
+        foreach (Gizmo gizmo in base.GetGizmos())
+        {
+            yield return gizmo;
+        }
+
+        Command_Action command_Policy = new()
+        {
+            defaultLabel = "OARO_ChangePolicy".Translate(),
+            defaultDesc = "OARO_ChangePolicyDesc".Translate(),
+            action = () => Find.WindowStack.Add(new Dialog_NodeTree(PolicyChangeNode()))
+        };
+        yield return command_Policy;
+
+        //调试按钮
+        if (DebugSettings.ShowDevGizmos)
+        {
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: +100 Population",
+                action = () => AdjustPopulation(100)
+            };
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: -100 Population",
+                action = () => AdjustPopulation(-100)
+            };
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: +10% DistEfficiency",
+                action = () => DistEfficiency += 0.1f
+            };
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: -10% DistEfficiency",
+                action = () => DistEfficiency -= 0.1f
+            };
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: +10% FamineRisk",
+                action = () => FamineRisk += 0.1f
+            };
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: -10% FamineRisk",
+                action = () => FamineRisk -= 0.1f
+            };
+        }
+    }
+
     private DiaNode ArrivedDiaNode(Caravan caravan)
     {
         TaggedString text = onMilitarySupervision ? "OARO_RefugeeInflux_ArrivalInfo_MS".Translate() : "OARO_RefugeeInflux_ArrivalInfo".Translate();
@@ -223,31 +270,40 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
 
             if (!isWorking)
             {
-                DiaOption huntingOpt = new("OARO_RefugeeInflux_Hunting".Translate())
+                foreach (WorkType workType in EnumUtility.GetValues<WorkType>())
                 {
-                    action = delegate
+                    TaggedString optLabel = $"OARO_RefugeeInflux_{workType}".Translate() + " (" + $"OARO_RefugeeInflux_{workType}_Skill".Translate() + ")";
+                    DiaOption workOpt = new(optLabel)
                     {
-                        curWork = WorkType.Hunting;
-                        base.Notify_CaravanArrived(caravan);
-                    },
-                    resolveTree = true
-                };
-                rootNode.options.Add(huntingOpt);
-
-                DiaOption pacifyOpt = new("OARO_RefugeeInflux_AssistPacify".Translate())
-                {
-                    action = delegate
-                    {
-                        curWork = WorkType.AssistPacify;
-                        base.Notify_CaravanArrived(caravan);
-                    },
-                    resolveTree = true
-                };
-                rootNode.options.Add(pacifyOpt);
+                        action = delegate
+                        {
+                            curWork = workType;
+                            base.Notify_CaravanArrived(caravan);
+                        },
+                        resolveTree = true
+                    };
+                    rootNode.options.Add(workOpt);
+                }
             }
         }
 
         rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        return rootNode;
+    }
+
+    private DiaNode PolicyChangeNode()
+    {
+        DiaNode rootNode = new("OARO_RefugeeInflux_PolicyInfo".Translate());
+
+        foreach (PolicyType policyType in EnumUtility.GetValues<PolicyType>())
+        {
+            DiaOption policyOpt = new($"OARO_RefugeeInflux_{curPolicy}".Translate())
+            {
+                action = () => { curPolicy = policyType; },
+                resolveTree = true
+            };
+            rootNode.options.Add(policyOpt);
+        }
         return rootNode;
     }
 
@@ -374,24 +430,24 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
 
     private void RecacheExtraFixeddistEfficiency()
     {
-        extraFixeddistEfficiency = 0f;
+        extraFixedDistEfficiency = 0f;
         forceDist = !cooldownManager.IsInCooldown("ForceDist");
 
         if (curPolicy == PolicyType.ImproveDist)
         {
-            extraFixeddistEfficiency += (0.05f + TotalPotency * 0.2f);
+            extraFixedDistEfficiency += (0.05f + TotalPotency * 0.2f);
         }
         if (onMilitarySupervision)
         {
-            extraFixeddistEfficiency += HasDisorderlyMilitaryTag ? 0.1f : 0.2f;
+            extraFixedDistEfficiency += HasDisorderlyMilitaryTag ? 0.1f : 0.2f;
         }
         else
         {
-            extraFixeddistEfficiency += (cliquesManager.GetCliqueWillingness(RefugeeCliqueKey) * 0.2f);
+            extraFixedDistEfficiency += (cliquesManager.GetCliqueWillingness(RefugeeCliqueKey) * 0.2f);
         }
         if (cliquesManager.IsCliqueActive("NearbyTown"))
         {
-            extraFixeddistEfficiency += 0.1f;
+            extraFixedDistEfficiency += 0.1f;
         }
     }
 

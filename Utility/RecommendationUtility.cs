@@ -25,7 +25,7 @@ public static class RecommendationUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CurRecommendationOfMap(RatkinOrder order, Map map)
     {
-        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.Cast<OrderRecommendation>().Where(r => r.RatkinOrder == order).Count() ?? 0;
+        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.OfType<OrderRecommendation>().Where(r => r.RatkinOrder == order).Count() ?? 0;
     }
 
     public static void GiveRecommendationsToPlayer(RatkinOrder order, int count, Action<Thing> giveAction)

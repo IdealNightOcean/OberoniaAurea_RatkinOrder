@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea_Frame;
-using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -112,20 +111,23 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         PeriodicCriticalDemandTrigger();
     }
 
-    public bool GenerateBranchFor(RatkinOrder order, WorldObject worldObject, bool addToManager = true)
+    public void AddBranch(Branch branch)
     {
-        Branch branch = Branch.GenerateBranchFor(order, worldObject);
-
         if (branch is null)
         {
-            return false;
+            Log.Error("Attempted to add a null branch.");
+            return;
+        }
+        if (branch.RatkinOrder != RatkinOrder)
+        {
+            Log.Error("Attempted to add a branch belonging to another RatkinOrder.");
+            return;
         }
 
-        if (addToManager)
+        if (!allBranches.Contains(branch))
         {
             allBranches.Add(branch);
         }
-        return true;
     }
 
     public void Notify_MyOrderRemoved()

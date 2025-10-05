@@ -6,6 +6,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.Grammar;
+using Verse.Utility;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -28,8 +29,8 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     private enum WorkType : byte
     {
         Infiltrate, //尝试渗透
-        Communication, //突袭营地
-        Negotiate //与贵族交流
+        Communication, //与贵族交流
+        Negotiate //与贵族谈判
     }
 
     public override int TicksNeeded => curWork switch
@@ -238,6 +239,95 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         Find.WindowStack.Add(new Dialog_NodeTree(ArrivedDiaNode(caravan)));
     }
 
+    private DiaNode ArrivedDiaNode(Caravan caravan)
+    {
+        DiaNode rootNode = new("OARO_NobilityTerritory_ArrivalInfo".Translate(Name));
+
+        DiaOption infiltrateOpt = new("OARO_NobilityTerritory_Infiltrate".Translate())
+        {
+            action = delegate
+            {
+                curWork = WorkType.Infiltrate;
+                base.Notify_CaravanArrived(caravan);
+            },
+            resolveTree = true
+        };
+        rootNode.options.Add(infiltrateOpt);
+
+
+        DiaOption assaultOpt = new("OARO_NobilityTerritory_Assault".Translate())
+        {
+            linkLateBind = () => AssaultNode(caravan),
+            resolveTree = false
+        };
+        rootNode.options.Add(assaultOpt);
+
+
+        if (!isWorking)
+        {
+            foreach (WorkType workType in EnumUtility.GetValues<WorkType>())
+            {
+                if (workType == WorkType.Negotiate)
+                {
+                    continue;
+                }
+
+                TaggedString optLabel = $"OARO_NobilityTerritory_{workType}".Translate() + " (" + $"OARO_NobilityTerritory_{workType}_Skill".Translate() + ")";
+                DiaOption workOpt = new(optLabel)
+                {
+                    action = delegate
+                    {
+                        curWork = workType;
+                        base.Notify_CaravanArrived(caravan);
+                    },
+                    resolveTree = true
+                };
+                rootNode.options.Add(workOpt);
+            }
+        }
+
+        DiaOption communicationOpt = new("OARO_NobilityTerritory_Communication".Translate())
+        {
+            action = delegate
+            {
+                curWork = WorkType.Communication;
+                base.Notify_CaravanArrived(caravan);
+            },
+            resolveTree = true
+        };
+        rootNode.options.Add(communicationOpt);
+
+        if (hasNegotiated)
+        {
+            DiaOption secondRoundNegotiateOpt = new("OARO_NobilityTerritory_RansomOpt".Translate())
+            {
+                linkLateBind = () => RansomDiaNode(caravan),
+                resolveTree = false
+            };
+            rootNode.options.Add(secondRoundNegotiateOpt);
+        }
+        else if (!isWorking)
+        {
+            TaggedString negotiateOptLabel = $"OARO_NobilityTerritory_{WorkType.Negotiate}".Translate() + " (" + $"OARO_NobilityTerritory_{WorkType.Negotiate}_Skill".Translate() + ")";
+            DiaOption negotiateOpt = new(negotiateOptLabel)
+            {
+                action = delegate
+                {
+                    curWork = WorkType.Negotiate;
+                    base.Notify_CaravanArrived(caravan);
+                },
+                resolveTree = true
+            };
+            if (CliquesManager.GetCliqueWillingness(NobilityCliqueKey) < 0.5f)
+            {
+                negotiateOpt.Disable("OARO_Insufficient_CliqueWillingness".Translate(nobilityName, 0.5f.ToStringPercent("f2")));
+            }
+            rootNode.options.Add(negotiateOpt);
+        }
+
+        return rootNode;
+    }
+
     protected override void PeriodicCheck()
     {
         float osmolityChange = 0f;
@@ -265,72 +355,6 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
 
     }
 
-    private DiaNode ArrivedDiaNode(Caravan caravan)
-    {
-        DiaNode rootNode = new("OARO_NobilityTerritory_ArrivalInfo".Translate(Name));
-
-        DiaOption infiltrateOpt = new("OARO_NobilityTerritory_Infiltrate".Translate())
-        {
-            action = delegate
-            {
-                curWork = WorkType.Infiltrate;
-                base.Notify_CaravanArrived(caravan);
-            },
-            resolveTree = true
-        };
-        rootNode.options.Add(infiltrateOpt);
-
-        if (!hasMapObject)
-        {
-            DiaOption assaultOpt = new("OARO_NobilityTerritory_Assault".Translate())
-            {
-                linkLateBind = () => AssaultNode(caravan),
-                resolveTree = false
-            };
-            rootNode.options.Add(assaultOpt);
-        }
-
-        DiaOption communicationOpt = new("OARO_NobilityTerritory_Communication".Translate())
-        {
-            action = delegate
-            {
-                curWork = WorkType.Communication;
-                base.Notify_CaravanArrived(caravan);
-            },
-            resolveTree = true
-        };
-        rootNode.options.Add(communicationOpt);
-
-        if (hasNegotiated)
-        {
-            DiaOption secondRoundNegotiateOpt = new("OARO_NobilityTerritory_RansomOpt".Translate())
-            {
-                linkLateBind = () => RansomDiaNode(caravan),
-                resolveTree = false
-            };
-            rootNode.options.Add(secondRoundNegotiateOpt);
-        }
-        else
-        {
-            DiaOption negotiateOpt = new("OARO_NobilityTerritory_Negotiate".Translate())
-            {
-                action = delegate
-                {
-                    curWork = WorkType.Negotiate;
-                    base.Notify_CaravanArrived(caravan);
-                },
-                resolveTree = true
-            };
-            if (CliquesManager.GetCliqueWillingness(NobilityCliqueKey) < 0.5f)
-            {
-                negotiateOpt.Disable("OARO_Insufficient_CliqueWillingness".Translate(nobilityName, 0.5f.ToStringPercent("f2")));
-            }
-            rootNode.options.Add(negotiateOpt);
-        }
-
-        return rootNode;
-    }
-
     protected override void FinishWork()
     {
         switch (curWork)
@@ -353,6 +377,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             default: break;
         }
     }
+
     protected override void InterruptWork() { }
 
     private void InfiltrateResult()

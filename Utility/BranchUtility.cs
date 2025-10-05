@@ -21,7 +21,6 @@ public static class BranchUtility
             return false;
         }
 
-        BranchManager branchManager = order.BranchManager;
         bool atLeastOneSite = false;
         foreach (Settlement settlement in Find.WorldObjects.Settlements)
         {
@@ -31,7 +30,7 @@ public static class BranchUtility
             }
             try
             {
-                if (branchManager.GenerateBranchFor(order, settlement, addToManager: true))
+                if (Branch.GenerateBranchFor(order, settlement, addToManager: true) is not null)
                 {
                     atLeastOneSite = true;
                 }
@@ -45,17 +44,22 @@ public static class BranchUtility
         return atLeastOneSite;
     }
 
-    public static IEnumerable<Branch> GetAllAffectedBranchSiteForOrder(this RatkinOrder order, PlanetTile tile)
+    public static IEnumerable<Branch> GetAllAvailableBranchForOrder(this RatkinOrder order, Predicate<Branch> predicate)
+    {
+        return order.BranchManager.AllBranches.Where(b => predicate(b));
+    }
+
+    public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder order, PlanetTile tile)
     {
         return order.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile));
     }
 
-    public static IEnumerable<Branch> GetAllAffectedBranchSiteForOrder(this RatkinOrder order, PlanetTile tile, Predicate<Branch> predicate)
+    public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder order, PlanetTile tile, Predicate<Branch> predicate)
     {
         return order.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile) && predicate(b));
     }
 
-    public static List<Branch> GetAllAffectedBranchSite(PlanetTile tile)
+    public static List<Branch> GetAllAffectedBranch(PlanetTile tile)
     {
         ConcurrentBag<Branch> result = [];
         RatkinOrderManager.Instance.AllRatkinOrders
@@ -74,7 +78,7 @@ public static class BranchUtility
         return result.ToList();
     }
 
-    public static List<Branch> GetAllAffectedBranchSite(PlanetTile tile, Predicate<Branch> predicate)
+    public static List<Branch> GetAllAffectedBranch(PlanetTile tile, Predicate<Branch> predicate)
     {
         ConcurrentBag<Branch> result = [];
         RatkinOrderManager.Instance.AllRatkinOrders

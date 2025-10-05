@@ -30,7 +30,7 @@ public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestroyed
             nextCacheTick = Find.TickManager.TicksGame + 60000;
             if (map.IsPlayerHome)
             {
-                BranchesInRadius = BranchUtility.GetAllAffectedBranchSite(map.Tile).ToList();
+                BranchesInRadius = BranchUtility.GetAllAffectedBranch(map.Tile).ToList();
             }
         }
     }

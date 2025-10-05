@@ -25,6 +25,8 @@ public static class OARO_ThingDefOf
 
     public static ThingDef OARO_PlagueSample; //瘟疫样本
 
+    public static ThingDef OARO_DesignDrawing; //设计规划图
+
     static OARO_ThingDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ThingDefOf));

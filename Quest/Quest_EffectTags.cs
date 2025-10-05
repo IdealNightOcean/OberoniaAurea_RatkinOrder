@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using RimWorld.QuestGen;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,19 @@ using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
+
+public class QuestNode_EffectTags : QuestNode
+{
+    protected override bool TestRunInt(Slate slate)
+    {
+        return true;
+    }
+
+    protected override void RunInt()
+    {
+        QuestGen.quest.AddPart(new QuestPart_EffectTags());
+    }
+}
 
 public class QuestPart_EffectTags : QuestPart
 {

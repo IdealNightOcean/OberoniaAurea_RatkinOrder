@@ -21,7 +21,7 @@ public class QuestNode_CliquesManager : QuestNode
     {
         QuestPart_CliquesManager questPart_CliquesManager = new()
         {
-            inSignalEnable = QuestGen.quest.InitiateSignal
+            inSignalEnable = QuestGen.slate.Get<string>("inSignal"),
         };
         questPart_CliquesManager.InitOrderBranch(branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch));
         QuestGen.quest.AddPart(questPart_CliquesManager);
@@ -219,9 +219,16 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             return false;
         }
-        if (clique.IsBranchClique && clique.RelatedBranch.Squad.SquadStat.Supply < 0.25f)
+        if (clique.IsBranchClique)
         {
-            return false;
+            if (clique.RelatedBranch.Squad.SquadStat.Supply < 0.25f)
+            {
+                return false;
+            }
+            if (clique.RelatedBranch.IsBranchOfType(BranchType.Friendly))
+            {
+                return RecommendationUtility.CurRecommendationOfMap(clique.RelatedBranch.RatkinOrder, OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true)) >= 1;
+            }
         }
         return clique.Willingness > 0.999f;
     }
@@ -248,9 +255,13 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             return true;
         }
 
-        int delayTicks = activeDelayTicks > 0 ? activeDelayTicks
-                                              : clique.IsBranchClique ? Rand.RangeInclusive(120000, 240000)
-                                                                      : -1;
+        int delayTicks = activeDelayTicks;
+        //非友好分队派别激活参与有2~4天默认延迟
+        if (delayTicks < 0 && clique.IsBranchClique && !clique.RelatedBranch.IsBranchOfType(BranchType.Friendly))
+        {
+            delayTicks = Rand.RangeInclusive(120000, 240000);
+        }
+
         if (delayTicks > 0)
         {
             clique.TicksToActive = Mathf.Min(clique.TicksToActive, delayTicks);
@@ -260,6 +271,11 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             if (clique.IsBranchClique)
             {
                 clique.RelatedBranch.Squad.SquadStat.Supply -= 0.25f;
+                //邀请友好分部派别参与消耗1推荐信
+                if (clique.RelatedBranch.IsBranchOfType(BranchType.Friendly))
+                {
+                    RecommendationUtility.UseRecommendationOfMap(clique.RelatedBranch.RatkinOrder, OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
+                }
             }
             Active();
         }

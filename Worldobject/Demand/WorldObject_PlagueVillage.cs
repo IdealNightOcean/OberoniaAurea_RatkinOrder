@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using Verse;
+using Verse.Utility;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -35,6 +36,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
     private WorkType curWork;
 
     private int nextPlagueSpreadTick = -1;
+    private int nextCanProvideMedicineTick = -1;
 
     private int originalPopulation;
     private int population;
@@ -260,27 +262,30 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
         };
         rootNode.options.Add(sellOpt);
 
-        DiaOption cureOpt = new("OARO_PlagueVillage_Cure".Translate())
+        if (Find.TickManager.TicksGame < nextCanProvideMedicineTick)
         {
-            action = delegate
-            {
-                curWork = WorkType.Cure;
-                base.StartWork(caravan);
-            },
-            resolveTree = true
-        };
-        rootNode.options.Add(cureOpt);
+            int cooldownTicksLeft = nextCanProvideMedicineTick - Find.TickManager.TicksGame;
+            dispensingOpt.Disable("WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod()));
+            sellOpt.Disable("WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod()));
+        }
 
-        DiaOption isolationOpt = new("OARO_PlagueVillage_Isolation".Translate())
+        if (!isWorking)
         {
-            action = delegate
+            foreach (WorkType workType in EnumUtility.GetValues<WorkType>())
             {
-                curWork = WorkType.Isolation;
-                base.StartWork(caravan);
-            },
-            resolveTree = true
-        };
-        rootNode.options.Add(isolationOpt);
+                TaggedString optLabel = $"OARO_PlagueVillage_{workType}".Translate() + " (" + $"OARO_PlagueVillage_{workType}_Skill".Translate() + ")";
+                DiaOption workOpt = new(optLabel)
+                {
+                    action = delegate
+                    {
+                        curWork = workType;
+                        base.Notify_CaravanArrived(caravan);
+                    },
+                    resolveTree = true
+                };
+                rootNode.options.Add(workOpt);
+            }
+        }
 
         rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
         return rootNode;
@@ -327,6 +332,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
 
         void DispatchResult(ThingDef thingDef, float spreadChange)
         {
+            nextCanProvideMedicineTick = Find.TickManager.TicksGame + 120000;
             if (HasQuestEffectTag(ResponsibleDoctor))
             {
                 spreadChange *= 1.25f;
@@ -339,33 +345,34 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
 
     private DiaNode SellNode(Caravan caravan)
     {
-        DiaNode dispatchNode = new("OARO_PlagueVillage_SellInfo".Translate());
+        DiaNode sellNode = new("OARO_PlagueVillage_SellInfo".Translate());
 
         DiaOption herbalOpt = new($"{ThingDefOf.MedicineHerbal.label} x 25")
         {
-            action = () => DispatchResult(ThingDefOf.MedicineHerbal, Rand.Range(0.015f, 0.02f)),
+            action = () => SellResult(ThingDefOf.MedicineHerbal, Rand.Range(0.015f, 0.02f)),
             resolveTree = true
         };
-        dispatchNode.options.Add(herbalOpt);
+        sellNode.options.Add(herbalOpt);
 
         DiaOption industrialOpt = new($"{ThingDefOf.MedicineIndustrial.label} x 25")
         {
-            action = () => DispatchResult(ThingDefOf.MedicineIndustrial, Rand.Range(0.025f, 0.03f)),
+            action = () => SellResult(ThingDefOf.MedicineIndustrial, Rand.Range(0.025f, 0.03f)),
             resolveTree = true
         };
-        dispatchNode.options.Add(industrialOpt);
+        sellNode.options.Add(industrialOpt);
 
         DiaOption utratechOpt = new($"{ThingDefOf.MedicineUltratech.label} x 25")
         {
-            action = () => DispatchResult(ThingDefOf.MedicineUltratech, Rand.Range(0.05f, 0.08f)),
+            action = () => SellResult(ThingDefOf.MedicineUltratech, Rand.Range(0.05f, 0.08f)),
             resolveTree = true
         };
-        dispatchNode.options.Add(utratechOpt);
+        sellNode.options.Add(utratechOpt);
 
-        return dispatchNode;
+        return sellNode;
 
-        void DispatchResult(ThingDef thingDef, float spreadChange)
+        void SellResult(ThingDef thingDef, float spreadChange)
         {
+            nextCanProvideMedicineTick = Find.TickManager.TicksGame + 120000;
             PlagueSpread -= spreadChange;
             caravan.RemoveThingsOfDef(thingDef, 25);
             int silverGain = (int)thingDef.GetStatValueAbstract(StatDefOf.MarketValue) * 25 * 4;
