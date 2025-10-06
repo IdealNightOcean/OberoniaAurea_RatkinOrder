@@ -1,5 +1,7 @@
 ﻿using System;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -96,7 +98,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
         }
         if (CanAddDemand(isCriticalDemand: false, ignoreCD: false, replaceCur: false))
         {
-            BranchDemandType demandType = Rand.Chance(0.1f) ? BranchDemandType.Urgency : BranchDemandType.Normal;
+            DemandType demandType = Rand.Chance(0.1f) ? DemandType.Urgency : DemandType.Normal;
             BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(Branch, demandType);
             if (demandDef is not null)
             {

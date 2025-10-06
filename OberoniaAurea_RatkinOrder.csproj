@@ -74,7 +74,6 @@
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
-    <Compile Include="Branch\BranchMedalType.cs" />
     <Compile Include="Components\TrackedIntValue.cs" />
     <Compile Include="Components\TrackedFloatValue.cs" />
     <Compile Include="Components\QuestEffectTag.cs" />
@@ -117,6 +116,7 @@
     <Compile Include="Quest\Quest_AllRatkinFactionsGoogwillChange.cs" />
     <Compile Include="Quest\Quest_BranchPopulationChange.cs" />
     <Compile Include="Quest\Reward\Reward_BranchPopulation.cs" />
+    <Compile Include="Squad\RatkinOrderRaidWorker.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemand.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemandHandler.cs" />
@@ -131,7 +131,6 @@
     <Compile Include="BranchStat\BranchStatPart_FacilityLevelToBuildingCeiling.cs" />
     <Compile Include="Branch\BranchBuildingConstructParameter.cs" />
     <Compile Include="BranchDemand\BranchDemand.cs" />
-    <Compile Include="BranchDemand\BranchDemandType.cs" />
     <Compile Include="DefModExtension\BranchBuilding_MemorialExtension.cs" />
     <Compile Include="DefModExtension\EncampmentSupplyExtension.cs" />
     <Compile Include="DefModExtension\FermentingBarrelExtension.cs" />
@@ -213,7 +212,6 @@
     <Compile Include="IncidentWorker\IncidentWorker_Test.cs" />
     <Compile Include="Job\JobDriver_CommonTalkWith.cs" />
     <Compile Include="DefModExtension\MercyQuestExtension.cs" />
-    <Compile Include="OrderRelationshipKind.cs" />
     <Compile Include="Quest\Quest_RatkinOrderRelationshipChange.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GenerateFaltSuperHeavyHowitzer.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_GetFactionName.cs" />
@@ -264,7 +262,6 @@
     <Compile Include="Branch\BranchFacilityHandler.cs" />
     <Compile Include="Branch\BranchResidentHandler.cs" />
     <Compile Include="Branch\BranchBuilding.cs" />
-    <Compile Include="Branch\BranchType.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
@@ -340,12 +337,11 @@
     <Compile Include="Squad\SquadTask\SquadTask_GroupPatrol.cs" />
     <Compile Include="Squad\SquadGroupPatrolManager.cs" />
     <Compile Include="Squad\SquadSupplyContractManager.cs" />
-    <Compile Include="Squad\SquadSupportHandler.cs" />
+    <Compile Include="Utility\SquadSupportUtility.cs" />
     <Compile Include="Def\SquadTaskDef.cs" />
     <Compile Include="Squad\SquadTask\SquadTaskHandler.cs" />
     <Compile Include="Squad\SquadTask\SquadTask_JurisdictionDuty.cs" />
     <Compile Include="Lord\LordJob_AssaultColony_NeverFleeOrder.cs" />
-    <Compile Include="Utility\SquadUtility.cs" />
     <Compile Include="Components\TagStrToValue\TagStrToBoolCountable.cs" />
     <Compile Include="Interface\IPostLoadInit.cs" />
     <Compile Include="Squad\Squad.cs" />

@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchMedalRecord;
 
 namespace OberoniaAurea.RatkinOrder;
 

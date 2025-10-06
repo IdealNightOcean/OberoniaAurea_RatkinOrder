@@ -2,6 +2,7 @@
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -51,7 +52,7 @@ public static class EsteemUtility
     private static readonly int[] EsteemSoftCap = [30, 50, 70, 90, 100];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int GetEsteemSoftCap(OrderRelationshipKind relationship)
+    public static int GetEsteemSoftCap(RelationshipKind relationship)
     {
         return EsteemSoftCap[Mathf.Clamp((int)relationship, 0, EsteemSoftCap.Length - 1)];
     }

@@ -5,17 +5,19 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchDemandUtility
 {
-    public static BranchDemandDef GetRandomBranchDemandOfType(Branch branch, BranchDemandType demandType)
+    public static BranchDemandDef GetRandomBranchDemandOfType(Branch branch, DemandType demandType)
     {
         return GetBranchDemandOfTypeWithWeight(branch, demandType).RandomElementByWeightWithFallback(pair => pair.Item2, fallback: (null, 1f)).Item1;
     }
 
-    public static List<(BranchDemandDef, float)> GetBranchDemandOfTypeWithWeight(Branch branch, BranchDemandType demandType)
+    public static List<(BranchDemandDef, float)> GetBranchDemandOfTypeWithWeight(Branch branch, DemandType demandType)
     {
         List<BranchDemandDef> demandOfType = DefDatabase<BranchDemandDef>.AllDefsListForReading.Where(d => d.demandType == demandType).ToList();
 
@@ -33,7 +35,7 @@ public static class BranchDemandUtility
         return demandsWithChance;
     }
 
-    public static string GetBranchDemandWithOfTypeWeightExplain(Branch branch, BranchDemandType demandType)
+    public static string GetBranchDemandWithOfTypeWeightExplain(Branch branch, DemandType demandType)
     {
         List<(BranchDemandDef, float)> demandsWithChance = GetBranchDemandOfTypeWithWeight(branch, demandType);
         if (demandsWithChance.NullOrEmpty())
@@ -69,7 +71,7 @@ public static class BranchDemandUtility
             ("OARO_ChangeOffset_HonorBranch", () => branch.IsBranchOfType(BranchType.Honor) ? 0.02f : 0f),
             ("OARO_BranchCriticalDemandAdd_Facility", () => branch.FacilityHandler.TotalFacilityLevel * 0.005f),
             ("OARO_BranchCriticalDemandAdd_Medal", () => branch.MedalHandler.TotalMedalCount * 0.005f),
-            ("OARO_BranchCriticalDemandAdd_Member", () => (1f - branch.Squad.SquadStat.MemberPercentage) * 0.05f),
+            ("OARO_BranchCriticalDemandAdd_Member", () => (1f - branch.SquadStat.MemberPercentage) * 0.05f),
             ("OARO_BranchCriticalDemandAdd_Fund", () => (1f - branch.RatkinOrder.Funds) * 0.1f),
         ];
 

@@ -114,7 +114,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
             {
                 if (nobilityTerritories.Remove(territory))
                 {
-                    if (territory.HasYield && (territory.TypeOfNobility == NobilityType.Justice || territory.TypeOfNobility == NobilityType.Kindness))
+                    if (territory.HasYield && (territory.NobilityTypeValue == NobilityType.Justice || territory.NobilityTypeValue == NobilityType.Kindness))
                     {
                         extraRecommendation++;
                     }

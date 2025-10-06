@@ -7,11 +7,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverFlee
 {
-    private Branch branch;
-    private bool isCommander;
-
-    private Squad Squad => branch.Squad;
-
     public LordJob_AssaultColony_NeverFleeOrder() { }
 
     public LordJob_AssaultColony_NeverFleeOrder(SpawnedPawnParams parms) : base(parms) { }
@@ -20,34 +15,27 @@ public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverF
         : base(assaulterFaction, canKidnap, canTimeoutOrFlee, sappers, useAvoidGridSmart, canSteal, breachers, canPickUpOpportunisticWeapons)
     { }
 
-    public void SetSquadIdentity(Branch branch, bool isCommander)
-    {
-        this.branch = branch;
-        this.isCommander = isCommander;
-    }
-
     public override void Notify_PawnLost(Pawn p, PawnLostCondition condition)
     {
         if (condition == PawnLostCondition.ExitedMap)
         {
-            if (Squad is not null)
-            {
-                if (isCommander)
-                {
-                    Squad.SquadStat.CommanderCount++;
-                }
-                else
-                {
-                    Squad.SquadStat.MemberCount++;
-                }
-            }
+            Notify_PawnLeftMap(p);
         }
     }
 
-    public override void ExposeData()
+    private static void Notify_PawnLeftMap(Pawn pawn)
     {
-        base.ExposeData();
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref isCommander, "isCommander");
+        Hediff_Knight knightHediff = pawn.GetKnightHediff();
+        if (knightHediff is not null && knightHediff.Squad is not null)
+        {
+            if (knightHediff.IsCommander)
+            {
+                knightHediff.Squad.SquadStat.CommanderCount += 1f;
+            }
+            else
+            {
+                knightHediff.Squad.SquadStat.MemberCount += 1f;
+            }
+        }
     }
 }

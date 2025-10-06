@@ -7,6 +7,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IDrawDevWindow
 {
+    public enum RelationshipKind : byte
+    {
+        Stranger,
+        Acquaintance,
+        Friendly,
+        Trustworthy,
+        Soulmate
+    }
+
     [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
 
     /*
@@ -23,11 +32,11 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IDra
     /*
     关系
     */
-    private OrderRelationshipKind relationship = OrderRelationshipKind.Stranger; //当前关系
+    private RelationshipKind relationship = RelationshipKind.Stranger; //当前关系
     private int lastRelationshipChangeTick = -1;
     private string lastRelationshipChangeReason = string.Empty;
 
-    public OrderRelationshipKind Relationship => relationship;
+    public RelationshipKind Relationship => relationship;
     public int LastRelationshipChangeTick => lastRelationshipChangeTick;
     public string LastRelationshipChangeReason => lastRelationshipChangeReason;
 
@@ -41,7 +50,7 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IDra
 
     public void PostOrderGenerated()
     {
-        relationship = GameComponent_RatkinOrder.Instance?.InitOrderRelationship ?? OrderRelationshipKind.Stranger;
+        relationship = GameComponent_RatkinOrder.Instance?.InitOrderRelationship ?? RelationshipKind.Stranger;
         esteem = EsteemUtility.GetEsteemSoftCap(relationship);
     }
 
@@ -52,7 +61,7 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IDra
         Scribe_Values.Look(ref lastEsteemChange, "lastEsteemChange", 0);
         Scribe_Values.Look(ref lastEsteemChangeReason, "lastEsteemChangeReason", string.Empty);
 
-        Scribe_Values.Look(ref relationship, "relationship", OrderRelationshipKind.Stranger);
+        Scribe_Values.Look(ref relationship, "relationship", RelationshipKind.Stranger);
         Scribe_Values.Look(ref lastRelationshipChangeTick, "lastRelationshipChangeTick", -1);
         Scribe_Values.Look(ref lastRelationshipChangeReason, "lastRelationshipChangeReason", string.Empty);
 
@@ -136,13 +145,13 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IDra
         }
     }
 
-    public void SetRelationship(OrderRelationshipKind newRelationship, string reason, bool sendLetter)
+    public void SetRelationship(RelationshipKind newRelationship, string reason, bool sendLetter)
     {
         if (newRelationship == relationship)
         {
             return;
         }
-        OrderRelationshipKind oldRelationship = relationship;
+        RelationshipKind oldRelationship = relationship;
 
         relationship = newRelationship;
 

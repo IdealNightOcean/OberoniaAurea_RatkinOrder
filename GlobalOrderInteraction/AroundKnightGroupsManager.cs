@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 

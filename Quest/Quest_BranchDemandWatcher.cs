@@ -2,6 +2,7 @@
 using RimWorld.QuestGen;
 using System.Linq;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -9,7 +10,7 @@ public class QuestNode_BranchDemandWatcher : QuestNode
 {
     public SlateRef<Branch> branch;
 
-    public SlateRef<BranchDemandType?> demandType;
+    public SlateRef<DemandType?> demandType;
 
     protected override bool TestRunInt(Slate slate)
     {
@@ -21,7 +22,7 @@ public class QuestNode_BranchDemandWatcher : QuestNode
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
             Branch = branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
-            DemandType = demandType.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType)
+            DemandType = demandType.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType)
         };
 
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
@@ -32,7 +33,7 @@ public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
 {
 
     public Branch Branch;
-    public BranchDemandType DemandType;
+    public DemandType DemandType;
 
     public override void ExposeData()
     {
@@ -66,13 +67,13 @@ public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
         }
     }
 
-    public static (Branch branch, BranchDemandType demandType) GetBranchDemand(Quest quest)
+    public static (Branch branch, DemandType demandType) GetBranchDemand(Quest quest)
     {
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = quest?.PartsListForReading.OfType<QuestPart_BranchDemandWatcher>()?.FirstOrFallback(null);
 
         if (questPart_BranchDemandWatcher is null)
         {
-            return (null, BranchDemandType.Normal);
+            return (null, DemandType.Normal);
         }
 
         return (questPart_BranchDemandWatcher.Branch, questPart_BranchDemandWatcher.DemandType);

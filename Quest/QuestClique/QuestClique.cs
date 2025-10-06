@@ -1,5 +1,6 @@
 ﻿using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -101,7 +102,7 @@ public class QuestClique : IExposable
     /// </summary>
     public static float GetBranchPotency(Branch branch)
     {
-        float branchPotency = (branch.Squad.SquadStat.MemberCount + branch.Squad.SquadStat.CommanderCount) * 10f
+        float branchPotency = (branch.SquadStat.MemberCount + branch.SquadStat.CommanderCount) * 10f
                             * (1f + (branch.FacilityHandler.TotalFacilityLevel + branch.MedalHandler.TotalMedalCount) * 0.04f);
 
         if (branch.IsBranchOfType(BranchType.Honor))

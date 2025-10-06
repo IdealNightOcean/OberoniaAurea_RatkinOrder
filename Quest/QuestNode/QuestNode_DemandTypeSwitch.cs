@@ -1,13 +1,14 @@
 ﻿using RimWorld.QuestGen;
 using System.Collections.Generic;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_DemandTypeSwitch : QuestNode
 {
-    public SlateRef<BranchDemandType?> demandType;
-    public Dictionary<BranchDemandType, QuestNode> demandNode;
+    public SlateRef<DemandType?> demandType;
+    public Dictionary<DemandType, QuestNode> demandNode;
 
     protected override bool TestRunInt(Slate slate)
     {
@@ -15,7 +16,7 @@ public class QuestNode_DemandTypeSwitch : QuestNode
         {
             return true;
         }
-        BranchDemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        DemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
         if (!demandType.HasValue)
         {
             return false;
@@ -34,7 +35,7 @@ public class QuestNode_DemandTypeSwitch : QuestNode
             return;
         }
         Slate slate = QuestGen.slate;
-        BranchDemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        DemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
         if (!demandType.HasValue)
         {
             return;

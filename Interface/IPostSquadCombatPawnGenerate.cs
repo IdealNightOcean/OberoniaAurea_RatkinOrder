@@ -4,5 +4,5 @@ namespace OberoniaAurea.RatkinOrder;
 
 public interface IPostSquadCombatPawnGenerate
 {
-    void PostSquadCombatPawnGenerate(Pawn pawn, Squad squad, bool isCommander, bool friendly);
+    void PostSquadCombatPawnGenerate(Pawn pawn, Branch branch, bool isCommander, bool friendly);
 }

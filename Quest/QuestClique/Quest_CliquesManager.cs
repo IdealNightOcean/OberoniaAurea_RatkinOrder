@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -221,7 +222,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
         if (clique.IsBranchClique)
         {
-            if (clique.RelatedBranch.Squad.SquadStat.Supply < 0.25f)
+            if (clique.RelatedBranch.SquadStat.Supply < 0.25f)
             {
                 return false;
             }
@@ -270,7 +271,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             if (clique.IsBranchClique)
             {
-                clique.RelatedBranch.Squad.SquadStat.Supply -= 0.25f;
+                clique.RelatedBranch.SquadStat.Supply -= 0.25f;
                 //邀请友好分部派别参与消耗1推荐信
                 if (clique.RelatedBranch.IsBranchOfType(BranchType.Friendly))
                 {

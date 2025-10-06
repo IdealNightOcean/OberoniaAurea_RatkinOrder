@@ -1,161 +1,88 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using Verse;
-using Verse.AI.Group;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public static class SquadCombatPawnUtility
 {
-    public static bool TryAssistSupport(this Squad squad, Map map, int member, int commander)
+    private static IReadOnlyList<(HediffDef, float)> tmpMedalHediffs;
+    private static IReadOnlyList<IPostSquadCombatPawnGenerate> tmpBranchPostSquadCombat;
+
+    public static List<Pawn> GenerateCombatPawns(Branch branch, Map map, int memberCount, int commanderCount, bool friendly)
     {
-        (List<Pawn> members, List<Pawn> commanders) = GeneratePawns(squad, map, member, commander);
-        if (members is null)
+        List<Pawn> pawns = [];
+        if (!branch.RatkinOrder.Def.TryGetRandomPawnGroupMaker(PawnGroupKindDefOf.Combat, out PawnGroupMaker groupMaker))
         {
-            return false;
+            Log.Error($"No usable PawnGroupMaker for {PawnGroupKindDefOf.Combat} found in {branch.RatkinOrder}");
+            return pawns;
         }
 
-        squad.PostSquadCombatPawnGenerate(members, commanders, friendly: true);
-
-        if (members.NullOrEmpty())
+        try
         {
-            return false;
-        }
+            tmpMedalHediffs = branch.MedalHandler.MedalHediffs;
+            tmpBranchPostSquadCombat = branch.PostSquadCombatPawnGenerate;
 
-        CombatPawnsArrival(squad, map, friendly: true, members, commanders);
+            Faction faction = branch.RatkinOrder.Faction;
+            int mapTile = map.Tile;
 
-        GetLetterText(squad);
-
-        return true;
-    }
-    private static (List<Pawn> members, List<Pawn> commanders) GeneratePawns(this Squad squad, Map map, int memberCount, int commanderCount)
-    {
-        OAFrame_PawnGenerateUtility.TryGetRandomPawnGroupMaker(PawnGroupKindDefOf.Combat, null, out PawnGroupMaker groupMaker);
-        if (groupMaker is null || groupMaker.guards.NullOrEmpty())
-        {
-            return (null, null);
-        }
-
-        Faction faction = squad.RatkinOrder.Faction;
-        Ideo ideo = faction.ideos.PrimaryIdeo;
-        int tile = map.Tile;
-
-        List<Pawn> members = [];
-
-        for (int i = 0; i < memberCount; i++)
-        {
-            PawnKindDef pawnKind = groupMaker.guards.RandomElementByWeight(g => g.selectionWeight).kind; //改为Default
-            PawnGenerationRequest request = OARO_PawnUtility.DefaultKnightGenerationRequest(pawnKind, faction, forceNew: false);
-            request.FixedIdeo = ideo;
-            request.Tile = tile;
-
-            Pawn pawn = PawnGenerator.GeneratePawn(request);
-            pawn.SetRatkinOrder(squad.RatkinOrder);
-
-            members.Add(pawn);
-        }
-
-        if (members.Count == 0)
-        {
-            return (null, null);
-        }
-
-        List<Pawn> commanders = [];
-        if (commanderCount > 0 && !groupMaker.options.NullOrEmpty())
-        {
-            for (int i = 0; i < commanderCount; i++)
+            if (memberCount > 0 && !groupMaker.options.NullOrEmpty())
             {
-                PawnKindDef pawnKind = groupMaker.options.RandomElementByWeight(g => g.selectionWeight).kind; //改为Default
-                PawnGenerationRequest request = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction);
-                request.FixedIdeo = ideo;
-                request.Tile = tile;
+                for (int i = 0; i < memberCount; i++)
+                {
+                    PawnKindDef pawnKind = groupMaker.guards.RandomElementByWeight(g => g.selectionWeight).kind;
+                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, branch.RatkinOrder, branch, isCommander: false, tile: mapTile);
+                    PostSquadCombatPawnGenerate(pawn, branch, isCommander: false, friendly: friendly);
+                    pawns.Add(pawn);
+                }
+            }
 
-                Pawn pawn = PawnGenerator.GeneratePawn(request);
-
-                commanders.Add(pawn);
+            if (commanderCount > 0 && !groupMaker.options.NullOrEmpty())
+            {
+                for (int i = 0; i < commanderCount; i++)
+                {
+                    PawnKindDef pawnKind = groupMaker.options.RandomElementByWeight(g => g.selectionWeight).kind;
+                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, branch.RatkinOrder, branch, isCommander: true, tile: mapTile);
+                    PostSquadCombatPawnGenerate(pawn, branch, isCommander: true, friendly: friendly);
+                    pawns.Add(pawn);
+                }
             }
         }
+        finally
+        {
+            tmpMedalHediffs = null;
+            tmpBranchPostSquadCombat = null;
+        }
 
-        if (commanders.Count == 0)
-        {
-            return (members, null);
-        }
-        else
-        {
-            return (members, commanders);
-        }
+        return pawns;
     }
 
-    private static void CombatPawnsArrival(this Squad squad, Map map, bool friendly, IEnumerable<Pawn> members, IEnumerable<Pawn> commanders)
+    private static void PostSquadCombatPawnGenerate(Pawn p, Branch branch, bool isCommander, bool friendly)
     {
-        Faction faction = squad.RatkinOrder.Faction;
-        bool quickMilitaryAid = friendly || (faction is not null && !faction.HostileTo(Faction.OfPlayer));
-        bool centerDrop = !quickMilitaryAid && Rand.Chance(0.2f);
-        int podOpenDelay = quickMilitaryAid ? 120 : 240;
-        IntVec3 spawnCenter;
-        Rot4 spawnRotation = Rot4.Random;
-
-        if (centerDrop)
+        if (tmpMedalHediffs is not null && tmpMedalHediffs.Count > 0)
         {
-            if (Rand.Chance(0.4f) && map.listerBuildings.ColonistsHaveBuildingWithPowerOn(ThingDefOf.OrbitalTradeBeacon))
+            foreach ((HediffDef hediffDef, float severity) in tmpMedalHediffs)
             {
-                spawnCenter = DropCellFinder.TradeDropSpot(map);
-            }
-            else if (!DropCellFinder.TryFindRaidDropCenterClose(out spawnCenter, map, canRoofPunch: true, allowIndoors: true))
-            {
-                spawnCenter = DropCellFinder.FindRaidDropCenterDistant(map);
+                Hediff hediff = p.health.GetOrAddHediff(hediffDef);
+                hediff.Severity = severity;
             }
         }
-        else
+        if (tmpBranchPostSquadCombat is not null && tmpBranchPostSquadCombat.Count > 0)
         {
-            spawnCenter = DropCellFinder.FindRaidDropCenterDistant(map);
-        }
-
-        if (quickMilitaryAid)
-        {
-            MakeSupportJob(squad, map, spawnCenter, members, commanders);
-        }
-        else
-        {
-            MakeAttackJob(squad, map, spawnCenter, members, commanders);
-        }
-
-        IEnumerable<Pawn> pawns = members;
-        if (commanders is not null)
-        {
-            pawns.Concat(commanders);
-        }
-
-        DropPodUtility.DropThingsNear(spawnCenter, map, pawns.Cast<Thing>(), podOpenDelay, canInstaDropDuringInit: false, leaveSlag: true, quickMilitaryAid, forbid: true, allowFogged: true, faction);
-    }
-
-    private static void MakeAttackJob(this Squad squad, Map map, IntVec3 spawnCenter, IEnumerable<Pawn> members, IEnumerable<Pawn> commanders)
-    {
-        IntVec3 originCell = spawnCenter.IsValid ? spawnCenter : members.FirstOrFallback().PositionHeld;
-        RCellFinder.TryFindRandomSpotJustOutsideColony(originCell, map, out IntVec3 result);
-        Faction faction = squad.RatkinOrder.Faction;
-
-        LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: false), map, members);
-
-        if (commanders is not null)
-        {
-            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: true), map, commanders);
-        }
-    }
-
-    private static void MakeSupportJob(this Squad squad, Map map, IntVec3 spawnCenter, IEnumerable<Pawn> members, IEnumerable<Pawn> commanders)
-    {
-        IntVec3 originCell = spawnCenter.IsValid ? spawnCenter : members.FirstOrFallback().PositionHeld;
-        RCellFinder.TryFindRandomSpotJustOutsideColony(originCell, map, out IntVec3 result);
-        Faction faction = squad.RatkinOrder.Faction;
-
-        LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: false), map, members);
-
-        if (commanders is not null)
-        {
-            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, result, squad.Branch, isCommander: true), map, commanders);
+            for (int i = 0; i < tmpBranchPostSquadCombat.Count; i++)
+            {
+                try
+                {
+                    tmpBranchPostSquadCombat[i].PostSquadCombatPawnGenerate(p, branch, isCommander: isCommander, friendly: friendly);
+                }
+                catch (Exception ex)
+                {
+                    string processorTypeName = tmpBranchPostSquadCombat[i]?.GetType()?.FullName ?? "UnknownProcessor";
+                    Log.Error($"Exception occurred while executing post-squad assist processor: ProcessorType={processorTypeName}, ErrorMessage: {ex.Message}");
+                    continue;
+                }
+            }
         }
     }
 

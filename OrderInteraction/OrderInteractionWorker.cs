@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using Verse;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -15,7 +16,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
     {
         if (ratkinOrder.Relationship < Def.floorRelationship)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(OrderRelationshipKind.Trustworthy));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Trustworthy));
         }
         if (ratkinOrder.Esteem < Def.floorEsteem)
         {

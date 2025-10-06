@@ -2,6 +2,7 @@
 using RimWorld;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -38,7 +39,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
     private EsteemHandler esteemHandler;
     public EsteemHandler EsteemHandler => esteemHandler;
     public int Esteem => esteemHandler.Esteem;
-    public OrderRelationshipKind Relationship => esteemHandler.Relationship;
+    public RelationshipKind Relationship => esteemHandler.Relationship;
 
     //资金
     private FundHandler fundHandler;

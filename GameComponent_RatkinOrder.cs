@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -8,7 +9,7 @@ public class GameComponent_RatkinOrder : GameComponent
 {
     public static GameComponent_RatkinOrder Instance { get; private set; }
 
-    public OrderRelationshipKind InitOrderRelationship;
+    public RelationshipKind InitOrderRelationship;
 
     private UniqueIDManager uniqueIDManager;
 
@@ -21,6 +22,12 @@ public class GameComponent_RatkinOrder : GameComponent
     /// 因不保存，应注意重新注册
     /// </summary>
     [Unsaved] public HashSet<Pawn> KnightPawns = [];
+
+    /// <summary>
+    /// 全局骑士长管理
+    /// 因不保存，应注意重新注册
+    /// </summary>
+    [Unsaved] public HashSet<Pawn> KnightCommanderPawns = [];
 
     /// <summary>
     /// 全局对话行为管理

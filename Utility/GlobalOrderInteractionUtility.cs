@@ -6,6 +6,8 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.Grammar;
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -21,9 +23,9 @@ public static class GlobalOrderInteractionUtility
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
 
-        if (ratkinOrder.Relationship < OrderRelationshipKind.Trustworthy)
+        if (ratkinOrder.Relationship < RelationshipKind.Trustworthy)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(OrderRelationshipKind.Trustworthy));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Trustworthy));
         }
 
         int needRecommendation = ratkinOrder.Esteem switch
@@ -73,9 +75,9 @@ public static class GlobalOrderInteractionUtility
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
 
-        if (ratkinOrder.Relationship < OrderRelationshipKind.Friendly)
+        if (ratkinOrder.Relationship < RelationshipKind.Friendly)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(OrderRelationshipKind.Friendly.GetLabel());
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipKind.Friendly.GetLabel());
         }
 
         if (GlobalOrderInteractionManager.ResidentKnightsManager.ResidentKnights.Count >= GlobalOrderInteractionManager.ResidentKnightsManager.ResidentLimit)
@@ -145,9 +147,9 @@ public static class GlobalOrderInteractionUtility
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
 
-        if (knightGroup.RatkinOrder.Relationship <= OrderRelationshipKind.Stranger)
+        if (knightGroup.RatkinOrder.Relationship <= RelationshipKind.Stranger)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(OrderRelationshipKind.Friendly.GetLabel());
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipKind.Friendly.GetLabel());
         }
 
         if (GlobalOrderInteractionManager.AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())

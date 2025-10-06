@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -165,7 +166,7 @@ public static class DebugRatkinOrders
         void SelectDemandType(Branch branch)
         {
             List<DebugMenuOption> demandTypeOptions = [];
-            foreach (BranchDemandType demandType in Enum.GetValues(typeof(BranchDemandType)))
+            foreach (DemandType demandType in Enum.GetValues(typeof(DemandType)))
             {
                 DebugMenuOption demandTypeOption = new(label: demandType.ToString(),
                                                        mode: DebugMenuOptionMode.Action,
@@ -175,7 +176,7 @@ public static class DebugRatkinOrders
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(demandTypeOptions));
         }
 
-        void SelectDemand(Branch branch, BranchDemandType branchDemandType)
+        void SelectDemand(Branch branch, DemandType branchDemandType)
         {
             List<DebugMenuOption> demandOptions = [];
             foreach (BranchDemandDef demandDef in DefDatabase<BranchDemandDef>.AllDefs.Where(d => d.demandType == branchDemandType))

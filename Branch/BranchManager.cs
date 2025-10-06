@@ -3,6 +3,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -238,7 +240,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
             {
                 if (Rand.Chance(BranchDemandUtility.GetCriticalDemandTriggerChance(branch, resultOnly: true, out _)))
                 {
-                    BranchDemandType demandType = Rand.Bool ? BranchDemandType.Important : BranchDemandType.Core;
+                    DemandType demandType = Rand.Bool ? DemandType.Important : DemandType.Core;
                     BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(branch, demandType);
                     if (demandDef is not null)
                     {

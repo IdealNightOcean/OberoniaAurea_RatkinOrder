@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using RimWorld.Planet;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using Verse;
@@ -46,9 +47,14 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         for (int i = 0; i < questParameter.LodgerCount; i++)
         {
             DevelopmentalStage developmentalStages = i < adultCount ? DevelopmentalStage.Adult : DevelopmentalStage.Child;
-            PawnGenerationRequest generationRequest = OARO_PawnUtility.DefaultKnightGenerationRequest(fixedPawnKind, questParameter.faction, forceNew: true);
+            PawnGenerationRequest generationRequest = OARO_PawnUtility.DefaultKnightGenerationRequest(fixedPawnKind, questParameter.faction, tile: questParameter.map.Tile, forceNew: true);
             generationRequest.AllowedDevelopmentalStages = developmentalStages;
-            Pawn pawn = quest.GeneratePawn(generationRequest);
+
+            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(generationRequest, ratkinOrder);
+            if (!pawn.IsWorldPawn())
+            {
+                Find.WorldPawns.PassToWorld(pawn);
+            }
 
             pawns.Add(pawn);
 
@@ -100,6 +106,6 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
 
     protected override void PostPawnGenerated(Pawn pawn)
     {
-        pawn.SetRatkinOrder(ratkinOrder);
+        pawn.InitKnightHediff(ratkinOrder);
     }
 }

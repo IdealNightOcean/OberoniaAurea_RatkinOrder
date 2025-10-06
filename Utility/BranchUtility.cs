@@ -12,11 +12,11 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchUtility
 {
-    public static readonly BranchMedalType[] BranchMedalsArr = (BranchMedalType[])Enum.GetValues(typeof(BranchMedalType));
+    public static readonly BranchMedalRecord.BranchMedalType[] BranchMedalsArr = (BranchMedalRecord.BranchMedalType[])Enum.GetValues(typeof(BranchMedalRecord.BranchMedalType));
 
-    public static bool InitBranchForNewOrder(this RatkinOrder order)
+    public static bool InitBranchForNewOrder(this RatkinOrder ratkinOrder)
     {
-        if (order is null || order.Faction is null || order.BranchManager is null)
+        if (ratkinOrder is null || ratkinOrder.Faction is null || ratkinOrder.BranchManager is null)
         {
             return false;
         }
@@ -30,33 +30,33 @@ public static class BranchUtility
             }
             try
             {
-                if (Branch.GenerateBranchFor(order, settlement, addToManager: true) is not null)
+                if (Branch.GenerateBranchFor(ratkinOrder, settlement, addToManager: true) is not null)
                 {
                     atLeastOneSite = true;
                 }
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to create a new branch for {order} at {settlement}: " + ex);
+                Log.Error($"Failed to create a new branch for {ratkinOrder} at {settlement}: " + ex);
                 continue;
             }
         }
         return atLeastOneSite;
     }
 
-    public static IEnumerable<Branch> GetAllAvailableBranchForOrder(this RatkinOrder order, Predicate<Branch> predicate)
+    public static IEnumerable<Branch> GetAllAvailableBranchForOrder(this RatkinOrder ratkinOrder, Predicate<Branch> predicate)
     {
-        return order.BranchManager.AllBranches.Where(b => predicate(b));
+        return ratkinOrder.BranchManager.AllBranches.Where(b => predicate(b));
     }
 
-    public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder order, PlanetTile tile)
+    public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder ratkinOrder, PlanetTile tile)
     {
-        return order.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile));
+        return ratkinOrder.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile));
     }
 
-    public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder order, PlanetTile tile, Predicate<Branch> predicate)
+    public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder ratkinOrder, PlanetTile tile, Predicate<Branch> predicate)
     {
-        return order.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile) && predicate(b));
+        return ratkinOrder.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile) && predicate(b));
     }
 
     public static List<Branch> GetAllAffectedBranch(PlanetTile tile)
@@ -66,9 +66,7 @@ public static class BranchUtility
             .AsParallel()
             .ForAll(order =>
             {
-                IEnumerable<Branch> affectedBranches = order.BranchManager.AllBranches
-                    .Where(b => b.IsInAffectedRange(tile));
-
+                IEnumerable<Branch> affectedBranches = order.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile));
                 foreach (Branch branch in affectedBranches)
                 {
                     result.Add(branch);
@@ -85,8 +83,7 @@ public static class BranchUtility
             .AsParallel()
             .ForAll(order =>
             {
-                IEnumerable<Branch> affectedBranches = order.BranchManager.AllBranches
-                    .Where(b => b.IsInAffectedRange(tile) && predicate(b));
+                IEnumerable<Branch> affectedBranches = order.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile) && predicate(b));
 
                 foreach (Branch branch in affectedBranches)
                 {
@@ -97,13 +94,13 @@ public static class BranchUtility
         return result.ToList();
     }
 
-    public static bool CanBeSiteForNewBranch(this RatkinOrder order, WorldObject worldObject)
+    public static bool CanBeSiteForNewBranch(this RatkinOrder ratkinOrder, WorldObject worldObject)
     {
-        if (order is null || worldObject is null)
+        if (ratkinOrder is null || worldObject is null)
         {
             return false;
         }
-        if (order.Faction != worldObject.Faction)
+        if (ratkinOrder.Faction != worldObject.Faction)
         {
             return false;
         }
@@ -116,15 +113,15 @@ public static class BranchUtility
         return true;
     }
 
-    public static AcceptanceReport CanInviteBranchCreation(this RatkinOrder order, Map map, PlanetTile tile, bool resultOnly)
+    public static AcceptanceReport CanInviteBranchCreation(this RatkinOrder ratkinOrder, Map map, PlanetTile tile, bool resultOnly)
     {
-        if (map is null || order is null)
+        if (map is null || ratkinOrder is null)
         {
             return false;
         }
-        if (OAFrame_MapUtility.AmountSendableSilver(map) < order.BranchManager.SilverNeededForNextBranchCreation)
+        if (OAFrame_MapUtility.AmountSendableSilver(map) < ratkinOrder.BranchManager.SilverNeededForNextBranchCreation)
         {
-            return resultOnly ? false : "NeedSilverLaunchable".Translate(order.BranchManager.SilverNeededForNextBranchCreation);
+            return resultOnly ? false : "NeedSilverLaunchable".Translate(ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
         }
 
         WorldObject curWO = null;
@@ -137,21 +134,21 @@ public static class BranchUtility
                 break;
             }
         }
-        return (curWO is null) || CanBeSiteForNewBranch(order, curWO);
+        return (curWO is null) || CanBeSiteForNewBranch(ratkinOrder, curWO);
     }
 
-    public static bool InviteBranchCreation(this RatkinOrder order, Map map, WorldObject worldObject)
+    public static bool InviteBranchCreation(this RatkinOrder ratkinOrder, Map map, WorldObject worldObject)
     {
         throw new NotImplementedException();
     }
 
-    public static void InviteBranchCreationForNewWorldObject(this RatkinOrder order, Map map, WorldObjectDef worldObjectDef, PlanetTile tile)
+    public static void InviteBranchCreationForNewWorldObject(this RatkinOrder ratkinOrder, Map map, WorldObjectDef worldObjectDef, PlanetTile tile)
     {
         WorldObject worldObject = WorldObjectMaker.MakeWorldObject(worldObjectDef);
         worldObject.Tile = tile;
-        worldObject.SetFaction(order.Faction);
+        worldObject.SetFaction(ratkinOrder.Faction);
 
-        if (InviteBranchCreation(order, map, worldObject))
+        if (InviteBranchCreation(ratkinOrder, map, worldObject))
         {
             Find.WorldObjects.Add(worldObject);
         }

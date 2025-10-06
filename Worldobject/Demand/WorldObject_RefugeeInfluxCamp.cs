@@ -272,8 +272,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             {
                 foreach (WorkType workType in EnumUtility.GetValues<WorkType>())
                 {
-                    TaggedString optLabel = $"OARO_RefugeeInflux_{workType}".Translate() + " (" + $"OARO_RefugeeInflux_{workType}_Skill".Translate() + ")";
-                    DiaOption workOpt = new(optLabel)
+                    DiaOption workOpt = new($"OARO_RefugeeInflux_{workType}".Translate())
                     {
                         action = delegate
                         {
@@ -297,7 +296,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
 
         foreach (PolicyType policyType in EnumUtility.GetValues<PolicyType>())
         {
-            DiaOption policyOpt = new($"OARO_RefugeeInflux_{curPolicy}".Translate())
+            DiaOption policyOpt = new($"OARO_RefugeeInflux_{policyType}".Translate())
             {
                 action = () => { curPolicy = policyType; },
                 resolveTree = true
@@ -528,12 +527,12 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         {
             action = delegate
             {
-                branch.Squad.SquadStat.Supply -= 0.5f;
+                branch.SquadStat.Supply -= 0.5f;
                 Distribute();
             },
             resolveTree = true
         };
-        if (branch.Squad.SquadStat.Supply < 0.5f)
+        if (branch.SquadStat.Supply < 0.5f)
         {
             branchOpt.Disable("OARO_Insufficient_SquadSupply".Translate(0.5f.ToStringPercent()));
         }

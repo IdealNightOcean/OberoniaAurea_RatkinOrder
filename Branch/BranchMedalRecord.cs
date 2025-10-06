@@ -4,6 +4,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public struct BranchMedalRecord : IExposable
 {
+    public enum BranchMedalType : byte
+    {
+        None,
+        Tenacity,
+        Courage,
+        Intervene,
+        Justice
+    }
+
     public BranchMedalType type;
     public short count;
     public int firstGotTick;

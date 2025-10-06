@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -38,7 +39,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
 
     private Branch branch;
     public Branch Branch => branch;
-    BranchDemandType demandType;
+    private DemandType demandType;
 
     private RegionalFeature regionalFeatureI;
     private RegionalFeature regionalFeatureII;
@@ -205,7 +206,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
         (Branch branch, demandType) = QuestPart_BranchDemandWatcher.GetBranchDemand(quest);
         InitOrderBranch(branch);
 
-        meteorologicalDataRequire = demandType == BranchDemandType.Urgency ? 3 : 2;
+        meteorologicalDataRequire = demandType == DemandType.Urgency ? 3 : 2;
 
         regionalFeatureI = RegionalFeatures[Rand.Range(1, RegionalFeatures.Count)];
         regionalFeatureII = RegionalFeatures[Rand.Range(0, RegionalFeatures.Count)];
@@ -243,7 +244,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
         };
         arriveNode.options.Add(meteorologicalOpt);
 
-        if (demandType != BranchDemandType.Supplementary)
+        if (demandType != DemandType.Supplementary)
         {
             DiaOption informationOpt = new("OARO_FieldSurvey_Information".Translate())
             {

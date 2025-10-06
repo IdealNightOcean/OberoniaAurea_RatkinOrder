@@ -2,12 +2,13 @@
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
 internal sealed class QuestNode_GenerateFaltSuperHeavyHowitzer : QuestNode
 {
-    public SlateRef<BranchDemandType?> demandType;
+    public SlateRef<DemandType?> demandType;
 
     [NoTranslate]
     public SlateRef<string> storeHowitzerAs;
@@ -24,12 +25,12 @@ internal sealed class QuestNode_GenerateFaltSuperHeavyHowitzer : QuestNode
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
-        BranchDemandType demandType = this.demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        DemandType demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
         int rewardSilverCount;
         int perfectRewardSilverCount;
         List<Thing> howitzers = [];
 
-        if (demandType == BranchDemandType.Supplementary)
+        if (demandType == DemandType.Supplementary)
         {
             Thing howitzer = ThingMaker.MakeThing(OARO_ThingDefOf.OARO_Turret_OrderSuperHeavyHowitzer);
             CompSuperHeavyHowitzer howitzerComp = howitzer.TryGetComp<CompSuperHeavyHowitzer>();
@@ -61,7 +62,7 @@ internal sealed class QuestNode_GenerateFaltSuperHeavyHowitzer : QuestNode
                 howitzers.Add(howitzerMini);
             }
 
-            if (demandType == BranchDemandType.Urgency)
+            if (demandType == DemandType.Urgency)
             {
                 rewardSilverCount = 140 * totalLatentFault;
                 perfectRewardSilverCount = 160 * (totalLatentFault + 3 * totalLatentFault);

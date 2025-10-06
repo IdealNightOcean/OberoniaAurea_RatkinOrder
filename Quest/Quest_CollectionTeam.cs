@@ -8,6 +8,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -20,7 +21,7 @@ public sealed class QuestNode_CollectionTeam : QuestNode
 
     public SlateRef<Branch> branch;
     public SlateRef<Faction> faction;
-    public SlateRef<BranchDemandType?> demandType;
+    public SlateRef<DemandType?> demandType;
 
     public SlateRef<IEnumerable<ThingDefCountClass>> requestThingDefCounts;
 
@@ -87,7 +88,7 @@ public sealed class QuestNode_CollectionTeam : QuestNode
         QuestPart_CollectionTeam questPart_CollectionTeam = (QuestPart_CollectionTeam)Activator.CreateInstance(questPartClass);
 
         questPart_CollectionTeam.Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        questPart_CollectionTeam.DemandType = demandType.GetValue(slate) ?? slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        questPart_CollectionTeam.DemandType = demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
         questPart_CollectionTeam.Faction = faction.GetValue(slate) ?? questPart_CollectionTeam.Branch?.RatkinOrder.Faction;
 
         questPart_CollectionTeam.inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? slate.Get<string>("inSignal");
@@ -131,7 +132,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     public MapParent MapParent;
     public IsolatedPawnGroupMakerDef PawnGroupMakerDef;
 
-    public BranchDemandType? DemandType;
+    public DemandType? DemandType;
 
     public int DurationTicks = 30000;
     public string TalkText;
@@ -418,7 +419,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             quest.End(QuestEndOutcome.Unknown, sendLetter: false, playSound: false);
         }
         Map map = MapParent.Map;
-        pawns = GenerateCaravanMembers();
+        pawns = GenerateCaravanMembers(map);
         if (pawns.NullOrEmpty())
         {
             return false;
@@ -471,7 +472,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         Find.WindowStack.Add(TalkNodeTree(talker, talkWith, map));
     }
 
-    protected virtual List<Pawn> GenerateCaravanMembers()
+    protected virtual List<Pawn> GenerateCaravanMembers(Map map)
     {
         if (RelatedFaction is null)
         {
@@ -486,6 +487,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
         List<Pawn> pawns = [];
         bool isKnight = Branch is not null;
+        PlanetTile mapTile = map.Tile;
         for (int i = 0; i < groupMaker.options.Count; i++)
         {
             PawnKindDef pawnKind = groupMaker.options[i].kind;
@@ -495,11 +497,11 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
                 Pawn pawn;
                 if (isKnight)
                 {
-                    pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, RatkinOrder);
+                    pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, RatkinOrder, Branch, tile: mapTile);
                 }
                 else
                 {
-                    pawn = PawnGenerator.GeneratePawn(OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, RelatedFaction));
+                    pawn = PawnGenerator.GeneratePawn(OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, RelatedFaction, tile: mapTile));
                 }
                 QuestUtility.AddQuestTag(pawn, PawnsTag);
                 if (!pawn.IsWorldPawn())

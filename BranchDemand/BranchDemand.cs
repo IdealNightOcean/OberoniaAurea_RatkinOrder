@@ -7,6 +7,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchDemand : IExposable
 {
+    public enum DemandType : byte
+    {
+        Normal,
+        Urgency,
+        Supplementary,
+        Important,
+        Core
+    }
+
     private enum DemandState : byte
     {
         NotAccepted,
@@ -22,7 +31,7 @@ public class BranchDemand : IExposable
     public BranchDemandDef Def => def;
     public bool HasAccepted => curState != DemandState.NotAccepted;
     public bool IsOngoing => curState == DemandState.Ongoing;
-    public BranchDemandType DemandType => def.demandType;
+    public DemandType DemandTypeValue => def.demandType;
     public Quest RelatedQuest => relatedQuest;
 
     private int appearTick = -1;

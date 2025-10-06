@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -15,13 +16,13 @@ public class BranchDemandDef : Def
 
     public Type demandClass = typeof(BranchDemand);
 
-    public BranchDemandType demandType;
+    public DemandType demandType;
     public float durationDays; //未接取时的持续时间，超过该时间仍未接取则会被移除
     public QuestScriptDef relatedQuestDef;
     public float baseSelectWeight = 100f;
 
     public int DurationTicks => (int)(durationDays * 60000f);
-    public bool IsCriticalDemand => demandType == BranchDemandType.Important || demandType == BranchDemandType.Core;
+    public bool IsCriticalDemand => demandType == DemandType.Important || demandType == DemandType.Core;
 
     public override IEnumerable<string> ConfigErrors()
     {

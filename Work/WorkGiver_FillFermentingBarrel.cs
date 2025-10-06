@@ -59,6 +59,6 @@ public class WorkGiver_FillFermentingBarrel : WorkGiver_ThingDefScanner
 
     private Thing FindRawMaterial(Pawn pawn, Building_OrderFermentingBarrel barrel)
     {
-        return GenClosest.ClosestThingReachable(pawn.Position, pawn.Map, ThingRequest.ForDef(barrel.ModEx_FermentingBarrel.rawMaterial), PathEndMode.ClosestTouch, TraverseParms.For(pawn), 9999f, (Thing x) => !x.IsForbidden(pawn) && pawn.CanReserve(x));
+        return GenClosest.ClosestThingReachable(pawn.Position, pawn.Map, ThingRequest.ForDef(barrel.ModEx_FermentingBarrel.rawMaterial), PathEndMode.ClosestTouch, TraverseParms.For(pawn), 9999f, x => !x.IsForbidden(pawn) && pawn.CanReserve(x));
     }
 }

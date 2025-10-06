@@ -2,6 +2,7 @@
 using RimWorld;
 using RimWorld.Planet;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Verse;
 
@@ -9,6 +10,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 {
+    [Flags]
+    public enum BranchType : byte
+    {
+        Normal = 0,
+        Friendly = 1,
+        Honor = 2,
+        Mobile = 4
+    }
+
     [Unsaved] public readonly BranchManager BranchManager;
     public RatkinOrder RatkinOrder => BranchManager.RatkinOrder;
 
@@ -27,8 +37,9 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     protected int friendlyExpiredTick = -1;
     private BranchType curType = BranchType.Normal;
-    public BranchType BranchType => curType;
+    public BranchType CurType => curType;
 
+    public bool SupportAuthority; //是否有支援权限
 
     private int population;
     private int NaturalPopulationCeiling => (int)this.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
@@ -40,7 +51,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
-    [Unsaved] public readonly SimpleUniqueList<IPostSquadCombatPawnGenerate> PostSquadCombatPawnGenerate = new(innerListLookMode: LookMode.Reference);
+    [Unsaved] public readonly List<IPostSquadCombatPawnGenerate> PostSquadCombatPawnGenerate = [];
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
 
@@ -53,6 +64,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     private BranchStoresReserveHandler storesReserveHandler;
 
     public Squad Squad => squad;
+    public SquadStat SquadStat => squad.SquadStat;
     public BranchMedalHandler MedalHandler => medalHandler;
     public BranchFacilityHandler FacilityHandler => facilityHandler;
     public BranchBuildingHandler BuildingHandler => buildingHandler;
@@ -84,6 +96,8 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         {
             branch = new(ratkinOrder);
             worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(branch);
+            branch.worldObject = worldObject;
+            branch.name = BranchUtility.GenerateBranchName(ratkinOrder);
             branch.PostGenerated();
             if (addToManager)
             {
@@ -109,7 +123,8 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
 
         Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
-        Scribe_Deep.Look(ref squad, "squad", ctorArgs: this);
+        Scribe_Deep.Look(ref squad, "squad", ctorArgs: [this, false]);
+        Scribe_Deep.Look(ref medalHandler, "medalHandler");
         Scribe_Deep.Look(ref facilityHandler, "facilityHandler", ctorArgs: this);
         Scribe_Deep.Look(ref buildingHandler, "buildingHandler", ctorArgs: this);
         Scribe_Deep.Look(ref demandHandler, "demandHandler", ctorArgs: this);
@@ -237,8 +252,6 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     private void PostGenerated()
     {
-        name = BranchUtility.GenerateBranchName(RatkinOrder);
-
         squad.PostBranchGenerated();
         medalHandler.PostBranchGenerated();
         facilityHandler.PostBranchGenerated();

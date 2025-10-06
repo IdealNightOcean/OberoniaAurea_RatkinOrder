@@ -1,7 +1,5 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
@@ -16,12 +14,9 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 
     public RatkinOrder RatkinOrder => Branch.RatkinOrder;
     public SquadManager SquadManager => RatkinOrder.SquadManager;
-    public CooldownRecordManager CooldownManager => Branch.CooldownManager;
 
     protected string name;
     public string Name => name;
-
-    public BranchType SquadType => Branch.BranchType;
 
     protected string stateStr = string.Empty;
     protected string TaskState => taskHandler.TaskState;
@@ -33,22 +28,20 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 
     protected SquadStat squadStat;
     protected SquadTaskHandler taskHandler;
-    protected SquadSupportHandler supportHandler;
 
     public SquadStat SquadStat => squadStat;
     public SquadTaskHandler TaskHandler => taskHandler;
-    public SquadSupportHandler SupportHandler => supportHandler;
 
-    private Squad(Branch branch)
+    private Squad(Branch branch, bool initCtor)
     {
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        if (initCtor)
+        {
+            EnsureComponentsInit();
+        }
     }
 
-    public void PostBranchGenerated()
-    {
-        name = "OARO_BranchSquadName".Translate(Branch.Name.Named("branchName"));
-        EnsureComponentsInit();
-    }
+    public void PostBranchGenerated() { }
 
     public static Squad GenerateSquadForBranch(Branch branch)
     {
@@ -66,7 +59,10 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 
         try
         {
-            squad = new(branch);
+            squad = new(branch, initCtor: true)
+            {
+                name = "OARO_BranchSquadName".Translate(branch.Name.Named("branchName"))
+            };
         }
         catch (Exception ex)
         {
@@ -83,23 +79,22 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
 
         Scribe_Deep.Look(ref squadStat, "squadStat");
         Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref supportHandler, "supportHandler", ctorArgs: this);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Squad(this));
 
     public void TickHour(int hourOfDay)
     {
-        if (!CooldownManager.IsInCooldown(KeyLibrary_CDRecord.SquadStateDesc))
+        if (!Branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.SquadStateDesc))
         {
-            CooldownManager.RegisterRecord(KeyLibrary_CDRecord.SquadStateDesc, cdTicks: 9 * 2500);
+            Branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.SquadStateDesc, cdTicks: 9 * 2500);
             UpdateStateDesc(hourOfDay);
         }
 
         if (hourOfDay == StatUpdateHour)
         {
             squadStat.UpdateCeiling(this, updateStatCache: true);
-            TryRecovery();
+            DailyRecovery();
         }
     }
     public void TickDay()
@@ -108,74 +103,14 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsBranchSquadOfType(BranchType type) => (SquadType & type) == type;
-
-    public void PostSquadCombatPawnGenerate(IEnumerable<Pawn> members, IEnumerable<Pawn> commanders, bool friendly)
-    {
-        if (members is null) { return; }
-        IReadOnlyList<(HediffDef, float)> medalHediffs = Branch.MedalHandler.MedalHediffs;
-        bool hasMedalHediffs = medalHediffs is not null;
-
-        SimpleUniqueList<IPostSquadCombatPawnGenerate> postSquadCombat = Branch.PostSquadCombatPawnGenerate;
-        bool hasPostSquadCombat = postSquadCombat is not null;
-
-        foreach (Pawn member in members)
-        {
-            if (hasMedalHediffs)
-            {
-                SquadUtility.ApplySquadMedalHediffs(member, medalHediffs);
-            }
-            if (hasPostSquadCombat)
-            {
-                for (int i = 0; i < postSquadCombat.Count; i++)
-                {
-                    try
-                    {
-                        postSquadCombat[i].PostSquadCombatPawnGenerate(member, this, isCommander: false, friendly);
-                    }
-                    catch (Exception ex)
-                    {
-                        string processorTypeName = postSquadCombat[i]?.GetType()?.FullName ?? "UnknownProcessor";
-                        Log.Error($"Exception occurred while executing post-squad assist processor: ProcessorType={processorTypeName}, ErrorMessage: {ex.Message}");
-                        continue;
-                    }
-                }
-            }
-        }
-
-        if (commanders is null) { return; }
-
-        foreach (Pawn commander in commanders)
-        {
-            if (hasMedalHediffs)
-            {
-                SquadUtility.ApplySquadMedalHediffs(commander, medalHediffs);
-            }
-            if (hasPostSquadCombat)
-            {
-                for (int i = 0; i < postSquadCombat.Count; i++)
-                {
-                    try
-                    {
-                        postSquadCombat[i].PostSquadCombatPawnGenerate(commander, this, isCommander: true, friendly);
-                    }
-                    catch (Exception ex)
-                    {
-                        string processorTypeName = postSquadCombat[i]?.GetType()?.FullName ?? "UnknownProcessor";
-                        Log.Error($"Exception occurred while executing post-squad assist processor: ProcessorType={processorTypeName}, ErrorMessage: {ex.Message}");
-                        continue;
-                    }
-                }
-            }
-        }
-    }
+    public bool IsBranchSquadOfType(Branch.BranchType type) => (Branch.CurType & type) == type;
 
     private void AnnualRetirement()
     {
         squadStat.MemberCount -= Mathf.CeilToInt(Rand.Range(0.05f, 0.1f) * squadStat.MemberCeiling);
     }
 
-    private void TryRecovery()
+    private void DailyRecovery()
     {
         if (taskHandler.BlockRecover)
         {
@@ -224,6 +159,5 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
     {
         squadStat ??= new SquadStat();
         taskHandler ??= new SquadTaskHandler(this);
-        supportHandler ??= new SquadSupportHandler(this);
     }
 }

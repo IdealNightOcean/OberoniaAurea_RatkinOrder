@@ -2,10 +2,12 @@
 using RimWorld;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class SquadSupportHandler(Squad squad) : IExposable
+public static class SquadSupportUtility
 {
     public enum SupportLevel : byte
     {
@@ -14,54 +16,49 @@ public class SquadSupportHandler(Squad squad) : IExposable
         Entire
     }
 
-    [Unsaved] public readonly Squad Squad = squad ?? throw new System.ArgumentNullException(nameof(squad));
-
-    private bool supportAuthority; //是否有支援权限
-    public bool SupportAuthority => supportAuthority;
-
-    public AcceptanceReport CanBombard(Map map, bool resultOnly = false)
+    public static AcceptanceReport CanBombard(Branch branch, Map map, bool resultOnly = false)
     {
-        if (!supportAuthority)
+        if (!branch.SupportAuthority)
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
 
         }
-        if (Squad.RatkinOrder.Relationship < OrderRelationshipKind.Friendly)
+        if (branch.RatkinOrder.Relationship < RelationshipKind.Friendly)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(OrderRelationshipKind.Friendly));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Friendly));
         }
-        if (Squad.SquadStat.Supply < 0.25f)
+        if (branch.SquadStat.Supply < 0.25f)
         {
             return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("25%");
         }
-        if (Squad.Branch.EffectTags.HasActiveTag(KeyLibrary_EffectTag.BlockBombard))
+        if (branch.EffectTags.HasActiveTag(KeyLibrary_EffectTag.BlockBombard))
         {
             return resultOnly ? false : "OARO_BranchBlockBombard".Translate();
         }
-        if (!Squad.Branch.IsInAffectedRange(map.Tile))
+        if (!branch.IsInAffectedRange(map.Tile))
         {
             return resultOnly ? false : "OARO_OutOfBranchAffectedRange".Translate();
         }
         return true;
     }
 
-    public AcceptanceReport CanSupport(SupportLevel level, Map map, bool resultOnly = false)
+    public static AcceptanceReport CanSupport(Branch branch, SupportLevel level, Map map, bool resultOnly = false)
     {
-        if (!supportAuthority)
+        if (!branch.SupportAuthority)
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
 
         }
-        if (Squad.BlockSupport)
+        if (branch.Squad.BlockSupport)
         {
             return resultOnly ? false : "OARO_SquadSupportBeBlocked".Translate();
         }
-        if (Squad.RatkinOrder.Relationship < OrderRelationshipKind.Trustworthy)
+        if (branch.RatkinOrder.Relationship < RelationshipKind.Trustworthy)
         {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(OrderRelationshipKind.Trustworthy));
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Trustworthy));
         }
 
-        SquadStat squadStat = Squad.SquadStat;
+        SquadStat squadStat = branch.SquadStat;
 
         if (squadStat.MemberPercentage < 0.5f)
         {
@@ -98,7 +95,7 @@ public class SquadSupportHandler(Squad squad) : IExposable
             default: break;
         }
 
-        if (!Squad.Branch.IsBranchOfType(BranchType.Mobile) && !Squad.Branch.IsInAffectedRange(map.Tile))
+        if (!branch.IsBranchOfType(BranchType.Mobile) && !branch.IsInAffectedRange(map.Tile))
         {
             return resultOnly ? false : "OARO_OutOfBranchAffectedRange".Translate();
         }
@@ -106,10 +103,9 @@ public class SquadSupportHandler(Squad squad) : IExposable
         return true;
     }
 
-
-    public void DoBombard(Map map)
+    public static void DoBombard(Branch branch, Map map)
     {
-        int bombCount = Mathf.FloorToInt(BranchStatUtility.GetStatValue(Squad.Branch, BranchStatDefOf.OARO_BombardSupportCount));
+        int bombCount = Mathf.FloorToInt(BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_BombardSupportCount));
         if (bombCount <= 0)
         {
             return;
@@ -122,10 +118,10 @@ public class SquadSupportHandler(Squad squad) : IExposable
         BombardSupportMaker bombMaker = (BombardSupportMaker)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_BombardSupportMaker);
         bombMaker.SetBombardCount(bombCount);
         GenPlace.TryPlaceThing(bombMaker, IntVec3.Zero, map, ThingPlaceMode.Near);
-        Squad.SquadStat.Supply -= 0.25f;
+        branch.SquadStat.Supply -= 0.25f;
     }
 
-    public void DoCombatSupport(SupportLevel level, Map map)
+    public static void DoCombatSupport(Branch branch, SupportLevel level, Map map)
     {
         if (map.ThreatsCountOfPlayer() <= 0)
         {
@@ -135,7 +131,7 @@ public class SquadSupportHandler(Squad squad) : IExposable
         int memberCount;
         int commanderCount;
         float supplyCost;
-        SquadStat squadStat = Squad.SquadStat;
+        SquadStat squadStat = branch.SquadStat;
 
         switch (level)
         {
@@ -162,16 +158,16 @@ public class SquadSupportHandler(Squad squad) : IExposable
             return;
         }
 
-        if (SquadCombatPawnUtility.TryAssistSupport(Squad, map, memberCount, commanderCount))
+        RatkinOrderRaidWorker ratkinOrderRaidWorker = new(branch, memberCount, commanderCount)
+        {
+            map = map
+        };
+
+        if (ratkinOrderRaidWorker.TryExecute())
         {
             squadStat.MemberCount -= memberCount;
             squadStat.CommanderCount -= commanderCount;
             squadStat.Supply -= supplyCost;
         }
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Values.Look(ref supportAuthority, "supportAuthority", defaultValue: false);
     }
 }

@@ -6,6 +6,7 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -14,38 +15,38 @@ public static class RelationshipUtility
     /// <summary>
     /// 关系类型枚举数组
     /// </summary>
-    public static readonly int RelationshipKindCount = Enum.GetValues(typeof(OrderRelationshipKind)).Length;
+    public static readonly int RelationshipKindCount = Enum.GetValues(typeof(RelationshipKind)).Length;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Color GetColor(this OrderRelationshipKind relationship)
+    public static Color GetColor(this RelationshipKind relationship)
     {
         return relationship switch
         {
-            OrderRelationshipKind.Stranger => Color.white,
-            OrderRelationshipKind.Acquaintance => Color.cyan,
-            OrderRelationshipKind.Friendly => Color.green,
-            OrderRelationshipKind.Trustworthy => Color.green,
-            OrderRelationshipKind.Soulmate => Color.green,
+            RelationshipKind.Stranger => Color.white,
+            RelationshipKind.Acquaintance => Color.cyan,
+            RelationshipKind.Friendly => Color.green,
+            RelationshipKind.Trustworthy => Color.green,
+            RelationshipKind.Soulmate => Color.green,
             _ => Color.white
         };
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetLabel(this OrderRelationshipKind relationship)
+    public static string GetLabel(this RelationshipKind relationship)
     {
         return $"OARO_Relationship_{relationship}".Translate().Colorize(relationship.GetColor());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static string GetDescription(RatkinOrder ratkinOrder, OrderRelationshipKind relationship)
+    public static string GetDescription(RatkinOrder ratkinOrder, RelationshipKind relationship)
     {
         return $"OARO_RelationshipDesc_{relationship}".Translate(ratkinOrder.Name).Colorize(relationship.GetColor());
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static OrderRelationshipKind RelationshipKindOffsetBy(this OrderRelationshipKind relationship, int offset)
+    public static RelationshipKind RelationshipKindOffsetBy(this RelationshipKind relationship, int offset)
     {
-        return (OrderRelationshipKind)Mathf.Clamp((int)relationship + offset, 0, RelationshipKindCount - 1);
+        return (RelationshipKind)Mathf.Clamp((int)relationship + offset, 0, RelationshipKindCount - 1);
     }
 
     public static void RelationshipKindOffsetBy(this RatkinOrder ratkinOrder, int offset, string reason, bool sendLetter)
@@ -62,8 +63,8 @@ public static class RelationshipUtility
     /// </summary>
     public static AcceptanceReport CanUpgradeRelationship(this RatkinOrder ratkinOrder, Map map, bool byPlayer, bool resultOnly)
     {
-        OrderRelationshipKind curRelationship = ratkinOrder.Relationship;
-        if (curRelationship == OrderRelationshipKind.Soulmate)
+        RelationshipKind curRelationship = ratkinOrder.Relationship;
+        if (curRelationship == RelationshipKind.Soulmate)
         {
             return resultOnly ? false : "OARO_ReachMax_OrderRelationship".Translate();
         }
@@ -87,23 +88,23 @@ public static class RelationshipUtility
             }
         }
 
-        OrderRelationshipKind newRelationship = curRelationship.RelationshipKindOffsetBy(1);
+        RelationshipKind newRelationship = curRelationship.RelationshipKindOffsetBy(1);
         int curRecommendationNeed = newRelationship.RecommendationNeed();
 
         switch (newRelationship)
         {
-            case OrderRelationshipKind.Acquaintance:
+            case RelationshipKind.Acquaintance:
                 return ValidateRelationshipRequirement(esteem: 20, totalRecommendation: 1);
-            case OrderRelationshipKind.Friendly:
+            case RelationshipKind.Friendly:
                 return ValidateRelationshipRequirement(esteem: 30, totalRecommendation: 3);
-            case OrderRelationshipKind.Trustworthy:
+            case RelationshipKind.Trustworthy:
                 if (ratkinOrder.BranchManager.NormalDemandFulfillCount < 2)
                 {
                     return resultOnly ? false : "OARO_Insufficient_NormalDemandFulfill".Translate(2);
                 }
                 return ValidateRelationshipRequirement(esteem: 40, totalRecommendation: 6, friendlyBranchesCount: 1);
 
-            case OrderRelationshipKind.Soulmate:
+            case RelationshipKind.Soulmate:
                 if (ratkinOrder.BranchManager.CriticalDemandFulfillCount < 2)
                 {
                     return resultOnly ? false : "OARO_Insufficient_CriticalDemandFulfill".Translate(2);
@@ -140,12 +141,12 @@ public static class RelationshipUtility
     /// </summary>
     public static void UpgradeRelationship(RatkinOrder ratkinOrder, Map map)
     {
-        if (ratkinOrder.Relationship == OrderRelationshipKind.Soulmate)
+        if (ratkinOrder.Relationship == RelationshipKind.Soulmate)
         {
             return;
         }
 
-        if (ratkinOrder.Relationship < OrderRelationshipKind.Friendly)
+        if (ratkinOrder.Relationship < RelationshipKind.Friendly)
         {
             ratkinOrder.RelationshipKindOffsetBy(1, "OARO_Relationship_PlayerUpgraded".Translate(), sendLetter: true);
             ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
@@ -228,7 +229,7 @@ public static class RelationshipUtility
     /// </summary>
     public static void AutoUpgradeRelationship(this RatkinOrder ratkinOrder, Map map)
     {
-        if (ratkinOrder.Relationship == OrderRelationshipKind.Soulmate)
+        if (ratkinOrder.Relationship == RelationshipKind.Soulmate)
         {
             return;
         }
@@ -260,7 +261,7 @@ public static class RelationshipUtility
     /// <summary>
     /// 骑士团关系变化邮件
     /// </summary>
-    public static void SendNewRelationshipLetter(RatkinOrder ratkinOrder, OrderRelationshipKind oldRelation, OrderRelationshipKind newRelation)
+    public static void SendNewRelationshipLetter(RatkinOrder ratkinOrder, RelationshipKind oldRelation, RelationshipKind newRelation)
     {
         bool upgraded = oldRelation < newRelation;
         StringBuilder sb = new();
@@ -294,7 +295,7 @@ public static class RelationshipUtility
             sb.AppendInNewLine("OARO_Relationship_GainPermission".Translate(ratkinOrder.NameColored));
             for (int i = oldIndex + 1; i <= newIndex; i++)
             {
-                sb.AppendInNewLine($"OARO_Relationship_Permission_{(OrderRelationshipKind)i}".Translate());
+                sb.AppendInNewLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
             }
         }
         else
@@ -302,7 +303,7 @@ public static class RelationshipUtility
             sb.AppendInNewLine("OARO_Relationship_LossPermission".Translate(ratkinOrder.NameColored));
             for (int i = oldIndex; i > newIndex; i--)
             {
-                sb.AppendInNewLine($"OARO_Relationship_Permission_{(OrderRelationshipKind)i}".Translate());
+                sb.AppendInNewLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
             }
         }
     }
@@ -311,12 +312,12 @@ public static class RelationshipUtility
     /// 提升到新等级需要的推荐信数量
     /// </summary>
     /// <param name="relationship">新骑士团关系等级</param>
-    private static int RecommendationNeed(this OrderRelationshipKind relationship)
+    private static int RecommendationNeed(this RelationshipKind relationship)
     {
         return relationship switch
         {
-            OrderRelationshipKind.Trustworthy => 1,
-            OrderRelationshipKind.Soulmate => 2,
+            RelationshipKind.Trustworthy => 1,
+            RelationshipKind.Soulmate => 2,
             _ => 0
         };
     }

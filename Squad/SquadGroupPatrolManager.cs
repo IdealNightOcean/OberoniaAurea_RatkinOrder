@@ -7,6 +7,8 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -135,7 +137,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
             tickToNextCheck = 60000;
             if (tickToNextStage > 60000
                 && passedBySquadCount < Participants.Count
-                && RatkinOrder.Relationship >= OrderRelationshipKind.Acquaintance)
+                && RatkinOrder.Relationship >= RelationshipKind.Acquaintance)
             {
                 SquadPassBy();
             }
@@ -297,11 +299,11 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         isPatrolActived = true;
         adjustCount = 0;
         adjustCeiling = 0;
-        if (RatkinOrder.Relationship == OrderRelationshipKind.Trustworthy)
+        if (RatkinOrder.Relationship == RelationshipKind.Trustworthy)
         {
             adjustCeiling = RatkinOrder.ReformationManager.HasReformation(null) ? 3 : 2;
         }
-        else if (RatkinOrder.Relationship == OrderRelationshipKind.Soulmate)
+        else if (RatkinOrder.Relationship == RelationshipKind.Soulmate)
         {
             adjustCeiling = RatkinOrder.ReformationManager.HasReformation(null) ? 6 : 4;
         }
@@ -421,12 +423,12 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         passedBySquadCount++;
 
         bool targetFriendly = targetSquad.IsBranchSquadOfType(BranchType.Friendly);
-        int relationShipDiff = RatkinOrder.Relationship - OrderRelationshipKind.Acquaintance;
+        int relationShipDiff = RatkinOrder.Relationship - RelationshipKind.Acquaintance;
         List<(int, float)> passByTypeList =
         [
             (0, Mathf.Max(0f, 75f - (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) - (targetFriendly ? 50f : 0f))),
             (1, Mathf.Max(0f, 20f + (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) + (targetFriendly ? 30f : 0f))),
-            (2, Mathf.Max(5f, 20f + (RatkinOrder.Relationship >= OrderRelationshipKind.Soulmate ?  5f : 0f) + (targetFriendly ? 20f : 0f))),
+            (2, Mathf.Max(5f, 20f + (RatkinOrder.Relationship >= RelationshipKind.Soulmate ?  5f : 0f) + (targetFriendly ? 20f : 0f))),
         ];
 
         int passByType = passByTypeList.RandomElementByWeight(t => t.Item2).Item1;

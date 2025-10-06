@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchMedalRecord;
 
 namespace OberoniaAurea.RatkinOrder;
 

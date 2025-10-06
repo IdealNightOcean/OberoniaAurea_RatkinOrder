@@ -49,7 +49,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     private string nobilityName;
     private NobilityType nobilityType;
     public string NobilityName => nobilityName;
-    public NobilityType TypeOfNobility => nobilityType;
+    public NobilityType NobilityTypeValue => nobilityType;
 
     private WorkType curWork;
     private int troops;
@@ -272,8 +272,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
                     continue;
                 }
 
-                TaggedString optLabel = $"OARO_NobilityTerritory_{workType}".Translate() + " (" + $"OARO_NobilityTerritory_{workType}_Skill".Translate() + ")";
-                DiaOption workOpt = new(optLabel)
+                DiaOption workOpt = new($"OARO_NobilityTerritory_{workType}".Translate())
                 {
                     action = delegate
                     {
@@ -659,7 +658,7 @@ public sealed class MapParent_NobilityTerritory : MapParent
     }
 
     public WorldObject_NobilityTerritory Parent;
-    public AssaultType TypeOfAssault;
+    public AssaultType AssaultTypeValue;
     public bool BranchJoin;
 
     private bool succeeded;
@@ -670,11 +669,11 @@ public sealed class MapParent_NobilityTerritory : MapParent
         BranchJoin = branchJoin;
         if (playerInitiated)
         {
-            TypeOfAssault = parent.Osmolity > 0.999f ? AssaultType.DeadlyPounce : Rand.Chance(parent.Osmolity) ? AssaultType.Pounce : AssaultType.Normal;
+            AssaultTypeValue = parent.Osmolity > 0.999f ? AssaultType.DeadlyPounce : Rand.Chance(parent.Osmolity) ? AssaultType.Pounce : AssaultType.Normal;
         }
         else
         {
-            TypeOfAssault = AssaultType.BePounced;
+            AssaultTypeValue = AssaultType.BePounced;
         }
     }
 
@@ -683,7 +682,7 @@ public sealed class MapParent_NobilityTerritory : MapParent
         base.PostMapGenerate();
         try
         {
-            LetterDef letterDef = TypeOfAssault switch
+            LetterDef letterDef = AssaultTypeValue switch
             {
                 AssaultType.BePounced => LetterDefOf.ThreatBig,
                 AssaultType.Normal => LetterDefOf.NeutralEvent,
@@ -691,8 +690,8 @@ public sealed class MapParent_NobilityTerritory : MapParent
             };
 
             Find.LetterStack.ReceiveLetter(
-                label: $"OARO_NobilityTerritory_AssaultLabel_{TypeOfAssault}".Translate(),
-                text: $"OARO_NobilityTerritory_AssaultText_{TypeOfAssault}".Translate(Parent.NobilityName),
+                label: $"OARO_NobilityTerritory_AssaultLabel_{AssaultTypeValue}".Translate(),
+                text: $"OARO_NobilityTerritory_AssaultText_{AssaultTypeValue}".Translate(Parent.NobilityName),
                 textLetterDef: letterDef,
                 lookTargets: this,
                 quest: Parent.AssociatedQuest);
@@ -707,7 +706,7 @@ public sealed class MapParent_NobilityTerritory : MapParent
     {
         base.ExposeData();
         Scribe_References.Look(ref Parent, "Parent");
-        Scribe_Values.Look(ref TypeOfAssault, "TypeOfAssault");
+        Scribe_Values.Look(ref AssaultTypeValue, "AssaultTypeValue");
         Scribe_Values.Look(ref BranchJoin, "BranchJoin");
 
         Scribe_Values.Look(ref succeeded, "succeeded", defaultValue: false);

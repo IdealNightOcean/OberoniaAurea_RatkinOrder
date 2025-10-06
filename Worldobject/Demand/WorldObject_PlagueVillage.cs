@@ -273,8 +273,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
         {
             foreach (WorkType workType in EnumUtility.GetValues<WorkType>())
             {
-                TaggedString optLabel = $"OARO_PlagueVillage_{workType}".Translate() + " (" + $"OARO_PlagueVillage_{workType}_Skill".Translate() + ")";
-                DiaOption workOpt = new(optLabel)
+                DiaOption workOpt = new($"OARO_PlagueVillage_{workType}".Translate())
                 {
                     action = delegate
                     {

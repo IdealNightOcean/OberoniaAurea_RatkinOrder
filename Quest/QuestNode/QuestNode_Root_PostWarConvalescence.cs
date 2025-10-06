@@ -2,6 +2,7 @@
 using RimWorld;
 using RimWorld.QuestGen;
 using Verse;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -11,7 +12,7 @@ namespace OberoniaAurea.RatkinOrder;
 internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_RefugeeKnightBase
 {
     private Branch branch;
-    private BranchDemandType demandType;
+    private DemandType demandType;
     private bool giveNormalRecommendation;
 
     private string outSigalPerfecState;
@@ -38,8 +39,8 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         slate.Set(UniqueLeavingLetterSlate, true);
 
         giveNormalRecommendation = Rand.Chance(0.25f);
-        demandType = slate.Get<BranchDemandType>(KeyLibrary_SlateStoreAs.DemandType);
-        if (demandType == BranchDemandType.Supplementary)
+        demandType = slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        if (demandType == DemandType.Supplementary)
         {
             questParameter.LodgerCount = 1;
         }
@@ -76,7 +77,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         base.PostPawnGenerated(pawn);
         OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
 
-        if (demandType == BranchDemandType.Supplementary || specialHediff is null)
+        if (demandType == DemandType.Supplementary || specialHediff is null)
         {
             return;
         }
@@ -155,7 +156,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         string outSignalHas = QuestGenUtility.HardcodedSignalWithQuestID("Lodgers_HasInjury");
         string outSignalNoOneHas = QuestGenUtility.HardcodedSignalWithQuestID("Lodgers_NoOneHasInjury");
-        if (demandType != BranchDemandType.Supplementary)
+        if (demandType != DemandType.Supplementary)
         {
             QuestPart_AnyPawnHasSpecialHediff questPart_AnyPawnHasSpecialHediff = new()
             {

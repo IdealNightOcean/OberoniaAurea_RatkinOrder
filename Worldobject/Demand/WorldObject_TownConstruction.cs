@@ -39,7 +39,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
     private WorkType curWork;
     private int nextPopulationGrowTick = -1;
 
-    protected SiteTrader innerTrader;
+    private SiteTrader innerTrader;
 
     private float population;
     public float Population
@@ -108,7 +108,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
 
     public void InitInnerTrader()
     {
-        innerTrader ??= new(traderKind: OARO_ModDefOf.OARO_TownUnderConstruction_Trader, worldObject: this, faction: Faction, refreshInterval: 10 * 60000);
+        innerTrader ??= new(traderKind: OARO_ModDefOf.OARO_TownConstruction_Trader, worldObject: this, faction: Faction, refreshInterval: 10 * 60000);
         innerTrader.GenerateThings(Tile);
     }
 
@@ -311,7 +311,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
 
         foreach (PolicyType policyType in EnumUtility.GetValues<PolicyType>())
         {
-            DiaOption policyOpt = new($"OARO_TownUnderConstruction_{curPolicy}".Translate())
+            DiaOption policyOpt = new($"OARO_TownUnderConstruction_{policyType}".Translate())
             {
                 action = () => { curPolicy = policyType; },
                 resolveTree = true
