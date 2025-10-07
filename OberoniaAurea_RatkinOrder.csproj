@@ -80,7 +80,10 @@
     <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
+    <Compile Include="Def\HonorBranchTypeDef.cs" />
+    <Compile Include="Def\SpecialLetterDef.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
+    <Compile Include="Hediff\Hediff_BranchMedal.cs" />
     <Compile Include="Hediff\Hediff_Knight.cs" />
     <Compile Include="Job\JobDriver_PlagueSample.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_QuestEffectTag.cs" />
@@ -156,6 +159,7 @@
     <Compile Include="Thing\Building_OrderFermentingBarrel.cs" />
     <Compile Include="Thing\Building_OrderLetterBox.cs" />
     <Compile Include="Thing\Bullet_Banner.cs" />
+    <Compile Include="Thing\CompDisappears.cs" />
     <Compile Include="Thing\CompEdgeSwordFightBack.cs" />
     <Compile Include="Thing\CompMeleeAttackCombo.cs" />
     <Compile Include="Thing\CompMeleeFightBack.cs" />

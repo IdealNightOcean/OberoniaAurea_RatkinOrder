@@ -9,10 +9,17 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public class OrderLetter : IExposable
 {
+    public enum LetterType : byte
+    {
+        Normal,
+        Urgent,
+        Official,
+    }
+
     public Faction RelatedFaction;
     public RatkinOrder RelatedOrder;
     public int ArrivalTick = -1;
-    public OrderLetterType LetterType = OrderLetterType.Normal;
+    public LetterType LetterTypeValue = LetterType.Normal;
     public LetterDef RelatedLetterDef;
 
     private TaggedString label;
@@ -137,7 +144,7 @@ public class OrderLetter : IExposable
         Scribe_Defs.Look(ref RelatedLetterDef, "RelatedLetterDef");
 
         Scribe_Values.Look(ref ArrivalTick, "ArrivalTick", -1);
-        Scribe_Values.Look(ref LetterType, "LetterType", OrderLetterType.Normal);
+        Scribe_Values.Look(ref LetterTypeValue, "LetterTypeValue", LetterType.Normal);
         Scribe_Values.Look(ref label, "label");
         Scribe_Values.Look(ref text, "text");
         Scribe_Values.Look(ref sender, "sender");

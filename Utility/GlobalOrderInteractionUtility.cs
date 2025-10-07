@@ -6,7 +6,6 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.Grammar;
-using static OberoniaAurea.RatkinOrder.Branch;
 using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -258,7 +257,7 @@ public static class GlobalOrderInteractionUtility
             }
         }
 
-        if (knights.Branch.IsBranchOfType(BranchType.Friendly))
+        if (knights.Branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             ApplyStepChange(0.25f, "OARO_ChangeOffset_FriendlyBranch");
 

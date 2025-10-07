@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -50,7 +49,7 @@ public class SquadTask_GroupPatrol : SquadTask
         reconnaissanceValue = (squad.SquadStat.MemberCount * 10f)
             * (1f + squad.Branch.MedalHandler.MedalTypeCount * 0.1f)
             * (1f + squad.Branch.FacilityHandler.TotalFacilityLevel * 0.02f)
-            * (squad.IsBranchSquadOfType(BranchType.Honor) ? 1.2f : 1f);
+            * (squad.IsBranchSquadOfType(Branch.BranchType.Honor) ? 1.2f : 1f);
     }
 
     public override void TaskEnd(Squad squad, bool interrupt)
@@ -60,7 +59,7 @@ public class SquadTask_GroupPatrol : SquadTask
         if (isExploration)
         {
             int explorationCount = GetExpectedExplorationCount(squad).Item1;
-            OrderLetter letter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_SquadExplorationResult".Translate(), "OARO_Letter_SquadExplorationResult".Translate(), OrderLetterType.Official, squad.RatkinOrder, squad.Name);
+            OrderLetter letter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_SquadExplorationResult".Translate(), "OARO_Letter_SquadExplorationResult".Translate(), OrderLetter.LetterType.Official, squad.RatkinOrder, squad.Name);
             letter.RelatedThings = [new ThingDefCount(targetOre, explorationCount)];
             OrderLetterBox.Instance.ReceiveLetter(letter);
         }
@@ -85,7 +84,7 @@ public class SquadTask_GroupPatrol : SquadTask
     {
         float rewardValue = squad.SquadStat.MemberCount * 50f * Rand.Range(0.5f, 1.75f)
                             * (squad.RatkinOrder.ReformationManager.HasReformation(null) ? 1.5f : 1f)
-                            * (squad.IsBranchSquadOfType(BranchType.Friendly) ? 1.2f : 1f);
+                            * (squad.IsBranchSquadOfType(Branch.BranchType.Friendly) ? 1.2f : 1f);
 
         Map map = Find.AnyPlayerHomeMap;
         if (map is null)

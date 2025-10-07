@@ -39,7 +39,15 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     private BranchType curType = BranchType.Normal;
     public BranchType CurType => curType;
 
+    private HonorBranchProperties honorProperties;
+    public HonorBranchProperties HonorProperties
+    {
+        get => IsBranchOfType(BranchType.Honor) ? honorProperties : null;
+        set => honorProperties = value;
+    }
+
     public bool SupportAuthority; //是否有支援权限
+
 
     private int population;
     private int NaturalPopulationCeiling => (int)this.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
@@ -252,19 +260,23 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     private void PostGenerated()
     {
-        squad.PostBranchGenerated();
         medalHandler.PostBranchGenerated();
+
         facilityHandler.PostBranchGenerated();
         buildingHandler.PostBranchGenerated();
+
         residentHandler.PostBranchGenerated();
+        squad.PostBranchGenerated();
     }
 
     public void PostLoadInit()
     {
         EnsureComponentsInit();
+        medalHandler.PostLoadInit();
 
         facilityHandler.PostLoadInit();
         buildingHandler.PostLoadInit();
+
         residentHandler.PostLoadInit();
         squad.PostLoadInit();
     }

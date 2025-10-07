@@ -1,82 +1,85 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class BranchFacilityDef : Def
 {
-    private readonly static BranchFacilityLevel[] AllStageLevels = (BranchFacilityLevel[])Enum.GetValues(typeof(BranchFacilityLevel));
-    private readonly static int LevelCount = AllStageLevels.Length;
+    public BranchFacilityLevelStage poorStage;
+    public BranchFacilityLevelStage normalStage;
+    public BranchFacilityLevelStage goodStage;
+    public BranchFacilityLevelStage excellentStage;
 
-    public int silverCost;
-    public int constructionDays;
-    public List<BranchFacilityLevelStage> levelStages = [];
-
-    public int GetLevelStageIndex(BranchFacilityLevel level)
+    public BranchFacilityLevelStage GetLevelStage(BranchFacilityLevel level)
     {
-        for (int i = 0; i < levelStages.Count; i++)
+        return level switch
         {
-            if (levelStages[i].level == level)
-            {
-                return i;
-            }
-        }
-        return -1;
+            BranchFacilityLevel.Poor => poorStage,
+            BranchFacilityLevel.Normal => normalStage,
+            BranchFacilityLevel.Good => goodStage,
+            BranchFacilityLevel.Excellent => excellentStage,
+            _ => poorStage
+        };
     }
 
-    public override void PostLoad()
+    /// <param name="minLevelExclude">最小等级（不包含）</param>
+    /// <param name="maxLevelInclude">最大等级（包含）</param>
+    public IEnumerable<BranchFacilityLevelStage> GetAllUpgradeStages(BranchFacilityLevel minLevelExclude, BranchFacilityLevel maxLevelInclude)
     {
-        base.PostLoad();
-        if (levelStages.NullOrEmpty())
+        if (minLevelExclude >= maxLevelInclude || minLevelExclude >= BranchFacilityLevel.Excellent)
         {
-            Log.Error($"BranchFacilityDef {defName} has no level stages defined.");
-            return;
+            yield break;
         }
-
-        List<BranchFacilityLevelStage> uniqueLevelStages = [];
-        HashSet<BranchFacilityLevel> definedLevels = [];
-
-        bool hasNoneLevel = false;
-        bool hasDuplicateLevel = false;
-        string duplicateLevels = string.Empty;
-
-        foreach (BranchFacilityLevelStage stage in levelStages)
+        for (BranchFacilityLevel level = minLevelExclude + 1; level <= maxLevelInclude; level++)
         {
-            if (stage.level == BranchFacilityLevel.None)
+            BranchFacilityLevelStage stage = GetLevelStage(level);
+            if (stage is not null)
             {
-                hasNoneLevel = true;
-                continue;
+                yield return stage;
             }
-            if (!definedLevels.Add(stage.level))
+        }
+    }
+
+    /// <param name="minLevelExclude">最小等级（不包含）</param>
+    /// <param name="maxLevelInclude">最大等级（包含）</param>
+    public IEnumerable<BranchFacilityLevelStage> GetAllDowngradeStages(BranchFacilityLevel maxLevelInclude, BranchFacilityLevel minLevelExclude)
+    {
+        if (minLevelExclude >= maxLevelInclude || minLevelExclude >= BranchFacilityLevel.Excellent)
+        {
+            yield break;
+        }
+        for (BranchFacilityLevel level = maxLevelInclude; level > minLevelExclude; level--)
+        {
+            BranchFacilityLevelStage stage = GetLevelStage(level);
+            if (stage is not null)
             {
-                duplicateLevels += ($"{stage.level}, ");
-                hasDuplicateLevel = true;
-                continue;
+                yield return stage;
             }
-            uniqueLevelStages.Add(stage);
+        }
+    }
+
+    public override IEnumerable<string> ConfigErrors()
+    {
+        foreach (string error in base.ConfigErrors())
+        {
+            yield return error;
         }
 
-        levelStages = uniqueLevelStages;
-        levelStages.SortBy(s => (int)s.level);
-
-        if (hasNoneLevel)
+        if (poorStage is null)
         {
-            Log.Warning($"BranchFacilityDef {defName} has a stage defined for level None, which is not allowed. Removed.");
+            yield return $"BranchFacilityDef {defName} has null {nameof(poorStage)}.";
         }
-        if (hasDuplicateLevel)
+        if (normalStage is null)
         {
-            Log.Error($"BranchFacilityDef {defName} has duplicate level stages defined for: {duplicateLevels.TrimEnd(',', ' ')}.\n Only first one will be used.");
+            yield return $"BranchFacilityDef {defName} has null {nameof(normalStage)}.";
         }
-
-        if (levelStages.Count < LevelCount - 1)
+        if (goodStage is null)
         {
-            string missingLevels = string.Join(", ", AllStageLevels
-                                         .Where(level => level != BranchFacilityLevel.None && !definedLevels.Contains(level))
-                                         .Select(level => level.ToString()));
-
-            Log.Error($"BranchFacilityDef {defName} is missing level stages for: {missingLevels}.");
+            yield return $"BranchFacilityDef {defName} has null {nameof(goodStage)}.";
+        }
+        if (excellentStage is null)
+        {
+            yield return $"BranchFacilityDef {defName} has null {nameof(excellentStage)}.";
         }
     }
 }

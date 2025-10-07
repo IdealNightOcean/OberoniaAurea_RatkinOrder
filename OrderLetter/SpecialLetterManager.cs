@@ -6,19 +6,21 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class SpecialLetterManager : IExposable
 {
-    private static OrderLetterBox OrderLetterBox => OrderLetterBox.Instance;
-
-    private bool helloLetterReceived;
+    protected HashSet<SpecialLetterDef> recievedSpecialLetters = [];
     protected HashSet<CertainDateLetterDef> recievedCertainDateLetters = [];
 
     private int curYear = 2025;
 
     public void Notify_GameStart()
     {
-        if (!helloLetterReceived)
+        foreach (SpecialLetterDef letterDef in DefDatabase<SpecialLetterDef>.AllDefs)
         {
-            TryMakeHelloLetter();
-            helloLetterReceived = true;
+            if (!recievedSpecialLetters.Contains(letterDef))
+            {
+                OrderLetter specialLetter = OrderLetterUtility.MakeOrderLetter(letterDef.label, letterDef.text, letterDef.letterType, sender: letterDef.sender, relatedOrder: null);
+                OrderLetterBox.Instance.ReceiveLetter(specialLetter);
+                recievedSpecialLetters.Add(letterDef);
+            }
         }
 
         DateTime todayDate = DateTime.Now.Date;
@@ -29,13 +31,13 @@ public class SpecialLetterManager : IExposable
             curYear = todayDate.Year;
         }
 
-        foreach (CertainDateLetterDef def in DefDatabase<CertainDateLetterDef>.AllDefs)
+        foreach (CertainDateLetterDef letterDef in DefDatabase<CertainDateLetterDef>.AllDefs)
         {
-            if (!recievedCertainDateLetters.Contains(def) && todayDate >= def.EarliestDate && todayDate <= def.LatestDate)
+            if (!recievedCertainDateLetters.Contains(letterDef) && todayDate >= letterDef.EarliestDate && todayDate <= letterDef.LatestDate)
             {
-                OrderLetter certainDateLetter = OrderLetterUtility.MakeOrderLetter(def.label, def.text, def.letterType, sender: def.sender, relatedOrder: null);
-                OrderLetterBox.ReceiveLetter(certainDateLetter);
-                recievedCertainDateLetters.Add(def);
+                OrderLetter certainDateLetter = OrderLetterUtility.MakeOrderLetter(letterDef.label, letterDef.text, letterDef.letterType, sender: letterDef.sender, relatedOrder: null);
+                OrderLetterBox.Instance.ReceiveLetter(certainDateLetter);
+                recievedCertainDateLetters.Add(letterDef);
             }
         }
     }
@@ -45,24 +47,17 @@ public class SpecialLetterManager : IExposable
         recievedCertainDateLetters.Clear();
     }
 
-    public static void TryMakeHelloLetter()
-    {
-        OrderLetter helloLetter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_HelloLetter".Translate(), "OARO_Letter_HelloLetter".Translate(), OrderLetterType.Urgent, sender: "OARO_MYG", relatedOrder: null);
-        OrderLetterBox.ReceiveLetter(helloLetter);
-    }
-
     public void ExposeData()
     {
-
-        Scribe_Values.Look(ref helloLetterReceived, "helloLetterReceived", defaultValue: false);
-
         Scribe_Values.Look(ref curYear, "curYear", 2025);
 
+        Scribe_Collections.Look(ref recievedSpecialLetters, "recievedSpecialLetters", LookMode.Def);
         Scribe_Collections.Look(ref recievedCertainDateLetters, "recievedCertainDateLetters", LookMode.Def);
 
         if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
         {
-            recievedCertainDateLetters.RemoveWhere(d => d is null);
+            recievedCertainDateLetters.RemoveWhere(l => l is null);
+            recievedCertainDateLetters.RemoveWhere(l => l is null);
         }
     }
 }

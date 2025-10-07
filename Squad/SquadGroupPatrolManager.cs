@@ -7,7 +7,6 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -407,7 +406,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         {
             if (squad.TaskHandler.CurTask is SquadTask_GroupPatrol groupPatrol && !groupPatrol.hadPassedBy)
             {
-                potentialPass.Add((squad, squad.IsBranchSquadOfType(BranchType.Friendly) ? 3f : 1f));
+                potentialPass.Add((squad, squad.IsBranchSquadOfType(Branch.BranchType.Friendly) ? 3f : 1f));
             }
         }
 
@@ -422,7 +421,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
         (targetSquad.TaskHandler.CurTask as SquadTask_GroupPatrol).hadPassedBy = true;
         passedBySquadCount++;
 
-        bool targetFriendly = targetSquad.IsBranchSquadOfType(BranchType.Friendly);
+        bool targetFriendly = targetSquad.IsBranchSquadOfType(Branch.BranchType.Friendly);
         int relationShipDiff = RatkinOrder.Relationship - RelationshipKind.Acquaintance;
         List<(int, float)> passByTypeList =
         [

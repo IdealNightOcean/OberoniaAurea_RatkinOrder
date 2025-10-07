@@ -1,7 +1,6 @@
 ﻿using RimWorld;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -35,7 +34,7 @@ public class Dialog_NodeTreeWithRatkinOrderInfo : Dialog_NodeTree
     {
         Text.Anchor = TextAnchor.LowerRight;
         curY += 10f;
-        RelationshipKind orderRelationship = ratkinOrder.Relationship;
+        EsteemHandler.RelationshipKind orderRelationship = ratkinOrder.Relationship;
         string text = ratkinOrder.NameColored.CapitalizeFirst() + "\n" + "OARO_Esteem".Translate().CapitalizeFirst() + ": " + ratkinOrder.Esteem;
         GUI.color = Color.gray;
         Rect textRect = new(rect.x, curY, rect.width, Text.CalcHeight(text, rect.width));

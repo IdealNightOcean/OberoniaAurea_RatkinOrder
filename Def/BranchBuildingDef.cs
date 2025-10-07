@@ -17,8 +17,15 @@ public class BranchBuildingDef : Def
 
     public int silverCost; //白银花费
     public float constructionDays; //建造所需天数
+
     public bool isSpecial;
-    public bool isHonorSymbol; //荣誉象征建筑，用于这种建筑的分部为荣誉分部
+
+    /// <summary>
+    /// 标记荣誉象征，建有该建筑的分部为荣誉分部；
+    /// 只在isSpecial为true时生效
+    /// </summary>
+    public bool isHonorSymbol;
+    public HonorBranchProperties honorProperties;
 
     public List<string> effectFlags; //效果标志列表
     public List<BranchStatModifier> branchStatModifies; //属性修正列表
@@ -41,5 +48,28 @@ public class BranchBuildingDef : Def
         }
 
         return false;
+    }
+
+    public override IEnumerable<string> ConfigErrors()
+    {
+        foreach (string error in base.ConfigErrors())
+        {
+            yield return error;
+        }
+
+        if (!isSpecial && isHonorSymbol)
+        {
+            yield return $"{defName}: isHonorSymbol only works when isSpecial is true.";
+        }
+
+        if (isHonorSymbol && honorProperties is null)
+        {
+            yield return $"{defName} is an HonorSymbol building but does not have honorProperties.";
+        }
+
+        if (!isHonorSymbol && honorProperties is not null)
+        {
+            yield return $"{defName} is not an HonorSymbol building but has honorProperties.";
+        }
     }
 }

@@ -2,7 +2,6 @@
 using RimWorld;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -95,7 +94,7 @@ public static class SquadSupportUtility
             default: break;
         }
 
-        if (!branch.IsBranchOfType(BranchType.Mobile) && !branch.IsInAffectedRange(map.Tile))
+        if (!branch.IsBranchOfType(Branch.BranchType.Mobile) && !branch.IsInAffectedRange(map.Tile))
         {
             return resultOnly ? false : "OARO_OutOfBranchAffectedRange".Translate();
         }
@@ -123,11 +122,6 @@ public static class SquadSupportUtility
 
     public static void DoCombatSupport(Branch branch, SupportLevel level, Map map)
     {
-        if (map.ThreatsCountOfPlayer() <= 0)
-        {
-            return;
-        }
-
         int memberCount;
         int commanderCount;
         float supplyCost;
@@ -165,8 +159,6 @@ public static class SquadSupportUtility
 
         if (ratkinOrderRaidWorker.TryExecute())
         {
-            squadStat.MemberCount -= memberCount;
-            squadStat.CommanderCount -= commanderCount;
             squadStat.Supply -= supplyCost;
         }
     }

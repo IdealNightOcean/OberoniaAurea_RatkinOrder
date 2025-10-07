@@ -1,6 +1,5 @@
 ﻿using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -43,7 +42,7 @@ public class QuestClique : IExposable
     public Branch RelatedBranch => relatedBranch;
     public RatkinOrder RelatedRatkinOrder => relatedBranch?.RatkinOrder;
     public bool IsBranchClique => relatedBranch is not null;
-    public bool IsFriendlyBranchClique => relatedBranch is not null && relatedBranch.IsBranchOfType(BranchType.Friendly);
+    public bool IsFriendlyBranchClique => relatedBranch is not null && relatedBranch.IsBranchOfType(Branch.BranchType.Friendly);
 
     public QuestClique() { }
     public QuestClique(string key) { this.key = key; }
@@ -105,7 +104,7 @@ public class QuestClique : IExposable
         float branchPotency = (branch.SquadStat.MemberCount + branch.SquadStat.CommanderCount) * 10f
                             * (1f + (branch.FacilityHandler.TotalFacilityLevel + branch.MedalHandler.TotalMedalCount) * 0.04f);
 
-        if (branch.IsBranchOfType(BranchType.Honor))
+        if (branch.IsBranchOfType(Branch.BranchType.Honor))
         {
             branchPotency *= 1.25f;
         }

@@ -61,7 +61,7 @@ public static class RecommendationUtility
                     ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
                         label: "OARO_LetterLabel_GetRecommendation_DropPod".Translate(),
                         text: "OARO_Letter_GetRecommendation_DropPod".Translate(ratkinOrder.Name, count),
-                        def: OARO_LetterDefOf.OARO_RatkinOrderPositiveLetter,
+                        def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
                         lookTargets: new LookTargets(spawnCell.Value, map),
                         relatedFaction: ratkinOrder.Faction);
                     letter.relatedOrder = ratkinOrder;
@@ -81,7 +81,7 @@ public static class RecommendationUtility
                     ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
                         label: "OARO_LetterLabel_GetRecommendation_Map".Translate(),
                         text: "OARO_Letter_GetRecommendation_Map".Translate(ratkinOrder.Name, count),
-                        def: OARO_LetterDefOf.OARO_RatkinOrderPositiveLetter,
+                        def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
                         lookTargets: new LookTargets(spawnCell.Value, map),
                         relatedFaction: ratkinOrder.Faction);
                     letter.relatedOrder = ratkinOrder;

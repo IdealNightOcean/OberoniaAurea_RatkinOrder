@@ -27,8 +27,8 @@ public class RatkinOrderDef : Def
             pawnGroupMaker = null;
             return false;
         }
-        return pawnGroupMakers.Where(gm => gm.kindDef == pawnGroupKindDef)
-                              .TryRandomElementByWeight(gm => gm.commonality, out pawnGroupMaker);
+        return pawnGroupMakers.Where(g => g.kindDef == pawnGroupKindDef)
+                              .TryRandomElementByWeight(g => g.commonality, out pawnGroupMaker);
     }
 
 }

@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -66,9 +65,9 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     public override void PostAdd()
     {
         base.PostAdd();
-        (Branch branch, DemandType demandType) = QuestPart_BranchDemandWatcher.GetBranchDemand(quest);
+        (Branch branch, BranchDemand.DemandType demandType) = QuestPart_BranchDemandWatcher.GetBranchDemand(quest);
         InitOrderBranch(branch);
-        if (demandType == DemandType.Urgency)
+        if (demandType == BranchDemand.DemandType.Urgency)
         {
             curTrust = Rand.Range(0.3f, 0.45f);
         }

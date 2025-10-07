@@ -9,16 +9,16 @@ public static class BranchStatUtility
 {
     public static bool TryGetStatTransformer(this Branch branch, BranchStatDef statDef, out BranchStatTransformer transformer)
     {
-        transformer = default;
+        transformer = BranchStatTransformer.DefaultTransformer;
         bool hasTransformer = false;
         if (branch.RatkinOrder.ReformationManager.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
         {
-            transformer = BranchStatTransformer.Merge(transformer, tempTransformer);
+            transformer.MergeWith(tempTransformer);
             hasTransformer = true;
         }
         if (branch.TransformerHandler.TryGetStatTransformer(statDef, out tempTransformer))
         {
-            transformer = BranchStatTransformer.Merge(transformer, tempTransformer);
+            transformer.MergeWith(tempTransformer);
             hasTransformer = true;
         }
         return hasTransformer;

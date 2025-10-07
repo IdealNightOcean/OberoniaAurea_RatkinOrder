@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using Verse;
+using static OberoniaAurea.RatkinOrder.OrderLetter;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -13,14 +14,14 @@ public static class OrderLetterUtility
         Find.WindowStack.Add(new Window_OrderLetterBox());
     }
 
-    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, OrderLetterType letterType, RatkinOrder relatedOrder, string sender = null)
+    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, LetterType letterType, RatkinOrder relatedOrder, string sender = null)
     {
         OrderLetter orderLetter = new()
         {
             Label = label,
             Text = text,
             Sender = sender ?? "OARO_Letter_UnkownSender",
-            LetterType = letterType,
+            LetterTypeValue = letterType,
             RelatedOrder = relatedOrder,
             RelatedFaction = relatedOrder.Faction
         };
@@ -30,7 +31,7 @@ public static class OrderLetterUtility
 
     public static void ReadLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
     {
-        if (!forceSlience && IsTransToRimLetter(letter.LetterType))
+        if (!forceSlience && IsTransToRimLetter(letter.LetterTypeValue))
         {
             Letter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.RelatedLetterDef ?? LetterDefOf.NeutralEvent, lookTargets: null, letter.RelatedFaction);
             Find.LetterStack.ReceiveLetter(rimLetter);
@@ -38,13 +39,13 @@ public static class OrderLetterUtility
         letter.PostReaded(letterBox);
     }
 
-    public static bool IsTransToRimLetter(OrderLetterType letterType)
+    public static bool IsTransToRimLetter(LetterType letterType)
     {
         return letterType switch
         {
-            OrderLetterType.Normal => LetterBox.autoTransNormal,
-            OrderLetterType.Urgent => LetterBox.autoTransUrgent,
-            OrderLetterType.Official => LetterBox.autoTransOfficial,
+            LetterType.Normal => LetterBox.autoTransNormal,
+            LetterType.Urgent => LetterBox.autoTransUrgent,
+            LetterType.Official => LetterBox.autoTransOfficial,
             _ => false,
         };
     }

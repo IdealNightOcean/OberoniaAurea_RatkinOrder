@@ -6,9 +6,10 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class OARO_LetterDefOf
 {
-    public static LetterDef OARO_RatkinOrderPositiveLetter;
-    public static LetterDef OARO_RatkinOrderNeutralLetter;
-    public static LetterDef OARO_RatkinOrderNegativeLetter;
+    public static LetterDef OARO_Order_PositiveLetter;
+    public static LetterDef OARO_Order_NeutralLetter;
+    public static LetterDef OARO_Order_NegativeLetter;
+    public static LetterDef OARO_Order_ThreatBigLetter;
 
     public static LetterDef OARO_AutoUpgradeRelationshipQuizLetter;
 

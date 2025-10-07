@@ -95,6 +95,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         Scribe_Values.Look(ref curWork, "curWork");
 
         Scribe_Values.Look(ref population, "population", 0);
+        Scribe_Values.Look(ref originalPopulation, "originalPopulation", 0);
         Scribe_Values.Look(ref yestPopulationChange, "yestPopulationChange", 0f);
 
         Scribe_Values.Look(ref distEfficiency, "distEfficiency", 0f);
@@ -105,7 +106,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         Scribe_Values.Look(ref famineRisk, "famineRisk", 0f);
         Scribe_Values.Look(ref yestFamineRiskChange, "yestFamineRiskChange", 0f);
 
-        Scribe_Deep.Look(ref cooldownManager, "cooldownManager", 0);
+        Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
     }
 
     public override void PostAdd()
@@ -204,13 +205,8 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         {
             yield return new Command_Action()
             {
-                defaultLabel = "DEV: +100 Population",
-                action = () => AdjustPopulation(100)
-            };
-            yield return new Command_Action()
-            {
                 defaultLabel = "DEV: -100 Population",
-                action = () => AdjustPopulation(-100)
+                action = () => AdjustPopulation(100)
             };
             yield return new Command_Action()
             {
@@ -231,6 +227,11 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             {
                 defaultLabel = "DEV: -10% FamineRisk",
                 action = () => FamineRisk -= 0.1f
+            };
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: Grain Arrival",
+                action = GrainArrival
             };
         }
     }
@@ -254,7 +255,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
                 action = MilitaryControl,
                 resolveTree = true
             };
-            rootNode.options.Add(exileOpt);
+            rootNode.options.Add(supervisionOpt);
 
             DiaOption distributionOpt = new("OARO_RefugeeInflux_DistributionFood".Translate())
             {
@@ -442,9 +443,9 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         }
         else
         {
-            extraFixedDistEfficiency += (cliquesManager.GetCliqueWillingness(RefugeeCliqueKey) * 0.2f);
+            extraFixedDistEfficiency += (CliquesManager.GetCliqueWillingness(RefugeeCliqueKey) * 0.2f);
         }
-        if (cliquesManager.IsCliqueActive("NearbyTown"))
+        if (CliquesManager.IsCliqueActive("NearbyTown"))
         {
             extraFixedDistEfficiency += 0.1f;
         }

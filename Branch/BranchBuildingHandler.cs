@@ -4,7 +4,6 @@ using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -249,7 +248,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         }
 
         newBuilding.InitActive(Branch);
-        ActiveBuilding(newBuilding);
+        ActiveBuilding(newBuilding, isSpecial: inSpecialSlot);
     }
 
     public void RemoveBuilding(BranchBuildingDef buildingDef)
@@ -260,8 +259,31 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             return;
         }
 
+        if (inSpecialSlot)
+        {
+            specialBuilding = null;
+        }
+        else
+        {
+            buildings.Remove(building);
+        }
+
         Branch.EffectTags.DecrementTagsValue(buildingDef.effectFlags);
-        Branch.TransformerHandler.RemoveStatModifies(buildingDef.branchStatModifies);
+        if (buildingDef.branchStatModifies is not null)
+        {
+            foreach (BranchStatModifier statModifier in buildingDef.branchStatModifies)
+            {
+                if (statModifier.Transformer.factor == 0f)
+                {
+                    Branch.RecacheBranchStat(statModifier.statDef);
+                }
+                else
+                {
+                    Branch.TransformerHandler.RemoveStatModifier(statModifier);
+                }
+            }
+        }
+
         if (building is ITickHour<Branch> ticksLong)
         {
             TickLongHandlers?.Remove(ticksLong);
@@ -275,24 +297,47 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             Branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
         }
 
-        if (inSpecialSlot)
-        {
-            specialBuilding = null;
-        }
-        else
-        {
-            buildings.Remove(building);
-        }
-
-
         building.PostRemoveBuilding(Branch);
+    }
+
+    public BranchStatTransformer GetBranchStatTransformer(BranchStatDef statDef)
+    {
+        BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
+        if (specialBuilding is not null && specialBuilding.Def.branchStatModifies is not null)
+        {
+            foreach (BranchStatModifier statModifier in specialBuilding.Def.branchStatModifies)
+            {
+                if (statModifier.statDef == statDef)
+                {
+                    transformer.MergeWith(statModifier.Transformer);
+                    break;
+                }
+            }
+        }
+
+        foreach (BranchBuilding building in buildings)
+        {
+            if (building.Def.branchStatModifies is not null)
+            {
+                foreach (BranchStatModifier statModifier in specialBuilding.Def.branchStatModifies)
+                {
+                    if (statModifier.statDef == statDef)
+                    {
+                        transformer.MergeWith(statModifier.Transformer);
+                        break;
+                    }
+                }
+            }
+        }
+
+        return transformer;
     }
 
     public void PostLoadInit()
     {
         if (specialBuilding is not null)
         {
-            ActiveBuilding(specialBuilding);
+            ActiveBuilding(specialBuilding, isSpecial: true);
         }
 
         if (buildings is null)
@@ -309,18 +354,19 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
 
         foreach (BranchBuilding building in buildings)
         {
-            ActiveBuilding(building);
+            ActiveBuilding(building, isSpecial: false);
         }
         IsNormalBuildingFullyCompleted = buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
     }
 
-    private void ActiveBuilding(BranchBuilding building)
+    private void ActiveBuilding(BranchBuilding building, bool isSpecial)
     {
         Branch.EffectTags.IncrementTagsValue(building.Def.effectFlags, addIfMiss: true);
         Branch.TransformerHandler.AddStatModifiers(building.Def.branchStatModifies);
-        if (building.Def.isHonorSymbol)
+        if (isSpecial && building.Def.isHonorSymbol)
         {
-            Branch.SetBranchType(BranchType.Honor, active: true);
+            Branch.SetBranchType(Branch.BranchType.Honor, active: true);
+            Branch.HonorProperties = building.Def.honorProperties;
         }
 
         if (building is ITickHour<Branch> tickLong)

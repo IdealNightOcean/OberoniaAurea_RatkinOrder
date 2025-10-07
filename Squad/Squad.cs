@@ -41,7 +41,13 @@ public class Squad : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay
         }
     }
 
-    public void PostBranchGenerated() { }
+    public void PostBranchGenerated()
+    {
+        squadStat.UpdateCeiling(this, updateStatCache: true);
+        squadStat.MemberCount = squadStat.MemberCeiling;
+        squadStat.CommanderCount = squadStat.CommanderCeiling;
+        squadStat.Supply = 0.5f;
+    }
 
     public static Squad GenerateSquadForBranch(Branch branch)
     {

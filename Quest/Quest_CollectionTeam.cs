@@ -8,7 +8,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
-using static OberoniaAurea.RatkinOrder.BranchDemand;
+
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -21,7 +21,7 @@ public sealed class QuestNode_CollectionTeam : QuestNode
 
     public SlateRef<Branch> branch;
     public SlateRef<Faction> faction;
-    public SlateRef<DemandType?> demandType;
+    public SlateRef<BranchDemand.DemandType?> demandType;
 
     public SlateRef<IEnumerable<ThingDefCountClass>> requestThingDefCounts;
 
@@ -88,7 +88,7 @@ public sealed class QuestNode_CollectionTeam : QuestNode
         QuestPart_CollectionTeam questPart_CollectionTeam = (QuestPart_CollectionTeam)Activator.CreateInstance(questPartClass);
 
         questPart_CollectionTeam.Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        questPart_CollectionTeam.DemandType = demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        questPart_CollectionTeam.DemandType = demandType.GetValue(slate) ?? slate.Get<BranchDemand.DemandType>(KeyLibrary_SlateStoreAs.DemandType);
         questPart_CollectionTeam.Faction = faction.GetValue(slate) ?? questPart_CollectionTeam.Branch?.RatkinOrder.Faction;
 
         questPart_CollectionTeam.inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? slate.Get<string>("inSignal");
@@ -132,7 +132,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     public MapParent MapParent;
     public IsolatedPawnGroupMakerDef PawnGroupMakerDef;
 
-    public DemandType? DemandType;
+    public BranchDemand.DemandType? DemandType;
 
     public int DurationTicks = 30000;
     public string TalkText;
@@ -479,7 +479,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             return null;
         }
 
-        OAFrame_PawnGenerateUtility.TryGetRandomPawnGroupMaker(PawnGroupKindDefOf.Peaceful, PawnGroupMakerDef, out PawnGroupMaker groupMaker);
+        PawnGroupMakerDef.TryGetRandomPawnGroupMaker(PawnGroupKindDefOf.Peaceful, out PawnGroupMaker groupMaker);
         if (groupMaker is null)
         {
             return null;

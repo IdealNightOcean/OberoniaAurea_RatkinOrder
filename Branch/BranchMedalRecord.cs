@@ -7,10 +7,10 @@ public struct BranchMedalRecord : IExposable
     public enum BranchMedalType : byte
     {
         None,
-        Tenacity,
-        Courage,
-        Intervene,
-        Justice
+        Tenacity, //坚韧
+        Courage, // 勇气
+        Rescue, //援护
+        Justice //正义
     }
 
     public BranchMedalType type;

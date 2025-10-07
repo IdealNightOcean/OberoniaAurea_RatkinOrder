@@ -70,6 +70,11 @@ public static class OARO_PawnUtility
     {
         Hediff_Knight knightHediff = (Hediff_Knight)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_OrderKnight);
         knightHediff.InitKnightHediff(ratkinOrder, branch, isCommander);
+        if (branch is not null)
+        {
+            Hediff_BranchMedal medalHediff = (Hediff_BranchMedal)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_BranchMedal);
+            medalHediff.InitOrderBranch(branch);
+        }
     }
 
     public static int GetTotalSkillLevelOf(IEnumerable<Pawn> pawns, SkillDef skill)

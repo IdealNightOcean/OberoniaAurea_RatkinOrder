@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -177,7 +176,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         {
             List<AroundKnightGroup> toRemoveGroups = aroundKnightGroups.GetRange(firstIndexToRemove, aroundKnightGroups.Count - firstIndexToRemove);
             AroundKnightGroup knightGroup = toRemoveGroups?.Where(g => g.CurBusyLevel == AroundKnightGroup.BusyLevel.Leisure
-                                                                       && g.Branch.IsBranchOfType(BranchType.Friendly))
+                                                                       && g.Branch.IsBranchOfType(Branch.BranchType.Friendly))
                                                            .RandomElementWithFallback(null);
 
             if (knightGroup is not null)

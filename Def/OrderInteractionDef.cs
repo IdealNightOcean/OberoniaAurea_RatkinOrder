@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Verse;
-using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -25,7 +24,7 @@ public class OrderInteractionDef : Def
     /// </summary>
     public OrderFundEventDef fundEventDef;
 
-    public RelationshipKind floorRelationship = RelationshipKind.Stranger;
+    public EsteemHandler.RelationshipKind floorRelationship = EsteemHandler.RelationshipKind.Stranger;
     public int floorEsteem;
 
     public override IEnumerable<string> ConfigErrors()

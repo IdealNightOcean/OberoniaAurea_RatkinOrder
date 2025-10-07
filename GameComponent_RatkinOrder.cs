@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -9,7 +8,7 @@ public class GameComponent_RatkinOrder : GameComponent
 {
     public static GameComponent_RatkinOrder Instance { get; private set; }
 
-    public RelationshipKind InitOrderRelationship;
+    public EsteemHandler.RelationshipKind InitOrderRelationship;
 
     private UniqueIDManager uniqueIDManager;
 

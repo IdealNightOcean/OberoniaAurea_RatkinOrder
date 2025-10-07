@@ -6,8 +6,8 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class OARO_ThingDefOf
 {
-    public static ThingDef Ratkin;
-    public static ThingDef Ratkin_Su;
+    public static ThingDef Ratkin; //鼠族
+    public static ThingDef Ratkin_Su; //鼠族实验体
 
     public static ThingDef OARO_OrderRecommendation; //推荐信
     public static ThingDef OARO_OrderCodePedestal; // 骑士团团规台

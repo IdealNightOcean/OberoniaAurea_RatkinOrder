@@ -7,7 +7,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class SquadCombatPawnUtility
 {
-    private static IReadOnlyList<(HediffDef, float)> tmpMedalHediffs;
     private static IReadOnlyList<IPostSquadCombatPawnGenerate> tmpBranchPostSquadCombat;
 
     public static List<Pawn> GenerateCombatPawns(Branch branch, Map map, int memberCount, int commanderCount, bool friendly)
@@ -21,7 +20,6 @@ public static class SquadCombatPawnUtility
 
         try
         {
-            tmpMedalHediffs = branch.MedalHandler.MedalHediffs;
             tmpBranchPostSquadCombat = branch.PostSquadCombatPawnGenerate;
 
             Faction faction = branch.RatkinOrder.Faction;
@@ -51,7 +49,6 @@ public static class SquadCombatPawnUtility
         }
         finally
         {
-            tmpMedalHediffs = null;
             tmpBranchPostSquadCombat = null;
         }
 
@@ -60,14 +57,6 @@ public static class SquadCombatPawnUtility
 
     private static void PostSquadCombatPawnGenerate(Pawn p, Branch branch, bool isCommander, bool friendly)
     {
-        if (tmpMedalHediffs is not null && tmpMedalHediffs.Count > 0)
-        {
-            foreach ((HediffDef hediffDef, float severity) in tmpMedalHediffs)
-            {
-                Hediff hediff = p.health.GetOrAddHediff(hediffDef);
-                hediff.Severity = severity;
-            }
-        }
         if (tmpBranchPostSquadCombat is not null && tmpBranchPostSquadCombat.Count > 0)
         {
             for (int i = 0; i < tmpBranchPostSquadCombat.Count; i++)
@@ -85,14 +74,4 @@ public static class SquadCombatPawnUtility
             }
         }
     }
-
-    private static string GetLetterText(this Squad squad)
-    {
-        Faction faction = squad.RatkinOrder.Faction;
-        string text = string.Format(PawnsArrivalModeDefOf.EdgeWalkIn.textEnemy, faction.def.pawnsPlural, faction.Name.ApplyTag(faction)).CapitalizeFirst();
-        text += "\n\n";
-        text += RaidStrategyDefOf.ImmediateAttackFriendly.arrivalTextEnemy;
-        return text;
-    }
-
 }

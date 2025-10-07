@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using Verse;
 using static OberoniaAurea.RatkinOrder.BranchMedalRecord;
 
@@ -17,17 +18,17 @@ public class BranchMedalHandler : IExposable, IPostLoadInit, IDrawDevWindow
     private int totalMedalCount;
     public int TotalMedalCount => totalMedalCount;
 
-    [Unsaved] private List<(HediffDef, float)> medalHediffs;
+    [Unsaved] private HediffStage medalHediffStage;
     [Unsaved] private bool medalHediffsDirty = true;
-    public IReadOnlyList<(HediffDef, float)> MedalHediffs
+    public HediffStage MedalHediffStage
     {
         get
         {
             if (medalHediffsDirty)
             {
-                RecacheMedalHediff();
+                RecacheMedalHediffStage();
             }
-            return medalHediffs;
+            return medalHediffStage;
         }
     }
 
@@ -126,36 +127,82 @@ public class BranchMedalHandler : IExposable, IPostLoadInit, IDrawDevWindow
         }
     }
 
-    private void RecacheMedalHediff()
+    private void RecacheMedalHediffStage()
     {
-        medalHediffs ??= [];
-        medalHediffs.Clear();
-
-        HediffDef gainHediff = GetMedalHediffDef(medalRecords[0].type);
-        if (gainHediff is not null)
+        HediffStage stage = new()
         {
-            medalHediffs.Add((gainHediff, 1.5f));
+            extraTooltip = string.Empty
+        };
+        for (int i = 0; i < medalRecords.Count; i++)
+        {
+            AdjustMedalHediffStage(stage, medalRecords[i].type, isPrimary: i == 0);
         }
-        for (int i = 1; i < medalRecords.Count; i++)
+        if (stage.extraTooltip.NullOrEmpty())
         {
-            gainHediff = GetMedalHediffDef(medalRecords[i].type);
-            if (gainHediff is not null)
+            stage.extraTooltip = null;
+        }
+        medalHediffStage = stage;
+
+        static void AdjustMedalHediffStage(HediffStage stage, BranchMedalType medalType, bool isPrimary)
+        {
+            Color color = Color.white;
+            switch (medalType)
             {
-                medalHediffs.Add((gainHediff, 0.5f));
+                case BranchMedalType.Tenacity:
+                    {
+                        stage.painFactor *= (isPrimary ? 0.85f : 0.95f);
+                        color = Color.yellow;
+                        break;
+                    }
+                case BranchMedalType.Courage:
+                    {
+                        stage.statOffsets ??= [];
+                        stage.statOffsets.Add(new StatModifier()
+                        {
+                            stat = StatDefOf.MeleeHitChance,
+                            value = isPrimary ? 4f : 2f
+                        });
+                        color = ColorLibrary.RedReadable;
+                        break;
+                    }
+                case BranchMedalType.Rescue:
+                    {
+                        stage.statOffsets ??= [];
+                        stage.statOffsets.Add(new StatModifier()
+                        {
+                            stat = StatDefOf.MedicalTendSpeed,
+                            value = isPrimary ? 0.12f : 0.06f
+                        });
+                        color = Color.cyan;
+                        break;
+                    }
+                case BranchMedalType.Justice:
+                    {
+                        stage.statOffsets ??= [];
+                        stage.statOffsets.Add(new StatModifier()
+                        {
+                            stat = StatDefOf.MoveSpeed,
+                            value = isPrimary ? 0.15f : 0.10f
+                        });
+                        stage.statOffsets.Add(new StatModifier()
+                        {
+                            stat = StatDefOf.WorkSpeedGlobal,
+                            value = isPrimary ? 0.05f : 0.03f
+                        });
+                        color = ColorLibrary.Orange;
+                        break;
+                    }
+                default: return; //无对应则不增加描述
             }
-        }
-        medalHediffsDirty = false;
 
-        static HediffDef GetMedalHediffDef(BranchMedalType medalType)
-        {
-            return medalType switch
+            if (isPrimary)
             {
-                BranchMedalType.Tenacity => HediffDefOf.CubeRage,
-                BranchMedalType.Courage => HediffDefOf.CubeRage,
-                BranchMedalType.Intervene => HediffDefOf.CubeRage,
-                BranchMedalType.Justice => HediffDefOf.CubeRage,
-                _ => null,
-            };
+                stage.extraTooltip += $"OARO_BranchMedalType_{medalType}".Translate().Colorize(color) + " ★\n";
+            }
+            else
+            {
+                stage.extraTooltip += $"OARO_BranchMedalType_{medalType}".Translate().Colorize(color) + "\n";
+            }
         }
     }
 }

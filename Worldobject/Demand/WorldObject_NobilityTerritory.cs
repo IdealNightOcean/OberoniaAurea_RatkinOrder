@@ -107,7 +107,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             Includes = { OARO_ModDefOf.OARO_Namer_Nobility }
         };
-        nobilityName = GrammarResolver.Resolve("r_text", namerRequest);
+        nobilityName = GrammarResolver.Resolve("r_name", namerRequest);
         Name = nobilityName;
 
         Osmolity = HasQuestEffectTag("WordGetsAround") ? 0.2f : 0f;

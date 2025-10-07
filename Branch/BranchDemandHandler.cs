@@ -1,6 +1,5 @@
 ﻿using System;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -122,7 +121,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
             Branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandAdd, cdTicks: 20 * 60000, shouldRemoveWhenExpired: true);
         }
 
-        if (Branch.IsBranchOfType(BranchType.Friendly))
+        if (Branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             BranchDemandUtility.FriendyBranchDemandInform(Branch, demandDef);
         }

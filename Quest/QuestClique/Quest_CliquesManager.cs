@@ -6,8 +6,6 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
-
 namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_CliquesManager : QuestNode
@@ -226,7 +224,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 return false;
             }
-            if (clique.RelatedBranch.IsBranchOfType(BranchType.Friendly))
+            if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
             {
                 return RecommendationUtility.CurRecommendationOfMap(clique.RelatedBranch.RatkinOrder, OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true)) >= 1;
             }
@@ -258,7 +256,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
         int delayTicks = activeDelayTicks;
         //非友好分队派别激活参与有2~4天默认延迟
-        if (delayTicks < 0 && clique.IsBranchClique && !clique.RelatedBranch.IsBranchOfType(BranchType.Friendly))
+        if (delayTicks < 0 && clique.IsBranchClique && !clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             delayTicks = Rand.RangeInclusive(120000, 240000);
         }
@@ -273,7 +271,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 clique.RelatedBranch.SquadStat.Supply -= 0.25f;
                 //邀请友好分部派别参与消耗1推荐信
-                if (clique.RelatedBranch.IsBranchOfType(BranchType.Friendly))
+                if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
                 {
                     RecommendationUtility.UseRecommendationOfMap(clique.RelatedBranch.RatkinOrder, OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
                 }

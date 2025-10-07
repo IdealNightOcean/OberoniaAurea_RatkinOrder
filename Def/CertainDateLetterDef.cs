@@ -1,24 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class CertainDateLetterDef : Def
+public class CertainDateLetterDef : SpecialLetterBaseDef
 {
     private static readonly int curYear = DateTime.Now.Year;
 
     public int month;
     public int day;
     public int delayableDays;
-
-    [MustTranslate]
-    public string sender;
-    [MustTranslate]
-    public string text;
-
-    public OrderLetterType letterType = OrderLetterType.Normal;
 
     public DateTime EarliestDate => new DateTime(year: curYear, month: month, day: day).Date;
     public DateTime LatestDate => EarliestDate.AddDays(delayableDays).Date;

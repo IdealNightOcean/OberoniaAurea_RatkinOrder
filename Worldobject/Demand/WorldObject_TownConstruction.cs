@@ -171,14 +171,14 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
         }
 
 
-        sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection".Translate(designPerfection.ToString("F2")));
+        sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection".Translate(designPerfection.ToStringPercent("F2")));
         if (designPerfection > 0.5f)
         {
-            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Buff".Translate(ExtraProgressFactor.ToString("F2")).Colorize(Color.green));
+            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Buff".Translate(ExtraProgressFactor.ToStringPercent("F2")).Colorize(Color.green));
         }
         else
         {
-            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Debuff".Translate(ProgressAbnormalRegressChance.ToString("F2")).Colorize(ColorLibrary.RedReadable));
+            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Debuff".Translate(ProgressAbnormalRegressChance.ToStringPercent("F2")).Colorize(ColorLibrary.RedReadable));
         }
 
         return sb.ToString();
@@ -204,8 +204,13 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
         {
             yield return new Command_Action()
             {
-                defaultLabel = "DEV: +500 WorkProgress",
-                action = () => AdjuestWorkProgress(500, abnormalRegress: false)
+                defaultLabel = "DEV: +100 Population",
+                action = () => Population += 500f
+            };
+            yield return new Command_Action()
+            {
+                defaultLabel = "DEV: +100 WorkProgress",
+                action = () => AdjuestWorkProgress(100, abnormalRegress: false)
             };
             yield return new Command_Action()
             {

@@ -12,9 +12,4 @@ public class BranchStatModifier
         DirectXmlCrossRefLoader.RegisterObjectWantsCrossRef(this, "statDef", xmlRoot);
         Transformer = DirectXmlToObject.ObjectFromXml<BranchStatTransformer>(xmlRoot, doPostLoad: false);
     }
-
-    public void PostLoad()
-    {
-        Transformer.EnsureFactorMinMagnitude();
-    }
 }

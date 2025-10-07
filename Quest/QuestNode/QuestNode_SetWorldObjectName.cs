@@ -35,9 +35,9 @@ public class QuestNode_SetWorldObjectName : QuestNode
         }
 
         RulePackDef nameMaker = this.nameMaker.GetValue(slate);
-        if (nameMaker is null)
+        if (nameMaker is not null)
         {
-            string name = NameGenerator.GenerateName(nameMaker);
+            string name = NameGenerator.GenerateName(nameMaker, rootKeyword: "r_name");
             nameableWorldObject.Name = name;
         }
     }

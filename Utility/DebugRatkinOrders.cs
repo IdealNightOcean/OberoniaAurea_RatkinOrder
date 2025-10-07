@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
-using static OberoniaAurea.RatkinOrder.BranchDemand;
+using Verse.Utility;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -166,7 +166,7 @@ public static class DebugRatkinOrders
         void SelectDemandType(Branch branch)
         {
             List<DebugMenuOption> demandTypeOptions = [];
-            foreach (DemandType demandType in Enum.GetValues(typeof(DemandType)))
+            foreach (BranchDemand.DemandType demandType in Enum.GetValues(typeof(BranchDemand.DemandType)))
             {
                 DebugMenuOption demandTypeOption = new(label: demandType.ToString(),
                                                        mode: DebugMenuOptionMode.Action,
@@ -176,7 +176,7 @@ public static class DebugRatkinOrders
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(demandTypeOptions));
         }
 
-        void SelectDemand(Branch branch, DemandType branchDemandType)
+        void SelectDemand(Branch branch, BranchDemand.DemandType branchDemandType)
         {
             List<DebugMenuOption> demandOptions = [];
             foreach (BranchDemandDef demandDef in DefDatabase<BranchDemandDef>.AllDefs.Where(d => d.demandType == branchDemandType))
@@ -244,6 +244,33 @@ public static class DebugRatkinOrders
             questOptions.Add(orderOption);
         }
         Find.WindowStack.Add(new Dialog_DebugOptionListLister(questOptions));
+    }
+
+    /// <summary>
+    /// 触发袭击
+    /// </summary>
+    [DebugAction(category: "OberoniaAurea",
+                 name: "Trigger Branch Raid",
+                 displayPriority: 420,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
+    private static void TriggerBranchRaid()
+    {
+        OrderBranchOptions(SelectRaidLevel);
+
+        void SelectRaidLevel(Branch branch)
+        {
+            List<DebugMenuOption> raidLevelOptions = [];
+            foreach (SquadSupportUtility.SupportLevel level in EnumUtility.GetValues<SquadSupportUtility.SupportLevel>())
+            {
+                DebugMenuOption levelOption = new(label: level.ToString(),
+                                                  mode: DebugMenuOptionMode.Action,
+                                                  method: () => SquadSupportUtility.DoCombatSupport(branch, level, Find.CurrentMap));
+
+                raidLevelOptions.Add(levelOption);
+            }
+            Find.WindowStack.Add(new Dialog_DebugOptionListLister(raidLevelOptions));
+        }
     }
 
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)

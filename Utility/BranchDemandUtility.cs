@@ -150,7 +150,7 @@ public static class BranchDemandUtility
 
             OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name),
                                                text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name, demandDef.label),
-                                               letterType: OrderLetterType.Official,
+                                               letterType: OrderLetter.LetterType.Official,
                                                relatedOrder: branch.RatkinOrder,
                                                sender: branch.Name);
         }

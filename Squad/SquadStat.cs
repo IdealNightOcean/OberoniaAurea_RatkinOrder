@@ -100,8 +100,8 @@ public class SquadStat : IExposable, IDrawDevWindow
     public void UpdateCeiling(Squad squad, bool updateStatCache)
     {
         Branch branch = squad.Branch;
-        MemberCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberCeiling, immediateUpdate: updateStatCache);
-        CommanderCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadCommanderCeiling, immediateUpdate: updateStatCache);
-        SupplyCeiling = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadSupplyCeiling, immediateUpdate: updateStatCache);
+        MemberCeiling = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberCeiling, immediateUpdate: updateStatCache);
+        CommanderCeiling = branch.GetStatValue(BranchStatDefOf.OARO_SquadCommanderCeiling, immediateUpdate: updateStatCache);
+        SupplyCeiling = branch.GetStatValue(BranchStatDefOf.OARO_SquadSupplyCeiling, immediateUpdate: updateStatCache);
     }
 }

@@ -5,6 +5,8 @@ using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using UnityEngine;
 using Verse;
 using Verse.Grammar;
 
@@ -44,16 +46,19 @@ public static class BranchUtility
         return atLeastOneSite;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<Branch> GetAllAvailableBranchForOrder(this RatkinOrder ratkinOrder, Predicate<Branch> predicate)
     {
         return ratkinOrder.BranchManager.AllBranches.Where(b => predicate(b));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder ratkinOrder, PlanetTile tile)
     {
         return ratkinOrder.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile));
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<Branch> GetAllAffectedBranchForOrder(this RatkinOrder ratkinOrder, PlanetTile tile, Predicate<Branch> predicate)
     {
         return ratkinOrder.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile) && predicate(b));
@@ -172,11 +177,42 @@ public static class BranchUtility
 
         return NameGenerator.GenerateName(grammarRequest, IsUniqueName, false, rootKeyword: "r_name");
 
-
         bool IsUniqueName(string name)
         {
             return !ratkinOrder.BranchManager.AllBranches.Select(b => b.Name).Contains(name);
         }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static BranchFacilityLevel BranchFacilityLevelOffSetBy(BranchFacilityLevel level, int offset)
+    {
+        return (BranchFacilityLevel)Mathf.Clamp((int)level + offset, 0, 4);
+    }
+
+    /// <summary>
+    /// 重新获取该分部某个BranchStatDef的对应BranchStatTransformer
+    /// </summary>
+    public static void RecacheBranchStat(this Branch branch, BranchStatDef statDef)
+    {
+        if (branch.TransformerHandler.RemoveStatRecord(statDef))
+        {
+            BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
+            transformer.MergeWith(branch.FacilityHandler.GetBranchStatTransformer(statDef));
+            transformer.MergeWith(branch.BuildingHandler.GetBranchStatTransformer(statDef));
+            branch.TransformerHandler.AddStatTransformer(statDef, transformer);
+        }
+    }
+
+    /// <summary>
+    /// 获取升级设施所需白银花费
+    /// </summary>
+    public static int GetFacilitySilverCost(Branch branch, BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel)
+    {
+        float baseCost = facilityDef.GetLevelStage(targetLevel)?.silverCost ?? BranchStatDefOf.OARO_BuildingCost.baseValue;
+        float result = branch.GetStatValue(BranchStatDefOf.OARO_BuildingCost, baseValueOverride: baseCost);
+        result *= branch.StoresReserveHandler.GetFacilityCostReduce(facilityDef);
+
+        return (int)result;
     }
 
     public static void OnBranchDestroyed(this QuestManager questManager, Branch branch)

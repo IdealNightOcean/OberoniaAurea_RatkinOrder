@@ -20,6 +20,7 @@ public class RatkinOrderRaidWorker
     public Map map;
     public RaidStrategyDef raidStrategy;
     public PawnsArrivalModeDef raidArrivalMode;
+    public bool sendStandardLetter = true;
 
     public RatkinOrderRaidWorker(Branch branch, int memberCount, int commanderCount)
     {
@@ -36,11 +37,13 @@ public class RatkinOrderRaidWorker
         }
 
         Faction faction = Faction;
+        bool isFriendly = IsFriendly;
+        PawnsArrivalModeDef raidArrivalMode = this.raidArrivalMode ?? (isFriendly ? PawnsArrivalModeDefOf.EdgeDrop : PawnsArrivalModeDefOf.EdgeWalkIn);
         IncidentParms incidentParms = new()
         {
             target = map,
             faction = faction,
-            raidStrategy = raidStrategy,
+            raidStrategy = raidStrategy ?? (isFriendly ? RaidStrategyDefOf.ImmediateAttackFriendly : RaidStrategyDefOf.ImmediateAttack),
             raidArrivalMode = raidArrivalMode,
         };
         if (!raidArrivalMode.Worker.TryResolveRaidSpawnCenter(incidentParms))
@@ -48,9 +51,8 @@ public class RatkinOrderRaidWorker
             return false;
         }
 
-        int memberCount = Mathf.Max(0, Mathf.Min(this.memberCount, branch.SquadStat.MemberCountInt));
-        int commanderCount = Mathf.Max(0, Mathf.Min(this.commanderCount, branch.SquadStat.CommanderCountInt));
-        bool isFriendly = IsFriendly;
+        memberCount = Mathf.Max(0, Mathf.Min(memberCount, branch.SquadStat.MemberCountInt));
+        commanderCount = Mathf.Max(0, Mathf.Min(commanderCount, branch.SquadStat.CommanderCountInt));
 
         List<Pawn> combatPanws = SquadCombatPawnUtility.GenerateCombatPawns(branch, map, memberCount, commanderCount, isFriendly);
         if (combatPanws.NullOrEmpty())
@@ -67,8 +69,72 @@ public class RatkinOrderRaidWorker
         else
         {
             LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, incidentParms.spawnCenter), map, combatPanws);
+            Find.TickManager.slower.SignalForceNormalSpeedShort();
+            Find.StoryWatcher.statsRecord.numRaidsEnemy++;
+            map.StoryState.lastRaidFaction = faction;
+        }
+
+        SquadStat squadStat = branch.SquadStat;
+        squadStat.MemberCount -= memberCount;
+        squadStat.CommanderCount -= commanderCount;
+
+        if (sendStandardLetter)
+        {
+            ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+                label: GetLetterLabel(incidentParms, isFriendly),
+                text: GetLetterText(incidentParms, combatPanws, isFriendly),
+                def: isFriendly ? OARO_LetterDefOf.OARO_Order_PositiveLetter : OARO_LetterDefOf.OARO_Order_ThreatBigLetter,
+                relatedFaction: faction,
+                lookTargets: combatPanws);
+            letter.relatedOrder = branch.RatkinOrder;
+            Find.LetterStack.ReceiveLetter(letter);
         }
 
         return true;
+    }
+
+    protected string GetLetterLabel(IncidentParms parms, bool isFriendly)
+    {
+        return (isFriendly ? parms.raidStrategy.letterLabelFriendly : RaidStrategyDefOf.ImmediateAttack.letterLabelEnemy)
+               + ": " + branch.Name;
+    }
+
+    protected string GetLetterText(IncidentParms parms, List<Pawn> pawns, bool isFriendly)
+    {
+        string text;
+        if (isFriendly)
+        {
+            text = string.Format(parms.raidArrivalMode.textFriendly, parms.faction.def.pawnsPlural, parms.faction.Name.ApplyTag(parms.faction));
+            text += "\n\n";
+            text += "OARO_RaidText_BranchInfo".Translate(branch.Name, commanderCount).Resolve();
+            text += "\n\n";
+            text += parms.raidStrategy.arrivalTextFriendly;
+            Pawn pawn = pawns.Find(p => p.Faction.leader == p);
+            if (pawn is not null)
+            {
+                text += "\n\n";
+                text += "FriendlyRaidLeaderPresent".Translate(pawn.Faction.def.pawnsPlural, pawn.LabelShort, pawn.Named("LEADER"));
+            }
+        }
+        else
+        {
+            text = string.Format(parms.raidArrivalMode.textEnemy, parms.faction.def.pawnsPlural, parms.faction.Name.ApplyTag(parms.faction)).CapitalizeFirst();
+            text += "\n\n";
+            text += "OARO_RaidText_BranchInfo".Translate(branch.Name, commanderCount).Resolve();
+            text += "\n\n";
+            text += parms.raidStrategy.arrivalTextEnemy;
+            Pawn pawn = pawns.Find(p => p.Faction.leader == p);
+            if (pawn is not null)
+            {
+                text += "\n\n";
+                text += "EnemyRaidLeaderPresent".Translate(pawn.Faction.def.pawnsPlural, pawn.LabelShort, pawn.Named("LEADER")).Resolve();
+            }
+            if (parms.raidAgeRestriction != null && !parms.raidAgeRestriction.arrivalTextExtra.NullOrEmpty())
+            {
+                text += "\n\n";
+                text += parms.raidAgeRestriction.arrivalTextExtra.Formatted(parms.faction.def.pawnsPlural.Named("PAWNSPLURAL")).Resolve();
+            }
+        }
+        return text;
     }
 }

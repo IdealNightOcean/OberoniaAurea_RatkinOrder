@@ -86,7 +86,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
                 ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
                     label: "OARO_NobilityTerritory_ExtraRecommendationLabel".Translate(),
                     text: "OARO_NobilityTerritory_ExtraRecommendationText".Translate(Branch?.RatkinOrder.Name, extraRecommendation),
-                    def: OARO_LetterDefOf.OARO_RatkinOrderPositiveLetter,
+                    def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
                     lookTargets: new LookTargets(spawnCell, map),
                     relatedFaction: Branch?.RatkinOrder.Faction,
                     quest: quest);

@@ -7,13 +7,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatTransformerHandler
 {
-    public Dictionary<BranchStatDef, BranchStatTransformer> branchStatTransformers;
+    public readonly Dictionary<BranchStatDef, BranchStatTransformer> branchStatTransformers = [];
 
     public bool TryGetStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
     {
-        if (statDef is null || branchStatTransformers is null)
+        if (statDef is null)
         {
-            transformer = default;
+            transformer = BranchStatTransformer.DefaultTransformer;
             return false;
         }
 
@@ -32,14 +32,14 @@ public class BranchStatTransformerHandler
             return;
         }
 
-        branchStatTransformers ??= [];
         foreach (BranchStatModifier modifier in modifiers)
         {
             try
             {
-                if (branchStatTransformers.TryGetValue(modifier.statDef, out BranchStatTransformer oldTransformer))
+                if (branchStatTransformers.TryGetValue(modifier.statDef, out BranchStatTransformer transformer))
                 {
-                    branchStatTransformers[modifier.statDef] = BranchStatTransformer.Merge(oldTransformer, modifier.Transformer);
+                    transformer.MergeWith(modifier.Transformer);
+                    branchStatTransformers[modifier.statDef] = transformer;
                 }
                 else
                 {
@@ -52,34 +52,28 @@ public class BranchStatTransformerHandler
                 continue;
             }
         }
+    }
 
-        if (branchStatTransformers.Count == 0)
-        {
-            branchStatTransformers = null;
-        }
+    public bool RemoveStatRecord(BranchStatDef statDef)
+    {
+        return branchStatTransformers.Remove(statDef);
     }
 
     public void AddStatTransformer(BranchStatDef statDef, BranchStatTransformer transformer)
     {
-        if (!BranchStatTransformer.IsValid(transformer))
+        if (!transformer.IsValid())
         {
             return;
         }
 
-        if (branchStatTransformers is null)
+        if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer oldTransformer))
         {
-            branchStatTransformers = new Dictionary<BranchStatDef, BranchStatTransformer> { { statDef, transformer } };
+            transformer.MergeWith(oldTransformer);
+            branchStatTransformers[statDef] = transformer;
         }
         else
         {
-            if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer oldTransformer))
-            {
-                branchStatTransformers[statDef] = BranchStatTransformer.Merge(oldTransformer, transformer);
-            }
-            else
-            {
-                branchStatTransformers.Add(statDef, transformer);
-            }
+            branchStatTransformers.Add(statDef, transformer);
         }
     }
 
@@ -90,7 +84,7 @@ public class BranchStatTransformerHandler
     }
     public void RemoveStatModifies(IEnumerable<BranchStatModifier> modifies)
     {
-        if (modifies is null || branchStatTransformers is null)
+        if (modifies is null)
         {
             return;
         }
@@ -99,12 +93,12 @@ public class BranchStatTransformerHandler
         {
             try
             {
-                if (branchStatTransformers.TryGetValue(modify.statDef, out BranchStatTransformer oldTransformer))
+                if (branchStatTransformers.TryGetValue(modify.statDef, out BranchStatTransformer transformer))
                 {
-                    BranchStatTransformer newTransformer = BranchStatTransformer.Unmerge(oldTransformer, modify.Transformer);
-                    if (BranchStatTransformer.IsValid(newTransformer))
+                    transformer.Unmerge(modify.Transformer);
+                    if (transformer.IsValid())
                     {
-                        branchStatTransformers[modify.statDef] = newTransformer;
+                        branchStatTransformers[modify.statDef] = transformer;
                     }
                     else
                     {
@@ -118,32 +112,23 @@ public class BranchStatTransformerHandler
                 continue;
             }
         }
-
-        if (branchStatTransformers.Count == 0)
-        {
-            branchStatTransformers = null;
-        }
     }
 
-    public void RemoveStatTransformer(BranchStatDef statDef, BranchStatTransformer transformer)
+    public void RemoveStatTransformer(BranchStatDef statDef, BranchStatTransformer toRemove)
     {
-        if (branchStatTransformers is null || !branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer oldTransformer))
+        if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
         {
             return;
         }
 
-        BranchStatTransformer newTransformer = BranchStatTransformer.Unmerge(oldTransformer, transformer);
-        if (BranchStatTransformer.IsValid(newTransformer))
+        transformer.Unmerge(toRemove);
+        if (transformer.IsValid())
         {
-            branchStatTransformers[statDef] = newTransformer;
+            branchStatTransformers[statDef] = transformer;
         }
         else
         {
             branchStatTransformers.Remove(statDef);
-            if (branchStatTransformers.Count == 0)
-            {
-                branchStatTransformers = null;
-            }
         }
     }
 

@@ -106,13 +106,6 @@ public class OrderLetterBox : IExposable
         return false;
     }
 
-    public void TriggerDialog()
-    {
-
-
-        nextCanClickTime = Time.time + 1f;
-    }
-
     private void RemoveOvercapArchivedLetters()
     {
         if (HasMaxLetterLimit)
