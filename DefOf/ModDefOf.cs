@@ -18,6 +18,8 @@ public static class OARO_ModDefOf
 
     public static HistoryEventDef OARO_OrderMediateFactionRelation;
 
+    public static IncidentDef OARO_RaidNobilityTerritory; //叛乱镇压 - 贵族领地战斗
+
     public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader; //丢东西的旅行商人
 
     public static RulePackDef OARO_Dialog_AroundKnightGroupVisitInvalid;

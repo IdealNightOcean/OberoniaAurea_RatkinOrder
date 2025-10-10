@@ -120,7 +120,12 @@ public static class SquadSupportUtility
         branch.SquadStat.Supply -= 0.25f;
     }
 
-    public static void DoCombatSupport(Branch branch, SupportLevel level, Map map)
+    public static bool DoCombatSupport(Branch branch, SupportLevel level, Map map)
+    {
+        return GenerateCombatRaidWorker(branch, level, map)?.TryExecute() ?? false;
+    }
+
+    public static RatkinOrderRaidWorker GenerateCombatRaidWorker(Branch branch, SupportLevel level, Map map)
     {
         int memberCount;
         int commanderCount;
@@ -144,22 +149,19 @@ public static class SquadSupportUtility
                 commanderCount = squadStat.CommanderCountInt;
                 supplyCost = 1f;
                 break;
-            default: return;
+            default: return null;
         }
 
-        if (memberCount <= 0)
+        if (memberCount <= 0 && commanderCount <= 0)
         {
-            return;
+            return null;
         }
 
-        RatkinOrderRaidWorker ratkinOrderRaidWorker = new(branch, memberCount, commanderCount)
+        RatkinOrderRaidWorker ratkinOrderRaidWorker = new(branch, memberCount, commanderCount, supplyCost)
         {
             map = map
         };
 
-        if (ratkinOrderRaidWorker.TryExecute())
-        {
-            squadStat.Supply -= supplyCost;
-        }
+        return ratkinOrderRaidWorker;
     }
 }

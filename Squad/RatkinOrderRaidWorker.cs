@@ -14,6 +14,7 @@ public class RatkinOrderRaidWorker
 
     protected int memberCount;
     protected int commanderCount;
+    protected float supplyCost;
 
     protected bool IsFriendly => (Faction?.HostileTo(Faction.OfPlayer) is not true);
 
@@ -22,11 +23,14 @@ public class RatkinOrderRaidWorker
     public PawnsArrivalModeDef raidArrivalMode;
     public bool sendStandardLetter = true;
 
-    public RatkinOrderRaidWorker(Branch branch, int memberCount, int commanderCount)
+    public List<Pawn> combatPanws;
+
+    public RatkinOrderRaidWorker(Branch branch, int memberCount, int commanderCount, float supplyCost)
     {
         this.branch = branch;
         this.memberCount = memberCount;
         this.commanderCount = commanderCount;
+        this.supplyCost = supplyCost;
     }
 
     public bool TryExecute()
@@ -54,7 +58,7 @@ public class RatkinOrderRaidWorker
         memberCount = Mathf.Max(0, Mathf.Min(memberCount, branch.SquadStat.MemberCountInt));
         commanderCount = Mathf.Max(0, Mathf.Min(commanderCount, branch.SquadStat.CommanderCountInt));
 
-        List<Pawn> combatPanws = SquadCombatPawnUtility.GenerateCombatPawns(branch, map, memberCount, commanderCount, isFriendly);
+        combatPanws = SquadCombatPawnUtility.GenerateCombatPawns(branch, map, memberCount, commanderCount, isFriendly);
         if (combatPanws.NullOrEmpty())
         {
             return false;
@@ -77,6 +81,7 @@ public class RatkinOrderRaidWorker
         SquadStat squadStat = branch.SquadStat;
         squadStat.MemberCount -= memberCount;
         squadStat.CommanderCount -= commanderCount;
+        squadStat.Supply -= supplyCost;
 
         if (sendStandardLetter)
         {

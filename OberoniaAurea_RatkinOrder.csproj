@@ -80,13 +80,14 @@
     <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
-    <Compile Include="Def\HonorBranchTypeDef.cs" />
+    <Compile Include="Branch\HonorBranchProperties.cs" />
     <Compile Include="Def\SpecialLetterDef.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
+    <Compile Include="Hediff\Hediff_PainLevelAsStage.cs" />
+    <Compile Include="Hediff\Hediff_HonorGlorious.cs" />
     <Compile Include="Hediff\Hediff_BranchMedal.cs" />
     <Compile Include="Hediff\Hediff_Knight.cs" />
     <Compile Include="Job\JobDriver_PlagueSample.cs" />
-    <Compile Include="KeyLibrary\KeyLibrary_QuestEffectTag.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_EffectTag.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_QuestCliqueKey.cs" />
     <Compile Include="Letter\ChoiceLetter_AutoUpgradeRelationship.cs" />
@@ -213,7 +214,7 @@
     <Compile Include="OrderHall\RoomRoleWorker_RatkinOrderHall.cs" />
     <Compile Include="GlobalOrderInteraction\GlobalOrderInteractionManager.cs" />
     <Compile Include="Thing\OrderRecommendation.cs" />
-    <Compile Include="IncidentWorker\IncidentWorker_Test.cs" />
+    <Compile Include="IncidentWorker\IncidentWorker_RaidNobilityTerritory.cs" />
     <Compile Include="Job\JobDriver_CommonTalkWith.cs" />
     <Compile Include="DefModExtension\MercyQuestExtension.cs" />
     <Compile Include="Quest\Quest_RatkinOrderRelationshipChange.cs" />

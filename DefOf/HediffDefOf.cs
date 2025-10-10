@@ -16,6 +16,9 @@ public static class OARO_HediffDefOf
 
     public static HediffDef OARO_Hediff_BranchMedal; //勋章buff
 
+    public static HediffDef OARO_Hediff_NobilityTerritoryPounce; //叛乱贵族 - 贵族被突袭
+    public static HediffDef OARO_Hediff_NobilityTerritoryPouncePlayer; //叛乱贵族 - 玩家被突袭
+
     static OARO_HediffDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_HediffDefOf));

@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.QuestGen;
 using Verse;
 
@@ -39,6 +40,6 @@ public class QuestNode_GetOrGenerateSubFaction : QuestNode
             slate.Set(storeAs.GetValue(slate), subFaction);
         }
 
-        QuestGen.quest.AddInvolvedFaction(subFaction);
+        OAFrame_QuestUtility.AddInvolvedFaction(QuestGen.quest, subFaction);
     }
 }

@@ -197,7 +197,7 @@ public class BranchMedalHandler : IExposable, IPostLoadInit, IDrawDevWindow
 
             if (isPrimary)
             {
-                stage.extraTooltip += $"OARO_BranchMedalType_{medalType}".Translate().Colorize(color) + " ★\n";
+                stage.extraTooltip += $"{("OARO_BranchMedalType_" + medalType.ToString()).Translate().Colorize(color)} {"★".Colorize(color)}\n";
             }
             else
             {
