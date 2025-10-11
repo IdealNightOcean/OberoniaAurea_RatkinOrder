@@ -30,9 +30,13 @@ public class TagStrToBoolCountable : IExposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool GetTagCount(string tag, out short tagCount)
+    public short GetTagCount(string tag)
     {
-        return tagStrCount.TryGetValue(tag, out tagCount);
+        if (tagStrCount.TryGetValue(tag, out short tagCount))
+        {
+            return tagCount;
+        }
+        return 0;
     }
 
     public void IncrementTagValue(string tag, bool addIfMiss)

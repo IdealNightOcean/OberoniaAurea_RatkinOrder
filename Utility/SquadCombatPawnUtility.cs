@@ -12,7 +12,8 @@ public static class SquadCombatPawnUtility
     public static List<Pawn> GenerateCombatPawns(Branch branch, Map map, int memberCount, int commanderCount, bool friendly)
     {
         List<Pawn> pawns = [];
-        if (!branch.RatkinOrder.Def.TryGetRandomPawnGroupMaker(PawnGroupKindDefOf.Combat, out PawnGroupMaker groupMaker))
+
+        if (!TryGetRandomBranchPawnGroupMakerOfKind(branch, PawnGroupKindDefOf.Combat, out PawnGroupMaker groupMaker))
         {
             Log.Error($"No usable PawnGroupMaker for {PawnGroupKindDefOf.Combat} found in {branch.RatkinOrder}");
             return pawns;
@@ -53,6 +54,20 @@ public static class SquadCombatPawnUtility
         }
 
         return pawns;
+    }
+
+    private static bool TryGetRandomBranchPawnGroupMakerOfKind(Branch branch, PawnGroupKindDef groupKind, out PawnGroupMaker groupMaker)
+    {
+        if (branch.HonorProperties?.TryGetRandomPawnGroupMaker(groupKind, out groupMaker) ?? false)
+        {
+            return true;
+        }
+        if (branch.RatkinOrder.Def.TryGetRandomPawnGroupMaker(groupKind, out groupMaker))
+        {
+            return true;
+        }
+        groupMaker = null;
+        return false;
     }
 
     private static void PostSquadCombatPawnGenerate(Pawn p, Branch branch, bool isCommander, bool friendly)

@@ -83,6 +83,7 @@
     <Compile Include="Branch\HonorBranchProperties.cs" />
     <Compile Include="Def\SpecialLetterDef.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
+    <Compile Include="Hediff\Hediff_HonorPaladin.cs" />
     <Compile Include="Hediff\Hediff_PainLevelAsStage.cs" />
     <Compile Include="Hediff\Hediff_HonorGlorious.cs" />
     <Compile Include="Hediff\Hediff_BranchMedal.cs" />
@@ -90,6 +91,7 @@
     <Compile Include="Job\JobDriver_PlagueSample.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_EffectTag.cs" />
     <Compile Include="KeyLibrary\KeyLibrary_QuestCliqueKey.cs" />
+    <Compile Include="KnightPawnsManager.cs" />
     <Compile Include="Letter\ChoiceLetter_AutoUpgradeRelationship.cs" />
     <Compile Include="GlobalOrderInteraction\AroundKnightGroup.cs" />
     <Compile Include="GlobalOrderInteraction\AroundKnightGroupsManager.cs" />
@@ -120,6 +122,7 @@
     <Compile Include="Quest\Quest_AllRatkinFactionsGoogwillChange.cs" />
     <Compile Include="Quest\Quest_BranchPopulationChange.cs" />
     <Compile Include="Quest\Reward\Reward_BranchPopulation.cs" />
+    <Compile Include="Reformation\ReformationType.cs" />
     <Compile Include="Squad\RatkinOrderRaidWorker.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
     <Compile Include="BranchDemand\AcceptedBranchDemand.cs" />

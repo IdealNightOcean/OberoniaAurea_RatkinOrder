@@ -189,14 +189,8 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetBranchType(BranchType type, bool active)
     {
-        if (active)
-        {
-            curType |= type;
-        }
-        else
-        {
-            curType &= ~type;
-        }
+        if (active) { curType |= type; }
+        else { curType &= ~type; }
     }
 
     public void SetFriendly(bool friendly, int durationTick = 40 * 60000, bool showMessage = true)

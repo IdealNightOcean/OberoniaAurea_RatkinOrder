@@ -4,7 +4,13 @@ public class OrderReformationWorker(OrderReformationDef def)
 {
     public readonly OrderReformationDef Def = def;
 
-    public virtual void PostAdd() { }
+    /// <summary>
+    /// 仅在添加自新时触发
+    /// </summary>
+    public virtual void InitActive(RatkinOrder ratkinOrder) { }
 
-    public virtual void PostInit() { }
+    /// <summary>
+    ///  添加自新和加载存档时触发
+    /// </summary>
+    public virtual void PostActive(RatkinOrder ratkinOrder) { }
 }

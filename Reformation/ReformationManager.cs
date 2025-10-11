@@ -57,13 +57,14 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasReformation(OrderReformationDef def)
-    {
-        return reformations.Contains(def);
-    }
+    public bool HasReformation(OrderReformationDef def) => reformations.Contains(def);
 
     public float GetReformProgressCost(OrderReformationDef def)
     {
+        if (EffectTags.GetTagCount())
+        {
+
+        }
         return def.reformProgressCost;
     }
 
@@ -94,18 +95,11 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
         return true;
     }
 
-    private void AddOrPostInitReformation(OrderReformationDef def, bool postInit)
+    private void ActiveReformation(OrderReformationDef def)
     {
         EffectTags.IncrementTagsValue(def.effectFlags, addIfMiss: true);
         TransformerHandler.AddStatModifiers(def.branchStatModifies);
-        if (postInit)
-        {
-            def.Worker.PostInit();
-        }
-        else
-        {
-            def.Worker.PostAdd();
-        }
+        def.Worker.PostActive(RatkinOrder);
     }
 
     public void PostLoadInit()
@@ -115,11 +109,11 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
         {
             try
             {
-                AddOrPostInitReformation(def, postInit: true);
+                ActiveReformation(def);
             }
             catch (Exception ex)
             {
-                Log.Error($"Fail to init reformation {def.label} after load: {ex}");
+                Log.Error($"Fail to reactive reformation {def.label} after load: {ex}");
                 continue;
             }
         }

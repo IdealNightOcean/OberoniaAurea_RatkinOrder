@@ -40,8 +40,7 @@ public class Hediff_Knight : HediffWithComps, IOnRatkinOrderRemoved, IOnBranchDe
         Log.Message($"Hediff_Knight InitRatkinOrder {pawn.Name}");
         if (ratkinOrder is null || !pawn.CanBeKnight())
         {
-            Log.Error("");
-            ratkinOrder = null;
+            this.ratkinOrder = null;
             pawn.health.RemoveHediff(this);
             return;
         }
@@ -68,6 +67,7 @@ public class Hediff_Knight : HediffWithComps, IOnRatkinOrderRemoved, IOnBranchDe
             pawn.health.RemoveHediff(this);
         }
     }
+
     public void Notify_BranchDestroyed(Branch branch)
     {
         if (this.branch == branch)

@@ -12,6 +12,7 @@ public class OrderReformationDef : Def
     private OrderReformationWorker worker;
     public OrderReformationWorker Worker => worker ??= (workerClass == DefaultWorkerClass ? DefaultWorker : (OrderReformationWorker)Activator.CreateInstance(workerClass, this));
 
+    public ReformationType reformationType;
     public float reformProgressCost;
 
     public List<OrderReformationDef> prerequisites;
