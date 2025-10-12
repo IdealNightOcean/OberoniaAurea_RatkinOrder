@@ -20,7 +20,7 @@ public class OrderFundEventDef : Def
         if (immediately && durationDays > 0)
         {
             durationDays = 0;
-            yield return $"The {defName} has both an immediately true flag and a positive durationDays value at the same time. Set durationDays to 0.";
+            yield return "has both an immediately true flag and a positive durationDays value at the same time. Set durationDays to 0.";
         }
     }
 }

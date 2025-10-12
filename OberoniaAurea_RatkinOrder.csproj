@@ -71,9 +71,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ability\AbilityComp_GiveRatkinHediff.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingComp.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingComp_OrderEffectTags.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingCompProperties.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingWithComps.cs" />
+    <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
+    <Compile Include="Components\KnightRecord.cs" />
     <Compile Include="Components\TrackedIntValue.cs" />
     <Compile Include="Components\TrackedFloatValue.cs" />
     <Compile Include="Components\QuestEffectTag.cs" />
@@ -83,6 +89,7 @@
     <Compile Include="Branch\HonorBranchProperties.cs" />
     <Compile Include="Def\SpecialLetterDef.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
+    <Compile Include="Hediff\Hediff_HonorHunting.cs" />
     <Compile Include="Hediff\Hediff_HonorPaladin.cs" />
     <Compile Include="Hediff\Hediff_PainLevelAsStage.cs" />
     <Compile Include="Hediff\Hediff_HonorGlorious.cs" />
@@ -136,7 +143,7 @@
     <Compile Include="BranchStat\BranchStatModifier.cs" />
     <Compile Include="BranchStat\BranchStatPart.cs" />
     <Compile Include="BranchStat\BranchStatPart_FacilityLevelToBuildingCeiling.cs" />
-    <Compile Include="Branch\BranchBuildingConstructParameter.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingConstructParameter.cs" />
     <Compile Include="BranchDemand\BranchDemand.cs" />
     <Compile Include="DefModExtension\BranchBuilding_MemorialExtension.cs" />
     <Compile Include="DefModExtension\EncampmentSupplyExtension.cs" />
@@ -256,10 +263,9 @@
     <Compile Include="BranchStat\BranchStatPart_FundToSquadMemberCeiling.cs" />
     <Compile Include="BranchStat\BranchStatWorker_Transformer.cs" />
     <Compile Include="Branch\Branch.cs" />
-    <Compile Include="Branch\BranchBuildingConstructChecker.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingConstructChecker.cs" />
     <Compile Include="Branch\BranchBuildingHandler.cs" />
-    <Compile Include="Branch\BranchBuildingMaker.cs" />
-    <Compile Include="Branch\BranchBuildingConstructChecker_Memorial.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingConstructChecker_Memorial.cs" />
     <Compile Include="Def\BranchFacilityDef.cs" />
     <Compile Include="Branch\BranchFacilityLevel.cs" />
     <Compile Include="Branch\BranchFacilityLevelStage.cs" />
@@ -269,7 +275,7 @@
     <Compile Include="Def\BranchBuildingDef.cs" />
     <Compile Include="Branch\BranchFacilityHandler.cs" />
     <Compile Include="Branch\BranchResidentHandler.cs" />
-    <Compile Include="Branch\BranchBuilding.cs" />
+    <Compile Include="BranchBuilding\BranchBuilding.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />

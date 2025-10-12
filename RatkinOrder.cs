@@ -33,6 +33,8 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
 
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
+    [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
+    [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
 
     // 认可度 | 关系 | 推荐信
     private EsteemHandler esteemHandler;

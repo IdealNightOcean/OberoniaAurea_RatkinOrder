@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using OberoniaAurea_Frame;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -60,6 +61,17 @@ public class DevWindow_Order : DevWindowBase
         listing_Rect.Label("Reformation:");
         Text.Font = GameFont.Small;
         ratkinOrder.ReformationManager.DrawDevWindow(listing_Rect);
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label("————————————————");
+        if (listing_Rect.ButtonText("EffectTags", null, 0.8f))
+        {
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.EffectTags.GetDetailString()));
+        }
+        if (listing_Rect.ButtonText("StatTransformers", null, 0.8f))
+        {
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.TransformerHandler.GetDetailString()));
+        }
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");

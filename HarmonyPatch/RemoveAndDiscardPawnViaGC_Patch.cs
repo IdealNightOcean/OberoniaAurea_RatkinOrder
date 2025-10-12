@@ -11,6 +11,9 @@ internal static class RemoveAndDiscardPawnViaGC_Patch
     [HarmonyPostfix]
     public static void Postfix(Pawn p)
     {
-        GameComponent_RatkinOrder.Instance?.KnightPawns.Remove(p);
+        if (p.CanBeKnight())
+        {
+            KnightPawnsManager.DeregisterKnight(p);
+        }
     }
 }

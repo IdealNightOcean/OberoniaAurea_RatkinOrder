@@ -1,6 +1,8 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
+using System;
+using System.Reflection;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -54,11 +56,25 @@ public class BranchDemand : IExposable
         }
     }
 
-    public BranchDemand() { }
-    public BranchDemand(BranchDemandDef def)
+    protected BranchDemand() { }
+
+    /// <summary>
+    /// 常用于反射构造，注意子类同参数构造函数需要非公开
+    /// </summary>
+    protected BranchDemand(BranchDemandDef def)
     {
         this.def = def;
         curState = DemandState.NotAccepted;
+    }
+
+    public static BranchDemand MakeBranchDemand(BranchDemandDef def)
+    {
+        return (BranchDemand)Activator.CreateInstance(
+            type: def.demandClass,
+            bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.CreateInstance,
+            binder: null,
+            args: [def],
+            culture: null);
     }
 
     public void ExposeData()

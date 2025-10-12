@@ -14,7 +14,7 @@ public class AbilityComp_GiveKnightsOfMapHediff : CompAbilityEffect_WithDuration
 
         for (int i = 0; i < pawns.Count; i++)
         {
-            if (pawns[i].IsOrderKnight())
+            if (pawns[i].IsKnight())
             {
                 ApplyInner(pawns[i], parent.pawn);
             }

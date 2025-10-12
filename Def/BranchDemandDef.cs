@@ -32,16 +32,11 @@ public class BranchDemandDef : Def
         }
         if (relatedQuestDef is null)
         {
-            yield return $"{defName} has a null relatedQuestDef.";
+            yield return "has a null relatedQuestDef.";
         }
         if (durationDays <= 0f)
         {
-            yield return $"{defName} should has a positive durationnDays.";
+            yield return "should has a positive durationnDays.";
         }
-    }
-
-    public BranchDemand MakeBranchDemand()
-    {
-        return (BranchDemand)Activator.CreateInstance(demandClass, this);
     }
 }

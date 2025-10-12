@@ -11,7 +11,7 @@ public static class BranchStatUtility
     {
         transformer = BranchStatTransformer.DefaultTransformer;
         bool hasTransformer = false;
-        if (branch.RatkinOrder.ReformationManager.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
+        if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
         {
             transformer.MergeWith(tempTransformer);
             hasTransformer = true;
@@ -81,7 +81,7 @@ public static class BranchStatUtility
     public static StringBuilder GetStatExplanation(this Branch branch, BranchStatDef statDef, float? baseValueOverride = null)
     {
         StringBuilder sb = new("OARO_StatBaseValue".Translate(baseValueOverride ?? statDef.baseValue));
-        if (branch.RatkinOrder.ReformationManager.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
+        if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
         {
             sb.AppendInNewLine("OARO_ReformationTransform".Translate());
             sb.AppendInNewLine(tempTransformer.GetTransformExplanation());

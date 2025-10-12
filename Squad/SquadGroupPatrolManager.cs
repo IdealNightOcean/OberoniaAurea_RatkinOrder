@@ -256,7 +256,7 @@ public class SquadGroupPatrolManager : IExposable, IDrawDevWindow
 
     private bool ChoiceParticipants()
     {
-        short reformationTags = RatkinOrder.ReformationManager.EffectTags.GetTagCount("");
+        short reformationTags = RatkinOrder.EffectTags.GetTagCount("");
 
         float rate = 0.2f + (reformationTags * 0.05f);
         int squadCount = Mathf.FloorToInt(SquadManager.AllSquadsCount * rate);

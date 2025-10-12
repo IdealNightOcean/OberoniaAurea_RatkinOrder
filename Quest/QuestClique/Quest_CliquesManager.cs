@@ -352,11 +352,11 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 if (change > 0f)
                 {
-                    Messages.Message("OARO_CliqueWillingness_Increase".Translate(clique.Name, change.ToString("F2")), MessageTypeDefOf.PositiveEvent);
+                    Messages.Message("OARO_CliqueWillingness_Increase".Translate(clique.Name, change.ToStringPercent("F2")), MessageTypeDefOf.PositiveEvent);
                 }
                 else
                 {
-                    Messages.Message("OARO_CliqueWillingness_Decrease".Translate(clique.Name, (-change).ToString("F2")), MessageTypeDefOf.NegativeEvent);
+                    Messages.Message("OARO_CliqueWillingness_Decrease".Translate(clique.Name, (-change).ToStringPercent("F2")), MessageTypeDefOf.NegativeEvent);
                 }
             }
         }

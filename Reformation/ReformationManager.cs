@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -22,9 +23,6 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
 
     private HashSet<OrderReformationDef> reformations = [];
     public int ReformationsCount => reformations.Count;
-
-    [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
-    [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
 
     public void PostOrderGenerated() { }
 
@@ -46,14 +44,6 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllActiveReformationString()));
         }
-        if (listing_Rect.ButtonText("EffectTags", null, 0.8f))
-        {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(EffectTags.GetDetailString()));
-        }
-        if (listing_Rect.ButtonText("StatTransformers", null, 0.8f))
-        {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(TransformerHandler.GetDetailString()));
-        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -61,11 +51,16 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
 
     public float GetReformProgressCost(OrderReformationDef def)
     {
-        if (EffectTags.GetTagCount())
+        if (FixedReformProgressCost > 0f)
         {
-
+            return FixedReformProgressCost;
         }
-        return def.reformProgressCost;
+        float reformProgressCost = def.reformProgressCost;
+
+        float memorialCostReduce = Mathf.Clamp(RatkinOrder.EffectTags.GetTagCount($"MemorialReformationCostReduce_{def.reformationType}") * 0.05f, 0f, 0.5f);
+        reformProgressCost *= (1f - memorialCostReduce);
+
+        return reformProgressCost;
     }
 
     public AcceptanceReport CanActiveReformation(OrderReformationDef def, bool resultOnly = false)
@@ -75,7 +70,7 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
             return resultOnly ? false : "OARO_HasSameReformation".Translate();
         }
 
-        float reformProgressCost = FixedReformProgressCost > 0f ? FixedReformProgressCost : GetReformProgressCost(def);
+        float reformProgressCost = GetReformProgressCost(def);
         if (reformProgress < reformProgressCost)
         {
             return resultOnly ? false : "OARO_Insufficien_ReformProgresst".Translate(reformProgressCost);
@@ -97,8 +92,8 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
 
     private void ActiveReformation(OrderReformationDef def)
     {
-        EffectTags.IncrementTagsValue(def.effectFlags, addIfMiss: true);
-        TransformerHandler.AddStatModifiers(def.branchStatModifies);
+        RatkinOrder.EffectTags.IncrementTagsValue(def.effectFlags, addIfMiss: true);
+        RatkinOrder.TransformerHandler.AddStatModifiers(def.branchStatModifies);
         def.Worker.PostActive(RatkinOrder);
     }
 

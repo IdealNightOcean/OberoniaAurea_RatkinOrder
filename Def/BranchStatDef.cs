@@ -21,8 +21,8 @@ public class BranchStatDef : Def
     public float baseValue = 0f; //基础值
 
     public bool cacheable = true;
-    public float minValue = int.MinValue + 1; //最小值
-    public float maxValue = int.MaxValue - 1; //最大值
+    public float minValue = int.MinValue; //最小值
+    public float maxValue = int.MaxValue; //最大值
     public bool nonNegative = false; //是否为非负数
     public int cacheDuration = 10000; //缓存持续时间 (单位：tick)
     public List<BranchStatPart> statParts; //属性修正器列表

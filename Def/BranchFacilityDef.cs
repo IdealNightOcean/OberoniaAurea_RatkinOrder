@@ -67,19 +67,19 @@ public class BranchFacilityDef : Def
 
         if (poorStage is null)
         {
-            yield return $"BranchFacilityDef {defName} has null {nameof(poorStage)}.";
+            yield return $"has null {nameof(poorStage)}.";
         }
         if (normalStage is null)
         {
-            yield return $"BranchFacilityDef {defName} has null {nameof(normalStage)}.";
+            yield return $"has null {nameof(normalStage)}.";
         }
         if (goodStage is null)
         {
-            yield return $"BranchFacilityDef {defName} has null {nameof(goodStage)}.";
+            yield return $"has null {nameof(goodStage)}.";
         }
         if (excellentStage is null)
         {
-            yield return $"BranchFacilityDef {defName} has null {nameof(excellentStage)}.";
+            yield return $"has null {nameof(excellentStage)}.";
         }
     }
 }

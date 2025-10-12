@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Reflection;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -7,6 +8,13 @@ public class SquadTask : IExposable
 {
     private SquadTaskDef def;
     public SquadTaskDef Def => def;
+
+    protected SquadTask() { }
+
+    /// <summary>
+    /// 常用于反射构造，注意子类同参数构造函数需要非公开
+    /// </summary>
+    protected SquadTask(SquadTaskDef def) => this.def = def;
 
     public virtual int TaskDurationTick(Squad squad)
     {
@@ -24,9 +32,12 @@ public class SquadTask : IExposable
 
     public static SquadTask MakeTask(SquadTaskDef def)
     {
-        SquadTask task = (SquadTask)Activator.CreateInstance(def.taskClass);
-        task.def = def;
-        return task;
+        return (SquadTask)Activator.CreateInstance(
+            type: def.taskClass,
+            bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.CreateInstance,
+            binder: null,
+            args: [def],
+            culture: null);
     }
 
     public virtual void ExposeData()

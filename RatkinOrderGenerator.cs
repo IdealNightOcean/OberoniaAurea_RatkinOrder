@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Linq;
 using Verse;
@@ -93,7 +94,7 @@ public static class RatkinOrderGenerator
 
         try
         {
-            BranchUtility.InitBranchForNewOrder(ratkinOrder);
+            InitBranchForNewOrder(ratkinOrder);
         }
         catch (Exception ex)
         {
@@ -104,6 +105,37 @@ public static class RatkinOrderGenerator
         RatkinOrderManager.Instance.AddRatkinOrder(ratkinOrder);
         return ratkinOrder;
     }
+
+    private static bool InitBranchForNewOrder(RatkinOrder ratkinOrder)
+    {
+        if (ratkinOrder is null || ratkinOrder.Faction is null)
+        {
+            return false;
+        }
+
+        bool atLeastOneSite = false;
+        foreach (Settlement settlement in Find.WorldObjects.Settlements.Where(s => s.Faction == ratkinOrder.Faction))
+        {
+            if (Rand.Chance(0.4f))
+            {
+                continue;
+            }
+            try
+            {
+                if (Branch.GenerateBranchFor(ratkinOrder, settlement, addToManager: true) is not null)
+                {
+                    atLeastOneSite = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Failed to create a new branch for {ratkinOrder} at {settlement}: " + ex);
+                continue;
+            }
+        }
+        return atLeastOneSite;
+    }
+
 
     public static string GenerateRatkinOrderName(RatkinOrderDef def)
     {

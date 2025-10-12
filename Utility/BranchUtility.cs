@@ -16,36 +16,6 @@ public static class BranchUtility
 {
     public static readonly BranchMedalRecord.BranchMedalType[] BranchMedalsArr = (BranchMedalRecord.BranchMedalType[])Enum.GetValues(typeof(BranchMedalRecord.BranchMedalType));
 
-    public static bool InitBranchForNewOrder(this RatkinOrder ratkinOrder)
-    {
-        if (ratkinOrder is null || ratkinOrder.Faction is null || ratkinOrder.BranchManager is null)
-        {
-            return false;
-        }
-
-        bool atLeastOneSite = false;
-        foreach (Settlement settlement in Find.WorldObjects.Settlements)
-        {
-            if (Rand.Chance(0.4f))
-            {
-                continue;
-            }
-            try
-            {
-                if (Branch.GenerateBranchFor(ratkinOrder, settlement, addToManager: true) is not null)
-                {
-                    atLeastOneSite = true;
-                }
-            }
-            catch (Exception ex)
-            {
-                Log.Error($"Failed to create a new branch for {ratkinOrder} at {settlement}: " + ex);
-                continue;
-            }
-        }
-        return atLeastOneSite;
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<Branch> GetAllAvailableBranchForOrder(this RatkinOrder ratkinOrder, Predicate<Branch> predicate)
     {

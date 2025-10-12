@@ -9,15 +9,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay, IDrawDevWindow
 {
-    private static readonly BranchBuildingDef[] memorials =
-    [
-        BranchBuildingDefOf.OARO_GuardMemorial,
-        BranchBuildingDefOf.OARO_PioneerMemorial,
-        BranchBuildingDefOf.OARO_InterveneMemorial,
-        BranchBuildingDefOf.OARO_LoyalMemorial,
-        BranchBuildingDefOf.OARO_GloryMemorial
-    ];
-
     [Unsaved] public readonly Branch Branch;
 
     [Unsaved] private SimpleValueCache<int> buildingCeilingCache;
@@ -230,7 +221,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         BranchBuilding newBuilding;
         try
         {
-            newBuilding = BranchBuildingMaker.MakeBranchBuilding(buildingDef);
+            newBuilding = BranchBuilding.MakeBranchBuilding(buildingDef, Branch);
         }
         catch (Exception e)
         {
@@ -247,7 +238,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             IsNormalBuildingFullyCompleted = buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
         }
 
-        newBuilding.InitActive(Branch);
+        newBuilding.InitActive();
         ActiveBuilding(newBuilding, isSpecial: inSpecialSlot);
     }
 
@@ -297,7 +288,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             Branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
         }
 
-        building.PostRemoveBuilding(Branch);
+        building.PostDeactive();
     }
 
     public BranchStatTransformer GetBranchStatTransformer(BranchStatDef statDef)
@@ -384,16 +375,11 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             Branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
         }
 
-        building.PostActive(Branch);
+        building.PostActive();
     }
 
     public void PostBranchGenerated()
     {
-        if (Rand.Chance(0.08f))
-        {
-            BranchBuildingDef specialBuildingDef = memorials[Rand.Range(0, memorials.Length)];
-            AddBuilding(specialBuildingDef, inSpecialSlot: true);
-            specialBuildingDef.GetModExtension<BranchBuilding_MemorialExtension>()?.CompleteRequirements(Branch);
-        }
+
     }
 }

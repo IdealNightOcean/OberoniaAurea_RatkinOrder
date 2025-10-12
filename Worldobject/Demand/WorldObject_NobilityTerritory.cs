@@ -2,6 +2,7 @@
 using RimWorld;
 using RimWorld.Planet;
 using System;
+using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -37,7 +38,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     {
         WorkType.Infiltrate => 20000,
         WorkType.Communication => nobilityType == NobilityType.Tyrannical ? 2500 : 20000,
-        WorkType.Negotiate => 300000,
+        WorkType.Negotiate => 30000,
         _ => 20000
     };
     protected override int PeriodicCheckInterval => 60000;
@@ -66,11 +67,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     private int ransomPlayer = -1;
 
     private float osmolity;
-    public float Osmolity
-    {
-        get => osmolity;
-        private set => osmolity = Mathf.Clamp01(osmolity);
-    }
+    public float Osmolity => osmolity;
 
     [Unsaved] private bool beAssaultedAfterWork = false;
 
@@ -102,7 +99,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         nobilityName = GrammarResolver.Resolve("r_name", namerRequest);
         Name = nobilityName;
 
-        Osmolity = HasQuestEffectTag("WordGetsAround") ? 0.2f : 0f;
+        osmolity = HasQuestEffectTag("WordGetsAround") ? 0.2f : 0f;
         troops = Rand.RangeInclusive(20, 80);
         this.nobilityType = nobilityType;
         hasExposeType = hasExposed;
@@ -168,13 +165,13 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
 
         if (hasExposeType)
         {
-            sb.Append("OARO_NobilityTerritory_NobilityType".Translate());
+            sb.AppendInNewLine("OARO_NobilityTerritory_NobilityType".Translate());
             sb.Append(": ");
             sb.Append($"OARO_NobilityTerritory_{nobilityType}".Translate());
         }
         if (hasExposeTroops)
         {
-            sb.Append("OARO_NobilityTerritory_Troops".Translate(troops));
+            sb.AppendInNewLine("OARO_NobilityTerritory_Troops".Translate(TroopsExposed));
         }
         sb.AppendInNewLine("OARO_NobilityTerritory_Osmolity".Translate(osmolity.ToStringPercent("F2")));
         if (isWorking)
@@ -185,6 +182,40 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         }
 
         return sb.ToString();
+    }
+
+    public override IEnumerable<Gizmo> GetGizmos()
+    {
+        foreach (Gizmo gizmo in base.GetGizmos())
+        {
+            yield return gizmo;
+        }
+
+        if (!DebugSettings.ShowDevGizmos)
+        {
+            yield break;
+        }
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Add 10% osmolity",
+            action = delegate
+            {
+                AdjustOsmolity(0.1f);
+            }
+        };
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Yield nobility",
+            action = NobilityYield
+        };
+        yield return new Command_Action()
+        {
+            defaultLabel = "DEV: Add 10% nobility willingness",
+            action = delegate
+            {
+                CliquesManager.AdjustCliqueWillingness(NobilityCliqueKey, 0.1f);
+            }
+        };
     }
 
     public void Notify_AssaultEnd(bool success)
@@ -334,8 +365,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             osmolityChange += Rand.Range(0.01f, 0.03f);
         }
 
-        Osmolity += osmolityChange;
-
+        AdjustOsmolity(osmolityChange);
     }
 
     protected override void FinishWork()
@@ -385,31 +415,10 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             osmolityGain += 0.05f;
         }
-
-        Osmolity += osmolityGain;
-
-        if (!hasExposeType && osmolity >= 0.2f)
-        {
-            hasExposeType = true;
-            Find.LetterStack.ReceiveLetter(
-                label: "OARO_NobilityTerritory_ExposeTypeLabel".Translate(),
-                text: "OARO_NobilityTerritory_ExposeTypeText".Translate(nobilityName, $"OARO_NobilityTerritory_{nobilityName}".Translate()),
-                textLetterDef: LetterDefOf.PositiveEvent,
-                lookTargets: this,
-                relatedFaction: Faction,
-                quest: quest);
-        }
-        if (!hasExposeTroops && osmolity >= 0.5f)
-        {
-            hasExposeTroops = true;
-            Find.LetterStack.ReceiveLetter(
-                label: "OARO_NobilityTerritory_ExposeTroopsLabel".Translate(),
-                text: "OARO_NobilityTerritory_ExposeTroopsText".Translate(nobilityName, TroopsExposed),
-                textLetterDef: LetterDefOf.PositiveEvent,
-                lookTargets: this,
-                relatedFaction: Faction,
-                quest: quest);
-        }
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+               "OARO_NobilityTerritory_InfiltrateResult".Translate(osmolityGain.ToStringPercent("F2")),
+               Faction));
+        AdjustOsmolity(osmolityGain);
     }
 
     private void CommunicationResult()
@@ -496,6 +505,34 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             {
                 ransomPlayer = Mathf.Max(1, Mathf.FloorToInt(ransom * 0.1f));
             }
+        }
+    }
+
+    private void AdjustOsmolity(float change)
+    {
+        osmolity = Mathf.Clamp01(osmolity + change);
+
+        if (!hasExposeType && osmolity >= 0.2f)
+        {
+            hasExposeType = true;
+            Find.LetterStack.ReceiveLetter(
+                label: "OARO_NobilityTerritory_ExposeTypeLabel".Translate(),
+                text: "OARO_NobilityTerritory_ExposeTypeText".Translate(nobilityName, $"OARO_NobilityTerritory_{nobilityType}".Translate()),
+                textLetterDef: LetterDefOf.PositiveEvent,
+                lookTargets: this,
+                relatedFaction: Faction,
+                quest: quest);
+        }
+        if (!hasExposeTroops && osmolity >= 0.5f)
+        {
+            hasExposeTroops = true;
+            Find.LetterStack.ReceiveLetter(
+                label: "OARO_NobilityTerritory_ExposeTroopsLabel".Translate(),
+                text: "OARO_NobilityTerritory_ExposeTroopsText".Translate(nobilityName, TroopsExposed),
+                textLetterDef: LetterDefOf.PositiveEvent,
+                lookTargets: this,
+                relatedFaction: Faction,
+                quest: quest);
         }
     }
 

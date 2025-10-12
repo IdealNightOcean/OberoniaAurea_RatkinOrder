@@ -15,6 +15,7 @@ public static class OARO_HediffDefOf
     public static HediffDef OARO_Hediff_BannerBullet; //旗弹标记
 
     public static HediffDef OARO_Hediff_BranchMedal; //勋章buff
+    public static HediffDef OARO_Hediff_HonorHunting_Debuff; //影猎骑士增伤
     public static HediffDef OARO_Hediff_HonorPaladin_Stimulate; //圣骑士鼓舞
 
     public static HediffDef OARO_Hediff_NobilityTerritoryPounce; //叛乱贵族 - 贵族被突袭

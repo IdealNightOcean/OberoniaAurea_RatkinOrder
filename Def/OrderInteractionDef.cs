@@ -35,7 +35,7 @@ public class OrderInteractionDef : Def
         }
         if (workerClass is null)
         {
-            yield return $"{this} has a null workerClass.";
+            yield return "has a null workerClass.";
         }
     }
 }

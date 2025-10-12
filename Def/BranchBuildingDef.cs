@@ -6,14 +6,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingDef : Def
 {
-    private static readonly Type DefaultConstructCheckerClass = typeof(BranchBuildingConstructChecker);
-    private static readonly BranchBuildingConstructChecker DefaultConstructChecker = new();
+    private static readonly Type defaultType = typeof(BranchBuilding);
+    private static readonly Type defaultConstructCheckerClass = typeof(BranchBuildingConstructChecker);
+    private static readonly BranchBuildingConstructChecker defaultConstructChecker = new();
 
-    public Type buildingClass = typeof(BranchBuilding);
+    public Type buildingClass = defaultType;
+    public Type constructCheckerClass = defaultConstructCheckerClass;
 
-    public Type constructCheckerClass = DefaultConstructCheckerClass;
     private BranchBuildingConstructChecker constructChecker;
-    public BranchBuildingConstructChecker ConstructChecker => constructChecker ??= (constructCheckerClass == DefaultConstructCheckerClass) ? DefaultConstructChecker : (BranchBuildingConstructChecker)Activator.CreateInstance(constructCheckerClass);
+    public BranchBuildingConstructChecker ConstructChecker => constructChecker ??= (constructCheckerClass == defaultConstructCheckerClass) ? defaultConstructChecker : (BranchBuildingConstructChecker)Activator.CreateInstance(constructCheckerClass);
 
     public int silverCost; //白银花费
     public float constructionDays; //建造所需天数
@@ -29,6 +30,12 @@ public class BranchBuildingDef : Def
 
     public List<string> effectFlags; //效果标志列表
     public List<BranchStatModifier> branchStatModifies; //属性修正列表
+
+    /// <summary>
+    /// comp列表，每个运行时类型只能有一个
+    /// 重复会导致报错 + 只有第一个生效
+    /// </summary>
+    public List<BranchBuildingCompProperties> comps;
 
     public bool GetBranchStatModifierOfDef(BranchStatDef statDef, out BranchStatModifier statModifier)
     {
@@ -59,17 +66,42 @@ public class BranchBuildingDef : Def
 
         if (!isSpecial && isHonorSymbol)
         {
-            yield return $"{defName}: isHonorSymbol only works when isSpecial is true.";
+            yield return "\"isHonorSymbol\" only works when \"isSpecial\" is true.";
         }
 
         if (isHonorSymbol && honorProperties is null)
         {
-            yield return $"{defName} is an HonorSymbol building but does not have honorProperties.";
+            yield return "is an HonorSymbol building but does not have honorProperties.";
         }
 
         if (!isHonorSymbol && honorProperties is not null)
         {
-            yield return $"{defName} is not an HonorSymbol building but has honorProperties.";
+            yield return "is not an HonorSymbol building but has honorProperties.";
+        }
+
+        if (buildingClass is null)
+        {
+            buildingClass = defaultType;
+            yield return "has null buildingClass. Set to default.";
+        }
+        if (constructCheckerClass is null)
+        {
+            constructCheckerClass = defaultConstructCheckerClass;
+            yield return "has null constructCheckerClass. Set to default.";
+        }
+        if (comps is not null && comps.Count > 0)
+        {
+            if (!typeof(BranchBuildingWithComps).IsAssignableFrom(buildingClass))
+            {
+                yield return "has components but it's buildingClass is not a BranchBuildingWithComps";
+            }
+            for (int i = 0; i < comps.Count; i++)
+            {
+                foreach (string compError in comps[i].ConfigErrors(this))
+                {
+                    yield return compError;
+                }
+            }
         }
     }
 }

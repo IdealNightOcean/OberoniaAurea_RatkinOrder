@@ -10,30 +10,10 @@ namespace OberoniaAurea.RatkinOrder;
 public static class OARO_PawnUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CanBeKnight(this Pawn p) => p is not null && p.RaceProps.Humanlike;
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsRatkin(this Pawn pawn)
     {
         return pawn.def == OARO_ThingDefOf.Ratkin || pawn.def == OARO_ThingDefOf.Ratkin_Su;
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsOrderKnight(this Pawn pawn)
-    {
-        return pawn.CanBeKnight() && GameComponent_RatkinOrder.Instance.KnightPawns.Contains(pawn);
-    }
-
-    public static Hediff_Knight GetKnightHediff(this Pawn pawn)
-    {
-        if (!pawn.CanBeKnight())
-        {
-            return null;
-        }
-
-        return pawn.health.hediffSet.GetFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_OrderKnight) as Hediff_Knight;
-    }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int GetSkillLevel(this Pawn pawn, SkillDef skill)

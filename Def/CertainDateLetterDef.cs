@@ -24,18 +24,18 @@ public class CertainDateLetterDef : SpecialLetterBaseDef
         if (month <= 0 || month > 12)
         {
             month = Mathf.Clamp(month, 1, 12);
-            yield return "Invalid month value. Month must be between 1 and 12.";
+            yield return "has an invalid month value. Month must be between 1 and 12.";
         }
 
         int maxDay = DateTime.DaysInMonth(curYear, month);
         if (day <= 0 || day > maxDay)
         {
-            yield return $"Invalid day value. Day must be between 1 and {maxDay}.";
+            yield return $"has an invalid day value. Day must be between 1 and {maxDay}.";
         }
 
         if (delayableDays < 0)
         {
-            yield return "Invalid delayableDays value. DelayableDays must be greater than 0.";
+            yield return "has an invalid delayableDays value. DelayableDays must be greater than 0.";
             delayableDays = 0;
         }
     }

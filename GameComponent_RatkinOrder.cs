@@ -17,18 +17,6 @@ public class GameComponent_RatkinOrder : GameComponent
     private GlobalOrderInteractionManager globalOrderInteractionManager;
 
     /// <summary>
-    /// 全局骑士管理
-    /// 因不保存，应注意重新注册
-    /// </summary>
-    [Unsaved] public HashSet<Pawn> KnightPawns = [];
-
-    /// <summary>
-    /// 全局骑士长管理
-    /// 因不保存，应注意重新注册
-    /// </summary>
-    [Unsaved] public HashSet<Pawn> KnightCommanderPawns = [];
-
-    /// <summary>
     /// 全局对话行为管理
     /// 因不保存，应注意重新注册
     /// </summary>
