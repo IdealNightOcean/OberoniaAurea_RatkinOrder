@@ -101,6 +101,13 @@ public class DevWindow_Branch : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
+        listing_Rect.Label("Task:");
+        Text.Font = GameFont.Small;
+        branch.TaskHandler.DrawDevWindow(listing_Rect);
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label("————————————————");
+        Text.Font = GameFont.Medium;
         listing_Rect.Label("Demand:");
         Text.Font = GameFont.Small;
         branch.DemandHandler.DrawDevWindow(listing_Rect);

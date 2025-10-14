@@ -1,29 +1,28 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.SquadGroupPatrolManager;
+using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class DevWindow_SquadGroupPatrolManager : DevWindowBase
+public class DevWindow_JointPatrolManager : DevWindowBase
 {
-    private readonly SquadGroupPatrolManager groupPatrolManager;
-    private readonly IReadOnlyList<Squad> participants;
+    private readonly RatkinOrder ratkinOrder;
+    private readonly JointPatrolManager jointPatrolManager;
     private readonly float needReconnaissanceValue;
     private readonly string patrolEndChances;
     private readonly string endResultText;
 
-    public DevWindow_SquadGroupPatrolManager(SquadGroupPatrolManager groupPatrolManager) : base()
+    public DevWindow_JointPatrolManager(RatkinOrder ratkinOrder) : base()
     {
-        this.groupPatrolManager = groupPatrolManager;
-        optionalTitle = groupPatrolManager.RatkinOrder.Name;
+        this.ratkinOrder = ratkinOrder;
+        jointPatrolManager = ratkinOrder.BranchManager.JointPatrolManager;
+        optionalTitle = ratkinOrder.Name;
 
-        participants = groupPatrolManager.Participants.ToList();
-        needReconnaissanceValue = groupPatrolManager.NeedReconnaissanceValue;
-        patrolEndChances = GetPatrolEndChancesString(groupPatrolManager.PatrolEndChances);
-        endResultText = groupPatrolManager.endResultText.Length > 0 ? groupPatrolManager.endResultText.ToString() : "None";
+        needReconnaissanceValue = jointPatrolManager.NeedReconnaissanceValue;
+        patrolEndChances = GetPatrolEndChancesString(jointPatrolManager.PatrolEndChances);
+        endResultText = jointPatrolManager.endResultText.Length > 0 ? jointPatrolManager.endResultText.ToString() : "None";
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -41,13 +40,13 @@ public class DevWindow_SquadGroupPatrolManager : DevWindowBase
         {
             Close();
             EndContents();
-            groupPatrolManager.RatkinOrder.OpenDevWindow();
+            ratkinOrder.OpenDevWindow();
             return;
         }
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
-        groupPatrolManager.DrawDevWindow(listing_Rect);
+        jointPatrolManager.DrawDevWindow(listing_Rect);
         listing_Rect.Label($"NeedReconnaissanceValue: {needReconnaissanceValue}");
 
         Text.Font = GameFont.Medium;
@@ -63,15 +62,17 @@ public class DevWindow_SquadGroupPatrolManager : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label($"All Participants: {participants.Count}");
+        listing_Rect.Label($"All Participants: {jointPatrolManager.Participants.Count}");
         Text.Font = GameFont.Small;
         listing_Rect.Gap(6f);
+
         int selectIndex = -1;
-        for (int i = 0; i < participants.Count; i++)
+        for (int i = 0; i < jointPatrolManager.Participants.Count; i++)
         {
-            if (listing_Rect.ButtonText(participants[i].Name, null, 0.8f))
+            if (listing_Rect.ButtonText(jointPatrolManager.Participants[i].Branch.Name, null, 0.8f))
             {
                 selectIndex = i;
+                break;
             }
         }
 
@@ -79,7 +80,8 @@ public class DevWindow_SquadGroupPatrolManager : DevWindowBase
         {
             Close();
             EndContents();
-            participants[selectIndex].OpenDevWindow();
+            jointPatrolManager.Participants[selectIndex].Branch.OpenDevWindow();
+            selectIndex = -1;
             return;
         }
 

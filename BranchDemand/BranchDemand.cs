@@ -108,7 +108,7 @@ public class BranchDemand : IExposable
     protected virtual Slate GenerateQuestSlate(Branch branch)
     {
         Slate slate = new();
-        slate.SetBasicOrderSlateVar(branch);
+        slate.SetBasicBranchSlateVar(branch);
 
         slate.Set(KeyLibrary_SlateStoreAs.DemandDef, Def);
         slate.Set(KeyLibrary_SlateStoreAs.DemandType, Def.demandType);

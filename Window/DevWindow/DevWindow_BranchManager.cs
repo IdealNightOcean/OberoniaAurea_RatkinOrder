@@ -9,13 +9,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class DevWindow_BranchManager : DevWindowBase
 {
+    private readonly RatkinOrder ratkinOrder;
     private readonly BranchManager branchManager;
     private readonly IReadOnlyList<Branch> allBranches;
     private readonly string mobileBranchName;
-    public DevWindow_BranchManager(BranchManager branchManager) : base()
+    public DevWindow_BranchManager(RatkinOrder ratkinOrder) : base()
     {
-        this.branchManager = branchManager;
-        optionalTitle = branchManager.RatkinOrder.Name;
+        this.ratkinOrder = ratkinOrder;
+        branchManager = ratkinOrder.BranchManager;
+        optionalTitle = ratkinOrder.Name;
 
         allBranches = branchManager.AllBranches;
 
@@ -45,7 +47,7 @@ public class DevWindow_BranchManager : DevWindowBase
         {
             Close();
             EndContents();
-            branchManager.RatkinOrder.OpenDevWindow();
+            ratkinOrder.OpenDevWindow();
             return;
         }
 

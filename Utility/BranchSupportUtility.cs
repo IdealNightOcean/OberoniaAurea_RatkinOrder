@@ -6,7 +6,7 @@ using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class SquadSupportUtility
+public static class BranchSupportUtility
 {
     public enum SupportLevel : byte
     {
@@ -17,10 +17,9 @@ public static class SquadSupportUtility
 
     public static AcceptanceReport CanBombard(Branch branch, Map map, bool resultOnly = false)
     {
-        if (!branch.SupportAuthority)
+        if (!branch.EffectTags.HasTag(KeyLibrary_EffectTag.SupportAuthority))
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
-
         }
         if (branch.RatkinOrder.Relationship < RelationshipKind.Friendly)
         {
@@ -30,7 +29,7 @@ public static class SquadSupportUtility
         {
             return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("25%");
         }
-        if (branch.EffectTags.HasActiveTag(KeyLibrary_EffectTag.BlockBombard))
+        if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.BlockBombard))
         {
             return resultOnly ? false : "OARO_BranchBlockBombard".Translate();
         }
@@ -43,12 +42,12 @@ public static class SquadSupportUtility
 
     public static AcceptanceReport CanSupport(Branch branch, SupportLevel level, Map map, bool resultOnly = false)
     {
-        if (!branch.SupportAuthority)
+        if (!branch.EffectTags.HasTag(KeyLibrary_EffectTag.SupportAuthority))
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
 
         }
-        if (branch.Squad.BlockSupport)
+        if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.BlockSupport))
         {
             return resultOnly ? false : "OARO_SquadSupportBeBlocked".Translate();
         }

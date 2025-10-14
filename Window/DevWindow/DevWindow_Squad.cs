@@ -30,20 +30,6 @@ public class DevWindow_Squad : DevWindowBase
             Find.WindowStack.Add(new DevWindow_Branch(squad.Branch));
             return;
         }
-        if (listing_Rect.ButtonText("SquadManager DevWin", null, 0.8f))
-        {
-            Close();
-            EndContents();
-            Find.WindowStack.Add(new DevWindow_SquadManager(squad.SquadManager));
-            return;
-        }
-        if (listing_Rect.ButtonText("Order DevWin", null, 0.8f))
-        {
-            Close();
-            EndContents();
-            Find.WindowStack.Add(new DevWindow_Order(squad.RatkinOrder));
-            return;
-        }
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
@@ -57,13 +43,6 @@ public class DevWindow_Squad : DevWindowBase
         listing_Rect.Label("Stat:");
         Text.Font = GameFont.Small;
         squad.SquadStat.DrawDevWindow(listing_Rect);
-
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
-        Text.Font = GameFont.Medium;
-        listing_Rect.Label("Task:");
-        Text.Font = GameFont.Small;
-        squad.TaskHandler.DrawDevWindow(listing_Rect);
 
         if (Event.current.type == EventType.Layout)
         {

@@ -261,11 +261,11 @@ public static class DebugRatkinOrders
         void SelectRaidLevel(Branch branch)
         {
             List<DebugMenuOption> raidLevelOptions = [];
-            foreach (SquadSupportUtility.SupportLevel level in EnumUtility.GetValues<SquadSupportUtility.SupportLevel>())
+            foreach (BranchSupportUtility.SupportLevel level in EnumUtility.GetValues<BranchSupportUtility.SupportLevel>())
             {
                 DebugMenuOption levelOption = new(label: level.ToString(),
                                                   mode: DebugMenuOptionMode.Action,
-                                                  method: () => SquadSupportUtility.DoCombatSupport(branch, level, Find.CurrentMap));
+                                                  method: () => BranchSupportUtility.DoCombatSupport(branch, level, Find.CurrentMap));
 
                 raidLevelOptions.Add(levelOption);
             }

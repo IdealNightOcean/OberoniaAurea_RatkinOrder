@@ -32,7 +32,7 @@ public class ThoughtWorker_BranchChurch : ThoughtWorker
         short count = 0;
         foreach (Branch branch in branchesInRadius)
         {
-            if (branch.EffectTags.HasActiveTag(KeyLibrary_EffectTag.Propaganda))
+            if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.Propaganda))
             {
                 count++;
             }

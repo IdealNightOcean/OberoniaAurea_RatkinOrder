@@ -6,18 +6,18 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
+public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 {
     private float BaseAutoStartTaskChance => Squad.IsBranchSquadOfType(Branch.BranchType.Mobile) ? 0.05f : 0.02f;
 
-    [Unsaved] public readonly Squad Squad;
+    [Unsaved] private readonly Branch branch;
 
-    private SquadTask curTask;
+    private BranchTask curTask;
     private int curTaskStartTick = -1;
     private int curTaskTickLeft = -1;
     private int squadRestEndTick = -1;
 
-    public SquadTask CurTask => curTask;
+    public BranchTask CurTask => curTask;
     public bool HasTask => curTask is not null;
     public int CurTaskDuration => curTaskStartTick > 0 ? Find.TickManager.TicksGame - curTaskStartTick : 0;
     public bool IsCurTaskOngoing => curTaskTickLeft > 0;
@@ -34,9 +34,9 @@ public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
     private float autoStartTaskChance;
     public float AutoStartTaskChance => autoStartTaskChance;
 
-    public SquadTaskHandler(Squad squad)
+    public BranchTaskHandler(Branch branch)
     {
-        Squad = squad ?? throw new ArgumentNullException(nameof(squad));
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
         autoStartTaskChance = BaseAutoStartTaskChance;
     }
 
@@ -190,7 +190,7 @@ public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
                 return true;
             }
 
-            curTask = SquadTask.MakeTask(newTaskDef);
+            curTask = BranchTask.MakeTask(newTaskDef);
             curTaskStartTick = Find.TickManager.TicksGame;
             curTaskTickLeft = curTask.TaskDurationTick(Squad);
             curTask.TaskStart(Squad);
@@ -211,7 +211,7 @@ public class SquadTaskHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    public bool StartTask(SquadTask newTask)
+    public bool StartTask(BranchTask newTask)
     {
         try
         {

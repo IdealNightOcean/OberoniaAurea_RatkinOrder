@@ -55,8 +55,8 @@ public class ResidencyWorker_Deployment : ResidencyWorker
         }
         cachedBranch = branch;
         cachedDailyXp = BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_DeployeeDailyXp, null, immediateUpdate: true);
-        cachedSilverReward = branch.EffectTags.HasActiveTag("InstinctTrain");
-        cachedIntensiveTrain = branch.EffectTags.HasActiveTag(KeyLibrary_EffectTag.IntensiveTrain);
+        cachedSilverReward = branch.EffectTags.HasTag("InstinctTrain");
+        cachedIntensiveTrain = branch.EffectTags.HasTag(KeyLibrary_EffectTag.IntensiveTrain);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

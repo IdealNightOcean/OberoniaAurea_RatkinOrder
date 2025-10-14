@@ -35,7 +35,7 @@ public static class OARO_QuestUtility
         slate.Set(KeyLibrary_SlateStoreAs.OrderFaction, ratkinOrder.Faction);
     }
 
-    public static void SetBasicOrderSlateVar(this Slate slate, Branch branch, bool alsoSetOrder = true)
+    public static void SetBasicBranchSlateVar(this Slate slate, Branch branch, bool alsoSetOrder = true)
     {
         if (alsoSetOrder)
         {

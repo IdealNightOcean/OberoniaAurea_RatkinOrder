@@ -24,4 +24,6 @@ public static class KeyLibrary_CDRecord
     public const string KnightGroupProactiveVisit = "KnightGroupProactiveVisit"; //骑士小组拜访
 
     public const string MercyQuestTryTriggered = "MercyQuestTryTriggered"; //善行任务触发
+
+    public const string AttackedOnTask = "AttackedOnTask"; //在任务中被攻击
 }

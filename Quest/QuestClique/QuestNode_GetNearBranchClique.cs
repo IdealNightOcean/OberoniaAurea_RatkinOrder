@@ -117,7 +117,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
 
         bool ValidateBranch(Branch b)
         {
-            return b != demandBranch && b.DemandHandler.CriticalDemand is null && !b.Squad.TaskHandler.HasTask;
+            return b != demandBranch && b.DemandHandler.CriticalDemand is null && !b.TaskHandler.HasTask;
         }
     }
 }

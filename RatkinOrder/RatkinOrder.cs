@@ -56,9 +56,8 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
     private BranchManager branchManager;
     public BranchManager BranchManager => branchManager;
 
-    //分队部分管理（分队为分部的子组件，生命周期和分部强相关）
-    private SquadManager squadManager;
-    public SquadManager SquadManager => squadManager;
+
+
 
     private RatkinOrder()
     {
@@ -71,7 +70,11 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
         this.faction = faction;
         curYearPassed = TickUtility.YearPassed();
 
-        EnsureComponentsInit();
+        cooldownManager = new();
+        esteemHandler = new EsteemHandler(this);
+        fundHandler = new FundHandler(this);
+        reformationManager = new ReformationManager(this);
+        branchManager = new BranchManager(this);
 
         loadID = UniqueIDManager.Instance.GetUniqueID("RatkinOrder");
     }
@@ -89,7 +92,6 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
         Scribe_Deep.Look(ref fundHandler, "fundHandler", ctorArgs: this);
         Scribe_Deep.Look(ref reformationManager, "reformationManager", ctorArgs: this);
         Scribe_Deep.Look(ref branchManager, "branchManager", ctorArgs: this);
-        Scribe_Deep.Look(ref squadManager, "squadManager", ctorArgs: [this, false]);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Order(this));
@@ -100,7 +102,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
 
         if (this.IsHashIntervalTick(1000))
         {
-            squadManager.TickLong();
+            branchManager.TickLong();
 
             if (this.IsHashIntervalTick(60000))
             {
@@ -118,7 +120,6 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
     public void OnRemoved()
     {
         branchManager.Notify_MyOrderRemoved();
-        squadManager.Notify_MyOrderRemoved();
     }
 
     public void PostGenerated()
@@ -130,21 +131,9 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
 
     public void PostLoadInit()
     {
-        EnsureComponentsInit();
-
         branchManager.PostLoadInit();
-        squadManager.PostLoadInit();
     }
 
     public string GetUniqueLoadID() => "RatkinOrder_" + loadID;
 
-    private void EnsureComponentsInit()
-    {
-        cooldownManager ??= new();
-        esteemHandler ??= new EsteemHandler(this);
-        fundHandler ??= new FundHandler(this);
-        reformationManager ??= new ReformationManager(this);
-        branchManager ??= new BranchManager(this);
-        squadManager ??= new SquadManager(this, initConstruct: true);
-    }
 }

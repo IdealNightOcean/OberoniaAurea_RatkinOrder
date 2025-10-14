@@ -7,27 +7,10 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class TagStrToBoolCountable : IExposable
 {
-    private const short DefaultValue = 0;
-    private const short MissingValue = -9999; //表示标签不存在的值
-
-    private Dictionary<string, short> tagStrCount;
-
-    public TagStrToBoolCountable()
-    {
-        tagStrCount = [];
-    }
+    private Dictionary<string, short> tagStrCount = [];
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasTag(string tag)
-    {
-        return tagStrCount.ContainsKey(tag);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasActiveTag(string tag)
-    {
-        return tagStrCount.TryGetValue(tag, fallback: MissingValue) > 0;
-    }
+    public bool HasTag(string tag) => tagStrCount.ContainsKey(tag);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public short GetTagCount(string tag)
@@ -41,25 +24,13 @@ public class TagStrToBoolCountable : IExposable
 
     public void IncrementTagValue(string tag, bool addIfMiss)
     {
-        short count = tagStrCount.TryGetValue(tag, fallback: MissingValue);
-
-        if (count == MissingValue)
+        if (tagStrCount.TryGetValue(tag, out short count))
         {
-            if (addIfMiss)
-            {
-                tagStrCount.Add(tag, value: 1);
-            }
+            tagStrCount[tag] = ++count;
         }
-        else
+        else if (addIfMiss)
         {
-            if (++count == DefaultValue)
-            {
-                tagStrCount.Remove(tag);
-            }
-            else
-            {
-                tagStrCount[tag] = count;
-            }
+            tagStrCount.Add(tag, value: 1);
         }
     }
 
@@ -79,11 +50,10 @@ public class TagStrToBoolCountable : IExposable
 
     public void DecrementTagValue(string tag)
     {
-        short count = tagStrCount.TryGetValue(tag, fallback: MissingValue);
-
-        if (count != MissingValue)
+        if (tagStrCount.TryGetValue(tag, out short count))
         {
-            if (--count == DefaultValue)
+            count--;
+            if (count <= 0)
             {
                 tagStrCount.Remove(tag);
             }

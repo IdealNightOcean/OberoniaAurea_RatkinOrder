@@ -17,6 +17,50 @@ public static class BranchUtility
     public static readonly BranchMedalRecord.BranchMedalType[] BranchMedalsArr = (BranchMedalRecord.BranchMedalType[])Enum.GetValues(typeof(BranchMedalRecord.BranchMedalType));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsInAffectedRange(this Branch branch, PlanetTile tile)
+    {
+        if (tile.Layer != branch.WorldObject.Tile.Layer)
+        {
+            return false;
+        }
+        return Find.WorldGrid.ApproxDistanceInTiles(branch.WorldObject.Tile, tile) <= BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_AffectRadius);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float DistanceTo(this Branch branch, PlanetTile tile)
+    {
+        if (tile.Layer != branch.WorldObject.Tile.Layer)
+        {
+            return 999999f;
+        }
+        return Find.WorldGrid.ApproxDistanceInTiles(branch.WorldObject.Tile, tile);
+    }
+
+    /// <summary>
+    /// 该分部是否正在边境轮巡
+    /// </summary>
+    public static bool IsOnJointPatrol(this Branch branch)
+    {
+        return branch.BranchManager.IsJointPatrolActived && branch.BranchManager.JointPatrolManager.IsParticipant(branch);
+    }
+
+    /// <summary>
+    /// 该分部能否参与边境轮巡
+    /// </summary>
+    public static bool CanParticipateInJointPatrol(this Branch branch)
+    {
+        if (!branch.TaskHandler.HasTask)
+        {
+            return true;
+        }
+        if (branch.TaskHandler.CurTask.Def.canInterruptedByJointPatrol)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<Branch> GetAllAvailableBranchForOrder(this RatkinOrder ratkinOrder, Predicate<Branch> predicate)
     {
         return ratkinOrder.BranchManager.AllBranches.Where(b => predicate(b));

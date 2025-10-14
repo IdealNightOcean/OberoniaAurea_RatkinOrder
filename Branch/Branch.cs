@@ -19,8 +19,8 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         Mobile = 4
     }
 
-    [Unsaved] public readonly BranchManager BranchManager;
-    public RatkinOrder RatkinOrder => BranchManager.RatkinOrder;
+    [Unsaved] public readonly RatkinOrder RatkinOrder;
+    public BranchManager BranchManager => RatkinOrder.BranchManager;
 
     private int loadID = -1;
     public int LoadID => loadID;
@@ -46,9 +46,6 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         set => honorProperties = value;
     }
 
-    public bool SupportAuthority; //是否有支援权限
-
-
     private int population;
     private int NaturalPopulationCeiling => (int)this.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
     public int Population
@@ -67,6 +64,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     private BranchMedalHandler medalHandler;
     private BranchFacilityHandler facilityHandler;
     private BranchBuildingHandler buildingHandler;
+    private BranchTaskHandler taskHandler;
     private BranchDemandHandler demandHandler;
     private BranchResidentHandler residentHandler;
     private BranchStoresReserveHandler storesReserveHandler;
@@ -76,19 +74,29 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     public BranchMedalHandler MedalHandler => medalHandler;
     public BranchFacilityHandler FacilityHandler => facilityHandler;
     public BranchBuildingHandler BuildingHandler => buildingHandler;
+    public BranchTaskHandler TaskHandler => taskHandler;
     public BranchDemandHandler DemandHandler => demandHandler;
     public BranchResidentHandler ResidentHandler => residentHandler;
     public BranchStoresReserveHandler StoresReserveHandler => storesReserveHandler;
 
-    private Branch(BranchManager branchManager)
+    private Branch(RatkinOrder ratkinOrder, bool initCtor)
     {
-        BranchManager = branchManager ?? throw new ArgumentNullException(nameof(branchManager));
+        RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
         TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
-    }
+        if (initCtor)
+        {
+            cooldownManager = new();
 
-    private Branch(RatkinOrder ratkinOrder) : this(ratkinOrder.BranchManager)
-    {
-        EnsureComponentsInit();
+            squad = Squad.GenerateSquadForBranch(this) ?? throw new NullReferenceException(nameof(squad));
+
+            medalHandler = new();
+            facilityHandler = new(this);
+            buildingHandler = new(this);
+            taskHandler = new(this);
+            demandHandler = new(this);
+            residentHandler = new(this);
+            storesReserveHandler = new(this);
+        }
         loadID = UniqueIDManager.Instance.GetUniqueID("Branch");
     }
 
@@ -102,7 +110,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         Branch branch;
         try
         {
-            branch = new(ratkinOrder);
+            branch = new(ratkinOrder, initCtor: true);
             worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(branch);
             branch.worldObject = worldObject;
             branch.name = BranchUtility.GenerateBranchName(ratkinOrder);
@@ -135,6 +143,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         Scribe_Deep.Look(ref medalHandler, "medalHandler");
         Scribe_Deep.Look(ref facilityHandler, "facilityHandler", ctorArgs: this);
         Scribe_Deep.Look(ref buildingHandler, "buildingHandler", ctorArgs: this);
+        Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
         Scribe_Deep.Look(ref demandHandler, "demandHandler", ctorArgs: this);
         Scribe_Deep.Look(ref residentHandler, "residentHandler", ctorArgs: this);
         Scribe_Deep.Look(ref storesReserveHandler, "storesReserveHandler", ctorArgs: this);
@@ -180,7 +189,6 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         buildingHandler.TickDay();
         residentHandler.TickDay();
         demandHandler.TickDay();
-        squad.TickDay();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -214,26 +222,6 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsInAffectedRange(PlanetTile tile)
-    {
-        if (tile.Layer != worldObject.Tile.Layer)
-        {
-            return false;
-        }
-        return Find.WorldGrid.ApproxDistanceInTiles(worldObject.Tile, tile) <= BranchStatUtility.GetStatValue(this, BranchStatDefOf.OARO_AffectRadius);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float DistanceTo(PlanetTile tile)
-    {
-        if (tile.Layer != worldObject.Tile.Layer)
-        {
-            return 999999f;
-        }
-        return Find.WorldGrid.ApproxDistanceInTiles(worldObject.Tile, tile);
-    }
-
     public void Destroy()
     {
         residentHandler.ForceEndAllResidency();
@@ -265,28 +253,12 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
     public void PostLoadInit()
     {
-        EnsureComponentsInit();
         medalHandler.PostLoadInit();
 
         facilityHandler.PostLoadInit();
         buildingHandler.PostLoadInit();
 
         residentHandler.PostLoadInit();
-        squad.PostLoadInit();
-    }
-
-    private void EnsureComponentsInit()
-    {
-        cooldownManager ??= new();
-
-        squad ??= Squad.GenerateSquadForBranch(this) ?? throw new NullReferenceException(nameof(squad));
-
-        medalHandler ??= new();
-        facilityHandler ??= new(this);
-        buildingHandler ??= new(this);
-        demandHandler ??= new(this);
-        residentHandler ??= new(this);
-        storesReserveHandler ??= new(this);
     }
 
     public string GetUniqueLoadID() => "Branch_" + loadID;

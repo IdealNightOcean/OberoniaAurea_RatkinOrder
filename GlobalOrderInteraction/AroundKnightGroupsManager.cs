@@ -110,7 +110,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         aroundKnightGroups.Remove(knightGroup);
 
         Slate slate = new();
-        slate.SetBasicOrderSlateVar(knightGroup.Branch);
+        slate.SetBasicBranchSlateVar(knightGroup.Branch);
         slate.Set("map", map);
         slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsCount, knightGroup.MemberCount);
         slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsDelay, knightGroup.TravelTicks);

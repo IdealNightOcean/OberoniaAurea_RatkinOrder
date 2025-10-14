@@ -89,26 +89,13 @@ public class DevWindow_Order : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Squad Manager:");
-        Text.Font = GameFont.Small;
-        if (listing_Rect.ButtonText("SquadManager DevWin", null, 0.8f))
-        {
-            Close();
-            EndContents();
-            ratkinOrder.SquadManager.OpenDevWindow();
-            return;
-        }
-
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
-        Text.Font = GameFont.Medium;
         listing_Rect.Label("Squad Group Patrol Manager:");
         Text.Font = GameFont.Small;
         if (listing_Rect.ButtonText("GroupPatrolManager DevWin", null, 0.8f))
         {
             Close();
             EndContents();
-            ratkinOrder.SquadManager.GroupPatrolManager.OpenDevWindow();
+            ratkinOrder.BranchManager.JointPatrolManager.OpenDevWindow();
             return;
         }
 

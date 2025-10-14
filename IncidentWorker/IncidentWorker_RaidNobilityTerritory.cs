@@ -36,7 +36,7 @@ internal sealed class IncidentWorker_RaidNobilityTerritory : IncidentWorker
         }
         if (nobilityTerritory.BranchJoin)
         {
-            SquadSupportUtility.DoCombatSupport(nobilityTerritory.Parent.Branch, SquadSupportUtility.SupportLevel.Entire, map);
+            BranchSupportUtility.DoCombatSupport(nobilityTerritory.Parent.Branch, BranchSupportUtility.SupportLevel.Entire, map);
         }
 
         if (nobilityTerritory.AssaultTypeValue == MapParent_NobilityTerritory.AssaultType.BePounced)

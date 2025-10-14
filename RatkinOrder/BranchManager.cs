@@ -10,10 +10,17 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchManager : IExposable, IPostLoadInit, ITickDay
 {
-    [Unsaved] public readonly RatkinOrder RatkinOrder;
+    [Unsaved] private readonly RatkinOrder ratkinOrder;
 
     private List<Branch> allBranches = [];
     public IReadOnlyList<Branch> AllBranches => allBranches;
+
+    private JointPatrolManager jointPatrolManager;
+    public JointPatrolManager JointPatrolManager => jointPatrolManager;
+    public bool IsJointPatrolActived => jointPatrolManager is not null;
+
+    [Unsaved] private readonly SimpleValueCache<int> totalKnightsCache;
+    public int TotalKnights => totalKnightsCache.GetCachedResult();
 
     public IEnumerable<Branch> HonorBranches
     {
@@ -80,20 +87,22 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
 
     public BranchManager(RatkinOrder ratkinOrder)
     {
-        RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
+        this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         friendlyBranchesCountCache = new SimpleValueCache<int>(cacheInterval: 60000, () => FriendlyBranches.Count());
+        totalKnightsCache = new SimpleValueCache<int>(cacheInterval: 60000, () => allBranches.Sum(b => b.SquadStat.CommanderCountInt + b.SquadStat.MemberCountInt));
     }
 
     public void OpenDevWindow()
     {
-        Find.WindowStack.Add(new DevWindow_BranchManager(this));
+        Find.WindowStack.Add(new DevWindow_BranchManager(ratkinOrder));
     }
 
     public void ExposeData()
     {
         Scribe_Values.Look(ref invitedBranchCreationsCount, "invitedBranchCreationsCount", 0);
 
-        Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: this);
+        Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: [this, false]);
+        Scribe_Deep.Look(ref jointPatrolManager, "jointPatrolManager", ctorArgs: [ratkinOrder]);
 
         Scribe_Values.Look(ref normalDemandFulfillCount, "normalDemandFulfillCount", 0);
         Scribe_Values.Look(ref criticalDemandFulfillCount, "criticalDemandFulfillCount", 0);
@@ -107,9 +116,17 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         }
     }
 
+    public void TickLong()
+    {
+        jointPatrolManager?.TickLong();
+    }
+
     public void TickDay()
     {
         DailyConstructCheck();
+
+        jointPatrolManager?.TickDay();
+
         PeriodicCriticalDemandTrigger();
     }
 
@@ -120,7 +137,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
             Log.Error("Attempted to add a null branch.");
             return;
         }
-        if (branch.RatkinOrder != RatkinOrder)
+        if (branch.RatkinOrder != ratkinOrder)
         {
             Log.Error("Attempted to add a branch belonging to another RatkinOrder.");
             return;
@@ -150,7 +167,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
     {
         if (!allBranches.Remove(branch))
         {
-            Log.Error($"Attempted to destroy a branch that does not exist in {RatkinOrder.Name} ({RatkinOrder.GetUniqueLoadID()}). Branch ID: {branch.GetUniqueLoadID()}.");
+            Log.Error($"Attempted to destroy a branch that does not exist in {ratkinOrder.Name} ({ratkinOrder.GetUniqueLoadID()}). Branch ID: {branch.GetUniqueLoadID()}.");
             return;
         }
 
@@ -161,6 +178,11 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         GlobalOrderInteractionManager.Instance.Notify_BranchDestroyed(branch);
         MapComponent_RatkinOrder.OnBranchDestroyed(branch);
         Find.QuestManager.OnBranchDestroyed(branch);
+    }
+
+    public void Notify_JointPatrolEnd()
+    {
+        jointPatrolManager = null;
     }
 
     public void Notify_DemandQuestCompleted(bool isCritical)
@@ -177,7 +199,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
 
     private void DailyConstructCheck()
     {
-        if (RatkinOrder.Funds < 0.7f)
+        if (ratkinOrder.Funds < 0.7f)
         {
             return;
         }
@@ -211,11 +233,11 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
 
                 if (successConstruct)
                 {
-                    RatkinOrder.FundHandler.AdjustFundsImmediately(-0.002f);
+                    ratkinOrder.FundHandler.AdjustFundsImmediately(-0.002f);
                 }
             }
 
-            if (RatkinOrder.Funds < 0.5f)
+            if (ratkinOrder.Funds < 0.5f)
             {
                 break;
             }
@@ -228,12 +250,12 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
     /// </summary>
     private void PeriodicCriticalDemandTrigger()
     {
-        if (RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.CriticalDemandPeriodic))
+        if (ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.CriticalDemandPeriodic))
         {
             return;
         }
 
-        RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandPeriodic, cdTicks: 5 * 60000);
+        ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandPeriodic, cdTicks: 5 * 60000);
         foreach (Branch branch in allBranches)
         {
             if (branch.DemandHandler.CanAddDemand(isCriticalDemand: true, ignoreCD: false, replaceCur: false))
@@ -311,7 +333,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
     {
         if (allBranches.RemoveAll(b => b is null) > 0)
         {
-            Log.Error($"Some branches of {RatkinOrder} were null after loading and have been removed.");
+            Log.Error($"Some branches of {ratkinOrder} were null after loading and have been removed.");
         }
 
         for (int i = 0; i < allBranches.Count; i++)
