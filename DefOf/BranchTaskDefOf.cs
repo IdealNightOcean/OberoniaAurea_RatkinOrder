@@ -5,9 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public class BranchTaskDefOf
 {
-    public static BranchTaskDef OARO_Squad_JurisdictionDutyPerp;
-    public static BranchTaskDef OARO_Squad_GroupPatrolPerp;
-    public static BranchTaskDef OARO_Squad_GroupPatrol;
+    public static BranchTaskDef OARO_JurisdictionDutyPerp;
 
     static BranchTaskDefOf()
     {

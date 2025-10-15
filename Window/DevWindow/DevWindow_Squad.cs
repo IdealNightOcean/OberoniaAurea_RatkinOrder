@@ -5,11 +5,11 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class DevWindow_Squad : DevWindowBase
 {
-    private readonly Squad squad;
-    public DevWindow_Squad(Squad squad) : base()
+    private readonly Branch branch;
+    public DevWindow_Squad(Branch branch) : base()
     {
-        this.squad = squad;
-        optionalTitle = squad.Branch.NameFull;
+        this.branch = branch;
+        optionalTitle = branch.NameFull;
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -27,9 +27,11 @@ public class DevWindow_Squad : DevWindowBase
         {
             Close();
             EndContents();
-            Find.WindowStack.Add(new DevWindow_Branch(squad.Branch));
+            Find.WindowStack.Add(new DevWindow_Branch(branch));
             return;
         }
+
+        BranchSquad squad = branch.Squad;
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
@@ -42,7 +44,20 @@ public class DevWindow_Squad : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Stat:");
         Text.Font = GameFont.Small;
-        squad.SquadStat.DrawDevWindow(listing_Rect);
+        listing_Rect.Label($"MemberCount: {squad.MemberCountInt}");
+        listing_Rect.Label($"CommanderCount: {squad.CommanderCountInt}");
+        listing_Rect.Gap(6f);
+        if (listing_Rect.ButtonText("Member +1", widthPct: 0.6f))
+        {
+            squad.MemberCount += 1f;
+        }
+        if (listing_Rect.ButtonText("Commander +1", widthPct: 0.6f))
+        {
+            squad.MemberCount += 1f;
+        }
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"MemberCeiling: {squad.MemberCeiling:F2}");
+        listing_Rect.Label($"CommanderCeiling: {squad.CommanderCeiling:F2}");
 
         if (Event.current.type == EventType.Layout)
         {

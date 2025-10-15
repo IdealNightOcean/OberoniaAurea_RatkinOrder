@@ -8,7 +8,7 @@ using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchManager : IExposable, IPostLoadInit, ITickDay
+public class BranchManager : IExposable, ITickDay
 {
     [Unsaved] private readonly RatkinOrder ratkinOrder;
 
@@ -63,7 +63,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         }
     }
 
-    public IEnumerable<(Branch Branch, BranchStoresReserve reserve)> AllPrimaryReserves
+    public IEnumerable<(Branch Branch, BranchStoresReserveHandler.ReserveRecord reserve)> AllPrimaryReserves
     {
         get
         {
@@ -89,7 +89,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         friendlyBranchesCountCache = new SimpleValueCache<int>(cacheInterval: 60000, () => FriendlyBranches.Count());
-        totalKnightsCache = new SimpleValueCache<int>(cacheInterval: 60000, () => allBranches.Sum(b => b.SquadStat.CommanderCountInt + b.SquadStat.MemberCountInt));
+        totalKnightsCache = new SimpleValueCache<int>(cacheInterval: 60000, () => allBranches.Sum(b => b.Squad.AllCrewCountInt));
     }
 
     public void OpenDevWindow()
@@ -149,7 +149,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         }
     }
 
-    public void Notify_MyOrderRemoved()
+    internal void Notify_MyOrderRemoved()
     {
         for (int i = 0; i < allBranches.Count; i++)
         {
@@ -180,12 +180,12 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         Find.QuestManager.OnBranchDestroyed(branch);
     }
 
-    public void Notify_JointPatrolEnd()
+    internal void Notify_JointPatrolEnd()
     {
         jointPatrolManager = null;
     }
 
-    public void Notify_DemandQuestCompleted(bool isCritical)
+    internal void Notify_DemandQuestCompleted(bool isCritical)
     {
         if (isCritical)
         {
@@ -204,40 +204,40 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
             return;
         }
 
-        List<(Branch branch, BranchStoresReserve reserve)> potentialReserve = AllPrimaryReserves.Where(pr => pr.reserve.costRate <= 0.7f).ToList();
+        List<(Branch branch, BranchStoresReserveHandler.ReserveRecord reserve)> potentialReserve = AllPrimaryReserves.Where(pr => pr.reserve.CostRateReduce >= 0.3f).ToList();
 
         for (int i = potentialReserve.Count - 1; i >= 0; i--)
         {
-            (Branch branch, BranchStoresReserve reserve) = potentialReserve[i];
+            (Branch branch, BranchStoresReserveHandler.ReserveRecord reserve) = potentialReserve[i];
 
             if (Rand.Chance(0.05f))
             {
                 bool successConstruct = false;
-                if (reserve.TargetBuilding is not null)
+                if (reserve.Target is BranchBuildingDef reserveBuilding)
                 {
-                    BranchBuildingConstructParameter constructParam = new(branch, reserve.TargetBuilding, reserve.InSpecialSlot);
+                    BranchBuildingConstructParameter constructParam = new(branch, reserveBuilding, reserve.InSpecialSlot);
                     if (branch.BuildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
                     {
                         branch.BuildingHandler.StartBuildingConstruction(constructParam);
                         successConstruct = true;
                     }
                 }
-                else if (reserve.TargetFacility is not null)
+                else if (reserve.Target is BranchFacilityDef reserveFacility)
                 {
-                    if (branch.FacilityHandler.CanConstructFacility(reserve.TargetFacility, byPlayer: false))
+                    if (branch.FacilityHandler.CanConstructFacility(reserveFacility, byPlayer: false))
                     {
-                        branch.FacilityHandler.StartFacilityConstruction(reserve.TargetFacility, byPlayer: false);
+                        branch.FacilityHandler.StartFacilityConstruction(reserveFacility, byPlayer: false);
                         successConstruct = true;
                     }
                 }
 
                 if (successConstruct)
                 {
-                    ratkinOrder.FundHandler.AdjustFundsImmediately(-0.002f);
+                    ratkinOrder.FundHandler.AdjustFundsImmediately(-0.002f, "OARO_Fund_BranchConstruct".Translate());
                 }
             }
 
-            if (ratkinOrder.Funds < 0.5f)
+            if (ratkinOrder.Funds < 0.2f)
             {
                 break;
             }
@@ -329,7 +329,7 @@ public class BranchManager : IExposable, IPostLoadInit, ITickDay
         normalMobileBranch?.SetBranchType(BranchType.Mobile, true);
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         if (allBranches.RemoveAll(b => b is null) > 0)
         {

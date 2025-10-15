@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchBuildingDef : Def
+public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveDef
 {
     private static readonly Type defaultType = typeof(BranchBuilding);
     private static readonly Type defaultConstructCheckerClass = typeof(BranchBuildingConstructChecker);

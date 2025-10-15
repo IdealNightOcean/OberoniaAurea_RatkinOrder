@@ -4,7 +4,7 @@ using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoadInit
+public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
 {
     public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
 
@@ -59,7 +59,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable, IPostLoa
         }
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         CheckDemand();
     }

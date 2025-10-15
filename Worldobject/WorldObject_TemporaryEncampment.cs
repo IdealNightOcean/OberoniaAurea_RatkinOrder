@@ -13,7 +13,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
 
     private Branch branch;
     public Branch Branch => branch;
-    public Squad Squad => branch.Squad;
+    public BranchSquad Squad => branch.Squad;
 
     private bool hasSupplyRequest;
     private ThingDef requestDef;

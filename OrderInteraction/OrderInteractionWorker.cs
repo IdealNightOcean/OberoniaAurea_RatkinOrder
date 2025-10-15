@@ -25,6 +25,10 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_Fund".Translate((Def.needFund * 0.01f).ToStringPercent("F2"));
         }
+        if (Def.fundEventDef is not null && ratkinOrder.Funds < Def.fundEventDef.changeRange.min)
+        {
+            return resultOnly ? false : "OARO_Insufficient_Fund".Translate((Def.fundEventDef.changeRange.min * 0.01f).ToStringPercent("F2"));
+        }
         if (!Def.cdRecordKey.NullOrEmpty())
         {
             int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.cdRecordKey);
@@ -44,16 +48,13 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
 
     public void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
-        if (Def.needFund > 0f)
+        if (Def.needFund != 0f)
         {
-            if (Def.fundEventDef is null)
-            {
-                ratkinOrder.FundHandler.AdjustFundsImmediately(Def.needFund);
-            }
-            else
-            {
-                ratkinOrder.FundHandler.AddFundEvent(Def.fundEventDef);
-            }
+            ratkinOrder.FundHandler.AdjustFundsImmediately(Def.needFund, Def.label);
+        }
+        if (Def.fundEventDef is not null)
+        {
+            ratkinOrder.FundHandler.AddFundEvent(Def.fundEventDef);
         }
 
         if (Def.cdDays > 0 && !Def.cdRecordKey.NullOrEmpty())

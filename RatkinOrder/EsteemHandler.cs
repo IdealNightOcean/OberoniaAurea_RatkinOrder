@@ -5,7 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay, IDrawDevWindow
+public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay
 {
     public enum RelationshipKind : byte
     {

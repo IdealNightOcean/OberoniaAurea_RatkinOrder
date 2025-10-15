@@ -7,18 +7,19 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, ITickDay, IDrawDevWindow
+public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 {
     [Unsaved] public readonly Branch Branch;
 
     [Unsaved] private SimpleValueCache<int> buildingCeilingCache;
     public int BuildingCeiling => buildingCeilingCache.GetCachedResult();
     public bool HasUnusedNormalSlots => buildings.Count < BuildingCeiling;
-    public bool IsNormalBuildingFullyCompleted { get; private set; }
-    public bool IsBuildingFullyCompleted => specialBuilding is not null && IsNormalBuildingFullyCompleted;
+    public bool IsNormalBuildingFullyCompleted => buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
 
     protected List<BranchBuilding> buildings = [];
     protected BranchBuilding specialBuilding;
+
+    public BranchBuilding SpecialBuilding => specialBuilding;
 
     [Unsaved] private List<ITickHour<Branch>> TickLongHandlers;
     [Unsaved] private List<ITickDay<Branch>> TickDayHandlers;
@@ -150,7 +151,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
     public int GetBuildingSilverCost(BranchBuildingDef buildingDef)
     {
         float result = Branch.GetStatValue(BranchStatDefOf.OARO_BuildingCost, baseValueOverride: buildingDef.silverCost);
-        result *= Branch.StoresReserveHandler.GetBuildingCostReduce(buildingDef);
+        result *= (1f - Branch.StoresReserveHandler.GetReserveCostReduce(buildingDef));
 
         return (int)result;
     }
@@ -208,7 +209,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
             int silverCost = GetBuildingSilverCost(constructParam.BuildingDef);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.caravan, ThingDefOf.Silver, silverCost);
         }
-        Branch.StoresReserveHandler.Notify_BuildingConstructStarted(underConstructionBuilding);
+        Branch.StoresReserveHandler.Notify_BranchConstructStarted(underConstructionBuilding);
     }
 
     private void AddBuilding(BranchBuildingDef buildingDef, bool inSpecialSlot)
@@ -235,7 +236,6 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         else
         {
             buildings.Add(newBuilding);
-            IsNormalBuildingFullyCompleted = buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
         }
 
         newBuilding.InitActive();
@@ -324,7 +324,7 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         return transformer;
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         if (specialBuilding is not null)
         {
@@ -334,7 +334,6 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         if (buildings is null)
         {
             buildings = [];
-            IsNormalBuildingFullyCompleted = false;
             return;
         }
 
@@ -347,7 +346,6 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         {
             ActiveBuilding(building, isSpecial: false);
         }
-        IsNormalBuildingFullyCompleted = buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
     }
 
     private void ActiveBuilding(BranchBuilding building, bool isSpecial)
@@ -378,8 +376,6 @@ public class BranchBuildingHandler : IExposable, IPostLoadInit, ITickHourOfDay, 
         building.PostActive();
     }
 
-    public void PostBranchGenerated()
-    {
-
-    }
+    internal void PostBranchGenerated()
+    { }
 }

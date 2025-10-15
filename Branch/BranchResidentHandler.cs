@@ -9,7 +9,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IPostLoadInit, IPawnRetentionHolder, IDrawDevWindow
+public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IPawnRetentionHolder
 {
     [Unsaved] public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
 
@@ -128,7 +128,7 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
         }
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         EnsureComponentsInit();
         residents.RemoveAll(p => p.DestroyedOrNull());

@@ -11,8 +11,11 @@ using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class JointPatrolManager : IExposable, IDrawDevWindow
+public class JointPatrolManager : IExposable
 {
+    private const int JointPatrolDurationPrepDays = 3;
+    private const int JointPatrolDurationDays = 7;
+
     public enum PatrolType : byte
     {
         Popedom,
@@ -27,6 +30,7 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
         Accident,
         Disaster
     }
+    public static readonly PatrolEndType[] PatrolEndTypeArr = (PatrolEndType[])Enum.GetValues(typeof(PatrolEndType));
 
     public class JointBranchRecord : IExposable
     {
@@ -58,7 +62,7 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
         /// </summary>
         public void RecordUpdate()
         {
-
+            GetReconnaissance();
             if (IsExploration)
             {
                 GetExpectedOreCount();
@@ -67,7 +71,7 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
 
         private void GetReconnaissance()
         {
-            reconnaissance = (Branch.SquadStat.MemberCount * 10f)
+            reconnaissance = (Branch.Squad.MemberCount * 10f)
                   * (1f + Branch.MedalHandler.MedalTypeCount * 0.1f)
                   * (1f + Branch.FacilityHandler.TotalFacilityLevel * 0.02f)
                   * (Branch.IsBranchOfType(Branch.BranchType.Honor) ? 1.2f : 1f);
@@ -75,8 +79,8 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
 
         private void GetExpectedOreCount()
         {
-            float rewardValue = Branch.SquadStat.MemberCount * 50f * Rand.Range(0.5f, 1.75f)
-                                * (Branch.RatkinOrder.ReformationManager.HasReformation(null) ? 1.5f : 1f)
+            float rewardValue = Branch.Squad.MemberCount * 50f * Rand.Range(0.5f, 1.75f)
+                                * (Branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ExplorationTraining) ? 1.5f : 1f)
                                 * (Branch.IsBranchOfType(Branch.BranchType.Friendly) ? 1.2f : 1f);
 
             Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: false);
@@ -102,10 +106,6 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
         }
     }
 
-    private const int JointPatrolDurationPrepDays = 3;
-    private const int JointPatrolDurationDays = 7;
-
-    public static readonly PatrolEndType[] PatrolEndTypeArr = (PatrolEndType[])Enum.GetValues(typeof(PatrolEndType));
 
     [Unsaved] private readonly List<(PatrolEndType, float)> patrolEndChances;
     [Unsaved] private int nextEndChancesGetTick = -1;
@@ -204,9 +204,11 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
         if ((tickToNextCheck -= 1000) <= 0)
         {
             tickToNextCheck = 10000;
+            curReconnaissance = 0f;
             for (int i = 0; i < participants.Count; i++)
             {
                 participants[i].RecordUpdate();
+                curReconnaissance += participants[i].Reconnbissance;
             }
         }
     }
@@ -346,11 +348,11 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
         adjustCeiling = 0;
         if (ratkinOrder.Relationship == RelationshipKind.Trustworthy)
         {
-            adjustCeiling = ratkinOrder.ReformationManager.HasReformation(null) ? 3 : 2;
+            adjustCeiling = ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ComprehensiveJointPatrolPreparation) ? 3 : 2;
         }
         else if (ratkinOrder.Relationship == RelationshipKind.Soulmate)
         {
-            adjustCeiling = ratkinOrder.ReformationManager.HasReformation(null) ? 6 : 4;
+            adjustCeiling = ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ComprehensiveJointPatrolPreparation) ? 6 : 4;
         }
         return true;
     }
@@ -389,12 +391,12 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
         int overcap = participants.Count - burdenSquadCount;
         if (overcap > 0)
         {
-            ratkinOrder.FundHandler.AdjustFundsImmediately(overcap * 0.05f);
+            ratkinOrder.FundHandler.AdjustFundsImmediately(overcap * 0.05f, "OARO_Fund_JointPatrolOvercap".Translate());
         }
 
         foreach (JointBranchRecord record in participants)
         {
-            record.Branch.SquadStat.Supply -= 0.5f;
+            record.Branch.Supply -= 0.5f;
         }
     }
 
@@ -469,7 +471,7 @@ public class JointPatrolManager : IExposable, IDrawDevWindow
     private void RecachePatrolEndChances()
     {
         nextEndChancesGetTick = Find.TickManager.TicksGame + 30000;
-        float preparedMulti = 0.5f;
+        float preparedMulti = ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ComprehensiveJointPatrolPreparation) ? 0.5f : 1f;
 
         patrolEndChances.Clear();
         switch (patrolType)

@@ -55,8 +55,8 @@ public class RatkinOrderRaidWorker
             return false;
         }
 
-        memberCount = Mathf.Max(0, Mathf.Min(memberCount, branch.SquadStat.MemberCountInt));
-        commanderCount = Mathf.Max(0, Mathf.Min(commanderCount, branch.SquadStat.CommanderCountInt));
+        memberCount = Mathf.Max(0, Mathf.Min(memberCount, branch.Squad.MemberCountInt));
+        commanderCount = Mathf.Max(0, Mathf.Min(commanderCount, branch.Squad.CommanderCountInt));
 
         combatPanws = SquadCombatPawnUtility.GenerateCombatPawns(branch, map, memberCount, commanderCount, isFriendly);
         if (combatPanws.NullOrEmpty())
@@ -78,10 +78,9 @@ public class RatkinOrderRaidWorker
             map.StoryState.lastRaidFaction = faction;
         }
 
-        SquadStat squadStat = branch.SquadStat;
-        squadStat.MemberCount -= memberCount;
-        squadStat.CommanderCount -= commanderCount;
-        squadStat.Supply -= supplyCost;
+        branch.Squad.MemberCount -= memberCount;
+        branch.Squad.CommanderCount -= commanderCount;
+        branch.Supply -= supplyCost;
 
         if (sendStandardLetter)
         {

@@ -17,7 +17,7 @@ public static class BranchStatDefOf
 
     public static BranchStatDef OARO_SquadMemberCeiling;
     public static BranchStatDef OARO_SquadCommanderCeiling;
-    public static BranchStatDef OARO_SquadSupplyCeiling;
+    public static BranchStatDef OARO_BranchSupplyCeiling;
 
     public static BranchStatDef OARO_SquadMemberRecoveryRate;
     public static BranchStatDef OARO_SquadSupplyRecoveryRate;

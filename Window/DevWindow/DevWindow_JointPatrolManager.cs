@@ -54,11 +54,6 @@ public class DevWindow_JointPatrolManager : DevWindowBase
         Text.Font = GameFont.Small;
         listing_Rect.Label(patrolEndChances);
 
-        Text.Font = GameFont.Medium;
-        listing_Rect.Label("End Result Text:");
-        Text.Font = GameFont.Small;
-        listing_Rect.Label(endResultText);
-
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;

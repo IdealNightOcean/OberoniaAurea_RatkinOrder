@@ -8,7 +8,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoadInit, IDrawDevWindow
+public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
 {
     [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
 
@@ -97,9 +97,12 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
         def.Worker.PostActive(RatkinOrder);
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
-        reformations.Remove(null);
+        if (reformations.Remove(null))
+        {
+            Log.Error($"Some reformations of {ratkinOrder} were null after loading and have been removed.");
+        }
         foreach (OrderReformationDef def in reformations)
         {
             try
@@ -109,7 +112,6 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable, IPostLoad
             catch (Exception ex)
             {
                 Log.Error($"Fail to reactive reformation {def.label} after load: {ex}");
-                continue;
             }
         }
     }

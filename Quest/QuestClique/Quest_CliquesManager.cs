@@ -220,7 +220,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
         if (clique.IsBranchClique)
         {
-            if (clique.RelatedBranch.SquadStat.Supply < 0.25f)
+            if (clique.RelatedBranch.Supply < 0.25f)
             {
                 return false;
             }
@@ -269,7 +269,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             if (clique.IsBranchClique)
             {
-                clique.RelatedBranch.SquadStat.Supply -= 0.25f;
+                clique.RelatedBranch.Supply -= 0.25f;
                 //邀请友好分部派别参与消耗1推荐信
                 if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
                 {

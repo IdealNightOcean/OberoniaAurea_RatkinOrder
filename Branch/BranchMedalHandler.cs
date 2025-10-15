@@ -7,7 +7,7 @@ using static OberoniaAurea.RatkinOrder.BranchMedalRecord;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchMedalHandler : IExposable, IPostLoadInit, IDrawDevWindow
+public class BranchMedalHandler : IExposable
 {
     private List<BranchMedalRecord> medalRecords = new(4);
 
@@ -96,7 +96,7 @@ public class BranchMedalHandler : IExposable, IPostLoadInit, IDrawDevWindow
     /// <summary>
     /// 初始化主要勋章
     /// </summary>
-    public void PostBranchGenerated()
+    internal void PostBranchGenerated()
     {
         BranchMedalType primaryMedal = BranchUtility.BranchMedalsArr[Rand.Range(1, BranchUtility.BranchMedalsArr.Length)];
         medalRecords.Add(new BranchMedalRecord()
@@ -109,7 +109,7 @@ public class BranchMedalHandler : IExposable, IPostLoadInit, IDrawDevWindow
         medalHediffsDirty = true;
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         medalRecords.RemoveAll(r => !BranchMedalRecord.Validate(r));
         if (totalMedalCount <= 0)

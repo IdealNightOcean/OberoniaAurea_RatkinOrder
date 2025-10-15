@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchFacilityDef : Def
+public class BranchFacilityDef : Def, BranchStoresReserveHandler.IStoresReserveDef
 {
     public BranchFacilityLevelStage poorStage;
     public BranchFacilityLevelStage normalStage;

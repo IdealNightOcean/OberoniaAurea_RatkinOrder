@@ -9,7 +9,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchFacilityHandler(Branch branch) : IExposable, IPostLoadInit
+public class BranchFacilityHandler(Branch branch) : IExposable
 {
     [Unsaved] public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
 
@@ -104,7 +104,7 @@ public class BranchFacilityHandler(Branch branch) : IExposable, IPostLoadInit
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, silverCost);
         }
 
-        Branch.StoresReserveHandler.Notify_FacilityConstructionStarted(facilityDef);
+        Branch.StoresReserveHandler.Notify_BranchConstructStarted(facilityDef);
     }
 
     private void CompleteFacilityConstruction()
@@ -210,7 +210,7 @@ public class BranchFacilityHandler(Branch branch) : IExposable, IPostLoadInit
         return transformer;
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         if (facilities.RemoveAll(kv => kv.Key is null || kv.Value == BranchFacilityLevel.None) > 0)
         {
@@ -225,7 +225,7 @@ public class BranchFacilityHandler(Branch branch) : IExposable, IPostLoadInit
         IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
     }
 
-    public void PostBranchGenerated()
+    internal void PostBranchGenerated()
     {
         List<BranchFacilityDef> allFacilities = DefDatabase<BranchFacilityDef>.AllDefsListForReading;
         for (int i = 0; i < allFacilities.Count; i++)

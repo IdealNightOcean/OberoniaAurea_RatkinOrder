@@ -224,7 +224,7 @@ public static class BranchUtility
     {
         float baseCost = facilityDef.GetLevelStage(targetLevel)?.silverCost ?? BranchStatDefOf.OARO_BuildingCost.baseValue;
         float result = branch.GetStatValue(BranchStatDefOf.OARO_BuildingCost, baseValueOverride: baseCost);
-        result *= branch.StoresReserveHandler.GetFacilityCostReduce(facilityDef);
+        result *= (1f - branch.StoresReserveHandler.GetReserveCostReduce(facilityDef));
 
         return (int)result;
     }

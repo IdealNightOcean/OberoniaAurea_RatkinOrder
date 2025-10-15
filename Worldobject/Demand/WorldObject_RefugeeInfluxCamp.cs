@@ -528,12 +528,12 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         {
             action = delegate
             {
-                branch.SquadStat.Supply -= 0.5f;
+                branch.Supply -= 0.5f;
                 Distribute();
             },
             resolveTree = true
         };
-        if (branch.SquadStat.Supply < 0.5f)
+        if (branch.Supply < 0.5f)
         {
             branchOpt.Disable("OARO_Insufficient_SquadSupply".Translate(0.5f.ToStringPercent()));
         }

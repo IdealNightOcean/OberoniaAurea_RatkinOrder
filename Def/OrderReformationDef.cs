@@ -4,13 +4,16 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士团自新Def
+/// </summary>
 public class OrderReformationDef : Def
 {
-    private static readonly Type DefaultWorkerClass = typeof(OrderReformationWorker);
-    private static readonly OrderReformationWorker DefaultWorker = new(null);
-    public Type workerClass = DefaultWorkerClass;
+    private static readonly Type defaultWorkerClass = typeof(OrderReformationWorker);
+    private static readonly OrderReformationWorker defaultWorker = new(null);
+    public Type workerClass = defaultWorkerClass;
     private OrderReformationWorker worker;
-    public OrderReformationWorker Worker => worker ??= (workerClass == DefaultWorkerClass ? DefaultWorker : (OrderReformationWorker)Activator.CreateInstance(workerClass, this));
+    public OrderReformationWorker Worker => worker ??= (workerClass == defaultWorkerClass ? defaultWorker : (OrderReformationWorker)Activator.CreateInstance(workerClass, this));
 
     public ReformationType reformationType;
     public float reformProgressCost;

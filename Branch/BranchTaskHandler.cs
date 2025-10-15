@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
 
@@ -266,14 +265,14 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
     {
         autoStartTaskChance += branch.IsBranchOfType(Branch.BranchType.Mobile) ? 0.01f : 0.005f;
         float usedChance = autoStartTaskChance;
-        if (branch.SquadStat.MemberPercentage >= 1f && branch.SquadStat.Supply >= 1f)
+        if (branch.Supply >= 1f && branch.Squad.MemberPercentage >= 1f)
         {
             usedChance += 0.5f;
         }
 
         if (autoStartFailCount >= 10 || autoTargetTask is null)
         {
-            autoTargetTask = DefDatabase<BranchTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen).RandomElementByWeightWithFallback(WeightSelector, BranchTaskDefOf.OARO_Squad_JurisdictionDutyPerp);
+            autoTargetTask = DefDatabase<BranchTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen).RandomElementByWeightWithFallback(WeightSelector, BranchTaskDefOf.OARO_JurisdictionDutyPerp);
         }
 
         if (Rand.Chance(usedChance) && autoTargetTask is not null)
@@ -320,7 +319,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     internal void PostLoadInit()
     {
-        if(curTask is not null)
+        if (curTask is not null)
         {
             branch.EffectTags.IncrementTagsValue(curTask.Def.effectFlags, addIfMiss: true);
         }

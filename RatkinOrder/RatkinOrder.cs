@@ -5,7 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
+public class RatkinOrder : IExposable, ILoadReferenceable
 {
     private int loadID = -1;
     public int LoadID => loadID;
@@ -106,7 +106,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
 
             if (this.IsHashIntervalTick(60000))
             {
-                fundHandler.TickDay();
+                fundHandler.DailySettlement();
                 branchManager.TickDay();
 
                 if (TickUtility.YearPassed() > curYearPassed)
@@ -122,18 +122,20 @@ public class RatkinOrder : IExposable, ILoadReferenceable, IPostLoadInit
         branchManager.Notify_MyOrderRemoved();
     }
 
-    public void PostGenerated()
+    internal void PostGenerated()
     {
         esteemHandler.PostOrderGenerated();
         fundHandler.PostOrderGenerated();
         reformationManager.PostOrderGenerated();
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         branchManager.PostLoadInit();
     }
 
     public string GetUniqueLoadID() => "RatkinOrder_" + loadID;
+    public override string ToString() => "RatkinOrder_" + loadID;
+
 
 }

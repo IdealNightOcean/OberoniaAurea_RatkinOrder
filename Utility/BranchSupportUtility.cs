@@ -25,7 +25,7 @@ public static class BranchSupportUtility
         {
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Friendly));
         }
-        if (branch.SquadStat.Supply < 0.25f)
+        if (branch.Supply < 0.25f)
         {
             return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("25%");
         }
@@ -56,9 +56,8 @@ public static class BranchSupportUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Trustworthy));
         }
 
-        SquadStat squadStat = branch.SquadStat;
 
-        if (squadStat.MemberPercentage < 0.5f)
+        if (branch.Squad.MemberPercentage < 0.5f)
         {
             return resultOnly ? false : "OARO_Insufficient_MemberPercentage".Translate("50%");
         }
@@ -66,27 +65,27 @@ public static class BranchSupportUtility
         switch (level)
         {
             case SupportLevel.Quarter:
-                if (squadStat.Supply < 0.25f)
+                if (branch.Supply < 0.25f)
                 {
                     return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("25%");
                 }
                 break;
 
             case SupportLevel.Half:
-                if (squadStat.Supply < 0.4f)
+                if (branch.Supply < 0.4f)
                 {
                     return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("40%");
                 }
                 break;
 
             case SupportLevel.Entire:
-                if (squadStat.MemberPercentage < 0.9f)
-                {
-                    return resultOnly ? false : "OARO_Insufficient_MemberPercentage".Translate("90%");
-                }
-                if (squadStat.Supply < 0.5f)
+                if (branch.Supply < 0.5f)
                 {
                     return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("50%");
+                }
+                if (branch.Squad.MemberPercentage < 0.9f)
+                {
+                    return resultOnly ? false : "OARO_Insufficient_MemberPercentage".Translate("90%");
                 }
                 break;
 
@@ -116,7 +115,7 @@ public static class BranchSupportUtility
         BombardSupportMaker bombMaker = (BombardSupportMaker)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_BombardSupportMaker);
         bombMaker.SetBombardCount(bombCount);
         GenPlace.TryPlaceThing(bombMaker, IntVec3.Zero, map, ThingPlaceMode.Near);
-        branch.SquadStat.Supply -= 0.25f;
+        branch.Supply -= 0.25f;
     }
 
     public static bool DoCombatSupport(Branch branch, SupportLevel level, Map map)
@@ -129,23 +128,23 @@ public static class BranchSupportUtility
         int memberCount;
         int commanderCount;
         float supplyCost;
-        SquadStat squadStat = branch.SquadStat;
+        BranchSquad squad = branch.Squad;
 
         switch (level)
         {
             case SupportLevel.Quarter:
-                memberCount = Mathf.FloorToInt(squadStat.MemberCount * 0.25f);
-                commanderCount = Mathf.Min(1, squadStat.CommanderCountInt);
+                memberCount = Mathf.FloorToInt(squad.MemberCount * 0.25f);
+                commanderCount = Mathf.Min(1, squad.CommanderCountInt);
                 supplyCost = 0.25f;
                 break;
             case SupportLevel.Half:
-                memberCount = Mathf.FloorToInt(squadStat.MemberCount * 0.5f);
-                commanderCount = Mathf.Min(1, squadStat.CommanderCountInt);
+                memberCount = Mathf.FloorToInt(squad.MemberCount * 0.5f);
+                commanderCount = Mathf.Min(1, squad.CommanderCountInt);
                 supplyCost = 0.5f;
                 break;
             case SupportLevel.Entire:
-                memberCount = squadStat.MemberCountInt;
-                commanderCount = squadStat.CommanderCountInt;
+                memberCount = squad.MemberCountInt;
+                commanderCount = squad.CommanderCountInt;
                 supplyCost = 1f;
                 break;
             default: return null;

@@ -4,11 +4,12 @@ using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
+public class Branch : IExposable, ILoadReferenceable
 {
     [Flags]
     public enum BranchType : byte
@@ -45,6 +46,13 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         get => IsBranchOfType(BranchType.Honor) ? honorProperties : null;
         set => honorProperties = value;
     }
+    private SimpleValueCache<float> supplyCeilingCache;
+    private float supply;
+    public float Supply
+    {
+        get => supply;
+        set => supply = Mathf.Clamp(value, 0f, supplyCeilingCache.GetCachedResult());
+    }
 
     private int population;
     private int NaturalPopulationCeiling => (int)this.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
@@ -60,7 +68,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
 
-    private Squad squad;
+    private BranchSquad squad;
     private BranchMedalHandler medalHandler;
     private BranchFacilityHandler facilityHandler;
     private BranchBuildingHandler buildingHandler;
@@ -69,8 +77,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     private BranchResidentHandler residentHandler;
     private BranchStoresReserveHandler storesReserveHandler;
 
-    public Squad Squad => squad;
-    public SquadStat SquadStat => squad.SquadStat;
+    public BranchSquad Squad => squad;
     public BranchMedalHandler MedalHandler => medalHandler;
     public BranchFacilityHandler FacilityHandler => facilityHandler;
     public BranchBuildingHandler BuildingHandler => buildingHandler;
@@ -83,11 +90,13 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
     {
         RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
         TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
+        supplyCeilingCache = new(cacheInterval: 60000, defaultValue: BranchStatDefOf.OARO_BranchSupplyCeiling.baseValue, () => this.GetStatValue(BranchStatDefOf.OARO_BranchSupplyCeiling));
+
         if (initCtor)
         {
             cooldownManager = new();
 
-            squad = Squad.GenerateSquadForBranch(this) ?? throw new NullReferenceException(nameof(squad));
+            squad = BranchSquad.GenerateSquadForBranch(this) ?? throw new NullReferenceException(nameof(squad));
 
             medalHandler = new();
             facilityHandler = new(this);
@@ -137,6 +146,8 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
 
         Scribe_Values.Look(ref friendlyExpiredTick, "friendlyExpiredTick", 0);
         Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
+
+        Scribe_Values.Look(ref supply, "supply", 0f);
 
         Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
         Scribe_Deep.Look(ref squad, "squad", ctorArgs: [this, false]);
@@ -251,7 +262,7 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         squad.PostBranchGenerated();
     }
 
-    public void PostLoadInit()
+    internal void PostLoadInit()
     {
         medalHandler.PostLoadInit();
 
@@ -259,7 +270,9 @@ public class Branch : IExposable, ILoadReferenceable, IPostLoadInit
         buildingHandler.PostLoadInit();
 
         residentHandler.PostLoadInit();
+        storesReserveHandler.PostLoadInit();
     }
 
     public string GetUniqueLoadID() => "Branch_" + loadID;
+    public override string ToString() => "Branch_" + loadID;
 }
