@@ -54,14 +54,6 @@ public class Branch : IExposable, ILoadReferenceable
         set => supply = Mathf.Clamp(value, 0f, supplyCeilingCache.GetCachedResult());
     }
 
-    private int population;
-    private int NaturalPopulationCeiling => (int)this.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
-    public int Population
-    {
-        get => population;
-        set => population = Math.Max(0, value);
-    }
-
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
     [Unsaved] public readonly List<IPostSquadCombatPawnGenerate> PostSquadCombatPawnGenerate = [];
@@ -72,6 +64,7 @@ public class Branch : IExposable, ILoadReferenceable
     private BranchMedalHandler medalHandler;
     private BranchFacilityHandler facilityHandler;
     private BranchBuildingHandler buildingHandler;
+    private BranchPopulationHandler populationHandler;
     private BranchTaskHandler taskHandler;
     private BranchDemandHandler demandHandler;
     private BranchResidentHandler residentHandler;
@@ -81,6 +74,7 @@ public class Branch : IExposable, ILoadReferenceable
     public BranchMedalHandler MedalHandler => medalHandler;
     public BranchFacilityHandler FacilityHandler => facilityHandler;
     public BranchBuildingHandler BuildingHandler => buildingHandler;
+    public BranchPopulationHandler PopulationHandler => populationHandler;
     public BranchTaskHandler TaskHandler => taskHandler;
     public BranchDemandHandler DemandHandler => demandHandler;
     public BranchResidentHandler ResidentHandler => residentHandler;
@@ -90,7 +84,7 @@ public class Branch : IExposable, ILoadReferenceable
     {
         RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
         TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
-        supplyCeilingCache = new(cacheInterval: 60000, defaultValue: BranchStatDefOf.OARO_BranchSupplyCeiling.baseValue, () => this.GetStatValue(BranchStatDefOf.OARO_BranchSupplyCeiling));
+        supplyCeilingCache = new(cacheInterval: 60000, defaultValue: BranchStatDefOf.OARO_SupplyCeiling.baseValue, () => this.GetStatValue(BranchStatDefOf.OARO_SupplyCeiling));
 
         if (initCtor)
         {
@@ -101,6 +95,7 @@ public class Branch : IExposable, ILoadReferenceable
             medalHandler = new();
             facilityHandler = new(this);
             buildingHandler = new(this);
+            populationHandler = new(this);
             taskHandler = new(this);
             demandHandler = new(this);
             residentHandler = new(this);
@@ -154,6 +149,7 @@ public class Branch : IExposable, ILoadReferenceable
         Scribe_Deep.Look(ref medalHandler, "medalHandler");
         Scribe_Deep.Look(ref facilityHandler, "facilityHandler", ctorArgs: this);
         Scribe_Deep.Look(ref buildingHandler, "buildingHandler", ctorArgs: this);
+        Scribe_Deep.Look(ref populationHandler, "populationHandler", ctorArgs: this);
         Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
         Scribe_Deep.Look(ref demandHandler, "demandHandler", ctorArgs: this);
         Scribe_Deep.Look(ref residentHandler, "residentHandler", ctorArgs: this);
@@ -237,18 +233,6 @@ public class Branch : IExposable, ILoadReferenceable
     {
         residentHandler.ForceEndAllResidency();
         worldObject?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
-    }
-
-    /// <summary>
-    /// 每日人口变化
-    /// </summary>
-    private int GetDailyPopulationDecline()
-    {
-        int naturalPopulationCeiling = NaturalPopulationCeiling;
-        float populationRatio = population / (float)naturalPopulationCeiling;
-
-
-        return 0;
     }
 
     private void PostGenerated()

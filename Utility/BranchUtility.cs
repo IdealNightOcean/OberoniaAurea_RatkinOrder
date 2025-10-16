@@ -210,10 +210,24 @@ public static class BranchUtility
     {
         if (branch.TransformerHandler.RemoveStatRecord(statDef))
         {
+            bool hasTransformer = false;
             BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
-            transformer.MergeWith(branch.FacilityHandler.GetBranchStatTransformer(statDef));
-            transformer.MergeWith(branch.BuildingHandler.GetBranchStatTransformer(statDef));
-            branch.TransformerHandler.AddStatTransformer(statDef, transformer);
+            BranchStatTransformer tempTransformer;
+            if (branch.FacilityHandler.GetBranchStatTransformer(statDef, out tempTransformer))
+            {
+                hasTransformer = true;
+                transformer.MergeWith(tempTransformer);
+            }
+            if (branch.BuildingHandler.GetBranchStatTransformer(statDef, out tempTransformer))
+            {
+                hasTransformer = true;
+                transformer.MergeWith(tempTransformer);
+            }
+
+            if (hasTransformer)
+            {
+                branch.TransformerHandler.AddStatTransformer(statDef, transformer);
+            }
         }
     }
 
@@ -222,8 +236,8 @@ public static class BranchUtility
     /// </summary>
     public static int GetFacilitySilverCost(Branch branch, BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel)
     {
-        float baseCost = facilityDef.GetLevelStage(targetLevel)?.silverCost ?? BranchStatDefOf.OARO_BuildingCost.baseValue;
-        float result = branch.GetStatValue(BranchStatDefOf.OARO_BuildingCost, baseValueOverride: baseCost);
+        float baseCost = facilityDef.GetLevelStage(targetLevel)?.silverCost ?? BranchStatDefOf.OARO_ConstructionCost.baseValue;
+        float result = branch.GetStatValue(BranchStatDefOf.OARO_ConstructionCost, baseValueOverride: baseCost);
         result *= (1f - branch.StoresReserveHandler.GetReserveCostReduce(facilityDef));
 
         return (int)result;

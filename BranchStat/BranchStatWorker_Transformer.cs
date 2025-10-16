@@ -26,7 +26,7 @@ public struct BranchStatTransCacheEnty : IEquatable<BranchStatTransCacheEnty>
     }
     public override readonly bool Equals(object obj)
     {
-        return obj is BranchStatCacheEnty other && Equals(other);
+        return obj is BranchStatTransCacheEnty other && Equals(other);
     }
     public readonly bool Equals(BranchStatTransCacheEnty other)
     {
@@ -54,9 +54,9 @@ public class BranchStatWorker_Transformer : BranchStatWorker
 
     public override float GetValue(Branch branch, float? baseValueOverride = null, bool immediateUpdate = false)
     {
-        if (!Stat.cacheable)
+        if (!StatDef.cacheable)
         {
-            return BranchStatUtility.GetNewStatValue(branch, Stat, baseValueOverride);
+            return BranchStatUtility.GetNewStatValue(branch, StatDef, baseValueOverride);
         }
 
         int ticksGame = Find.TickManager.TicksGame;
@@ -64,20 +64,20 @@ public class BranchStatWorker_Transformer : BranchStatWorker
         {
             if (immediateUpdate || cacheEnty.ExpiredTick < ticksGame)
             {
-                BranchStatTransCacheEnty newEnty = RecacheCacheEnty(Stat, branch, ticksGame);
+                BranchStatTransCacheEnty newEnty = RecacheCacheEnty(StatDef, branch, ticksGame);
                 temporaryStatCache[branch] = newEnty;
-                return BranchStatUtility.GetNewStatValueFormTrans(branch, Stat, newEnty.CacheTrans, baseValueOverride);
+                return BranchStatUtility.GetNewStatValueFormTrans(branch, StatDef, newEnty.CacheTrans, baseValueOverride);
             }
             else
             {
-                return BranchStatUtility.GetNewStatValueFormTrans(branch, Stat, cacheEnty.CacheTrans, baseValueOverride);
+                return BranchStatUtility.GetNewStatValueFormTrans(branch, StatDef, cacheEnty.CacheTrans, baseValueOverride);
             }
         }
         else
         {
-            BranchStatTransCacheEnty newEnty = RecacheCacheEnty(Stat, branch, ticksGame);
+            BranchStatTransCacheEnty newEnty = RecacheCacheEnty(StatDef, branch, ticksGame);
             temporaryStatCache.Add(branch, newEnty);
-            return BranchStatUtility.GetNewStatValueFormTrans(branch, Stat, newEnty.CacheTrans, baseValueOverride);
+            return BranchStatUtility.GetNewStatValueFormTrans(branch, StatDef, newEnty.CacheTrans, baseValueOverride);
         }
     }
 

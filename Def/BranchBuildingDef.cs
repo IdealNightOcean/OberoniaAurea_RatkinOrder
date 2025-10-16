@@ -18,6 +18,10 @@ public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveD
 
     public int silverCost; //白银花费
     public float constructionDays; //建造所需天数
+    public int recommendedPopulation;
+
+    public bool IsUpgradable => advancedProperties is not null;
+    public BuildingAdvancedProperties advancedProperties;
 
     public bool isSpecial;
 
@@ -25,7 +29,7 @@ public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveD
     /// 标记荣誉象征，建有该建筑的分部为荣誉分部；
     /// 只在isSpecial为true时生效
     /// </summary>
-    public bool isHonorSymbol;
+    public bool IsHonorSymbol => honorProperties is not null;
     public HonorBranchProperties honorProperties;
 
     public List<string> effectFlags; //效果标志列表
@@ -64,19 +68,9 @@ public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveD
             yield return error;
         }
 
-        if (!isSpecial && isHonorSymbol)
+        if (!isSpecial && IsHonorSymbol)
         {
             yield return "\"isHonorSymbol\" only works when \"isSpecial\" is true.";
-        }
-
-        if (isHonorSymbol && honorProperties is null)
-        {
-            yield return "is an HonorSymbol building but does not have honorProperties.";
-        }
-
-        if (!isHonorSymbol && honorProperties is not null)
-        {
-            yield return "is not an HonorSymbol building but has honorProperties.";
         }
 
         if (buildingClass is null)

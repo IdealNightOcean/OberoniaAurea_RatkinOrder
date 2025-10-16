@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Runtime.CompilerServices;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -14,12 +15,11 @@ public struct BranchStatTransformer
 
     public static BranchStatTransformer DefaultTransformer => new();
 
-
     public BranchStatTransformer() { }
     public BranchStatTransformer(float offset, float factor, float fixedOffset)
     {
         this.offset = offset;
-        this.factor = factor;
+        this.factor = factor < 0f ? 0f : factor;
         this.fixedOffset = fixedOffset;
     }
 
@@ -71,14 +71,50 @@ public struct BranchStatTransformer
         return result;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public readonly string GetTransformExplanation()
+    public readonly void ModifyExplanation(BranchStatDef statDef, StringBuilder explanation)
     {
-        return "OARO_StatTransformerExplanation".Translate(
-            offset,
-            factor.ToStringPercent("F2"),
-            fixedOffset
-        );
+        if (statDef.statType == BranchStatDef.StatType.Percent)
+        {
+            if (offset != 0f)
+            {
+                explanation.Append("    ");
+                explanation.AppendLine("OARO_StatExplain_Offset".Translate(offset.ToStringPercentSigned("F2"))
+                                                                .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+            }
+            if (factor != 1f)
+            {
+                explanation.Append("    ");
+                explanation.AppendLine("OARO_StatExplain_Factor".Translate(factor.ToStringPercentSigned("F2"))
+                                                                .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+            }
+            if (fixedOffset != 0f)
+            {
+                explanation.Append("    ");
+                explanation.AppendLine("OARO_StatExplain_FixedOffset".Translate(fixedOffset.ToStringPercentSigned("F2"))
+                                                                     .Colorize((fixedOffset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+            }
+        }
+        else
+        {
+            if (offset != 0f)
+            {
+                explanation.Append("    ");
+                explanation.AppendLine("OARO_StatExplain_Offset".Translate(offset.ToStringWithSign("F2"))
+                                                               .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+            }
+            if (factor != 1f)
+            {
+                explanation.Append("    ");
+                explanation.AppendLine("OARO_StatExplain_Factor".Translate(factor.ToString("F2"))
+                                                                .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+            }
+            if (fixedOffset != 0f)
+            {
+                explanation.Append("    ");
+                explanation.AppendLine("OARO_StatExplain_FixedOffset".Translate(fixedOffset.ToStringWithSign("F2"))
+                                                                     .Colorize((fixedOffset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+            }
+        }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

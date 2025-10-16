@@ -9,7 +9,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 {
-    [Unsaved] public readonly Branch Branch;
+    [Unsaved] private readonly Branch branch;
 
     [Unsaved] private SimpleValueCache<int> buildingCeilingCache;
     public int BuildingCeiling => buildingCeilingCache.GetCachedResult();
@@ -32,8 +32,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public BranchBuildingHandler(Branch branch)
     {
-        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: 1, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(Branch, immediateUpdate: true));
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: 1, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
     }
 
     public void ExposeData()
@@ -98,7 +98,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         {
             for (int i = 0; i < TickLongHandlers.Count; i++)
             {
-                TickLongHandlers[i].TickHour(Branch);
+                TickLongHandlers[i].TickHour(branch);
             }
         }
     }
@@ -108,7 +108,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         {
             for (int i = 0; i < TickDayHandlers.Count; i++)
             {
-                TickDayHandlers[i].TickDay(Branch);
+                TickDayHandlers[i].TickDay(branch);
             }
         }
     }
@@ -150,8 +150,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public int GetBuildingSilverCost(BranchBuildingDef buildingDef)
     {
-        float result = Branch.GetStatValue(BranchStatDefOf.OARO_BuildingCost, baseValueOverride: buildingDef.silverCost);
-        result *= (1f - Branch.StoresReserveHandler.GetReserveCostReduce(buildingDef));
+        float result = branch.GetStatValue(BranchStatDefOf.OARO_ConstructionCost, baseValueOverride: buildingDef.silverCost);
+        result *= (1f - branch.StoresReserveHandler.GetReserveCostReduce(buildingDef));
 
         return (int)result;
     }
@@ -209,7 +209,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             int silverCost = GetBuildingSilverCost(constructParam.BuildingDef);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.caravan, ThingDefOf.Silver, silverCost);
         }
-        Branch.StoresReserveHandler.Notify_BranchConstructStarted(underConstructionBuilding);
+        branch.StoresReserveHandler.Notify_BranchConstructStarted(underConstructionBuilding);
     }
 
     private void AddBuilding(BranchBuildingDef buildingDef, bool inSpecialSlot)
@@ -217,16 +217,17 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         inSpecialSlot = inSpecialSlot || buildingDef.isSpecial;
         if (inSpecialSlot && specialBuilding is not null)
         {
+            Log.Error($"Attempted to add a new branch building to the special building slot of {branch}, but one already exists.");
             return;
         }
         BranchBuilding newBuilding;
         try
         {
-            newBuilding = BranchBuilding.MakeBranchBuilding(buildingDef, Branch);
+            newBuilding = BranchBuilding.GenerateBranchBuilding(buildingDef, branch);
         }
         catch (Exception e)
         {
-            Log.Error($"Failed to add building {buildingDef.defName} to {Branch}: {e.Message}");
+            Log.Error($"Failed to generate building {buildingDef.defName} for {branch}: {e.Message}");
             return;
         }
         if (inSpecialSlot)
@@ -259,22 +260,6 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             buildings.Remove(building);
         }
 
-        Branch.EffectTags.DecrementTagsValue(buildingDef.effectFlags);
-        if (buildingDef.branchStatModifies is not null)
-        {
-            foreach (BranchStatModifier statModifier in buildingDef.branchStatModifies)
-            {
-                if (statModifier.Transformer.factor == 0f)
-                {
-                    Branch.RecacheBranchStat(statModifier.statDef);
-                }
-                else
-                {
-                    Branch.TransformerHandler.RemoveStatModifier(statModifier);
-                }
-            }
-        }
-
         if (building is ITickHour<Branch> ticksLong)
         {
             TickLongHandlers?.Remove(ticksLong);
@@ -285,43 +270,83 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
         if (building is IPostSquadCombatPawnGenerate postPawnGenerate)
         {
-            Branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
+            branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
+        }
+
+        branch.EffectTags.DecrementTagsValue(buildingDef.effectFlags);
+        if (building.HasUpgraded)
+        {
+            branch.EffectTags.DecrementTagsValue(buildingDef.advancedProperties?.effectFlags);
+        }
+
+        HashSet<BranchStatDef> statNeedRecache = [];
+        List<BranchStatModifier> branchStatModifies;
+        //移除一般修正
+        if (buildingDef.branchStatModifies is not null)
+        {
+            branchStatModifies = buildingDef.branchStatModifies;
+            for (int i = 0; i < branchStatModifies.Count; i++)
+            {
+                if (branchStatModifies[i].Transformer.factor == 0f)
+                {
+                    statNeedRecache.Add(branchStatModifies[i].statDef);
+                }
+                else
+                {
+                    branch.TransformerHandler.RemoveStatModifier(branchStatModifies[i]);
+                }
+            }
+        }
+        //移除升级修正
+        if (building.HasUpgraded && buildingDef.advancedProperties.branchStatModifies is not null)
+        {
+            branchStatModifies = buildingDef.advancedProperties.branchStatModifies;
+            for (int i = 0; i < branchStatModifies.Count; i++)
+            {
+                if (branchStatModifies[i].Transformer.factor == 0f)
+                {
+                    statNeedRecache.Add(branchStatModifies[i].statDef);
+                }
+                else
+                {
+                    branch.TransformerHandler.RemoveStatModifier(branchStatModifies[i]);
+                }
+            }
+        }
+        //重新获得 factor == 0f 的修正
+        if (statNeedRecache.Count > 0)
+        {
+            foreach (BranchStatDef statDef in statNeedRecache)
+            {
+                branch.RecacheBranchStat(statDef);
+            }
         }
 
         building.PostDeactive();
     }
 
-    public BranchStatTransformer GetBranchStatTransformer(BranchStatDef statDef)
+    public bool GetBranchStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
     {
-        BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
-        if (specialBuilding is not null && specialBuilding.Def.branchStatModifies is not null)
+        transformer = BranchStatTransformer.DefaultTransformer;
+        BranchStatTransformer tempTransformer;
+        bool hasTransformer = false;
+
+        if (specialBuilding is not null && specialBuilding.TryGetStatTransformer(statDef, out tempTransformer))
         {
-            foreach (BranchStatModifier statModifier in specialBuilding.Def.branchStatModifies)
+            hasTransformer = true;
+            transformer.MergeWith(tempTransformer);
+        }
+
+        for (int i = 0; i < buildings.Count; i++)
+        {
+            if (buildings[i].TryGetStatTransformer(statDef, out tempTransformer))
             {
-                if (statModifier.statDef == statDef)
-                {
-                    transformer.MergeWith(statModifier.Transformer);
-                    break;
-                }
+                hasTransformer = true;
+                transformer.MergeWith(tempTransformer);
             }
         }
 
-        foreach (BranchBuilding building in buildings)
-        {
-            if (building.Def.branchStatModifies is not null)
-            {
-                foreach (BranchStatModifier statModifier in specialBuilding.Def.branchStatModifies)
-                {
-                    if (statModifier.statDef == statDef)
-                    {
-                        transformer.MergeWith(statModifier.Transformer);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return transformer;
+        return hasTransformer;
     }
 
     internal void PostLoadInit()
@@ -339,7 +364,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (buildings.RemoveAll(b => b is null) > 0)
         {
-            Log.Error($"{Branch} has null buildings after loading, Removed.");
+            Log.Error($"{branch} has null buildings after loading, Removed.");
         }
 
         foreach (BranchBuilding building in buildings)
@@ -350,12 +375,17 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     private void ActiveBuilding(BranchBuilding building, bool isSpecial)
     {
-        Branch.EffectTags.IncrementTagsValue(building.Def.effectFlags, addIfMiss: true);
-        Branch.TransformerHandler.AddStatModifiers(building.Def.branchStatModifies);
-        if (isSpecial && building.Def.isHonorSymbol)
+        branch.EffectTags.IncrementTagsValue(building.Def.effectFlags, addIfMiss: true);
+        branch.TransformerHandler.AddStatModifiers(building.Def.branchStatModifies);
+        if (isSpecial && building.Def.IsHonorSymbol)
         {
-            Branch.SetBranchType(Branch.BranchType.Honor, active: true);
-            Branch.HonorProperties = building.Def.honorProperties;
+            branch.SetBranchType(Branch.BranchType.Honor, active: true);
+            branch.HonorProperties = building.Def.honorProperties;
+        }
+
+        if (CanUpgradeBuilding(building))
+        {
+            UpgradeBuilding(building);
         }
 
         if (building is ITickHour<Branch> tickLong)
@@ -370,12 +400,29 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
         if (building is IPostSquadCombatPawnGenerate postPawnGenerate)
         {
-            Branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
+            branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
         }
 
         building.PostActive();
     }
 
-    internal void PostBranchGenerated()
-    { }
+    private bool CanUpgradeBuilding(BranchBuilding building)
+    {
+        if (building is null || !building.Def.IsUpgradable || building.HasUpgraded)
+        {
+            return false;
+        }
+        return branch.PopulationHandler.Population >= building.Def.advancedProperties.advancedPopulation;
+    }
+
+    private void UpgradeBuilding(BranchBuilding building)
+    {
+        building.HasUpgraded = true;
+        branch.EffectTags.IncrementTagsValue(building.Def.advancedProperties.effectFlags, addIfMiss: true);
+        branch.TransformerHandler.AddStatModifiers(building.Def.advancedProperties.branchStatModifies);
+
+        building.PostUpgraded();
+    }
+
+    internal void PostBranchGenerated() { }
 }

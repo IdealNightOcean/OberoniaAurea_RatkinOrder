@@ -5,62 +5,25 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public struct BranchStatCacheEnty : IEquatable<BranchStatCacheEnty>
+public class BranchStatWorker(BranchStatDef statDef)
 {
-    public float CacheValue; //缓存值
-    public int ExpiredTick; //缓存时间戳
+    public readonly BranchStatDef StatDef = statDef ?? throw new ArgumentNullException(nameof(statDef));
 
-    public BranchStatCacheEnty(float cacheValue, int expiredTick)
-    {
-        CacheValue = cacheValue;
-        ExpiredTick = expiredTick;
-    }
-    public override readonly string ToString()
-    {
-        return $"BranchStatCacheEnty({CacheValue}, {ExpiredTick})";
-    }
-
-    public override int GetHashCode()
-    {
-        return CacheValue.GetHashCode() ^ ExpiredTick.GetHashCode();
-    }
-    public override readonly bool Equals(object obj)
-    {
-        return obj is BranchStatCacheEnty other && Equals(other);
-    }
-    public readonly bool Equals(BranchStatCacheEnty other)
-    {
-        return CacheValue == other.CacheValue && ExpiredTick == other.ExpiredTick;
-    }
-    public static bool operator ==(BranchStatCacheEnty left, BranchStatCacheEnty right)
-    {
-        return left.Equals(right);
-    }
-    public static bool operator !=(BranchStatCacheEnty left, BranchStatCacheEnty right)
-    {
-        return !left.Equals(right);
-    }
-}
-
-public class BranchStatWorker(BranchStatDef stat)
-{
-    public readonly BranchStatDef Stat = stat ?? throw new ArgumentNullException(nameof(stat));
-
-    protected Dictionary<Branch, BranchStatCacheEnty> temporaryStatCache = stat.cacheable ? [] : null;
+    protected Dictionary<Branch, CacheEnty> temporaryStatCache = statDef.cacheable ? [] : null;
 
     public virtual float GetValue(Branch branch, float? baseValueOverride = null, bool immediateUpdate = false)
     {
-        if (!Stat.cacheable)
+        if (!StatDef.cacheable)
         {
-            return BranchStatUtility.GetNewStatValue(branch, Stat, baseValueOverride);
+            return BranchStatUtility.GetNewStatValue(branch, StatDef, baseValueOverride);
         }
 
         int ticksGame = Find.TickManager.TicksGame;
-        if (temporaryStatCache.TryGetValue(branch, out BranchStatCacheEnty cacheEnty))
+        if (temporaryStatCache.TryGetValue(branch, out CacheEnty cacheEnty))
         {
             if (immediateUpdate || cacheEnty.ExpiredTick < ticksGame)
             {
-                BranchStatCacheEnty newEnty = RecacheCacheEnty(Stat, branch, baseValueOverride, ticksGame);
+                CacheEnty newEnty = RecacheCacheEnty(StatDef, branch, baseValueOverride, ticksGame);
                 temporaryStatCache[branch] = newEnty;
                 return newEnty.CacheValue;
             }
@@ -71,9 +34,17 @@ public class BranchStatWorker(BranchStatDef stat)
         }
         else
         {
-            BranchStatCacheEnty newEnty = RecacheCacheEnty(Stat, branch, baseValueOverride, ticksGame);
+            CacheEnty newEnty = RecacheCacheEnty(StatDef, branch, baseValueOverride, ticksGame);
             temporaryStatCache.Add(branch, newEnty);
             return newEnty.CacheValue;
+        }
+    }
+
+    public void UpdateStatCache(Branch branch, float value)
+    {
+        if (StatDef.cacheable)
+        {
+            temporaryStatCache[branch] = new CacheEnty(value, Find.TickManager.TicksGame + StatDef.cacheDuration);
         }
     }
 
@@ -83,9 +54,47 @@ public class BranchStatWorker(BranchStatDef stat)
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static BranchStatCacheEnty RecacheCacheEnty(BranchStatDef statDef, Branch branch, float? baseValueOverride, int ticksGame)
+    private static CacheEnty RecacheCacheEnty(BranchStatDef statDef, Branch branch, float? baseValueOverride, int ticksGame)
     {
         float result = BranchStatUtility.GetNewStatValue(branch, statDef, baseValueOverride);
-        return new BranchStatCacheEnty(result, ticksGame + statDef.cacheDuration);
+        return new CacheEnty(result, ticksGame + statDef.cacheDuration);
+    }
+
+
+    public struct CacheEnty : IEquatable<CacheEnty>
+    {
+        public float CacheValue; //缓存值
+        public int ExpiredTick; //缓存时间戳
+
+        public CacheEnty(float cacheValue, int expiredTick)
+        {
+            CacheValue = cacheValue;
+            ExpiredTick = expiredTick;
+        }
+        public override readonly string ToString()
+        {
+            return $"BranchStatCacheEnty({CacheValue}, {ExpiredTick})";
+        }
+
+        public override int GetHashCode()
+        {
+            return CacheValue.GetHashCode() ^ ExpiredTick.GetHashCode();
+        }
+        public override readonly bool Equals(object obj)
+        {
+            return obj is CacheEnty other && Equals(other);
+        }
+        public readonly bool Equals(CacheEnty other)
+        {
+            return CacheValue == other.CacheValue && ExpiredTick == other.ExpiredTick;
+        }
+        public static bool operator ==(CacheEnty left, CacheEnty right)
+        {
+            return left.Equals(right);
+        }
+        public static bool operator !=(CacheEnty left, CacheEnty right)
+        {
+            return !left.Equals(right);
+        }
     }
 }

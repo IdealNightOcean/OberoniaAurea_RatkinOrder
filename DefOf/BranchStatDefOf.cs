@@ -6,21 +6,24 @@ namespace OberoniaAurea.RatkinOrder;
 public static class BranchStatDefOf
 {
     public static BranchStatDef OARO_AffectRadius;
-    public static BranchStatDef OARO_NaturalPopulationCeiling; // 自然人口上限
+
     public static BranchStatDef OARO_BuildingCeiling;
     public static BranchStatDef OARO_DeployeeDailyXp;
 
-    public static BranchStatDef OARO_BuildingCost;
-    public static BranchStatDef OARO_FacilityCost;
+    public static BranchStatDef OARO_SupplyCeiling; //分部补给容量上限
+    public static BranchStatDef OARO_SupplyRecoveryRate; //分部补给恢复速率
+
+    public static BranchStatDef OARO_DailyPopulationGrowth; // 每日人口增长
+    public static BranchStatDef OARO_NaturalPopulationCeiling; // 自然人口上限
+
+    public static BranchStatDef OARO_ConstructionCost;
 
     public static BranchStatDef OARO_BombardSupportCount;
 
     public static BranchStatDef OARO_SquadMemberCeiling;
     public static BranchStatDef OARO_SquadCommanderCeiling;
-    public static BranchStatDef OARO_BranchSupplyCeiling;
 
     public static BranchStatDef OARO_SquadMemberRecoveryRate;
-    public static BranchStatDef OARO_SquadSupplyRecoveryRate;
 
     static BranchStatDefOf()
     {

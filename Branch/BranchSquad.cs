@@ -135,7 +135,7 @@ public class BranchSquad : IExposable, ITickHourOfDay
         /*
         if (squadStat.Supply < squadStat.SupplyCeiling)
         {
-            squadStat.Supply += BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadSupplyRecoveryRate);
+            squadStat.Supply += BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SupplyRecoveryRate);
         }
         */
     }

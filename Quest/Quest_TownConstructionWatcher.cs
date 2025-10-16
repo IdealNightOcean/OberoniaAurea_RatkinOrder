@@ -95,24 +95,20 @@ internal sealed class QuestPart_TownConstructionWatcher : QuestPart
 
         if (Town.ConstructionScale >= 2)
         {
-            Log.Message("111");
             Settlement settlement = SettleUtility.AddNewHome(Town.Tile, faction);
             if (Town.ConstructionScale >= 3)
             {
-                Log.Message("222");
                 Branch branch = Branch.GenerateBranchFor(Town.Branch.RatkinOrder, settlement, addToManager: true);
                 if (branch is not null)
                 {
-                    Log.Message("333");
                     branch.SetFriendly(friendly: true, durationTick: 40 * 60000, showMessage: false);
 
                     if (Town.ConstructionScale >= 4)
                     {
-                        Log.Message("444");
                         BranchFacilityHandler facilityHandler = branch.FacilityHandler;
                         foreach (BranchFacilityDef facilityDef in DefDatabase<BranchFacilityDef>.AllDefs)
                         {
-                            facilityHandler.TryUpgradeFacility(facilityDef, BranchFacilityLevel.Normal, addIfMiss: true);
+                            facilityHandler.TryActiveNewStage(facilityDef, BranchFacilityLevel.Normal, addIfMiss: true);
                         }
                     }
                 }

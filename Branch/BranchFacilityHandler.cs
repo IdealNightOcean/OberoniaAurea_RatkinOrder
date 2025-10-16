@@ -9,9 +9,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchFacilityHandler(Branch branch) : IExposable
+public class BranchFacilityHandler : IExposable
 {
-    [Unsaved] public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    [Unsaved] private readonly Branch branch;
 
     private Dictionary<BranchFacilityDef, BranchFacilityLevel> facilities = [];
     [Unsaved] private int totalFacilityLevel;
@@ -23,6 +23,11 @@ public class BranchFacilityHandler(Branch branch) : IExposable
     private BranchFacilityDef buildingFacility;
     private int buildingTicksLeft = -1;
     public bool IsBusy => buildingFacility is not null;
+
+    public BranchFacilityHandler(Branch branch)
+    {
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    }
 
     public void ExposeData()
     {
@@ -77,7 +82,7 @@ public class BranchFacilityHandler(Branch branch) : IExposable
 
         if (byPlayer)
         {
-            int silverCost = BranchUtility.GetFacilitySilverCost(Branch, facilityDef, newLevel);
+            int silverCost = BranchUtility.GetFacilitySilverCost(branch, facilityDef, newLevel);
             if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OARO_NotEnoughSilver".Translate(silverCost);
@@ -100,11 +105,11 @@ public class BranchFacilityHandler(Branch branch) : IExposable
 
         if (byPlayer)
         {
-            int silverCost = BranchUtility.GetFacilitySilverCost(Branch, facilityDef, BranchUtility.BranchFacilityLevelOffSetBy(oldLevel, 1));
+            int silverCost = BranchUtility.GetFacilitySilverCost(branch, facilityDef, BranchUtility.BranchFacilityLevelOffSetBy(oldLevel, 1));
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, silverCost);
         }
 
-        Branch.StoresReserveHandler.Notify_BranchConstructStarted(facilityDef);
+        branch.StoresReserveHandler.Notify_BranchConstructStarted(facilityDef);
     }
 
     private void CompleteFacilityConstruction()
@@ -113,7 +118,7 @@ public class BranchFacilityHandler(Branch branch) : IExposable
         {
             return;
         }
-        TryUpgradeFacility(buildingFacility, BranchUtility.BranchFacilityLevelOffSetBy(GetFacilityLevel(buildingFacility), 1));
+        TryActiveNewStage(buildingFacility, BranchUtility.BranchFacilityLevelOffSetBy(GetFacilityLevel(buildingFacility), 1));
 
         buildingTicksLeft = -1;
         buildingFacility = null;
@@ -128,10 +133,10 @@ public class BranchFacilityHandler(Branch branch) : IExposable
         {
             return;
         }
-        ActiveStage(facilityDef, BranchFacilityLevel.None, BranchFacilityLevel.Poor, isPostInit: false);
+        ActiveStage(facilityDef, BranchFacilityLevel.Poor);
     }
 
-    public bool TryUpgradeFacility(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel, bool addIfMiss = false)
+    public bool TryActiveNewStage(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel, bool addIfMiss = false)
     {
         if (facilityDef is null || targetLevel == BranchFacilityLevel.None)
         {
@@ -144,45 +149,63 @@ public class BranchFacilityHandler(Branch branch) : IExposable
             return false;
         }
 
-        if (ActiveStage(facilityDef, oldLevel, targetLevel, isPostInit: false))
+        HashSet<BranchStatDef> statNeedRecache = [];
+        if (oldLevel != BranchFacilityLevel.None)
         {
-            facilities[facilityDef] = targetLevel;
-            IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
-            return true;
-        }
-        else
-        {
-            return false;
-        }
-    }
-
-    private bool ActiveStage(BranchFacilityDef facilityDef, BranchFacilityLevel minLevelExclude, BranchFacilityLevel maxLevelInclude, bool isPostInit = false)
-    {
-        foreach (BranchFacilityLevelStage stage in facilityDef.GetAllUpgradeStages(minLevelExclude, maxLevelInclude))
-        {
-            Branch.EffectTags.IncrementTagsValue(stage.effectFlags, addIfMiss: true);
-            Branch.TransformerHandler.AddStatModifiers(stage.statModifies);
-            if (isPostInit)
+            BranchFacilityLevelStage oldStage = facilityDef.GetLevelStage(oldLevel);
+            if (oldStage is not null)
             {
-                stage.PostLoadInit(Branch);
-            }
-            else
-            {
-                stage.PostActive(Branch);
+                branch.EffectTags.DecrementTagsValue(oldStage.effectFlags);
+                if (oldStage.statModifies is not null)
+                {
+                    List<BranchStatModifier> statModifies = oldStage.statModifies;
+                    for (int i = 0; i < statModifies.Count; i++)
+                    {
+                        if (statModifies[i].Transformer.factor == 0f)
+                        {
+                            statNeedRecache.Add(statModifies[i].statDef);
+                        }
+                        else
+                        {
+                            branch.TransformerHandler.RemoveStatModifier(statModifies[i]);
+                        }
+                    }
+                }
             }
         }
 
-        if (!isPostInit)
+        ActiveStage(facilityDef, targetLevel);
+
+        facilities[facilityDef] = targetLevel;
+        IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
+
+        //需要在设施等级改变后再次重新获取 factor == 0f 的BranchStat
+        if (statNeedRecache.Count > 0)
         {
-            totalFacilityLevel += (minLevelExclude - maxLevelInclude);
+            foreach (BranchStatDef statDef in statNeedRecache)
+            {
+                branch.RecacheBranchStat(statDef);
+            }
         }
 
         return true;
     }
 
-    public BranchStatTransformer GetBranchStatTransformer(BranchStatDef statDef)
+    private void ActiveStage(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel)
     {
-        BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
+        BranchFacilityLevelStage targetStage = facilityDef.GetLevelStage(targetLevel);
+        if (targetStage is not null)
+        {
+            branch.EffectTags.DecrementTagsValue(targetStage.effectFlags);
+            branch.TransformerHandler.AddStatModifiers(targetStage.statModifies);
+        }
+    }
+
+    public bool GetBranchStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
+    {
+        transformer = BranchStatTransformer.DefaultTransformer;
+        bool hasTransformer = false;
+
         foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> facility in facilities)
         {
             if (facility.Value == BranchFacilityLevel.None)
@@ -190,36 +213,35 @@ public class BranchFacilityHandler(Branch branch) : IExposable
                 continue;
             }
 
-            foreach (BranchFacilityLevelStage stage in facility.Key.GetAllUpgradeStages(BranchFacilityLevel.None, facility.Value))
+            BranchFacilityLevelStage stage = facility.Key.GetLevelStage(facility.Value);
+            if (stage is null || stage.statModifies.NullOrEmpty())
             {
-                if (stage.statModifies.NullOrEmpty())
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                foreach (BranchStatModifier statModifier in stage.statModifies)
+            for (int i = 0; i < stage.statModifies.Count; i++)
+            {
+                if (stage.statModifies[i].statDef == statDef)
                 {
-                    if (statModifier.statDef == statDef)
-                    {
-                        transformer.MergeWith(statModifier.Transformer);
-                        break;
-                    }
+                    hasTransformer = true;
+                    transformer.MergeWith(stage.statModifies[i].Transformer);
+                    break;
                 }
             }
         }
-        return transformer;
+        return hasTransformer;
     }
 
     internal void PostLoadInit()
     {
         if (facilities.RemoveAll(kv => kv.Key is null || kv.Value == BranchFacilityLevel.None) > 0)
         {
-            Log.Error($"{Branch} has null or None facilities after loading, Removed.");
+            Log.Error($"{branch} has null or None facilities after loading, Removed.");
         }
 
         foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> item in facilities)
         {
-            ActiveStage(item.Key, BranchFacilityLevel.None, item.Value, isPostInit: true);
+            ActiveStage(item.Key, item.Value);
         }
 
         IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
@@ -231,7 +253,7 @@ public class BranchFacilityHandler(Branch branch) : IExposable
         for (int i = 0; i < allFacilities.Count; i++)
         {
             BranchFacilityLevel initLevel = Rand.Chance(0.3f) ? BranchFacilityLevel.Normal : BranchFacilityLevel.Poor;
-            TryUpgradeFacility(allFacilities[i], initLevel, addIfMiss: true);
+            TryActiveNewStage(allFacilities[i], initLevel, addIfMiss: true);
         }
     }
 }

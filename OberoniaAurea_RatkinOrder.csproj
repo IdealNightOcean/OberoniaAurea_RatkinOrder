@@ -76,10 +76,16 @@
     <Compile Include="BranchBuilding\BranchBuildingCompProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingWithComps.cs" />
     <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
+    <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
+    <Compile Include="BranchStat\BranchStatPart_SupplyRecoveryRate.cs" />
+    <Compile Include="BranchStat\BranchStatPart_SquadMemberRecoveryRate.cs" />
+    <Compile Include="BranchStat\BranchStatPart_ConstructionCost.cs" />
+    <Compile Include="BranchStat\BranchStatPart_NaturalPopulationCeiling.cs" />
     <Compile Include="BranchTask\BranchTask.cs" />
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
+    <Compile Include="Branch\BranchPopulationHandler.cs" />
     <Compile Include="Components\KnightRecord.cs" />
     <Compile Include="Components\TrackedIntValue.cs" />
     <Compile Include="Components\TrackedFloatValue.cs" />
@@ -144,7 +150,7 @@
     <Compile Include="BranchDemand\BranchDemandWeighter_SupplyDepotCotr.cs" />
     <Compile Include="BranchStat\BranchStatModifier.cs" />
     <Compile Include="BranchStat\BranchStatPart.cs" />
-    <Compile Include="BranchStat\BranchStatPart_FacilityLevelToBuildingCeiling.cs" />
+    <Compile Include="BranchStat\BranchStatPart_BuildingCeiling.cs" />
     <Compile Include="BranchBuilding\BranchBuildingConstructParameter.cs" />
     <Compile Include="BranchDemand\BranchDemand.cs" />
     <Compile Include="DefModExtension\BranchBuilding_MemorialExtension.cs" />
@@ -261,8 +267,8 @@
     <Compile Include="Thought\ThoughtWorker_WineDisplayShelf.cs" />
     <Compile Include="Utility\BranchStatUtility.cs" />
     <Compile Include="BranchStat\BranchStatWorker.cs" />
-    <Compile Include="BranchStat\BranchStatPart_FundToAffectRadius.cs" />
-    <Compile Include="BranchStat\BranchStatPart_FundToSquadMemberCeiling.cs" />
+    <Compile Include="BranchStat\BranchStatPart_AffectRadius.cs" />
+    <Compile Include="BranchStat\BranchStatPart_SquadMemberCeiling.cs" />
     <Compile Include="BranchStat\BranchStatWorker_Transformer.cs" />
     <Compile Include="Branch\Branch.cs" />
     <Compile Include="BranchBuilding\BranchBuildingConstructChecker.cs" />

@@ -18,6 +18,12 @@ public class BranchStatDef : Def
     private BranchStatWorker worker;
     public BranchStatWorker Worker => worker ??= (BranchStatWorker)Activator.CreateInstance(workerClass, args: this);
 
+    /// <summary>
+    /// 一般的Stat越大越好（如影响距离）
+    /// 反转的Stat越小越好（如建设花费）
+    /// </summary>
+    public bool reverse;
+
     public float baseValue = 0f; //基础值
 
     public bool cacheable = true;
