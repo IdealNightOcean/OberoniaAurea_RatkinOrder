@@ -246,6 +246,7 @@ public class JointPatrolManager : IExposable
         if (participantsHash.Add(branch))
         {
             participants.Add(new JointBranchRecord() { Branch = branch });
+            branch.WorkStateDirty = true;
         }
     }
 
@@ -258,6 +259,7 @@ public class JointPatrolManager : IExposable
                 if (participants[i].Branch == branch)
                 {
                     participants.RemoveAt(i);
+                    branch.WorkStateDirty = true;
                     break;
                 }
             }

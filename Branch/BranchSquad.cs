@@ -44,7 +44,7 @@ public class BranchSquad : IExposable, ITickHourOfDay
     private float memberCount; //分队成员数量
     private float commanderCount; //分队骑士长数量
 
-    private BranchSquad(Branch branch)
+    internal BranchSquad(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
         memberCeilingCache = new(cacheInterval: 60000, defaultValue: BranchStatDefOf.OARO_SquadMemberCeiling.baseValue, () => branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberCeiling));
@@ -53,37 +53,10 @@ public class BranchSquad : IExposable, ITickHourOfDay
 
     public void PostBranchGenerated()
     {
+        name = "OARO_BranchSquadName".Translate(branch.Name.Named("branchName"));
+
         memberCount = MemberCeiling;
         commanderCount = CommanderCeiling;
-    }
-
-    public static BranchSquad GenerateSquadForBranch(Branch branch)
-    {
-        if (branch is null)
-        {
-            return null;
-        }
-        if (branch.Squad is not null)
-        {
-            Log.Error($"Branch {branch} already has a squad assigned. Cannot generate a new one. Returning existing squad instead.");
-            return branch.Squad;
-        }
-
-        BranchSquad squad;
-
-        try
-        {
-            squad = new(branch)
-            {
-                name = "OARO_BranchSquadName".Translate(branch.Name.Named("branchName"))
-            };
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"Failed to create BranchSquad for branch {branch}. Returning null: " + ex);
-            return null;
-        }
-        return squad;
     }
 
     public void ExposeData()
@@ -94,7 +67,22 @@ public class BranchSquad : IExposable, ITickHourOfDay
         Scribe_Values.Look(ref commanderCount, "commanderCount", 0f);
     }
 
-    public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Squad(branch));
+    public void DrawDevWindow(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"Name: {name}");
+        if (listing_Rect.ButtonTextLabeled($"MemberCount: {MemberCountInt}", "Member +1"))
+        {
+            MemberCount += 1f;
+        }
+        if (listing_Rect.ButtonTextLabeled($"CommanderCount: {CommanderCountInt}", "Commander +1"))
+        {
+            CommanderCount += 1f;
+        }
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"MemberCeiling: {MemberCeiling:F2}");
+        listing_Rect.Label($"CommanderCeiling: {CommanderCeiling:F2}");
+    }
 
     public void TickHour(int hourOfDay)
     {

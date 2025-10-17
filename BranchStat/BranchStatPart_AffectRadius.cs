@@ -6,9 +6,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatPart_AffectRadius : BranchStatPart
 {
-    public override float PostTransform(Branch branch, float value)
+    public override void PostTransform(Branch branch, ref float curValue)
     {
-        return value += (branch.RatkinOrder.FundHandler.Funds / 0.08f);
+        curValue += branch.RatkinOrder.FundHandler.Funds / 0.08f;
     }
 
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)

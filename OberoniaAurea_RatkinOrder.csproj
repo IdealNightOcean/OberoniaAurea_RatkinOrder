@@ -82,7 +82,9 @@
     <Compile Include="BranchStat\BranchStatPart_SquadMemberRecoveryRate.cs" />
     <Compile Include="BranchStat\BranchStatPart_ConstructionCost.cs" />
     <Compile Include="BranchStat\BranchStatPart_NaturalPopulationCeiling.cs" />
+    <Compile Include="BranchStat\BranchStatPart_DailyPopulationGrowth.cs" />
     <Compile Include="BranchTask\BranchTask.cs" />
+    <Compile Include="BranchTask\BranchTask_JurisdictionDuty.cs" />
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
@@ -191,7 +193,6 @@
     <Compile Include="Branch\BranchDemandHandler.cs" />
     <Compile Include="Components\TagStrToValue\TagStrToValue.cs" />
     <Compile Include="DefOf\BranchStatDefOf.cs" />
-    <Compile Include="DefOf\BranchDemandDefOf.cs" />
     <Compile Include="DefOf\QuestScriptDefOf.cs" />
     <Compile Include="DefOf\ThingDefOf.cs" />
     <Compile Include="DefOf\RimWorldDefOf.cs" />
@@ -293,7 +294,6 @@
     <Compile Include="Worldobject\Demand\WorldObject_RefugeeInfluxCamp.cs" />
     <Compile Include="Worldobject\WorldObjectComp_BranchSite.cs" />
     <Compile Include="Window\DevWindow\DevWindow_GlobalOrderInteractHandler.cs" />
-    <Compile Include="Window\DevWindow\DevWindow_Squad.cs" />
     <Compile Include="Window\DevWindow\DevWindow_Branch.cs" />
     <Compile Include="Window\DevWindow\DevWindow_BranchManager.cs" />
     <Compile Include="Window\DevWindow\DevWindow_Order.cs" />
@@ -357,7 +357,7 @@
     <Compile Include="Utility\BranchSupportUtility.cs" />
     <Compile Include="Def\BranchTaskDef.cs" />
     <Compile Include="Branch\BranchTaskHandler.cs" />
-    <Compile Include="BranchTask\BranchTask_JurisdictionDuty.cs" />
+    <Compile Include="BranchTask\BranchTask_JurisdictionDutyPrep.cs" />
     <Compile Include="Lord\LordJob_AssaultColony_NeverFleeOrder.cs" />
     <Compile Include="Components\TagStrToValue\TagStrToBoolCountable.cs" />
     <Compile Include="Branch\BranchSquad.cs" />

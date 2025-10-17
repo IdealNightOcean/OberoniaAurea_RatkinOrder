@@ -4,9 +4,9 @@ using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
+public class BranchDemandHandler : ITickDay, IExposable
 {
-    public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    private readonly Branch branch;
 
     private BranchDemand normalDemand;
     private BranchDemand criticalDemand;
@@ -14,6 +14,11 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
     public BranchDemand NormalDemand => normalDemand;
     public BranchDemand CriticalDemand => criticalDemand;
     public bool HasDemand => normalDemand is not null || criticalDemand is not null;
+
+    internal BranchDemandHandler(Branch branch)
+    {
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    }
 
     public void ExposeData()
     {
@@ -33,9 +38,9 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
             listing_Rect.SubLabel(normalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, normalDemand))
+                if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(branch, normalDemand))
                 {
-                    GlobalOrderInteractionManager.AcceptedBranchDemandHandler.AcceptDemand(Branch, normalDemand);
+                    GlobalOrderInteractionManager.AcceptedBranchDemandHandler.AcceptDemand(branch, normalDemand);
                 }
             }
         }
@@ -51,9 +56,9 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
             listing_Rect.SubLabel(criticalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(Branch, criticalDemand))
+                if (GlobalOrderInteractionManager.AcceptedBranchDemandHandler.CanAcceptDemand(branch, criticalDemand))
                 {
-                    GlobalOrderInteractionManager.AcceptedBranchDemandHandler.AcceptDemand(Branch, criticalDemand);
+                    GlobalOrderInteractionManager.AcceptedBranchDemandHandler.AcceptDemand(branch, criticalDemand);
                 }
             }
         }
@@ -98,7 +103,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
         if (CanAddDemand(isCriticalDemand: false, ignoreCD: false, replaceCur: false))
         {
             DemandType demandType = Rand.Chance(0.1f) ? DemandType.Urgency : DemandType.Normal;
-            BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(Branch, demandType);
+            BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(branch, demandType);
             if (demandDef is not null)
             {
                 AddNewDemand(demandDef);
@@ -111,19 +116,19 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
         if (demandDef.IsCriticalDemand)
         {
             criticalDemand = BranchDemand.MakeBranchDemand(demandDef);
-            criticalDemand.PostAddToBranch(Branch);
-            Branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandAdd, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
+            criticalDemand.PostAddToBranch(branch);
+            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandAdd, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
         }
         else
         {
             normalDemand = BranchDemand.MakeBranchDemand(demandDef);
-            normalDemand.PostAddToBranch(Branch);
-            Branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandAdd, cdTicks: 20 * 60000, shouldRemoveWhenExpired: true);
+            normalDemand.PostAddToBranch(branch);
+            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandAdd, cdTicks: 20 * 60000, shouldRemoveWhenExpired: true);
         }
 
-        if (Branch.IsBranchOfType(Branch.BranchType.Friendly))
+        if (branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
-            BranchDemandUtility.FriendyBranchDemandInform(Branch, demandDef);
+            BranchDemandUtility.FriendyBranchDemandInform(branch, demandDef);
         }
     }
 
@@ -136,7 +141,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
                 if (replaceCur)
                 {
                     return !criticalDemand.IsOngoing
-                        && (ignoreCD || !Branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.CriticalDemandAdd));
+                        && (ignoreCD || !branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.CriticalDemandAdd));
                 }
                 else
                 {
@@ -145,7 +150,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
             }
             else
             {
-                return ignoreCD || !Branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.CriticalDemandAdd);
+                return ignoreCD || !branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.CriticalDemandAdd);
             }
         }
         else
@@ -155,7 +160,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
                 if (replaceCur)
                 {
                     return !normalDemand.IsOngoing
-                        && (ignoreCD || Branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd));
+                        && (ignoreCD || branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd));
                 }
                 else
                 {
@@ -164,7 +169,7 @@ public class BranchDemandHandler(Branch branch) : ITickDay, IExposable
             }
             else
             {
-                return ignoreCD || Branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd);
+                return ignoreCD || branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd);
             }
         }
     }

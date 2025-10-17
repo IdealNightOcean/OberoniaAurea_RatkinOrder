@@ -39,20 +39,23 @@ public class DevWindow_Branch : DevWindowBase
             return;
         }
 
-        listing_Rect.Gap(6f);
+        listing_Rect.Gap(12f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
         listing_Rect.Label($"ID: {branch.LoadID}");
         listing_Rect.Label($"Name: {branch.Name}");
         Text.Font = GameFont.Small;
 
+        listing_Rect.Gap(12f);
+        listing_Rect.Label("————————————————");
+        listing_Rect.Label($"WorkState: {branch.CurWorkState}");
+
         listing_Rect.Gap(6f);
-        if (branch.WorldObject is not null)
+        if (branch.BaseSite is not null)
         {
-            listing_Rect.Label($"RelatedWorldObject: {branch.WorldObject}");
-            if (listing_Rect.ButtonText("Jump to", widthPct: 0.4f))
+            if (listing_Rect.ButtonTextLabeled($"BaseSite: {branch.BaseSite}", "Jump to"))
             {
-                CameraJumper.TryJumpAndSelect(branch.WorldObject);
+                CameraJumper.TryJumpAndSelect(branch.BaseSite);
             }
         }
         if (listing_Rect.ButtonText("EffectTags", null, 0.8f))
@@ -64,66 +67,67 @@ public class DevWindow_Branch : DevWindowBase
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(branch.TransformerHandler.GetDetailString()));
         }
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label($"Squad:");
         Text.Font = GameFont.Small;
-        if (listing_Rect.ButtonText("Squad", null, 0.8f))
-        {
-            Close();
-            EndContents();
-            branch.Squad.OpenDevWindow();
-            return;
-        }
-
-        listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
+        branch.Squad.DrawDevWindow(listing_Rect);
+
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Medal:");
         Text.Font = GameFont.Small;
+        listing_Rect.Label("————————————————");
         branch.MedalHandler.DrawDevWindow(listing_Rect);
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Facility:");
         Text.Font = GameFont.Small;
+        listing_Rect.Label("————————————————");
         branch.FacilityHandler.DrawDevWindow(listing_Rect);
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Building:");
         Text.Font = GameFont.Small;
+        listing_Rect.Label("————————————————");
         branch.BuildingHandler.DrawDevWindow(listing_Rect);
 
-        listing_Rect.Gap(6f);
+        listing_Rect.Gap(12f);
+        Text.Font = GameFont.Medium;
+        listing_Rect.Label("Population:");
+        Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
+        branch.PopulationHandler.DrawDevWindow(listing_Rect);
+
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Task:");
         Text.Font = GameFont.Small;
+        listing_Rect.Label("————————————————");
         branch.TaskHandler.DrawDevWindow(listing_Rect);
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Demand:");
         Text.Font = GameFont.Small;
+        listing_Rect.Label("————————————————");
         branch.DemandHandler.DrawDevWindow(listing_Rect);
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Resident:");
         Text.Font = GameFont.Small;
+        listing_Rect.Label("————————————————");
         branch.ResidentHandler.DrawDevWindow(listing_Rect);
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
+        listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
         listing_Rect.Label("StoresReserve:");
         Text.Font = GameFont.Small;
+        listing_Rect.Label("————————————————");
         branch.StoresReserveHandler.DrawDevWindow(listing_Rect);
 
         if (Event.current.type == EventType.Layout)

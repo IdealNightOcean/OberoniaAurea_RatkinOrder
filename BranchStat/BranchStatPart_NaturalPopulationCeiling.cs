@@ -6,9 +6,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatPart_NaturalPopulationCeiling : BranchStatPart
 {
-    public override float PostTransform(Branch branch, float curValue)
+    public override void PostTransform(Branch branch, ref float curValue)
     {
-        return curValue + branch.FacilityHandler.TotalFacilityLevel * 200;
+        curValue += branch.FacilityHandler.TotalFacilityLevel * 200;
     }
 
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)

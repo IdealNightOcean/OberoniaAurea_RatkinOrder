@@ -43,6 +43,6 @@ public static class OARO_QuestUtility
         }
         slate.Set(KeyLibrary_SlateStoreAs.Branch, branch);
         slate.Set(KeyLibrary_SlateStoreAs.BranchName, branch.Name);
-        slate.Set(KeyLibrary_SlateStoreAs.BranchSite, branch.WorldObject);
+        slate.Set(KeyLibrary_SlateStoreAs.BranchSite, branch.BaseSite);
     }
 }

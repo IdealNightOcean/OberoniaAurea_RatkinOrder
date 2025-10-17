@@ -6,10 +6,10 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatPart_ConstructionCost : BranchStatPart
 {
-    public override float PostTransform(Branch branch, float curValue)
+    public override void PostTransform(Branch branch, ref float curValue)
     {
         float costRate = 1f - Mathf.Clamp(branch.PopulationHandler.Population / 100f * 0.01f, 0f, 0.9f);
-        return curValue * costRate;
+        curValue *= costRate;
     }
 
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)

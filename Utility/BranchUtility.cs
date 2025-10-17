@@ -19,21 +19,21 @@ public static class BranchUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInAffectedRange(this Branch branch, PlanetTile tile)
     {
-        if (tile.Layer != branch.WorldObject.Tile.Layer)
+        if (tile.Layer != branch.BaseSite.Tile.Layer)
         {
             return false;
         }
-        return Find.WorldGrid.ApproxDistanceInTiles(branch.WorldObject.Tile, tile) <= BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_AffectRadius);
+        return Find.WorldGrid.ApproxDistanceInTiles(branch.BaseSite.Tile, tile) <= BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_AffectRadius);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float DistanceTo(this Branch branch, PlanetTile tile)
     {
-        if (tile.Layer != branch.WorldObject.Tile.Layer)
+        if (tile.Layer != branch.BaseSite.Tile.Layer)
         {
             return 999999f;
         }
-        return Find.WorldGrid.ApproxDistanceInTiles(branch.WorldObject.Tile, tile);
+        return Find.WorldGrid.ApproxDistanceInTiles(branch.BaseSite.Tile, tile);
     }
 
     /// <summary>

@@ -26,15 +26,15 @@ public class Branch : IExposable, ILoadReferenceable
     private int loadID = -1;
     public int LoadID => loadID;
 
-    [Unsaved] public int TickHashOffset;
+    [Unsaved] public readonly int TickHashOffset;
 
     private string name;
     public string Name => name;
     public string NameFull => RatkinOrder.Name + "-" + name;
 
-    private WorldObject worldObject;
-    public WorldObject WorldObject => worldObject;
-    public int Tile => worldObject?.Tile ?? -1;
+    private WorldObject baseSite;
+    public WorldObject BaseSite => baseSite;
+    public int Tile => baseSite?.Tile ?? -1;
 
     protected int friendlyExpiredTick = -1;
     private BranchType curType = BranchType.Normal;
@@ -54,27 +54,42 @@ public class Branch : IExposable, ILoadReferenceable
         set => supply = Mathf.Clamp(value, 0f, supplyCeilingCache.GetCachedResult());
     }
 
+    [Unsaved] private string curWorkState = string.Empty;
+    [Unsaved] public bool WorkStateDirty = true;
+    public string CurWorkState
+    {
+        get
+        {
+            if (WorkStateDirty)
+            {
+                UpdateWorkState();
+                WorkStateDirty = false;
+            }
+            return curWorkState;
+        }
+    }
+
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
     [Unsaved] public readonly List<IPostSquadCombatPawnGenerate> PostSquadCombatPawnGenerate = [];
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
 
-    private BranchSquad squad;
     private BranchMedalHandler medalHandler;
     private BranchFacilityHandler facilityHandler;
     private BranchBuildingHandler buildingHandler;
     private BranchPopulationHandler populationHandler;
+    private BranchSquad squad;
     private BranchTaskHandler taskHandler;
     private BranchDemandHandler demandHandler;
     private BranchResidentHandler residentHandler;
     private BranchStoresReserveHandler storesReserveHandler;
 
-    public BranchSquad Squad => squad;
     public BranchMedalHandler MedalHandler => medalHandler;
     public BranchFacilityHandler FacilityHandler => facilityHandler;
     public BranchBuildingHandler BuildingHandler => buildingHandler;
     public BranchPopulationHandler PopulationHandler => populationHandler;
+    public BranchSquad Squad => squad;
     public BranchTaskHandler TaskHandler => taskHandler;
     public BranchDemandHandler DemandHandler => demandHandler;
     public BranchResidentHandler ResidentHandler => residentHandler;
@@ -90,18 +105,17 @@ public class Branch : IExposable, ILoadReferenceable
         {
             cooldownManager = new();
 
-            squad = BranchSquad.GenerateSquadForBranch(this) ?? throw new NullReferenceException(nameof(squad));
-
             medalHandler = new();
             facilityHandler = new(this);
             buildingHandler = new(this);
             populationHandler = new(this);
+            squad = new(this);
             taskHandler = new(this);
             demandHandler = new(this);
-            residentHandler = new(this);
+            residentHandler = new(this, initCtor: true);
             storesReserveHandler = new(this);
         }
-        loadID = UniqueIDManager.Instance.GetUniqueID("Branch");
+        loadID = UniqueIDManager.GetUniqueID("Branch");
     }
 
     public static Branch GenerateBranchFor(RatkinOrder ratkinOrder, WorldObject worldObject, bool addToManager = true)
@@ -116,7 +130,7 @@ public class Branch : IExposable, ILoadReferenceable
         {
             branch = new(ratkinOrder, initCtor: true);
             worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(branch);
-            branch.worldObject = worldObject;
+            branch.baseSite = worldObject;
             branch.name = BranchUtility.GenerateBranchName(ratkinOrder);
             branch.PostGenerated();
             if (addToManager)
@@ -137,7 +151,7 @@ public class Branch : IExposable, ILoadReferenceable
     {
         Scribe_Values.Look(ref loadID, "loadID", -1);
         Scribe_Values.Look(ref name, "name");
-        Scribe_References.Look(ref worldObject, "worldObject");
+        Scribe_References.Look(ref baseSite, "baseSite");
 
         Scribe_Values.Look(ref friendlyExpiredTick, "friendlyExpiredTick", 0);
         Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
@@ -145,14 +159,14 @@ public class Branch : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref supply, "supply", 0f);
 
         Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
-        Scribe_Deep.Look(ref squad, "squad", ctorArgs: [this, false]);
         Scribe_Deep.Look(ref medalHandler, "medalHandler");
         Scribe_Deep.Look(ref facilityHandler, "facilityHandler", ctorArgs: this);
         Scribe_Deep.Look(ref buildingHandler, "buildingHandler", ctorArgs: this);
+        Scribe_Deep.Look(ref squad, "squad", ctorArgs: this);
         Scribe_Deep.Look(ref populationHandler, "populationHandler", ctorArgs: this);
         Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
         Scribe_Deep.Look(ref demandHandler, "demandHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref residentHandler, "residentHandler", ctorArgs: this);
+        Scribe_Deep.Look(ref residentHandler, "residentHandler", ctorArgs: [this, false]);
         Scribe_Deep.Look(ref storesReserveHandler, "storesReserveHandler", ctorArgs: this);
     }
 
@@ -173,7 +187,7 @@ public class Branch : IExposable, ILoadReferenceable
 
     private void TickHour()
     {
-        int hourOfDay = GenLocalDate.HourOfDay(worldObject.Tile);
+        int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
 
         facilityHandler.TickHour();
         buildingHandler.TickHour(hourOfDay);
@@ -189,13 +203,19 @@ public class Branch : IExposable, ILoadReferenceable
         }
 
         squad.TickHour(hourOfDay);
+
+        if (!CooldownManager.IsInCooldown(KeyLibrary_CDRecord.BranchWorkState))
+        {
+            WorkStateDirty = true;
+        }
     }
 
     private void TickDay()
     {
         buildingHandler.TickDay();
-        residentHandler.TickDay();
+        populationHandler.TickDay();
         demandHandler.TickDay();
+        residentHandler.TickDay();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -229,21 +249,50 @@ public class Branch : IExposable, ILoadReferenceable
         }
     }
 
+    private void UpdateWorkState()
+    {
+        CooldownManager.RegisterRecord(KeyLibrary_CDRecord.BranchWorkState, cdTicks: 6 * 2500);
+
+        if (taskHandler.HasTask)
+        {
+            curWorkState = taskHandler.TaskLabel;
+            return;
+        }
+
+        if (this.IsOnJointPatrol())
+        {
+            curWorkState = "OARO_BranchWorkState_JointPatrol".Translate();
+            return;
+        }
+
+        int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
+        if (hourOfDay <= 5 || hourOfDay >= 21)
+        {
+            curWorkState = "OARO_BranchWorkState_Rest".Translate();
+            return;
+        }
+
+        curWorkState = "OARO_SquadState_Idle".Translate();
+    }
+
     public void Destroy()
     {
         residentHandler.ForceEndAllResidency();
-        worldObject?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
+        baseSite?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
     }
 
     private void PostGenerated()
     {
         medalHandler.PostBranchGenerated();
-
         facilityHandler.PostBranchGenerated();
         buildingHandler.PostBranchGenerated();
 
-        residentHandler.PostBranchGenerated();
+        populationHandler.PostBranchGenerated();
         squad.PostBranchGenerated();
+
+        residentHandler.PostBranchGenerated();
+
+        curWorkState = "OARO_SquadState_Idle".Translate();
     }
 
     internal void PostLoadInit()

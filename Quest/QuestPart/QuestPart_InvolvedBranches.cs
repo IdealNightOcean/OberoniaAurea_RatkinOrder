@@ -20,9 +20,9 @@ public class QuestPart_InvolvedBranches : QuestPart, IOnBranchDestroyed
             }
             foreach (Branch branch in Branches)
             {
-                if (branch?.WorldObject is not null)
+                if (branch?.BaseSite is not null)
                 {
-                    yield return branch.WorldObject;
+                    yield return branch.BaseSite;
                 }
             }
         }

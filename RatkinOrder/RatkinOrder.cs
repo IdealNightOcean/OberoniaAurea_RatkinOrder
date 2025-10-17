@@ -10,7 +10,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     private int loadID = -1;
     public int LoadID => loadID;
 
-    [Unsaved] public int TickHashOffset;
+    [Unsaved] public readonly int TickHashOffset;
     private int curYearPassed = -1;
 
     private RatkinOrderDef def;
@@ -56,9 +56,6 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     private BranchManager branchManager;
     public BranchManager BranchManager => branchManager;
 
-
-
-
     private RatkinOrder()
     {
         TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
@@ -76,7 +73,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
         reformationManager = new ReformationManager(this);
         branchManager = new BranchManager(this);
 
-        loadID = UniqueIDManager.Instance.GetUniqueID("RatkinOrder");
+        loadID = UniqueIDManager.GetUniqueID("RatkinOrder");
     }
 
     public void ExposeData()

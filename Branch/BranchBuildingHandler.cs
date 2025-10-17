@@ -16,12 +16,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     public bool HasUnusedNormalSlots => buildings.Count < BuildingCeiling;
     public bool IsNormalBuildingFullyCompleted => buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
 
-    protected List<BranchBuilding> buildings = [];
-    protected BranchBuilding specialBuilding;
+    private List<BranchBuilding> buildings = [];
+    private BranchBuilding specialBuilding;
 
+    public IReadOnlyList<BranchBuilding> Buildings => buildings;
     public BranchBuilding SpecialBuilding => specialBuilding;
 
-    [Unsaved] private List<ITickHour<Branch>> TickLongHandlers;
+    [Unsaved] private List<ITickHour<Branch>> TickHourHandlers;
     [Unsaved] private List<ITickDay<Branch>> TickDayHandlers;
 
     private BranchBuildingDef underConstructionBuilding;
@@ -30,10 +31,10 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public bool IsBusy => underConstructionBuilding is not null;
 
-    public BranchBuildingHandler(Branch branch)
+    internal BranchBuildingHandler(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: 1, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
+        buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: (int)BranchStatDefOf.OARO_BuildingCeiling.baseValue, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
     }
 
     public void ExposeData()
@@ -94,11 +95,26 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             }
         }
 
-        if (TickLongHandlers is not null)
+        if (CanUpgradeBuilding(specialBuilding))
         {
-            for (int i = 0; i < TickLongHandlers.Count; i++)
+            specialBuilding.InitUpgraded();
+            UpgradeBuilding(specialBuilding);
+        }
+
+        for (int i = 0; i < buildings.Count; i++)
+        {
+            if (CanUpgradeBuilding(buildings[i]))
             {
-                TickLongHandlers[i].TickHour(branch);
+                buildings[i].InitUpgraded();
+                UpgradeBuilding(buildings[i]);
+            }
+        }
+
+        if (TickHourHandlers is not null)
+        {
+            for (int i = 0; i < TickHourHandlers.Count; i++)
+            {
+                TickHourHandlers[i].TickHour(branch);
             }
         }
     }
@@ -241,6 +257,12 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         newBuilding.InitActive();
         ActiveBuilding(newBuilding, isSpecial: inSpecialSlot);
+
+        if (CanUpgradeBuilding(newBuilding))
+        {
+            newBuilding.InitUpgraded();
+            UpgradeBuilding(newBuilding);
+        }
     }
 
     public void RemoveBuilding(BranchBuildingDef buildingDef)
@@ -262,7 +284,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (building is ITickHour<Branch> ticksLong)
         {
-            TickLongHandlers?.Remove(ticksLong);
+            TickHourHandlers?.Remove(ticksLong);
         }
         if (building is ITickDay<Branch> newTickDay)
         {
@@ -367,9 +389,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             Log.Error($"{branch} has null buildings after loading, Removed.");
         }
 
-        foreach (BranchBuilding building in buildings)
+        for (int i = 0; i < buildings.Count; i++)
         {
-            ActiveBuilding(building, isSpecial: false);
+            ActiveBuilding(buildings[i], isSpecial: false);
+            if (buildings[i].HasUpgraded)
+            {
+                UpgradeBuilding(buildings[i]);
+            }
         }
     }
 
@@ -383,15 +409,10 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             branch.HonorProperties = building.Def.honorProperties;
         }
 
-        if (CanUpgradeBuilding(building))
-        {
-            UpgradeBuilding(building);
-        }
-
         if (building is ITickHour<Branch> tickLong)
         {
-            TickLongHandlers ??= [];
-            TickLongHandlers.Add(tickLong);
+            TickHourHandlers ??= [];
+            TickHourHandlers.Add(tickLong);
         }
         if (building is ITickDay<Branch> tickDay)
         {
@@ -420,7 +441,6 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         building.HasUpgraded = true;
         branch.EffectTags.IncrementTagsValue(building.Def.advancedProperties.effectFlags, addIfMiss: true);
         branch.TransformerHandler.AddStatModifiers(building.Def.advancedProperties.branchStatModifies);
-
         building.PostUpgraded();
     }
 

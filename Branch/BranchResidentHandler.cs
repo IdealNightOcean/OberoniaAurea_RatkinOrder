@@ -4,14 +4,13 @@ using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IPawnRetentionHolder
+public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHolder
 {
-    [Unsaved] public readonly Branch Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    [Unsaved] private readonly Branch branch;
 
     private ThingOwner<Pawn> residents;
     private List<BranchResidentRecord> residentRecords = [];
@@ -20,7 +19,7 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
     {
         get
         {
-            if (!Branch.WorldObject.Spawned)
+            if (!branch.BaseSite.Spawned)
             {
                 return null;
             }
@@ -28,10 +27,23 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
         }
     }
 
-    public void PostBranchGenerated()
+    internal BranchResidentHandler(Branch branch, bool initCtor)
     {
-        EnsureComponentsInit();
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        if (initCtor)
+        {
+            residents = new ThingOwner<Pawn>(this);
+            residentRecords = [];
+        }
     }
+
+    public void ExposeData()
+    {
+        Scribe_Deep.Look(ref residents, "residents");
+        Scribe_Collections.Look(ref residentRecords, "residentRecords", LookMode.Deep);
+    }
+
+    internal void PostBranchGenerated() { }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
@@ -89,7 +101,7 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
     public void ForceEndAllResidency()
     {
         residentRecords.Clear();
-        Caravan caravan = CaravanMaker.MakeCaravan(residents.InnerListForReading, Faction.OfPlayer, Branch.WorldObject.Tile, addToWorldPawnsIfNotAlready: true);
+        Caravan caravan = CaravanMaker.MakeCaravan(residents.InnerListForReading, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
     }
 
     private void FinishResidency(IEnumerable<BranchResidentRecord> residentRecords)
@@ -101,7 +113,7 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
 
         foreach (BranchResidentRecord record in residentRecords)
         {
-            record.ResidencyWorker?.ResidencyEnd(Branch, record.Resident, record.TotalDeployDays);
+            record.ResidencyWorker?.ResidencyEnd(branch, record.Resident, record.TotalDeployDays);
         }
 
         List<Pawn> pawns = residentRecords.Select(rc => rc.Resident)
@@ -109,7 +121,7 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
         Map map = Find.AnyPlayerHomeMap;
         if (map is null)
         {
-            Caravan caravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, Branch.WorldObject.Tile, addToWorldPawnsIfNotAlready: true);
+            Caravan caravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
             Find.LetterStack.ReceiveLetter("OARO_LetterLabel_DeployFinished".Translate(),
                                            "OARO_Letter_DeployFinishedCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
                                            LetterDefOf.PositiveEvent, caravan);
@@ -130,16 +142,8 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
 
     internal void PostLoadInit()
     {
-        EnsureComponentsInit();
         residents.RemoveAll(p => p.DestroyedOrNull());
         residentRecords.RemoveAll(rc => rc is null || rc.Resident.DestroyedOrNull());
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void EnsureComponentsInit()
-    {
-        residents ??= new ThingOwner<Pawn>(this);
-        residentRecords ??= [];
     }
 
     private static int ResidencyInsertCompare(ResidencyWorker x, ResidencyWorker y)
@@ -152,22 +156,13 @@ public class BranchResidentHandler(Branch branch) : IExposable, IThingHolder, IP
                   .CompareTo((y.Priority, y.GetType().FullName));
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public ThingOwner GetDirectlyHeldThings()
     {
         return residents;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void GetChildHolders(List<IThingHolder> outChildren)
     {
         ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, GetDirectlyHeldThings());
     }
-
-    public void ExposeData()
-    {
-        Scribe_Deep.Look(ref residents, "residents");
-        Scribe_Collections.Look(ref residentRecords, "residentRecords", LookMode.Deep);
-    }
-
 }

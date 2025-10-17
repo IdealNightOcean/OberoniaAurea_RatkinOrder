@@ -66,6 +66,14 @@ public class BranchBuilding : IExposable
     /// </summary>
     public virtual void PostDeactive() { }
 
+    /// <summary>
+    /// 仅在建筑升级时触发
+    /// </summary>
+    public virtual void InitUpgraded() { }
+
+    /// <summary>
+    ///  建筑升级时和已升级建筑加载存档时触发
+    /// </summary>
     public virtual void PostUpgraded() { }
 
     public bool TryGetStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)

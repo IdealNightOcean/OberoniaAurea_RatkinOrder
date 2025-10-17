@@ -148,7 +148,7 @@ public static class ModUtility
         }
         yield return new Rule_String(prefix + "name", branch.Name.Colorize(ratkinOrder.Color));
         yield return new Rule_String(prefix + "nameFull", branch.NameFull.Colorize(ratkinOrder.Color));
-        foreach (Rule worldObjRule in GrammarUtility.RulesForWorldObject(prefix + "Site", branch.WorldObject))
+        foreach (Rule worldObjRule in GrammarUtility.RulesForWorldObject(prefix + "Site", branch.BaseSite))
         {
             yield return worldObjRule;
         }

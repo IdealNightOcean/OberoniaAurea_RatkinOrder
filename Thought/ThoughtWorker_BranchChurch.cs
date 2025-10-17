@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ThoughtWorker_BranchChurch : ThoughtWorker
 {
-    private static SimpleMapCahce<short> mapCahce = new(60000, defaultValue: 0, onlyPlayerHome: true, GetChurchCount);
+    private static SimpleMapCahce<int> mapCahce = new(60000, defaultValue: -1, onlyPlayerHome: true, GetChurchCount);
 
     protected override ThoughtState CurrentStateInternal(Pawn p)
     {
@@ -16,28 +16,39 @@ public class ThoughtWorker_BranchChurch : ThoughtWorker
             return ThoughtState.Inactive;
         }
 
-        short count = mapCahce.GetCachedResult(p.Map);
-        return count > 0 ? ThoughtState.ActiveAtStage(count - 1) : ThoughtState.Inactive;
+        int stage = mapCahce.GetCachedResult(p.Map);
+        return stage < 0 ? ThoughtState.Inactive : ThoughtState.ActiveAtStage(stage);
     }
 
-
-    private static short GetChurchCount(Map map)
+    private static int GetChurchCount(Map map)
     {
-        IEnumerable<Branch> branchesInRadius = map.GetComponent<MapComponent_RatkinOrder>()?.BranchesInRadius;
-        if (branchesInRadius is null)
+        IReadOnlyList<Branch> branchesInRadius = map.GetComponent<MapComponent_RatkinOrder>()?.BranchesInRadius;
+        if (branchesInRadius is null || branchesInRadius.Count == 0)
         {
-            return 0;
+            return -1;
         }
 
-        short count = 0;
-        foreach (Branch branch in branchesInRadius)
+        int count = 0;
+        bool hasAdvanced = false;
+        for (int i = 0; i < branchesInRadius.Count; i++)
         {
-            if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.Propaganda))
+            if (branchesInRadius[i].EffectTags.HasTag(KeyLibrary_EffectTag.AdvancedPropaganda))
+            {
+                count++;
+                hasAdvanced = true;
+            }
+            else if (branchesInRadius[i].EffectTags.HasTag(KeyLibrary_EffectTag.Propaganda))
             {
                 count++;
             }
         }
-        return count;
+
+        if (count <= 0)
+        {
+            return -1;
+        }
+
+        return (count > 2 ? 2 : count) - 1 + (hasAdvanced ? 2 : 0);
     }
 
     public static void ClearStaticCache()

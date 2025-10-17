@@ -2,6 +2,7 @@
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -134,7 +135,7 @@ public class QuestPart_BranchPopulationChange : QuestPart
 
         if (!hasTriggerd && signal.tag == InSignalTrigger)
         {
-            Branch.PopulationHandler.AdjustPopulation(Amount * ChangeFactor);
+            Branch.PopulationHandler.Population += Mathf.RoundToInt(Amount * ChangeFactor);
             hasTriggerd = true;
         }
     }

@@ -6,9 +6,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatPart_SupplyRecoveryRate : BranchStatPart
 {
-    public override float PostTransform(Branch branch, float value)
+    public override void PostTransform(Branch branch, ref float curValue)
     {
-        return value + branch.PopulationHandler.Population / 100f * 0.0005f;
+        curValue += branch.PopulationHandler.Population / 100f * 0.0005f;
     }
 
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)

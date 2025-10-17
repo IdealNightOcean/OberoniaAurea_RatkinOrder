@@ -39,9 +39,9 @@ public static class BranchStatUtility
         {
             explanation.AppendLine("OARO_StatExplain_StatParts".Translate());
             List<BranchStatPart> statParts = statDef.statParts;
-            for (int i = 0; i < statParts.Count; i++)
+            for (int i = 0; i < statDef.statParts.Count; i++)
             {
-                result = statParts[i].PostTransform(branch, result);
+                statParts[i].PostTransform(branch, ref result);
                 statParts[i].ModifyExplanation(branch, explanation);
             }
         }
@@ -55,15 +55,15 @@ public static class BranchStatUtility
         switch (statDef.statType)
         {
             case BranchStatDef.StatType.Int:
-                explanation.AppendLine("OARO_StatExplain_ResultInt".Translate(Mathf.Round(result).ToStringWithSign())
-                                                                .Colorize((result < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+                explanation.AppendLine("OARO_StatExplain_ResultInt".Translate(Mathf.Round(result).ToString())
+                                                                   .Colorize((result < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
                 break;
             case BranchStatDef.StatType.Float:
-                explanation.AppendLine("OARO_StatExplain_Result".Translate(result.ToStringWithSign("F2"))
+                explanation.AppendLine("OARO_StatExplain_Result".Translate(result.ToString("F2"))
                                                                 .Colorize((result < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
                 break;
             case BranchStatDef.StatType.Percent:
-                explanation.AppendLine("OARO_StatExplain_Result".Translate(result.ToStringPercentSigned("F2"))
+                explanation.AppendLine("OARO_StatExplain_Result".Translate(result.ToStringPercent("F2"))
                                                                 .Colorize((result < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
                 break;
             default: break;
@@ -109,9 +109,9 @@ public static class BranchStatUtility
 
         if (statDef.statParts is not null)
         {
-            foreach (BranchStatPart part in statDef.statParts)
+            for (int i = 0; i < statDef.statParts.Count; i++)
             {
-                result = part.PostTransform(branch, result);
+                statDef.statParts[i].PostTransform(branch, ref result);
             }
         }
 
@@ -129,9 +129,9 @@ public static class BranchStatUtility
 
         if (statDef.statParts is not null)
         {
-            foreach (BranchStatPart part in statDef.statParts)
+            for (int i = 0; i < statDef.statParts.Count; i++)
             {
-                result = part.PostTransform(branch, result);
+                statDef.statParts[i].PostTransform(branch, ref result);
             }
         }
 

@@ -94,6 +94,30 @@ public class BranchBuildingWithComps : BranchBuilding
         }
     }
 
+    public override void InitUpgraded()
+    {
+        base.InitUpgraded();
+        if (comps is not null)
+        {
+            for (int i = 0; i < comps.Count; i++)
+            {
+                comps[i].PostInitUpgraded();
+            }
+        }
+    }
+
+    public override void PostUpgraded()
+    {
+        base.PostUpgraded();
+        if (comps is not null)
+        {
+            for (int i = 0; i < comps.Count; i++)
+            {
+                comps[i].PostPostUpgraded();
+            }
+        }
+    }
+
     public T GetComp<T>() where T : BranchBuildingComp
     {
         if (comps is null || comps.Count == 0)

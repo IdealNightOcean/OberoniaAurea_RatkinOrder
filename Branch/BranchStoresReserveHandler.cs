@@ -7,9 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOfDay
+public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
 {
-    [Unsaved] private readonly Branch branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    [Unsaved] private readonly Branch branch;
 
     private static readonly float[] CostRateReduceArr = [0.02f, 0.01f, 0.005f, 0.0025f];
     private const int StoresReserveCeiling = 3;
@@ -19,6 +19,11 @@ public class BranchStoresReserveHandler(Branch branch) : IExposable, ITickHourOf
 
     public ReserveRecord PrimaryReserves => storesReserves.FirstOrFallback(null);
     public float PrimaryCostRateReduce => PrimaryReserves?.CostRateReduce ?? 0f;
+
+    internal BranchStoresReserveHandler(Branch branch)
+    {
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+    }
 
     public void ExposeData()
     {

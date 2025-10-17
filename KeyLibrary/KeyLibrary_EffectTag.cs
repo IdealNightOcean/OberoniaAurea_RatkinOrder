@@ -6,6 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 public static class KeyLibrary_EffectTag
 {
     public const string Propaganda = "Propaganda"; //教堂宣讲
+    public const string AdvancedPropaganda = "AdvancedPropaganda"; //高级教堂宣讲
     public const string IntensiveTrain = "IntensiveTrain"; //强化训练
 
     public const string BlockSquadRecover = "BlockSquadRecover";  //禁用分队恢复

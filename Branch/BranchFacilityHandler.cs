@@ -14,17 +14,30 @@ public class BranchFacilityHandler : IExposable
     [Unsaved] private readonly Branch branch;
 
     private Dictionary<BranchFacilityDef, BranchFacilityLevel> facilities = [];
+    public IReadOnlyDictionary<BranchFacilityDef, BranchFacilityLevel> Facilities => facilities;
+
     [Unsaved] private int totalFacilityLevel;
+    [Unsaved] private bool facilityLevelDirty = true;
+    public int TotalFacilityLevel
+    {
+        get
+        {
+            if (facilityLevelDirty)
+            {
+                totalFacilityLevel = facilities.Sum(kv => (int)kv.Value);
+                facilityLevelDirty = false;
+            }
+            return totalFacilityLevel;
+        }
+    }
 
     public bool IsFacilityFullyCompleted { get; private set; }
-    public Dictionary<BranchFacilityDef, BranchFacilityLevel> Facilities => facilities;
-    public int TotalFacilityLevel => totalFacilityLevel;
 
     private BranchFacilityDef buildingFacility;
     private int buildingTicksLeft = -1;
     public bool IsBusy => buildingFacility is not null;
 
-    public BranchFacilityHandler(Branch branch)
+    internal BranchFacilityHandler(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
     }
@@ -33,31 +46,32 @@ public class BranchFacilityHandler : IExposable
     {
         Scribe_Collections.Look(ref facilities, "facilities", LookMode.Def, LookMode.Value);
 
-        Scribe_Values.Look(ref totalFacilityLevel, "totalFacilityLevel", 0);
         Scribe_Defs.Look(ref buildingFacility, "buildingFacility");
         Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"TotalFacilityLevel: {totalFacilityLevel}");
+        listing_Rect.Label($"TotalFacilityLevel: {TotalFacilityLevel}");
         foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> facility in facilities)
         {
             listing_Rect.SubLabel($"{facility.Key.label}: {facility.Value}", 0.8f);
         }
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label("BuildingFacility");
+
         if (buildingFacility is null)
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.Label("BuildingFacility: None");
         }
         else
         {
-            listing_Rect.SubLabel(buildingFacility.label, 0.8f);
+            listing_Rect.Label($"BuildingFacility: {buildingFacility.label} | {buildingTicksLeft}");
         }
-        listing_Rect.Label($"BuildingTicksLeft: {buildingTicksLeft}");
     }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public BranchFacilityLevel GetFacilityLevel(BranchFacilityDef facilityDef) => facilities.TryGetValue(facilityDef, fallback: BranchFacilityLevel.None);
 
     public void TickHour()
     {
@@ -124,18 +138,6 @@ public class BranchFacilityHandler : IExposable
         buildingFacility = null;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public BranchFacilityLevel GetFacilityLevel(BranchFacilityDef facilityDef) => facilities.TryGetValue(facilityDef, fallback: BranchFacilityLevel.None);
-
-    public void AddFacility(BranchFacilityDef facilityDef)
-    {
-        if (facilityDef is null || facilities.ContainsKey(facilityDef))
-        {
-            return;
-        }
-        ActiveStage(facilityDef, BranchFacilityLevel.Poor);
-    }
-
     public bool TryActiveNewStage(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel, bool addIfMiss = false)
     {
         if (facilityDef is null || targetLevel == BranchFacilityLevel.None)
@@ -143,8 +145,12 @@ public class BranchFacilityHandler : IExposable
             return false;
         }
 
-        BranchFacilityLevel oldLevel = facilities.TryGetValue(facilityDef, fallback: BranchFacilityLevel.None);
-        if ((!addIfMiss && oldLevel == BranchFacilityLevel.None) || oldLevel == BranchFacilityLevel.Excellent || oldLevel >= targetLevel)
+        if (!facilities.TryGetValue(facilityDef, out BranchFacilityLevel oldLevel) && !addIfMiss)
+        {
+            return false;
+        }
+
+        if (oldLevel == BranchFacilityLevel.Excellent || oldLevel >= targetLevel)
         {
             return false;
         }
@@ -177,6 +183,7 @@ public class BranchFacilityHandler : IExposable
         ActiveStage(facilityDef, targetLevel);
 
         facilities[facilityDef] = targetLevel;
+        facilityLevelDirty = true;
         IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
 
         //需要在设施等级改变后再次重新获取 factor == 0f 的BranchStat

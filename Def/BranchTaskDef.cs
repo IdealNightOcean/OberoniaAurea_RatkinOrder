@@ -11,7 +11,7 @@ public class BranchTaskDef : Def
         Low,
         Medium,
         High,
-        Urgency,
+        Urgency
     }
 
     private static readonly Type DefaultStartCheckerClass = typeof(BranchTaskStartChecker);
@@ -27,7 +27,6 @@ public class BranchTaskDef : Def
     public bool canInterrupted = true;
     public bool canInterruptedByJointPatrol = true; //能否被边境轮巡打断
     public bool ignoreRest = false; //是否无视休息
-    public bool isOutdoor = false; //是否为户外任务
 
     public bool canBeRandomlyChosen = true;
 

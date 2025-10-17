@@ -6,9 +6,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatPart_SquadMemberCeiling : BranchStatPart
 {
-    public override float PostTransform(Branch branch, float value)
+    public override void PostTransform(Branch branch, ref float curValue)
     {
-        return value + branch.RatkinOrder.FundHandler.Funds;
+        curValue += branch.RatkinOrder.FundHandler.Funds;
     }
 
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)
