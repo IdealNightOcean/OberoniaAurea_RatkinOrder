@@ -7,6 +7,8 @@ public class BuildingAdvancedProperties
 {
     [MustTranslate]
     public string label;
+    [MustTranslate]
+    public string extraDescription;
 
     public int advancedPopulation;
 

@@ -18,7 +18,7 @@ public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveD
 
     public int silverCost; //白银花费
     public float constructionDays; //建造所需天数
-    public int recommendedPopulation;
+    public int suggestedMinPopulation;
 
     public bool IsUpgradable => advancedProperties is not null;
     public BuildingAdvancedProperties advancedProperties;
