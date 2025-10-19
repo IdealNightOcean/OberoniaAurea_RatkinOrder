@@ -1,21 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class OrderInteractionDef : Def
+public class OrderInteractionDef : InteractionDefBase
 {
     public Type workerClass;
     private OrderInteractionWorker worker;
-    public OrderInteractionWorker Worker => worker ??= (OrderInteractionWorker)Activator.CreateInstance(workerClass, this);
-    public string cdRecordKey;
+    public OrderInteractionWorker Worker => worker ??= (OrderInteractionWorker)Activator.CreateInstance(workerClass, args: this);
 
-    public int cdDays;
-
-    public int needRecommendation;
-    public float needFund;
-
+    public float needFund = -1f;
     /// <summary>
     /// 只在 needFund > 0f 时生效
     /// needFund > 0f 时
@@ -24,8 +18,7 @@ public class OrderInteractionDef : Def
     /// </summary>
     public OrderFundEventDef fundEventDef;
 
-    public EsteemHandler.RelationshipKind floorRelationship = EsteemHandler.RelationshipKind.Stranger;
-    public int floorEsteem;
+    public float MinFundNeeded => needFund > 0f ? needFund : (fundEventDef is null ? 0f : fundEventDef.changeRange.min);
 
     public override IEnumerable<string> ConfigErrors()
     {
@@ -36,6 +29,11 @@ public class OrderInteractionDef : Def
         if (workerClass is null)
         {
             yield return "has a null workerClass.";
+        }
+
+        if (needFund > 0f && fundEventDef is not null)
+        {
+            yield return "can't set both needFund and fundEventDef.";
         }
     }
 }

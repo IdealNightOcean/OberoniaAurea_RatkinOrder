@@ -88,7 +88,7 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
     {
         if (CanRetain)
         {
-            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = ModUtility.ConfirmDiaNodeTreeWithRatkinOrderInfo(
+            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.ConfirmDiaNodeTreeWithRatkinOrderInfo(
                 text: "OARO_AssistKnight_RetainInfo".Translate(RatkinOrder.Name),
                 ratkinOrder: RatkinOrder,
                 acceptText: "OARO_AssistKnight_Retain".Translate(),

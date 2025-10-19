@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class CertainDateLetterDef : SpecialLetterBaseDef
+public class CertainDateLetterDef : SpecialLetterDefBase
 {
     private static readonly int curYear = DateTime.Now.Year;
 

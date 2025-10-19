@@ -78,9 +78,10 @@
     <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
+    <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchStat\BranchStatPart_SupplyRecoveryRate.cs" />
     <Compile Include="BranchStat\BranchStatPart_SquadMemberRecoveryRate.cs" />
-    <Compile Include="BranchStat\BranchStatPart_ConstructionCost.cs" />
+    <Compile Include="BranchStat\BranchStatPart_ConstructionCostFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_NaturalPopulationCeiling.cs" />
     <Compile Include="BranchStat\BranchStatPart_DailyPopulationGrowth.cs" />
     <Compile Include="BranchTask\BranchTask.cs" />
@@ -97,6 +98,8 @@
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
     <Compile Include="BranchBuilding\HonorBranchProperties.cs" />
+    <Compile Include="Def\BranchInteractionDef.cs" />
+    <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\SpecialLetterDef.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
     <Compile Include="Hediff\Hediff_HonorHunting.cs" />
@@ -201,6 +204,8 @@
     <Compile Include="Def\ResidentKnightRoleDef.cs" />
     <Compile Include="Thing\CompPlagueSample.cs" />
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
+    <Compile Include="Utility\BranchConstructUtility.cs" />
+    <Compile Include="Utility\WindowUtility.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
     <Compile Include="Utility\QuestUtility.cs" />
     <Compile Include="Utility\RelationshipUtility.cs" />
@@ -270,7 +275,6 @@
     <Compile Include="BranchStat\BranchStatWorker.cs" />
     <Compile Include="BranchStat\BranchStatPart_AffectRadius.cs" />
     <Compile Include="BranchStat\BranchStatPart_SquadMemberCeiling.cs" />
-    <Compile Include="BranchStat\BranchStatWorker_Transformer.cs" />
     <Compile Include="Branch\Branch.cs" />
     <Compile Include="BranchBuilding\BranchBuildingConstructChecker.cs" />
     <Compile Include="Branch\BranchBuildingHandler.cs" />
@@ -287,6 +291,7 @@
     <Compile Include="BranchBuilding\BranchBuilding.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
+    <Compile Include="Window\MainTabWindow_InteractionKnights.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_TownConstruction.cs" />
     <Compile Include="Worldobject\Demand\GenStep_NobilityTerritoryPawns.cs" />

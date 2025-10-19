@@ -35,7 +35,7 @@ public static class BranchStatUtility
             if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
             {
                 explanation.AppendLine("OARO_StatExplain_BranchInfrastructure".Translate());
-                tempTransformer.ModifyExplanation(statDef, explanation);
+                tempTransformer.AppendTransExplanation(statDef, explanation);
 
                 if (showResultValue)
                 {
@@ -46,7 +46,7 @@ public static class BranchStatUtility
             if (branch.TransformerHandler.TryGetStatTransformer(statDef, out transformer))
             {
                 explanation.AppendLine("OARO_StatExplain_OrderReformation".Translate());
-                tempTransformer.ModifyExplanation(statDef, explanation);
+                tempTransformer.AppendTransExplanation(statDef, explanation);
 
                 if (showResultValue)
                 {
@@ -130,7 +130,19 @@ public static class BranchStatUtility
         float result;
         try
         {
-            if (TryGetStatTransformer(branch, statDef, out BranchStatTransformer transformer))
+            BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
+            bool hasTransformer = false;
+            if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
+            {
+                transformer.MergeWith(tempTransformer);
+                hasTransformer = true;
+            }
+            if (branch.TransformerHandler.TryGetStatTransformer(statDef, out tempTransformer))
+            {
+                transformer.MergeWith(tempTransformer);
+                hasTransformer = true;
+            }
+            if (hasTransformer)
             {
                 result = transformer.DoTransform(statDef, baseValueOverride);
             }
@@ -188,22 +200,5 @@ public static class BranchStatUtility
             Log.Error($"Failed to calculate new BranchStat value: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}].\nException:\n" + ex);
         }
         return result;
-    }
-
-    public static bool TryGetStatTransformer(this Branch branch, BranchStatDef statDef, out BranchStatTransformer transformer)
-    {
-        transformer = BranchStatTransformer.DefaultTransformer;
-        bool hasTransformer = false;
-        if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
-        {
-            transformer.MergeWith(tempTransformer);
-            hasTransformer = true;
-        }
-        if (branch.TransformerHandler.TryGetStatTransformer(statDef, out tempTransformer))
-        {
-            transformer.MergeWith(tempTransformer);
-            hasTransformer = true;
-        }
-        return hasTransformer;
     }
 }

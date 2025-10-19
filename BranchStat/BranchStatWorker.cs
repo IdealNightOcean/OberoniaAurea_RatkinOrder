@@ -9,9 +9,9 @@ public class BranchStatWorker(BranchStatDef statDef)
 {
     public readonly BranchStatDef StatDef = statDef ?? throw new ArgumentNullException(nameof(statDef));
 
-    protected Dictionary<Branch, CacheEnty> temporaryStatCache = statDef.cacheable ? [] : null;
+    private Dictionary<Branch, CacheEnty> temporaryStatCache = statDef.cacheable ? [] : null;
 
-    public virtual float GetValue(Branch branch, float? baseValueOverride = null, bool immediateUpdate = false)
+    public float GetValue(Branch branch, float? baseValueOverride = null, bool immediateUpdate = false)
     {
         if (!StatDef.cacheable)
         {
@@ -48,7 +48,7 @@ public class BranchStatWorker(BranchStatDef statDef)
         }
     }
 
-    public virtual void DeleteStatCache()
+    public void DeleteStatCache()
     {
         temporaryStatCache = null;
     }

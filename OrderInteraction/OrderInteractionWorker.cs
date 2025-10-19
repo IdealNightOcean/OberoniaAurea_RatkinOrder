@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using Verse;
 
@@ -21,13 +22,9 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_Esteem".Translate(Def.floorEsteem);
         }
-        if (ratkinOrder.Funds < Def.needFund)
+        if (ratkinOrder.Funds < Def.MinFundNeeded)
         {
-            return resultOnly ? false : "OARO_Insufficient_Fund".Translate((Def.needFund * 0.01f).ToStringPercent("F2"));
-        }
-        if (Def.fundEventDef is not null && ratkinOrder.Funds < Def.fundEventDef.changeRange.min)
-        {
-            return resultOnly ? false : "OARO_Insufficient_Fund".Translate((Def.fundEventDef.changeRange.min * 0.01f).ToStringPercent("F2"));
+            return resultOnly ? false : "OARO_Insufficient_Fund".Translate(Def.MinFundNeeded.ToStringPercent("F2"));
         }
         if (!Def.cdRecordKey.NullOrEmpty())
         {
@@ -41,6 +38,10 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
         }
+        if (Def.needSilver > 0 && !map.HasEnoughThingsOfDef(ThingDefOf.Silver, Def.needSilver))
+        {
+            return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, Def.needSilver);
+        }
         return true;
     }
 
@@ -48,25 +49,43 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
 
     public void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
-        if (Def.needFund != 0f)
+        try
         {
-            ratkinOrder.FundHandler.AdjustFundsImmediately(Def.needFund, Def.label);
+            if (Def.needFund > 0f)
+            {
+                ratkinOrder.FundHandler.AdjustFundsImmediately(Def.needFund, Def.label);
+            }
+            else if (Def.fundEventDef is not null)
+            {
+                ratkinOrder.FundHandler.AddFundEvent(Def.fundEventDef);
+            }
+
+            if (Def.cdDays > 0 && !Def.cdRecordKey.NullOrEmpty())
+            {
+                ratkinOrder.CooldownManager.RegisterRecord(Def.cdRecordKey, cdTicks: Def.cdDays * 60000);
+            }
+
+            if (Def.needRecommendation > 0)
+            {
+                RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, Def.needRecommendation);
+            }
+            if (Def.needSilver > 0)
+            {
+                map.DestoryThingsOfDef(ThingDefOf.Silver, Def.needSilver);
+            }
         }
-        if (Def.fundEventDef is not null)
+        catch (Exception ex)
         {
-            ratkinOrder.FundHandler.AddFundEvent(Def.fundEventDef);
+            Log.Error($"Error processing costs for BranchInteraction [{Def.defName}].\nException:\n{ex}");
         }
 
-        if (Def.cdDays > 0 && !Def.cdRecordKey.NullOrEmpty())
+        try
         {
-            ratkinOrder.CooldownManager.RegisterRecord(Def.cdRecordKey, cdTicks: Def.cdDays * 60000);
+            InteractionEffect(ratkinOrder, map);
         }
-
-        if (Def.needRecommendation > 0)
+        catch (Exception ex)
         {
-            RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, Def.needRecommendation);
+            Log.Error($"Error triggering effect for BranchInteraction [{Def.defName}].\nException:\n{ex}");
         }
-
-        InteractionEffect(ratkinOrder, map);
     }
 }

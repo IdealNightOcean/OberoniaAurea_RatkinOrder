@@ -199,7 +199,7 @@ public static class GlobalOrderInteractionUtility
         grammarRequest.Constants.Add("isProactive", isProactive.ToString());
         TaggedString talkText = GrammarResolver.Resolve("r_text", grammarRequest);
 
-        Find.WindowStack.Add(ModUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(talkText, branch.RatkinOrder));
+        Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(talkText, branch.RatkinOrder));
     }
 
     /// <summary>
@@ -208,29 +208,33 @@ public static class GlobalOrderInteractionUtility
     public static float InvitationAcceptanceChance(AroundKnightGroup knights, bool resultOnly, out string explain)
     {
         explain = null;
-        if (AroundKnightGroup.Validate(knights))
+        if (!AroundKnightGroup.Validate(knights))
         {
             return 0f;
         }
         float curChance = 0f;
 
-        StringBuilder sb = resultOnly ? null : new();
+        StringBuilder sb = resultOnly ? null : new(128);
         RatkinOrder ratkinOrder = knights.RatkinOrder;
 
-        ApplyStepChange((int)ratkinOrder.Relationship * 0.04f, "OARO_ChangeOffset_Relationship");
+        float stepChange = (int)ratkinOrder.Relationship * 0.04f;
+        if (stepChange != 0f)
+        {
+            ApplyStepChange(stepChange, "OARO_ChangeOffset_Relationship");
+        }
+
         ApplyStepChange(ratkinOrder.Esteem * 0.01f, "OARO_ChangeOffset_Esteem");
 
-        float stepChange = knights.CurBusyLevel switch
+        stepChange = knights.CurBusyLevel switch
         {
             AroundKnightGroup.BusyLevel.Leisure => 0.2f,
             AroundKnightGroup.BusyLevel.Busy => -0.2f,
             AroundKnightGroup.BusyLevel.VeryBusy => -0.6f,
             _ => 0f
         };
-        curChance += stepChange;
-        if (stepChange != 0f && !resultOnly)
+        if (stepChange != 0f)
         {
-            sb.AppendInNewLine($"OARO_AroundKnights_{knights.CurBusyLevel}_Offset".Translate().Colorize(Color.green));
+            ApplyStepChange(stepChange, $"OARO_AroundKnights_{knights.CurBusyLevel}_Offset");
         }
 
         if (knights.TravelTicks >= 60000)
@@ -276,7 +280,7 @@ public static class GlobalOrderInteractionUtility
             curChance += change;
             if (!resultOnly)
             {
-                sb.AppendInNewLine(reason.Translate(change.ToStringPercent("F2")).Colorize(change < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendInNewLine(reason.Translate(change.ToStringPercentSigned("F2")).Colorize(change < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
     }

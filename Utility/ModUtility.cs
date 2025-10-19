@@ -1,7 +1,5 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using RimWorld.Planet;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -152,17 +150,5 @@ public static class ModUtility
         {
             yield return worldObjRule;
         }
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Dialog_NodeTreeWithRatkinOrderInfo DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(TaggedString text, RatkinOrder ratkinOrder, Action acceptAction = null, Action rejectAction = null)
-    {
-        return new Dialog_NodeTreeWithRatkinOrderInfo(OAFrame_DiaUtility.ConfirmDiaNode(text, "Confirm".Translate(), acceptAction, "Close".Translate(), rejectAction), ratkinOrder);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Dialog_NodeTreeWithRatkinOrderInfo ConfirmDiaNodeTreeWithRatkinOrderInfo(TaggedString text, RatkinOrder ratkinOrder, string acceptText = null, Action acceptAction = null, string rejectText = null, Action rejectAction = null)
-    {
-        return new Dialog_NodeTreeWithRatkinOrderInfo(OAFrame_DiaUtility.ConfirmDiaNode(text, acceptText, acceptAction, rejectText, rejectAction), ratkinOrder);
     }
 }

@@ -19,7 +19,6 @@ public class AroundKnightGroup : IExposable
     public BusyLevel CurBusyLevel;
 
     public Branch Branch => branch;
-    public BranchSquad Squad => branch?.Squad;
     public RatkinOrder RatkinOrder => branch?.RatkinOrder;
 
     private AroundKnightGroup() { }

@@ -66,7 +66,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
     internal void PostBranchGenerated()
     {
-        population = (int)(naturalPopulationCeilingCache.GetCachedResult() * 0.5f);
+        population = (int)(naturalPopulationCeilingCache.GetCachedResult() * Rand.Range(0.3f, 0.7f));
         yesterdayPopulation = population;
     }
 }

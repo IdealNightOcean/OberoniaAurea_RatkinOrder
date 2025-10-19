@@ -2,7 +2,7 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class SpecialLetterBaseDef : Def
+public abstract class SpecialLetterDefBase : Def
 {
     [MustTranslate]
     public string sender;
@@ -18,4 +18,4 @@ public abstract class SpecialLetterBaseDef : Def
 }
 
 
-public class SpecialLetterDef : SpecialLetterBaseDef;
+public class SpecialLetterDef : SpecialLetterDefBase;

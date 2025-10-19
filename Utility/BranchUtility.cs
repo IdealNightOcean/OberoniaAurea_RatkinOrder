@@ -6,7 +6,6 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using Verse;
 using Verse.Grammar;
 
@@ -197,12 +196,6 @@ public static class BranchUtility
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static BranchFacilityLevel BranchFacilityLevelOffSetBy(BranchFacilityLevel level, int offset)
-    {
-        return (BranchFacilityLevel)Mathf.Clamp((int)level + offset, 0, 4);
-    }
-
     /// <summary>
     /// 重新获取该分部某个BranchStatDef的对应BranchStatTransformer
     /// </summary>
@@ -229,18 +222,6 @@ public static class BranchUtility
                 branch.TransformerHandler.AddStatTransformer(statDef, transformer);
             }
         }
-    }
-
-    /// <summary>
-    /// 获取升级设施所需白银花费
-    /// </summary>
-    public static int GetFacilitySilverCost(Branch branch, BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel)
-    {
-        float baseCost = facilityDef.GetLevelStage(targetLevel)?.silverCost ?? BranchStatDefOf.OARO_ConstructionCost.baseValue;
-        float result = branch.GetStatValue(BranchStatDefOf.OARO_ConstructionCost, baseValueOverride: baseCost);
-        result *= (1f - branch.StoresReserveHandler.GetReserveCostReduce(facilityDef));
-
-        return (int)result;
     }
 
     public static void OnBranchDestroyed(this QuestManager questManager, Branch branch)

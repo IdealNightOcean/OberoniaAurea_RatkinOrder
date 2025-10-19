@@ -92,11 +92,11 @@ public class BranchFacilityHandler : IExposable
         {
             return resultOnly ? false : "OARO_FacilityAlreadyAtMaxLevel".Translate();
         }
-        BranchFacilityLevel newLevel = BranchUtility.BranchFacilityLevelOffSetBy(oldLevel, 1);
+        BranchFacilityLevel targetLevel = oldLevel.FacilityLevelOffSetBy(1);
 
         if (byPlayer)
         {
-            int silverCost = BranchUtility.GetFacilitySilverCost(branch, facilityDef, newLevel);
+            int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
             if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OARO_NotEnoughSilver".Translate(silverCost);
@@ -115,11 +115,12 @@ public class BranchFacilityHandler : IExposable
         }
 
         buildingFacility = facilityDef;
-        buildingTicksLeft = Find.TickManager.TicksGame;
+        BranchFacilityLevel targetLevel = oldLevel.FacilityLevelOffSetBy(1);
+        buildingTicksLeft = branch.GetFacilityTimeCost(facilityDef, targetLevel);
 
         if (byPlayer)
         {
-            int silverCost = BranchUtility.GetFacilitySilverCost(branch, facilityDef, BranchUtility.BranchFacilityLevelOffSetBy(oldLevel, 1));
+            int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, silverCost);
         }
 
@@ -132,7 +133,7 @@ public class BranchFacilityHandler : IExposable
         {
             return;
         }
-        TryActiveNewStage(buildingFacility, BranchUtility.BranchFacilityLevelOffSetBy(GetFacilityLevel(buildingFacility), 1));
+        TryActiveNewStage(buildingFacility, GetFacilityLevel(buildingFacility).FacilityLevelOffSetBy(1), addIfMiss: true);
 
         buildingTicksLeft = -1;
         buildingFacility = null;

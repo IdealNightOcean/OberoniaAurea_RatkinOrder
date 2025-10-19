@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -10,17 +9,17 @@ public class BranchStatDef : Def
     public enum StatType : byte
     {
         Float,
-        Percent,
         Int,
+        Percent
     }
-    public StatType statType = StatType.Float; //属性类型
-    public Type workerClass = typeof(BranchStatWorker); //属性计算器类
-    private BranchStatWorker worker;
-    public BranchStatWorker Worker => worker ??= (BranchStatWorker)Activator.CreateInstance(workerClass, args: this);
 
+    private BranchStatWorker worker;
+    public BranchStatWorker Worker => worker ??= new BranchStatWorker(this);
+
+    public StatType statType = StatType.Float; //属性类型
     /// <summary>
     /// 一般的Stat越大越好（如影响距离）
-    /// 反转的Stat越小越好（如建设花费）
+    /// 反转的Stat越小越好（如建设花费系数）
     /// </summary>
     public bool reverse;
 
@@ -35,12 +34,6 @@ public class BranchStatDef : Def
 
     public override void PostLoad()
     {
-        if (statType == StatType.Int)
-        {
-            minValue = Mathf.Round(minValue);
-            maxValue = Mathf.Round(maxValue);
-        }
-
         if (nonNegative)
         {
             minValue = Mathf.Max(minValue, 0f);
@@ -52,9 +45,14 @@ public class BranchStatDef : Def
             (minValue, maxValue) = (maxValue, minValue);
         }
 
+        if (statType == StatType.Int)
+        {
+            minValue = Mathf.FloorToInt(minValue);
+            maxValue = Mathf.CeilToInt(maxValue);
+        }
+
         baseValue = Mathf.Clamp(baseValue, minValue, maxValue);
 
         statParts?.SortByDescending(part => part.Priority);
-
     }
 }

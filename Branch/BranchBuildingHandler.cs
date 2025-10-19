@@ -164,14 +164,6 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         return (null, false);
     }
 
-    public int GetBuildingSilverCost(BranchBuildingDef buildingDef)
-    {
-        float result = branch.GetStatValue(BranchStatDefOf.OARO_ConstructionCost, baseValueOverride: buildingDef.silverCost);
-        result *= (1f - branch.StoresReserveHandler.GetReserveCostReduce(buildingDef));
-
-        return (int)result;
-    }
-
     public AcceptanceReport CanConstructBuilding(BranchBuildingConstructParameter constructParam, bool resultOnly = false)
     {
         if (constructParam.InSpecialSlot && specialBuilding is not null)
@@ -193,7 +185,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (constructParam.ByPlayer)
         {
-            int silverCost = GetBuildingSilverCost(buildingDef);
+            int silverCost = branch.GetBuildingSilverCost(buildingDef);
             if (!CaravanInventoryUtility.HasThings(constructParam.caravan, ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OARO_NotEnoughSilver".Translate(silverCost);
@@ -219,10 +211,10 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     {
         underConstructionBuilding = constructParam.BuildingDef;
 
-        buildingTicksLeft = (int)(underConstructionBuilding.constructionDays * 60000);
+        buildingTicksLeft = branch.GetBuildingTimeCost(underConstructionBuilding);
         if (constructParam.ByPlayer)
         {
-            int silverCost = GetBuildingSilverCost(constructParam.BuildingDef);
+            int silverCost = branch.GetBuildingSilverCost(constructParam.BuildingDef);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.caravan, ThingDefOf.Silver, silverCost);
         }
         branch.StoresReserveHandler.Notify_BranchConstructStarted(underConstructionBuilding);

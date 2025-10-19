@@ -40,11 +40,11 @@ public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
         Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
         if (map is not null && RelationshipUtility.TryTriggerRelationshipQuest(relatedOrder, map))
         {
-            ModUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_Triggered".Translate(relatedOrder.Name), relatedOrder);
+            OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_Triggered".Translate(relatedOrder.Name), relatedOrder);
         }
         else
         {
-            ModUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_TriggerFailed".Translate(relatedOrder.Name), relatedOrder);
+            OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_TriggerFailed".Translate(relatedOrder.Name), relatedOrder);
         }
     }
 }

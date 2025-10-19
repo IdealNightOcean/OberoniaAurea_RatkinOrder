@@ -7,36 +7,6 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public static class LetterBoxTexture
-{
-    public static readonly Texture2D MainBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_MainBackground");
-
-    public static readonly Texture2D LeftRibbon = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftRibbon");
-    public static readonly Texture2D LeftBigLetter = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftBigLetter");
-    public static readonly Texture2D LeftMainBackBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftMainBackBackground");
-    public static readonly Texture2D LeftCuttingLine = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftCuttingLine");
-    public static readonly Texture2D LeftLetterIcon_Close = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterIcon_Close");
-    public static readonly Texture2D LeftLetterIcon_Open = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterIcon_Open");
-    public static readonly Texture2D LeftLetterEntry_Odd = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_Odd");
-    public static readonly Texture2D LeftLetterEntry_Even = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_Even");
-    public static readonly Texture2D LeftLetterEntry_HighLight = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_HighLight");
-    public static readonly Texture2D LeftLetterEntry_Sel = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_Sel");
-    public static readonly Texture2D LeftButtonBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftButtonBackground");
-    public static readonly Texture2D LeftButtonBackground_Down = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftButtonBackground_Down");
-    public static readonly Texture2D LeftPigeonReliefSculpture = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftPigeonReliefSculpture");
-
-    public static readonly Texture2D RightUpClose = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpClose");
-    public static readonly Texture2D RightUpSetting = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpSetting");
-    public static readonly Texture2D RightMainBackBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightMainBackBackground");
-    public static readonly Texture2D RightUpLetter = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpLetter");
-    public static readonly Texture2D RightUpCuttingLine = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpCuttingLine");
-    public static readonly Texture2D RightCoatOfArms = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightCoatOfArms");
-    public static readonly Texture2D RightDownCuttingLine = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightDownCuttingLine");
-    public static readonly Texture2D RightRibbon = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightRibbon");
-    public static readonly Texture2D RightMedal = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightMedal");
-}
-
-
 public class Window_OrderLetterBox : Window
 {
     protected override float Margin => 0.0f;
@@ -73,94 +43,94 @@ public class Window_OrderLetterBox : Window
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect reuseRect = default;
+        Rect reusedRect = default;
 
         //主背景
         Rect mainRect = inRect;
         mainRect.xMin += 66f;
         mainRect.xMax -= 24f;
-        GUI.DrawTexture(mainRect, LetterBoxTexture.MainBackground, ScaleMode.StretchToFill);
+        GUI.DrawTexture(mainRect, mainBackground, ScaleMode.StretchToFill);
 
         Rect mainInnerRect = mainRect.ContractedBy(3f);
 
         //左上绶带
-        reuseRect = new(mainInnerRect.xMin + 58f, mainInnerRect.yMin + 29f, 391f, 75f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.LeftRibbon);
+        reusedRect = new(mainInnerRect.xMin + 58f, mainInnerRect.yMin + 29f, 391f, 75f);
+        GUI.DrawTexture(reusedRect, leftRibbon);
 
         //左侧上部大信封
-        reuseRect = new(mainInnerRect.xMin + 196f, mainInnerRect.yMin + 18f, 115f, 76f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.LeftBigLetter);
+        reusedRect = new(mainInnerRect.xMin + 196f, mainInnerRect.yMin + 18f, 115f, 76f);
+        GUI.DrawTexture(reusedRect, leftBigLetter);
 
         //左侧主背景
         Rect leftMainRect = new(mainInnerRect.xMin + 46f, mainInnerRect.yMin + 112f, 414f, 593f);
-        GUI.DrawTexture(leftMainRect, LetterBoxTexture.LeftMainBackBackground);
+        GUI.DrawTexture(leftMainRect, leftMainBackBackground);
 
         //左侧上部标题
         Rect leftInnerRect = leftMainRect.ContractedBy(3f);
-        reuseRect = new(CenterMinCoords(leftInnerRect.x, leftInnerRect.width, 74f), leftInnerRect.yMin + 3f, 74f, 32f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(leftInnerRect, leftInnerRect.yMin + 3f, 74f, 32f);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reuseRect, "OARO_Inbox".Translate());
+        Widgets.Label(reusedRect, "OARO_Inbox".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
         //左侧上部（标题 | 列表）分割线
-        reuseRect = new(CenterMinCoords(leftInnerRect.x, leftInnerRect.width, 358f), leftInnerRect.yMin + 42f, 358f, 3f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.LeftCuttingLine);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(leftInnerRect, leftInnerRect.yMin + 42f, 358f, 3f);
+        GUI.DrawTexture(reusedRect, leftCuttingLine);
 
         //左侧列表
-        Rect leftListRect = new(leftInnerRect.xMin + 4f, reuseRect.yMax + 4f, 379f, 527f);
+        Rect leftListRect = new(leftInnerRect.xMin + 4f, reusedRect.yMax + 4f, 379f, 527f);
         DrawLetterList(leftListRect);
 
         //左侧下部按钮
-        reuseRect = new(leftMainRect.xMin, leftMainRect.yMax + 2f, 414f, 92f);
+        reusedRect = new(leftMainRect.xMin, leftMainRect.yMax + 2f, 414f, 92f);
         Text.Font = GameFont.Medium;
-        if (ButtonImageWithLabel(reuseRect, "OARO_Epistolize".Translate(), LetterBoxTexture.LeftButtonBackground, LetterBoxTexture.LeftButtonBackground_Down))
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_Epistolize".Translate(), leftButtonBackground, leftButtonBackground_Down))
         {
 
         }
         Text.Font = GameFont.Small;
 
         //左下鸽子
-        reuseRect = new(inRect.xMin, inRect.yMax - 446f, 126f, 449f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.LeftPigeonReliefSculpture);
+        reusedRect = new(inRect.xMin, inRect.yMax - 446f, 126f, 449f);
+        GUI.DrawTexture(reusedRect, leftPigeonReliefSculpture);
 
         //右侧右上关闭按钮
-        reuseRect = new(mainRect.xMax - (15f + 38f), mainRect.yMin + 14f, 38f, 38f);
-        if (Widgets.ButtonImage(reuseRect, LetterBoxTexture.RightUpClose))
+        reusedRect = new(mainRect.xMax - (15f + 38f), mainRect.yMin + 14f, 38f, 38f);
+        if (Widgets.ButtonImage(reusedRect, rightUpClose))
         {
             Close();
         }
         //右侧右上设置按钮
-        reuseRect = new(reuseRect.xMin - (10f + 38f), reuseRect.yMin, 38f, 38f);
-        if (Widgets.ButtonImage(reuseRect, LetterBoxTexture.RightUpSetting))
+        reusedRect = new(reusedRect.xMin - (10f + 38f), reusedRect.yMin, 38f, 38f);
+        if (Widgets.ButtonImage(reusedRect, rightUpSetting))
         {
             Find.WindowStack.Add(new Window_LetterBoxSetting());
         }
 
         //右侧主背景
-        reuseRect = new(leftMainRect.xMax + 16f, mainInnerRect.yMin + 63f, 705f, 733f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.RightMainBackBackground);
+        reusedRect = new(leftMainRect.xMax + 16f, mainInnerRect.yMin + 63f, 705f, 733f);
+        GUI.DrawTexture(reusedRect, rightMainBackBackground);
 
-        Rect rightInnerRect = reuseRect.ContractedBy(3f);
+        Rect rightInnerRect = reusedRect.ContractedBy(3f);
 
         //右侧右上信封
-        reuseRect = new(rightInnerRect.xMin + 35f, rightInnerRect.yMin + 31f, 78f, 69f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.RightUpLetter);
+        reusedRect = new(rightInnerRect.xMin + 35f, rightInnerRect.yMin + 31f, 78f, 69f);
+        GUI.DrawTexture(reusedRect, rightUpLetter);
 
         //右侧上部信件标题
-        reuseRect = new(reuseRect.xMax + 16f, rightInnerRect.yMin + 48f, 383f, 32f);
+        reusedRect = new(reusedRect.xMax + 16f, rightInnerRect.yMin + 48f, 383f, 32f);
         Text.Font = GameFont.Medium;
-        Widgets.LabelEllipses(reuseRect, curLetter?.Label ?? "OARO_Letter_NoSelected".Translate());
+        Widgets.LabelEllipses(reusedRect, curLetter?.Label ?? "OARO_Letter_NoSelected".Translate());
         Text.Font = GameFont.Small;
 
         //右侧上部分割线
-        reuseRect = new(rightInnerRect.xMax - (58f + 518f), rightInnerRect.yMin + 93f, 518f, 17f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.RightUpCuttingLine);
+        reusedRect = new(rightInnerRect.xMax - (58f + 518f), rightInnerRect.yMin + 93f, 518f, 17f);
+        GUI.DrawTexture(reusedRect, rightUpCuttingLine);
 
         //右侧信件主要显示区
-        Rect letterTextRect = new(CenterMinCoords(rightInnerRect.x, rightInnerRect.width, 564f), rightInnerRect.yMin + 130f, 564f, 408f);
+        Rect letterTextRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, rightInnerRect.yMin + 130f, 564f, 408f);
         if (curLetter is not null)
         {
             Text.Font = GameFont.Medium;
@@ -168,30 +138,27 @@ public class Window_OrderLetterBox : Window
             Text.Font = GameFont.Small;
         }
 
-        reuseRect = new(CenterMinCoords(letterTextRect.x, letterTextRect.width, 342f),
-                        CenterMinCoords(letterTextRect.y, letterTextRect.height, 367f),
-                        342f,
-                        367f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.RightCoatOfArms);
+        reusedRect = OARO_WindowUtility.CenterRect(letterTextRect, 342f, 367f);
+        GUI.DrawTexture(reusedRect, rightCoatOfArms);
 
         //右侧下部分割线
-        reuseRect = new(CenterMinCoords(rightInnerRect.x, rightInnerRect.width, 642f), letterTextRect.yMax + 24f, 642f, 9f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.RightDownCuttingLine);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, letterTextRect.yMax + 24f, 642f, 9f);
+        GUI.DrawTexture(reusedRect, rightDownCuttingLine);
 
         //右侧下部信件绶带
-        reuseRect = new(CenterMinCoords(rightInnerRect.x, rightInnerRect.width, 652f), reuseRect.yMax + 10f, 652f, 130f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.RightRibbon);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, reusedRect.yMax + 10f, 652f, 130f);
+        GUI.DrawTexture(reusedRect, rightRibbon);
 
         //右侧下部信件信息显示
-        reuseRect = new(CenterMinCoords(rightInnerRect.x, rightInnerRect.width, 340f), reuseRect.yMin + 10f, 340f, 113f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, reusedRect.yMin + 10f, 340f, 113f);
         Text.Font = GameFont.Medium;
-        Widgets.TextArea(reuseRect, curLetterDesc, readOnly: true);
+        Widgets.TextArea(reusedRect, curLetterDesc, readOnly: true);
         Text.Font = GameFont.Small;
 
         /*
         //右上勋章
-        reuseRect = new(inRect.xMax - 50f, inRect.yMin + 62f, 50f, 97f);
-        GUI.DrawTexture(reuseRect, LetterBoxTexture.RightMedal);
+        reusedRect = new(inRect.xMax - 50f, inRect.yMin + 62f, 50f, 97f);
+        GUI.DrawTexture(reusedRect, rightMedal);
         */
     }
 
@@ -231,24 +198,24 @@ public class Window_OrderLetterBox : Window
 
     private bool DrawLetterEntry(Rect inRect, int index)
     {
-        Rect reuseRect = new(inRect.xMin + 2f, CenterMinCoords(inRect.yMin, inRect.height, 49f), 49f, 49f);
+        Rect reuseRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 2f, 49f, 49f);
         if (index == selectedLetterIndex)
         {
-            GUI.DrawTexture(inRect, LetterBoxTexture.LeftLetterEntry_Sel);
+            GUI.DrawTexture(inRect, leftLetterEntry_Sel);
             Widgets.DrawBox(inRect);
-            GUI.DrawTexture(reuseRect, LetterBoxTexture.LeftLetterIcon_Open);
+            GUI.DrawTexture(reuseRect, leftLetterIcon_Open);
         }
         else
         {
             if (Mouse.IsOver(inRect))
             {
-                GUI.DrawTexture(inRect, LetterBoxTexture.LeftLetterEntry_HighLight);
+                GUI.DrawTexture(inRect, leftLetterEntry_HighLight);
             }
             else
             {
-                GUI.DrawTexture(inRect, (index & 1) == 0 ? LetterBoxTexture.LeftLetterEntry_Even : LetterBoxTexture.LeftLetterEntry_Odd);
+                GUI.DrawTexture(inRect, (index & 1) == 0 ? leftLetterEntry_Even : leftLetterEntry_Odd);
             }
-            GUI.DrawTexture(reuseRect, LetterBoxTexture.LeftLetterIcon_Close, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reuseRect, leftLetterIcon_Close, ScaleMode.ScaleToFit);
         }
 
         reuseRect = Rect.MinMaxRect(reuseRect.xMax + 6f, inRect.yMin + 2f, inRect.xMax - 2f, inRect.yMax - 2f);
@@ -289,54 +256,29 @@ public class Window_OrderLetterBox : Window
         }
     }
 
-    /// <summary>
-    /// Rect居中对应最小坐标
-    /// </summary>
-    /// <param name="outerMinCoords">做标准Rect对应最小坐标</param>
-    /// <param name="outerSize">做标准Rect尺寸</param>
-    /// <param name="innerSize">被居中Rect尺寸</param>
-    /// <returns>Rect居中对应最小坐标</returns>
-    private static float CenterMinCoords(float outerMinCoords, float outerSize, float innerSize) => outerMinCoords + (outerSize - innerSize) * 0.5f;
+    private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_MainBackground");
 
-    private static bool ButtonImage(Rect butRect, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
-    {
-        if (Mouse.IsOver(butRect))
-        {
-            GUI.DrawTexture(butRect, downTex);
-        }
-        else
-        {
-            GUI.DrawTexture(butRect, baseTex);
-        }
+    private static readonly Texture2D leftRibbon = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftRibbon");
+    private static readonly Texture2D leftBigLetter = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftBigLetter");
+    private static readonly Texture2D leftMainBackBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftMainBackBackground");
+    private static readonly Texture2D leftCuttingLine = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftCuttingLine");
+    private static readonly Texture2D leftLetterIcon_Close = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterIcon_Close");
+    private static readonly Texture2D leftLetterIcon_Open = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterIcon_Open");
+    private static readonly Texture2D leftLetterEntry_Odd = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_Odd");
+    private static readonly Texture2D leftLetterEntry_Even = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_Even");
+    private static readonly Texture2D leftLetterEntry_HighLight = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_HighLight");
+    private static readonly Texture2D leftLetterEntry_Sel = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftLetterEntry_Sel");
+    private static readonly Texture2D leftButtonBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftButtonBackground");
+    private static readonly Texture2D leftButtonBackground_Down = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftButtonBackground_Down");
+    private static readonly Texture2D leftPigeonReliefSculpture = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_LeftPigeonReliefSculpture");
 
-        if (!tooltip.NullOrEmpty())
-        {
-            TooltipHandler.TipRegion(butRect, tooltip);
-        }
-
-        return Widgets.ButtonInvisible(butRect, doMouseoverSound);
-    }
-
-    private static bool ButtonImageWithLabel(Rect butRect, string label, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
-    {
-        bool result = ButtonImage(butRect, baseTex, downTex, doMouseoverSound, tooltip);
-
-        TextAnchor anchor = Text.Anchor;
-        Color color = GUI.color;
-        bool wordWrap = Text.WordWrap;
-
-        Text.Anchor = TextAnchor.MiddleCenter;
-        if (butRect.height < Text.LineHeight * 2f)
-        {
-            Text.WordWrap = false;
-        }
-
-        Widgets.Label(butRect, label);
-
-        Text.Anchor = anchor;
-        GUI.color = color;
-        Text.WordWrap = wordWrap;
-
-        return result;
-    }
+    private static readonly Texture2D rightUpClose = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpClose");
+    private static readonly Texture2D rightUpSetting = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpSetting");
+    private static readonly Texture2D rightMainBackBackground = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightMainBackBackground");
+    private static readonly Texture2D rightUpLetter = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpLetter");
+    private static readonly Texture2D rightUpCuttingLine = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightUpCuttingLine");
+    private static readonly Texture2D rightCoatOfArms = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightCoatOfArms");
+    private static readonly Texture2D rightDownCuttingLine = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightDownCuttingLine");
+    private static readonly Texture2D rightRibbon = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightRibbon");
+    private static readonly Texture2D rightMedal = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightMedal");
 }
