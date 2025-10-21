@@ -36,9 +36,11 @@ public class Branch : IExposable, ILoadReferenceable
     public WorldObject BaseSite => baseSite;
     public int Tile => baseSite?.Tile ?? -1;
 
-    protected int friendlyExpiredTick = -1;
     private BranchType curType = BranchType.Normal;
     public BranchType CurType => curType;
+
+    protected int friendlyExpiredTick = -1;
+    public int FriendlyExpiredTick => friendlyExpiredTick;
 
     private HonorBranchProperties honorProperties;
     public HonorBranchProperties HonorProperties
@@ -54,8 +56,22 @@ public class Branch : IExposable, ILoadReferenceable
         set => supply = Mathf.Clamp(value, 0f, supplyCeilingCache.GetCachedResult());
     }
 
+    [Unsaved] private bool isIdleNow = true;
     [Unsaved] private string curWorkState = string.Empty;
     [Unsaved] public bool WorkStateDirty = true;
+    public bool IsIdleNow
+    {
+        get
+        {
+            if (WorkStateDirty)
+            {
+                UpdateWorkState();
+                WorkStateDirty = false;
+            }
+            return isIdleNow;
+        }
+    }
+
     public string CurWorkState
     {
         get
@@ -255,16 +271,19 @@ public class Branch : IExposable, ILoadReferenceable
 
         if (taskHandler.HasTask)
         {
+            isIdleNow = false;
             curWorkState = taskHandler.TaskLabel;
             return;
         }
 
         if (this.IsOnJointPatrol())
         {
+            isIdleNow = false;
             curWorkState = "OARO_BranchWorkState_JointPatrol".Translate();
             return;
         }
 
+        isIdleNow = true;
         int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
         if (hourOfDay <= 5 || hourOfDay >= 21)
         {

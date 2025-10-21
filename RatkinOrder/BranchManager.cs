@@ -101,7 +101,7 @@ public class BranchManager : IExposable, ITickDay
     {
         Scribe_Values.Look(ref invitedBranchCreationsCount, "invitedBranchCreationsCount", 0);
 
-        Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: [this, false]);
+        Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: [ratkinOrder, false]);
         Scribe_Deep.Look(ref jointPatrolManager, "jointPatrolManager", ctorArgs: [ratkinOrder]);
 
         Scribe_Values.Look(ref normalDemandFulfillCount, "normalDemandFulfillCount", 0);

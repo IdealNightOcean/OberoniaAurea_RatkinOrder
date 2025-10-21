@@ -19,7 +19,7 @@ public static class BranchStatDefOf
     public static BranchStatDef OARO_ConstructionCostFactor; //建设白银花费系数
     public static BranchStatDef OARO_ConstructionSpeedFactor; //建设速度系数
 
-    public static BranchStatDef OARO_BombardSupportCount;
+    public static BranchStatDef OARO_BombardSupportCeiling;
 
     public static BranchStatDef OARO_SquadMemberCeiling;
     public static BranchStatDef OARO_SquadCommanderCeiling;

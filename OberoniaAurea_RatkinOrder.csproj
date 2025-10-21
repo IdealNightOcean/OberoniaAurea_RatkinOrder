@@ -291,6 +291,7 @@
     <Compile Include="BranchBuilding\BranchBuilding.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
+    <Compile Include="Window\MainTabWindow_OrderBranches.cs" />
     <Compile Include="Window\MainTabWindow_InteractionKnights.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_TownConstruction.cs" />

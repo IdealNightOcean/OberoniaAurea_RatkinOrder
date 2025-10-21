@@ -102,7 +102,7 @@ public static class BranchSupportUtility
 
     public static void DoBombard(Branch branch, Map map)
     {
-        int bombCount = Mathf.FloorToInt(BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_BombardSupportCount));
+        int bombCount = Mathf.FloorToInt(BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_BombardSupportCeiling));
         if (bombCount <= 0)
         {
             return;

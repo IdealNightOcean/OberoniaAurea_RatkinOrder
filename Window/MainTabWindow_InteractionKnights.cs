@@ -45,10 +45,10 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         RecacheAroundKnightGroups();
     }
 
-    public override void PostOpen()
+    public override void PreOpen()
     {
+        base.PreOpen();
         RecacheAroundKnightGroups();
-        Log.Message(aroundKnightGroups.Count.ToString());
     }
 
     protected override void SetInitialSizeAndPosition()
