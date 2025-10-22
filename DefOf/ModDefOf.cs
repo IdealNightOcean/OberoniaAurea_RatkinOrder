@@ -22,6 +22,8 @@ public static class OARO_ModDefOf
 
     public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader; //丢东西的旅行商人
 
+    public static RulePackDef OARO_NameBuilder_BranchName; //分部名称拼装 
+    public static RulePackDef OARO_NameBuilder_SquadName; //分队名称拼装
     public static RulePackDef OARO_Dialog_AroundKnightGroupVisitInvalid;
     public static RulePackDef OARO_Namer_Nobility; //贵族名称
 

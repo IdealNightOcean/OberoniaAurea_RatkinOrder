@@ -105,7 +105,7 @@ public struct BranchStatTransformer
             {
                 explanation.Append("    ");
                 explanation.AppendLine("OARO_StatExplain_Offset".Translate(offset.ToStringWithSign("F2"))
-                                                               .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+                                                                .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
             }
             if (factor != 1f)
             {
@@ -140,10 +140,14 @@ public struct BranchStatTransformer
 
     public override int GetHashCode()
     {
-        int hash = 17 * 23 + offset.GetHashCode();
-        hash = hash * 23 + factor.GetHashCode();
-        return hash;
+        unchecked
+        {
+            int hash = 17 * 23 + offset.GetHashCode();
+            hash = hash * 23 + factor.GetHashCode();
+            return hash;
+        }
     }
+
     public override readonly string ToString()
     {
         return $"offset: {offset}, factor: {factor}";

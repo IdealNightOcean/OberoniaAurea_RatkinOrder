@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
+using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -28,9 +29,12 @@ public class Branch : IExposable, ILoadReferenceable
 
     [Unsaved] public readonly int TickHashOffset;
 
-    private string name;
+    private int ordinal;
+    private string nameCore = string.Empty;
+    private string name = string.Empty;
+
+    public string NameCore => nameCore;
     public string Name => name;
-    public string NameFull => RatkinOrder.Name + "-" + name;
 
     private WorldObject baseSite;
     public WorldObject BaseSite => baseSite;
@@ -57,6 +61,7 @@ public class Branch : IExposable, ILoadReferenceable
     }
 
     [Unsaved] private bool isIdleNow = true;
+    [Unsaved] private bool isOutdoorNow = true;
     [Unsaved] private string curWorkState = string.Empty;
     [Unsaved] public bool WorkStateDirty = true;
     public bool IsIdleNow
@@ -69,6 +74,19 @@ public class Branch : IExposable, ILoadReferenceable
                 WorkStateDirty = false;
             }
             return isIdleNow;
+        }
+    }
+
+    public bool IsOutdoorNow
+    {
+        get
+        {
+            if (WorkStateDirty)
+            {
+                UpdateWorkState();
+                WorkStateDirty = false;
+            }
+            return isOutdoorNow;
         }
     }
 
@@ -147,7 +165,6 @@ public class Branch : IExposable, ILoadReferenceable
             branch = new(ratkinOrder, initCtor: true);
             worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(branch);
             branch.baseSite = worldObject;
-            branch.name = BranchUtility.GenerateBranchName(ratkinOrder);
             branch.PostGenerated();
             if (addToManager)
             {
@@ -168,6 +185,10 @@ public class Branch : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref loadID, "loadID", -1);
         Scribe_Values.Look(ref name, "name");
         Scribe_References.Look(ref baseSite, "baseSite");
+
+        Scribe_Values.Look(ref ordinal, "ordinal", 0);
+        Scribe_Values.Look(ref nameCore, "nameCore", string.Empty);
+        Scribe_Values.Look(ref name, "name", string.Empty);
 
         Scribe_Values.Look(ref friendlyExpiredTick, "friendlyExpiredTick", 0);
         Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
@@ -265,6 +286,23 @@ public class Branch : IExposable, ILoadReferenceable
         }
     }
 
+    public void Rename(int ordinal, string nameCore)
+    {
+        this.ordinal = ordinal;
+        this.nameCore = nameCore;
+        int unitsDigit = ordinal % 10;
+        GrammarRequest grammarRequest = new()
+        {
+            Includes = { OARO_ModDefOf.OARO_NameBuilder_BranchName }
+        };
+        grammarRequest.Constants.Add("unitsDigit", unitsDigit.ToString());
+        grammarRequest.Rules.Add(new Rule_String("ordinal", ordinal.ToString()));
+        grammarRequest.Rules.Add(new Rule_String("nameCore", nameCore));
+        name = GrammarResolver.Resolve("r_name", grammarRequest);
+
+        squad.Rename(ordinal, nameCore);
+    }
+
     private void UpdateWorkState()
     {
         CooldownManager.RegisterRecord(KeyLibrary_CDRecord.BranchWorkState, cdTicks: 6 * 2500);
@@ -272,6 +310,7 @@ public class Branch : IExposable, ILoadReferenceable
         if (taskHandler.HasTask)
         {
             isIdleNow = false;
+            isOutdoorNow = taskHandler.CurTask.Def.isOutdoorTask;
             curWorkState = taskHandler.TaskLabel;
             return;
         }
@@ -279,11 +318,13 @@ public class Branch : IExposable, ILoadReferenceable
         if (this.IsOnJointPatrol())
         {
             isIdleNow = false;
+            isOutdoorNow = true;
             curWorkState = "OARO_BranchWorkState_JointPatrol".Translate();
             return;
         }
 
         isIdleNow = true;
+        isOutdoorNow = false;
         int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
         if (hourOfDay <= 5 || hourOfDay >= 21)
         {
@@ -291,7 +332,7 @@ public class Branch : IExposable, ILoadReferenceable
             return;
         }
 
-        curWorkState = "OARO_SquadState_Idle".Translate();
+        curWorkState = "OARO_BranchWorkState_Idle".Translate();
     }
 
     public void Destroy()
@@ -302,6 +343,10 @@ public class Branch : IExposable, ILoadReferenceable
 
     private void PostGenerated()
     {
+        int ordinal = BranchUtility.GetBranchOrdinal(loadID, RatkinOrder.LoadID);
+        nameCore = BranchUtility.GenerateBranchNameCore(RatkinOrder);
+        Rename(ordinal, nameCore);
+
         medalHandler.PostBranchGenerated();
         facilityHandler.PostBranchGenerated();
         buildingHandler.PostBranchGenerated();

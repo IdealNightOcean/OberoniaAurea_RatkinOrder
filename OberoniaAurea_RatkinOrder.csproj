@@ -205,6 +205,7 @@
     <Compile Include="Thing\CompPlagueSample.cs" />
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
     <Compile Include="Utility\BranchConstructUtility.cs" />
+    <Compile Include="Utility\IconLibrary.cs" />
     <Compile Include="Utility\WindowUtility.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
     <Compile Include="Utility\QuestUtility.cs" />
@@ -291,7 +292,7 @@
     <Compile Include="BranchBuilding\BranchBuilding.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
-    <Compile Include="Window\MainTabWindow_OrderBranches.cs" />
+    <Compile Include="Window\MainTabWindow_BranchSquad.cs" />
     <Compile Include="Window\MainTabWindow_InteractionKnights.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_TownConstruction.cs" />

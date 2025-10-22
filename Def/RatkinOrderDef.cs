@@ -13,7 +13,7 @@ public class RatkinOrderDef : Def
 
     public RulePackDef nameMaker;
 
-    public RulePackDef branchNameMaker;
+    public RulePackDef branchNameCoreSelecter;
 
     public Color? color;
 

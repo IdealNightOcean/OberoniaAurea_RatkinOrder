@@ -10,7 +10,7 @@ public class DevWindow_Branch : DevWindowBase
     public DevWindow_Branch(Branch branch) : base()
     {
         this.branch = branch;
-        optionalTitle = branch.NameFull;
+        optionalTitle = branch.Name;
     }
 
     public override void DoWindowContents(Rect inRect)

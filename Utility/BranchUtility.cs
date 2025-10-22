@@ -176,23 +176,36 @@ public static class BranchUtility
         }
     }
 
-    public static string GenerateBranchName(RatkinOrder ratkinOrder)
+    public static string GenerateBranchNameCore(RatkinOrder ratkinOrder)
     {
-        int ordinal = Rand.Range(1, 999);
-        int unitsDigit = ordinal % 10;
-
         GrammarRequest grammarRequest = new()
         {
-            Includes = { ratkinOrder.Def.branchNameMaker }
+            Includes = { ratkinOrder.Def.branchNameCoreSelecter }
         };
-        grammarRequest.Constants.Add("unitsDigit", unitsDigit.ToString());
-        grammarRequest.Rules.Add(new Rule_String("ordinal", ordinal.ToString()));
 
         return NameGenerator.GenerateName(grammarRequest, IsUniqueName, false, rootKeyword: "r_name");
 
         bool IsUniqueName(string name)
         {
-            return !ratkinOrder.BranchManager.AllBranches.Select(b => b.Name).Contains(name);
+            return !ratkinOrder.BranchManager.AllBranches.Select(b => b.NameCore).Contains(name);
+        }
+    }
+
+    /// <summary>
+    /// 分部的名称序号生成器
+    /// </summary>
+    /// <returns>1~999的尽量不重复的随机数</returns>
+    public static int GetBranchOrdinal(int branchID, int orderID)
+    {
+        int m = 999;
+        int a = 445;
+        int c = 700001;
+        unchecked
+        {
+            int ordinal = 31 * branchID + orderID;
+            ordinal ^= (ordinal >> 16);
+            ordinal = (a * ordinal + c) % m + 1;
+            return ordinal > 0 ? ordinal : ordinal + m;
         }
     }
 

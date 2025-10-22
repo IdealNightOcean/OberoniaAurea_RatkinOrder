@@ -1,16 +1,18 @@
-﻿using Verse;
+﻿using System;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public struct BranchMedalRecord : IExposable
 {
+    [Flags]
     public enum BranchMedalType : byte
     {
-        None,
-        Courage, // 勇气
-        Tenacity, //坚韧
-        Rescue, //援护
-        Justice //公义
+        None = 0,
+        Courage = 1, // 勇气
+        Tenacity = 2, //坚韧
+        Rescue = 4, //援护
+        Justice = 8 //公义
     }
 
     public BranchMedalType type;
@@ -27,10 +29,7 @@ public struct BranchMedalRecord : IExposable
     /// <summary>
     /// None类型勋章和非正数勋章无效
     /// </summary>
-    public static bool Validate(BranchMedalRecord record)
-    {
-        return record.type != BranchMedalType.None && record.count > 0;
-    }
+    public readonly bool Validate() => type != BranchMedalType.None && count > 0;
 
     public void ExposeData()
     {

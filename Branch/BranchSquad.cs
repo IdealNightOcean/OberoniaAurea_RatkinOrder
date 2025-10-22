@@ -1,9 +1,9 @@
 ﻿using OberoniaAurea_Frame;
-using RimWorld;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
+using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -51,10 +51,21 @@ public class BranchSquad : IExposable, ITickHourOfDay
         commanderCeilingCache = new(cacheInterval: 60000, defaultValue: BranchStatDefOf.OARO_SquadCommanderCeiling.baseValue, () => branch.GetStatValue(BranchStatDefOf.OARO_SquadCommanderCeiling));
     }
 
+    internal void Rename(int ordinal, string nameCore)
+    {
+        int unitsDigit = ordinal % 10;
+        GrammarRequest grammarRequest = new()
+        {
+            Includes = { OARO_ModDefOf.OARO_NameBuilder_SquadName }
+        };
+        grammarRequest.Constants.Add("unitsDigit", unitsDigit.ToString());
+        grammarRequest.Rules.Add(new Rule_String("ordinal", ordinal.ToString()));
+        grammarRequest.Rules.Add(new Rule_String("nameCore", nameCore));
+        name = GrammarResolver.Resolve("r_name", grammarRequest);
+    }
+
     public void PostBranchGenerated()
     {
-        name = "OARO_BranchSquadName".Translate(branch.Name.Named("branchName"));
-
         memberCount = MemberCeiling;
         commanderCount = CommanderCeiling;
     }

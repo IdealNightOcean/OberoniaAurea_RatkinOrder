@@ -24,9 +24,10 @@ public class BranchTaskDef : Def
 
     public TaskPriority priority = TaskPriority.Low;
 
+    public bool isOutdoorTask; //是否为户外任务
     public bool canInterrupted = true;
     public bool canInterruptedByJointPatrol = true; //能否被边境轮巡打断
-    public bool ignoreRest = false; //是否无视休息
+    public bool ignoreRest; //是否无视休息
 
     public bool canBeRandomlyChosen = true;
 

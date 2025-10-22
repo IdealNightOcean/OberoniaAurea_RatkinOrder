@@ -5,104 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchSummaryCacheEntry
-{
-    public readonly Branch Branch;
-
-    public string SquadName = string.Empty;
-    public string BaseSiteName = string.Empty;
-    public float Distance = -1f;
-    public bool OnTask;
-    public int CurAllCrewCount;
-    public float Potency;
-
-    public Texture2D HonorIcon;
-    public Texture2D HonorStripSmall;
-    public Texture2D HonorBackgroundSmall;
-    public Texture2D HonorDecorationSmall;
-
-    public BranchSummaryCacheEntry() { }
-
-    public BranchSummaryCacheEntry(Branch branch, Map map)
-    {
-        Branch = branch;
-        SquadName = branch.Squad.Name;
-
-        if (branch.BaseSite is INameableWorldObject nameSite)
-        {
-            BaseSiteName = nameSite.Name;
-        }
-        else
-        {
-            BaseSiteName = branch.BaseSite.Label;
-        }
-
-        Distance = branch.DistanceTo(map.Tile);
-        CurAllCrewCount = branch.Squad.AllCrewCountInt;
-        HonorIcon = branch.HonorProperties?.IconTexture;
-
-        BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
-        if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
-        {
-            HonorStripSmall = new CachedTexture($"UI/OrderBranches/OARO_HonorStripSmall_{primaryMedal}").Texture;
-            HonorBackgroundSmall = new CachedTexture($"UI/OrderBranches/OARO_HonorBackgroundSmall_{primaryMedal}").Texture;
-            HonorDecorationSmall = new CachedTexture($"UI/OrderBranches/OARO_HonorDecorationSmall_{primaryMedal}").Texture;
-        }
-    }
-}
-
-public class BranchInfoCacheEntry : BranchSummaryCacheEntry
-{
-    public bool HasSupportAuthority;
-
-    public string FriendlyExpireDateStr = string.Empty;
-    public float FriendlyProcess;
-
-    public int CommanderCeiling;
-    public int CrewCeiling;
-    public float MemberRecoveryRate;
-    public int BombardSupportCeiling;
-
-    public Texture2D HonorExpandIcon;
-    public Texture2D HonorStrip;
-    public Texture2D HonorBackground;
-    public Texture2D HonorDecoration;
-    public Texture2D MedalBackground;
-
-    public BranchInfoCacheEntry() : base() { }
-
-    public BranchInfoCacheEntry(Branch branch, Map map) : base(branch, map)
-    {
-        HasSupportAuthority = branch.EffectTags.HasTag(KeyLibrary_EffectTag.SupportAuthority);
-
-        if (branch.IsBranchOfType(Branch.BranchType.Friendly))
-        {
-            FriendlyProcess = Mathf.Clamp01(branch.FriendlyExpiredTick / 40f * 60000f);
-            FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyExpiredTick, Find.WorldGrid.LongLatOf(map.Tile));
-        }
-        HonorExpandIcon = branch.HonorProperties?.ExpandingIconTexture;
-
-        BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
-        if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
-        {
-            HonorStrip = new CachedTexture($"UI/OrderBranches/OARO_HonorStrip_{primaryMedal}").Texture;
-            HonorBackground = new CachedTexture($"UI/OrderBranches/OARO_HonorBackground_{primaryMedal}").Texture;
-            HonorDecoration = new CachedTexture($"UI/OrderBranches/OARO_HonorDecoration_{primaryMedal}").Texture;
-            MedalBackground = new CachedTexture($"UI/OrderBranches/OARO_MedalBackground_{primaryMedal}").Texture;
-        }
-
-        CommanderCeiling = (int)branch.Squad.CommanderCeiling;
-        CrewCeiling = (int)branch.Squad.MemberCeiling + CommanderCeiling;
-
-        MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate);
-        BombardSupportCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling);
-    }
-
-}
-
-
-
-public class MainTabWindow_OrderBranches : MainTabWindow
+public class MainTabWindow_BranchSquad : MainTabWindow
 {
     public override Vector2 InitialSize => new(1627f, 944f);
     public override Vector2 RequestedTabSize => new(1627f, 944f);
@@ -117,7 +20,7 @@ public class MainTabWindow_OrderBranches : MainTabWindow
 
     private List<BranchSummaryCacheEntry> branchSummaryCaches = [];
 
-    public MainTabWindow_OrderBranches()
+    public MainTabWindow_BranchSquad()
     {
         forcePause = true;
         draggable = false;
@@ -133,8 +36,6 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         //注：用的通讯台声音
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
-
-
     }
 
     public override void PreOpen()
@@ -151,25 +52,25 @@ public class MainTabWindow_OrderBranches : MainTabWindow
 
         SelectBranch(branchSummaryCaches[0].Branch, 0);
     }
-
-    protected override void SetInitialSizeAndPosition()
+    public override void Close(bool doCloseSound = true)
     {
-        Vector2 initialSize = InitialSize;
-        windowRect = new Rect((UI.screenWidth - initialSize.x) / 2f, (UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
-        windowRect = windowRect.Rounded();
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.UpperLeft;
+        base.Close(doCloseSound);
     }
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect reusedRect = default;
         Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1547f, 904f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(3f);
+
         float mainInnerRectY = mainInnerRect.yMin;
 
-        float rectY = mainInnerRectY + 205f;
-        float rectHeight = 657f;
+        float areaRectY = mainInnerRectY + 205f;
+        float areaRectHeight = 657f;
+        Rect reusedRect;
 
         //顶部缎带
         reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1568f, 137f);
@@ -179,10 +80,10 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 12f, 322f, 90f);
         GUI.DrawTexture(reusedRect, topTitleground);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, mainInnerRectY + 6f, 236f, 78f);
+        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 128f, 64f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, "OARO_BranchWindows".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchSquadWindow".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -194,7 +95,7 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
-        Rect middleRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, rectY, 583f, rectHeight);
+        Rect middleRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, areaRectY, 583f, areaRectHeight);
         if (DrawMiddleRect(middleRect))
         {
             return;
@@ -204,7 +105,7 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnY(middleRect, middleRect.x - (32f + 3f), 3f, 717f);
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
-        Rect leftRect = new(reusedRect.xMin - (12f + 415f), rectY, 415f, rectHeight);
+        Rect leftRect = new(reusedRect.xMin - (12f + 415f), areaRectY, 415f, areaRectHeight);
         DrawLeftRect(leftRect);
 
         //中|右分界线
@@ -212,7 +113,7 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
 
-        Rect rightRect = new(reusedRect.xMax + 32f, rectY, 352f, rectHeight);
+        Rect rightRect = new(reusedRect.xMax + 32f, areaRectY, 352f, areaRectHeight);
         //小队科技
         reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, mainInnerRectY + 150f, 322f, 48f);
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -278,18 +179,14 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         GUI.DrawTexture(upRect, middleUpBackground, ScaleMode.ScaleToFit);
         Rect upInnerRect = upRect.ContractedBy(frameWidth);
 
-        //上部丝带
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 70f, 629f, 101f);
-        GUI.DrawTexture(reusedRect, middleUpRibbon);
-
-        //上左侧颜色条
+        //上部左侧颜色条
         reusedRect = OARO_WindowUtility.CenterRectOnY(upInnerRect, upInnerRect.x, 6f, 144f);
         if (selBranchInfo.HonorStrip is not null)
         {
             GUI.DrawTexture(reusedRect, selBranchInfo.HonorStrip);
         }
 
-        //上左侧部分
+        //上部左侧部分
         Rect areaRect = new(reusedRect.xMax, upInnerRect.y, 245f, upInnerRect.height);
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.x, 240f, areaRect.height - 5f);
         if (selBranchInfo.HonorBackground is not null)
@@ -312,15 +209,13 @@ public class MainTabWindow_OrderBranches : MainTabWindow
             GUI.DrawTexture(reusedRect, middleUpGeneralSquadIcon, ScaleMode.ScaleToFit);
         }
 
-        //上右侧部分
+        //上部右侧部分
         areaRect = Rect.MinMaxRect(areaRect.xMax + 2f, upInnerRect.yMin, upInnerRect.xMax, upInnerRect.yMax);
-        if (selBranchInfo.MedalBackground is not null)
-        {
-            GUI.DrawTexture(areaRect, selBranchInfo.MedalBackground, ScaleMode.ScaleToFit);
-        }
+        DrawMedal(areaRect);
 
-        reusedRect = OARO_WindowUtility.CenterRect(areaRect, 300f, 112f);
-        GUI.DrawTexture(reusedRect, middleUpPeristele);
+        //上部丝带
+        areaRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 70f, 629f, 101f);
+        GUI.DrawTexture(areaRect, middleUpRibbon);
 
         //中部
         Rect middleRect = new(inRectX, upRect.yMax + 32f, rectWidth, rectHeight);
@@ -500,6 +395,45 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         return false;
     }
 
+    private void DrawMedal(Rect inRect)
+    {
+        if (selBranchInfo.MedalBackground is not null)
+        {
+            GUI.DrawTexture(inRect, selBranchInfo.MedalBackground, ScaleMode.ScaleToFit);
+        }
+
+        //上侧勋章柱框
+        Rect reusedRect = OARO_WindowUtility.CenterRect(inRect, 300f, 112f);
+        GUI.DrawTexture(reusedRect, middleUpPeristele);
+
+        //分部勋章
+        Rect medalRect = OARO_WindowUtility.CenterRect(inRect, 192f, 140f);
+        reusedRect = new(medalRect.x, medalRect.y, 80f, 70f);
+
+        BranchMedalHandler medalHandler = selBranch.MedalHandler;
+        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Courage))
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Courage, ScaleMode.ScaleToFit);
+        }
+        reusedRect = new(reusedRect.xMax + 32f, medalRect.y, 80f, 70f);
+        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Tenacity))
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Tenacity, ScaleMode.ScaleToFit);
+        }
+
+        reusedRect = new(medalRect.x, reusedRect.yMax, 80f, 70f);
+        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Rescue))
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Rescue, ScaleMode.ScaleToFit);
+        }
+
+        reusedRect = new(reusedRect.xMax + 32f, reusedRect.y, 80f, 70f);
+        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Justice))
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Justice, ScaleMode.ScaleToFit);
+        }
+    }
+
     private void DrawLeftRect(Rect inRect)
     {
         GUI.DrawTexture(inRect, leftBackground);
@@ -512,19 +446,31 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         listRect.width = 393f;
         listRect.height = viewHeight;
 
-
         Widgets.BeginScrollView(inRect, ref scrollPosition_Squads, listRect);
         float entryX = listRect.x;
         float entryY = listRect.y;
+        int squadCount = branchSummaryCaches.Count;
+        int usedCount = Mathf.Max(7,squadCount);
         Rect entryRect;
 
         Text.Anchor = TextAnchor.MiddleCenter;
-        for (int i = 0; i < branchSummaryCaches.Count; i++)
+        for (int i = 0; i < squadCount; i++)
         {
             entryRect = new(entryX, entryY, 393f, 91f);
             entryY += 91;
 
             DrawSquadEntry(entryRect, branchSummaryCaches[i], i);
+        }
+
+        if (usedCount > squadCount)
+        {
+            for (int i = squadCount; i < usedCount; i++)
+            {
+                entryRect = new(entryX, entryY, 393f, 91f);
+                entryY += 91;
+
+                GUI.DrawTexture(entryRect, leftListBackground);
+            }
         }
         Text.Anchor = TextAnchor.UpperLeft;
         Widgets.EndScrollView();
@@ -569,9 +515,14 @@ public class MainTabWindow_OrderBranches : MainTabWindow
 
     private void DrawSquadEntry(Rect inRect, BranchSummaryCacheEntry entry, int index)
     {
+        GUI.DrawTexture(inRect, leftListBackground);
         if (Mouse.IsOver(inRect))
         {
             Widgets.DrawHighlight(inRect);
+        }
+        if (selBranchIndex == index)
+        {
+            Widgets.DrawHighlightSelected(inRect);
         }
         inRect = inRect.ContractedBy(2f);
         if (Widgets.ButtonInvisible(inRect))
@@ -609,12 +560,25 @@ public class MainTabWindow_OrderBranches : MainTabWindow
             GUI.DrawTexture(reusedRect, leftGeneralSquadIcon, ScaleMode.ScaleToFit);
         }
 
-        Rect squadNameRect = new(leftRect.x + 100f, leftRect.y + 4f, 128f, 22f);
-        Widgets.Label(squadNameRect, entry.SquadName);
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Rect squadNameRect = Rect.MinMaxRect(leftRect.x + 100f, leftRect.y + 4f, leftRect.xMax - 16f, leftRect.y + 4f + 22f);
+        string squadName = entry.SquadName;
+        if (Text.CalcSize(squadName).x < 100f)
+        {
+            Widgets.Label(squadNameRect, squadName);
+        }
+        else
+        {
+            Widgets.LabelEllipses(squadNameRect, squadName);
+            if (Mouse.IsOver(squadNameRect) && !squadName.NullOrEmpty())
+            {
+                TooltipHandler.TipRegion(squadNameRect, () => squadName, 6844867);
+            }
+        }
 
-        reusedRect = new(squadNameRect.x, squadNameRect.yMax + 4f, 25f, 30f);
+        reusedRect = new(squadNameRect.x + 16f, squadNameRect.yMax + 4f, 25f, 30f);
         string relation;
-        if (entry.Branch?.IsBranchOfType(Branch.BranchType.Friendly) ?? false)
+        if (entry.Branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             GUI.DrawTexture(reusedRect, smallFriendlyIcon, ScaleMode.ScaleToFit);
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
@@ -628,14 +592,38 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 3f, 40f, 20f);
         Widgets.Label(reusedRect, relation);
 
-        reusedRect = new(squadNameRect.xMax - 30f, squadNameRect.yMax + 4f, 30f, 30f);
+        reusedRect = new(squadNameRect.xMax - 48f, squadNameRect.yMax + 4f, 30f, 30f);
+        if (entry.Branch.IsIdleNow)
+        {
+            GUI.DrawTexture(reusedRect, smallIdleIcon, ScaleMode.ScaleToFit);
+        }
+        else if (entry.Branch.IsOutdoorNow)
+        {
+            GUI.DrawTexture(reusedRect, smallOutdoorIcon, ScaleMode.ScaleToFit);
+        }
+        else
+        {
+            GUI.DrawTexture(reusedRect, smallIndoorIcon, ScaleMode.ScaleToFit);
+        }
 
         Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 3f, 60f, 20f);
-        Widgets.Label(reusedRect, entry.Branch.CurWorkState);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 60f, 20f);
+        string workState = entry.Branch.CurWorkState;
+        if (Text.CalcSize(workState).x < 60f)
+        {
+            Widgets.Label(reusedRect, workState);
+        }
+        else
+        {
+            Widgets.LabelEllipses(reusedRect, workState);
+            if (Mouse.IsOver(reusedRect) && !workState.NullOrEmpty())
+            {
+                TooltipHandler.TipRegion(reusedRect, () => workState, 3548681);
+            }
+        }
 
         Text.Anchor = TextAnchor.MiddleLeft;
-        Rect rightRect = Rect.MinMaxRect(leftRect.xMax + 10f, inRect.yMin, inRect.xMax, inRect.yMax);
+        Rect rightRect = Rect.MinMaxRect(leftRect.xMax + 16f, inRect.yMin, inRect.xMax, inRect.yMax);
         reusedRect = new(rightRect.x, rightRect.y, rightRect.width, 29f);
         Widgets.Label(reusedRect, "OARO_CurAllCrewCount".Translate(entry.CurAllCrewCount));
         reusedRect = new(rightRect.x, reusedRect.yMax, rightRect.width, 29f);
@@ -649,6 +637,7 @@ public class MainTabWindow_OrderBranches : MainTabWindow
             _ => "OARO_BranchSupply_Enough".Translate().Colorize(Color.green),
         };
         Widgets.Label(reusedRect, supplyState);
+        Text.Anchor = TextAnchor.MiddleCenter;
     }
 
     private void SelectBranch(Branch branch, int index)
@@ -670,54 +659,162 @@ public class MainTabWindow_OrderBranches : MainTabWindow
         selBranchInfo = new();
     }
 
-    public override void PreClose()
+    protected override void SetInitialSizeAndPosition()
     {
-        Text.Font = GameFont.Small;
-        Text.Anchor = TextAnchor.UpperLeft;
-        base.PreClose();
+        Vector2 initialSize = InitialSize;
+        windowRect = new Rect((UI.screenWidth - initialSize.x) / 2f, (UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
+        windowRect = windowRect.Rounded();
     }
 
-    private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MainBackground");
+    private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MainBackground");
 
-    private static readonly Texture2D topTitleground = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_TopTitleground");
-    private static readonly Texture2D topRibbon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_TopRibbon");
+    private static readonly Texture2D topTitleground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_TopTitleground");
+    private static readonly Texture2D topRibbon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_TopRibbon");
 
-    private static readonly Texture2D middleCuttingLine = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleCuttingLine");
-    private static readonly Texture2D middleCheckButton = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleCheckButton");
-    private static readonly Texture2D middleCheckButton_Down = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleCheckButton_Down");
+    private static readonly Texture2D middleCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCuttingLine");
+    private static readonly Texture2D middleCheckButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCheckButton");
+    private static readonly Texture2D middleCheckButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCheckButton_Down");
 
-    private static readonly Texture2D middleUpRibbon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleUpRibbon");
-    private static readonly Texture2D middleUpBackground = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleUpBackground");
-    private static readonly Texture2D middleUpPeristele = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleUpPeristele");
-    private static readonly Texture2D middleUpGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleUpGeneralSquadIcon");
+    private static readonly Texture2D middleUpRibbon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpRibbon");
+    private static readonly Texture2D middleUpBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpBackground");
+    private static readonly Texture2D middleUpPeristele = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpPeristele");
+    private static readonly Texture2D middleUpGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpGeneralSquadIcon");
 
-    private static readonly Texture2D middleMiddleBackground = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleMiddleBackground");
+    private static readonly Texture2D middleMiddleBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleMiddleBackground");
     private static readonly Texture2D middleMiddleBarHighlightTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.34f, 0.42f, 0.43f));
     private static readonly Texture2D middleMiddleEmptyBarTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.03f, 0.035f, 0.05f));
-    private static readonly Texture2D middleClickToAddButton = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleClickToAddButton");
-    private static readonly Texture2D middleClickToAddButton_Down = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleClickToAddButton_Down");
-    private static readonly Texture2D middleSilverButton = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleSilverButton");
-    private static readonly Texture2D middleSilverButton_Down = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleSilverButton_Down");
-    private static readonly Texture2D middleMemberIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleMemberIcon");
-    private static readonly Texture2D middleCommanderIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_MiddleCommanderIcon");
+    private static readonly Texture2D middleClickToAddButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleClickToAddButton");
+    private static readonly Texture2D middleClickToAddButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleClickToAddButton_Down");
+    private static readonly Texture2D middleSilverButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleSilverButton");
+    private static readonly Texture2D middleSilverButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleSilverButton_Down");
+    private static readonly Texture2D middleMemberIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleMemberIcon");
+    private static readonly Texture2D middleCommanderIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCommanderIcon");
 
-    private static readonly Texture2D leftBackground = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_LeftBackground");
-    private static readonly Texture2D leftGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_LeftGeneralSquadIcon");
+    private static readonly Texture2D leftBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftBackground");
+    private static readonly Texture2D leftGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftGeneralSquadIcon");
+    private static readonly Texture2D leftListBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftListBackground");
 
-    private static readonly Texture2D rightBackground = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_RightBackground");
-    private static readonly Texture2D rightCuttingLine = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_RightCuttingLine");
-    private static readonly Texture2D rightSupportSquadIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_RightSupportSquadIcon");
+    private static readonly Texture2D rightBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RightBackground");
+    private static readonly Texture2D rightCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RightCuttingLine");
+    private static readonly Texture2D rightSupportSquadIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RightSupportSquadIcon");
 
-    private static readonly Texture2D branchSupplyLack = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_BranchSupply_Lack");
-    private static readonly Texture2D branchSupplyJust = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_BranchSupply_Just");
-    private static readonly Texture2D branchSupplyEnough = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_BranchSupply_Enough");
+    private static readonly Texture2D branchSupplyLack = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchSupply_Lack");
+    private static readonly Texture2D branchSupplyJust = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchSupply_Just");
+    private static readonly Texture2D branchSupplyEnough = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchSupply_Enough");
 
-    private static readonly Texture2D bigStrangeIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_BigStrangeIcon");
-    private static readonly Texture2D bigFriendlyIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_BigFriendlyIcon");
-    private static readonly Texture2D smallStrangeIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_SmallStrangeIcon");
-    private static readonly Texture2D smallFriendlyIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_SmallFriendlyIcon");
+    private static readonly Texture2D bigStrangeIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigStrangeIcon");
+    private static readonly Texture2D bigFriendlyIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigFriendlyIcon");
+    private static readonly Texture2D bigIdleIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigIdleIcon");
+    private static readonly Texture2D bigOutdoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigOutdoorIcon");
+    private static readonly Texture2D bigIndoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigIndoorIcon");
+    private static readonly Texture2D smallStrangeIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallStrangeIcon");
+    private static readonly Texture2D smallFriendlyIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallFriendlyIcon");
+    private static readonly Texture2D smallOutdoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallOutdoorIcon");
+    private static readonly Texture2D smallIndoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallIndoorIcon");
+    private static readonly Texture2D smallIdleIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallIdleIcon");
 
-    private static readonly Texture2D branchBaseSiteIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_BranchBaseIcon");
-    private static readonly Texture2D recommendationIcon = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_RecommendationIcon");
-    private static readonly Texture2D verticalCuttingLine = ContentFinder<Texture2D>.Get("UI/OrderBranches/OARO_VerticalCuttingLine");
+    private static readonly Texture2D branchBaseSiteIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchBaseIcon");
+    private static readonly Texture2D recommendationIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RecommendationIcon");
+    private static readonly Texture2D verticalCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_VerticalCuttingLine");
+}
+
+public class BranchSummaryCacheEntry
+{
+    public readonly Branch Branch;
+
+    public string SquadName = "----";
+    public string BaseSiteName = "----";
+    public float Distance = -1f;
+    public int CurAllCrewCount;
+    public float Potency;
+
+    public Texture2D HonorIcon;
+    public Texture2D HonorStripSmall;
+    public Texture2D HonorBackgroundSmall;
+    public Texture2D HonorDecorationSmall;
+
+    public BranchSummaryCacheEntry() { }
+
+    public BranchSummaryCacheEntry(Branch branch, Map map)
+    {
+        Branch = branch;
+        SquadName = branch.Squad.Name;
+
+        if (branch.BaseSite is INameableWorldObject nameSite)
+        {
+            BaseSiteName = nameSite.Name;
+        }
+        else
+        {
+            BaseSiteName = branch.BaseSite.Label;
+        }
+
+        Distance = branch.DistanceTo(map.Tile);
+        CurAllCrewCount = branch.Squad.AllCrewCountInt;
+
+        if (branch.IsBranchOfType(Branch.BranchType.Honor))
+        {
+            HonorIcon = branch.HonorProperties?.IconTexture;
+            BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
+            if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
+            {
+                HonorStripSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorStripSmall_{primaryMedal}").Texture;
+                HonorBackgroundSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorBackgroundSmall_{primaryMedal}").Texture;
+                HonorDecorationSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorDecorationSmall_{primaryMedal}").Texture;
+            }
+        }
+    }
+}
+
+public class BranchInfoCacheEntry : BranchSummaryCacheEntry
+{
+    public bool HasSupportAuthority;
+
+    public string FriendlyExpireDateStr = string.Empty;
+    public float FriendlyProcess;
+
+    public int CommanderCeiling;
+    public int CrewCeiling;
+    public float MemberRecoveryRate;
+    public int BombardSupportCeiling;
+
+    public Texture2D MedalBackground;
+
+    public Texture2D HonorExpandIcon;
+    public Texture2D HonorStrip;
+    public Texture2D HonorBackground;
+    public Texture2D HonorDecoration;
+
+    public BranchInfoCacheEntry() : base() { }
+
+    public BranchInfoCacheEntry(Branch branch, Map map) : base(branch, map)
+    {
+        HasSupportAuthority = branch.EffectTags.HasTag(KeyLibrary_EffectTag.SupportAuthority);
+
+        if (branch.IsBranchOfType(Branch.BranchType.Friendly))
+        {
+            FriendlyProcess = Mathf.Clamp01(branch.FriendlyExpiredTick / 40f * 60000f);
+            FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyExpiredTick, Find.WorldGrid.LongLatOf(map.Tile));
+        }
+        HonorExpandIcon = branch.HonorProperties?.ExpandingIconTexture;
+
+        BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
+        if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
+        {
+            MedalBackground = new CachedTexture($"UI/BranchSquad/OARO_MedalBackground_{primaryMedal}").Texture;
+            if (branch.IsBranchOfType(Branch.BranchType.Honor))
+            {
+                HonorStrip = new CachedTexture($"UI/BranchSquad/OARO_HonorStrip_{primaryMedal}").Texture;
+                HonorBackground = new CachedTexture($"UI/BranchSquad/OARO_HonorBackground_{primaryMedal}").Texture;
+                HonorDecoration = new CachedTexture($"UI/BranchSquad/OARO_HonorDecoration_{primaryMedal}").Texture;
+            }
+        }
+
+        CommanderCeiling = (int)branch.Squad.CommanderCeiling;
+        CrewCeiling = (int)branch.Squad.MemberCeiling + CommanderCeiling;
+
+        MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate);
+        BombardSupportCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling);
+    }
+
 }
