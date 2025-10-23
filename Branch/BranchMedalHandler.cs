@@ -11,9 +11,9 @@ public class BranchMedalHandler : IExposable
 {
     private List<BranchMedalRecord> medalRecords = new(4);
 
-    [Unsaved] private BranchMedalType allHasTypes = BranchMedalType.None;
+    [Unsaved] private BranchMedalType allHasTypes = 0;
     public BranchMedalType AllHasTypes => allHasTypes;
-    public BranchMedalType PrimaryMedal => medalRecords[0].type;
+    public BranchMedalType PrimaryMedal => medalRecords[0].Type;
     public int MedalTypeCount => medalRecords.Count;
     public IReadOnlyList<BranchMedalRecord> MedalRecords => medalRecords;
 
@@ -46,12 +46,12 @@ public class BranchMedalHandler : IExposable
         listing_Rect.Label("Medals:");
         foreach (BranchMedalRecord mr in medalRecords)
         {
-            listing_Rect.SubLabel($"({mr.type}, {mr.count})", 0.8f);
+            listing_Rect.SubLabel($"({mr.Type}, {mr.Count})", 0.8f);
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasMedal(BranchMedalType medal) => (allHasTypes & medal) == medal;
+    public bool HasMedal(BranchMedalType medal) => (allHasTypes & medal) != 0;
 
     public int GetMedalCount(BranchMedalType medal)
     {
@@ -61,9 +61,9 @@ public class BranchMedalHandler : IExposable
         }
         for (int i = 0; i < medalRecords.Count; i++)
         {
-            if (medalRecords[i].type == medal)
+            if (medalRecords[i].Type == medal)
             {
-                return medalRecords[i].count;
+                return medalRecords[i].Count;
             }
         }
         return 0;
@@ -81,9 +81,9 @@ public class BranchMedalHandler : IExposable
             for (int i = 0; i < medalRecords.Count; i++)
             {
                 BranchMedalRecord record = medalRecords[i];
-                if (record.type == medal)
+                if (record.Type == medal)
                 {
-                    record.count += count;
+                    record.Count += count;
                     medalRecords[i] = record;
                     totalMedalCount += count;
                 }
@@ -93,12 +93,12 @@ public class BranchMedalHandler : IExposable
         {
             medalRecords.Add(new BranchMedalRecord()
             {
-                type = medal,
-                count = count,
-                firstGotTick = Find.TickManager.TicksGame
+                Type = medal,
+                Count = count,
+                FirstGotTick = Find.TickManager.TicksGame
             });
 
-            medalRecords.SortBy(r => (int)r.type);
+            medalRecords.SortBy(r => (int)r.Type);
             allHasTypes |= medal;
         }
 
@@ -129,8 +129,8 @@ public class BranchMedalHandler : IExposable
         totalMedalCount = 0;
         for (int i = 1; i < medalRecords.Count; i++)
         {
-            allHasTypes |= medalRecords[i].type;
-            totalMedalCount += medalRecords[i].count;
+            allHasTypes |= medalRecords[i].Type;
+            totalMedalCount += medalRecords[i].Count;
         }
     }
 
@@ -142,7 +142,7 @@ public class BranchMedalHandler : IExposable
         };
         for (int i = 0; i < medalRecords.Count; i++)
         {
-            AdjustMedalHediffStage(stage, medalRecords[i].type, isPrimary: i == 0);
+            AdjustMedalHediffStage(stage, medalRecords[i].Type, isPrimary: i == 0);
         }
         if (stage.extraTooltip.NullOrEmpty())
         {

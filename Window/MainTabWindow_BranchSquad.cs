@@ -1,24 +1,41 @@
 ﻿using RimWorld;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
+using Verse.Utility;
+using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class MainTabWindow_BranchSquad : MainTabWindow
 {
+    private enum TabType
+    {
+        All,
+        Near,
+        Friendly
+    }
+
     public override Vector2 InitialSize => new(1627f, 944f);
     public override Vector2 RequestedTabSize => new(1627f, 944f);
 
     private Vector2 scrollPosition_Squads;
 
-    private Map map;
+    private readonly RatkinOrder ratkinOrder;
+    private readonly Map map;
 
     private int selBranchIndex;
     private Branch selBranch;
     private BranchInfoCacheEntry selBranchInfo;
+    private bool needRefreshSel;
 
-    private List<BranchSummaryCacheEntry> branchSummaryCaches = [];
+    private TabType curTab = TabType.All;
+    private readonly List<TabRecord> tabs = [];
+
+    private readonly List<BranchSummaryCacheEntry> branchSummaryCaches = [];
+    private readonly List<BranchSummaryCacheEntry> tabSummaryCaches = [];
 
     public MainTabWindow_BranchSquad()
     {
@@ -36,22 +53,25 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         //注：用的通讯台声音
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
+
+        map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(map));
+        ratkinOrder = RatkinOrderManager.Instance.AllRatkinOrders[0] ?? throw new ArgumentNullException(nameof(ratkinOrder));
     }
 
     public override void PreOpen()
     {
         base.PreOpen();
-        map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
-        RatkinOrder ratkinOrder = RatkinOrderManager.Instance.AllRatkinOrders[0];
-
-        branchSummaryCaches = [];
-        foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
-        {
-            branchSummaryCaches.Add(new BranchSummaryCacheEntry(branch, map));
-        }
-
-        SelectBranch(branchSummaryCaches[0].Branch, 0);
+        RecacheBranchSummary();
     }
+
+    public override void PostClose()
+    {
+        base.PostClose();
+        DeselectBranch();
+        branchSummaryCaches.Clear();
+        tabSummaryCaches.Clear();
+    }
+
     public override void Close(bool doCloseSound = true)
     {
         Text.Font = GameFont.Small;
@@ -61,6 +81,11 @@ public class MainTabWindow_BranchSquad : MainTabWindow
 
     public override void DoWindowContents(Rect inRect)
     {
+        if (needRefreshSel)
+        {
+            RefreshSelBranch();
+        }
+
         Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1547f, 904f);
         GUI.DrawTexture(mainRect, mainBackground);
 
@@ -98,6 +123,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         Rect middleRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, areaRectY, 583f, areaRectHeight);
         if (DrawMiddleRect(middleRect))
         {
+            Close();
             return;
         }
 
@@ -146,31 +172,34 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         reusedRect = new(inRectX, reusedRect.yMax + 10f, 23f, 32f);
         GUI.DrawTexture(reusedRect, branchBaseSiteIcon);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 8f, 80f, 32f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 12f, 88f, 48f);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, selBranchInfo.BaseSiteName);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 32f, 60f, 32f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "Check".Translate(), middleCheckButton, middleCheckButton_Down))
+        if (DrawButtonWithDisableReason(butRect: reusedRect,
+                                        label: "OARO_CheckBranchSite".Translate(),
+                                        baseTex: middleCheckButton,
+                                        downTex: middleCheckButton_Down,
+                                        acceptance: selBranch is not null,
+                                        showReason: false,
+                                        tipUniqueID: -1))
         {
-            Close();
+            CameraJumper.TryJumpAndSelect(selBranch.BaseSite);
             return true;
         }
 
-        Text.Anchor = TextAnchor.MiddleLeft;
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRect.xMax - 180f, 90f, 32f);
-        Widgets.Label(reusedRect, "OARO_BranchSiteDistance_Prefix".Translate());
-
         Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRect.xMax - 90f, 90f, 32f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRect.xMax - 192f, 192f, 32f);
         if (selBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_BranchSiteDistance_Suffix".Translate(selBranchInfo.Distance.ToString("F0")));
+            Widgets.Label(reusedRect, "OARO_BranchSiteDistance".Translate(selBranchInfo.Distance.ToString("F0"))
+                                                               .Colorize(selBranchInfo.IsInAffectedRange ? Color.green : Color.white));
         }
         else
         {
-            Widgets.Label(reusedRect, "OARO_BranchSiteDistance_SuffixN".Translate());
+            Widgets.Label(reusedRect, "OARO_BranchSiteDistanceN".Translate());
         }
 
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -234,7 +263,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         TaggedString friendlyExpireDate;
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 43f, 51f);
-        if (selBranch?.IsBranchOfType(Branch.BranchType.Friendly) ?? false)
+        if (selBranch?.IsBranchOfType(BranchType.Friendly) ?? false)
         {
             GUI.DrawTexture(reusedRect, bigFriendlyIcon, ScaleMode.ScaleToFit);
 
@@ -270,7 +299,13 @@ public class MainTabWindow_BranchSquad : MainTabWindow
 
         reusedRect.xMin = reusedRect.xMax + 8f;
         reusedRect.xMax = areaRect.xMax - 2f;
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_ClickToAdd".Translate(), middleClickToAddButton, middleClickToAddButton_Down))
+        if (DrawButtonWithDisableReason(butRect: reusedRect,
+                                        label: "OARO_ClickToAdd".Translate(),
+                                        baseTex: middleClickToAddButton,
+                                        downTex: middleClickToAddButton_Down,
+                                        acceptance: selBranch is not null,
+                                        showReason: false,
+                                        tipUniqueID: -1))
         {
 
         }
@@ -280,6 +315,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         reusedRect = new(areaRect.x, areaRect.y + 4f, 128f, 24f);
         Widgets.Label(reusedRect, "OARO_BranchSupplyState".Translate());
 
+        TaggedString supplyState = string.Empty;
         if (selBranch is not null)
         {
             switch (selBranch.Supply)
@@ -287,51 +323,47 @@ public class MainTabWindow_BranchSquad : MainTabWindow
                 case < 0.2f:
                     reusedRect = OARO_WindowUtility.CenterRectOnX(areaRect, reusedRect.yMax + 26f, 20f, 19f);
                     GUI.DrawTexture(reusedRect, branchSupplyLack);
-                    reusedRect = new(areaRect.x + 10f, areaRect.yMax - (24f + 2f), 64f, 24f);
-                    Text.Anchor = TextAnchor.MiddleLeft;
-                    Widgets.Label(reusedRect, "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange));
+                    supplyState = "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange);
                     break;
 
                 case < 0.8f:
                     reusedRect = OARO_WindowUtility.CenterRectOnX(areaRect, reusedRect.yMax + 6f, 62f, 39f);
                     GUI.DrawTexture(reusedRect, branchSupplyJust);
-                    reusedRect = new(areaRect.x + 10f, areaRect.yMax - (24f + 2f), 64f, 24f);
-                    Text.Anchor = TextAnchor.MiddleLeft;
-                    Widgets.Label(reusedRect, "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow));
+                    supplyState = "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow);
                     break;
 
                 default:
                     reusedRect = OARO_WindowUtility.CenterRectOnX(areaRect, reusedRect.yMax + 6f, 104f, 39f);
                     GUI.DrawTexture(reusedRect, branchSupplyEnough);
-                    reusedRect = new(areaRect.x + 10f, areaRect.yMax - (24f + 2f), 64f, 24f);
-                    Text.Anchor = TextAnchor.MiddleLeft;
-                    Widgets.Label(reusedRect, "OARO_BranchSupply_Enough".Translate().Colorize(Color.green));
+                    supplyState = "OARO_BranchSupply_Enough".Translate().Colorize(Color.green);
                     break;
             }
-            Text.Anchor = TextAnchor.MiddleRight;
-            reusedRect = new(areaRect.xMax - (10f + 64f), areaRect.yMax - (24f + 2f), 64f, 24f);
-            Widgets.Label(reusedRect, selBranch.Supply.ToStringPercent("F0"));
-            Text.Anchor = TextAnchor.MiddleCenter;
+            supplyState += ("   " + selBranch.Supply.ToStringPercent("F0"));
         }
         else
         {
-            reusedRect = new(areaRect.x + 10f, areaRect.yMax - (24f + 2f), 64f, 24f);
-            Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label(reusedRect, "--");
-            Text.Anchor = TextAnchor.MiddleRight;
-            reusedRect = new(areaRect.xMax - (10f + 64f), areaRect.yMax - (24f + 2f), 64f, 24f);
-            Widgets.Label(reusedRect, "--%");
-            Text.Anchor = TextAnchor.MiddleCenter;
+            supplyState = "--   --%";
         }
+
+        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
+        Widgets.Label(reusedRect, supplyState);
 
 
         //中部中下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 128f, middleBottomHeight);
-        if (OARO_WindowUtility.ButtonImage(areaRect, middleSilverButton, middleSilverButton_Down))
+        if (selBranch is not null)
         {
+            if (OARO_WindowUtility.ButtonImage(areaRect, middleSilverButton, middleSilverButton_Down))
+            {
 
+            }
+        }
+        else
+        {
+            GUI.DrawTexture(areaRect, middleClickToAddButton_Down);
         }
         reusedRect = new(areaRect.x + 16f, areaRect.y + 8f, 40f, 24f);
+        Widgets.ThingIcon(reusedRect, ThingDefOf.Silver, graphicIndexOverride: 2);
 
         reusedRect = new(reusedRect.xMax + 8f, areaRect.y + 8f, 40f, 24f);
         Widgets.Label(reusedRect, ThingDefOf.Silver.label);
@@ -361,11 +393,18 @@ public class MainTabWindow_BranchSquad : MainTabWindow
 
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(areaRect.x, areaRect.yMax - 39f, 186f, 39f);
-        if (OARO_WindowUtility.ButtonImage(reusedRect, middleSilverButton, middleSilverButton_Down))
+
+        if (selBranch is not null)
         {
+            if (OARO_WindowUtility.ButtonImage(reusedRect, middleSilverButton, middleSilverButton_Down))
+            {
 
+            }
         }
-
+        else
+        {
+            GUI.DrawTexture(reusedRect, middleCheckButton_Down);
+        }
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 50f, 26f, 23f);
         GUI.DrawTexture(reusedRect, recommendationIcon);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 6f, 64f, 24f);
@@ -374,23 +413,197 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         //中部右下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 186f, middleBottomHeight);
         reusedRect = new(areaRect.x + 4f, areaRect.y + 8f, 70f, 24f);
-        Widgets.Label(reusedRect, "OARO_CommanderCountInfo".Translate());
+        Widgets.Label(reusedRect, "OARO_IncludeCommanderCountInfo".Translate());
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, reusedRect.xMax + 4f, 29f, 27f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, reusedRect.xMax + 10f, 29f, 27f);
         GUI.DrawTexture(reusedRect, middleCommanderIcon);
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.xMax - 54f, 50f, 24f);
         if (selBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_CommanderCountNum".Translate(selBranch.Squad.CommanderCountInt, selBranchInfo.CommanderCeiling));
+            Widgets.Label(reusedRect, "OARO_IncludeCommanderCountNum".Translate(selBranch.Squad.CommanderCountInt, selBranchInfo.CommanderCeiling));
         }
         else
         {
-            Widgets.Label(reusedRect, "OARO_CommanderCountNumN".Translate());
+            Widgets.Label(reusedRect, "OARO_IncludeCommanderCountNumN".Translate());
         }
 
         //下部区域
         Rect bottomRect = new(inRectX, middleRect.yMax + 32f, rectWidth, rectHeight);
+        bool hasSupportAuthority = selBranch?.HasSupportAuthority ?? false;
+
+        //下部左侧区域
+        areaRect = new(bottomRect.x, bottomRect.y, 200f, rectHeight);
+        GUI.DrawTexture(areaRect, middleBottomBackground, ScaleMode.ScaleToFit);
+        areaRect = areaRect.ContractedBy(2f);
+
+        reusedRect = new(areaRect.x + 18f, areaRect.y + 14f, 60f, 65f);
+        Color stateColor = Color.white;
+        if (selBranch is not null)
+        {
+            if (selBranch.IsIdleNow)
+            {
+                GUI.DrawTexture(reusedRect, bigIdleIcon, ScaleMode.ScaleToFit);
+                stateColor = Color.cyan;
+            }
+            else if (selBranch.IsOutdoorNow)
+            {
+                GUI.DrawTexture(reusedRect, bigOutdoorIcon, ScaleMode.ScaleToFit);
+                stateColor = ColorLibrary.Orange;
+            }
+            else
+            {
+                GUI.DrawTexture(reusedRect, bigIndoorIcon, ScaleMode.ScaleToFit);
+                stateColor = Color.yellow;
+            }
+        }
+
+        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 95f, 20f);
+        Widgets.Label(reusedRect, "OARO_BranchWorkState".Translate());
+        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 16f, 95f, 20f);
+        if (selBranch is not null)
+        {
+            Widgets.Label(reusedRect, selBranch.CurWorkState.Colorize(stateColor));
+        }
+        else
+        {
+            Widgets.Label(reusedRect, "----".Colorize(stateColor));
+        }
+
+        reusedRect = new(areaRect.x + 97f, areaRect.y + 14f, 98f, 20f);
+        Widgets.Label(reusedRect, "OARO_AutoStartTaskChance".Translate());
+
+        reusedRect = new(areaRect.x + 97f, reusedRect.yMax + 10f, 98f, 20f);
+        if (selBranch?.IsIdleNow ?? false)
+        {
+            Widgets.Label(reusedRect, selBranch.TaskHandler.AutoStartTaskChance.ToStringPercent("F0"));
+        }
+        else
+        {
+            Widgets.Label(reusedRect, "--%");
+        }
+
+        reusedRect = new(areaRect.x + 97f, areaRect.y + 85f, 98f, 20f);
+        Widgets.Label(reusedRect, "OARO_RequestCombatReadiness".Translate());
+
+        reusedRect = new(areaRect.x + 97f, areaRect.yMax - 37f, 98f, 37f);
+        if (hasSupportAuthority && selBranchInfo.CanRequestCombatReadiness)
+        {
+            if (OARO_WindowUtility.ButtonImage(reusedRect, middleCombatReadinessButton, middleCombatReadinessButton_Down))
+            {
+                selBranch.TaskHandler.TrySwitchToTask(BranchTaskDefOf.OARO_CombatReadiness);
+                needRefreshSel = true;
+            }
+        }
+        else
+        {
+            GUI.DrawTexture(reusedRect, middleCombatReadinessButton_Down);
+            if (hasSupportAuthority)
+            {
+                string reason = selBranchInfo.CanRequestCombatReadiness.Reason;
+                if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(reusedRect))
+                {
+                    TooltipHandler.TipRegion(reusedRect, () => reason, 6484159);
+                }
+            }
+        }
+
+        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 29f, 29f);
+        GUI.DrawTexture(reusedRect, middleCombatReadinessButton_Icon);
+
+        areaRect = new(areaRect.xMax + 2f, areaRect.y, 380f, areaRect.height);
+        Rect supportOptRect = areaRect;
+        supportOptRect.yMax = areaRect.yMin + 40f;
+        Text.Font = GameFont.Medium;
+        Widgets.Label(supportOptRect, "OARO_SupportOption".Translate());
+        Text.Font = GameFont.Small;
+
+        reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
+        GUI.DrawTexture(reusedRect, middleBottom_Light, ScaleMode.ScaleToFit);
+
+        reusedRect.xMax = reusedRect.xMin + 100f;
+        Widgets.Label(reusedRect, "OARO_SupportAuthority".Translate());
+
+        reusedRect.xMin = reusedRect.xMax;
+        reusedRect.xMax = areaRect.xMax;
+        if (hasSupportAuthority)
+        {
+            Widgets.Label(reusedRect, "OARO_SupportAuthorityUnlocked".Translate());
+            reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 227f, 11f);
+            GUI.DrawTexture(reusedRect, middleSupportLockLine);
+        }
+
+        reusedRect = new(areaRect.x, areaRect.y + 78f, 100f, 38f);
+        Widgets.Label(reusedRect, "OARO_UsableBombardCount".Translate());
+
+        reusedRect.xMin = reusedRect.xMax;
+        reusedRect.xMax = areaRect.xMax;
+        DrawBombardCount(reusedRect);
+
+        reusedRect = new(areaRect.x, reusedRect.yMax, areaRect.width, 38f);
+        GUI.DrawTexture(reusedRect, middleBottom_Light, ScaleMode.ScaleToFit);
+
+        reusedRect.xMax = reusedRect.xMin + 100f;
+        Widgets.Label(reusedRect, "OARO_RequestSupport".Translate());
+
+        reusedRect.xMin = reusedRect.xMax;
+        reusedRect.xMax += 140f;
+
+        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
+        if (DrawButtonWithDisableReason(butRect: reusedRect,
+                               label: "OARO_BombardSupport".Translate(),
+                               baseTex: middleSupportButton,
+                               downTex: middleSupportButton_Down,
+                               acceptance: selBranchInfo.BombardFeasibility,
+                               showReason: hasSupportAuthority,
+                               tipUniqueID: 945641))
+        {
+
+        }
+
+        reusedRect.xMax = areaRect.xMax;
+        reusedRect.xMin = areaRect.xMax - 140f;
+        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
+
+        if (DrawButtonWithDisableReason(butRect: reusedRect,
+                                       label: "OARO_MilitarySupport".Translate(),
+                                       baseTex: middleSupportButton,
+                                       downTex: middleSupportButton_Down,
+                                       acceptance: selBranchInfo.SupportFeasibility,
+                                       showReason: hasSupportAuthority,
+                                       tipUniqueID: 8831443))
+        {
+
+        }
+
+        if (!hasSupportAuthority)
+        {
+            reusedRect = Rect.MinMaxRect(areaRect.xMin - 102f, supportOptRect.yMax, areaRect.xMax + 3f, areaRect.yMax + 5f);
+            GUI.DrawTexture(reusedRect, middleLockShade, ScaleMode.ScaleToFit, true);
+            reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
+            if (selBranchInfo.CanUnlockSupportAuthority)
+            {
+                if (OARO_WindowUtility.ButtonImage(reusedRect, middleUnlockButton, middleUnlockButton_Down))
+                {
+                    BranchUtility.UnlockSupportAuthority(selBranch, map);
+                    needRefreshSel = true;
+                }
+            }
+            else
+            {
+                GUI.DrawTexture(reusedRect, middleUnlockButton_Down);
+                string reason = selBranchInfo.CanUnlockSupportAuthority.Reason;
+                if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(reusedRect))
+                {
+                    TooltipHandler.TipRegion(reusedRect, () => reason, 56974814);
+                }
+            }
+            reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
+            GUI.DrawTexture(reusedRect, recommendationIcon);
+            Text.Anchor = TextAnchor.MiddleCenter;
+            reusedRect = new(reusedRect.xMax + 8f, reusedRect.y, 80f, 24f);
+            Widgets.Label(reusedRect, "OARO_RequestUnlockSupport".Translate());
+        }
 
         return false;
     }
@@ -405,6 +618,11 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         //上侧勋章柱框
         Rect reusedRect = OARO_WindowUtility.CenterRect(inRect, 300f, 112f);
         GUI.DrawTexture(reusedRect, middleUpPeristele);
+
+        if (selBranch is null)
+        {
+            return;
+        }
 
         //分部勋章
         Rect medalRect = OARO_WindowUtility.CenterRect(inRect, 192f, 140f);
@@ -434,23 +652,79 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         }
     }
 
+    private void DrawBombardCount(Rect inRect)
+    {
+        Rect areaRect = inRect;
+        areaRect.xMin = areaRect.xMax - 80f;
+        int bombardSupportCeiling = selBranchInfo.BombardSupportCeiling;
+        if (selBranch is not null)
+        {
+            Widgets.Label(areaRect, "OARO_BombardSupportCeiling".Translate(bombardSupportCeiling.ToString()));
+        }
+        else
+        {
+            Widgets.Label(areaRect, "OARO_BombardSupportCeilingN".Translate());
+        }
+        areaRect = inRect;
+        areaRect.xMin += 8f;
+        areaRect.xMax -= 80f;
+
+        Rect iconRect = OARO_WindowUtility.CenterRect(areaRect, 28f * 6, 28f);
+
+        float shellX = iconRect.x;
+        float shellY = iconRect.y;
+        Rect shellRect;
+        int bombardDrawLeft = Mathf.Min(6, bombardSupportCeiling);
+        while (bombardDrawLeft >= 2)
+        {
+            shellRect = new(shellX, shellY, 28f, 28f);
+            GUI.DrawTexture(shellRect, middleShellIcon);
+            bombardDrawLeft -= 2;
+            shellX += 28f;
+
+        }
+        if (bombardDrawLeft > 0)
+        {
+            shellRect = new(shellX, shellY, 28f, 28f);
+            GUI.DrawTexture(shellRect, middleShellIcon_Half);
+        }
+    }
+
     private void DrawLeftRect(Rect inRect)
     {
         GUI.DrawTexture(inRect, leftBackground);
+        Rect tabRect = new(inRect.x, inRect.y - 32f, inRect.width, 32);
+
+        tabs.Clear();
+        tabs.Add(new TabRecord("OARO_BranchSquad_All".Translate().CapitalizeFirst(), delegate
+        {
+            SwitchTapBranchSummary(TabType.All);
+        }, curTab == TabType.All));
+        tabs.Add(new TabRecord("OARO_BranchSquad_Near".Translate().CapitalizeFirst(), delegate
+        {
+            SwitchTapBranchSummary(TabType.Near);
+        }, curTab == TabType.Near));
+        tabs.Add(new TabRecord("OARO_BranchSquad_Friendly".Translate().CapitalizeFirst(), delegate
+        {
+            SwitchTapBranchSummary(TabType.Friendly);
+        }, curTab == TabType.Friendly));
+        TabDrawer.DrawTabs(tabRect, tabs, maxTabWidth: 140f);
+
         inRect = inRect.ContractedBy(2f);
 
-
-
-        float viewHeight = branchSummaryCaches.Count * 91f;
+        float viewHeight = tabSummaryCaches.Count * 91f;
         Rect listRect = inRect;
         listRect.width = 393f;
         listRect.height = viewHeight;
 
+        Rect scrollRect = Rect.MinMaxRect(listRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
+        GUI.DrawTexture(scrollRect, leftScroll, ScaleMode.ScaleToFit);
+
         Widgets.BeginScrollView(inRect, ref scrollPosition_Squads, listRect);
         float entryX = listRect.x;
         float entryY = listRect.y;
-        int squadCount = branchSummaryCaches.Count;
-        int usedCount = Mathf.Max(7,squadCount);
+        int squadCount = tabSummaryCaches.Count;
+        int usedCount = Mathf.Max(7, squadCount);
         Rect entryRect;
 
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -459,7 +733,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
             entryRect = new(entryX, entryY, 393f, 91f);
             entryY += 91;
 
-            DrawSquadEntry(entryRect, branchSummaryCaches[i], i);
+            DrawSquadEntry(entryRect, tabSummaryCaches[i], i);
         }
 
         if (usedCount > squadCount)
@@ -480,7 +754,6 @@ public class MainTabWindow_BranchSquad : MainTabWindow
     {
         float inRectX = inRect.x;
         float inRectY = inRect.y;
-
         Rect reusedRect;
 
         //名称|内容分割线
@@ -500,12 +773,12 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         Text.Anchor = TextAnchor.LowerRight;
         Widgets.Label(reusedRect, $"× {5}");
 
-        reusedRect = new(reusedRect.x - (12f + 26f), reusedRect.y, 26f, 24f);
+        reusedRect = new(reusedRect.x - (4f + 26f), reusedRect.y, 26f, 24f);
         GUI.DrawTexture(reusedRect, recommendationIcon);
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
-        Rect mainRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 597f, 352f, 597f);
+        Rect mainRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 45f, 352f, 597f);
         GUI.DrawTexture(mainRect, rightBackground);
         mainRect = mainRect.ContractedBy(2f);
 
@@ -527,7 +800,14 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         inRect = inRect.ContractedBy(2f);
         if (Widgets.ButtonInvisible(inRect))
         {
-            SelectBranch(entry.Branch, index);
+            if (selBranchIndex == index)
+            {
+                DeselectBranch();
+            }
+            else
+            {
+                SelectBranch(index);
+            }
         }
 
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x, 6f, 87f);
@@ -537,6 +817,11 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         }
 
         Rect leftRect = new(inRect.x + 6f, inRect.y, 224f, inRect.height);
+
+        reusedRect = new(leftRect.x + 2f, leftRect.y + 2f, 32f, 20f);
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Widgets.Label(reusedRect, entry.Distance.ToString("F0").Colorize(entry.IsInAffectedRange ? Color.green : Color.white));
+
         if (entry.HonorDecorationSmall is not null)
         {
             reusedRect = leftRect.ContractedBy(10f);
@@ -560,7 +845,6 @@ public class MainTabWindow_BranchSquad : MainTabWindow
             GUI.DrawTexture(reusedRect, leftGeneralSquadIcon, ScaleMode.ScaleToFit);
         }
 
-        Text.Anchor = TextAnchor.MiddleCenter;
         Rect squadNameRect = Rect.MinMaxRect(leftRect.x + 100f, leftRect.y + 4f, leftRect.xMax - 16f, leftRect.y + 4f + 22f);
         string squadName = entry.SquadName;
         if (Text.CalcSize(squadName).x < 100f)
@@ -570,7 +854,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         else
         {
             Widgets.LabelEllipses(squadNameRect, squadName);
-            if (Mouse.IsOver(squadNameRect) && !squadName.NullOrEmpty())
+            if (!string.IsNullOrEmpty(squadName) && Mouse.IsOver(squadNameRect))
             {
                 TooltipHandler.TipRegion(squadNameRect, () => squadName, 6844867);
             }
@@ -578,7 +862,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
 
         reusedRect = new(squadNameRect.x + 16f, squadNameRect.yMax + 4f, 25f, 30f);
         string relation;
-        if (entry.Branch.IsBranchOfType(Branch.BranchType.Friendly))
+        if (entry.Branch.IsBranchOfType(BranchType.Friendly))
         {
             GUI.DrawTexture(reusedRect, smallFriendlyIcon, ScaleMode.ScaleToFit);
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
@@ -592,7 +876,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 3f, 40f, 20f);
         Widgets.Label(reusedRect, relation);
 
-        reusedRect = new(squadNameRect.xMax - 48f, squadNameRect.yMax + 4f, 30f, 30f);
+        reusedRect = new(squadNameRect.xMax - 40f, squadNameRect.yMax + 4f, 30f, 30f);
         if (entry.Branch.IsIdleNow)
         {
             GUI.DrawTexture(reusedRect, smallIdleIcon, ScaleMode.ScaleToFit);
@@ -606,31 +890,32 @@ public class MainTabWindow_BranchSquad : MainTabWindow
             GUI.DrawTexture(reusedRect, smallIndoorIcon, ScaleMode.ScaleToFit);
         }
 
-        Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 60f, 20f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 40f, 20f);
         string workState = entry.Branch.CurWorkState;
-        if (Text.CalcSize(workState).x < 60f)
+        if (Text.CalcSize(workState).x < 40f)
         {
             Widgets.Label(reusedRect, workState);
         }
         else
         {
             Widgets.LabelEllipses(reusedRect, workState);
-            if (Mouse.IsOver(reusedRect) && !workState.NullOrEmpty())
+            if (!string.IsNullOrEmpty(workState) && Mouse.IsOver(reusedRect))
             {
                 TooltipHandler.TipRegion(reusedRect, () => workState, 3548681);
             }
         }
 
         Text.Anchor = TextAnchor.MiddleLeft;
-        Rect rightRect = Rect.MinMaxRect(leftRect.xMax + 16f, inRect.yMin, inRect.xMax, inRect.yMax);
-        reusedRect = new(rightRect.x, rightRect.y, rightRect.width, 29f);
+
+        Rect rightRect = Rect.MinMaxRect(leftRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
+        float textX = rightRect.xMin + 24f;
+        reusedRect = new(textX, rightRect.y, rightRect.width, 29f);
         Widgets.Label(reusedRect, "OARO_CurAllCrewCount".Translate(entry.CurAllCrewCount));
-        reusedRect = new(rightRect.x, reusedRect.yMax, rightRect.width, 29f);
-        Widgets.Label(reusedRect, relation);
-        reusedRect = new(rightRect.x, reusedRect.yMax, rightRect.width, 29f);
+        reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
+        Widgets.Label(reusedRect, "OARO_BranchPotency".Translate());
+        reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
         string supplyState = "OARO_BranchSupplyState".Translate() + "  ";
-        supplyState += selBranch.Supply switch
+        supplyState += entry.Branch.Supply switch
         {
             < 0.2f => "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange),
             < 0.8f => "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow),
@@ -640,8 +925,97 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         Text.Anchor = TextAnchor.MiddleCenter;
     }
 
-    private void SelectBranch(Branch branch, int index)
+    private void RefreshSelBranch()
     {
+        needRefreshSel = false;
+        SelectBranch(selBranchIndex);
+        if (selBranchIndex < 0)
+        {
+            return;
+        }
+        tabSummaryCaches[selBranchIndex] = new BranchSummaryCacheEntry(selBranch, map);
+        for (int i = 0; i < branchSummaryCaches.Count; i++)
+        {
+            if (branchSummaryCaches[i].Branch == selBranch)
+            {
+                branchSummaryCaches[i] = new BranchSummaryCacheEntry(selBranch, map);
+                break;
+            }
+        }
+    }
+
+    private void RecacheBranchSummary()
+    {
+        DeselectBranch();
+        branchSummaryCaches.Clear();
+        foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
+        {
+            branchSummaryCaches.Add(new BranchSummaryCacheEntry(branch, map));
+        }
+        if (branchSummaryCaches.Count > 0)
+        {
+            branchSummaryCaches.Sort(new BranchSummaryCacheEntry.SquadWindowEntryComparer());
+            GetCurTapBranchSummary();
+        }
+    }
+
+    private void SwitchTapBranchSummary(TabType tabType)
+    {
+        if (curTab == tabType)
+        {
+            return;
+        }
+        curTab = tabType;
+        GetCurTapBranchSummary();
+    }
+
+    private void GetCurTapBranchSummary()
+    {
+        DeselectBranch();
+        tabSummaryCaches.Clear();
+        if (branchSummaryCaches.Count > 0)
+        {
+            switch (curTab)
+            {
+                case TabType.All:
+                    {
+                        tabSummaryCaches.AddRange(branchSummaryCaches);
+                        break;
+                    }
+                case TabType.Near:
+                    {
+                        for (int i = 0; i < branchSummaryCaches.Count; i++)
+                        {
+                            if (branchSummaryCaches[i].IsInAffectedRange)
+                            {
+                                tabSummaryCaches.Add(branchSummaryCaches[i]);
+                            }
+                        }
+                        break;
+                    }
+                case TabType.Friendly:
+                    {
+                        for (int i = 0; i < branchSummaryCaches.Count; i++)
+                        {
+                            if (branchSummaryCaches[i].Branch.IsBranchOfType(BranchType.Friendly))
+                            {
+                                tabSummaryCaches.Add(branchSummaryCaches[i]);
+                            }
+                        }
+                        break;
+                    }
+            }
+
+            if (tabSummaryCaches.Count > 0)
+            {
+                SelectBranch(0);
+            }
+        }
+    }
+
+    private void SelectBranch(int index)
+    {
+        Branch branch = tabSummaryCaches[index].Branch;
         if (branch is null)
         {
             DeselectBranch();
@@ -657,6 +1031,30 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         selBranch = null;
         selBranchIndex = -1;
         selBranchInfo = new();
+    }
+
+    private static bool DrawButtonWithDisableReason(Rect butRect, string label, Texture2D baseTex, Texture2D downTex, AcceptanceReport acceptance, int tipUniqueID, bool showReason = true)
+    {
+        if (acceptance)
+        {
+            return OARO_WindowUtility.TextButtonImage(butRect, label, baseTex, downTex);
+        }
+        else
+        {
+            GUI.DrawTexture(butRect, downTex);
+            Widgets.Label(butRect, label);
+
+            if (showReason)
+            {
+                string reason = acceptance.Reason;
+                if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(butRect))
+                {
+                    TooltipHandler.TipRegion(butRect, () => reason, tipUniqueID);
+                }
+            }
+
+            return false;
+        }
     }
 
     protected override void SetInitialSizeAndPosition()
@@ -690,9 +1088,25 @@ public class MainTabWindow_BranchSquad : MainTabWindow
     private static readonly Texture2D middleMemberIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleMemberIcon");
     private static readonly Texture2D middleCommanderIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCommanderIcon");
 
+    private static readonly Texture2D middleBottomBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleBottomBackground");
+    private static readonly Texture2D middleBottom_Light = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleBottom_Light");
+    private static readonly Texture2D middleCombatReadinessButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCombatReadinessButton");
+    private static readonly Texture2D middleCombatReadinessButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCombatReadinessButton_Down");
+    private static readonly Texture2D middleCombatReadinessButton_Icon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleCombatReadinessButton_Icon");
+    private static readonly Texture2D middleSupportLockLine = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleSupportLockLine");
+    private static readonly Texture2D middleShellIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleShellIcon");
+    private static readonly Texture2D middleShellIcon_Half = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleShellIcon_Half");
+    private static readonly Texture2D middleSupportButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleSupportButton");
+    private static readonly Texture2D middleSupportButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleSupportButton_Down");
+    private static readonly Texture2D middleLockShade = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleLockShade");
+    private static readonly Texture2D middleUnlockButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUnlockButton");
+    private static readonly Texture2D middleUnlockButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUnlockButton_Down");
+
+
     private static readonly Texture2D leftBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftBackground");
     private static readonly Texture2D leftGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftGeneralSquadIcon");
     private static readonly Texture2D leftListBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftListBackground");
+    private static readonly Texture2D leftScroll = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftScroll");
 
     private static readonly Texture2D rightBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RightBackground");
     private static readonly Texture2D rightCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RightCuttingLine");
@@ -722,22 +1136,26 @@ public class BranchSummaryCacheEntry
 {
     public readonly Branch Branch;
 
-    public string SquadName = "----";
-    public string BaseSiteName = "----";
-    public float Distance = -1f;
-    public int CurAllCrewCount;
-    public float Potency;
+    public readonly string SquadName = "----";
+    public readonly string BaseSiteName = "----";
+    public readonly float Distance = -1f;
+    public readonly float AffectedRange = -1f;
+    public bool IsInAffectedRange => AffectedRange >= Distance;
+    public readonly int CurAllCrewCount = -1;
+    public readonly float Potency;
 
-    public Texture2D HonorIcon;
-    public Texture2D HonorStripSmall;
-    public Texture2D HonorBackgroundSmall;
-    public Texture2D HonorDecorationSmall;
+    public readonly Texture2D HonorIcon;
+    public readonly Texture2D HonorStripSmall;
+    public readonly Texture2D HonorBackgroundSmall;
+    public readonly Texture2D HonorDecorationSmall;
 
     public BranchSummaryCacheEntry() { }
 
     public BranchSummaryCacheEntry(Branch branch, Map map)
     {
-        Branch = branch;
+        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        _ = map ?? throw new ArgumentNullException(nameof(map));
+
         SquadName = branch.Squad.Name;
 
         if (branch.BaseSite is INameableWorldObject nameSite)
@@ -750,9 +1168,10 @@ public class BranchSummaryCacheEntry
         }
 
         Distance = branch.DistanceTo(map.Tile);
+        AffectedRange = branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
         CurAllCrewCount = branch.Squad.AllCrewCountInt;
 
-        if (branch.IsBranchOfType(Branch.BranchType.Honor))
+        if (branch.IsBranchOfType(BranchType.Honor))
         {
             HonorIcon = branch.HonorProperties?.IconTexture;
             BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
@@ -764,34 +1183,69 @@ public class BranchSummaryCacheEntry
             }
         }
     }
+
+    public class SquadWindowEntryComparer : IComparer<BranchSummaryCacheEntry>
+    {
+        public int Compare(BranchSummaryCacheEntry x, BranchSummaryCacheEntry y)
+        {
+            Branch xBranch = x?.Branch;
+            Branch yBranch = y?.Branch;
+
+            if (xBranch is null && yBranch is null) return 0;
+            if (xBranch is not null && yBranch is null) return -1;
+            if (xBranch is null && yBranch is not null) return 1;
+            if (x.IsInAffectedRange != y.IsInAffectedRange)
+            {
+                return x.IsInAffectedRange ? -1 : 1;
+            }
+
+            bool xIsFriendly = xBranch.IsBranchOfType(BranchType.Friendly);
+            bool yIsFriendly = yBranch.IsBranchOfType(BranchType.Friendly);
+            if (xIsFriendly != yIsFriendly)
+            {
+                return xIsFriendly ? -1 : 1;
+            }
+
+            bool xIsHonor = xBranch.IsBranchOfType(BranchType.Honor);
+            bool yIsHonor = yBranch.IsBranchOfType(BranchType.Honor);
+            if (xIsHonor != yIsHonor)
+            {
+                return xIsHonor ? -1 : 1;
+            }
+
+            return x.Distance.CompareTo(y.Distance);
+        }
+    }
 }
 
 public class BranchInfoCacheEntry : BranchSummaryCacheEntry
 {
-    public bool HasSupportAuthority;
+    public readonly string FriendlyExpireDateStr = string.Empty;
+    public readonly float FriendlyProcess = 0f;
 
-    public string FriendlyExpireDateStr = string.Empty;
-    public float FriendlyProcess;
+    public readonly int CommanderCeiling = -1;
+    public readonly int CrewCeiling = -1;
+    public readonly float MemberRecoveryRate = -1f;
+    public readonly int BombardSupportCeiling = -1;
 
-    public int CommanderCeiling;
-    public int CrewCeiling;
-    public float MemberRecoveryRate;
-    public int BombardSupportCeiling;
+    public readonly Texture2D MedalBackground;
 
-    public Texture2D MedalBackground;
+    public readonly Texture2D HonorExpandIcon;
+    public readonly Texture2D HonorStrip;
+    public readonly Texture2D HonorBackground;
+    public readonly Texture2D HonorDecoration;
 
-    public Texture2D HonorExpandIcon;
-    public Texture2D HonorStrip;
-    public Texture2D HonorBackground;
-    public Texture2D HonorDecoration;
+    public readonly AcceptanceReport CanUnlockSupportAuthority = false;
+    public readonly AcceptanceReport CanRequestCombatReadiness = false;
+    public readonly List<AcceptanceReport> SupportFeasibilities;
+    public AcceptanceReport SupportFeasibility => SupportFeasibilities?.FirstOrFallback(fallback: false) ?? false;
+    public readonly AcceptanceReport BombardFeasibility = false;
 
     public BranchInfoCacheEntry() : base() { }
 
     public BranchInfoCacheEntry(Branch branch, Map map) : base(branch, map)
     {
-        HasSupportAuthority = branch.EffectTags.HasTag(KeyLibrary_EffectTag.SupportAuthority);
-
-        if (branch.IsBranchOfType(Branch.BranchType.Friendly))
+        if (branch.IsBranchOfType(BranchType.Friendly))
         {
             FriendlyProcess = Mathf.Clamp01(branch.FriendlyExpiredTick / 40f * 60000f);
             FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyExpiredTick, Find.WorldGrid.LongLatOf(map.Tile));
@@ -802,12 +1256,23 @@ public class BranchInfoCacheEntry : BranchSummaryCacheEntry
         if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
         {
             MedalBackground = new CachedTexture($"UI/BranchSquad/OARO_MedalBackground_{primaryMedal}").Texture;
-            if (branch.IsBranchOfType(Branch.BranchType.Honor))
+            if (branch.IsBranchOfType(BranchType.Honor))
             {
                 HonorStrip = new CachedTexture($"UI/BranchSquad/OARO_HonorStrip_{primaryMedal}").Texture;
                 HonorBackground = new CachedTexture($"UI/BranchSquad/OARO_HonorBackground_{primaryMedal}").Texture;
                 HonorDecoration = new CachedTexture($"UI/BranchSquad/OARO_HonorDecoration_{primaryMedal}").Texture;
             }
+        }
+
+        CanUnlockSupportAuthority = BranchUtility.CanUnlockSupportAuthority(branch, map, resultOnly: false);
+        CanRequestCombatReadiness = branch.TaskHandler.CanSwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, resultOnly: false);
+        BombardFeasibility = BranchSupportUtility.CanBombard(branch, map, resultOnly: false);
+
+        List<BranchSupportUtility.SupportLevel> supportLevels = EnumUtility.GetValues<BranchSupportUtility.SupportLevel>().ToList();
+        SupportFeasibilities = new(supportLevels.Count);
+        for (int i = 0; i < supportLevels.Count; i++)
+        {
+            SupportFeasibilities.Add(BranchSupportUtility.CanSupport(branch, supportLevels[i], map, resultOnly: false));
         }
 
         CommanderCeiling = (int)branch.Squad.CommanderCeiling;

@@ -20,7 +20,7 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
                 }
                 foreach (BranchMedalRecord record in medalRecords)
                 {
-                    if (record.count < memorialExtension.medalCount)
+                    if (record.Count < memorialExtension.medalCount)
                     {
                         return "OARO_Insufficient_SquadMedal".Translate();
                     }

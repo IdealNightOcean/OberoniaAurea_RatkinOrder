@@ -59,6 +59,32 @@ public static class BranchUtility
         return false;
     }
 
+    public static AcceptanceReport CanUnlockSupportAuthority(Branch branch, Map map, bool resultOnly)
+    {
+        if (branch.HasSupportAuthority)
+        {
+            return resultOnly ? false : "OARO_AlreadyHasSupportAuthority".Translate();
+        }
+
+        RatkinOrder ratkinOrder = branch.RatkinOrder;
+        if (ratkinOrder.Faction.HostileTo(Faction.OfPlayer))
+        {
+            return resultOnly ? false : "OARO_OrderFaction_Hostile".Translate();
+        }
+        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < 1)
+        {
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, ratkinOrder.Name);
+        }
+
+        return true;
+    }
+
+    public static void UnlockSupportAuthority(Branch branch, Map map)
+    {
+        RecommendationUtility.UseRecommendationOfMap(branch.RatkinOrder, map, 1);
+        branch.HasSupportAuthority = true;
+    }
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static IEnumerable<Branch> GetAllAvailableBranchForOrder(this RatkinOrder ratkinOrder, Predicate<Branch> predicate)
     {

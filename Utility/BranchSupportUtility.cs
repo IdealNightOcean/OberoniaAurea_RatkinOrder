@@ -17,7 +17,7 @@ public static class BranchSupportUtility
 
     public static AcceptanceReport CanBombard(Branch branch, Map map, bool resultOnly = false)
     {
-        if (!branch.EffectTags.HasTag(KeyLibrary_EffectTag.SupportAuthority))
+        if (!branch.HasSupportAuthority)
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
         }
@@ -42,7 +42,7 @@ public static class BranchSupportUtility
 
     public static AcceptanceReport CanSupport(Branch branch, SupportLevel level, Map map, bool resultOnly = false)
     {
-        if (!branch.EffectTags.HasTag(KeyLibrary_EffectTag.SupportAuthority))
+        if (!branch.HasSupportAuthority)
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
 

@@ -6,6 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchTaskDefOf
 {
     public static BranchTaskDef OARO_JurisdictionDutyPrep;
+    public static BranchTaskDef OARO_CombatReadiness; //战备
 
     static BranchTaskDefOf()
     {

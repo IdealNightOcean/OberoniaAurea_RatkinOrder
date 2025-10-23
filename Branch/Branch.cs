@@ -46,7 +46,9 @@ public class Branch : IExposable, ILoadReferenceable
     protected int friendlyExpiredTick = -1;
     public int FriendlyExpiredTick => friendlyExpiredTick;
 
-    private HonorBranchProperties honorProperties;
+    public bool HasSupportAuthority;
+
+    [Unsaved] private HonorBranchProperties honorProperties;
     public HonorBranchProperties HonorProperties
     {
         get => IsBranchOfType(BranchType.Honor) ? honorProperties : null;
@@ -190,6 +192,7 @@ public class Branch : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref nameCore, "nameCore", string.Empty);
         Scribe_Values.Look(ref name, "name", string.Empty);
 
+        Scribe_Values.Look(ref HasSupportAuthority, "HasSupportAuthority", defaultValue: false);
         Scribe_Values.Look(ref friendlyExpiredTick, "friendlyExpiredTick", 0);
         Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
 
@@ -256,7 +259,7 @@ public class Branch : IExposable, ILoadReferenceable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsBranchOfType(BranchType type) => (curType & type) == type;
+    public bool IsBranchOfType(BranchType type) => (curType & type) != 0;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void SetBranchType(BranchType type, bool active)
