@@ -53,10 +53,10 @@ public class QuestPart_MercyQuestWatcher : QuestPart
     {
         GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
         float letterChance = 0.2f;
-        ResidentKnight residentKnight = GlobalOrderInteractionManager.ResidentKnightsManager.GetResidentKnightOfRole(OARO_ModDefOf.OARO_Orderly);
-        if (residentKnight is not null)
+
+        if (GlobalOrderInteractionManager.ResidentKnightsManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out Pawn knight))
         {
-            letterChance += (residentKnight.RoleDef.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(residentKnight.Pawn);
+            letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(knight);
         }
         if (Rand.Chance(letterChance))
         {

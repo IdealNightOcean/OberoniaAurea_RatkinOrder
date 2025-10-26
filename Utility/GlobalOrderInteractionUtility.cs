@@ -79,9 +79,10 @@ public static class GlobalOrderInteractionUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipKind.Friendly.GetLabel());
         }
 
-        if (GlobalOrderInteractionManager.ResidentKnightsManager.ResidentKnights.Count >= GlobalOrderInteractionManager.ResidentKnightsManager.ResidentLimit)
+        int residentKnightCeiling = ResidentKnightCeiling(ratkinOrder);
+        if (GlobalOrderInteractionManager.ResidentKnightsManager.ResidentKnights.Count >= residentKnightCeiling)
         {
-            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(GlobalOrderInteractionManager.ResidentKnightsManager.ResidentLimit);
+            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(residentKnightCeiling);
         }
 
         if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < 1)
@@ -104,32 +105,27 @@ public static class GlobalOrderInteractionUtility
         OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnight, slate, forced: false);
     }
 
-    /// <summary>
-    /// 常驻骑士额外上限 - 骑士团大厅
-    /// </summary>
-    public static int ExtraResidentKnightLimit_OrderHallLevel => GlobalOrderInteractionManager.OrderHallLevel switch
+    // 某骑士团常驻骑士上限
+    public static int ResidentKnightCeiling(this RatkinOrder ratkinOrder)
     {
-        < 2 => 0,
-        2 => 1,
-        < 5 => 2,
-        5 => 3,
-        _ => 4
-    };
-
-    /// <summary>
-    /// 当前季度无花费邀请骑士小组上限
-    /// </summary>
-    public static int SeasonInvitationLimit()
-    {
-        return GlobalOrderInteractionManager.OrderHallLevel switch
+        int ceiling = 1;
+        ceiling += GlobalOrderInteractionManager.OrderHallLevel switch
         {
-            < 2 => 0,
-            2 => 1,
-            < 5 => 2,
-            5 => 3,
-            _ => 4
+            < 3 => 0,
+            < 5 => 1,
+            < 6 => 2,
+            _ => 3
         };
+
+        ceiling += (int)(ratkinOrder.Esteem / 30f);
+        if (ratkinOrder.ReformationManager.HasReformation(null))
+        {
+            ceiling += 4;
+        }
+
+        return ceiling;
     }
+
 
     /// <summary>
     /// 能否邀请附近骑士小组到访
@@ -168,17 +164,18 @@ public static class GlobalOrderInteractionUtility
     public static void InviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
     {
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
-        if (Rand.Chance(chance) && GlobalOrderInteractionManager.AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
+        AroundKnightGroupsManager aroundKnightGroupsManager = GlobalOrderInteractionManager.AroundKnightGroupsManager;
+        if (Rand.Chance(chance) && aroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
         {
-            GlobalOrderInteractionManager.AroundKnightGroupsManager.SeasonInvitationUsed++;
-            if (GlobalOrderInteractionManager.AroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
+            aroundKnightGroupsManager.SeasonInvitationUsed++;
+            if (aroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
             {
                 RecommendationUtility.UseRecommendationOfMap(knightGroup.RatkinOrder, map, 1);
             }
         }
         else
         {
-            GlobalOrderInteractionManager.AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
+            aroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
             AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
         }
     }
@@ -317,5 +314,21 @@ public static class GlobalOrderInteractionUtility
                                                                      scriptDef: mercyQuestExtension?.preQuestDef ?? OARO_QuestScriptDefOf.OARO_MercyPre_HelpSeeker,
                                                                      slate: slate,
                                                                      forced: true);
+    }
+
+
+    /// <summary>
+    /// 当前季度无花费邀请骑士小组上限
+    /// </summary>
+    private static int SeasonInvitationLimit()
+    {
+        return GlobalOrderInteractionManager.OrderHallLevel switch
+        {
+            < 2 => 0,
+            2 => 1,
+            < 5 => 2,
+            5 => 3,
+            _ => 4
+        };
     }
 }

@@ -1,68 +1,49 @@
 ﻿using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ResidentKnightsManager : IExposable, IOnRatkinOrderRemoved
+public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 {
-    private List<ResidentKnight> residentKnights = [];
-    public IReadOnlyList<ResidentKnight> ResidentKnights => residentKnights;
 
-    private int residentLimit;
-    public int ResidentLimit
-    {
-        get
-        {
-            return residentLimit + GlobalOrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel;
-        }
-        set
-        {
-            residentLimit = Mathf.Max(0, value - GlobalOrderInteractionUtility.ExtraResidentKnightLimit_OrderHallLevel);
-        }
-    }
+    private Dictionary<Pawn, ResidentKnight> residentKnights = [];
+    private Dictionary<ResidentKnightRoleDef, Pawn> rolesToKnights = [];
 
-    public IEnumerable<Pawn> NoRoleKnights
-    {
-        get
-        {
-            foreach (ResidentKnight knight in residentKnights)
-            {
-                if (!knight.IsActive)
-                {
-                    yield return knight.Pawn;
-                }
-            }
-        }
-    }
+    public IReadOnlyDictionary<Pawn, ResidentKnight> ResidentKnights => residentKnights;
+    public IReadOnlyDictionary<ResidentKnightRoleDef, Pawn> RolesToKnights => RolesToKnights;
 
 
-    [Unsaved] private readonly Dictionary<StatDef, float> statOffsets;
-    [Unsaved] private readonly Dictionary<StatDef, float> statFactors;
+    [Unsaved] private readonly Dictionary<StatDef, float> statOffsets = [];
+    [Unsaved] private readonly Dictionary<StatDef, float> statFactors = [];
 
-    [Unsaved] private readonly HediffStage buffHediffStage;
-    [Unsaved] private bool buffStageDirty;
+    [Unsaved] private readonly HediffStage buffHediffStage = new();
+    [Unsaved] private int nextBuffStatRegainTick = -1;
 
     public HediffStage BuffHediffStage
     {
         get
         {
-            if (buffStageDirty)
+            if (Find.TickManager.TicksGame > nextBuffStatRegainTick)
             {
-                EstablishBuffStageStatModifier();
+                RegainRoleBuffStat();
             }
             return buffHediffStage;
         }
     }
 
-    public ResidentKnightsManager()
+    public void ExposeData()
     {
-        statOffsets = [];
-        statFactors = [];
+        Scribe_Collections.Look(ref residentKnights, "residentKnights", LookMode.Deep);
 
-        buffHediffStage = new HediffStage();
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+
+            rolesToKnights.RemoveAll(kv => kv.Key is null || kv.Value is null);
+            nextBuffStatRegainTick = -1;
+        }
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -74,166 +55,183 @@ public class ResidentKnightsManager : IExposable, IOnRatkinOrderRemoved
         }
         else
         {
-            foreach (ResidentKnight rk in residentKnights)
+            foreach (var kv in residentKnights)
             {
-                listing_Rect.SubLabel(rk.ToString(), widthPct: 0.8f);
+                listing_Rect.SubLabel(kv.Key.Name + ": " + kv.Value.ToString(), widthPct: 0.8f);
             }
         }
     }
 
-    public void ExposeData()
-    {
-        Scribe_Collections.Look(ref residentKnights, "residentKnights", LookMode.Deep);
-        Scribe_Values.Look(ref residentLimit, "residentLimit", 0);
+    public bool IsResidentKnight(Pawn pawn) => residentKnights.ContainsKey(pawn);
 
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+    public bool TryGetKnightRecord(Pawn pawn, out ResidentKnight record) => residentKnights.TryGetValue(pawn, out record);
+
+    public bool TryGetKnightOfRole(ResidentKnightRoleDef roleDef, out Pawn knight) => rolesToKnights.TryGetValue(roleDef, out knight);
+
+
+    private void RemoveAllInvalidRecord(Predicate<ResidentKnight> extraRemove = null)
+    {
+        HashSet<Pawn> pawnsToRemove = [];
+        HashSet<ResidentKnightRoleDef> rolesToRemove = [];
+
+        if (extraRemove is null)
         {
-            residentKnights.RemoveAll(k => !ValidateResidentKnight(k));
-            RegainResidentStat();
+            foreach (KeyValuePair<Pawn, ResidentKnight> kv in residentKnights)
+            {
+                (Pawn knight, ResidentKnight record) = kv;
+                if (knight is null || record is null || record.Branch is null)
+                {
+                    pawnsToRemove.Add(knight);
+                    if (record?.CurRole is not null)
+                    {
+                        rolesToRemove.Add(record.CurRole);
+                    }
+                }
+            }
         }
-    }
+        else
+        {
+            foreach (KeyValuePair<Pawn, ResidentKnight> kv in residentKnights)
+            {
+                (Pawn knight, ResidentKnight record) = kv;
+                if (knight is null || record is null || record.Branch is null || extraRemove.Invoke(record))
+                {
+                    pawnsToRemove.Add(knight);
+                    if (record?.CurRole is not null)
+                    {
+                        rolesToRemove.Add(record.CurRole);
+                    }
+                }
+            }
+        }
+        if (rolesToKnights.RemoveAll(kv => kv.Key is null || kv.Value is null) > 0)
+        {
+            nextBuffStatRegainTick = -1;
+        }
 
-    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
-    {
-        residentKnights.RemoveAll(k => !ValidateResidentKnight(k) || k.RatkinOrder == ratkinOrder);
-        RegainResidentStat();
-    }
-
-    public void AddNewResidentKnight(Pawn pawn, RatkinOrder ratkinOrder, bool replaceCur = false)
-    {
-        if (pawn is null || ratkinOrder is null)
+        if (pawnsToRemove.Count <= 0)
         {
             return;
         }
-
-        if (GetResidentKnightIndexOfPawn(pawn) < 0)
+        foreach (Pawn p in pawnsToRemove)
         {
-            residentKnights.Add(new ResidentKnight(pawn, ratkinOrder));
+            residentKnights.Remove(p);
+        }
+
+        if (rolesToRemove.Count > 0)
+        {
+            foreach (ResidentKnightRoleDef role in rolesToRemove)
+            {
+                rolesToKnights.Remove(role);
+            }
+
+            nextBuffStatRegainTick = -1;
+        }
+    }
+
+    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder) => RemoveAllInvalidRecord((record) => record.Branch.RatkinOrder == ratkinOrder);
+    public void Notify_BranchDestroyed(Branch branch) => RemoveAllInvalidRecord((record) => record.Branch == branch);
+
+    public void AddResidentKnight(Pawn pawn, KnightRecord knightRecord)
+    {
+        if (!residentKnights.ContainsKey(pawn))
+        {
+            residentKnights.Add(pawn, new ResidentKnight(knightRecord.Branch));
         }
     }
 
     public void RemoveResidentKnight(Pawn pawn)
     {
-        if (pawn is null)
+        if (pawn is null || !residentKnights.TryGetValue(pawn, out ResidentKnight record))
         {
             return;
         }
-
-        int index = GetResidentKnightIndexOfPawn(pawn);
-
-        if (index >= 0)
+        residentKnights.Remove(pawn);
+        if (record.CurRole is not null)
         {
-            bool isActive = residentKnights[index].IsActive;
-            residentKnights[index].ChangePosition(null);
-            residentKnights.RemoveAt(index);
-            if (isActive)
-            {
-                RegainResidentStat();
-            }
+            rolesToKnights.Remove(record.CurRole);
+            nextBuffStatRegainTick = -1;
         }
-    }
-
-    public ResidentKnight GetResidentKnightOfRole(ResidentKnightRoleDef def)
-    {
-        if (def is null)
-        {
-            return null;
-        }
-
-        for (int i = 0; i < residentKnights.Count; i++)
-        {
-            if (residentKnights[i].RoleDef == def)
-            {
-                return residentKnights[i];
-            }
-        }
-        return null;
-    }
-
-    public int GetResidentKnightIndexOfPawn(Pawn pawn)
-    {
-        for (int i = 0; i < residentKnights.Count; i++)
-        {
-            if (residentKnights[i].Pawn == pawn)
-            {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public ResidentKnight GetResidentKnightOfPawn(Pawn pawn)
-    {
-        int index = GetResidentKnightIndexOfPawn(pawn);
-        return index < 0 ? null : residentKnights[index];
     }
 
     public bool SetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
     {
-        ResidentKnight pawnRecord = GetResidentKnightOfPawn(pawn);
-        if (pawnRecord is null)
+        if (!residentKnights.TryGetValue(pawn, out ResidentKnight pawnRecord))
         {
             return false;
         }
 
-        ResidentKnight defRecord = GetResidentKnightOfRole(roleDef);
-        if (defRecord == pawnRecord)
+        ResidentKnight curRolePawnRecord = null;
+        if (rolesToKnights.TryGetValue(roleDef, out Pawn curRolePawn))
         {
+            if (curRolePawn == pawn)
+            {
+                return true;
+            }
+            if (!replaceCurRole)
+            {
+                return false;
+            }
+        }
+
+        ResidentKnightRoleDef pOldRole = pawnRecord.CurRole;
+
+        nextBuffStatRegainTick = -1;
+        //新增职位
+        if (curRolePawn is null && pOldRole is null)
+        {
+            pawnRecord.CurRole = roleDef;
+            rolesToKnights[roleDef] = pawn;
             return true;
         }
 
-        if (defRecord is null)
+        //两人交接职位
+        if (curRolePawn is not null && pOldRole is null)
         {
-            if (pawnRecord.IsActive)
-            {
-                pawnRecord.ChangePosition(roleDef);
-                RegainResidentStat();
-            }
-            else
-            {
-                pawnRecord.ChangePosition(roleDef);
-                ActiveNewResident(pawnRecord);
-            }
+            curRolePawnRecord.CurRole = null;
+            pawnRecord.CurRole = roleDef;
+            rolesToKnights[roleDef] = pawn;
             return true;
         }
-        else if (replaceCurRole)
+
+        //本人职位改变
+        if (curRolePawn is null && pOldRole is not null)
         {
-            defRecord.ChangePosition(pawnRecord.RoleDef);
-            pawnRecord.ChangePosition(roleDef);
+            pawnRecord.CurRole = roleDef;
+            rolesToKnights.Remove(pOldRole);
+            return true;
+        }
+
+        //双方交换职位
+        if (curRolePawn is not null && pOldRole is not null)
+        {
+            curRolePawnRecord.CurRole = pOldRole;
+            pawnRecord.CurRole = roleDef;
+            rolesToKnights[roleDef] = pawn;
             return true;
         }
 
         return false;
     }
 
-    private void RegainResidentStat()
+    private void RegainRoleBuffStat()
     {
         statOffsets.Clear();
         statFactors.Clear();
+        nextBuffStatRegainTick = Find.TickManager.TicksGame + 60000;
 
-        foreach (ResidentKnight resident in residentKnights)
+        foreach (KeyValuePair<ResidentKnightRoleDef, Pawn> rolePawn in rolesToKnights)
         {
-            if (resident.IsActive)
-            {
-                ActiveNewResident(resident);
-            }
+            (ResidentKnightRoleDef roldDef, Pawn pawn) = rolePawn;
+            AddStatModifier(roldDef.statOffsets, isFactor: false);
+            AddStatModifier(roldDef.RoleWorker.RoleStatOffsets(pawn), isFactor: false);
+
+            AddStatModifier(roldDef.statFactors, isFactor: true);
+            AddStatModifier(roldDef.RoleWorker.RoleStatFactors(pawn), isFactor: true);
         }
 
-        buffStageDirty = true;
-    }
-
-    private void ActiveNewResident(ResidentKnight resident)
-    {
-        if (resident is null || resident.RoleDef is null)
-        {
-            return;
-        }
-
-        AddStatModifier(resident.RoleDef.statOffsets, isFactor: false);
-        AddStatModifier(resident.RoleDef.RoleWorker.RoleStatOffsets(resident.Pawn), isFactor: false);
-
-        AddStatModifier(resident.RoleDef.statFactors, isFactor: true);
-        AddStatModifier(resident.RoleDef.RoleWorker.RoleStatFactors(resident.Pawn), isFactor: true);
+        buffHediffStage.statOffsets = statOffsets.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
+        buffHediffStage.statFactors = statFactors.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
 
         void AddStatModifier(IEnumerable<StatModifier> modifiers, bool isFactor)
         {
@@ -241,9 +239,7 @@ public class ResidentKnightsManager : IExposable, IOnRatkinOrderRemoved
             {
                 return;
             }
-
             Dictionary<StatDef, float> target = isFactor ? statFactors : statOffsets;
-            buffStageDirty = true;
 
             foreach (StatModifier modifier in modifiers)
             {
@@ -265,17 +261,5 @@ public class ResidentKnightsManager : IExposable, IOnRatkinOrderRemoved
                 }
             }
         }
-    }
-
-    private void EstablishBuffStageStatModifier()
-    {
-        buffHediffStage.statOffsets = statOffsets.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
-        buffHediffStage.statFactors = statFactors.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
-        buffStageDirty = false;
-    }
-
-    private static bool ValidateResidentKnight(ResidentKnight k)
-    {
-        return k is not null && k.Pawn is not null && k.RatkinOrder is not null;
     }
 }

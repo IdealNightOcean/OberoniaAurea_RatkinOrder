@@ -101,6 +101,7 @@
     <Compile Include="Def\BranchInteractionDef.cs" />
     <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\SpecialLetterDef.cs" />
+    <Compile Include="GlobalOrderInteraction\ResidentKnight\ResidentKnight.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
     <Compile Include="Hediff\Hediff_HonorHunting.cs" />
     <Compile Include="Hediff\Hediff_HonorPaladin.cs" />
@@ -203,6 +204,8 @@
     <Compile Include="Def\OrderInteractionDef.cs" />
     <Compile Include="Def\ResidentKnightRoleDef.cs" />
     <Compile Include="Thing\CompPlagueSample.cs" />
+    <Compile Include="Thought\ThoughtWorker_ResidentKnight.cs" />
+    <Compile Include="Thought\ThoughtWorker_ResidentKnightSocial.cs" />
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
     <Compile Include="Utility\BranchConstructUtility.cs" />
     <Compile Include="Utility\IconLibrary.cs" />
@@ -214,7 +217,6 @@
     <Compile Include="Utility\MercyQuestDataBase.cs" />
     <Compile Include="Window\DevWindow\DevWindowBase.cs" />
     <Compile Include="Window\Dialog_NodeTreeWithRatkinOrderInfo.cs" />
-    <Compile Include="Hediff\Hediff_ResidentKnight.cs" />
     <Compile Include="Hediff\Hediff_ByResidentKnight.cs" />
     <Compile Include="Letter\ChoiceLetter_RatkinOrder.cs" />
     <Compile Include="Letter\ChoiceLetter_KnightGroupProactiveVisit.cs" />
@@ -222,7 +224,6 @@
     <Compile Include="DefModExtension\OrderHallRestrictionExtension.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_ResidentKnight.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_ResidentKnightWatcher.cs" />
-    <Compile Include="GlobalOrderInteraction\ResidentKnight\ResidentKnight.cs" />
     <Compile Include="GlobalOrderInteraction\ResidentKnight\ResidentKnightsManager.cs" />
     <Compile Include="GlobalOrderInteraction\ResidentKnight\ResidentKnightRoleWorker.cs" />
     <Compile Include="Thing\OrderCodePedestal.cs" />

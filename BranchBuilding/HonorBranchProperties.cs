@@ -16,6 +16,8 @@ public class HonorBranchProperties
 
     public HediffDef buffHediff;
 
+    public ResidentKnightAcademicDef academicDef;
+
     public List<PawnGroupMaker> pawnGroupMakers;
 
     [NoTranslate]

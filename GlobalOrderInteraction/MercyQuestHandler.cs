@@ -52,10 +52,9 @@ public class MercyQuestHandler : IExposable
     private float GetMercyQuestChance()
     {
         float chance = mercyQuestBaseChance;
-        ResidentKnight orderly = GlobalOrderInteractionManager.ResidentKnightsManager.GetResidentKnightOfRole(OARO_ModDefOf.OARO_Orderly);
-        if (orderly is not null)
+        if (GlobalOrderInteractionManager.ResidentKnightsManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out Pawn knight))
         {
-            chance *= (orderly.RoleDef.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(orderly.Pawn) ?? 1f;
+            chance *= (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(knight) ?? 1f;
         }
         return chance;
     }

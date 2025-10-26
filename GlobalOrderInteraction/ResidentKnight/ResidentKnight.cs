@@ -1,114 +1,110 @@
 ﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ResidentKnight : IExposable, IEquatable<ResidentKnight>
+public class Hediff_ResidentKnightBuff : Hediff
 {
-    private Pawn pawn;
-    private RatkinOrder ratkinOrder;
-    private ResidentKnightRoleDef roleDef;
-    private int lastPositionChangeTick = -1;
+    public override int CurStageIndex => buffStageIndex;
 
-    public Pawn Pawn => pawn;
-    public RatkinOrder RatkinOrder => ratkinOrder;
-    public ResidentKnightRoleDef RoleDef => roleDef;
+    private int buffStageIndex;
 
-    public bool IsActive => roleDef is not null;
-    public bool CanChangePositionNow
+    public void SetBuffStage(int buffStageIndex)
     {
-        get
+        this.buffStageIndex = Mathf.Min(def.stages?.Count ?? 0, buffStageIndex);
+    }
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_Values.Look(ref buffStageIndex, "buffStageIndex", 0);
+    }
+}
+
+public class ResidentKnightAcademicDef : Def
+{
+    /// <summary>
+    /// 不要使用组合枚举！
+    /// </summary>
+    public KnightRecord.PersonalityType knightPersonality;
+
+    public List<ResidentKnightAcademicStage> academicStages = [];
+
+    public int MaxStageLevel => academicStages.Count;
+
+    public override IEnumerable<string> ConfigErrors()
+    {
+        foreach (string error in base.ConfigErrors())
         {
-            if (roleDef is null || lastPositionChangeTick < 0)
-            {
-                return true;
-            }
-            return Find.TickManager.TicksGame > lastPositionChangeTick + roleDef.positionChangeCDDays * 60000;
+            yield return error;
+        }
+        if (knightPersonality == KnightRecord.PersonalityType.None)
+        {
+            yield return "";
         }
     }
+}
+
+
+public class ResidentKnightAcademicStage
+{
+    public Hediff buffHediff;
+    public float buffHediffStage;
+
+}
+
+public class ResidentKnight
+{
+    public enum Rank : byte
+    {
+        Regular,
+        Elite,
+        Honor,
+        Crown
+    }
+
+    private Branch branch;
+    private Rank curRank;
+    private float meditationPoints;
+
+    public ResidentKnightRoleDef CurRole;
+
+    public Branch Branch => branch;
+    public Rank CurRank => curRank;
+    public float MeditationPoints => meditationPoints;
+
+
+    private ResidentKnightAcademicDef genealAcademicDef;
+    public ResidentKnightAcademicDef HonorAcademicDef => branch.HonorProperties?.academicDef;
+
+    private int genealAcademicLevel;
+    private int honorAcademicLevel;
+    public int TotalAcademicLevel => genealAcademicLevel + honorAcademicLevel;
+
 
     private ResidentKnight() { }
-    public ResidentKnight(Pawn pawn, RatkinOrder ratkinOrder)
-    {
-        this.pawn = pawn;
-        this.ratkinOrder = ratkinOrder;
-        roleDef = null;
-        lastPositionChangeTick = -1;
-    }
 
-    public void ExposeData()
+    public ResidentKnight(Branch branch)
     {
-        Scribe_Defs.Look(ref roleDef, "roleDef");
-        Scribe_References.Look(ref pawn, "pawn");
-        Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
-        Scribe_Values.Look(ref lastPositionChangeTick, "lastPositionChangeTick", -1);
-    }
-
-    public void ChangePosition(ResidentKnightRoleDef roleDef)
-    {
-        if (this.roleDef == roleDef)
-        {
-            return;
-        }
-
-        this.roleDef?.RoleWorker.PostDeactiveRole(pawn);
-        this.roleDef = roleDef;
-        this.roleDef?.RoleWorker.PostActiveRole(pawn);
-        lastPositionChangeTick = Find.TickManager.TicksGame;
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
     }
 
     public override string ToString()
     {
-        return $"{pawn.Name} - {ratkinOrder.Name} - {roleDef?.label ?? "None"}";
+        return $"Branch: {branch.Name}, Rank: {curRank}, MeditationPoints: {meditationPoints}, AcademicDef: ({genealAcademicDef},{HonorAcademicDef}),TotalAcademicLevel: {TotalAcademicLevel}({genealAcademicLevel}, {honorAcademicLevel}), Role: {CurRole} ";
     }
 
-    public override bool Equals(object obj)
+    private int NoAdditionalCostAcademicCeiling()
     {
-        if (ReferenceEquals(this, obj))
+        return curRank switch
         {
-            return true;
-        }
-
-        if (obj is not ResidentKnight other)
-        {
-            return false;
-        }
-
-        return roleDef == other.roleDef && pawn == other.pawn;
-    }
-
-    public bool Equals(ResidentKnight other)
-    {
-        if (this == other)
-        {
-            return true;
-        }
-        if (other is null)
-        {
-            return false;
-        }
-
-        return roleDef == other.roleDef || pawn == other.pawn;
-    }
-
-    public override int GetHashCode()
-    {
-        unchecked
-        {
-            int hash = 17;
-            hash = hash * 31 + (roleDef?.GetHashCode() ?? 0);
-            hash = hash * 31 + (pawn?.GetHashCode() ?? 0);
-            return hash;
-        }
-    }
-
-    public static bool operator ==(ResidentKnight left, ResidentKnight right)
-    {
-        return Equals(left, right);
-    }
-
-    public static bool operator !=(ResidentKnight left, ResidentKnight right)
-    {
-        return !Equals(left, right);
+            Rank.Regular => 5,
+            Rank.Elite => 10,
+            Rank.Honor => 20,
+            Rank.Crown => 60,
+            _ => 60
+        };
     }
 }

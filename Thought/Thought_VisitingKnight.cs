@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -22,12 +23,11 @@ public class Thought_VisitingKnight : Thought_Memory
 
     private static int GetMoodOffset()
     {
-        ResidentKnight residentKnight = GlobalOrderInteractionManager.ResidentKnightsManager.GetResidentKnightOfRole(OARO_ModDefOf.OARO_Clerk);
-        if (residentKnight is null)
+        if (GlobalOrderInteractionManager.ResidentKnightsManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Clerk, out Pawn knight))
         {
-            return 0;
+            return (OARO_ModDefOf.OARO_Clerk.RoleWorker as ResidentKnightRoleWorker_Clerk)?.KnightMoodOffset(knight) ?? 0;
         }
-        return (residentKnight.RoleDef.RoleWorker as ResidentKnightRoleWorker_Clerk)?.KnightMoodOffset(residentKnight.Pawn) ?? 0;
+        return 0;
     }
 
     public static void ClearStaticCache()

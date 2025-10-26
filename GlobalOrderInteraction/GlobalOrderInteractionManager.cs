@@ -84,6 +84,7 @@ public class GlobalOrderInteractionManager : IExposable, IOnRatkinOrderRemoved, 
     public void Notify_BranchDestroyed(Branch branch)
     {
         acceptedBranchDemandHandler.Notify_BranchDestroyed(branch);
+        residentKnightsManager.Notify_BranchDestroyed(branch);
         aroundKnightGroupsManager.Notify_BranchDestroyed(branch);
     }
 
