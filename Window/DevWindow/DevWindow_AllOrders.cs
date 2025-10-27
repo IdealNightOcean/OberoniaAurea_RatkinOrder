@@ -9,7 +9,7 @@ public class DevWindow_AllOrders : DevWindowBase
     private readonly IReadOnlyList<RatkinOrder> allRatkinOrders;
     public DevWindow_AllOrders() : base()
     {
-        allRatkinOrders = RatkinOrderManager.Instance.AllRatkinOrders;
+        allRatkinOrders = RatkinOrderManager.AllRatkinOrders;
     }
 
     public override void DoWindowContents(Rect inRect)

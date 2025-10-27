@@ -31,7 +31,8 @@ public static class SquadCombatPawnUtility
                 for (int i = 0; i < memberCount; i++)
                 {
                     PawnKindDef pawnKind = groupMaker.guards.RandomElementByWeight(g => g.selectionWeight).kind;
-                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, branch.RatkinOrder, branch, isCommander: false, tile: mapTile);
+                    KnightRecord knightRecord = new(branch, isCommander: false);
+                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
                     PostSquadCombatPawnGenerate(pawn, branch, isCommander: false, friendly: friendly);
                     pawns.Add(pawn);
                 }
@@ -42,7 +43,8 @@ public static class SquadCombatPawnUtility
                 for (int i = 0; i < commanderCount; i++)
                 {
                     PawnKindDef pawnKind = groupMaker.options.RandomElementByWeight(g => g.selectionWeight).kind;
-                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, branch.RatkinOrder, branch, isCommander: true, tile: mapTile);
+                    KnightRecord knightRecord = new(branch, isCommander: true);
+                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
                     PostSquadCombatPawnGenerate(pawn, branch, isCommander: true, friendly: friendly);
                     pawns.Add(pawn);
                 }
@@ -58,7 +60,7 @@ public static class SquadCombatPawnUtility
 
     private static bool TryGetRandomBranchPawnGroupMakerOfKind(Branch branch, PawnGroupKindDef groupKind, out PawnGroupMaker groupMaker)
     {
-        if (branch.HonorProperties?.TryGetRandomPawnGroupMaker(groupKind, out groupMaker) ?? false)
+        if (branch.HonorDef?.TryGetRandomPawnGroupMaker(groupKind, out groupMaker) ?? false)
         {
             return true;
         }

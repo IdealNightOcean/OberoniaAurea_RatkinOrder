@@ -175,7 +175,7 @@ public class BranchManager : IExposable, ITickDay
 
         if (branch == normalMobileBranch) { normalMobileBranch = null; }
         if (branch == honorMobileBranch) { honorMobileBranch = null; }
-        GlobalOrderInteractionManager.Instance.Notify_BranchDestroyed(branch);
+        GlobalInteractionManager.Instance.Notify_BranchDestroyed(branch);
         MapComponent_RatkinOrder.OnBranchDestroyed(branch);
         Find.QuestManager.OnBranchDestroyed(branch);
     }

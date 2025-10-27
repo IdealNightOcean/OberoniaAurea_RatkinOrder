@@ -19,18 +19,18 @@ internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Main Order Code Pedestal:");
         Text.Font = GameFont.Small;
-        if (GlobalOrderInteractionManager.MainOrderCodePedestal is null)
+        if (OrderHallHandler.MainOrderCodePedestal is null)
         {
             listing_Rect.Label("None");
         }
         else
         {
-            listing_Rect.Label($"Thing: {GlobalOrderInteractionManager.MainOrderCodePedestal}");
-            listing_Rect.Label($"Map: {GlobalOrderInteractionManager.MainOrderCodePedestal.MapHeld}");
-            listing_Rect.Label($"OrderHallLevel: {GlobalOrderInteractionManager.OrderHallLevel}");
+            listing_Rect.Label($"Thing: {OrderHallHandler.MainOrderCodePedestal}");
+            listing_Rect.Label($"Map: {OrderHallHandler.MainOrderCodePedestal.MapHeld}");
+            listing_Rect.Label($"OrderHallLevel: {OrderHallHandler.OrderHallLevel}");
             if (listing_Rect.ButtonText("Jump to", widthPct: 0.4f))
             {
-                CameraJumper.TryJumpAndSelect(GlobalOrderInteractionManager.MainOrderCodePedestal);
+                CameraJumper.TryJumpAndSelect(OrderHallHandler.MainOrderCodePedestal);
             }
         }
 
@@ -39,14 +39,14 @@ internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Resident Knights:");
         Text.Font = GameFont.Small;
-        GlobalOrderInteractionManager.ResidentKnightsManager.DrawDevWindow(listing_Rect);
+        ResidentKnightsManager.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
         listing_Rect.Label("Around Knight Groups:");
         Text.Font = GameFont.Small;
-        GlobalOrderInteractionManager.AroundKnightGroupsManager.DrawDevWindow(listing_Rect);
+        AroundKnightGroupsManager.DrawDevWindow(listing_Rect);
 
         if (Event.current.type == EventType.Layout)
         {

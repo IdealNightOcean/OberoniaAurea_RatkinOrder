@@ -43,24 +43,9 @@ public class QuestPart_MercyQuestWatcher : QuestPart
         base.Cleanup();
         if (quest.State == QuestState.EndedSuccess)
         {
-            SendSucceedRatkinOrderLetter();
+            MercyQuestHandler.Notify_MercyQuestSucceed(quest);
         }
         SubFaction = null;
         ParentFaction = null;
-    }
-
-    private static void SendSucceedRatkinOrderLetter()
-    {
-        GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
-        float letterChance = 0.2f;
-
-        if (GlobalOrderInteractionManager.ResidentKnightsManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out Pawn knight))
-        {
-            letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(knight);
-        }
-        if (Rand.Chance(letterChance))
-        {
-
-        }
     }
 }

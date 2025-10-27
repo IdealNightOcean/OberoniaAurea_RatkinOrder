@@ -28,7 +28,7 @@ public static class BranchDemandUtility
         List<(BranchDemandDef, float)> demandsWithChance = new(demandOfType.Count);
         for (int i = 0; i < demandOfType.Count; i++)
         {
-            demandsWithChance.Add((demandOfType[i], demandOfType[i].Weighter.GetDemandWeightOnly(branch)));
+            demandsWithChance.AddMercyQuest((demandOfType[i], demandOfType[i].Weighter.GetDemandWeightOnly(branch)));
         }
         */
 

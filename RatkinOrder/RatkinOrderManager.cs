@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using System.Collections.Generic;
 using Verse;
 
@@ -7,24 +6,33 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class RatkinOrderManager : IExposable
 {
-    public static RatkinOrderManager Instance { get; private set; }
-
-    private List<RatkinOrder> allRatkinOrders = [];
-    public IReadOnlyList<RatkinOrder> AllRatkinOrders => allRatkinOrders;
+    private static List<RatkinOrder> allRatkinOrders = [];
+    public static IReadOnlyList<RatkinOrder> AllRatkinOrders => allRatkinOrders;
 
     public RatkinOrderManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
-        Instance = this;
+        allRatkinOrders.Clear();
     }
-    public static void ClearStaticCache() => Instance = null;
+    public static void ClearStaticCache()
+    {
+        allRatkinOrders.Clear();
+    }
 
-    public void OpenDevWindow()
+    public void ExposeData()
+    {
+        Scribe_Collections.Look(ref allRatkinOrders, "allRatkinOrders", LookMode.Deep);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            PostLoadInit();
+        }
+    }
+
+    public static void OpenDevWindow()
     {
         Find.WindowStack.Add(new DevWindow_AllOrders());
     }
 
-    public void Tick()
+    public static void Tick()
     {
         for (int i = 0; i < allRatkinOrders.Count; i++)
         {
@@ -32,7 +40,7 @@ public class RatkinOrderManager : IExposable
         }
     }
 
-    public bool FactionHasRatkinOrder(Faction faction)
+    public static bool FactionHasRatkinOrder(Faction faction)
     {
         if (faction is null)
         {
@@ -49,7 +57,7 @@ public class RatkinOrderManager : IExposable
         return false;
     }
 
-    public RatkinOrder GetRatkinOrderForFaction(Faction faction)
+    public static RatkinOrder GetRatkinOrderForFaction(Faction faction)
     {
         if (faction is null)
         {
@@ -66,7 +74,7 @@ public class RatkinOrderManager : IExposable
         return null;
     }
 
-    public void AddRatkinOrder(RatkinOrder order)
+    public static void AddRatkinOrder(RatkinOrder order)
     {
         if (order is not null && !allRatkinOrders.Contains(order))
         {
@@ -74,7 +82,7 @@ public class RatkinOrderManager : IExposable
         }
     }
 
-    public void RemoveRatkinOrder(RatkinOrder order)
+    public static void RemoveRatkinOrder(RatkinOrder order)
     {
         if (!allRatkinOrders.Contains(order))
         {
@@ -84,12 +92,12 @@ public class RatkinOrderManager : IExposable
         allRatkinOrders.Remove(order);
         order.OnRemoved();
 
-        GlobalOrderInteractionManager.Instance.Notify_RatkinOrderRemoved(order);
+        GlobalInteractionManager.Instance.Notify_RatkinOrderRemoved(order);
         MapComponent_RatkinOrder.OnRatkinOrderRemoved(order);
         Find.QuestManager.OnRatkinOrderRemoved(order);
     }
 
-    private void PostLoadInit()
+    private static void PostLoadInit()
     {
         if (allRatkinOrders.RemoveAll(r => r is null) > 0)
         {
@@ -98,15 +106,6 @@ public class RatkinOrderManager : IExposable
         for (int i = 0; i < allRatkinOrders.Count; i++)
         {
             allRatkinOrders[i].PostLoadInit();
-        }
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Collections.Look(ref allRatkinOrders, "allRatkinOrders", LookMode.Deep);
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
-        {
-            PostLoadInit();
         }
     }
 }

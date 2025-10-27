@@ -6,14 +6,8 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-//xml相关
-public class HonorBranchProperties
+public class HonorBranchDef : Def
 {
-    [MustTranslate]
-    public string honorName;
-    [MustTranslate]
-    public string honorDescription;
-
     public HediffDef buffHediff;
 
     public ResidentKnightAcademicDef academicDef;
@@ -69,5 +63,4 @@ public class HonorBranchProperties
         return pawnGroupMakers.Where(g => g.kindDef == pawnGroupKindDef)
                               .TryRandomElementByWeight(g => g.commonality, out groupMaker);
     }
-
 }

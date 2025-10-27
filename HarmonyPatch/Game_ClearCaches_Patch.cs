@@ -15,7 +15,7 @@ internal static class Game_ClearCaches_Patch
         KnightPawnsManager.ClearStaticCache();
         RatkinOrderManager.ClearStaticCache();
         OrderLetterBox.ClearStaticCache();
-        GlobalOrderInteractionManager.ClearStaticCache();
+        GlobalInteractionManager.ClearStaticCache();
 
         ResidencyWorker_Deployment.ClearStaticCache();
 

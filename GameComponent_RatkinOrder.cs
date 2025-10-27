@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -14,7 +15,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
     private RatkinOrderManager ratkinOrderManager;
     private OrderLetterBox orderLetterBox;
-    private GlobalOrderInteractionManager globalOrderInteractionManager;
+    private GlobalInteractionManager globalInteractionManager;
 
     /// <summary>
     /// 全局对话行为管理
@@ -46,7 +47,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
         Scribe_Deep.Look(ref ratkinOrderManager, "ratkinOrderManager");
         Scribe_Deep.Look(ref orderLetterBox, "orderLetterBox");
-        Scribe_Deep.Look(ref globalOrderInteractionManager, "globalOrderInteractionManager");
+        Scribe_Deep.Look(ref globalInteractionManager, "globalInteractionManager");
     }
 
     public override void StartedNewGame()
@@ -66,7 +67,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
     public override void GameComponentTick()
     {
-        ratkinOrderManager.Tick();
+        RatkinOrderManager.Tick();
     }
 
     /// <summary>
@@ -76,6 +77,19 @@ public class GameComponent_RatkinOrder : GameComponent
     /// </summary>
     private void EnsureComponentsInit()
     {
+        try
+        {
+            if (!OrderDefDataBase.Initialized)
+            {
+                OrderDefDataBase.Initialize();
+            }
+
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Failed to initialize OrderDefDataBase.\nException:\n {ex.Message}");
+        }
+
         try
         {
             uniqueIDManager ??= new UniqueIDManager();
@@ -108,12 +122,12 @@ public class GameComponent_RatkinOrder : GameComponent
 
         try
         {
-            globalOrderInteractionManager ??= new GlobalOrderInteractionManager();
+            globalInteractionManager ??= new GlobalInteractionManager();
         }
         catch
         {
-            GlobalOrderInteractionManager.ClearStaticCache();
-            globalOrderInteractionManager = new GlobalOrderInteractionManager();
+            GlobalInteractionManager.ClearStaticCache();
+            globalInteractionManager = new GlobalInteractionManager();
         }
     }
 }

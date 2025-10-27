@@ -18,6 +18,8 @@ public static class OARO_ModDefOf
 
     public static HistoryEventDef OARO_OrderMediateFactionRelation;
 
+    public static HonorBranchDef OARO_Honor_Instructor; //荣誉分部 - 教导骑士
+
     public static IncidentDef OARO_RaidNobilityTerritory; //叛乱镇压 - 贵族领地战斗
 
     public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader; //丢东西的旅行商人
@@ -37,8 +39,12 @@ public static class OARO_ModDefOf
     public static ResidentKnightRoleDef OARO_Clerk; //驻地文书
     public static ResidentKnightRoleDef OARO_Orderly; //地区看护
 
+    public static StatDef OARO_Stat_MeditationFactor; //每日修行点获得系数
+    public static StatDef OARO_Stat_MeditationBase; //每日修行点获得
+
     public static TraitDef OARO_OrderKnight;
 
+    public static OrderReformationDef OARO_ReformationPlaceholder; //未实现Def自新占位
 
     static OARO_ModDefOf()
     {

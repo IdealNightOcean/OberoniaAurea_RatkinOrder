@@ -29,8 +29,8 @@ public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveD
     /// 标记荣誉象征，建有该建筑的分部为荣誉分部；
     /// 只在isSpecial为true时生效
     /// </summary>
-    public bool IsHonorSymbol => honorProperties is not null;
-    public HonorBranchProperties honorProperties;
+    public bool IsHonorSymbol => honorDef is not null;
+    public HonorBranchDef honorDef;
 
     public List<string> effectFlags; //效果标志列表
     public List<BranchStatModifier> branchStatModifies; //属性修正列表

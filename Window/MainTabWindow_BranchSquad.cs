@@ -9,6 +9,7 @@ using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
+[StaticConstructorOnStartup]
 public class MainTabWindow_BranchSquad : MainTabWindow
 {
     private enum TabType
@@ -23,8 +24,8 @@ public class MainTabWindow_BranchSquad : MainTabWindow
 
     private Vector2 scrollPosition_Squads;
 
-    private readonly RatkinOrder ratkinOrder;
-    private readonly Map map;
+    private RatkinOrder ratkinOrder;
+    private Map map;
 
     private int selBranchIndex;
     private Branch selBranch;
@@ -54,8 +55,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
 
-        map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(map));
-        ratkinOrder = RatkinOrderManager.Instance.AllRatkinOrders[0] ?? throw new ArgumentNullException(nameof(ratkinOrder));
+
     }
 
     public override void PreOpen()
@@ -946,6 +946,9 @@ public class MainTabWindow_BranchSquad : MainTabWindow
 
     private void RecacheBranchSummary()
     {
+        map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(map));
+        ratkinOrder = RatkinOrderManager.AllRatkinOrders[0] ?? throw new ArgumentNullException(nameof(ratkinOrder));
+
         DeselectBranch();
         branchSummaryCaches.Clear();
         foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
@@ -1173,7 +1176,7 @@ public class BranchSummaryCacheEntry
 
         if (branch.IsBranchOfType(BranchType.Honor))
         {
-            HonorIcon = branch.HonorProperties?.IconTexture;
+            HonorIcon = branch.HonorDef?.IconTexture;
             BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
             if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
             {
@@ -1250,7 +1253,7 @@ public class BranchInfoCacheEntry : BranchSummaryCacheEntry
             FriendlyProcess = Mathf.Clamp01(branch.FriendlyExpiredTick / 40f * 60000f);
             FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyExpiredTick, Find.WorldGrid.LongLatOf(map.Tile));
         }
-        HonorExpandIcon = branch.HonorProperties?.ExpandingIconTexture;
+        HonorExpandIcon = branch.HonorDef?.ExpandingIconTexture;
 
         BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
         if (primaryMedal != BranchMedalRecord.BranchMedalType.None)

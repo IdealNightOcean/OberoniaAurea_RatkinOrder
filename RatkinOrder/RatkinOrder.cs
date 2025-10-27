@@ -133,6 +133,4 @@ public class RatkinOrder : IExposable, ILoadReferenceable
 
     public string GetUniqueLoadID() => "RatkinOrder_" + loadID;
     public override string ToString() => "RatkinOrder_" + loadID;
-
-
 }

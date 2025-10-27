@@ -6,6 +6,6 @@ public class RoomRoleWorker_RatkinOrderHall : RoomRoleWorker
 {
     public override float GetScore(Room room)
     {
-        return GlobalOrderInteractionManager.MainOrderCodePedestal?.CachedRoom == room ? 99999f : 0f;
+        return OrderHallHandler.OrderHallRoom == room ? 99999f : 0f;
     }
 }

@@ -29,7 +29,7 @@ public class DevWindow_Order : DevWindowBase
         {
             Close();
             EndContents();
-            RatkinOrderManager.Instance.OpenDevWindow();
+            RatkinOrderManager.OpenDevWindow();
             return;
         }
 

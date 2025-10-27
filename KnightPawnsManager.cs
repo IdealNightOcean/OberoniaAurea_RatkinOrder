@@ -6,8 +6,11 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class KnightPawnsManager
 {
-    private readonly static Dictionary<Pawn, KnightRecord> knights = new(32);
-    public static void ClearStaticCache() => knights.Clear();
+    private static readonly Dictionary<Pawn, KnightRecord> knights = new(32);
+    public static void ClearStaticCache()
+    {
+        knights.Clear();
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CanBeKnight(this Pawn pawn) => pawn is not null && pawn.RaceProps.Humanlike;

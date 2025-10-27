@@ -22,22 +22,23 @@ public static class OARO_PawnUtility
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Pawn GenerateOrderKnight(PawnGenerationRequest generationRequest, RatkinOrder ratkinOrder, Branch branch = null, bool isCommander = false)
+    public static Pawn GenerateOrderKnight(PawnGenerationRequest generationRequest, KnightRecord knightRecord)
     {
         Pawn pawn = PawnGenerator.GeneratePawn(generationRequest);
-        pawn.InitKnightHediff(ratkinOrder, branch, isCommander);
+        pawn.InitKnightHediff(knightRecord);
         return pawn;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Pawn GenerateOrderKnight(PawnKindDef pawnKind, RatkinOrder ratkinOrder, Branch branch = null, bool isCommander = false, PlanetTile? tile = null, bool forceNew = false)
+    public static Pawn GenerateOrderKnight(PawnKindDef pawnKind, KnightRecord knightRecord, PlanetTile? tile = null, bool forceNew = false)
     {
-        return GenerateOrderKnight(generationRequest: DefaultKnightGenerationRequest(pawnKind, ratkinOrder.Faction, forceNew: forceNew),
-                                   ratkinOrder: ratkinOrder,
-                                   branch: branch,
-                                   isCommander: isCommander);
+        Pawn pawn = PawnGenerator.GeneratePawn(DefaultKnightGenerationRequest(pawnKind, knightRecord.RatkinOrder.Faction, tile, forceNew));
+        pawn.InitKnightHediff(knightRecord);
+        return pawn;
     }
 
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static PawnGenerationRequest DefaultKnightGenerationRequest(PawnKindDef pawnKind, Faction faction, PlanetTile? tile = null, bool forceNew = false)
     {
         PawnGenerationRequest generationRequest = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile, forceNew: forceNew);
@@ -46,14 +47,14 @@ public static class OARO_PawnUtility
         return generationRequest;
     }
 
-    public static void InitKnightHediff(this Pawn pawn, RatkinOrder ratkinOrder, Branch branch = null, bool isCommander = false)
+    public static void InitKnightHediff(this Pawn pawn, KnightRecord knightRecord)
     {
         Hediff_Knight knightHediff = (Hediff_Knight)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_OrderKnight);
-        knightHediff.InitKnightHediff(ratkinOrder, branch, isCommander);
-        if (branch is not null)
+        knightHediff.InitKnightHediff(knightRecord);
+        if (knightRecord.Branch is not null)
         {
             Hediff_BranchMedal medalHediff = (Hediff_BranchMedal)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_BranchMedal);
-            medalHediff.InitOrderBranch(branch);
+            medalHediff.InitOrderBranch(knightRecord.Branch);
         }
     }
 

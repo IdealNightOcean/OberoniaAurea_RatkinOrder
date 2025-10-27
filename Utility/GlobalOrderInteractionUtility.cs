@@ -17,7 +17,7 @@ public static class GlobalOrderInteractionUtility
     /// </summary>
     public static AcceptanceReport CanRecruitKnight(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
-        if (GlobalOrderInteractionManager.RatkinOrderHall is null)
+        if (OrderHallHandler.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -69,7 +69,7 @@ public static class GlobalOrderInteractionUtility
             return false;
         }
 
-        if (GlobalOrderInteractionManager.RatkinOrderHall is null)
+        if (OrderHallHandler.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -79,8 +79,8 @@ public static class GlobalOrderInteractionUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipKind.Friendly.GetLabel());
         }
 
-        int residentKnightCeiling = ResidentKnightCeiling(ratkinOrder);
-        if (GlobalOrderInteractionManager.ResidentKnightsManager.ResidentKnights.Count >= residentKnightCeiling)
+        int residentKnightCeiling = ResidentKnightsManager.ResidentKnightCeiling;
+        if (ResidentKnightsManager.KnightsCount >= residentKnightCeiling)
         {
             return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(residentKnightCeiling);
         }
@@ -105,27 +105,6 @@ public static class GlobalOrderInteractionUtility
         OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnight, slate, forced: false);
     }
 
-    // 某骑士团常驻骑士上限
-    public static int ResidentKnightCeiling(this RatkinOrder ratkinOrder)
-    {
-        int ceiling = 1;
-        ceiling += GlobalOrderInteractionManager.OrderHallLevel switch
-        {
-            < 3 => 0,
-            < 5 => 1,
-            < 6 => 2,
-            _ => 3
-        };
-
-        ceiling += (int)(ratkinOrder.Esteem / 30f);
-        if (ratkinOrder.ReformationManager.HasReformation(null))
-        {
-            ceiling += 4;
-        }
-
-        return ceiling;
-    }
-
 
     /// <summary>
     /// 能否邀请附近骑士小组到访
@@ -137,7 +116,7 @@ public static class GlobalOrderInteractionUtility
             return false;
         }
 
-        if (GlobalOrderInteractionManager.RatkinOrderHall is null)
+        if (OrderHallHandler.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -147,7 +126,7 @@ public static class GlobalOrderInteractionUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipKind.Friendly.GetLabel());
         }
 
-        if (GlobalOrderInteractionManager.AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())
+        if (AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())
         {
             if (RecommendationUtility.CurRecommendationOfMap(knightGroup.RatkinOrder, map) < 1)
             {
@@ -164,18 +143,17 @@ public static class GlobalOrderInteractionUtility
     public static void InviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
     {
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
-        AroundKnightGroupsManager aroundKnightGroupsManager = GlobalOrderInteractionManager.AroundKnightGroupsManager;
-        if (Rand.Chance(chance) && aroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
+        if (Rand.Chance(chance) && AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
         {
-            aroundKnightGroupsManager.SeasonInvitationUsed++;
-            if (aroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
+            AroundKnightGroupsManager.SeasonInvitationUsed++;
+            if (AroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
             {
                 RecommendationUtility.UseRecommendationOfMap(knightGroup.RatkinOrder, map, 1);
             }
         }
         else
         {
-            aroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
+            AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
             AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
         }
     }
@@ -243,7 +221,7 @@ public static class GlobalOrderInteractionUtility
             ApplyStepChange(0.1f, "OARO_AroundKnights_TravelTimeShort");
         }
 
-        stepChange = (GlobalOrderInteractionManager.OrderHallLevel - 2) * 0.05f;
+        stepChange = (OrderHallHandler.OrderHallLevel - 2) * 0.05f;
         if (stepChange > 0f)
         {
             ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");
@@ -322,7 +300,7 @@ public static class GlobalOrderInteractionUtility
     /// </summary>
     private static int SeasonInvitationLimit()
     {
-        return GlobalOrderInteractionManager.OrderHallLevel switch
+        return OrderHallHandler.OrderHallLevel switch
         {
             < 2 => 0,
             2 => 1,

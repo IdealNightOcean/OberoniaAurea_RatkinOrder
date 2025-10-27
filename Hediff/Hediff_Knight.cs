@@ -4,7 +4,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Hediff_Knight : HediffWithComps
 {
-    private KnightRecord knightRecord = new();
+    private KnightRecord knightRecord;
 
     public override void ExposeData()
     {
@@ -24,22 +24,18 @@ public class Hediff_Knight : HediffWithComps
         }
     }
 
-    public void InitKnightHediff(RatkinOrder ratkinOrder, Branch branch = null, bool isCommander = false)
+    public void InitKnightHediff(KnightRecord knightRecord)
     {
-        if (ratkinOrder is null || !pawn.CanBeKnight())
+        if (knightRecord?.RatkinOrder is null || !pawn.CanBeKnight())
         {
             pawn.health.RemoveHediff(this);
             return;
         }
 
-        Log.Message($"Hediff_Knight InitRatkinOrder {pawn.Name}");
-        knightRecord.RatkinOrder = ratkinOrder;
-        knightRecord.Branch = branch;
-        knightRecord.IsCommander = isCommander;
+        this.knightRecord = knightRecord;
         KnightPawnsManager.RegisterKnight(pawn, knightRecord);
     }
 
-    public void InitKnightHediff(Branch branch, bool isCommander = false) => InitKnightHediff(branch?.RatkinOrder, branch, isCommander);
 
     public override void PostRemoved()
     {

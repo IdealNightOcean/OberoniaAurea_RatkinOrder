@@ -5,95 +5,31 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderCodePedestal : ThingWithComps
 {
-    private bool isMainPedestal;
-
-    [Unsaved] private Room cachedRoom;
-    private int cachedOrderHallLevel = -1;
-
-    [Unsaved] private int ticksToNextRoomCheck;
-    [Unsaved] private int nextLevelCheckTick;
-
-    public Room CachedRoom => cachedRoom;
-    public int CachedOrderHallLevel
-    {
-        get
-        {
-            if (!isMainPedestal)
-            {
-                return 0;
-            }
-            if (cachedOrderHallLevel <= 0 || Find.TickManager.TicksGame > nextLevelCheckTick)
-            {
-                cachedOrderHallLevel = OrderHallUtility.GetOrderHallLevel(cachedRoom);
-                nextLevelCheckTick = Find.TickManager.TicksGame + 2500;
-            }
-            return cachedOrderHallLevel;
-        }
-    }
-
-    public override void ExposeData()
-    {
-        base.ExposeData();
-        Scribe_Values.Look(ref isMainPedestal, "isMainPedestal", defaultValue: false);
-        Scribe_Values.Look(ref cachedOrderHallLevel, "cachedOrderHallLevel", -1);
-    }
-
-    public override void SpawnSetup(Map map, bool respawningAfterLoad)
-    {
-        base.SpawnSetup(map, respawningAfterLoad);
-        RecheckMainPedestalState();
-    }
+    public bool IsMainPedestal => this == OrderHallHandler.MainOrderCodePedestal;
 
     public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
     {
-        if (isMainPedestal)
+        if (IsMainPedestal)
         {
-            TryUnsetAsMainPedestal();
-
             if (BeingTransportedOnGravship)
             {
-                isMainPedestal = true;
+                OrderHallHandler.OnPedestalChange();
+            }
+            else
+            {
+                OrderHallHandler.TryUnsetMainPedestal(this);
             }
         }
         base.DeSpawn(mode);
     }
 
-    protected override void TickInterval(int delta)
-    {
-        base.TickInterval(delta);
-        if (isMainPedestal && (ticksToNextRoomCheck -= delta) <= 0)
-        {
-            ticksToNextRoomCheck = 250;
-            Room curRoom = this.GetRoom();
-            if (curRoom != cachedRoom)
-            {
-                cachedRoom = curRoom;
-                cachedOrderHallLevel = OrderHallUtility.GetOrderHallLevel(cachedRoom);
-                nextLevelCheckTick = Find.TickManager.TicksGame + 2500;
-            }
-        }
-    }
-
     public override void PostSwapMap()
     {
         base.PostSwapMap();
-        if (Spawned)
+        if (Spawned && IsMainPedestal)
         {
-            RecheckMainPedestalState();
+            OrderHallHandler.OnPedestalChange();
         }
-    }
-
-    public int GetNewestHallLevel()
-    {
-        if (!isMainPedestal)
-        {
-            return 0;
-        }
-        cachedRoom = this.GetRoom();
-        ticksToNextRoomCheck = 250;
-        cachedOrderHallLevel = OrderHallUtility.GetOrderHallLevel(cachedRoom);
-        nextLevelCheckTick = Find.TickManager.TicksGame + 2500;
-        return cachedOrderHallLevel;
     }
 
     public override IEnumerable<Gizmo> GetGizmos()
@@ -107,13 +43,13 @@ public class OrderCodePedestal : ThingWithComps
             yield break;
         }
 
-        if (isMainPedestal)
+        if (IsMainPedestal)
         {
             Command_Action command_UnsetAsMain = new()
             {
                 defaultLabel = "OARO_CodePedestal_Unset".Translate(),
                 defaultDesc = "OARO_CodePedestal_UnsetDesc".Translate(),
-                action = delegate { TryUnsetAsMainPedestal(); }
+                action = delegate { OrderHallHandler.TryUnsetMainPedestal(this); }
             };
             yield return command_UnsetAsMain;
 
@@ -121,10 +57,7 @@ public class OrderCodePedestal : ThingWithComps
             {
                 defaultLabel = "OARO_CodePedestal_RecheckHallLevel".Translate(),
                 defaultDesc = "OARO_CodePedestal_RecheckHallLevelDesc".Translate(),
-                action = delegate
-                {
-                    GetNewestHallLevel();
-                }
+                action = OrderHallHandler.OnPedestalChange
             };
             yield return command_RecheckHallLevel;
         }
@@ -134,68 +67,18 @@ public class OrderCodePedestal : ThingWithComps
             {
                 defaultLabel = "OARO_CodePedestal_SetAsMain".Translate(),
                 defaultDesc = "OARO_CodePedestal_SetAsMainDesc".Translate(),
-                action = delegate { TrySetAsMainPedestal(replaceCur: false); }
+                action = delegate { OrderHallHandler.TrySetMainPedestal(this, replaceCur: false); }
             };
 
             Command_Action command_SetAsOrReplaceMain = new()
             {
                 defaultLabel = "OARO_CodePedestal_ForceSetAsMain".Translate(),
                 defaultDesc = "OARO_CodePedestal_ForceSetAsMainDesc".Translate(),
-                action = delegate { TrySetAsMainPedestal(replaceCur: true); }
+                action = delegate { OrderHallHandler.TrySetMainPedestal(this, replaceCur: true); }
             };
 
             yield return command_SetAsMain;
             yield return command_SetAsOrReplaceMain;
         }
     }
-
-    private void RecheckMainPedestalState()
-    {
-        if (isMainPedestal)
-        {
-            TrySetAsMainPedestal(replaceCur: false);
-        }
-        else
-        {
-            UnsetAsMainPedestal();
-        }
-    }
-
-    public bool TrySetAsMainPedestal(bool replaceCur)
-    {
-        if (GlobalOrderInteractionManager.Instance.SetMainOrderCodePedestal(this, replaceCur))
-        {
-            isMainPedestal = true;
-            cachedRoom = this.GetRoom();
-            ticksToNextRoomCheck = 250;
-            nextLevelCheckTick = -1;
-            return true;
-        }
-        else
-        {
-            UnsetAsMainPedestal();
-            return false;
-        }
-    }
-
-    public void Notify_MainReplacedByOther()
-    {
-        UnsetAsMainPedestal();
-    }
-
-    private void TryUnsetAsMainPedestal()
-    {
-        UnsetAsMainPedestal();
-        GlobalOrderInteractionManager.Instance.Notify_MainOrderCodePedestalUnset(this);
-    }
-
-    private void UnsetAsMainPedestal()
-    {
-        isMainPedestal = false;
-        cachedRoom = null;
-        cachedOrderHallLevel = 0;
-        ticksToNextRoomCheck = 250;
-        nextLevelCheckTick = int.MaxValue;
-    }
-
 }

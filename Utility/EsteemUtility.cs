@@ -12,7 +12,7 @@ public static class EsteemUtility
     /// </summary>
     public static void AdjustAllOrdersEsteem(int change, bool byPlayer, bool showPlayerChangeMessage = true, string reason = null)
     {
-        foreach (RatkinOrder order in RatkinOrderManager.Instance.AllRatkinOrders)
+        foreach (RatkinOrder order in RatkinOrderManager.AllRatkinOrders)
         {
             order.EsteemHandler.AdjustEsteem(change, byPlayer, showPlayerChangeMessage: false, reason);
         }

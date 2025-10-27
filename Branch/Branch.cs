@@ -48,11 +48,11 @@ public class Branch : IExposable, ILoadReferenceable
 
     public bool HasSupportAuthority;
 
-    [Unsaved] private HonorBranchProperties honorProperties;
-    public HonorBranchProperties HonorProperties
+    [Unsaved] private HonorBranchDef honorDef;
+    public HonorBranchDef HonorDef
     {
-        get => IsBranchOfType(BranchType.Honor) ? honorProperties : null;
-        set => honorProperties = value;
+        get => IsBranchOfType(BranchType.Honor) ? honorDef : null;
+        set => honorDef = value;
     }
     private SimpleValueCache<float> supplyCeilingCache;
     private float supply;

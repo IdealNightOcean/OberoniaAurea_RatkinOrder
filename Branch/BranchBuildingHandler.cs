@@ -398,7 +398,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         if (isSpecial && building.Def.IsHonorSymbol)
         {
             branch.SetBranchType(Branch.BranchType.Honor, active: true);
-            branch.HonorProperties = building.Def.honorProperties;
+            branch.HonorDef = building.Def.honorDef;
         }
 
         if (building is ITickHour<Branch> tickLong)

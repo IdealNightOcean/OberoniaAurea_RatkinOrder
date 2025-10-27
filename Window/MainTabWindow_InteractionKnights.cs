@@ -39,7 +39,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
 
-        curOrderHallLevel = Mathf.Max(1, GlobalOrderInteractionManager.OrderHallLevel);
+        curOrderHallLevel = Mathf.Max(1, OrderHallHandler.OrderHallLevel);
         topShieldTexture = new CachedTexture($"UI/InteractionKnights/OARO_TopShield_{curOrderHallLevel}").Texture;
 
         RecacheAroundKnightGroups();
@@ -324,7 +324,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         aroundGroupTipIndex = -1;
         aroundGroupTipCache = string.Empty;
         aroundKnightGroups.Clear();
-        IReadOnlyList<AroundKnightGroup> tempGroups = GlobalOrderInteractionManager.AroundKnightGroupsManager.AroundKnightGroups;
+        IReadOnlyList<AroundKnightGroup> tempGroups = AroundKnightGroupsManager.AroundKnightGroups;
         for (int i = 0; i < tempGroups.Count; i++)
         {
             float successRate = GlobalOrderInteractionUtility.InvitationAcceptanceChance(tempGroups[i], resultOnly: true, out _);

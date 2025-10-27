@@ -9,21 +9,45 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class MercyQuestHandler : IExposable
 {
-    private float mercyQuestBaseChance;
+    private static float mercyQuestBaseChance;
+
+    public MercyQuestHandler() => ResetStaticValue();
+
+    public static void ResetStaticValue()
+    {
+        mercyQuestBaseChance = 0f;
+    }
 
     public void ExposeData()
     {
         Scribe_Values.Look(ref mercyQuestBaseChance, "mercyQuestBaseChance", 0f);
     }
 
-    public void PeriodicTriggerMercyQuest()
+    public static void Notify_MercyQuestSucceed(Quest quest)
     {
-        if (GlobalOrderInteractionManager.RatkinOrderHall is null || GlobalOrderInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
+        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
+        float letterChance = 0.2f;
+
+        if (ResidentKnightsManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out Pawn knight))
+        {
+            letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(knight);
+        }
+        if (Rand.Chance(letterChance))
+        {
+
+        }
+
+        ResidentKnightsManager.Notify_MercyQuestSucceed();
+    }
+
+    public static void PeriodicTriggerMercyQuest()
+    {
+        if (OrderHallHandler.OrderHallRoom is null || GlobalInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
         {
             return;
         }
 
-        GlobalOrderInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, shouldRemoveWhenExpired: true);
+        GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, shouldRemoveWhenExpired: true);
 
         Map map;
         if (Rand.Chance(1f - GetMercyQuestChance()) || (map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false)) is null)
@@ -32,7 +56,7 @@ public class MercyQuestHandler : IExposable
             return;
         }
 
-        foreach (QuestScriptDef scriptDef in MercyQuestDataBase.AllDefsListForReading.InRandomOrder().Take(3))
+        foreach (QuestScriptDef scriptDef in OrderDefDataBase.MercyQuestsList.InRandomOrder().Take(3))
         {
             Slate slate = new();
             slate.Set("map", map);
@@ -49,10 +73,10 @@ public class MercyQuestHandler : IExposable
         mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.1f, 0.8f);
     }
 
-    private float GetMercyQuestChance()
+    private static float GetMercyQuestChance()
     {
         float chance = mercyQuestBaseChance;
-        if (GlobalOrderInteractionManager.ResidentKnightsManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out Pawn knight))
+        if (ResidentKnightsManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out Pawn knight))
         {
             chance *= (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(knight) ?? 1f;
         }

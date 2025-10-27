@@ -50,7 +50,8 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             PawnGenerationRequest generationRequest = OARO_PawnUtility.DefaultKnightGenerationRequest(fixedPawnKind, questParameter.faction, tile: questParameter.map.Tile, forceNew: true);
             generationRequest.AllowedDevelopmentalStages = developmentalStages;
 
-            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(generationRequest, ratkinOrder);
+
+            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(generationRequest, new KnightRecord(ratkinOrder));
             if (!pawn.IsWorldPawn())
             {
                 Find.WorldPawns.PassToWorld(pawn);
@@ -106,6 +107,6 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
 
     protected override void PostPawnGenerated(Pawn pawn)
     {
-        pawn.InitKnightHediff(ratkinOrder);
+        pawn.InitKnightHediff(new KnightRecord(ratkinOrder));
     }
 }

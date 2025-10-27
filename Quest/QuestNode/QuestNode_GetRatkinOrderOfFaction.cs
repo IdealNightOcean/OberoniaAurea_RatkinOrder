@@ -9,6 +9,6 @@ public class QuestNode_GetRatkinOrderOfFaction : QuestNode_GetRatkinOrderBase
 
     protected override RatkinOrder GetRatkinOrder(Slate slate)
     {
-        return RatkinOrderManager.Instance.GetRatkinOrderForFaction(faction.GetValue(slate));
+        return RatkinOrderManager.GetRatkinOrderForFaction(faction.GetValue(slate));
     }
 }

@@ -38,9 +38,9 @@ public static class TalkActionUtility
         IntVec3 result;
         if (nearOrderHall)
         {
-            if (GlobalOrderInteractionManager.MainOrderCodePedestal?.Map == talkWith.Map)
+            if (OrderHallHandler.MainOrderCodePedestal?.Map == talkWith.Map)
             {
-                IntVec3 searchRootPos = GlobalOrderInteractionManager.MainOrderCodePedestal?.Position ?? talkWith.Position;
+                IntVec3 searchRootPos = OrderHallHandler.MainOrderCodePedestal?.Position ?? talkWith.Position;
                 RCellFinder.TryFindRandomSpotJustOutsideColony(searchRootPos, talkWith.Map, talkWith, out result);
                 return result;
             }

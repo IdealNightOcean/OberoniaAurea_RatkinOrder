@@ -79,7 +79,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
         }
 
         // 其它骑士团附近派系
-        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.Instance.AllRatkinOrders)
+        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.AllRatkinOrders)
         {
             if (ratkinOrder == demandOrder)
             {

@@ -118,16 +118,8 @@ public class BranchMedalHandler : IExposable
     internal void PostLoadInit()
     {
         medalRecords.RemoveAll(r => !r.Validate());
-        if (totalMedalCount <= 0)
-        {
-            RecacheMedalsCount();
-        }
-    }
-
-    private void RecacheMedalsCount()
-    {
         totalMedalCount = 0;
-        for (int i = 1; i < medalRecords.Count; i++)
+        for (int i = 0; i < medalRecords.Count; i++)
         {
             allHasTypes |= medalRecords[i].Type;
             totalMedalCount += medalRecords[i].Count;

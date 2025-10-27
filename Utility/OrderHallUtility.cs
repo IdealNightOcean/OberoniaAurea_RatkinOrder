@@ -15,7 +15,7 @@ public static class OrderHallUtility
 
     public static int GetOrderHallLevel(Room room)
     {
-        if (room is null || room != GlobalOrderInteractionManager.MainOrderCodePedestal?.CachedRoom)
+        if (room is null || room != OrderHallHandler.OrderHallRoom)
         {
             return 0;
         }
@@ -170,5 +170,32 @@ public static class OrderHallUtility
         }
 
         return maxPotentialLevel;
+    }
+
+    public static int KnightAcademicFurnituresCount(Room room)
+    {
+        if (room is null)
+        {
+            return 0;
+        }
+
+        int count = 0;
+        foreach (Region region in room.Regions)
+        {
+            List<Thing> allThings = region.ListerThings.AllThings;
+            for (int i = 0; i < allThings.Count; i++)
+            {
+                List<string> buildingTags = allThings[i].def?.building?.buildingTags;
+                if (buildingTags is null)
+                {
+                    continue;
+                }
+                if (buildingTags.Contains(""))
+                {
+                    count++;
+                }
+            }
+        }
+        return count;
     }
 }

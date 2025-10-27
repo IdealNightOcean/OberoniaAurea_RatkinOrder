@@ -106,7 +106,7 @@ public static class BranchUtility
     public static List<Branch> GetAllAffectedBranch(PlanetTile tile)
     {
         ConcurrentBag<Branch> result = [];
-        RatkinOrderManager.Instance.AllRatkinOrders
+        RatkinOrderManager.AllRatkinOrders
             .AsParallel()
             .ForAll(order =>
             {
@@ -123,7 +123,7 @@ public static class BranchUtility
     public static List<Branch> GetAllAffectedBranch(PlanetTile tile, Predicate<Branch> predicate)
     {
         ConcurrentBag<Branch> result = [];
-        RatkinOrderManager.Instance.AllRatkinOrders
+        RatkinOrderManager.AllRatkinOrders
             .AsParallel()
             .ForAll(order =>
             {

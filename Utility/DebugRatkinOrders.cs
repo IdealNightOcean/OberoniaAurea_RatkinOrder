@@ -98,7 +98,7 @@ public static class DebugRatkinOrders
                  allowedGameStates = AllowedGameStates.Playing)]
     private static void RemoveRatkinOrder()
     {
-        RatkinOrderOptions((ratkinOrder) => RatkinOrderManager.Instance.RemoveRatkinOrder(ratkinOrder));
+        RatkinOrderOptions((ratkinOrder) => RatkinOrderManager.RemoveRatkinOrder(ratkinOrder));
     }
 
     /// <summary>
@@ -111,12 +111,12 @@ public static class DebugRatkinOrders
                  allowedGameStates = AllowedGameStates.Playing)]
     private static void OpenOrderInteractionDevWindow()
     {
-        if (GlobalOrderInteractionManager.Instance is null)
+        if (GlobalInteractionManager.Instance is null)
         {
             Messages.Message("GlobalOrderInteractionManager is null", MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
-        GlobalOrderInteractionManager.OpenDevWindow();
+        GlobalInteractionManager.OpenDevWindow();
     }
 
     /// <summary>
@@ -235,7 +235,7 @@ public static class DebugRatkinOrders
     private static void TriggerMercyQuest()
     {
         List<DebugMenuOption> questOptions = [];
-        foreach (QuestScriptDef scriptDef in MercyQuestDataBase.AllDefsListForReading)
+        foreach (QuestScriptDef scriptDef in OrderDefDataBase.MercyQuestsList)
         {
             DebugMenuOption orderOption = new(label: scriptDef.defName,
                                               mode: DebugMenuOptionMode.Action,
@@ -276,7 +276,7 @@ public static class DebugRatkinOrders
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)
     {
         List<DebugMenuOption> orderOptions = [];
-        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.Instance.AllRatkinOrders)
+        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.AllRatkinOrders)
         {
             DebugMenuOption orderOption = new(label: ratkinOrder.Name,
                                               mode: DebugMenuOptionMode.Action,
@@ -290,7 +290,7 @@ public static class DebugRatkinOrders
     private static void OrderBranchOptions(Action<Branch> branchAction)
     {
         List<DebugMenuOption> orderOptions = [];
-        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.Instance.AllRatkinOrders)
+        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.AllRatkinOrders)
         {
             DebugMenuOption orderOption = new(label: ratkinOrder.Name,
                                               mode: DebugMenuOptionMode.Action,

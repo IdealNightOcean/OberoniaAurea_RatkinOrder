@@ -39,7 +39,7 @@ public class OrderInteractionWorker_Sponsor(OrderInteractionDef def) : OrderInte
 
         }
 
-        GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.SponsoredSilver, 5000, addIfMiss: true);
+        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.SponsoredSilver, 5000, addIfMiss: true);
 
         throw new NotImplementedException();
     }

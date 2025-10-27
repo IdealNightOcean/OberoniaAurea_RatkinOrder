@@ -6,8 +6,11 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IOnBranchDestroyed
 {
-    private List<AcceptedBranchDemand> acceptedBranchDemands = new(2);
-    public IReadOnlyList<AcceptedBranchDemand> AcceptedBranchDemands => acceptedBranchDemands;
+    private static List<AcceptedBranchDemand> acceptedBranchDemands = new(2);
+    public static IReadOnlyList<AcceptedBranchDemand> AcceptedBranchDemands => acceptedBranchDemands;
+
+    public AcceptedBranchDemandHandler() => ResetStaticValue();
+    public static void ResetStaticValue() => acceptedBranchDemands.Clear();
 
     public void ExposeData()
     {
@@ -28,7 +31,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
         acceptedBranchDemands.RemoveAll(ac => ac.Branch is null || ac.Branch == branch);
     }
 
-    public bool CanAcceptDemand(Branch branch, BranchDemand demand)
+    public static bool CanAcceptDemand(Branch branch, BranchDemand demand)
     {
         if (acceptedBranchDemands.Count >= 2)
         {
@@ -38,7 +41,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
         return BranchDemandUtility.CanAcceptDemand(branch, demand);
     }
 
-    public void AcceptDemand(Branch branch, BranchDemand demand)
+    public static void AcceptDemand(Branch branch, BranchDemand demand)
     {
         AcceptedBranchDemand acceptedDemand = new(branch, demand);
         demand.OnAccepted(branch);
@@ -49,7 +52,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
         }
     }
 
-    public void Notify_DemandQuestClean(Quest quest)
+    public static void Notify_DemandQuestClean(Quest quest)
     {
         AcceptedBranchDemand toRmove = null;
         foreach (AcceptedBranchDemand acceptedDemand in acceptedBranchDemands)
@@ -60,14 +63,14 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved, IO
                 acceptedDemand.Branch.DemandHandler.Notify_DemandQuestClean(acceptedDemand.IsCritical);
                 if (quest?.State == QuestState.EndedSuccess)
                 {
-                    GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchDemandCompleted, 1, addIfMiss: true);
+                    GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchDemandCompleted, 1, addIfMiss: true);
                     if (acceptedDemand.IsCritical)
                     {
-                        GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.CriticalDemandCompleted, 1, addIfMiss: true);
+                        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.CriticalDemandCompleted, 1, addIfMiss: true);
                     }
                     else
                     {
-                        GlobalOrderInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.NormalDemandCompleted, 1, addIfMiss: true);
+                        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.NormalDemandCompleted, 1, addIfMiss: true);
                     }
                     acceptedDemand.Branch.BranchManager.Notify_DemandQuestCompleted(acceptedDemand.IsCritical);
                 }
