@@ -38,9 +38,9 @@ public class BranchDemandHandler : ITickDay, IExposable
             listing_Rect.SubLabel(normalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (AcceptedBranchDemandHandler.CanAcceptDemand(branch, normalDemand))
+                if (AcceptedBranchDemandHandler.Instance.CanAcceptDemand(branch, normalDemand))
                 {
-                    AcceptedBranchDemandHandler.AcceptDemand(branch, normalDemand);
+                    AcceptedBranchDemandHandler.Instance.AcceptDemand(branch, normalDemand);
                 }
             }
         }
@@ -56,9 +56,9 @@ public class BranchDemandHandler : ITickDay, IExposable
             listing_Rect.SubLabel(criticalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (AcceptedBranchDemandHandler.CanAcceptDemand(branch, criticalDemand))
+                if (AcceptedBranchDemandHandler.Instance.CanAcceptDemand(branch, criticalDemand))
                 {
-                    AcceptedBranchDemandHandler.AcceptDemand(branch, criticalDemand);
+                    AcceptedBranchDemandHandler.Instance.AcceptDemand(branch, criticalDemand);
                 }
             }
         }

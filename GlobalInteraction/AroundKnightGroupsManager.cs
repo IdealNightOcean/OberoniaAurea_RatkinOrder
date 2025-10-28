@@ -153,8 +153,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         }
         int takeCount = Rand.RangeInclusive(1, 2) + (aroundKnightGroups.Count == 0 ? 1 : 0);
         takeCount = Mathf.Min(takeCount, potentialBranches.Count);
-        List<Branch> targetBranch = potentialBranches.TakeRandomDistinct(takeCount);
-        foreach (Branch branch in targetBranch)
+        foreach (Branch branch in potentialBranches.TakeRandomElements(takeCount))
         {
             aroundKnightGroups.Add(new AroundKnightGroup(branch));
         }

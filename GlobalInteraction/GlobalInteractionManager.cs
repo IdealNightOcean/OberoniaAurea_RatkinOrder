@@ -16,6 +16,7 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
     private OrderHallHandler orderHallHandler;
     private AcceptedBranchDemandHandler acceptedBranchDemandHandler;
+
     private ResidentKnightsManager residentKnightsManager;
     private AroundKnightGroupsManager aroundKnightGroupsManager;
     private MercyQuestHandler mercyQuestHandler;
@@ -38,8 +39,10 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
     public static void ClearStaticCache()
     {
         Instance = null;
+
+        AcceptedBranchDemandHandler.ClearStaticCache();
+
         OrderHallHandler.ResetStaticValue();
-        AcceptedBranchDemandHandler.ResetStaticValue();
         ResidentKnightsManager.ResetStaticValue();
         AroundKnightGroupsManager.ResetStaticValue();
         MercyQuestHandler.ResetStaticValue();

@@ -102,6 +102,9 @@
     <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\ResidentKnightAcademicDef.cs" />
     <Compile Include="Def\SpecialLetterDef.cs" />
+    <Compile Include="GlobalInteraction\BranchRelatedRecord\AcceptBranchContract.cs" />
+    <Compile Include="GlobalInteraction\BranchRelatedRecord\BranchRelatedRecord.cs" />
+    <Compile Include="GlobalInteraction\BranchRelatedRecord\BranchRelatedRecordsHandler.cs" />
     <Compile Include="GlobalInteraction\OrderHallHandler.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightRecord.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
@@ -150,8 +153,8 @@
     <Compile Include="RatkinOrder\RatkinOrderRaidWorker.cs" />
     <Compile Include="StatWorker_s.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
-    <Compile Include="BranchDemand\AcceptedBranchDemand.cs" />
-    <Compile Include="BranchDemand\AcceptedBranchDemandHandler.cs" />
+    <Compile Include="GlobalInteraction\BranchRelatedRecord\AcceptedBranchDemand.cs" />
+    <Compile Include="GlobalInteraction\BranchRelatedRecord\AcceptedBranchDemandHandler.cs" />
     <Compile Include="BranchDemand\BranchDemandWeighter.cs" />
     <Compile Include="BranchDemand\BranchDemandWeighter_FieldSurvey.cs" />
     <Compile Include="BranchDemand\BranchDemandWeighter_FamineVillage.cs" />

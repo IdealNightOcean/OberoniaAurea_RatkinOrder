@@ -1,7 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
-using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -56,7 +55,7 @@ public class MercyQuestHandler : IExposable
             return;
         }
 
-        foreach (QuestScriptDef scriptDef in OrderDefDataBase.MercyQuestsList.InRandomOrder().Take(3))
+        foreach (QuestScriptDef scriptDef in OrderDefDataBase.MercyQuestsList.TakeRandomElements(3).InRandomOrder())
         {
             Slate slate = new();
             slate.Set("map", map);

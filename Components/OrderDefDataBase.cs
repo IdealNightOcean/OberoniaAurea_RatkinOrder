@@ -65,7 +65,7 @@ public static class OrderDefDataBase
                 mercyQuestsList.Add(allQuestDefs[i]);
             }
         }
-        Log.Message("Mercy Quests list initialized".Colorize(Color.cyan));
+        Log.Message("MercyQuests list initialized".Colorize(Color.cyan));
     }
 
     private static void InitResidentKnightAcademicDefs()

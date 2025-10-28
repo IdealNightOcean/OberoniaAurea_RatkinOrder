@@ -46,7 +46,7 @@ public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
     {
         base.Cleanup();
 
-        AcceptedBranchDemandHandler.Notify_DemandQuestClean(quest);
+        AcceptedBranchDemandHandler.Instance.Notify_DemandQuestClean(quest);
         DemandType = default;
         Branch = null;
     }

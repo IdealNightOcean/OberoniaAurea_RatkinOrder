@@ -2,23 +2,20 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class AcceptedBranchDemand : IExposable
+public class AcceptedBranchDemand : BranchRelatedRecord
 {
-    public Branch Branch;
     public bool IsCritical;
-
     public BranchDemand Demand => IsCritical ? Branch.DemandHandler.CriticalDemand : Branch.DemandHandler.NormalDemand;
 
-    private AcceptedBranchDemand() { }
-    public AcceptedBranchDemand(Branch branch, BranchDemand demand)
+    private AcceptedBranchDemand() : base() { }
+    public AcceptedBranchDemand(Branch branch, BranchDemand demand) : base(branch)
     {
-        Branch = branch;
         IsCritical = demand.Def.IsCriticalDemand;
     }
 
-    public void ExposeData()
+    public override void ExposeData()
     {
-        Scribe_References.Look(ref Branch, "Branch");
+        base.ExposeData();
         Scribe_Values.Look(ref IsCritical, "IsCritical", defaultValue: false);
     }
 }

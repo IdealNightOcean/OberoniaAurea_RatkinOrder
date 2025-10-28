@@ -22,8 +22,7 @@ public class DemandPreSetQuestEffectTags : DefModExtension
             int selCount = Mathf.Min(randomTagsSelectCount.RandomInRange, randomTags.Count);
             if (selCount > 0)
             {
-                List<QuestEffectTag> selTags = randomTags.TakeRandomDistinct(selCount);
-                tags.AddRange(selTags);
+                tags.AddRange(randomTags.TakeRandomElements(selCount));
             }
         }
         return tags;
