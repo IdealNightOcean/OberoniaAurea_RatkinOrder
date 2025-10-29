@@ -31,9 +31,34 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public static IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
     public static IReadOnlyDictionary<ResidentKnightRoleDef, Pawn> RolesToKnights => RolesToKnights;
 
+    [Unsaved] private static KnightPersonality allHasPersonalityTypes;
+    [Unsaved] private static int instructorKnightsCount;
+    [Unsaved] private static int nextResidentKnightCheckTick = -1;
+    public static KnightPersonality AllHasPersonalityTypes
+    {
+        get
+        {
+            if (Find.TickManager.TicksGame > nextResidentKnightCheckTick)
+            {
+                RecheckResidentKnight();
+            }
+            return allHasPersonalityTypes;
+        }
+    }
+    public static int InstructorKnightsCount
+    {
+        get
+        {
+            if (Find.TickManager.TicksGame > nextResidentKnightCheckTick)
+            {
+                RecheckResidentKnight();
+            }
+            return instructorKnightsCount;
+        }
+    }
+
     [Unsaved] private static readonly Dictionary<StatDef, float> statOffsets = [];
     [Unsaved] private static readonly Dictionary<StatDef, float> statFactors = [];
-
     [Unsaved] private static HediffStage buffHediffStage;
     [Unsaved] private static int nextBuffStatRegainTick = -1;
 
@@ -67,6 +92,11 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         statOffsets.Clear();
         statFactors.Clear();
         buffHediffStage = null;
+
+        allHasPersonalityTypes = KnightPersonality.None;
+        instructorKnightsCount = 0;
+        nextResidentKnightCheckTick = -1;
+        nextBuffStatRegainTick = -1;
     }
 
     public void ExposeData()
@@ -121,11 +151,10 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         float gainPoints = 0f;
         foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
         {
-            gainPoints = kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationBase) * kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
+            gainPoints = kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationDailyGain);
             kv.Value.MeditationPoints += gainPoints;
         }
     }
-
 
     private static void RemoveAllInvalidRecord(Predicate<ResidentKnightRecord> extraRemove = null)
     {
@@ -289,6 +318,20 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
 
         return false;
+    }
+
+    private static void RecheckResidentKnight()
+    {
+        nextResidentKnightCheckTick = Find.TickManager.TicksGame + 30000;
+        allHasPersonalityTypes = KnightPersonality.None;
+        foreach (ResidentKnightRecord record in residentKnights.Values)
+        {
+            allHasPersonalityTypes |= record.Personality;
+            if (record.Branch.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor)
+            {
+                instructorKnightsCount++;
+            }
+        }
     }
 
     private static void RegainRoleBuffStat()

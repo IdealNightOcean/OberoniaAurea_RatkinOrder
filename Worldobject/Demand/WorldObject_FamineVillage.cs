@@ -80,7 +80,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     public override string GetInspectString()
     {
         StringBuilder sb = new(base.GetInspectString());
-        sb.AppendInNewLine("OARO_FamineVillage_CurTrust".Translate(curTrust.ToString("F2")));
+        sb.AppendInNewLine("OARO_FamineVillage_CurTrust".Translate(curTrust.ToString("0.##")));
         return sb.ToString();
     }
 
@@ -237,7 +237,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                     }
                     curTrust = Mathf.Clamp01(curTrust + gainedTrust);
                     gainTrustCount++;
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_GainTrust".Translate(gainedTrust.ToString("F2"), curTrust.ToString("F2")), Faction));
+                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_GainTrust".Translate(gainedTrust.ToString("0.##"), curTrust.ToString("0.##")), Faction));
                     return;
                 }
             case WorkType.PryInfo:

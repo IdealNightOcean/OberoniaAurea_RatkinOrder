@@ -171,14 +171,14 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
         }
 
 
-        sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection".Translate(designPerfection.ToStringPercent("F2")));
+        sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection".Translate(designPerfection.ToStringPercent("0.##")));
         if (designPerfection > 0.5f)
         {
-            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Buff".Translate(ExtraProgressFactor.ToStringPercent("F2")).Colorize(Color.green));
+            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Buff".Translate(ExtraProgressFactor.ToStringPercent("0.##")).Colorize(Color.green));
         }
         else
         {
-            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Debuff".Translate(ProgressAbnormalRegressChance.ToStringPercent("F2")).Colorize(ColorLibrary.RedReadable));
+            sb.AppendInNewLine($"OARO_TownUnderConstruction_DesignPerfection_Debuff".Translate(ProgressAbnormalRegressChance.ToStringPercent("0.##")).Colorize(ColorLibrary.RedReadable));
         }
 
         return sb.ToString();
@@ -372,7 +372,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
             }
             DesignPerfection += designPerfectionChange;
 
-            Messages.Message(text: "OARO_TownUnderConstruction_DailyReport".Translate(poputionGrow.ToString("F0"), designPerfectionChange.ToStringPercent("F2")),
+            Messages.Message(text: "OARO_TownUnderConstruction_DailyReport".Translate(poputionGrow.ToString("F0"), designPerfectionChange.ToStringPercent("0.##")),
                              def: MessageTypeDefOf.PositiveEvent);
         }
 
@@ -383,7 +383,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
         if (Rand.Chance(0.25f) || HasQuestEffectTag("RapidConstruction"))
         {
             DesignPerfection -= 0.02f;
-            Messages.Message(text: "OARO_TownUnderConstruction_YoungWork_N".Translate(youngWorkProgress.ToStringWithSign(), 0.02f.ToStringPercent("F2")),
+            Messages.Message(text: "OARO_TownUnderConstruction_YoungWork_N".Translate(youngWorkProgress.ToStringWithSign(), 0.02f.ToStringPercent("0.##")),
                              def: youngWorkProgress > 0 ? MessageTypeDefOf.PositiveEvent : MessageTypeDefOf.NeutralEvent);
         }
         else
@@ -399,14 +399,14 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
                 {
                     float designGain = 0.01f + TotalPotency * 0.015f;
                     DesignPerfection += designGain;
-                    Messages.Message(text: "OARO_TownUnderConstruction_ProgrammeResult".Translate(designGain.ToStringPercent("F2")),
+                    Messages.Message(text: "OARO_TownUnderConstruction_ProgrammeResult".Translate(designGain.ToStringPercent("0.##")),
                                      def: MessageTypeDefOf.PositiveEvent);
                     break;
                 }
             case PolicyType.IntegrationLabor:
                 {
                     CliquesManager.AdjustCliquePotency("YoungResident", 0.05f);
-                    Messages.Message(text: "OARO_TownUnderConstruction_IntegrationLaborResult".Translate(0.05f.ToStringPercent("F2")),
+                    Messages.Message(text: "OARO_TownUnderConstruction_IntegrationLaborResult".Translate(0.05f.ToStringPercent("0.##")),
                                      def: MessageTypeDefOf.PositiveEvent);
                     break;
                 }
@@ -417,7 +417,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
 
                     string cliqueKey = RandomResidentCliqueKey;
                     CliquesManager.AdjustCliqueWillingness(cliqueKey, 0.05f);
-                    Messages.Message(text: "OARO_TownUnderConstruction_InvitationSettleResult".Translate(populationGain, CliquesManager.GetCliqueName(cliqueKey), 0.05f.ToStringPercent("F2")),
+                    Messages.Message(text: "OARO_TownUnderConstruction_InvitationSettleResult".Translate(populationGain, CliquesManager.GetCliqueName(cliqueKey), 0.05f.ToStringPercent("0.##")),
                                      def: MessageTypeDefOf.PositiveEvent);
                     break;
                 }
@@ -453,7 +453,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
                     string cliqueKey = RandomResidentCliqueKey;
                     CliquesManager.AdjustCliqueWillingness(cliqueKey, 0.05f);
 
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_AssistInvitationResult".Translate(populationGain, CliquesManager.GetCliqueName(cliqueKey), 0.05f.ToStringPercent("F2"))));
+                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_AssistInvitationResult".Translate(populationGain, CliquesManager.GetCliqueName(cliqueKey), 0.05f.ToStringPercent("0.##"))));
                     break;
                 }
             case WorkType.AssistConstruction:
@@ -491,7 +491,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
         {
             float designPerfectionGain = giveCount * 0.04f;
             DesignPerfection += designPerfectionGain;
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_DeliveryResult".Translate(giveCount, OARO_ThingDefOf.OARO_DesignDrawing.label, designPerfectionGain.ToStringPercent("F2"))));
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_DeliveryResult".Translate(giveCount, OARO_ThingDefOf.OARO_DesignDrawing.label, designPerfectionGain.ToStringPercent("0.##"))));
         }
     }
 
@@ -580,7 +580,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
                 float designPerfectionFactor = DesignPerfectionScaleChange[constructionScale];
                 designPerfection *= designPerfectionFactor;
                 taggedString += "\n\n";
-                taggedString += "OARO_TownUnderConstruction_NewScaleDesignChange".Translate(designPerfectionFactor.ToStringPercent("F2"), designPerfection.ToStringPercent("F2"));
+                taggedString += "OARO_TownUnderConstruction_NewScaleDesignChange".Translate(designPerfectionFactor.ToStringPercent("0.##"), designPerfection.ToStringPercent("0.##"));
             }
 
             Find.LetterStack.ReceiveLetter(

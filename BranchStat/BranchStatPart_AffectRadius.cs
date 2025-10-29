@@ -14,7 +14,7 @@ public class BranchStatPart_AffectRadius : BranchStatPart
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)
     {
         explanation.Append("    ");
-        explanation.AppendLine("OARO_StatOffset_Fund".Translate((branch.RatkinOrder.FundHandler.Funds / 0.08f).ToStringWithSign("F2"))
+        explanation.AppendLine("OARO_StatOffset_Fund".Translate((branch.RatkinOrder.FundHandler.Funds / 0.08f).ToStringWithSign("0.##"))
                                                      .Colorize(Color.green));
     }
 }

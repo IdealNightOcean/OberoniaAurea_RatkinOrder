@@ -89,7 +89,7 @@ public static class RelationshipUtility
         }
 
         RelationshipKind newRelationship = curRelationship.RelationshipKindOffsetBy(1);
-        int curRecommendationNeed = newRelationship.RecommendationNeed();
+        int curRecommendationNeed = RecommendationUtility.RecommendationNeed_OrderRelationUpgrade(newRelationship);
 
         switch (newRelationship)
         {
@@ -155,7 +155,8 @@ public static class RelationshipUtility
         {
             ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
 
-            int recommendationNeed = ratkinOrder.Relationship.RelationshipKindOffsetBy(1).RecommendationNeed();
+            RelationshipKind targetRelation = ratkinOrder.Relationship.RelationshipKindOffsetBy(1);
+            int recommendationNeed = RecommendationUtility.RecommendationNeed_OrderRelationUpgrade(targetRelation);
             if (recommendationNeed > 0)
             {
                 RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
@@ -219,7 +220,7 @@ public static class RelationshipUtility
             curChance *= change;
             if (!resultOnly)
             {
-                sb.Append(reason.Translate(change.ToStringPercent("F2")).Colorize(change < 1f ? ColorLibrary.Red : Color.green));
+                sb.Append(reason.Translate(change.ToStringPercent("0.##")).Colorize(change < 1f ? ColorLibrary.Red : Color.green));
             }
         }
     }
@@ -306,19 +307,5 @@ public static class RelationshipUtility
                 sb.AppendInNewLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
             }
         }
-    }
-
-    /// <summary>
-    /// 提升到新等级需要的推荐信数量
-    /// </summary>
-    /// <param name="relationship">新骑士团关系等级</param>
-    private static int RecommendationNeed(this RelationshipKind relationship)
-    {
-        return relationship switch
-        {
-            RelationshipKind.Trustworthy => 1,
-            RelationshipKind.Soulmate => 2,
-            _ => 0
-        };
     }
 }

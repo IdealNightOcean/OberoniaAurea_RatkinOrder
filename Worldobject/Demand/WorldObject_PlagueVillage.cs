@@ -128,7 +128,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             _ => ColorLibrary.RedReadable
         };
         sb.AppendInNewLine("OARO_WorldObejct_PopulationInfo".Translate(population, originalPopulation).Colorize(PopulationColor));
-        sb.AppendInNewLine("OARO_PlagueVillage_Control".Translate(plagueControl.ToString("F2"), maxPlagueControl.ToString("F2")));
+        sb.AppendInNewLine("OARO_PlagueVillage_Control".Translate(plagueControl.ToString("0.##"), maxPlagueControl.ToString("0.##")));
 
         Color SpreadColor = plagueSpread switch
         {
@@ -138,7 +138,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             < 1.8f => ColorLibrary.Orange,
             _ => ColorLibrary.RedReadable
         };
-        sb.AppendInNewLine("OARO_PlagueVillage_PlagueSpread".Translate(plagueSpread.ToStringPercent("F2")).Colorize(SpreadColor));
+        sb.AppendInNewLine("OARO_PlagueVillage_PlagueSpread".Translate(plagueSpread.ToStringPercent("0.##")).Colorize(SpreadColor));
 
         return sb.ToString();
     }
@@ -225,7 +225,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                         {
                             controlAdd *= 0.5f;
                         }
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(controlAdd.ToString("F2"))));
+                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(controlAdd.ToString("0.##"))));
                         AdjustPlagueControl(controlAdd);
                         return;
                     }
@@ -234,7 +234,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                         int totalSocialLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
                         float spreadReduce = totalSocialLevel * 0.00025f;
                         PlagueSpread -= spreadReduce;
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(spreadReduce.ToStringPercent("F2"))));
+                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(spreadReduce.ToStringPercent("0.##"))));
                         return;
                     }
                 default: return;
@@ -338,7 +338,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             }
             PlagueSpread -= spreadChange;
             caravan.RemoveThingsOfDef(thingDef, 25);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_DispatchResult".Translate(spreadChange.ToString("F2"))));
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_DispatchResult".Translate(spreadChange.ToString("0.##"))));
         }
     }
 
@@ -381,7 +381,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                 CaravanInventoryUtility.GiveThing(caravan, thing);
             }
 
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_SellResult".Translate(spreadChange.ToString("F2"), silverGain)));
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_SellResult".Translate(spreadChange.ToString("0.##"), silverGain)));
         }
     }
 
@@ -399,7 +399,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                     {
                         controlAdd *= 0.5f;
                     }
-                    Messages.Message("OARO_PlagueVillage_OrderControlResult".Translate(plagueSpreadReduce.ToStringPercent("F2"), controlAdd.ToString("F2")), MessageTypeDefOf.PositiveEvent, historical: true);
+                    Messages.Message("OARO_PlagueVillage_OrderControlResult".Translate(plagueSpreadReduce.ToStringPercent("0.##"), controlAdd.ToString("0.##")), MessageTypeDefOf.PositiveEvent, historical: true);
                     AdjustPlagueControl(controlAdd);
                     break;
                 }
@@ -432,7 +432,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                     {
                         controlAdd *= 0.5f;
                     }
-                    Messages.Message("OARO_PlagueVillage_SurveyAssistanceResult".Translate(controlAdd.ToString("F2")), MessageTypeDefOf.PositiveEvent, historical: true);
+                    Messages.Message("OARO_PlagueVillage_SurveyAssistanceResult".Translate(controlAdd.ToString("0.##")), MessageTypeDefOf.PositiveEvent, historical: true);
                     AdjustPlagueControl(controlAdd);
                     break;
                 }

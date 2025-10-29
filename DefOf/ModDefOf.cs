@@ -39,8 +39,9 @@ public static class OARO_ModDefOf
     public static ResidentKnightRoleDef OARO_Clerk; //驻地文书
     public static ResidentKnightRoleDef OARO_Orderly; //地区看护
 
+    public static StatDef OARO_Stat_MeditationDailyGain; //每日修行点获得
     public static StatDef OARO_Stat_MeditationFactor; //每日修行点获得系数
-    public static StatDef OARO_Stat_MeditationBase; //每日修行点获得
+    public static StatDef OARO_Stat_MeditationBase; //每日修行点获得基础
 
     public static TraitDef OARO_OrderKnight;
 

@@ -13,7 +13,7 @@ public class QuestClique : IExposable
     public string InactiveDesc = string.Empty;
 
     public string Description => IsActive ? FullActiveDesc : InactiveDesc;
-    public string FullActiveDesc => (ActiveDesc + ": " + Potency.ToStringWithSign("F2")).Colorize(Potency < 0f ? ColorLibrary.RedReadable : Color.green);
+    public string FullActiveDesc => (ActiveDesc + ": " + Potency.ToStringWithSign("0.##")).Colorize(Potency < 0f ? ColorLibrary.RedReadable : Color.green);
 
     private float potency; // 效能，-1~1
     private float willingness; // 参与意愿，0~1

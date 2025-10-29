@@ -27,13 +27,7 @@ public static class GlobalOrderInteractionUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Trustworthy));
         }
 
-        int needRecommendation = ratkinOrder.Esteem switch
-        {
-            < 30 => 5,
-            < 70 => 4,
-            < 90 => 3,
-            _ => 2
-        };
+        int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
         if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < needRecommendation)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(needRecommendation, ratkinOrder.Name);
@@ -46,13 +40,7 @@ public static class GlobalOrderInteractionUtility
     /// </summary>
     public static void RecruitmentKnight(RatkinOrder ratkinOrder, Map map, Pawn pawn)
     {
-        int needRecommendation = ratkinOrder.Esteem switch
-        {
-            < 30 => 5,
-            < 70 => 4,
-            < 90 => 3,
-            _ => 2
-        };
+        int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
 
         RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, needRecommendation);
         throw new NotImplementedException();
@@ -84,10 +72,10 @@ public static class GlobalOrderInteractionUtility
         {
             return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(residentKnightCeiling);
         }
-
-        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < 1)
+        int recommendationNeed = RecommendationUtility.RecommendationNeed_ApplyResidentKnight(ratkinOrder);
+        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < recommendationNeed)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, ratkinOrder.Name);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed, ratkinOrder.Name);
         }
 
         return true;
@@ -102,7 +90,54 @@ public static class GlobalOrderInteractionUtility
         slate.SetBasicOrderSlateVar(ratkinOrder);
         slate.Set("map", map);
 
-        OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnight, slate, forced: false);
+        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnight, slate, forced: false))
+        {
+            int recommendationNeed = RecommendationUtility.RecommendationNeed_ApplyResidentKnight(ratkinOrder);
+            if (recommendationNeed > 0)
+            {
+                RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
+            }
+        }
+    }
+
+    public static AcceptanceReport CanUpgradeResidentKnightRank(ResidentKnightRecord record, Map map, bool resultOnly = false)
+    {
+        if (record.CurRank == ResidentKnightRecord.Rank.Crown)
+        {
+            return resultOnly ? false : "OARO_ReachMax_ResidentKnightRank".Translate();
+        }
+
+        int noAdditionalCostAcademicCeiling = record.NoAdditionalCostAcademicCeiling();
+        if (record.TotalAcademicLevel < noAdditionalCostAcademicCeiling)
+        {
+            return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.ToString());
+        }
+
+        ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
+        RatkinOrder ratkinOrder = record.Branch.RatkinOrder;
+        int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
+        if (recommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < recommendationNeed)
+        {
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed, ratkinOrder.Name);
+        }
+        return true;
+    }
+
+    public static void UpgradeResidentKnightRank(Pawn knight, ResidentKnightRecord record, Map map)
+    {
+        ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
+        if (targetRank == record.CurRank)
+        {
+            return;
+        }
+        RatkinOrder ratkinOrder = record.Branch.RatkinOrder;
+
+        int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
+        if (recommendationNeed > 0)
+        {
+            RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
+        }
+        record.CurRank = targetRank;
     }
 
 
@@ -241,7 +276,7 @@ public static class GlobalOrderInteractionUtility
             ApplyStepChange(0.25f, "OARO_ChangeOffset_FriendlyBranch");
 
             curChance *= 1.25f;
-            sb.AppendInNewLine("OARO_ChangeFactor_FriendlyBranch".Translate(1.25f.ToStringPercent("F2")).Colorize(Color.green));
+            sb.AppendInNewLine("OARO_ChangeFactor_FriendlyBranch".Translate(1.25f.ToStringPercent("0.##")).Colorize(Color.green));
         }
 
         if (!resultOnly)
@@ -255,7 +290,7 @@ public static class GlobalOrderInteractionUtility
             curChance += change;
             if (!resultOnly)
             {
-                sb.AppendInNewLine(reason.Translate(change.ToStringPercentSigned("F2")).Colorize(change < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendInNewLine(reason.Translate(change.ToStringPercentSigned("0.##")).Colorize(change < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
     }

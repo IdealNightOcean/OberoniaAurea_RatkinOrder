@@ -173,7 +173,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             sb.AppendInNewLine("OARO_NobilityTerritory_Troops".Translate(TroopsExposed));
         }
-        sb.AppendInNewLine("OARO_NobilityTerritory_Osmolity".Translate(osmolity.ToStringPercent("F2")));
+        sb.AppendInNewLine("OARO_NobilityTerritory_Osmolity".Translate(osmolity.ToStringPercent("0.##")));
         if (isWorking)
         {
             sb.AppendInNewLine("OARO_WorldObejct_CurWork".Translate());
@@ -416,7 +416,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             osmolityGain += 0.05f;
         }
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
-               "OARO_NobilityTerritory_InfiltrateResult".Translate(osmolityGain.ToStringPercent("F2")),
+               "OARO_NobilityTerritory_InfiltrateResult".Translate(osmolityGain.ToStringPercent("0.##")),
                Faction));
         AdjustOsmolity(osmolityGain);
     }
@@ -428,7 +428,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             CliquesManager.AdjustCliqueWillingness(NobilityCliqueKey, 0.1f);
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
-                "OARO_NobilityTerritory_CommunicationResultLow".Translate(nobilityName, 0.1f.ToStringPercent("F2")),
+                "OARO_NobilityTerritory_CommunicationResultLow".Translate(nobilityName, 0.1f.ToStringPercent("0.##")),
                 Faction));
         }
         else
@@ -463,7 +463,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
 
             CliquesManager.AdjustCliqueWillingness(NobilityCliqueKey, willingnessChange);
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
-                "OARO_NobilityTerritory_CommunicationResult".Translate(nobilityName, willingnessChange.ToStringPercent("F2")),
+                "OARO_NobilityTerritory_CommunicationResult".Translate(nobilityName, willingnessChange.ToStringPercent("0.##")),
                 Faction));
         }
     }
@@ -563,7 +563,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
 
     private DiaNode AssaultNode(Caravan caravan)
     {
-        TaggedString nodeText = "OARO_NobilityTerritory_AssaultInfo".Translate(nobilityName, osmolity.ToStringPercent("F2"), Branch.Name.Named("BRANCH"));
+        TaggedString nodeText = "OARO_NobilityTerritory_AssaultInfo".Translate(nobilityName, osmolity.ToStringPercent("0.##"), Branch.Name.Named("BRANCH"));
         if (hasExposeTroops)
         {
             nodeText += "\n\n" + "OARO_NobilityTerritory_Troops".Translate(troops);

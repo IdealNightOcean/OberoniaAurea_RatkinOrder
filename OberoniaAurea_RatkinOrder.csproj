@@ -94,6 +94,7 @@
     <Compile Include="Components\TrackedFloatValue.cs" />
     <Compile Include="Components\QuestEffectTag.cs" />
     <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
+    <Compile Include="DefModExtension\KnightJoyBuilding.cs" />
     <Compile Include="DefOf\OrderReformationDefOf.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
@@ -107,6 +108,7 @@
     <Compile Include="GlobalInteraction\BranchRelatedRecord\BranchRelatedRecordsHandler.cs" />
     <Compile Include="GlobalInteraction\OrderHallHandler.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightRecord.cs" />
+    <Compile Include="HarmonyPatch\HotReloadDefs_Patch.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
     <Compile Include="Hediff\Hediff_HonorHunting.cs" />
     <Compile Include="Hediff\Hediff_HonorPaladin.cs" />
@@ -151,7 +153,9 @@
     <Compile Include="Quest\Reward\Reward_BranchPopulation.cs" />
     <Compile Include="Reformation\ReformationType.cs" />
     <Compile Include="RatkinOrder\RatkinOrderRaidWorker.cs" />
-    <Compile Include="StatWorker_s.cs" />
+    <Compile Include="Stat\StatPart_MeditationBase.cs" />
+    <Compile Include="Stat\StatPart_MeditationFactor.cs" />
+    <Compile Include="Stat\StatWorker_MeditationPointDailyGain.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
     <Compile Include="GlobalInteraction\BranchRelatedRecord\AcceptedBranchDemand.cs" />
     <Compile Include="GlobalInteraction\BranchRelatedRecord\AcceptedBranchDemandHandler.cs" />
@@ -216,6 +220,7 @@
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
     <Compile Include="Utility\BranchConstructUtility.cs" />
     <Compile Include="Utility\IconLibrary.cs" />
+    <Compile Include="Utility\KnightPersonalityUtility.cs" />
     <Compile Include="Utility\WindowUtility.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
     <Compile Include="Utility\QuestUtility.cs" />

@@ -48,7 +48,7 @@ public static class BranchDemandUtility
         StringBuilder sb = new();
         foreach ((BranchDemandDef, float) pair in demandsWithChance)
         {
-            sb.AppendInNewLine($"{pair.Item1.label}: {(pair.Item2 / totalWeight).ToStringPercent("F2")}");
+            sb.AppendInNewLine($"{pair.Item1.label}: {(pair.Item2 / totalWeight).ToStringPercent("0.##")}");
         }
         return sb.ToString();
     }
@@ -85,7 +85,7 @@ public static class BranchDemandUtility
             chance += stepChange;
             if (!resultOnly && stepChange != 0f)
             {
-                sb.AppendInNewLine(key.Translate(stepChange.ToStringPercentSigned("F2")).Colorize(stepChange >= 0f ? Color.green : ColorLibrary.RedReadable));
+                sb.AppendInNewLine(key.Translate(stepChange.ToStringPercentSigned("0.##")).Colorize(stepChange >= 0f ? Color.green : ColorLibrary.RedReadable));
             }
         }
 

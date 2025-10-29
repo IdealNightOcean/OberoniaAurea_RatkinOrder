@@ -27,7 +27,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         }
         if (branch.Supply < Def.needSupply)
         {
-            return resultOnly ? false : "OARO_Insufficient_BranchSupply".Translate(Def.needSupply.ToStringPercent("F2"));
+            return resultOnly ? false : "OARO_Insufficient_BranchSupply".Translate(Def.needSupply.ToStringPercent("0.##"));
         }
         if (branch.PopulationHandler.Population < Def.floorPopulation)
         {

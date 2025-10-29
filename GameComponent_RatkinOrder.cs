@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -77,19 +76,6 @@ public class GameComponent_RatkinOrder : GameComponent
     /// </summary>
     private void EnsureComponentsInit()
     {
-        try
-        {
-            if (!OrderDefDataBase.Initialized)
-            {
-                OrderDefDataBase.Initialize();
-            }
-
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"Failed to initialize OrderDefDataBase.\nException:\n {ex.Message}");
-        }
-
         try
         {
             uniqueIDManager ??= new UniqueIDManager();

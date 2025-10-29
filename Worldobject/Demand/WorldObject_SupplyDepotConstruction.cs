@@ -61,11 +61,11 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
             if (!autoCotrInofrmed && constricProgress >= 400f)
             {
                 autoCotrInofrmed = true;
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_AutoCtorStar".Translate(gainProgress.ToString("F2")), Faction));
+                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_AutoCtorStar".Translate(gainProgress.ToString("0.##")), Faction));
             }
             else
             {
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_Finished".Translate(gainProgress.ToString("F2")), Faction));
+                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_Finished".Translate(gainProgress.ToString("0.##")), Faction));
             }
         }
     }

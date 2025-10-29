@@ -28,7 +28,7 @@ public class CompPlagueSample : CompInteractWithThing
 
     public override string CompInspectStringExtra()
     {
-        return "OARO_PlagueSample_Points".Translate(samplePoints.ToString("F2"), MaxSamplePoints.ToString("F2"));
+        return "OARO_PlagueSample_Points".Translate(samplePoints.ToString("0.##"), MaxSamplePoints.ToString("0.##"));
     }
 
     public void InitSample(Quest quest, WorldObject_PlagueVillage plagueVillage, bool isStrangePlague)
@@ -60,7 +60,7 @@ public class CompPlagueSample : CompInteractWithThing
             {
                 controlGain *= 2f;
             }
-            Messages.Message("OARO_PlagueSample_Result".Translate(controlGain.ToString("F2")), MessageTypeDefOf.PositiveEvent);
+            Messages.Message("OARO_PlagueSample_Result".Translate(controlGain.ToString("0.##")), MessageTypeDefOf.PositiveEvent);
             plagueVillage?.AdjustPlagueControl(controlGain);
         }
 

@@ -1,7 +1,5 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -9,44 +7,27 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class OrderDefDataBase
 {
-    private static bool initialized;
-    public static bool Initialized => initialized;
-
     private static readonly List<QuestScriptDef> mercyQuestsList = [];
-    public static IReadOnlyList<QuestScriptDef> MercyQuestsList
+    public static IReadOnlyList<QuestScriptDef> MercyQuestsList => mercyQuestsList;
+
+    private static readonly Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> knightAcademicByPersonality = [];
+
+    private static readonly Dictionary<ThingDef, KnightPersonality> joyBuildingToKnightPersonality = [];
+
+    public static void ClearStaticCache()
     {
-        get
-        {
-            if (!initialized)
-            {
-                Log.Error($"Attempted to use {nameof(MercyQuestsList)} before {nameof(OrderDefDataBase)} was initialized.");
-                return null;
-            }
-            return mercyQuestsList;
-        }
+        mercyQuestsList.Clear();
+        knightAcademicByPersonality.Clear();
+        joyBuildingToKnightPersonality.Clear();
     }
 
-    private static Dictionary<KnightRecord.PersonalityType, List<ResidentKnightAcademicDef>> knightAcademicByPersonality = [];
-
-    public static void Initialize()
+    public static bool GetKnightPersonalityForJoyBuilding(ThingDef thingDef, out KnightPersonality personality)
     {
-        if (initialized)
-        {
-            return;
-        }
-
-        InitMercyQuests();
-        InitResidentKnightAcademicDefs();
-        initialized = true;
+        return joyBuildingToKnightPersonality.TryGetValue(thingDef, out personality);
     }
 
-    public static ResidentKnightAcademicDef GetRandomKnightAcademicOfPersonality(KnightRecord.PersonalityType personality)
+    public static ResidentKnightAcademicDef GetRandomKnightAcademicOfPersonality(KnightPersonality personality)
     {
-        if (!initialized)
-        {
-            Log.Error($"Attempted to use {nameof(knightAcademicByPersonality)} before {nameof(OrderDefDataBase)} was initialized.");
-            return null;
-        }
         if (knightAcademicByPersonality.TryGetValue(personality, out List<ResidentKnightAcademicDef> defsList))
         {
             return defsList.RandomElementWithFallback(null);
@@ -54,26 +35,50 @@ public static class OrderDefDataBase
         return null;
     }
 
-    private static void InitMercyQuests()
+    public static void AddMercyQuests(QuestScriptDef scriptDef)
     {
-        mercyQuestsList.Clear();
-        List<QuestScriptDef> allQuestDefs = DefDatabase<QuestScriptDef>.AllDefsListForReading;
-        for (int i = 0; i < allQuestDefs.Count; i++)
+        if (scriptDef is null)
         {
-            if (allQuestDefs[i].GetModExtension<MercyQuestFlag>() is not null)
-            {
-                mercyQuestsList.Add(allQuestDefs[i]);
-            }
+            Log.Error($"Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: scriptDef cannot be null.");
+            return;
         }
-        Log.Message("MercyQuests list initialized".Colorize(Color.cyan));
+        mercyQuestsList.Add(scriptDef);
+    }
+    public static void AddKnightJoyBuilding(ThingDef buildingDef, KnightPersonality personality)
+    {
+        if (buildingDef is null)
+        {
+            Log.Error($"Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: buildingDef cannot be null.");
+            return;
+        }
+        if (personality == KnightPersonality.None)
+        {
+            Log.Error($"Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            return;
+        }
+        joyBuildingToKnightPersonality[buildingDef] = personality;
     }
 
-    private static void InitResidentKnightAcademicDefs()
+    public static void AddKnightAcademicByPersonality(KnightPersonality personality, ResidentKnightAcademicDef academicDef)
     {
-        knightAcademicByPersonality = DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.GroupBy(d => d.knightPersonality)
-                                                                                                  .ToDictionary(g => g.Key, g => g.ToList());
+        if (personality == KnightPersonality.None)
+        {
+            Log.Error($"Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            return;
+        }
+        if (academicDef is null)
+        {
+            Log.Error($"Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: academicDef cannot be null.");
+            return;
+        }
 
-        knightAcademicByPersonality ??= [];
-        Log.Message("KnightAcademic-Personality dictionary initialized".Colorize(Color.cyan));
+        if (knightAcademicByPersonality.TryGetValue(personality, out List<ResidentKnightAcademicDef> academicList))
+        {
+            academicList.Add(academicDef);
+        }
+        else
+        {
+            knightAcademicByPersonality.Add(personality, [academicDef]);
+        }
     }
 }

@@ -1,11 +1,17 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class OrderHallHandler : IExposable
 {
+    private const int HallRoomRecacheInterval = 250;
+    private const int HallLevelRecacheInterval = 15000;
+    private const int HallBuildingsRecacheInterval = 30000;
+
     private static OrderCodePedestal mainOrderCodePedestal;
     public static OrderCodePedestal MainOrderCodePedestal => mainOrderCodePedestal;
 
@@ -17,7 +23,7 @@ public class OrderHallHandler : IExposable
         {
             if (Find.TickManager.TicksGame > nextHallRoomCacheTick)
             {
-                nextHallRoomCacheTick = Find.TickManager.TicksGame + 250;
+                nextHallRoomCacheTick = Find.TickManager.TicksGame + HallRoomRecacheInterval;
                 orderHallRoom = mainOrderCodePedestal?.GetRoom();
             }
             return orderHallRoom;
@@ -25,7 +31,7 @@ public class OrderHallHandler : IExposable
     }
 
     [Unsaved]
-    private static SimpleValueCache<int> orderHallLevelCache = new(cacheInterval: 2500,
+    private static readonly SimpleValueCache<int> orderHallLevelCache = new(cacheInterval: HallLevelRecacheInterval,
                                                                    defaultValue: 0,
                                                                    checker: static delegate
                                                                    {
@@ -33,23 +39,47 @@ public class OrderHallHandler : IExposable
                                                                    });
     public static int OrderHallLevel => orderHallLevelCache.GetCachedResult();
 
-    [Unsaved]
-    private static SimpleValueCache<int> academicFurnituresCache = new(cacheInterval: 2500,
-                                                                      defaultValue: 0,
-                                                                      checker: static delegate
-                                                                      {
-                                                                          return OrderHallUtility.KnightAcademicFurnituresCount(OrderHallRoom);
-                                                                      });
-    public static int AcademicFurnituresCount => academicFurnituresCache.GetCachedResult();
+    [Unsaved] private static int nextHallBuildingCacheTick = -1;
+    [Unsaved] private static int academicFurnituresCount;
+    public static int AcademicFurnituresCount
+    {
+        get
+        {
+            if (Find.TickManager.TicksGame > nextHallBuildingCacheTick)
+            {
+                RecacheOrderHallBuildings();
+            }
+            return academicFurnituresCount;
+        }
+    }
+
+    [Unsaved] private static readonly Dictionary<KnightPersonality, HashSet<ThingDef>> knightJoyBuildingDefsByPersonality = new(KnightPersonalityUtility.AvailablePersonalitiesCount);
+    public static IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightJoyBuildingDefsByPersonality
+    {
+        get
+        {
+            if (Find.TickManager.TicksGame > nextHallBuildingCacheTick)
+            {
+                RecacheOrderHallBuildings();
+            }
+            return knightJoyBuildingDefsByPersonality;
+        }
+    }
 
     public OrderHallHandler() => ResetStaticValue();
 
     public static void ResetStaticValue()
     {
         mainOrderCodePedestal = null;
+        OnPedestalChange();
+    }
+    public static void OnPedestalChange()
+    {
+        academicFurnituresCount = 0;
         nextHallRoomCacheTick = -1;
+        nextHallBuildingCacheTick = -1;
         orderHallLevelCache.Reset();
-        academicFurnituresCache.Reset();
+        knightJoyBuildingDefsByPersonality.Clear();
     }
 
     public void ExposeData()
@@ -91,10 +121,55 @@ public class OrderHallHandler : IExposable
         return true;
     }
 
-    public static void OnPedestalChange()
+    private static void RecacheOrderHallBuildings()
     {
-        nextHallRoomCacheTick = -1;
-        orderHallLevelCache.Reset();
-        academicFurnituresCache.Reset();
+        nextHallBuildingCacheTick = Find.TickManager.TicksGame + HallBuildingsRecacheInterval;
+
+        academicFurnituresCount = 0;
+        knightJoyBuildingDefsByPersonality.Clear();
+        try
+        {
+            Room room = OrderHallRoom;
+            if (room is null)
+            {
+                return;
+            }
+            foreach (Region region in room.Regions)
+            {
+                List<Thing> allThings = region.ListerThings.AllThings;
+                for (int i = 0; i < allThings.Count; i++)
+                {
+                    List<string> buildingTags = allThings[i].def.building?.buildingTags;
+                    if (buildingTags is null)
+                    {
+                        continue;
+                    }
+                    if (buildingTags.Contains("OARO_KnightAcademic"))
+                    {
+                        academicFurnituresCount++;
+                    }
+
+                    if (buildingTags.Contains("OARO_KnightJoyFurniture"))
+                    {
+                        ThingDef thingDef = allThings[i].def;
+                        if (OrderDefDataBase.GetKnightPersonalityForJoyBuilding(thingDef, out KnightPersonality personality))
+                        {
+                            if (knightJoyBuildingDefsByPersonality.TryGetValue(personality, out HashSet<ThingDef> defsHash))
+                            {
+                                defsHash.Add(thingDef);
+                            }
+                            else
+                            {
+                                knightJoyBuildingDefsByPersonality.Add(personality, [thingDef]);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Exception occurred on {nameof(OrderHallHandler)}.{nameof(RecacheOrderHallBuildings)}.\nException:\n{ex.Message}");
+        }
     }
 }

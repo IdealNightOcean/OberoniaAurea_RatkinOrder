@@ -15,30 +15,39 @@ public static class OrderHallUtility
 
     public static int GetOrderHallLevel(Room room)
     {
-        if (room is null || room != OrderHallHandler.OrderHallRoom)
+        int maxPotentialLevel = 0;
+        try
         {
-            return 0;
+            if (room is null || room != OrderHallHandler.OrderHallRoom)
+            {
+                return 0;
+            }
+
+            int areaRestrict = Array.BinarySearch(areaBoundaries, room.CellCount);
+            areaRestrict = areaRestrict < 0 ? ~areaRestrict : areaRestrict + 1;
+            int impressivenessRestrict = Array.BinarySearch(impressivenessBoundaries, room.GetStat(RoomStatDefOf.Impressiveness));
+            impressivenessRestrict = impressivenessRestrict < 0 ? ~impressivenessRestrict : impressivenessRestrict + 1;
+
+            maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, 7);
+            maxPotentialLevel = maxPotentialLevel < 1 ? 1 : maxPotentialLevel;
+
+            if (maxPotentialLevel <= 1) { return 1; }
+
+            Log.Message($"before terrain: {maxPotentialLevel}");
+            maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
+            // 最高可能索引为0，只能是1级
+            if (maxPotentialLevel <= 1) { return 1; }
+
+            Log.Message($"before building: {maxPotentialLevel}");
+            maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
+
+            return Mathf.Clamp(maxPotentialLevel, 1, 7);
         }
-
-        int areaRestrict = Array.BinarySearch(areaBoundaries, room.CellCount);
-        areaRestrict = areaRestrict < 0 ? ~areaRestrict : areaRestrict + 1;
-        int impressivenessRestrict = Array.BinarySearch(impressivenessBoundaries, room.GetStat(RoomStatDefOf.Impressiveness));
-        impressivenessRestrict = impressivenessRestrict < 0 ? ~impressivenessRestrict : impressivenessRestrict + 1;
-
-        int maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, 7);
-        maxPotentialLevel = maxPotentialLevel < 1 ? 1 : maxPotentialLevel;
-
-        if (maxPotentialLevel <= 1) { return 1; }
-
-        Log.Message($"before terrain: {maxPotentialLevel}");
-        maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
-        // 最高可能索引为0，只能是1级
-        if (maxPotentialLevel <= 1) { return 1; }
-
-        Log.Message($"before building: {maxPotentialLevel}");
-        maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
-
-        return Mathf.Clamp(maxPotentialLevel, 1, 7);
+        catch (Exception ex)
+        {
+            Log.Error($"Exception occurred on {nameof(OrderHallUtility)}.{nameof(GetOrderHallLevel)}.\nException:\n{ex.Message}");
+            return maxPotentialLevel;
+        }
     }
 
     private static int TerrainRestrict(Room room, int maxPotentialLevel)
@@ -170,32 +179,5 @@ public static class OrderHallUtility
         }
 
         return maxPotentialLevel;
-    }
-
-    public static int KnightAcademicFurnituresCount(Room room)
-    {
-        if (room is null)
-        {
-            return 0;
-        }
-
-        int count = 0;
-        foreach (Region region in room.Regions)
-        {
-            List<Thing> allThings = region.ListerThings.AllThings;
-            for (int i = 0; i < allThings.Count; i++)
-            {
-                List<string> buildingTags = allThings[i].def?.building?.buildingTags;
-                if (buildingTags is null)
-                {
-                    continue;
-                }
-                if (buildingTags.Contains(""))
-                {
-                    count++;
-                }
-            }
-        }
-        return count;
     }
 }

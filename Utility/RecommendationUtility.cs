@@ -7,6 +7,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -146,5 +147,68 @@ public static class RecommendationUtility
                                                             thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
                                                             count: useCount,
                                                             validator: (t) => ((OrderRecommendation)t).RatkinOrder == order);
+    }
+
+
+
+    /// <summary>
+    /// 提升到新等级需要的推荐信数量
+    /// </summary>
+    /// <param name="targetRelation">目标关系等级</param>
+    public static int RecommendationNeed_OrderRelationUpgrade(RelationshipKind targetRelation)
+    {
+        return targetRelation switch
+        {
+            RelationshipKind.Trustworthy => 1,
+            RelationshipKind.Soulmate => 2,
+            _ => 0
+        };
+    }
+
+    /// <summary>
+    /// 招募骑士所需推荐信数量
+    /// </summary>
+    public static int RecommendationNeed_RecruitmentKnight(RatkinOrder ratkinOrder)
+    {
+        return ratkinOrder.Esteem switch
+        {
+            < 30 => 5,
+            < 70 => 4,
+            < 90 => 3,
+            _ => 2
+        };
+    }
+
+    /// <summary>
+    /// 招募常驻骑士所需推荐信数量
+    /// </summary>
+    public static int RecommendationNeed_ApplyResidentKnight(RatkinOrder ratkinOrder)
+    {
+        return ratkinOrder.Esteem switch
+        {
+            > 50 => 3,
+            _ => 2
+        };
+    }
+
+    /// <summary>
+    /// 提升常驻骑士阶位所需推荐信数量
+    /// </summary>
+    /// <param name="targetRank">目标阶位</param>
+    public static int RecommendationNeed_ResidentKnightRankUpgrade(RatkinOrder ratkinOrder, ResidentKnightRecord.Rank targetRank)
+    {
+        int needCount = targetRank switch
+        {
+            ResidentKnightRecord.Rank.Regular => 0,
+            ResidentKnightRecord.Rank.Elite => 1,
+            ResidentKnightRecord.Rank.Honor => 2,
+            ResidentKnightRecord.Rank.Crown => 4,
+            _ => 0
+        };
+        if (ratkinOrder.Relationship >= EsteemHandler.RelationshipKind.Soulmate)
+        {
+            needCount--;
+        }
+        return needCount > 0 ? needCount : 0;
     }
 }

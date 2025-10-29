@@ -21,10 +21,10 @@ public static class BranchStatUtility
                     explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()));
                     break;
                 case BranchStatDef.StatType.Float:
-                    explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign("F2")));
+                    explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign("0.##")));
                     break;
                 case BranchStatDef.StatType.Percent:
-                    explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent("F2")));
+                    explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent("0.##")));
                     break;
                 default: break;
             }
@@ -108,11 +108,11 @@ public static class BranchStatUtility
                                                                      .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
                 break;
             case BranchStatDef.StatType.Float:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToString("F2"))
+                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToString("0.##"))
                                                                   .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
                 break;
             case BranchStatDef.StatType.Percent:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToStringPercent("F2"))
+                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToStringPercent("0.##"))
                                                                   .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
                 break;
             default: break;

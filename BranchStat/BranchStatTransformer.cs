@@ -71,14 +71,14 @@ public struct BranchStatTransformer
         if (statDef.statType == BranchStatDef.StatType.Percent)
         {
             return statDef.label
-                 + $": {offset.ToStringPercentSigned("F2").Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}"
-                 + $" / ×{factor.ToStringPercentSigned("F2").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
+                 + $": {offset.ToStringPercentSigned("0.##").Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}"
+                 + $" / ×{factor.ToStringPercentSigned("0.##").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
         }
         else
         {
             return statDef.label
-                 + $": {offset.ToStringWithSign("F2").Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}"
-                 + $" / ×{factor.ToStringWithSign("F2").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
+                 + $": {offset.ToStringWithSign("0.##").Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}"
+                 + $" / ×{factor.ToStringWithSign("0.##").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
         }
     }
 
@@ -89,13 +89,13 @@ public struct BranchStatTransformer
             if (offset != 0f)
             {
                 explanation.Append("    ");
-                explanation.AppendLine("OARO_StatExplain_Offset".Translate(offset.ToStringPercentSigned("F2"))
+                explanation.AppendLine("OARO_StatExplain_Offset".Translate(offset.ToStringPercentSigned("0.##"))
                                                                 .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
             }
             if (factor != 1f)
             {
                 explanation.Append("    ");
-                explanation.AppendLine("OARO_StatExplain_Factor".Translate(factor.ToStringPercentSigned("F2"))
+                explanation.AppendLine("OARO_StatExplain_Factor".Translate(factor.ToStringPercentSigned("0.##"))
                                                                 .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
             }
         }
@@ -104,13 +104,13 @@ public struct BranchStatTransformer
             if (offset != 0f)
             {
                 explanation.Append("    ");
-                explanation.AppendLine("OARO_StatExplain_Offset".Translate(offset.ToStringWithSign("F2"))
+                explanation.AppendLine("OARO_StatExplain_Offset".Translate(offset.ToStringWithSign("0.##"))
                                                                 .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
             }
             if (factor != 1f)
             {
                 explanation.Append("    ");
-                explanation.AppendLine("OARO_StatExplain_Factor".Translate(factor.ToString("F2"))
+                explanation.AppendLine("OARO_StatExplain_Factor".Translate(factor.ToString("0.##"))
                                                                 .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
             }
         }

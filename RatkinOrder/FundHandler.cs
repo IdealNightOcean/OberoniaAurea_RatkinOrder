@@ -252,13 +252,13 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
     public string GetFundChangeDetail()
     {
         StringBuilder sb = new();
-        sb.AppendLine("OARO_Fund_ImmediatelyChange".Translate(immediatelyChange.ToStringWithSign("F2")).Colorize(immediatelyChange < 0f ? ColorLibrary.RedReadable : Color.green));
+        sb.AppendLine("OARO_Fund_ImmediatelyChange".Translate(immediatelyChange.ToStringWithSign("0.##")).Colorize(immediatelyChange < 0f ? ColorLibrary.RedReadable : Color.green));
         sb.AppendLine("----");
         if (immediatelyChangeExplanation.Count > 0)
         {
             foreach (KeyValuePair<string, float> kv in immediatelyChangeExplanation)
             {
-                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringWithSign("F2")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringWithSign("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
 
@@ -266,13 +266,13 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
         sb.AppendLine("-*-*-*-*-*-");
         sb.AppendLine();
 
-        sb.AppendLine("OARO_Fund_ExpectedChange".Translate(expectedChange.ToStringWithSign("F2")).Colorize(expectedChange < 0f ? ColorLibrary.RedReadable : Color.green));
+        sb.AppendLine("OARO_Fund_ExpectedChange".Translate(expectedChange.ToStringWithSign("0.##")).Colorize(expectedChange < 0f ? ColorLibrary.RedReadable : Color.green));
         sb.AppendLine("----");
         if (expectedChangeExplanation.Count > 0)
         {
             foreach (KeyValuePair<string, float> kv in expectedChangeExplanation)
             {
-                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringWithSign("F2")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringWithSign("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
 

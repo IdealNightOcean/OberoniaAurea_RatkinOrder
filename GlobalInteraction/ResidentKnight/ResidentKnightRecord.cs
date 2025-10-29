@@ -1,4 +1,5 @@
 ﻿using System;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -12,21 +13,20 @@ public class ResidentKnightRecord : IExposable
         Honor,
         Crown
     }
+    public static Rank RankOffsetBy(Rank rank, int offset) => (Rank)Mathf.Clamp((int)rank + offset, 0, 3);
 
-
-    private KnightRecord.PersonalityType personality;
+    private KnightPersonality personality;
     private Branch branch;
-    private Rank curRank;
+    public Rank CurRank;
     public float MeditationPoints;
 
     public ResidentKnightRoleDef CurRole;
 
     public Branch Branch => branch;
-    public Rank CurRank => curRank;
 
     private ResidentKnightAcademicDef genealAcademicDef;
     public ResidentKnightAcademicDef HonorAcademicDef => branch.HonorDef?.academicDef;
-    public KnightRecord.PersonalityType Personality => personality;
+    public KnightPersonality Personality => personality;
 
     private int genealAcademicLevel;
     private int honorAcademicLevel;
@@ -41,9 +41,9 @@ public class ResidentKnightRecord : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref personality, "personality", KnightRecord.PersonalityType.None);
+        Scribe_Values.Look(ref personality, "personality", KnightPersonality.None);
         Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref curRank, "curRank", Rank.Regular);
+        Scribe_Values.Look(ref CurRank, "CurRank", Rank.Regular);
         Scribe_Values.Look(ref MeditationPoints, "MeditationPoints", 0f);
         Scribe_Defs.Look(ref CurRole, "CurRole");
         Scribe_Defs.Look(ref genealAcademicDef, "genealAcademicDef");
@@ -75,7 +75,7 @@ public class ResidentKnightRecord : IExposable
 
     public override string ToString()
     {
-        return $"Branch: {branch.Name}, Rank: {curRank}, MeditationPoints: {MeditationPoints}, AcademicDef: ({genealAcademicDef},{HonorAcademicDef}),TotalAcademicLevel: {TotalAcademicLevel}({genealAcademicLevel}, {honorAcademicLevel}), Role: {CurRole} ";
+        return $"Branch: {branch.Name}, Rank: {CurRank}, MeditationPoints: {MeditationPoints}, AcademicDef: ({genealAcademicDef},{HonorAcademicDef}),TotalAcademicLevel: {TotalAcademicLevel}({genealAcademicLevel}, {honorAcademicLevel}), Role: {CurRole} ";
     }
 
     public void ResignationWarningCheck()
@@ -92,9 +92,9 @@ public class ResidentKnightRecord : IExposable
         hasWarnedResignation = false;
     }
 
-    private int NoAdditionalCostAcademicCeiling()
+    public int NoAdditionalCostAcademicCeiling()
     {
-        return curRank switch
+        return CurRank switch
         {
             Rank.Regular => 5,
             Rank.Elite => 10,

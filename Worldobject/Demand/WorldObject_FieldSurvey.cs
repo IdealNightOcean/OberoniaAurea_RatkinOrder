@@ -107,9 +107,9 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                                                                 .Colorize(meteorologicalDataGained >= meteorologicalDataRequire ? Color.green : Color.white));
         sb.AppendInNewLine("OARO_FieldSurvey_GeologicalInsights".Translate(geologicalInsights));
 
-        sb.AppendInNewLine("OARO_FieldSurvey_GeologicalInsightsInfo".Translate((geologicalInsights * PerInsightToInfo).ToStringPercent("F2")));
+        sb.AppendInNewLine("OARO_FieldSurvey_GeologicalInsightsInfo".Translate((geologicalInsights * PerInsightToInfo).ToStringPercent("0.##")));
 
-        sb.AppendInNewLine("OARO_FieldSurvey_InfoCompleteness".Translate(infoCompleteness.ToStringPercent("F2"))
+        sb.AppendInNewLine("OARO_FieldSurvey_InfoCompleteness".Translate(infoCompleteness.ToStringPercent("0.##"))
                                                               .Colorize(infoCompleteness >= 5f ? Color.green : Color.white));
 
         if (featureExposed)
@@ -291,7 +291,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                     float gainInfo = PerInsightToInfo;
                     InfoCompleteness += gainInfo;
                     nextAvailableTick = Find.TickManager.TicksGame + GetCoolDownTicks();
-                    Messages.Message("OARO_FieldSurvey_Meteorological_Finished".Translate(gainInfo.ToStringPercent("F2")), MessageTypeDefOf.PositiveEvent);
+                    Messages.Message("OARO_FieldSurvey_Meteorological_Finished".Translate(gainInfo.ToStringPercent("0.##")), MessageTypeDefOf.PositiveEvent);
                     return;
                 }
             case WorkType.Exploration:
@@ -300,7 +300,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                     geologicalInsights += gainInsights;
                     float gainInfo = gainInsights * PerInsightToInfo;
                     InfoCompleteness += gainInfo;
-                    Messages.Message("OARO_FieldSurvey_Exploration_Finished".Translate(gainInsights, gainInfo.ToStringPercent("F2")), MessageTypeDefOf.PositiveEvent);
+                    Messages.Message("OARO_FieldSurvey_Exploration_Finished".Translate(gainInsights, gainInfo.ToStringPercent("0.##")), MessageTypeDefOf.PositiveEvent);
 
                     if (occurSpecialEvent >= maxSpecialEvent)
                     {
@@ -344,7 +344,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                     {
                         float gainInfo = maxSkillLevel * 1.5f + totalSkillLevel * 0.5f;
                         InfoCompleteness += gainInfo;
-                        Messages.Message("OARO_FieldSurvey_Information_Finished".Translate(gainInfo.ToStringPercent("F2")), MessageTypeDefOf.PositiveEvent);
+                        Messages.Message("OARO_FieldSurvey_Information_Finished".Translate(gainInfo.ToStringPercent("0.##")), MessageTypeDefOf.PositiveEvent);
 
                     }
 

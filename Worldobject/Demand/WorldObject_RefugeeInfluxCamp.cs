@@ -164,7 +164,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
 
         sb.AppendInNewLine("OARO_WorldObejct_PopulationInfo".Translate(population, originalPopulation));
 
-        sb.AppendInNewLine("OARO_RefugeeInflux_DistEfficiency".Translate(distEfficiency.ToStringPercent("F2")));
+        sb.AppendInNewLine("OARO_RefugeeInflux_DistEfficiency".Translate(distEfficiency.ToStringPercent("0.##")));
         sb.AppendInNewLine("OARO_RefugeeInflux_DistEfficiencyDesc".Translate());
 
         Color famineRiskColor = FamineRiskLevel switch
@@ -174,7 +174,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             2 => ColorLibrary.Orange,
             _ => ColorLibrary.RedReadable,
         };
-        sb.AppendInNewLine("OARO_RefugeeInflux_FamineRisk".Translate(famineRisk.ToStringPercent("F2")).Colorize(famineRiskColor));
+        sb.AppendInNewLine("OARO_RefugeeInflux_FamineRisk".Translate(famineRisk.ToStringPercent("0.##")).Colorize(famineRiskColor));
         sb.AppendInNewLine($"OARO_RefugeeInflux_FamineRiskDesc_{FamineRiskLevel}".Translate().Colorize(famineRiskColor));
 
         return sb.ToString();
@@ -408,21 +408,21 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         {
             FamineRisk -= 0.75f;
             letterDef = LetterDefOf.PositiveEvent;
-            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.75f.ToStringPercent("F2"));
+            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.75f.ToStringPercent("0.##"));
         }
         else if (corruptionLevel == 1)
         {
             FamineRisk -= 0.55f;
             AdjuestRefugeeWillingness(-0.05f);
             letterDef = LetterDefOf.NeutralEvent;
-            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.55f.ToStringPercent("F2"), 0.05f.ToStringPercent("f2"));
+            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.55f.ToStringPercent("0.##"), 0.05f.ToStringPercent("f2"));
         }
         else
         {
             FamineRisk -= 0.25f;
             AdjuestRefugeeWillingness(-0.2f);
             letterDef = LetterDefOf.NegativeEvent;
-            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.25f.ToStringPercent("F2"), 0.2f.ToStringPercent("f2"));
+            text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.25f.ToStringPercent("0.##"), 0.2f.ToStringPercent("f2"));
         }
 
         Find.LetterStack.ReceiveLetter("OARO_RefugeeInflux_GrainArrivalLabel".Translate(Name), text, letterDef, lookTargets: this, quest: quest);
@@ -465,14 +465,14 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
                         famineRiskChange *= 1.5f;
                     }
                     FamineRisk -= famineRiskChange;
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_HuntingResult".Translate(famineRiskChange.ToStringPercent("F2"))));
+                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_HuntingResult".Translate(famineRiskChange.ToStringPercent("0.##"))));
                     break;
                 }
             case WorkType.AssistPacify:
                 {
                     float willingnessChange = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social) * 0.001f;
                     AdjuestRefugeeWillingness(willingnessChange);
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_PacifyResult".Translate(willingnessChange.ToStringPercent("F2"))));
+                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_PacifyResult".Translate(willingnessChange.ToStringPercent("0.##"))));
                     break;
                 }
             default: break;
@@ -498,7 +498,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         AdjuestRefugeeWillingness(-0.25f);
         AdjustPopulation(-100);
 
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_ExileResult".Translate(100, 0.25f.ToStringPercent("F2"))));
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_ExileResult".Translate(100, 0.25f.ToStringPercent("0.##"))));
     }
 
     private void MilitaryControl()
@@ -563,7 +563,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             cooldownManager.RegisterRecord("DistributionFood", cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
             FamineRisk -= 0.55f;
             AdjuestRefugeeWillingness(0.2f);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_DistributionFoodResult".Translate(0.55f.ToStringPercent("F2"), 0.2f.ToStringPercent("F2"))));
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_DistributionFoodResult".Translate(0.55f.ToStringPercent("0.##"), 0.2f.ToStringPercent("0.##"))));
         }
     }
 

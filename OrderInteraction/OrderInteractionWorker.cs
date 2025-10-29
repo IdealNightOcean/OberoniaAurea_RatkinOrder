@@ -24,7 +24,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         }
         if (ratkinOrder.Funds < Def.MinFundNeeded)
         {
-            return resultOnly ? false : "OARO_Insufficient_Fund".Translate(Def.MinFundNeeded.ToStringPercent("F2"));
+            return resultOnly ? false : "OARO_Insufficient_Fund".Translate(Def.MinFundNeeded.ToStringPercent("0.##"));
         }
         if (!Def.cdRecordKey.NullOrEmpty())
         {

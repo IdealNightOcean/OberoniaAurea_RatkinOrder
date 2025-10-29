@@ -8,7 +8,7 @@ public class ResidentKnightAcademicDef : Def
     /// <summary>
     /// 不要使用组合枚举！
     /// </summary>
-    public KnightRecord.PersonalityType knightPersonality;
+    public KnightPersonality knightPersonality;
 
     public List<ResidentKnightAcademicStage> academicStages = [];
 
@@ -20,9 +20,18 @@ public class ResidentKnightAcademicDef : Def
         {
             yield return error;
         }
-        if (knightPersonality == KnightRecord.PersonalityType.None)
+        if (knightPersonality == KnightPersonality.None)
         {
             yield return "";
+        }
+    }
+
+    public override void PostLoad()
+    {
+        base.PostLoad();
+        if (knightPersonality != KnightPersonality.None)
+        {
+            OrderDefDataBase.AddKnightAcademicByPersonality(knightPersonality, this);
         }
     }
 }

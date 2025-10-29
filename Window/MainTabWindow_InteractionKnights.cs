@@ -5,6 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+[StaticConstructorOnStartup]
 public class MainTabWindow_InteractionKnights : MainTabWindow
 {
     public override Vector2 InitialSize => new(1462f, 919f);
