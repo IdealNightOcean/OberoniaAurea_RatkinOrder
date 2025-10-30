@@ -20,7 +20,6 @@ public class StatPart_MeditationFactor : StatPart
             return;
         }
 
-
         val += OrderHallHandler.OrderHallLevel switch
         {
             < 2 => 0f,

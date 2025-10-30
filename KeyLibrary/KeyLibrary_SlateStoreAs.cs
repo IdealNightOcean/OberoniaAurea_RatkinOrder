@@ -28,6 +28,11 @@ public static class KeyLibrary_SlateStoreAs
     public const string DemandType = "demandType";
     public const string DemandDef = "demandDef";
 
+    public const string ContractDef = "contractDef";
+    public const string ContractThingDef = "contractThingDef";
+    public const string ContractThingCount = "contractThingCount";
+    public const string ContractReason = "contractReason";
+
     public const string PreSetQuestEffectTags = "PreSetQuestEffectTags";
     public const string QuestEffectTags = "QuestEffectTags";
 

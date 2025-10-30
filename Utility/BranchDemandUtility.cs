@@ -24,14 +24,6 @@ public static class BranchDemandUtility
         List<(BranchDemandDef def, float)> demandsWithChance = demandOfType.AsParallel()
                                                                            .Select(def => (def, def.Weighter.GetDemandWeightOnly(def, branch)))
                                                                            .ToList();
-        /*
-        List<(BranchDemandDef, float)> demandsWithChance = new(demandOfType.Count);
-        for (int i = 0; i < demandOfType.Count; i++)
-        {
-            demandsWithChance.AddMercyQuest((demandOfType[i], demandOfType[i].Weighter.GetDemandWeightOnly(branch)));
-        }
-        */
-
         return demandsWithChance;
     }
 

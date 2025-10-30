@@ -208,6 +208,35 @@ public static class DebugRatkinOrders
     }
 
     /// <summary>
+    /// 添加分部合约
+    /// </summary>
+    [DebugAction(category: "OberoniaAurea",
+                 name: "Add new branch contract",
+                 displayPriority: 440,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.Playing)]
+    private static void AddBranchContract()
+    {
+        OrderBranchOptions(SelectDemand);
+
+        void SelectDemand(Branch branch)
+        {
+            List<DebugMenuOption> contractOptions = [];
+            foreach (BranchContractDef contractDef in DefDatabase<BranchContractDef>.AllDefs)
+            {
+                DebugMenuOption demandOption = new(label: contractDef.defName,
+                                                   mode: DebugMenuOptionMode.Action,
+                                                   method: delegate
+                                                   {
+                                                       branch.PopulationHandler.TryAddContract(contractDef);
+                                                   });
+                contractOptions.Add(demandOption);
+            }
+            Find.WindowStack.Add(new Dialog_DebugOptionListLister(contractOptions));
+        }
+    }
+
+    /// <summary>
     /// 添加常驻骑士
     /// </summary>
     [DebugAction(category: "OberoniaAurea",

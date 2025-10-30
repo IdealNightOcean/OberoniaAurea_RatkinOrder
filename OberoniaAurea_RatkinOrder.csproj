@@ -86,6 +86,7 @@
     <Compile Include="BranchStat\BranchStatPart_DailyPopulationGrowth.cs" />
     <Compile Include="BranchTask\BranchTask.cs" />
     <Compile Include="BranchTask\BranchTask_JurisdictionDuty.cs" />
+    <Compile Include="Branch\BranchContract.cs" />
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
@@ -98,6 +99,7 @@
     <Compile Include="DefOf\OrderReformationDefOf.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
+    <Compile Include="Def\BranchContractDef.cs" />
     <Compile Include="Def\HonorBranchDef.cs" />
     <Compile Include="Def\BranchInteractionDef.cs" />
     <Compile Include="Def\InteractionDefBase.cs" />
@@ -128,7 +130,9 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
     <Compile Include="OrderLetter\OrderLetterType.cs" />
+    <Compile Include="Quest\Quest_BranchContractWatcher.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_GetNearBranchClique.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_BranchIsTypeOf.cs" />
     <Compile Include="Quest\Quest_TownConstructionWatcher.cs" />
     <Compile Include="Quest\Quest_NobilityTerritoryWatcher.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_LostItemsOfTrader.cs" />
@@ -155,6 +159,7 @@
     <Compile Include="RatkinOrder\RatkinOrderRaidWorker.cs" />
     <Compile Include="Stat\StatPart_MeditationBase.cs" />
     <Compile Include="Stat\StatPart_MeditationFactor.cs" />
+    <Compile Include="Stat\StatWorker_MeditationPointBase.cs" />
     <Compile Include="Stat\StatWorker_MeditationPointDailyGain.cs" />
     <Compile Include="Thing\BombardSupportMaker.cs" />
     <Compile Include="GlobalInteraction\BranchRelatedRecord\AcceptedBranchDemand.cs" />

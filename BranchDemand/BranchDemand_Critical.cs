@@ -5,9 +5,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchDemand_Critical : BranchDemand
 {
-    public BranchDemand_Critical() : base() { }
-    protected BranchDemand_Critical(BranchDemandDef def) : base(def) { }
-
     protected override Slate GenerateQuestSlate(Branch branch)
     {
         Slate slate = base.GenerateQuestSlate(branch);

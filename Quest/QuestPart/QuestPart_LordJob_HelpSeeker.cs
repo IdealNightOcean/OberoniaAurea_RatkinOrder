@@ -80,23 +80,18 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 
     private TaggedString GetTalkText(QuestScriptDef mercyQuest)
     {
-        TaggedString talkText;
         MercyQuestExtension mercyQuestExtension = mercyQuest.GetModExtension<MercyQuestExtension>();
         if (mercyQuestExtension is null)
         {
-            talkText = "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
+            return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
         }
         else
         {
-            if (mercyQuestExtension.fixedQuestDesc is not null)
+            if (!string.IsNullOrEmpty(mercyQuestExtension.fixedQuestDesc))
             {
-                talkText = mercyQuestExtension.fixedQuestDesc.Formatted(TextNamedArguments());
+                return mercyQuestExtension.fixedQuestDesc.Formatted(TextNamedArguments());
             }
-            else if (mercyQuestExtension.questDescMaker is null)
-            {
-                talkText = "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
-            }
-            else
+            if (mercyQuestExtension.questDescMaker is not null)
             {
                 GrammarRequest grammarRequest = new();
                 grammarRequest.Includes.Add(mercyQuestExtension.questDescMaker);
@@ -106,10 +101,10 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
                 {
                     grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("PARENTFACTION", ParentFaction));
                 }
-                talkText = GrammarResolver.Resolve("r_text", grammarRequest);
+                return GrammarResolver.Resolve("r_text", grammarRequest);
             }
+            return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
         }
-        return talkText;
     }
 
     private NamedArgument[] TextNamedArguments()

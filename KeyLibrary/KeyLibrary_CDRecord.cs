@@ -17,6 +17,8 @@ public static class KeyLibrary_CDRecord
     public const string NormalDemandPeriodic = "NormalDemandPeriodic"; // 普通需求周期检查
     public const string NormalDemandAdd = "NormalDemandAdd"; // 普通需求添加
 
+    public const string ContractAddCheck = "ContractAddCheck"; //分部合约检测
+
     public const string DemandFriendlyInform = "DemandFriendlyInform"; // 友好分部需求告知
 
     public const string BranchWorkState = "BranchWorkState"; // 分部状态描述更新

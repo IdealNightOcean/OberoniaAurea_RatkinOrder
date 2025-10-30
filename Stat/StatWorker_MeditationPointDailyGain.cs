@@ -1,39 +1,11 @@
 ﻿using RimWorld;
-using System.Runtime.CompilerServices;
 using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class StatWorker_MeditationPointDailyGain : StatWorker
+public class StatWorker_MeditationPointDailyGain : StatWorker_MeditationPointBase
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected static bool CanApplyOn(StatRequest req)
-    {
-        Pawn pawn = req.Pawn ?? (req.Thing as Pawn);
-        return pawn.CanBeKnight() && pawn.Faction.IsPlayerSafe() && ResidentKnightsManager.IsResidentKnight(pawn);
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    protected static bool CanApplyOn(Thing thing)
-    {
-        if (thing is Pawn pawn)
-        {
-            return pawn.CanBeKnight() && pawn.Faction.IsPlayerSafe() && ResidentKnightsManager.IsResidentKnight(pawn);
-        }
-        return false;
-    }
-
-    public override bool ShouldShowFor(StatRequest req)
-    {
-        return CanApplyOn(req) && base.ShouldShowFor(req);
-    }
-
-    public override bool IsDisabledFor(Thing thing)
-    {
-        return CanApplyOn(thing) && base.IsDisabledFor(thing);
-    }
-
     public override float GetValueUnfinalized(StatRequest req, bool applyPostProcess = true)
     {
         Pawn pawn = req.Pawn ?? (req.Thing as Pawn);
