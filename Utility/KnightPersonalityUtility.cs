@@ -1,18 +1,23 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public static class KnightPersonalityUtility
 {
-    private static readonly KnightPersonality[] personalityTypesArr = (KnightPersonality[])Enum.GetValues(typeof(KnightPersonality));
-    public static KnightPersonality GetRandomAvailablePersonality() => personalityTypesArr[Rand.Range(1, personalityTypesArr.Length)];
 
-    /// <summary>
-    /// KnightPersonality.None不计数
-    /// </summary>
-    public const int AvailablePersonalitiesCount = 5;
+    public static KnightPersonality GetRandomAvailablePersonality() => EnumArraryLibrary.KnightPersonalitiesArr[Rand.Range(1, EnumArraryLibrary.KnightPersonalitiesArr.Length)];
+    public static IEnumerable<KnightPersonality> GetContainedPersonalities(KnightPersonality personality)
+    {
+        KnightPersonality[] knightPersonalitiesArr = EnumArraryLibrary.KnightPersonalitiesArr;
+        for (int i = 1; i < knightPersonalitiesArr.Length; i++)
+        {
+            if ((personality & knightPersonalitiesArr[i]) != 0)
+            {
+                yield return knightPersonalitiesArr[i];
+            }
+        }
+    }
 
     /// <summary>
     /// 是否为相互共鸣个性
@@ -46,16 +51,5 @@ public static class KnightPersonalityUtility
             KnightPersonality.Justice => KnightPersonality.Compassion | KnightPersonality.Oath,
             _ => KnightPersonality.None,
         };
-    }
-
-    public static IEnumerable<KnightPersonality> GetContainedPersonalities(KnightPersonality personality)
-    {
-        for (int i = 1; i < personalityTypesArr.Length; i++)
-        {
-            if ((personality | personalityTypesArr[i]) != 0)
-            {
-                yield return personalityTypesArr[i];
-            }
-        }
     }
 }

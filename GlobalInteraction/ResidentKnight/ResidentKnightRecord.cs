@@ -63,7 +63,7 @@ public class ResidentKnightRecord : IExposable
         branch = knightRecord.Branch;
         this.genealAcademicDef = genealAcademicDef ?? OrderDefDataBase.GetRandomKnightAcademicOfPersonality(personality) ?? throw new ArgumentNullException(nameof(this.genealAcademicDef));
         residenceStartTick = Find.TickManager.TicksGame;
-        if (branch.RatkinOrder.ReformationManager.HasReformation(OARO_ModDefOf.OARO_ReformationPlaceholder))
+        if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             ResignationDaysLeft = 4 * 60;
         }

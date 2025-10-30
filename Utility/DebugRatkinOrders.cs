@@ -182,7 +182,7 @@ public static class DebugRatkinOrders
             foreach (BranchDemandDef demandDef in DefDatabase<BranchDemandDef>.AllDefs.Where(d => d.demandType == branchDemandType))
             {
                 string label = demandDef.label;
-                bool canAdd = branch.DemandHandler.CanAddDemand(demandDef.IsCriticalDemand, ignoreCD: true, replaceCur: true);
+                bool canAdd = branch.DemandHandler.CanAddDemand(demandDef.IsCritical, ignoreCD: true, replaceCur: true);
                 if (!canAdd)
                 {
                     label += " [NotNow]";
@@ -248,7 +248,7 @@ public static class DebugRatkinOrders
     {
         RatkinOrderOptions(delegate (RatkinOrder ratkinOrder)
         {
-            GlobalOrderInteractionUtility.ApplyResidentKnight(ratkinOrder: ratkinOrder,
+            GlobalInteractionUtility.ApplyResidentKnight(ratkinOrder: ratkinOrder,
                                                               map: OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
         });
     }
@@ -268,7 +268,7 @@ public static class DebugRatkinOrders
         {
             DebugMenuOption orderOption = new(label: scriptDef.defName,
                                               mode: DebugMenuOptionMode.Action,
-                                              method: () => GlobalOrderInteractionUtility.TryTriggerMercyQuest(scriptDef));
+                                              method: () => GlobalInteractionUtility.TryTriggerMercyQuest(scriptDef));
 
             questOptions.Add(orderOption);
         }

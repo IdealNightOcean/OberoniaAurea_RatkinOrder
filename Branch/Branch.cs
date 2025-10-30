@@ -43,8 +43,8 @@ public class Branch : IExposable, ILoadReferenceable
     private BranchType curType = BranchType.Normal;
     public BranchType CurType => curType;
 
-    protected int friendlyExpiredTick = -1;
-    public int FriendlyExpiredTick => friendlyExpiredTick;
+    protected int friendlyDaysLeft = -1;
+    public int FriendlyDaysLeft => friendlyDaysLeft;
 
     public bool HasSupportAuthority;
 
@@ -193,7 +193,7 @@ public class Branch : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref name, "name", string.Empty);
 
         Scribe_Values.Look(ref HasSupportAuthority, "HasSupportAuthority", defaultValue: false);
-        Scribe_Values.Look(ref friendlyExpiredTick, "friendlyExpiredTick", 0);
+        Scribe_Values.Look(ref friendlyDaysLeft, "friendlyDaysLeft", 0);
         Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
 
         Scribe_Values.Look(ref supply, "supply", 0f);
@@ -237,11 +237,6 @@ public class Branch : IExposable, ILoadReferenceable
             storesReserveHandler.TickHour(hourOfDay);
         }
 
-        if (friendlyExpiredTick > 0 && (friendlyExpiredTick -= 2500) <= 0)
-        {
-            SetFriendly(false);
-        }
-
         squad.TickHour(hourOfDay);
 
         if (!CooldownManager.IsInCooldown(KeyLibrary_CDRecord.BranchWorkState))
@@ -252,6 +247,11 @@ public class Branch : IExposable, ILoadReferenceable
 
     private void TickDay()
     {
+        if (friendlyDaysLeft > 0 && (friendlyDaysLeft--) <= 0)
+        {
+            SetFriendly(false);
+        }
+
         buildingHandler.TickDay();
         populationHandler.TickDay();
         demandHandler.TickDay();
@@ -268,24 +268,33 @@ public class Branch : IExposable, ILoadReferenceable
         else { curType &= ~type; }
     }
 
-    public void SetFriendly(bool friendly, int durationTick = 40 * 60000, bool showMessage = true)
+    public void SetFriendly(bool friendly, int durationDays = -1, bool showMessage = true)
     {
         if (friendly)
         {
-            if (friendlyExpiredTick > 0)
-            {
-                friendlyExpiredTick += durationTick;
-            }
-            else
+            if (friendlyDaysLeft <= 0)
             {
                 SetBranchType(BranchType.Friendly, true);
-                friendlyExpiredTick = Find.TickManager.TicksGame + durationTick;
+            }
+            if (durationDays < 0)
+            {
+                durationDays = BranchUtility.GetDefaultFriendlyDurationDays(this);
+            }
+
+            friendlyDaysLeft = durationDays > friendlyDaysLeft ? durationDays : friendlyDaysLeft;
+            if (showMessage)
+            {
+                Messages.Message("OARO_Mess_BranchBeFriendly".Translate(name, friendlyDaysLeft), baseSite, MessageTypeDefOf.PositiveEvent);
             }
         }
         else
         {
             SetBranchType(BranchType.Friendly, false);
-            friendlyExpiredTick = -1;
+            friendlyDaysLeft = -1;
+            if (showMessage)
+            {
+                Messages.Message("OARO_Mess_BranchBeNonFriendly".Translate(name), baseSite, MessageTypeDefOf.NegativeEvent);
+            }
         }
     }
 

@@ -13,27 +13,6 @@ public class AcceptedBranchDemandHandler : BranchRelatedRecordsHandler<AcceptedB
         Instance = this;
     }
 
-    public bool CanAcceptDemand(Branch branch, BranchDemand demand)
-    {
-        if (records.Count >= 2)
-        {
-            return false;
-        }
-
-        return BranchDemandUtility.CanAcceptDemand(branch, demand);
-    }
-
-    public void AcceptDemand(Branch branch, BranchDemand demand)
-    {
-        AcceptedBranchDemand acceptedDemand = new(branch, demand);
-        demand.OnAccepted(branch);
-
-        if (demand.IsOngoing)
-        {
-            records.Add(acceptedDemand);
-        }
-    }
-
     public void Notify_DemandQuestClean(Quest quest)
     {
         AcceptedBranchDemand toRmove = null;
@@ -42,7 +21,7 @@ public class AcceptedBranchDemandHandler : BranchRelatedRecordsHandler<AcceptedB
             if (quest == acceptedDemand.Demand.RelatedQuest)
             {
                 toRmove = acceptedDemand;
-                acceptedDemand.Branch.DemandHandler.Notify_DemandQuestClean(acceptedDemand.IsCritical);
+                acceptedDemand.Branch.DemandHandler.RemoveDemand(acceptedDemand.IsCritical);
                 if (quest?.State == QuestState.EndedSuccess)
                 {
                     GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchDemandCompleted, 1, addIfMiss: true);

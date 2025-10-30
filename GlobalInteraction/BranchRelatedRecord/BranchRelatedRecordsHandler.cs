@@ -20,6 +20,9 @@ public abstract class BranchRelatedRecordsHandler<T> : IExposable, IOnRatkinOrde
         }
     }
 
+    public void AddRecord(T record) => records.Add(record);
+    public bool RemoveRecord(T record) => records.Remove(record);
+
     public virtual void Notify_RatkinOrderRemoved(RatkinOrder order) => records.RemoveAll(r => r is null || r.Branch is null || r.Branch.RatkinOrder == order);
 
     public virtual void Notify_BranchDestroyed(Branch branch) => records.RemoveAll(r => r is null || r.Branch is null || r.Branch == branch);

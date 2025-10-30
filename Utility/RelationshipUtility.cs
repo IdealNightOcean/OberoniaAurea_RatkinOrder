@@ -1,7 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
-using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
@@ -12,10 +11,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class RelationshipUtility
 {
-    /// <summary>
-    /// 关系类型枚举数组
-    /// </summary>
-    public static readonly int RelationshipKindCount = Enum.GetValues(typeof(RelationshipKind)).Length;
+    public const int RelationshipKindCount = 5;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Color GetColor(this RelationshipKind relationship)
@@ -278,7 +274,7 @@ public static class RelationshipUtility
 
         sb.AppendLine();
         sb.AppendLine();
-        if (!ratkinOrder.EsteemHandler.LastRelationshipChangeReason.NullOrEmpty())
+        if (!string.IsNullOrEmpty(ratkinOrder.EsteemHandler.LastRelationshipChangeReason))
         {
             sb.AppendInNewLine("OARO_LastRelationshipChangeReason".Translate(ratkinOrder.EsteemHandler.LastRelationshipChangeReason));
             sb.AppendLine();

@@ -104,6 +104,10 @@ public static class BranchDemandUtility
             return false;
         }
 
+        if (AcceptedBranchDemandHandler.Instance.Records.Count >= RatkinOrderSettings.MaxConcurrentAcceptedDemand)
+        {
+            return false;
+        }
         return true;
 
         /*
@@ -128,10 +132,17 @@ public static class BranchDemandUtility
         */
     }
 
+    public static void AcceptDemand(Branch branch, bool isCritical)
+    {
+        if (branch.DemandHandler.TryAcceptedDemand(isCritical))
+        {
+            AcceptedBranchDemandHandler.Instance.AddRecord(new AcceptedBranchDemand(branch, isCritical));
+        }
+    }
 
     public static void FriendyBranchDemandInform(Branch branch, BranchDemandDef demandDef)
     {
-        bool showMessage = demandDef.IsCriticalDemand ? RatkinOrderSettings.CriticalDemandShowMess : RatkinOrderSettings.NoramlDemandShowMess;
+        bool showMessage = demandDef.IsCritical ? RatkinOrderSettings.CriticalDemandShowMess : RatkinOrderSettings.NoramlDemandShowMess;
         if (showMessage)
         {
             Messages.Message("OARO_Message_DemandFriendlyInform".Translate(branch.Name, demandDef.label), MessageTypeDefOf.PositiveEvent);

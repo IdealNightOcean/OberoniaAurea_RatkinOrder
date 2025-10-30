@@ -45,8 +45,6 @@ public static class OARO_ModDefOf
 
     public static TraitDef OARO_OrderKnight;
 
-    public static OrderReformationDef OARO_ReformationPlaceholder; //未实现Def自新占位
-
     static OARO_ModDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ModDefOf));

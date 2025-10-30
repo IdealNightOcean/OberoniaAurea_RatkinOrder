@@ -10,14 +10,15 @@ public class QuestNode_AddGeneralClique : QuestNode
 
     [MustTranslate]
     public SlateRef<string> cliqueName = string.Empty;
-    public SlateRef<float> initPotency;
+    public SlateRef<float?> initPotency;
+    public SlateRef<float?> initWillingness;
 
     [MustTranslate]
     public SlateRef<string> activeDesc = string.Empty;
     [MustTranslate]
     public SlateRef<string> inactiveDesc = string.Empty;
 
-    public SlateRef<float> initWillingness;
+
 
     public SlateRef<bool> isActivatable = true;
     public SlateRef<bool> isCommunicable;
@@ -38,7 +39,7 @@ public class QuestNode_AddGeneralClique : QuestNode
     {
         Slate slate = QuestGen.slate;
         string cliqueKey = GetCliqueKey();
-        if (cliqueKey.NullOrEmpty())
+        if (string.IsNullOrEmpty(cliqueKey))
         {
             return;
         }
@@ -49,8 +50,10 @@ public class QuestNode_AddGeneralClique : QuestNode
         }
 
         QuestClique questClique = GenerateClique(cliqueKey);
-
-        questPart_CliquesManager.TryAddClique(questClique, replaceCur.GetValue(slate), defaultActive.GetValue(slate));
+        if (questClique is not null)
+        {
+            questPart_CliquesManager.TryAddClique(questClique, replaceCur.GetValue(slate), defaultActive.GetValue(slate));
+        }
     }
 
     protected virtual string GetCliqueKey()
@@ -67,8 +70,8 @@ public class QuestNode_AddGeneralClique : QuestNode
             ActiveDesc = activeDesc.GetValue(slate),
             InactiveDesc = inactiveDesc.GetValue(slate),
 
-            Potency = initPotency.GetValue(slate),
-            Willingness = initWillingness.GetValue(slate),
+            Potency = initPotency.GetValue(slate) ?? 0f,
+            Willingness = initWillingness.GetValue(slate) ?? 0f,
 
             IsActivatable = isActivatable.GetValue(slate),
             IsCommunicable = isCommunicable.GetValue(slate),

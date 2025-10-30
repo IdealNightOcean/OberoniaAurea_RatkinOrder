@@ -90,7 +90,7 @@ public abstract class TagStrToValue<T> : IExposable where T : struct, IEquatable
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             tagStrToValue ??= [];
-            tagStrToValue.RemoveAll(kv => kv.Key.NullOrEmpty());
+            tagStrToValue.RemoveAll(kv => string.IsNullOrEmpty(kv.Key));
         }
     }
 }

@@ -23,7 +23,7 @@ public class HonorBranchDef : Def
         {
             if (iconTexture is null)
             {
-                if (iconPath.NullOrEmpty())
+                if (string.IsNullOrEmpty(iconPath))
                 {
                     return null;
                 }
@@ -43,7 +43,7 @@ public class HonorBranchDef : Def
         {
             if (expandingIconTexture is null)
             {
-                if (expandingIconPath.NullOrEmpty())
+                if (string.IsNullOrEmpty(expandingIconPath))
                 {
                     return null;
                 }

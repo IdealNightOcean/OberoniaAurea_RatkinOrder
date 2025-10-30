@@ -111,7 +111,7 @@ public class BranchMedalHandler : IExposable
     /// </summary>
     internal void PostBranchGenerated()
     {
-        BranchMedalType primaryMedal = BranchUtility.BranchMedalsArr[Rand.Range(1, BranchUtility.BranchMedalsArr.Length)];
+        BranchMedalType primaryMedal = BranchUtility.GetRandomAvailableBranchMedalType();
         AddMedal(primaryMedal, 1);
     }
 
@@ -136,7 +136,7 @@ public class BranchMedalHandler : IExposable
         {
             AdjustMedalHediffStage(stage, medalRecords[i].Type, isPrimary: i == 0);
         }
-        if (stage.extraTooltip.NullOrEmpty())
+        if (string.IsNullOrEmpty(stage.extraTooltip))
         {
             stage.extraTooltip = null;
         }

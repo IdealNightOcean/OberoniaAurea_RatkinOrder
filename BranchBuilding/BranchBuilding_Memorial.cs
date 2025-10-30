@@ -9,14 +9,15 @@ public class BranchBuilding_Memorial : BranchBuildingWithComps
         if (memorialExtension is not null)
         {
             BranchMedalHandler medalHandler = branch.MedalHandler;
+            BranchMedalRecord.BranchMedalType[] branchMedalsArr = EnumArraryLibrary.BranchMedalsArr;
             if (memorialExtension.requireAllTypesOfMedals)
             {
-                for (int i = 1; i < BranchUtility.BranchMedalsArr.Length; i++) // 从1开始，因为0是None
+                for (int i = 1; i < branchMedalsArr.Length; i++) // 从1开始，因为0是None
                 {
-                    short count = (short)(memorialExtension.medalCount - medalHandler.GetMedalCount(BranchUtility.BranchMedalsArr[i]));
+                    short count = (short)(memorialExtension.medalCount - medalHandler.GetMedalCount(branchMedalsArr[i]));
                     if (count > 0)
                     {
-                        medalHandler.AddMedal(BranchUtility.BranchMedalsArr[i], count);
+                        medalHandler.AddMedal(branchMedalsArr[i], count);
                     }
                 }
             }

@@ -21,6 +21,7 @@ public static class KeyLibrary_CDRecord
 
     public const string DemandFriendlyInform = "DemandFriendlyInform"; // 友好分部需求告知
 
+    public const string BranchFriendly = "BranchFriendly"; // 分部友好状态
     public const string BranchWorkState = "BranchWorkState"; // 分部状态描述更新
 
     public const string KnightGroupProactiveVisit = "KnightGroupProactiveVisit"; //骑士小组拜访

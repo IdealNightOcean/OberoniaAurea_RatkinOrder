@@ -47,31 +47,26 @@ public class QuestClique : IExposable
     public QuestClique() { }
     public QuestClique(string key) { this.key = key; }
 
-    public void InitForBranch(Branch branch, bool initWithBranchPotency = true)
+    public void InitForBranch(Branch branch)
     {
         relatedBranch = branch;
 
-        if (key.NullOrEmpty())
+        if (string.IsNullOrEmpty(key))
         {
             key = GetBranchCliqueKey(branch);
         }
-        if (Name.NullOrEmpty())
+        if (string.IsNullOrEmpty(Name))
         {
             Name = branch.Name;
         }
 
-        if (ActiveDesc.NullOrEmpty())
+        if (string.IsNullOrEmpty(ActiveDesc))
         {
             ActiveDesc = "OARO_QuestClique_DefaultBranchActive".Translate(relatedBranch.Name);
         }
-        if (InactiveDesc.NullOrEmpty())
+        if (string.IsNullOrEmpty(InactiveDesc))
         {
             InactiveDesc = "OARO_QuestClique_DefaultBranchInactive".Translate(relatedBranch.Name);
-        }
-
-        if (initWithBranchPotency)
-        {
-            Potency = BranchPotencyToCliquePotency(GetBranchPotency(branch));
         }
     }
 
@@ -108,7 +103,7 @@ public class QuestClique : IExposable
         {
             branchPotency *= 1.25f;
         }
-        if (branch.RatkinOrder.ReformationManager.HasReformation(null))
+        if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             branchPotency *= 1.1f;
         }
@@ -124,12 +119,5 @@ public class QuestClique : IExposable
         return Mathf.Clamp(branchPotency, 0f, 0.5f);
     }
 
-    public static string GetBranchCliqueKey(Branch branch)
-    {
-        if (branch is null)
-        {
-            return null;
-        }
-        return "BranchClique_" + branch.GetUniqueLoadID();
-    }
+    public static string GetBranchCliqueKey(Branch branch) => branch is null ? string.Empty : "BranchClique_" + branch.GetUniqueLoadID();
 }

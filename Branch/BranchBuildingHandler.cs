@@ -95,6 +95,17 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             }
         }
 
+        if (TickHourHandlers is not null)
+        {
+            for (int i = 0; i < TickHourHandlers.Count; i++)
+            {
+                TickHourHandlers[i].TickHour(branch);
+            }
+        }
+    }
+
+    public void TickDay()
+    {
         if (CanUpgradeBuilding(specialBuilding))
         {
             specialBuilding.InitUpgraded();
@@ -110,16 +121,6 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             }
         }
 
-        if (TickHourHandlers is not null)
-        {
-            for (int i = 0; i < TickHourHandlers.Count; i++)
-            {
-                TickHourHandlers[i].TickHour(branch);
-            }
-        }
-    }
-    public void TickDay()
-    {
         if (TickDayHandlers is not null)
         {
             for (int i = 0; i < TickDayHandlers.Count; i++)
@@ -384,10 +385,6 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         for (int i = 0; i < buildings.Count; i++)
         {
             ActiveBuilding(buildings[i], isSpecial: false);
-            if (buildings[i].HasUpgraded)
-            {
-                UpgradeBuilding(buildings[i]);
-            }
         }
     }
 
@@ -395,6 +392,11 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     {
         branch.EffectTags.IncrementTagsValue(building.Def.effectFlags, addIfMiss: true);
         branch.TransformerHandler.AddStatModifiers(building.Def.branchStatModifies);
+        if (building.HasUpgraded)
+        {
+            UpgradeBuilding(building);
+        }
+
         if (isSpecial && building.Def.IsHonorSymbol)
         {
             branch.SetBranchType(Branch.BranchType.Honor, active: true);

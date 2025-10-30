@@ -101,7 +101,7 @@ internal sealed class QuestPart_TownConstructionWatcher : QuestPart
                 Branch branch = Branch.GenerateBranchFor(Town.Branch.RatkinOrder, settlement, addToManager: true);
                 if (branch is not null)
                 {
-                    branch.SetFriendly(friendly: true, durationTick: 40 * 60000, showMessage: false);
+                    branch.SetFriendly(friendly: true, showMessage: false);
 
                     if (Town.ConstructionScale >= 4)
                     {

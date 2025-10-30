@@ -85,16 +85,16 @@ public class QuestPart_OrderEsteemChange : QuestPart, IOnRatkinOrderRemoved
     public string Reason;
     public override void Notify_QuestSignalReceived(Signal signal)
     {
-        if (signal.tag == InSignalTrigger)
+        if (RatkinOrder is not null && signal.tag == InSignalTrigger)
         {
-            RatkinOrder?.EsteemHandler.AdjustEsteem(Change, byPlayer: true, reason: Reason);
+            RatkinOrder.EsteemHandler.AdjustEsteem(Change, byPlayer: true, reason: Reason);
         }
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        InSignalTrigger = string.Empty;
+        InSignalTrigger = null;
         RatkinOrder = null;
         Reason = null;
         Change = 0;
@@ -118,5 +118,4 @@ public class QuestPart_OrderEsteemChange : QuestPart, IOnRatkinOrderRemoved
             RatkinOrder = null;
         }
     }
-
 }

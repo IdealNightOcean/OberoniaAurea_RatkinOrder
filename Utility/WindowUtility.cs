@@ -49,7 +49,7 @@ public static class OARO_WindowUtility
             GUI.DrawTexture(butRect, baseTex);
         }
 
-        if (!tooltip.NullOrEmpty())
+        if (!string.IsNullOrEmpty(tooltip))
         {
             TooltipHandler.TipRegion(butRect, tooltip);
         }

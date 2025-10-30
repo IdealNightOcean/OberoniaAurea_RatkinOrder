@@ -48,7 +48,7 @@ public class QuestNode_OrderCrewAidDelay : QuestNode_Delay
             QuestGenUtility.RunInnerNode(node, questPart_OrderCrewAidDelay);
         }
 
-        if (!outSignalComplete.GetValue(slate).NullOrEmpty())
+        if (!string.IsNullOrEmpty(outSignalComplete.GetValue(slate)))
         {
             questPart_OrderCrewAidDelay.outSignalsCompleted.Add(QuestGenUtility.HardcodedSignalWithQuestID(outSignalComplete.GetValue(slate)));
         }

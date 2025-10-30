@@ -105,7 +105,7 @@ public class TagStrToBoolCountable : IExposable
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             tagStrCount ??= [];
-            tagStrCount.RemoveAll(kv => kv.Key.NullOrEmpty() || kv.Value == 0);
+            tagStrCount.RemoveAll(kv => string.IsNullOrEmpty(kv.Key) || kv.Value == 0);
         }
     }
 }

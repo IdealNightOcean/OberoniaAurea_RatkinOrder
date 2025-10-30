@@ -298,9 +298,9 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
             if (index != aroundGroupTipIndex)
             {
                 aroundGroupTipIndex = index;
-                GlobalOrderInteractionUtility.InvitationAcceptanceChance(group, resultOnly: false, out aroundGroupTipCache);
+                GlobalInteractionUtility.InvitationAcceptanceChance(group, resultOnly: false, out aroundGroupTipCache);
             }
-            if (!aroundGroupTipCache.NullOrEmpty())
+            if (!string.IsNullOrEmpty(aroundGroupTipCache))
             {
                 TooltipHandler.TipRegion(reusedRect, () => aroundGroupTipCache, 21345447);
             }
@@ -314,7 +314,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
             downTex: aroundKnightGroupButton_Down))
         {
             Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-            GlobalOrderInteractionUtility.InviteAroundKnightGroup(group, map);
+            GlobalInteractionUtility.InviteAroundKnightGroup(group, map);
             return true;
         }
         return false;
@@ -328,7 +328,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         IReadOnlyList<AroundKnightGroup> tempGroups = AroundKnightGroupsManager.AroundKnightGroups;
         for (int i = 0; i < tempGroups.Count; i++)
         {
-            float successRate = GlobalOrderInteractionUtility.InvitationAcceptanceChance(tempGroups[i], resultOnly: true, out _);
+            float successRate = GlobalInteractionUtility.InvitationAcceptanceChance(tempGroups[i], resultOnly: true, out _);
             aroundKnightGroups.Add((tempGroups[i], successRate));
         }
     }

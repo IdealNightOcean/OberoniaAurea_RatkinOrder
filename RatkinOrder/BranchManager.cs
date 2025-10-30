@@ -262,8 +262,7 @@ public class BranchManager : IExposable, ITickDay
             {
                 if (Rand.Chance(BranchDemandUtility.GetCriticalDemandTriggerChance(branch, resultOnly: true, out _)))
                 {
-                    DemandType demandType = Rand.Bool ? DemandType.Important : DemandType.Core;
-                    BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(branch, demandType);
+                    BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(branch, DemandType.Critical);
                     if (demandDef is not null)
                     {
                         branch.DemandHandler.AddNewDemand(demandDef);

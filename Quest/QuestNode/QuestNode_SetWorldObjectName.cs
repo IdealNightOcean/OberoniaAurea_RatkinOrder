@@ -28,7 +28,7 @@ public class QuestNode_SetWorldObjectName : QuestNode
         }
 
         string fixedName = this.fixedName.GetValue(slate);
-        if (!fixedName.NullOrEmpty())
+        if (!string.IsNullOrEmpty(fixedName))
         {
             nameableWorldObject.Name = fixedName;
             return;

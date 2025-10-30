@@ -39,5 +39,4 @@ public static class KeyLibrary_SlateStoreAs
     public const string VisitingKnightsDelay = "visitingKnightsDelay";
     public const string VisitingKnightsDuration = "visitingKnightsDuration";
     public const string VisitingKnightsCount = "visitingKnightsCount";
-
 }

@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
+using System;
 using Verse;
 using Verse.Grammar;
 
@@ -10,11 +11,11 @@ public class BranchContract : IExposable
 {
     public enum ContractState : byte
     {
+        Invalid,
         NotAccepted,
         Cooling,
         Ongoing,
-        Finished,
-        Invalid
+        Finished
     }
 
     private BranchContractDef def;
@@ -37,9 +38,9 @@ public class BranchContract : IExposable
         {
             return curState switch
             {
+                ContractState.Invalid or ContractState.Finished => true,
                 ContractState.Ongoing => relatedQuest?.State != QuestState.Ongoing,
                 ContractState.NotAccepted or ContractState.Cooling => TicksToExpire <= 0,
-                ContractState.Finished or ContractState.Invalid => true,
                 _ => true,
             };
         }
@@ -47,11 +48,7 @@ public class BranchContract : IExposable
 
     public static BranchContract MakeBranchContract(BranchContractDef def)
     {
-        return new BranchContract
-        {
-            def = def,
-            curState = ContractState.NotAccepted
-        };
+        return new BranchContract { def = def };
     }
 
     public void ExposeData()
@@ -59,7 +56,7 @@ public class BranchContract : IExposable
         Scribe_Defs.Look(ref def, "def");
         Scribe_Values.Look(ref requestCount, "requestCount", 0);
         Scribe_Values.Look(ref requestReason, "requestReason", string.Empty);
-        Scribe_Values.Look(ref curState, "curState", ContractState.NotAccepted);
+        Scribe_Values.Look(ref curState, "curState", ContractState.Invalid);
         Scribe_Values.Look(ref expirationTick, "expirationTick", -1);
         Scribe_References.Look(ref relatedQuest, "relatedQuest");
     }
@@ -67,9 +64,18 @@ public class BranchContract : IExposable
     public void PostInit(Branch branch)
     {
         requestCount = def.requestCountRange.RandomInRange;
+
         relatedQuest = null;
         expirationTick = Find.TickManager.TicksGame + def.DurationTicks;
-        requestReason = GetContractReason(branch);
+        try
+        {
+            requestReason = GetContractReason(branch);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"Exception occurred while getting contract reason: {ex.Message}");
+            requestReason = "ERROR".Colorize(ColorLibrary.RedReadable);
+        }
         curState = ContractState.NotAccepted;
     }
 

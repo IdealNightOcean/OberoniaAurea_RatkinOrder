@@ -53,7 +53,7 @@ public class OrderHallHandler : IExposable
         }
     }
 
-    [Unsaved] private static readonly Dictionary<KnightPersonality, HashSet<ThingDef>> knightJoyBuildingDefsByPersonality = new(KnightPersonalityUtility.AvailablePersonalitiesCount);
+    [Unsaved] private static readonly Dictionary<KnightPersonality, HashSet<ThingDef>> knightJoyBuildingDefsByPersonality = new(EnumArraryLibrary.AvailablePersonalitiesCount);
     public static IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightJoyBuildingDefsByPersonality
     {
         get

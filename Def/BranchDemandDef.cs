@@ -21,8 +21,13 @@ public class BranchDemandDef : Def
     public QuestScriptDef relatedQuestDef;
     public float baseSelectWeight = 100f;
 
+    [MustTranslate]
+    public string targetDesc;
+    [MustTranslate]
+    public string rewardDesc;
+
     public int DurationTicks => (int)(durationDays * 60000f);
-    public bool IsCriticalDemand => demandType == DemandType.Important || demandType == DemandType.Core;
+    public bool IsCritical => demandType == DemandType.Critical;
 
     public override IEnumerable<string> ConfigErrors()
     {

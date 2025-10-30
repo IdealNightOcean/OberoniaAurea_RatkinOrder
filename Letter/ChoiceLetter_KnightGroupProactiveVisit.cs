@@ -44,7 +44,7 @@ public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
         if (map is null || !AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
         {
             AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
-            GlobalOrderInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: true);
+            GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: true);
         }
     }
 

@@ -185,7 +185,10 @@ public class BranchFacilityHandler : IExposable
 
         facilities[facilityDef] = targetLevel;
         facilityLevelDirty = true;
-        IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
+        if (targetLevel == BranchFacilityLevel.Excellent)
+        {
+            IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
+        }
 
         //需要在设施等级改变后再次重新获取 factor == 0f 的BranchStat
         if (statNeedRecache.Count > 0)
@@ -247,12 +250,17 @@ public class BranchFacilityHandler : IExposable
             Log.Error($"{branch} has null or None facilities after loading, Removed.");
         }
 
-        foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> item in facilities)
+        int excellentFacilityCount = 0;
+        foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> kv in facilities)
         {
-            ActiveStage(item.Key, item.Value);
+            ActiveStage(kv.Key, kv.Value);
+            if (kv.Value == BranchFacilityLevel.Excellent)
+            {
+                excellentFacilityCount++;
+            }
         }
 
-        IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
+        IsFacilityFullyCompleted = facilities.Count == excellentFacilityCount;
     }
 
     internal void PostBranchGenerated()

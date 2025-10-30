@@ -106,6 +106,8 @@ public class BranchPopulationHandler : IExposable, ITickDay
                 {
                     contracts.RemoveAt(i);
                 }
+
+                GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchContractCompleted, 1f, addIfMiss: true);
                 break;
             }
         }

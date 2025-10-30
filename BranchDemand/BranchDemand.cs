@@ -13,30 +13,27 @@ public class BranchDemand : IExposable
         Normal,
         Urgency,
         Supplementary,
-        Important,
-        Core
+        Critical,
     }
 
     private enum DemandState : byte
     {
+        Invalid,
         NotAccepted,
         Ongoing,
-        Finished,
-        Invalid,
+        Finished
     }
 
     private BranchDemandDef def;
     private DemandState curState;
     private Quest relatedQuest;
+    private int expirationTick = -1;
 
     public BranchDemandDef Def => def;
     public bool HasAccepted => curState != DemandState.NotAccepted;
     public bool IsOngoing => curState == DemandState.Ongoing;
     public DemandType DemandTypeValue => def.demandType;
     public Quest RelatedQuest => relatedQuest;
-
-    private int expirationTick = -1;
-
     public int TicksToExpire => expirationTick - Find.TickManager.TicksGame;
 
     public bool ShouldRemove
@@ -61,17 +58,15 @@ public class BranchDemand : IExposable
         return demand;
     }
 
-    public void ExposeData()
+    public virtual void ExposeData()
     {
         Scribe_Defs.Look(ref def, "def");
-        Scribe_Values.Look(ref curState, "curState", DemandState.NotAccepted);
-
+        Scribe_Values.Look(ref curState, "curState", DemandState.Invalid);
         Scribe_References.Look(ref relatedQuest, "relatedQuest");
-
         Scribe_Values.Look(ref expirationTick, "expirationTick", -1);
     }
 
-    public virtual void PostAddToBranch(Branch branch)
+    public virtual void PostInit(Branch branch)
     {
         expirationTick = Find.TickManager.TicksGame + def.DurationTicks;
         curState = DemandState.NotAccepted;

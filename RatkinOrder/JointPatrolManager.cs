@@ -30,7 +30,6 @@ public class JointPatrolManager : IExposable
         Accident,
         Disaster
     }
-    public static readonly PatrolEndType[] PatrolEndTypeArr = (PatrolEndType[])Enum.GetValues(typeof(PatrolEndType));
 
     public class JointBranchRecord : IExposable
     {
@@ -167,14 +166,15 @@ public class JointPatrolManager : IExposable
     public JointPatrolManager(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        patrolEndChances = new List<(PatrolEndType, float)>(PatrolEndTypeArr.Length)
+        PatrolEndType[] patrolEndTypeArr = EnumArraryLibrary.PatrolEndTypeArr;
+        patrolEndChances = new List<(PatrolEndType, float)>(patrolEndTypeArr.Length)
         {
             (PatrolEndType.Nothing, 1f)
         };
 
-        for (int i = 1; i < PatrolEndTypeArr.Length; i++)
+        for (int i = 1; i < patrolEndTypeArr.Length; i++)
         {
-            patrolEndChances.Add((PatrolEndTypeArr[i], 0f));
+            patrolEndChances.Add((patrolEndTypeArr[i], 0f));
         }
     }
 
@@ -501,9 +501,10 @@ public class JointPatrolManager : IExposable
                 return;
             default:
                 patrolEndChances.Add((PatrolEndType.Nothing, 1f));
-                for (int i = 1; i < PatrolEndTypeArr.Length; i++)
+                PatrolEndType[] patrolEndTypeArr = EnumArraryLibrary.PatrolEndTypeArr;
+                for (int i = 1; i < patrolEndTypeArr.Length; i++)
                 {
-                    patrolEndChances.Add((PatrolEndTypeArr[i], 0f));
+                    patrolEndChances.Add((patrolEndTypeArr[i], 0f));
                 }
                 return;
         }

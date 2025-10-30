@@ -14,7 +14,7 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
             if (memorialExtension.requireAllTypesOfMedals)
             {
                 IReadOnlyList<BranchMedalRecord> medalRecords = constructParam.Branch.MedalHandler.MedalRecords;
-                if (medalRecords.Count < BranchUtility.BranchMedalsArr.Length - 1) // -1是因为有None这个Type
+                if (medalRecords.Count < EnumArraryLibrary.BranchMedalsArr.Length - 1) // -1是因为有None这个Type
                 {
                     return "OARO_Insufficient_SquadMedal".Translate();
                 }

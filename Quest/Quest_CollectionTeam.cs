@@ -585,7 +585,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
     protected virtual TaggedString GetTalkNodeText(Pawn talker, Pawn talkWith)
     {
-        if (TalkText.NullOrEmpty())
+        if (string.IsNullOrEmpty(TalkText))
         {
             return "OARO_CollectionTeam_DefaultTalkText".Translate(talker.Named("TALKER"), talkWith.Named("TALKWITH")) + "\n\n" + RequestThingsSummary();
         }

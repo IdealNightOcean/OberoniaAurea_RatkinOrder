@@ -5,54 +5,54 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestNode_SetBranchToFriendly : QuestNode
+public class QuestNode_GiveBranchMedal : QuestNode
 {
     public SlateRef<string> inSignal;
 
     public SlateRef<Branch> branch;
-    public SlateRef<int> durationDays = Reward_FriendlyBranch.DefaultFriendlyDays;
-    public SlateRef<bool> showMessage = true;
+    public SlateRef<BranchMedalRecord.BranchMedalType?> potentialTypes;
+    public SlateRef<short> count;
 
     public SlateRef<bool> isReward;
     public SlateRef<bool> isSingleReward;
 
     protected override bool TestRunInt(Slate slate)
     {
-        return true;
+        return potentialTypes.GetValue(slate).HasValue;
     }
 
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
-        if (durationDays.GetValue(slate) == 0)
+        if (count.GetValue(slate) <= 0)
         {
             return;
         }
-
-        QuestPart_SetBranchToFriendly questPart_SetBranchToFriendly = new()
+        QuestPart_GiveBranchMedal questPart_GiveBranchMedal = new()
         {
             InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
             Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
-            DurationDays = durationDays.GetValue(slate),
-            ShowMessage = showMessage.GetValue(slate),
+            Count = count.GetValue(slate),
+            PotentialTypes = potentialTypes.GetValue(slate).GetValueOrDefault(defaultValue: BranchMedalRecord.BranchMedalType.None),
         };
 
-        QuestGen.quest.AddPart(questPart_SetBranchToFriendly);
+        QuestGen.quest.AddPart(questPart_GiveBranchMedal);
 
         if (isReward.GetValue(slate))
         {
             QuestPart_Choice questPart_Choice;
-            Reward_FriendlyBranch reward = new()
+            Reward_BranchMedals reward = new()
             {
-                Branch = questPart_SetBranchToFriendly.Branch,
-                DurationDays = questPart_SetBranchToFriendly.DurationDays
+                Branch = questPart_GiveBranchMedal.Branch,
+                PotentialTypes = questPart_GiveBranchMedal.PotentialTypes,
+                Amount = questPart_GiveBranchMedal.Count
             };
 
             if (isSingleReward.GetValue(slate))
             {
                 questPart_Choice = new QuestPart_Choice()
                 {
-                    inSignalChoiceUsed = questPart_SetBranchToFriendly.InSignalTrigger,
+                    inSignalChoiceUsed = questPart_GiveBranchMedal.InSignalTrigger,
                 };
 
                 questPart_Choice.choices.Add(new QuestPart_Choice.Choice() { rewards = [reward] });
@@ -73,27 +73,21 @@ public class QuestNode_SetBranchToFriendly : QuestNode
     }
 }
 
-public class QuestPart_SetBranchToFriendly : QuestPart, IOnBranchDestroyed
+
+public class QuestPart_GiveBranchMedal : QuestPart
 {
     public string InSignalTrigger;
     public Branch Branch;
-    public int DurationDays = Reward_FriendlyBranch.DefaultFriendlyDays;
-    public bool ShowMessage = true;
-    public override void Notify_QuestSignalReceived(Signal signal)
-    {
-        if (signal.tag == InSignalTrigger)
-        {
-            Branch?.SetFriendly(friendly: true, durationTick: DurationDays * 60000, showMessage: ShowMessage);
-        }
-    }
+    public BranchMedalRecord.BranchMedalType PotentialTypes;
+    public short Count;
 
     public override void Cleanup()
     {
         base.Cleanup();
-        InSignalTrigger = string.Empty;
+        InSignalTrigger = null;
         Branch = null;
-        DurationDays = 0;
-        ShowMessage = true;
+        PotentialTypes = BranchMedalRecord.BranchMedalType.None;
+        Count = 0;
     }
 
     public override void ExposeData()
@@ -101,22 +95,19 @@ public class QuestPart_SetBranchToFriendly : QuestPart, IOnBranchDestroyed
         base.ExposeData();
         Scribe_Values.Look(ref InSignalTrigger, "InSignalTrigger");
         Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Values.Look(ref DurationDays, "DurationDays", Reward_FriendlyBranch.DefaultFriendlyDays);
-        Scribe_Values.Look(ref ShowMessage, "ShowMessage", defaultValue: true);
+        Scribe_Values.Look(ref PotentialTypes, "PotentialTypes", BranchMedalRecord.BranchMedalType.None);
+        Scribe_Values.Look(ref Count, "Count", (short)0);
     }
 
-    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
+    public override void Notify_QuestSignalReceived(Signal signal)
     {
-        if (Branch?.RatkinOrder == ratkinOrder)
+        if (Count > 0 && Branch is not null && signal.tag == InSignalTrigger)
         {
-            Branch = null;
-        }
-    }
-    public void Notify_BranchDestroyed(Branch branch)
-    {
-        if (Branch == branch)
-        {
-            Branch = null;
+            BranchMedalRecord.BranchMedalType medalType = BranchUtility.GetContainedBranchMedals(PotentialTypes).RandomElementWithFallback(BranchMedalRecord.BranchMedalType.None);
+            if (medalType != BranchMedalRecord.BranchMedalType.None)
+            {
+                Branch.MedalHandler.AddMedal(medalType, Count);
+            }
         }
     }
 }

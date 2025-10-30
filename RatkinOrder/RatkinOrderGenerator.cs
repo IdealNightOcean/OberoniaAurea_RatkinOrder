@@ -135,7 +135,7 @@ public static class RatkinOrderGenerator
 
     public static string GenerateRatkinOrderName(RatkinOrderDef def)
     {
-        if (!def.fixedName.NullOrEmpty())
+        if (!string.IsNullOrEmpty(def.fixedName))
         {
             return def.fixedName;
         }

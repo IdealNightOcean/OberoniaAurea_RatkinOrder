@@ -31,7 +31,7 @@ public class StatPart_MeditationFactor : StatPart
         };
 
         Branch branch = record.Branch;
-        if (branch.RatkinOrder.ReformationManager.HasReformation(OARO_ModDefOf.OARO_ReformationPlaceholder))
+        if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             val += 0.25f;
         }
@@ -94,9 +94,9 @@ public class StatPart_MeditationFactor : StatPart
         }
 
         Branch branch = record.Branch;
-        if (branch.RatkinOrder.ReformationManager.HasReformation(OARO_ModDefOf.OARO_ReformationPlaceholder))
+        if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
-            sb.AppendLine("OARO_ChangeOffset_Reformation".Translate(OARO_ModDefOf.OARO_ReformationPlaceholder.label, 0.25f.ToStringPercentSigned("0.##")));
+            sb.AppendLine("OARO_ChangeOffset_Reformation".Translate(OrderReformationDefOf.OARO_ReformationPlaceholder.label, 0.25f.ToStringPercentSigned("0.##")));
         }
 
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))

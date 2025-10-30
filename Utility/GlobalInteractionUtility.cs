@@ -10,7 +10,7 @@ using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class GlobalOrderInteractionUtility
+public static class GlobalInteractionUtility
 {
     /// <summary>
     /// 能否招募骑士
@@ -262,7 +262,7 @@ public static class GlobalOrderInteractionUtility
             ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");
         }
 
-        if (ratkinOrder.ReformationManager.HasReformation(null))
+        if (ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             curChance += 0.2f;
             if (!resultOnly)

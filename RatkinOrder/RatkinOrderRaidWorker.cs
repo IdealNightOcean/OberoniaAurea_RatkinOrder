@@ -133,7 +133,7 @@ public class RatkinOrderRaidWorker
                 text += "\n\n";
                 text += "EnemyRaidLeaderPresent".Translate(pawn.Faction.def.pawnsPlural, pawn.LabelShort, pawn.Named("LEADER")).Resolve();
             }
-            if (parms.raidAgeRestriction != null && !parms.raidAgeRestriction.arrivalTextExtra.NullOrEmpty())
+            if (parms.raidAgeRestriction != null && !string.IsNullOrEmpty(parms.raidAgeRestriction.arrivalTextExtra))
             {
                 text += "\n\n";
                 text += parms.raidAgeRestriction.arrivalTextExtra.Formatted(parms.faction.def.pawnsPlural.Named("PAWNSPLURAL")).Resolve();

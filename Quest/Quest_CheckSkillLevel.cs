@@ -76,12 +76,12 @@ public class QuestPart_CheckSkillLevel : QuestPart
             {
                 if (Pawn.skills is null || Pawn.skills.GetSkill(Skill).GetLevel() < MinLevel)
                 {
-                    if (!OutSignalFail.NullOrEmpty())
+                    if (!string.IsNullOrEmpty(OutSignalFail))
                     {
                         Find.SignalManager.SendSignal(new Signal(OutSignalFail));
                     }
                 }
-                else if (!OutSignalSuccess.NullOrEmpty())
+                else if (!string.IsNullOrEmpty(OutSignalSuccess))
                 {
                     Find.SignalManager.SendSignal(new Signal(OutSignalSuccess));
                 }

@@ -33,7 +33,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_BranchPopulation".Translate(Def.floorPopulation);
         }
-        if (!Def.cdRecordKey.NullOrEmpty())
+        if (!string.IsNullOrEmpty(Def.cdRecordKey))
         {
             int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.cdRecordKey);
             if (cooldownTicksLeft > 0)
@@ -58,7 +58,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
     {
         try
         {
-            if (Def.cdDays > 0 && !Def.cdRecordKey.NullOrEmpty())
+            if (Def.cdDays > 0 && !string.IsNullOrEmpty(Def.cdRecordKey))
             {
                 branch.CooldownManager.RegisterRecord(Def.cdRecordKey, cdTicks: Def.cdDays * 60000);
             }

@@ -13,7 +13,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchUtility
 {
-    public static readonly BranchMedalRecord.BranchMedalType[] BranchMedalsArr = (BranchMedalRecord.BranchMedalType[])Enum.GetValues(typeof(BranchMedalRecord.BranchMedalType));
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInAffectedRange(this Branch branch, PlanetTile tile)
@@ -280,6 +279,29 @@ public static class BranchUtility
         foreach (IOnBranchDestroyed relatedPart in ratkinOrderRelateds)
         {
             relatedPart.Notify_BranchDestroyed(branch);
+        }
+    }
+
+    /// <summary>
+    /// 友好分部默认持续天数
+    /// </summary>
+    public static int GetDefaultFriendlyDurationDays(Branch branch)
+    {
+        int durationDays = 40;
+        durationDays += branch.RatkinOrder.Esteem * 2;
+        return durationDays;
+    }
+
+    public static BranchMedalRecord.BranchMedalType GetRandomAvailableBranchMedalType() => EnumArraryLibrary.BranchMedalsArr[Rand.Range(1, EnumArraryLibrary.BranchMedalsArr.Length)];
+    public static IEnumerable<BranchMedalRecord.BranchMedalType> GetContainedBranchMedals(BranchMedalRecord.BranchMedalType medalType)
+    {
+        BranchMedalRecord.BranchMedalType[] branchMedalsArr = EnumArraryLibrary.BranchMedalsArr;
+        for (int i = 1; i < branchMedalsArr.Length; i++)
+        {
+            if ((medalType & branchMedalsArr[i]) != 0)
+            {
+                yield return branchMedalsArr[i];
+            }
         }
     }
 }

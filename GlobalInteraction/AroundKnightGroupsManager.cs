@@ -69,10 +69,10 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
                 if (listing_Rect.ButtonText("Invite", widthPct: 0.4f))
                 {
                     Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-                    AcceptanceReport acceptanceReport = GlobalOrderInteractionUtility.CanInviteAroundKnightGroup(knightGroup, map, resultOnly: false);
+                    AcceptanceReport acceptanceReport = GlobalInteractionUtility.CanInviteAroundKnightGroup(knightGroup, map, resultOnly: false);
                     if (acceptanceReport)
                     {
-                        GlobalOrderInteractionUtility.InviteAroundKnightGroup(knightGroup, map);
+                        GlobalInteractionUtility.InviteAroundKnightGroup(knightGroup, map);
                     }
                     else
                     {
@@ -87,7 +87,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
                     if (map is null || !TriggerVisitQuest(knightGroup, map))
                     {
                         RemoveKnightGroup(knightGroup);
-                        GlobalOrderInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
+                        GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
                     }
                     break;
                 }

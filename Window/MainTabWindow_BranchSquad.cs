@@ -1250,8 +1250,8 @@ public class BranchInfoCacheEntry : BranchSummaryCacheEntry
     {
         if (branch.IsBranchOfType(BranchType.Friendly))
         {
-            FriendlyProcess = Mathf.Clamp01(branch.FriendlyExpiredTick / 40f * 60000f);
-            FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyExpiredTick, Find.WorldGrid.LongLatOf(map.Tile));
+            FriendlyProcess = Mathf.Clamp01(branch.FriendlyDaysLeft / (float)BranchUtility.GetDefaultFriendlyDurationDays(branch));
+            FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyDaysLeft, Find.WorldGrid.LongLatOf(map.Tile));
         }
         HonorExpandIcon = branch.HonorDef?.ExpandingIconTexture;
 

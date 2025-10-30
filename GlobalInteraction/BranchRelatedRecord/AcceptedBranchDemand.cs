@@ -8,9 +8,9 @@ public class AcceptedBranchDemand : BranchRelatedRecord
     public BranchDemand Demand => IsCritical ? Branch.DemandHandler.CriticalDemand : Branch.DemandHandler.NormalDemand;
 
     private AcceptedBranchDemand() : base() { }
-    public AcceptedBranchDemand(Branch branch, BranchDemand demand) : base(branch)
+    public AcceptedBranchDemand(Branch branch, bool isCritical) : base(branch)
     {
-        IsCritical = demand.Def.IsCriticalDemand;
+        IsCritical = isCritical;
     }
 
     public override void ExposeData()
