@@ -97,6 +97,22 @@ public static class BranchDemandUtility
         return chance;
     }
 
+    public static (bool, BranchDemandDef) TryAddRandomDemandToBranch(Branch branch, DemandType demandType, bool ignoreCD = false, bool replaceCur = false)
+    {
+        if (branch is null || !branch.DemandHandler.CanAddDemand(isCriticalDemand: demandType == DemandType.Critical, ignoreCD, replaceCur))
+        {
+            return (false, null);
+        }
+
+        BranchDemandDef demandDef = GetRandomBranchDemandOfType(branch, demandType);
+        if (demandDef is null)
+        {
+            return (false, null);
+        }
+        branch.DemandHandler.AddNewDemand(demandDef);
+        return (true, demandDef);
+    }
+
     public static bool CanAcceptDemand(Branch branch, BranchDemand demand)
     {
         if (branch is null || demand is null || demand.HasAccepted)
@@ -137,25 +153,6 @@ public static class BranchDemandUtility
         if (branch.DemandHandler.TryAcceptedDemand(isCritical))
         {
             AcceptedBranchDemandHandler.Instance.AddRecord(new AcceptedBranchDemand(branch, isCritical));
-        }
-    }
-
-    public static void FriendyBranchDemandInform(Branch branch, BranchDemandDef demandDef)
-    {
-        bool showMessage = demandDef.IsCritical ? RatkinOrderSettings.CriticalDemandShowMess : RatkinOrderSettings.NoramlDemandShowMess;
-        if (showMessage)
-        {
-            Messages.Message("OARO_Message_DemandFriendlyInform".Translate(branch.Name, demandDef.label), MessageTypeDefOf.PositiveEvent);
-        }
-        if (Rand.Bool && !branch.RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.DemandFriendlyInform))
-        {
-            branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.DemandFriendlyInform, cdTicks: 12 * 60000, shouldRemoveWhenExpired: true);
-
-            OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name),
-                                               text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name, demandDef.label),
-                                               letterType: OrderLetter.LetterType.Official,
-                                               relatedOrder: branch.RatkinOrder,
-                                               sender: branch.Name);
         }
     }
 }

@@ -1,9 +1,8 @@
 ﻿using System.Collections.Generic;
-using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchFacilityDef : Def, BranchStoresReserveHandler.IStoresReserveDef
+public class BranchFacilityDef : BranchConstructionDef
 {
     public BranchFacilityLevelStage poorStage;
     public BranchFacilityLevelStage normalStage;

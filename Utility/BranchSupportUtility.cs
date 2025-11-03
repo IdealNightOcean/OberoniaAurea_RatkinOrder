@@ -120,7 +120,26 @@ public static class BranchSupportUtility
 
     public static bool DoCombatSupport(Branch branch, SupportLevel level, Map map)
     {
-        return GenerateCombatRaidWorker(branch, level, map)?.TryExecute() ?? false;
+        if (GenerateCombatRaidWorker(branch, level, map)?.TryExecute() ?? false)
+        {
+            if (Rand.Chance(0.15f))
+            {
+                (bool added, BranchDemandDef demandDef) = BranchDemandUtility.TryAddRandomDemandToBranch(branch, BranchDemand.DemandType.Supplementary);
+                if (added)
+                {
+                    OrderLetter orderLetter = OrderLetterUtility.MakeOrderLetter(
+                        label: "OARO_BranchDemand_SupportTriggerLabel".Translate(),
+                        text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.Name.Named("BRANCHNAME"), demandDef.label.Named("DEMAND")),
+                        letterType: OrderLetter.LetterType.Official,
+                        relatedOrder: branch.RatkinOrder,
+                        sender: branch.Name);
+
+                    OrderLetterBox.Instance.ReceiveLetter(orderLetter);
+                }
+            }
+            return true;
+        }
+        return false;
     }
 
     public static RatkinOrderRaidWorker GenerateCombatRaidWorker(Branch branch, SupportLevel level, Map map)

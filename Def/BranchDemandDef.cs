@@ -8,16 +8,22 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchDemandDef : Def
 {
-    private static readonly Type DefaultWeighterClass = typeof(BranchDemandWeighter);
-    private static readonly BranchDemandWeighter DefaultWeighter = new();
-    public Type weighterClass = DefaultWeighterClass;
-    private BranchDemandWeighter weighter;
-    public BranchDemandWeighter Weighter => weighter ??= (weighterClass == DefaultWeighterClass) ? DefaultWeighter : (BranchDemandWeighter)Activator.CreateInstance(weighterClass);
+    private static readonly Type defaultWeighterClass = typeof(BranchDemandWeighter);
+    private static readonly BranchDemandWeighter defaultWeighter = new();
+    private static readonly Type defaultWorkClass = typeof(BranchDemand);
 
-    public Type demandClass = typeof(BranchDemand);
+    public Type weighterClass = defaultWeighterClass;
+    private BranchDemandWeighter weighter;
+    public BranchDemandWeighter Weighter => weighter ??= (weighterClass == defaultWeighterClass) ? defaultWeighter : (BranchDemandWeighter)Activator.CreateInstance(weighterClass);
+
+    public Type demandClass = defaultWorkClass;
 
     public DemandType demandType;
-    public float durationDays; //未接取时的持续时间，超过该时间仍未接取则会被移除
+
+    /// <summary>
+    /// 未接取时的持续时间，超过该时间仍未接取则会被移除
+    /// </summary>
+    public float durationDays;
     public QuestScriptDef relatedQuestDef;
     public float baseSelectWeight = 100f;
 
@@ -34,6 +40,17 @@ public class BranchDemandDef : Def
         foreach (string error in base.ConfigErrors())
         {
             yield return error;
+        }
+
+        if (weighterClass is null)
+        {
+            weighterClass = defaultWeighterClass;
+            yield return "has a null weighterClass. Set to default.";
+        }
+        if (demandClass is null)
+        {
+            demandClass = defaultWorkClass;
+            yield return "has a null demandClass. Set to default.";
         }
         if (relatedQuestDef is null)
         {

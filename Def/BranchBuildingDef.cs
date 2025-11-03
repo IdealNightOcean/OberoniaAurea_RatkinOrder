@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveDef
+public class BranchBuildingDef : BranchConstructionDef
 {
     private static readonly Type defaultType = typeof(BranchBuilding);
     private static readonly Type defaultConstructCheckerClass = typeof(BranchBuildingConstructChecker);
@@ -33,33 +33,16 @@ public class BranchBuildingDef : Def, BranchStoresReserveHandler.IStoresReserveD
     public HonorBranchDef honorDef;
 
     public List<string> effectFlags; //效果标志列表
-    public List<BranchStatModifier> branchStatModifies; //属性修正列表
+    public List<BranchStatModifier> branchStatOffsets; //属性修正列表（Offset）
+    public List<BranchStatModifier> branchStatFactors; //属性修正列表（Factor）
+    [MustTranslate]
+    public List<string> customEffectDescriptions;
 
     /// <summary>
     /// comp列表，每个运行时类型只能有一个
     /// 重复会导致报错 + 只有第一个生效
     /// </summary>
     public List<BranchBuildingCompProperties> comps;
-
-    public bool GetBranchStatModifierOfDef(BranchStatDef statDef, out BranchStatModifier statModifier)
-    {
-        statModifier = null;
-        if (branchStatModifies is null)
-        {
-            return false;
-        }
-
-        for (int i = 0; i < branchStatModifies.Count; i++)
-        {
-            if (branchStatModifies[i].statDef == statDef)
-            {
-                statModifier = branchStatModifies[i];
-                return true;
-            }
-        }
-
-        return false;
-    }
 
     public override IEnumerable<string> ConfigErrors()
     {

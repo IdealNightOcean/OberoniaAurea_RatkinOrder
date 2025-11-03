@@ -6,13 +6,28 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchStatModifier
 {
     public BranchStatDef statDef;
-    public BranchStatTransformer Transformer;
+    public float value;
 
-    public string ModifySummary() => Transformer.TransSummary(statDef);
+    public BranchStatModifier() { }
+
+    public BranchStatModifier(BranchStatDef statDef, float value)
+    {
+        this.statDef = statDef;
+        this.value = value;
+    }
 
     public void LoadDataFromXmlCustom(XmlNode xmlRoot)
     {
         DirectXmlCrossRefLoader.RegisterObjectWantsCrossRef(this, "statDef", xmlRoot);
-        Transformer = DirectXmlToObject.ObjectFromXml<BranchStatTransformer>(xmlRoot, doPostLoad: false);
+        value = ParseHelper.FromString<float>(xmlRoot.FirstChild.Value);
+    }
+
+    public override string ToString()
+    {
+        if (statDef is null)
+        {
+            return "(null BranchStat)";
+        }
+        return statDef.defName + "-" + value;
     }
 }

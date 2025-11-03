@@ -156,28 +156,14 @@ public class BranchFacilityHandler : IExposable
             return false;
         }
 
-        HashSet<BranchStatDef> statNeedRecache = [];
         if (oldLevel != BranchFacilityLevel.None)
         {
             BranchFacilityLevelStage oldStage = facilityDef.GetLevelStage(oldLevel);
             if (oldStage is not null)
             {
                 branch.EffectTags.DecrementTagsValue(oldStage.effectFlags);
-                if (oldStage.statModifies is not null)
-                {
-                    List<BranchStatModifier> statModifies = oldStage.statModifies;
-                    for (int i = 0; i < statModifies.Count; i++)
-                    {
-                        if (statModifies[i].Transformer.factor == 0f)
-                        {
-                            statNeedRecache.Add(statModifies[i].statDef);
-                        }
-                        else
-                        {
-                            branch.TransformerHandler.RemoveStatModifier(statModifies[i]);
-                        }
-                    }
-                }
+                branch.TransformerHandler.UnmergeStatsOffset(oldStage.branchStatOffsets);
+                branch.TransformerHandler.UnmergeStatsFactor(oldStage.branchStatFactors, doZeroUnmergedProcess: false);
             }
         }
 
@@ -190,14 +176,7 @@ public class BranchFacilityHandler : IExposable
             IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
         }
 
-        //需要在设施等级改变后再次重新获取 factor == 0f 的BranchStat
-        if (statNeedRecache.Count > 0)
-        {
-            foreach (BranchStatDef statDef in statNeedRecache)
-            {
-                branch.RecacheBranchStat(statDef);
-            }
-        }
+        branch.TransformerHandler.DoZeroFactorUnmergedProcess();
 
         return true;
     }
@@ -208,7 +187,8 @@ public class BranchFacilityHandler : IExposable
         if (targetStage is not null)
         {
             branch.EffectTags.DecrementTagsValue(targetStage.effectFlags);
-            branch.TransformerHandler.AddStatModifiers(targetStage.statModifies);
+            branch.TransformerHandler.MergeStatOffsets(targetStage.branchStatOffsets, addIfMiss: true);
+            branch.TransformerHandler.MergeStatFactors(targetStage.branchStatFactors, addIfMiss: true);
         }
     }
 
@@ -225,18 +205,36 @@ public class BranchFacilityHandler : IExposable
             }
 
             BranchFacilityLevelStage stage = facility.Key.GetLevelStage(facility.Value);
-            if (stage is null || stage.statModifies.NullOrEmpty())
+            if (stage is null)
             {
                 continue;
             }
 
-            for (int i = 0; i < stage.statModifies.Count; i++)
+            List<BranchStatModifier> statModifiers;
+            if (stage.branchStatOffsets is not null)
             {
-                if (stage.statModifies[i].statDef == statDef)
+                statModifiers = stage.branchStatOffsets;
+                for (int i = 0; i < statModifiers.Count; i++)
                 {
-                    hasTransformer = true;
-                    transformer.MergeWith(stage.statModifies[i].Transformer);
-                    break;
+                    if (statModifiers[i].statDef == statDef)
+                    {
+                        hasTransformer = true;
+                        transformer.MergeOffset(statModifiers[i].value);
+                        break;
+                    }
+                }
+            }
+            if (stage.branchStatFactors is not null)
+            {
+                statModifiers = stage.branchStatFactors;
+                for (int i = 0; i < statModifiers.Count; i++)
+                {
+                    if (statModifiers[i].statDef == statDef)
+                    {
+                        hasTransformer = true;
+                        transformer.MergeFactor(statModifiers[i].value);
+                        break;
+                    }
                 }
             }
         }

@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+﻿using System;
+using System.Collections.Generic;
 using System.Text;
 using Verse;
 
@@ -8,6 +8,8 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchStatTransformerHandler
 {
     public readonly Dictionary<BranchStatDef, BranchStatTransformer> branchStatTransformers = [];
+    public Action<HashSet<BranchStatDef>> OnZeroFactorUnmerged;
+    private HashSet<BranchStatDef> zeroFactorUnmergedStats;
 
     public bool TryGetStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
     {
@@ -20,104 +22,125 @@ public class BranchStatTransformerHandler
         return branchStatTransformers.TryGetValue(statDef, out transformer);
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void AddStatModifier(BranchStatModifier modifier)
+    public void AddStatTransformer(BranchStatDef statDef, BranchStatTransformer transformer, bool replaceCur = false)
     {
-        AddStatTransformer(modifier.statDef, modifier.Transformer);
-    }
-    public void AddStatModifiers(IEnumerable<BranchStatModifier> modifiers)
-    {
-        if (modifiers is null)
+        if (replaceCur || !branchStatTransformers.ContainsKey(statDef))
         {
-            return;
-        }
-
-        foreach (BranchStatModifier modifier in modifiers)
-        {
-            try
-            {
-                if (branchStatTransformers.TryGetValue(modifier.statDef, out BranchStatTransformer transformer))
-                {
-                    transformer.MergeWith(modifier.Transformer);
-                    branchStatTransformers[modifier.statDef] = transformer;
-                }
-                else
-                {
-                    branchStatTransformers.Add(modifier.statDef, modifier.Transformer);
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Log.Error($"Failed to add stat modifier for {modifier.statDef.defName}: {ex.Message}");
-                continue;
-            }
+            branchStatTransformers[statDef] = transformer;
         }
     }
+    public bool RemoveStatTransformer(BranchStatDef statDef) => branchStatTransformers.Remove(statDef);
 
-    public bool RemoveStatRecord(BranchStatDef statDef)
+    public void MergeStatTransformer(BranchStatDef statDef, BranchStatTransformer toAdd, bool addIfMiss = true)
     {
-        return branchStatTransformers.Remove(statDef);
-    }
-
-    public void AddStatTransformer(BranchStatDef statDef, BranchStatTransformer transformer)
-    {
-        if (!transformer.IsValid())
+        if (!toAdd.IsValid())
         {
             return;
         }
 
         if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer oldTransformer))
         {
-            transformer.MergeWith(oldTransformer);
-            branchStatTransformers[statDef] = transformer;
+            toAdd.MergeWith(oldTransformer);
+            branchStatTransformers[statDef] = toAdd;
         }
-        else
+        else if (addIfMiss)
         {
-            branchStatTransformers.Add(statDef, transformer);
+            branchStatTransformers.Add(statDef, toAdd);
         }
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void RemoveStatModifier(BranchStatModifier modifier)
+    public void MergeStatTransformers(IEnumerable<KeyValuePair<BranchStatDef, BranchStatTransformer>> toAdds, bool addIfMiss = true)
     {
-        RemoveStatTransformer(modifier.statDef, modifier.Transformer);
-    }
-    public void RemoveStatModifies(IEnumerable<BranchStatModifier> modifies)
-    {
-        if (modifies is null)
+        if (toAdds is not null)
         {
-            return;
-        }
-
-        foreach (BranchStatModifier modify in modifies)
-        {
-            try
+            foreach (KeyValuePair<BranchStatDef, BranchStatTransformer> toAdd in toAdds)
             {
-                if (branchStatTransformers.TryGetValue(modify.statDef, out BranchStatTransformer transformer))
-                {
-                    transformer.Unmerge(modify.Transformer);
-                    if (transformer.IsValid())
-                    {
-                        branchStatTransformers[modify.statDef] = transformer;
-                    }
-                    else
-                    {
-                        branchStatTransformers.Remove(modify.statDef);
-                    }
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Log.Error($"Failed to Remove stat modifier for {modify.statDef.defName}: {ex.Message}");
-                continue;
+                MergeStatTransformer(toAdd.Key, toAdd.Value, addIfMiss);
             }
         }
     }
 
-    public void RemoveStatTransformer(BranchStatDef statDef, BranchStatTransformer toRemove)
+    public void MergeStatOffset(BranchStatModifier modifier, bool addIfMiss = true)
+    {
+        MergeStatOffset(modifier.statDef, modifier.value, addIfMiss);
+    }
+    public void MergeStatOffset(BranchStatDef statDef, float toAdd, bool addIfMiss = true)
+    {
+        if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        {
+            transformer.MergeOffset(toAdd);
+            if (transformer.IsValid())
+            {
+                branchStatTransformers[statDef] = transformer;
+            }
+            else
+            {
+                branchStatTransformers.Remove(statDef);
+            }
+        }
+        else if (addIfMiss && toAdd != 0)
+        {
+            branchStatTransformers.Add(statDef, new BranchStatTransformer() { offset = toAdd });
+        }
+    }
+    public void MergeStatOffsets(IEnumerable<BranchStatModifier> modifiers, bool addIfMiss = true)
+    {
+        if (modifiers is not null)
+        {
+            foreach (BranchStatModifier modifier in modifiers)
+            {
+                MergeStatOffset(modifier.statDef, modifier.value, addIfMiss);
+            }
+        }
+    }
+
+    public void MergeStatFactor(BranchStatModifier modifier, bool addIfMiss = true)
+    {
+        UnmergeStatFactor(modifier.statDef, modifier.value, addIfMiss);
+    }
+    public void MergeStatFactor(BranchStatDef statDef, float toAdd, bool addIfMiss = true)
+    {
+        if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        {
+            transformer.MergeFactor(toAdd);
+            if (transformer.IsValid())
+            {
+                branchStatTransformers[statDef] = transformer;
+            }
+            else
+            {
+                branchStatTransformers.Remove(statDef);
+            }
+        }
+        else if (addIfMiss && toAdd != 1f)
+        {
+            branchStatTransformers.Add(statDef, new BranchStatTransformer() { factor = toAdd });
+        }
+    }
+    public void MergeStatFactors(IEnumerable<BranchStatModifier> modifiers, bool addIfMiss = true)
+    {
+        if (modifiers is not null)
+        {
+            foreach (BranchStatModifier modifier in modifiers)
+            {
+                MergeStatFactor(modifier.statDef, modifier.value, addIfMiss);
+            }
+        }
+    }
+
+    public void UnmergeStatTransformer(BranchStatDef statDef, BranchStatTransformer toRemove, bool doZeroUnmergedProcess = true)
     {
         if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
         {
+            return;
+        }
+        if (toRemove.factor == 0f)
+        {
+            zeroFactorUnmergedStats ??= [];
+            zeroFactorUnmergedStats.Add(statDef);
+            if (doZeroUnmergedProcess)
+            {
+                DoZeroFactorUnmergedProcess();
+            }
             return;
         }
 
@@ -129,6 +152,98 @@ public class BranchStatTransformerHandler
         else
         {
             branchStatTransformers.Remove(statDef);
+        }
+    }
+    public void UnmergeStatTransformers(IEnumerable<KeyValuePair<BranchStatDef, BranchStatTransformer>> toRemoves, bool doZeroUnmergedProcess = true)
+    {
+        if (toRemoves is not null)
+        {
+            foreach (KeyValuePair<BranchStatDef, BranchStatTransformer> toRemove in toRemoves)
+            {
+                UnmergeStatTransformer(toRemove.Key, toRemove.Value, doZeroUnmergedProcess: false);
+            }
+            if (doZeroUnmergedProcess)
+            {
+                DoZeroFactorUnmergedProcess();
+            }
+        }
+
+    }
+
+    public void UnmergeStatOffset(BranchStatModifier modifier)
+    {
+        UnmergeStatFactor(modifier.statDef, modifier.value);
+    }
+    public void UnmergeStatOffset(BranchStatDef statDef, float toRemove)
+    {
+        if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        {
+            return;
+        }
+        transformer.UnmergeOffset(toRemove);
+        if (transformer.IsValid())
+        {
+            branchStatTransformers[statDef] = transformer;
+        }
+        else
+        {
+            branchStatTransformers.Remove(statDef);
+        }
+    }
+    public void UnmergeStatsOffset(IEnumerable<BranchStatModifier> modifiers)
+    {
+        if (modifiers is not null)
+        {
+            foreach (BranchStatModifier modifier in modifiers)
+            {
+                UnmergeStatOffset(modifier.statDef, modifier.value);
+            }
+        }
+    }
+
+    public void UnmergeStatFactor(BranchStatModifier modifier, bool doZeroUnmergedProcess = true)
+    {
+        UnmergeStatFactor(modifier.statDef, modifier.value, doZeroUnmergedProcess);
+    }
+    public void UnmergeStatFactor(BranchStatDef statDef, float toRemove, bool doZeroUnmergedProcess = true)
+    {
+        if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        {
+            return;
+        }
+        if (toRemove == 0f)
+        {
+            zeroFactorUnmergedStats ??= [];
+            zeroFactorUnmergedStats.Add(statDef);
+            if (doZeroUnmergedProcess)
+            {
+                DoZeroFactorUnmergedProcess();
+            }
+            return;
+        }
+
+        transformer.UnmergeFactor(toRemove);
+        if (transformer.IsValid())
+        {
+            branchStatTransformers[statDef] = transformer;
+        }
+        else
+        {
+            branchStatTransformers.Remove(statDef);
+        }
+    }
+    public void UnmergeStatsFactor(IEnumerable<BranchStatModifier> modifiers, bool doZeroUnmergedProcess = true)
+    {
+        if (modifiers is not null)
+        {
+            foreach (BranchStatModifier modifier in modifiers)
+            {
+                UnmergeStatFactor(modifier.statDef, modifier.value, doZeroUnmergedProcess: false);
+            }
+            if (doZeroUnmergedProcess)
+            {
+                DoZeroFactorUnmergedProcess();
+            }
         }
     }
 
@@ -146,5 +261,21 @@ public class BranchStatTransformerHandler
             sb.AppendInNewLine(kv.Value.ToString());
         }
         return sb.ToString();
+    }
+
+    public void DoZeroFactorUnmergedProcess()
+    {
+        if (zeroFactorUnmergedStats is null || zeroFactorUnmergedStats.Count <= 0)
+        {
+            return;
+        }
+        try
+        {
+            OnZeroFactorUnmerged?.Invoke(zeroFactorUnmergedStats);
+        }
+        finally
+        {
+            zeroFactorUnmergedStats = null;
+        }
     }
 }

@@ -33,11 +33,37 @@ public class RatkinOrderSettings : ModSettings
 
     public static int MaxConcurrentAcceptedDemand = 2; //最多同时接取需求数
 
+    public static bool HasMaxLetterLimit = true; //是否启用信件上限
+    public static int MaxLetterCount = 100; //收件箱最多存在的信件数
+    [Unsaved] private static string maxLetterCountStr;
+    public static bool HasLetterRetentionLimit = true; //是否启用信件过期时间
+    public static int MaxLetterRetentionDays = 300; //信件最长保留时间（天）
+    [Unsaved] private static string maxLetterRetentionDaysStr;
+
     public override void ExposeData()
     {
         base.ExposeData();
         Scribe_Values.Look(ref NoramlDemandShowMess, "NoramlDemandShowMess", defaultValue: true);
         Scribe_Values.Look(ref CriticalDemandShowMess, "CriticalDemandShowMess", defaultValue: true);
+        Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, "MaxConcurrentAcceptedDemand", 2);
+
+        Scribe_Values.Look(ref HasMaxLetterLimit, "HasMaxLetterLimit", defaultValue: true);
+        Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, "MaxConcurrentAcceptedDemand", 2);
+        Scribe_Values.Look(ref HasLetterRetentionLimit, "HasLetterRetentionLimit", defaultValue: true);
+        Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, "MaxConcurrentAcceptedDemand", 2);
+
+    }
+
+    private static void Reset()
+    {
+        NoramlDemandShowMess = true;
+        CriticalDemandShowMess = true;
+        MaxConcurrentAcceptedDemand = 2;
+
+        HasMaxLetterLimit = true;
+        MaxLetterCount = 100;
+        HasLetterRetentionLimit = true;
+        MaxConcurrentAcceptedDemand = 300;
     }
 
     public void DoSettingsWindowContents(Rect inRect)
@@ -58,6 +84,18 @@ public class RatkinOrderSettings : ModSettings
 
         MaxConcurrentAcceptedDemand = (int)listing_Rect.SliderLabeled("OARO_MaxConcurrentAcceptedDemand".Translate(MaxConcurrentAcceptedDemand.ToString()), MaxConcurrentAcceptedDemand, 1f, 99f);
 
+        listing_Rect.CheckboxLabeled("OARO_HasMaxLetterLimit".Translate(), ref HasMaxLetterLimit);
+        if (HasMaxLetterLimit)
+        {
+            listing_Rect.TextFieldNumericLabeled(label: "OARO_MaxLetterCount".Translate(), ref MaxLetterCount, ref maxLetterCountStr, 1f, 500f);
+        }
+
+        listing_Rect.CheckboxLabeled("OARO_HasLetterRetentionLimit".Translate(), ref HasLetterRetentionLimit);
+        if (HasLetterRetentionLimit)
+        {
+            listing_Rect.TextFieldNumericLabeled(label: "OARO_MaxLetterRetentionDays".Translate(), ref MaxLetterRetentionDays, ref maxLetterRetentionDaysStr, 1f, 600f);
+        }
+
         if (listing_Rect.ButtonText("OAFrame_Reset".Translate()))
         {
             Reset();
@@ -69,13 +107,5 @@ public class RatkinOrderSettings : ModSettings
         }
         Widgets.EndScrollView();
 
-    }
-
-    private static void Reset()
-    {
-        NoramlDemandShowMess = true;
-        CriticalDemandShowMess = true;
-
-        MaxConcurrentAcceptedDemand = 2;
     }
 }

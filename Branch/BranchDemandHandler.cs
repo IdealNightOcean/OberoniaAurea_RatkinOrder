@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -157,7 +158,21 @@ public class BranchDemandHandler : ITickDay, IExposable
 
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
-            BranchDemandUtility.FriendyBranchDemandInform(branch, demandDef);
+            bool showMessage = demandDef.IsCritical ? RatkinOrderSettings.CriticalDemandShowMess : RatkinOrderSettings.NoramlDemandShowMess;
+            if (showMessage)
+            {
+                Messages.Message("OARO_Message_DemandFriendlyInform".Translate(branch.Name, demandDef.label), MessageTypeDefOf.PositiveEvent);
+            }
+            if (Rand.Bool && !branch.RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.DemandFriendlyInform))
+            {
+                branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.DemandFriendlyInform, cdTicks: 12 * 60000, shouldRemoveWhenExpired: true);
+
+                OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name),
+                                                   text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name, demandDef.label),
+                                                   letterType: OrderLetter.LetterType.Official,
+                                                   relatedOrder: branch.RatkinOrder,
+                                                   sender: branch.Name);
+            }
         }
     }
 

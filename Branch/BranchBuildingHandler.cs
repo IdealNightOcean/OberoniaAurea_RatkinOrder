@@ -294,49 +294,28 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             branch.EffectTags.DecrementTagsValue(buildingDef.advancedProperties?.effectFlags);
         }
 
-        HashSet<BranchStatDef> statNeedRecache = [];
-        List<BranchStatModifier> branchStatModifies;
         //移除一般修正
-        if (buildingDef.branchStatModifies is not null)
+        if (buildingDef.branchStatOffsets is not null)
         {
-            branchStatModifies = buildingDef.branchStatModifies;
-            for (int i = 0; i < branchStatModifies.Count; i++)
-            {
-                if (branchStatModifies[i].Transformer.factor == 0f)
-                {
-                    statNeedRecache.Add(branchStatModifies[i].statDef);
-                }
-                else
-                {
-                    branch.TransformerHandler.RemoveStatModifier(branchStatModifies[i]);
-                }
-            }
+            branch.TransformerHandler.UnmergeStatsOffset(buildingDef.branchStatOffsets);
+        }
+        if (buildingDef.branchStatFactors is not null)
+        {
+            branch.TransformerHandler.UnmergeStatsFactor(buildingDef.branchStatFactors, doZeroUnmergedProcess: false);
         }
         //移除升级修正
-        if (building.HasUpgraded && buildingDef.advancedProperties.branchStatModifies is not null)
+        if (building.HasUpgraded && buildingDef.advancedProperties is not null)
         {
-            branchStatModifies = buildingDef.advancedProperties.branchStatModifies;
-            for (int i = 0; i < branchStatModifies.Count; i++)
+            if (buildingDef.advancedProperties.branchStatOffsets is not null)
             {
-                if (branchStatModifies[i].Transformer.factor == 0f)
-                {
-                    statNeedRecache.Add(branchStatModifies[i].statDef);
-                }
-                else
-                {
-                    branch.TransformerHandler.RemoveStatModifier(branchStatModifies[i]);
-                }
+                branch.TransformerHandler.UnmergeStatsOffset(buildingDef.advancedProperties.branchStatOffsets);
+            }
+            if (buildingDef.advancedProperties.branchStatFactors is not null)
+            {
+                branch.TransformerHandler.UnmergeStatsFactor(buildingDef.advancedProperties.branchStatFactors, doZeroUnmergedProcess: false);
             }
         }
-        //重新获得 factor == 0f 的修正
-        if (statNeedRecache.Count > 0)
-        {
-            foreach (BranchStatDef statDef in statNeedRecache)
-            {
-                branch.RecacheBranchStat(statDef);
-            }
-        }
-
+        branch.TransformerHandler.DoZeroFactorUnmergedProcess();
         building.PostDeactive();
     }
 
@@ -391,7 +370,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     private void ActiveBuilding(BranchBuilding building, bool isSpecial)
     {
         branch.EffectTags.IncrementTagsValue(building.Def.effectFlags, addIfMiss: true);
-        branch.TransformerHandler.AddStatModifiers(building.Def.branchStatModifies);
+        branch.TransformerHandler.MergeStatOffsets(building.Def.branchStatOffsets, addIfMiss: true);
+        branch.TransformerHandler.MergeStatFactors(building.Def.branchStatFactors, addIfMiss: true);
         if (building.HasUpgraded)
         {
             UpgradeBuilding(building);
@@ -434,7 +414,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     {
         building.HasUpgraded = true;
         branch.EffectTags.IncrementTagsValue(building.Def.advancedProperties.effectFlags, addIfMiss: true);
-        branch.TransformerHandler.AddStatModifiers(building.Def.advancedProperties.branchStatModifies);
+        branch.TransformerHandler.MergeStatOffsets(building.Def.advancedProperties.branchStatOffsets, addIfMiss: true);
+        branch.TransformerHandler.MergeStatFactors(building.Def.advancedProperties.branchStatFactors, addIfMiss: true);
         building.PostUpgraded();
     }
 

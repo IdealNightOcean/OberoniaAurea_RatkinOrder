@@ -21,5 +21,6 @@ public class OrderReformationDef : Def
     public List<OrderReformationDef> prerequisites;
 
     public List<string> effectFlags; //效果标志列表
-    public List<BranchStatModifier> branchStatModifies; //属性修正列表
+    public List<BranchStatModifier> branchStatOffsets; //属性修正列表（Offset）
+    public List<BranchStatModifier> branchStatFactors; //属性修正列表（Factor）
 }

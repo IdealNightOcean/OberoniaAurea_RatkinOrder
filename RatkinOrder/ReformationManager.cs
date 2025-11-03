@@ -93,7 +93,8 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
     private void ActiveReformation(OrderReformationDef def)
     {
         RatkinOrder.EffectTags.IncrementTagsValue(def.effectFlags, addIfMiss: true);
-        RatkinOrder.TransformerHandler.AddStatModifiers(def.branchStatModifies);
+        RatkinOrder.TransformerHandler.MergeStatOffsets(def.branchStatOffsets, addIfMiss: true);
+        RatkinOrder.TransformerHandler.MergeStatFactors(def.branchStatFactors, addIfMiss: true);
         def.Worker.PostActive(RatkinOrder);
     }
 

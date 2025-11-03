@@ -239,7 +239,7 @@ public static class BranchUtility
     /// </summary>
     public static void RecacheBranchStat(this Branch branch, BranchStatDef statDef)
     {
-        if (branch.TransformerHandler.RemoveStatRecord(statDef))
+        if (branch.TransformerHandler.RemoveStatTransformer(statDef))
         {
             bool hasTransformer = false;
             BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
@@ -257,7 +257,7 @@ public static class BranchUtility
 
             if (hasTransformer)
             {
-                branch.TransformerHandler.AddStatTransformer(statDef, transformer);
+                branch.TransformerHandler.MergeStatTransformer(statDef, transformer);
             }
         }
     }

@@ -53,7 +53,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
     }
 
-    public void SetPrimaryReserves(IStoresReserveDef def, bool inSpecialSlot = false)
+    public void SetPrimaryReserves(BranchConstructionDef def, bool inSpecialSlot = false)
     {
         if (storesReserves.Count == 0)
         {
@@ -79,7 +79,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         storesReserves.Insert(0, ReserveRecord.GenrateNewRecord(def, inSpecialSlot));
     }
 
-    public void AddNewReserve(IStoresReserveDef def, bool inSpecialSlot = false)
+    public void AddNewReserve(BranchConstructionDef def, bool inSpecialSlot = false)
     {
         if (def is null)
         {
@@ -122,7 +122,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
     }
 
-    public void RemoveReserve(IStoresReserveDef def)
+    public void RemoveReserve(BranchConstructionDef def)
     {
         for (int i = 0; i < storesReserves.Count; i++)
         {
@@ -134,12 +134,12 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
     }
 
-    public void Notify_BranchConstructStarted(IStoresReserveDef def)
+    public void Notify_BranchConstructStarted(BranchConstructionDef def)
     {
         RemoveReserve(def);
     }
 
-    public float GetReserveCostReduce(IStoresReserveDef def)
+    public float GetReserveCostReduce(BranchConstructionDef def)
     {
         for (int i = 0; i < storesReserves.Count; i++)
         {
@@ -228,14 +228,9 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     //  相关类中类丨类中接口
     // *-----------------------------------------------------------------------* //
 
-    /// <summary>
-    /// 用于标记BranchFacilityDef和BranchBuildingDef
-    /// </summary>
-    public interface IStoresReserveDef;
-
     public abstract class ReserveRecord : IExposable
     {
-        public abstract IStoresReserveDef Target { get; }
+        public abstract BranchConstructionDef Target { get; }
         protected bool inSpecialSlot;
         public virtual bool InSpecialSlot
         {
@@ -252,7 +247,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
             CostRateReduce = costRateReduce;
         }
 
-        public static ReserveRecord GenrateNewRecord(IStoresReserveDef def, bool inSpecialSlot = false, float costRateReduce = 0f)
+        public static ReserveRecord GenrateNewRecord(BranchConstructionDef def, bool inSpecialSlot = false, float costRateReduce = 0f)
         {
             if (def is BranchBuildingDef buildingDef)
             {
@@ -278,7 +273,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     public class BuildingReserveRecord : ReserveRecord
     {
         private BranchBuildingDef target;
-        public override IStoresReserveDef Target => target;
+        public override BranchConstructionDef Target => target;
 
         public override bool InSpecialSlot
         {
@@ -305,7 +300,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     public class FacilityReserveRecord : ReserveRecord
     {
         private BranchFacilityDef target;
-        public override IStoresReserveDef Target => target;
+        public override BranchConstructionDef Target => target;
 
         public FacilityReserveRecord() { }
         public FacilityReserveRecord(BranchFacilityDef def, bool inSpecialSlot, float costRateReduce) : base(inSpecialSlot, costRateReduce)

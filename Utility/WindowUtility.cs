@@ -3,6 +3,7 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
+using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -78,5 +79,127 @@ public static class OARO_WindowUtility
         Text.WordWrap = wordWrap;
 
         return result;
+    }
+
+    /// <summary>
+    /// 绘制分部简述
+    /// inRect: (width: 299f, height: 87f)
+    /// </summary>
+    /// <param name="inRect">width: 299f, height: 87f</param>
+    public static void DrawBranchSummary(Rect inRect, BranchSummaryCacheEntry entry)
+    {
+        Rect reusedRect = CenterRectOnY(inRect, inRect.x, 6f, 87f);
+        if (entry.HonorStripSmall is not null)
+        {
+            GUI.DrawTexture(reusedRect, entry.HonorStripSmall);
+        }
+
+        Rect leftRect = new(inRect.x + 6f, inRect.y, 224f, inRect.height);
+
+        reusedRect = new(leftRect.x + 2f, leftRect.y + 2f, 32f, 20f);
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Widgets.Label(reusedRect, entry.Distance.ToString("F0").Colorize(entry.IsInAffectedRange ? Color.green : Color.white));
+
+        if (entry.HonorDecorationSmall is not null)
+        {
+            reusedRect = leftRect.ContractedBy(10f);
+            GUI.DrawTexture(reusedRect, entry.HonorDecorationSmall, ScaleMode.ScaleToFit);
+        }
+
+        if (entry.HonorBackgroundSmall is not null)
+        {
+            reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
+            GUI.DrawTexture(reusedRect, entry.HonorBackgroundSmall);
+        }
+
+        if (entry.HonorIcon is not null)
+        {
+            reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
+            GUI.DrawTexture(reusedRect, entry.HonorIcon, ScaleMode.ScaleToFit);
+        }
+        else
+        {
+            reusedRect = CenterRectOnY(leftRect, leftRect.x + 38f, 34f, 37f);
+            GUI.DrawTexture(reusedRect, IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
+        }
+
+        Rect squadNameRect = Rect.MinMaxRect(leftRect.x + 100f, leftRect.y + 4f, leftRect.xMax - 16f, leftRect.y + 4f + 22f);
+        string squadName = entry.SquadName;
+        if (Text.CalcSize(squadName).x < 100f)
+        {
+            Widgets.Label(squadNameRect, squadName);
+        }
+        else
+        {
+            Widgets.LabelEllipses(squadNameRect, squadName);
+            if (!string.IsNullOrEmpty(squadName) && Mouse.IsOver(squadNameRect))
+            {
+                TooltipHandler.TipRegion(squadNameRect, () => squadName, 6844867);
+            }
+        }
+
+        reusedRect = new(squadNameRect.x + 16f, squadNameRect.yMax + 4f, 25f, 30f);
+        string relation;
+        if (entry.Branch.IsBranchOfType(BranchType.Friendly))
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
+            relation = "OARO_Friendly".Translate().Colorize(Color.green);
+        }
+        else
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.SmallStrangeIcon, ScaleMode.ScaleToFit);
+            relation = "OARO_Strange".Translate();
+        }
+
+        reusedRect = CenterRectOnX(reusedRect, reusedRect.yMax + 3f, 40f, 20f);
+        Widgets.Label(reusedRect, relation);
+
+        reusedRect = new(squadNameRect.xMax - 40f, squadNameRect.yMax + 4f, 30f, 30f);
+        if (entry.Branch.IsIdleNow)
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+        }
+        else if (entry.Branch.IsOutdoorNow)
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.SmallOutdoorIcon, ScaleMode.ScaleToFit);
+        }
+        else
+        {
+            GUI.DrawTexture(reusedRect, IconLibrary.SmallIndoorIcon, ScaleMode.ScaleToFit);
+        }
+
+        reusedRect = CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 40f, 20f);
+        string workState = entry.Branch.CurWorkState;
+        if (Text.CalcSize(workState).x < 40f)
+        {
+            Widgets.Label(reusedRect, workState);
+        }
+        else
+        {
+            Widgets.LabelEllipses(reusedRect, workState);
+            if (!string.IsNullOrEmpty(workState) && Mouse.IsOver(reusedRect))
+            {
+                TooltipHandler.TipRegion(reusedRect, () => workState, 3548681);
+            }
+        }
+
+        Text.Anchor = TextAnchor.MiddleLeft;
+
+        Rect rightRect = Rect.MinMaxRect(leftRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
+        float textX = rightRect.xMin + 24f;
+        reusedRect = new(textX, rightRect.y, rightRect.width, 29f);
+        Widgets.Label(reusedRect, "OARO_CurAllCrewCount".Translate(entry.CurAllCrewCount));
+        reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
+        Widgets.Label(reusedRect, "OARO_BranchPotency".Translate());
+        reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
+        string supplyState = "OARO_BranchSupplyState".Translate() + "  ";
+        supplyState += entry.Branch.Supply switch
+        {
+            < 0.2f => "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange),
+            < 0.8f => "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow),
+            _ => "OARO_BranchSupply_Enough".Translate().Colorize(Color.green),
+        };
+        Widgets.Label(reusedRect, supplyState);
+        Text.Anchor = TextAnchor.UpperLeft;
     }
 }

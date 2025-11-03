@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -9,5 +10,9 @@ public class BranchFacilityLevelStage
     public int constructionDays;
 
     public List<string> effectFlags;
-    public List<BranchStatModifier> statModifies;
+    public List<BranchStatModifier> branchStatOffsets; //属性修正列表（Offset）
+    public List<BranchStatModifier> branchStatFactors; //属性修正列表（Factor）
+
+    [MustTranslate]
+    public List<string> customEffectDescriptions;
 }

@@ -82,29 +82,59 @@ public class BranchBuilding : IExposable
         bool hasTransformer = false;
 
         List<BranchStatModifier> branchStatModifies;
-        if (def.branchStatModifies is not null)
+        if (def.branchStatOffsets is not null)
         {
-            branchStatModifies = def.branchStatModifies;
+            branchStatModifies = def.branchStatOffsets;
             for (int i = 0; i < branchStatModifies.Count; i++)
             {
                 if (branchStatModifies[i].statDef == statDef)
                 {
                     hasTransformer = true;
-                    transformer.MergeWith(branchStatModifies[i].Transformer);
+                    transformer.MergeOffset(branchStatModifies[i].value);
                     break;
                 }
             }
         }
-        if (HasUpgraded && def.advancedProperties?.branchStatModifies is not null)
+        if (def.branchStatFactors is not null)
         {
-            branchStatModifies = def.advancedProperties.branchStatModifies;
+            branchStatModifies = def.branchStatFactors;
             for (int i = 0; i < branchStatModifies.Count; i++)
             {
                 if (branchStatModifies[i].statDef == statDef)
                 {
                     hasTransformer = true;
-                    transformer.MergeWith(branchStatModifies[i].Transformer);
+                    transformer.MergeFactor(branchStatModifies[i].value);
                     break;
+                }
+            }
+        }
+
+        if (HasUpgraded && def.advancedProperties is not null)
+        {
+            if (def.advancedProperties.branchStatOffsets is not null)
+            {
+                branchStatModifies = def.advancedProperties.branchStatOffsets;
+                for (int i = 0; i < branchStatModifies.Count; i++)
+                {
+                    if (branchStatModifies[i].statDef == statDef)
+                    {
+                        hasTransformer = true;
+                        transformer.MergeOffset(branchStatModifies[i].value);
+                        break;
+                    }
+                }
+            }
+            if (def.advancedProperties.branchStatFactors is not null)
+            {
+                branchStatModifies = def.advancedProperties.branchStatFactors;
+                for (int i = 0; i < branchStatModifies.Count; i++)
+                {
+                    if (branchStatModifies[i].statDef == statDef)
+                    {
+                        hasTransformer = true;
+                        transformer.MergeFactor(branchStatModifies[i].value);
+                        break;
+                    }
                 }
             }
         }

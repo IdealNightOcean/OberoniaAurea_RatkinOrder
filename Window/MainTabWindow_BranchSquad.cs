@@ -1,10 +1,8 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Verse;
-using Verse.Utility;
 using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -29,7 +27,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
 
     private int selBranchIndex;
     private Branch selBranch;
-    private BranchInfoCacheEntry selBranchInfo;
+    private SquadInfoCacheEntry selBranchInfo;
     private bool needRefreshSel;
 
     private TabType curTab = TabType.All;
@@ -265,7 +263,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 43f, 51f);
         if (selBranch?.IsBranchOfType(BranchType.Friendly) ?? false)
         {
-            GUI.DrawTexture(reusedRect, bigFriendlyIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, IconLibrary.BigFriendlyIcon, ScaleMode.ScaleToFit);
 
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
             friendlyProcess = selBranchInfo.FriendlyProcess;
@@ -273,7 +271,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         }
         else
         {
-            GUI.DrawTexture(reusedRect, bigStrangeIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, IconLibrary.BigStrangeIcon, ScaleMode.ScaleToFit);
 
             relation = "OARO_Strange".Translate();
             friendlyProcess = 0f;
@@ -443,17 +441,17 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         {
             if (selBranch.IsIdleNow)
             {
-                GUI.DrawTexture(reusedRect, bigIdleIcon, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(reusedRect, IconLibrary.BigIdleIcon, ScaleMode.ScaleToFit);
                 stateColor = Color.cyan;
             }
             else if (selBranch.IsOutdoorNow)
             {
-                GUI.DrawTexture(reusedRect, bigOutdoorIcon, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(reusedRect, IconLibrary.BigOutdoorIcon, ScaleMode.ScaleToFit);
                 stateColor = ColorLibrary.Orange;
             }
             else
             {
-                GUI.DrawTexture(reusedRect, bigIndoorIcon, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(reusedRect, IconLibrary.BigIndoorIcon, ScaleMode.ScaleToFit);
                 stateColor = Color.yellow;
             }
         }
@@ -797,8 +795,8 @@ public class MainTabWindow_BranchSquad : MainTabWindow
         {
             Widgets.DrawHighlightSelected(inRect);
         }
-        inRect = inRect.ContractedBy(2f);
-        if (Widgets.ButtonInvisible(inRect))
+        Rect summaryRect = inRect.ContractedBy(2f);
+        if (Widgets.ButtonInvisible(summaryRect))
         {
             if (selBranchIndex == index)
             {
@@ -810,119 +808,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
             }
         }
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x, 6f, 87f);
-        if (entry.HonorStripSmall is not null)
-        {
-            GUI.DrawTexture(reusedRect, entry.HonorStripSmall);
-        }
-
-        Rect leftRect = new(inRect.x + 6f, inRect.y, 224f, inRect.height);
-
-        reusedRect = new(leftRect.x + 2f, leftRect.y + 2f, 32f, 20f);
-        Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(reusedRect, entry.Distance.ToString("F0").Colorize(entry.IsInAffectedRange ? Color.green : Color.white));
-
-        if (entry.HonorDecorationSmall is not null)
-        {
-            reusedRect = leftRect.ContractedBy(10f);
-            GUI.DrawTexture(reusedRect, entry.HonorDecorationSmall, ScaleMode.ScaleToFit);
-        }
-
-        if (entry.HonorBackgroundSmall is not null)
-        {
-            reusedRect = OARO_WindowUtility.CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            GUI.DrawTexture(reusedRect, entry.HonorBackgroundSmall);
-        }
-
-        if (entry.HonorIcon is not null)
-        {
-            reusedRect = OARO_WindowUtility.CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
-            GUI.DrawTexture(reusedRect, entry.HonorIcon, ScaleMode.ScaleToFit);
-        }
-        else
-        {
-            reusedRect = OARO_WindowUtility.CenterRectOnY(leftRect, leftRect.x + 38f, 34f, 37f);
-            GUI.DrawTexture(reusedRect, leftGeneralSquadIcon, ScaleMode.ScaleToFit);
-        }
-
-        Rect squadNameRect = Rect.MinMaxRect(leftRect.x + 100f, leftRect.y + 4f, leftRect.xMax - 16f, leftRect.y + 4f + 22f);
-        string squadName = entry.SquadName;
-        if (Text.CalcSize(squadName).x < 100f)
-        {
-            Widgets.Label(squadNameRect, squadName);
-        }
-        else
-        {
-            Widgets.LabelEllipses(squadNameRect, squadName);
-            if (!string.IsNullOrEmpty(squadName) && Mouse.IsOver(squadNameRect))
-            {
-                TooltipHandler.TipRegion(squadNameRect, () => squadName, 6844867);
-            }
-        }
-
-        reusedRect = new(squadNameRect.x + 16f, squadNameRect.yMax + 4f, 25f, 30f);
-        string relation;
-        if (entry.Branch.IsBranchOfType(BranchType.Friendly))
-        {
-            GUI.DrawTexture(reusedRect, smallFriendlyIcon, ScaleMode.ScaleToFit);
-            relation = "OARO_Friendly".Translate().Colorize(Color.green);
-        }
-        else
-        {
-            GUI.DrawTexture(reusedRect, smallStrangeIcon, ScaleMode.ScaleToFit);
-            relation = "OARO_Strange".Translate();
-        }
-
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 3f, 40f, 20f);
-        Widgets.Label(reusedRect, relation);
-
-        reusedRect = new(squadNameRect.xMax - 40f, squadNameRect.yMax + 4f, 30f, 30f);
-        if (entry.Branch.IsIdleNow)
-        {
-            GUI.DrawTexture(reusedRect, smallIdleIcon, ScaleMode.ScaleToFit);
-        }
-        else if (entry.Branch.IsOutdoorNow)
-        {
-            GUI.DrawTexture(reusedRect, smallOutdoorIcon, ScaleMode.ScaleToFit);
-        }
-        else
-        {
-            GUI.DrawTexture(reusedRect, smallIndoorIcon, ScaleMode.ScaleToFit);
-        }
-
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 40f, 20f);
-        string workState = entry.Branch.CurWorkState;
-        if (Text.CalcSize(workState).x < 40f)
-        {
-            Widgets.Label(reusedRect, workState);
-        }
-        else
-        {
-            Widgets.LabelEllipses(reusedRect, workState);
-            if (!string.IsNullOrEmpty(workState) && Mouse.IsOver(reusedRect))
-            {
-                TooltipHandler.TipRegion(reusedRect, () => workState, 3548681);
-            }
-        }
-
-        Text.Anchor = TextAnchor.MiddleLeft;
-
-        Rect rightRect = Rect.MinMaxRect(leftRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
-        float textX = rightRect.xMin + 24f;
-        reusedRect = new(textX, rightRect.y, rightRect.width, 29f);
-        Widgets.Label(reusedRect, "OARO_CurAllCrewCount".Translate(entry.CurAllCrewCount));
-        reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
-        Widgets.Label(reusedRect, "OARO_BranchPotency".Translate());
-        reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
-        string supplyState = "OARO_BranchSupplyState".Translate() + "  ";
-        supplyState += entry.Branch.Supply switch
-        {
-            < 0.2f => "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange),
-            < 0.8f => "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow),
-            _ => "OARO_BranchSupply_Enough".Translate().Colorize(Color.green),
-        };
-        Widgets.Label(reusedRect, supplyState);
-        Text.Anchor = TextAnchor.MiddleCenter;
+        OARO_WindowUtility.DrawBranchSummary(summaryRect, entry);
     }
 
     private void RefreshSelBranch()
@@ -1105,9 +991,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
     private static readonly Texture2D middleUnlockButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUnlockButton");
     private static readonly Texture2D middleUnlockButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUnlockButton_Down");
 
-
     private static readonly Texture2D leftBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftBackground");
-    private static readonly Texture2D leftGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftGeneralSquadIcon");
     private static readonly Texture2D leftListBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftListBackground");
     private static readonly Texture2D leftScroll = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_LeftScroll");
 
@@ -1119,170 +1003,7 @@ public class MainTabWindow_BranchSquad : MainTabWindow
     private static readonly Texture2D branchSupplyJust = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchSupply_Just");
     private static readonly Texture2D branchSupplyEnough = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchSupply_Enough");
 
-    private static readonly Texture2D bigStrangeIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigStrangeIcon");
-    private static readonly Texture2D bigFriendlyIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigFriendlyIcon");
-    private static readonly Texture2D bigIdleIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigIdleIcon");
-    private static readonly Texture2D bigOutdoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigOutdoorIcon");
-    private static readonly Texture2D bigIndoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BigIndoorIcon");
-    private static readonly Texture2D smallStrangeIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallStrangeIcon");
-    private static readonly Texture2D smallFriendlyIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallFriendlyIcon");
-    private static readonly Texture2D smallOutdoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallOutdoorIcon");
-    private static readonly Texture2D smallIndoorIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallIndoorIcon");
-    private static readonly Texture2D smallIdleIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_SmallIdleIcon");
-
     private static readonly Texture2D branchBaseSiteIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchBaseIcon");
     private static readonly Texture2D recommendationIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RecommendationIcon");
     private static readonly Texture2D verticalCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_VerticalCuttingLine");
-}
-
-public class BranchSummaryCacheEntry
-{
-    public readonly Branch Branch;
-
-    public readonly string SquadName = "----";
-    public readonly string BaseSiteName = "----";
-    public readonly float Distance = -1f;
-    public readonly float AffectedRange = -1f;
-    public bool IsInAffectedRange => AffectedRange >= Distance;
-    public readonly int CurAllCrewCount = -1;
-    public readonly float Potency;
-
-    public readonly Texture2D HonorIcon;
-    public readonly Texture2D HonorStripSmall;
-    public readonly Texture2D HonorBackgroundSmall;
-    public readonly Texture2D HonorDecorationSmall;
-
-    public BranchSummaryCacheEntry() { }
-
-    public BranchSummaryCacheEntry(Branch branch, Map map)
-    {
-        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        _ = map ?? throw new ArgumentNullException(nameof(map));
-
-        SquadName = branch.Squad.Name;
-
-        if (branch.BaseSite is INameableWorldObject nameSite)
-        {
-            BaseSiteName = nameSite.Name;
-        }
-        else
-        {
-            BaseSiteName = branch.BaseSite.Label;
-        }
-
-        Distance = branch.DistanceTo(map.Tile);
-        AffectedRange = branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
-        CurAllCrewCount = branch.Squad.AllCrewCountInt;
-
-        if (branch.IsBranchOfType(BranchType.Honor))
-        {
-            HonorIcon = branch.HonorDef?.IconTexture;
-            BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
-            if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
-            {
-                HonorStripSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorStripSmall_{primaryMedal}").Texture;
-                HonorBackgroundSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorBackgroundSmall_{primaryMedal}").Texture;
-                HonorDecorationSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorDecorationSmall_{primaryMedal}").Texture;
-            }
-        }
-    }
-
-    public class SquadWindowEntryComparer : IComparer<BranchSummaryCacheEntry>
-    {
-        public int Compare(BranchSummaryCacheEntry x, BranchSummaryCacheEntry y)
-        {
-            Branch xBranch = x?.Branch;
-            Branch yBranch = y?.Branch;
-
-            if (xBranch is null && yBranch is null) return 0;
-            if (xBranch is not null && yBranch is null) return -1;
-            if (xBranch is null && yBranch is not null) return 1;
-            if (x.IsInAffectedRange != y.IsInAffectedRange)
-            {
-                return x.IsInAffectedRange ? -1 : 1;
-            }
-
-            bool xIsFriendly = xBranch.IsBranchOfType(BranchType.Friendly);
-            bool yIsFriendly = yBranch.IsBranchOfType(BranchType.Friendly);
-            if (xIsFriendly != yIsFriendly)
-            {
-                return xIsFriendly ? -1 : 1;
-            }
-
-            bool xIsHonor = xBranch.IsBranchOfType(BranchType.Honor);
-            bool yIsHonor = yBranch.IsBranchOfType(BranchType.Honor);
-            if (xIsHonor != yIsHonor)
-            {
-                return xIsHonor ? -1 : 1;
-            }
-
-            return x.Distance.CompareTo(y.Distance);
-        }
-    }
-}
-
-public class BranchInfoCacheEntry : BranchSummaryCacheEntry
-{
-    public readonly string FriendlyExpireDateStr = string.Empty;
-    public readonly float FriendlyProcess = 0f;
-
-    public readonly int CommanderCeiling = -1;
-    public readonly int CrewCeiling = -1;
-    public readonly float MemberRecoveryRate = -1f;
-    public readonly int BombardSupportCeiling = -1;
-
-    public readonly Texture2D MedalBackground;
-
-    public readonly Texture2D HonorExpandIcon;
-    public readonly Texture2D HonorStrip;
-    public readonly Texture2D HonorBackground;
-    public readonly Texture2D HonorDecoration;
-
-    public readonly AcceptanceReport CanUnlockSupportAuthority = false;
-    public readonly AcceptanceReport CanRequestCombatReadiness = false;
-    public readonly List<AcceptanceReport> SupportFeasibilities;
-    public AcceptanceReport SupportFeasibility => SupportFeasibilities?.FirstOrFallback(fallback: false) ?? false;
-    public readonly AcceptanceReport BombardFeasibility = false;
-
-    public BranchInfoCacheEntry() : base() { }
-
-    public BranchInfoCacheEntry(Branch branch, Map map) : base(branch, map)
-    {
-        if (branch.IsBranchOfType(BranchType.Friendly))
-        {
-            FriendlyProcess = Mathf.Clamp01(branch.FriendlyDaysLeft / (float)BranchUtility.GetDefaultFriendlyDurationDays(branch));
-            FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyDaysLeft, Find.WorldGrid.LongLatOf(map.Tile));
-        }
-        HonorExpandIcon = branch.HonorDef?.ExpandingIconTexture;
-
-        BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
-        if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
-        {
-            MedalBackground = new CachedTexture($"UI/BranchSquad/OARO_MedalBackground_{primaryMedal}").Texture;
-            if (branch.IsBranchOfType(BranchType.Honor))
-            {
-                HonorStrip = new CachedTexture($"UI/BranchSquad/OARO_HonorStrip_{primaryMedal}").Texture;
-                HonorBackground = new CachedTexture($"UI/BranchSquad/OARO_HonorBackground_{primaryMedal}").Texture;
-                HonorDecoration = new CachedTexture($"UI/BranchSquad/OARO_HonorDecoration_{primaryMedal}").Texture;
-            }
-        }
-
-        CanUnlockSupportAuthority = BranchUtility.CanUnlockSupportAuthority(branch, map, resultOnly: false);
-        CanRequestCombatReadiness = branch.TaskHandler.CanSwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, resultOnly: false);
-        BombardFeasibility = BranchSupportUtility.CanBombard(branch, map, resultOnly: false);
-
-        List<BranchSupportUtility.SupportLevel> supportLevels = EnumUtility.GetValues<BranchSupportUtility.SupportLevel>().ToList();
-        SupportFeasibilities = new(supportLevels.Count);
-        for (int i = 0; i < supportLevels.Count; i++)
-        {
-            SupportFeasibilities.Add(BranchSupportUtility.CanSupport(branch, supportLevels[i], map, resultOnly: false));
-        }
-
-        CommanderCeiling = (int)branch.Squad.CommanderCeiling;
-        CrewCeiling = (int)branch.Squad.MemberCeiling + CommanderCeiling;
-
-        MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate);
-        BombardSupportCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling);
-    }
-
 }

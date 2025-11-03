@@ -1,19 +1,10 @@
-﻿using RimWorld;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
+﻿using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class HonorBranchDef : Def
+public abstract class BranchConstructionDef : Def
 {
-    public HediffDef buffHediff;
-
-    public ResidentKnightAcademicDef academicDef;
-
-    public List<PawnGroupMaker> pawnGroupMakers;
-
     [NoTranslate]
     protected string iconPath;
     protected Texture2D iconTexture;
@@ -51,16 +42,5 @@ public class HonorBranchDef : Def
             }
             return expandingIconTexture;
         }
-    }
-
-    public bool TryGetRandomPawnGroupMaker(PawnGroupKindDef pawnGroupKindDef, out PawnGroupMaker groupMaker)
-    {
-        if (pawnGroupMakers.NullOrEmpty())
-        {
-            groupMaker = null;
-            return false;
-        }
-        return pawnGroupMakers.Where(g => g.kindDef == pawnGroupKindDef)
-                              .TryRandomElementByWeight(g => g.commonality, out groupMaker);
     }
 }

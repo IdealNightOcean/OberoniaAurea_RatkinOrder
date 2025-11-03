@@ -1,8 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
-using System.Data;
-using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -11,10 +9,6 @@ namespace OberoniaAurea.RatkinOrder;
 public class OrderLetterBox : IExposable
 {
     public static OrderLetterBox Instance { get; private set; }
-
-    public const int MaxLetterCount = 100;
-    public const int MaxLetterRetentionDays = 60;
-    public bool HasMaxLetterLimit = false;
 
     public bool autoTransNormal;
     public bool autoTransUrgent = true;
@@ -42,15 +36,45 @@ public class OrderLetterBox : IExposable
 
     public void LetterBoxDay()
     {
-        archivedLetters.AddRange(unreadLetters.Where(l => l.Expired));
-        unreadLetters.RemoveAll(l => l.Expired);
+        List<OrderLetter> validLetters = new(8);
+        List<OrderLetter> expiredLetters = new(8);
 
-        RemoveOvercapArchivedLetters();
+        for (int i = 0; i < unreadLetters.Count; i++)
+        {
+            if (unreadLetters[i].Expired)
+            {
+                expiredLetters.Add(unreadLetters[i]);
+            }
+            else
+            {
+                validLetters.Add(unreadLetters[i]);
+            }
+        }
+
+        if (expiredLetters.Count > 0)
+        {
+            unreadLetters.Clear();
+            unreadLetters.AddRange(validLetters);
+            AddLettersToOrderedList(archivedLetters, expiredLetters);
+
+            if (RatkinOrderSettings.HasMaxLetterLimit)
+            {
+                RemoveOvercapArchivedLetters();
+            }
+        }
+
+        if (RatkinOrderSettings.HasLetterRetentionLimit)
+        {
+            int ticksGame = Find.TickManager.TicksGame;
+            int maxLetterRetentionDays = RatkinOrderSettings.MaxLetterRetentionDays;
+            archivedLetters.RemoveAll(r => (ticksGame - r.ArrivalTick) / 60000 >= maxLetterRetentionDays);
+        }
     }
+
     public void ReceiveLetter(OrderLetter letter)
     {
         letter.ArrivalTick = Find.TickManager.TicksGame;
-        unreadLetters.Add(letter);
+        AddLetterToOrderedList(unreadLetters, letter);
     }
 
     public void ReadSingleLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
@@ -70,9 +94,9 @@ public class OrderLetterBox : IExposable
     {
         try
         {
-            foreach (OrderLetter letter in unreadLetters)
+            for (int i = 0; i < unreadLetters.Count; i++)
             {
-                OrderLetterUtility.ReadLetter(letter, letterBox, forceSlience);
+                OrderLetterUtility.ReadLetter(unreadLetters[i], letterBox, forceSlience);
             }
         }
         catch (Exception ex)
@@ -80,16 +104,17 @@ public class OrderLetterBox : IExposable
             Log.Error($"Error when reading all unread letters, force archived. {ex.Message}");
         }
 
-        archivedLetters.AddRange(unreadLetters);
-        unreadLetters.Clear();
-        RemoveOvercapArchivedLetters();
+        ClearAllUnreadLetters();
     }
 
     public void ClearAllUnreadLetters()
     {
-        archivedLetters.AddRange(unreadLetters);
+        AddLettersToOrderedList(archivedLetters, unreadLetters);
         unreadLetters.Clear();
-        RemoveOvercapArchivedLetters();
+        if (RatkinOrderSettings.HasMaxLetterLimit)
+        {
+            RemoveOvercapArchivedLetters();
+        }
     }
 
     public void ClearAllArchivedLetters()
@@ -108,21 +133,17 @@ public class OrderLetterBox : IExposable
 
     private void RemoveOvercapArchivedLetters()
     {
-        if (HasMaxLetterLimit)
+        int overCap = archivedLetters.Count - RatkinOrderSettings.MaxLetterCount;
+        if (overCap > 0)
         {
-            int overCap = archivedLetters.Count - MaxLetterCount;
-            if (overCap > 0)
-            {
-                archivedLetters.SortBy(l => l.ArrivalTick);
-                archivedLetters.RemoveRange(0, overCap);
-            }
+            archivedLetters.RemoveRange(archivedLetters.Count - overCap, overCap);
         }
     }
 
     private void ArchiveLetter(OrderLetter letter)
     {
         unreadLetters.Remove(letter);
-        archivedLetters.Add(letter);
+        AddLetterToOrderedList(archivedLetters, letter);
     }
 
     public void ExposeData()
@@ -140,7 +161,83 @@ public class OrderLetterBox : IExposable
         {
             unreadLetters.RemoveAll(l => l is null);
             archivedLetters.RemoveAll(l => l is null);
+
+            unreadLetters.SortBy(r => -r.ArrivalTick);
+            archivedLetters.SortBy(r => -r.ArrivalTick);
         }
+    }
+
+    /// <summary>
+    /// 根据OrderLetter.ArrivalTick降序添加信件
+    /// </summary>
+    /// <param name="originList">原列表（降序丨有修改）</param>
+    private void AddLetterToOrderedList(List<OrderLetter> originList, OrderLetter letter)
+    {
+        int leftIndex = 0;
+        int rightIndex = originList.Count;
+        int midIndex;
+        while (leftIndex < rightIndex)
+        {
+            midIndex = (leftIndex + rightIndex) / 2;
+            if (originList[midIndex].ArrivalTick > letter.ArrivalTick)
+            {
+                leftIndex = midIndex + 1;
+            }
+            else
+            {
+                rightIndex = midIndex;
+            }
+        }
+
+        originList.Insert(leftIndex, letter);
+    }
+
+    /// <summary>
+    /// 根据OrderLetter.ArrivalTick降序添加信件
+    /// </summary>
+    /// <param name="originList">被添加列表（降序丨有修改）</param>
+    ///  <param name="lettersToAdd">添加列表（降序丨无修改）</param>
+    private void AddLettersToOrderedList(List<OrderLetter> originList, List<OrderLetter> lettersToAdd)
+    {
+        if (lettersToAdd.Count <= 3)
+        {
+            for (int i = 0; i < lettersToAdd.Count; i++)
+            {
+                AddLetterToOrderedList(originList, lettersToAdd[i]);
+            }
+            return;
+        }
+
+        List<OrderLetter> mergedList = new(originList.Count + lettersToAdd.Count);
+        int j = 0;
+        int k = 0;
+        while (j < originList.Count && k < lettersToAdd.Count)
+        {
+            if (originList[j].ArrivalTick > lettersToAdd[k].ArrivalTick)
+            {
+                mergedList.Add(originList[j]);
+                j++;
+            }
+            else
+            {
+                mergedList.Add(lettersToAdd[k]);
+                k++;
+            }
+        }
+        while (j < originList.Count)
+        {
+            mergedList.Add(originList[j]);
+            j++;
+        }
+
+        while (k < lettersToAdd.Count)
+        {
+            mergedList.Add(lettersToAdd[k]);
+            k++;
+        }
+
+        originList.Clear();
+        originList.AddRange(mergedList);
     }
 
 }

@@ -21,12 +21,20 @@ public struct BranchStatTransformer
         this.factor = factor < 0f ? 0f : factor;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void MergeWith(BranchStatTransformer other)
     {
         offset += other.offset;
         factor *= other.factor;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void MergeOffset(float value) => offset += value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void MergeFactor(float value) => factor *= value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Unmerge(BranchStatTransformer toRemove)
     {
         if (toRemove.factor == 0f)
@@ -38,6 +46,22 @@ public struct BranchStatTransformer
         }
         offset -= toRemove.offset;
         factor /= toRemove.factor;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnmergeOffset(float value) => offset -= value;
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public void UnmergeFactor(float value)
+    {
+        if (value == 0f)
+        {
+            Log.Error($"Unmerge failed: value is 0.");
+            throw new ArgumentOutOfRangeException(
+                paramName: nameof(value),
+                message: "Unmerge operation requires a non-zero factor to avoid calculation errors.");
+        }
+        factor /= value;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
