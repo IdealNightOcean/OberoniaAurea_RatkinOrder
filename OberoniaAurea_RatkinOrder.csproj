@@ -74,6 +74,7 @@
     <Compile Include="BranchBuilding\BranchBuildingComp.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_OrderEffectTags.cs" />
     <Compile Include="BranchBuilding\BranchBuildingCompProperties.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingConstructionRecord.cs" />
     <Compile Include="BranchBuilding\BranchBuildingWithComps.cs" />
     <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
@@ -90,8 +91,8 @@
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
-    <Compile Include="Components\SquadInfoCacheEntry.cs" />
-    <Compile Include="Components\BranchSummaryCacheEntry.cs" />
+    <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
+    <Compile Include="Window\UICacheComp\BranchSummaryUICache.cs" />
     <Compile Include="Components\KnightRecord.cs" />
     <Compile Include="Components\TrackedIntValue.cs" />
     <Compile Include="Components\TrackedFloatValue.cs" />
@@ -316,7 +317,9 @@
     <Compile Include="BranchBuilding\BranchBuilding.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
-    <Compile Include="Window\MainTabWindow_BranchSquad.cs" />
+    <Compile Include="Window\UICacheComp\BranchBuildingDefSummaryUICache.cs" />
+    <Compile Include="Window\UICacheComp\BranchFacilitySummaryUICache.cs" />
+    <Compile Include="Window\Window_BranchSquad.cs" />
     <Compile Include="Window\MainTabWindow_InteractionKnights.cs" />
     <Compile Include="Window\Window_Branch.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
@@ -433,7 +436,7 @@
     <Compile Include="Worldobject\Mercy\WorldObject_UnsalableArtcraft.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Components\BranchInfoCacheEntry.cs" />
+    <Compile Include="Window\UICacheComp\BranchInfoUICache.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

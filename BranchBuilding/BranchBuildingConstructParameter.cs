@@ -1,9 +1,8 @@
 ﻿using RimWorld.Planet;
-using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchBuildingConstructParameter : IExposable
+public struct BranchBuildingConstructParameter
 {
     public Branch Branch;
     public BranchBuildingDef BuildingDef;
@@ -16,18 +15,8 @@ public class BranchBuildingConstructParameter : IExposable
     public bool ByPlayer;
     public Caravan caravan;
 
-    public bool NeedDoubleConfirm => ByPlayer && BuildingDef.ConstructChecker.DoubleComfirm;
-    public void DoubleComfirm() => BuildingDef.ConstructChecker.DoubleComfirmAction(this);
-
-    public void ExposeData()
-    {
-        Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Defs.Look(ref BuildingDef, "BuildingDef");
-        Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
-
-        Scribe_Values.Look(ref ByPlayer, "ByPlayer", defaultValue: false);
-        Scribe_References.Look(ref caravan, "caravan");
-    }
+    public readonly bool NeedDoubleConfirm => ByPlayer && BuildingDef.ConstructChecker.DoubleComfirm;
+    public readonly void DoubleComfirm() => BuildingDef.ConstructChecker.DoubleComfirmAction(this);
 
     public BranchBuildingConstructParameter() { }
 

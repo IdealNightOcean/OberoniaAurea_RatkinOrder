@@ -25,10 +25,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     [Unsaved] private List<ITickHour<Branch>> TickHourHandlers;
     [Unsaved] private List<ITickDay<Branch>> TickDayHandlers;
 
-    private BranchBuildingDef underConstructionBuilding;
-    private bool inSpecialSlot;
-    private int buildingTicksLeft = -1;
-
+    private BranchBuildingConstructionRecord underConstructionBuilding;
+    public BranchBuildingConstructionRecord UnderConstructionBuilding => underConstructionBuilding;
     public bool IsBusy => underConstructionBuilding is not null;
 
     internal BranchBuildingHandler(Branch branch)
@@ -42,9 +40,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         Scribe_Collections.Look(ref buildings, "buildings", LookMode.Deep);
         Scribe_Deep.Look(ref specialBuilding, "specialBuilding");
 
-        Scribe_Defs.Look(ref underConstructionBuilding, "underConstructionBuilding");
-        Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
-        Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
+        Scribe_Deep.Look(ref underConstructionBuilding, "underConstructionBuilding");
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -74,24 +70,22 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
         else
         {
-            listing_Rect.SubLabel(underConstructionBuilding.label, 0.8f);
+            listing_Rect.SubLabel(underConstructionBuilding.BuildingDef.label, 0.8f);
+            listing_Rect.Label($"BuildingTicksLeft: {underConstructionBuilding.durationTicksLeft}");
         }
-        listing_Rect.Label($"BuildingTicksLeft: {buildingTicksLeft}");
     }
 
     public void TickHour(int hourOfDay)
     {
-        if (buildingTicksLeft > 0 && (buildingTicksLeft -= 2500) <= 0)
+        if (underConstructionBuilding is not null && (underConstructionBuilding.durationTicksLeft -= 2500) <= 0)
         {
             try
             {
-                AddBuilding(underConstructionBuilding, inSpecialSlot);
+                AddBuilding(underConstructionBuilding.BuildingDef, underConstructionBuilding.InSpecialSlot);
             }
             finally
             {
                 underConstructionBuilding = null;
-                inSpecialSlot = false;
-                buildingTicksLeft = -1;
             }
         }
 
@@ -210,15 +204,18 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void StartBuildingConstructionDirectly(BranchBuildingConstructParameter constructParam)
     {
-        underConstructionBuilding = constructParam.BuildingDef;
+        BranchBuildingDef buildingDef = constructParam.BuildingDef;
+        underConstructionBuilding = new(
+            def: buildingDef,
+            inSpecialSlot: constructParam.InSpecialSlot,
+            durationTicks: branch.GetBuildingTimeCost(underConstructionBuilding.BuildingDef));
 
-        buildingTicksLeft = branch.GetBuildingTimeCost(underConstructionBuilding);
         if (constructParam.ByPlayer)
         {
             int silverCost = branch.GetBuildingSilverCost(constructParam.BuildingDef);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.caravan, ThingDefOf.Silver, silverCost);
         }
-        branch.StoresReserveHandler.Notify_BranchConstructStarted(underConstructionBuilding);
+        branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);
     }
 
     private void AddBuilding(BranchBuildingDef buildingDef, bool inSpecialSlot)

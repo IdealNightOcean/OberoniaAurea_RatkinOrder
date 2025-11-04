@@ -15,4 +15,32 @@ public class BranchFacilityLevelStage
 
     [MustTranslate]
     public List<string> customEffectDescriptions;
+
+    public IEnumerable<string> GetEffectDescriptions()
+    {
+        if (branchStatOffsets is not null)
+        {
+            foreach (BranchStatModifier modifier in branchStatOffsets)
+            {
+                yield return modifier.ToStringOffset();
+            }
+        }
+
+        if (branchStatFactors is not null)
+        {
+            foreach (BranchStatModifier modifier in branchStatFactors)
+            {
+                yield return modifier.ToStringFactor();
+            }
+        }
+
+        if (customEffectDescriptions is not null)
+        {
+            foreach (string desc in customEffectDescriptions)
+            {
+                yield return desc;
+            }
+
+        }
+    }
 }

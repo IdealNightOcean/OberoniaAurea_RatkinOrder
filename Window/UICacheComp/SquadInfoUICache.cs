@@ -8,7 +8,7 @@ using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class SquadInfoCacheEntry : BranchSummaryCacheEntry
+public class SquadInfoUICache : BranchSummaryUICache
 {
     public readonly string FriendlyExpireDateStr = string.Empty;
     public readonly float FriendlyProcess = 0f;
@@ -31,17 +31,17 @@ public class SquadInfoCacheEntry : BranchSummaryCacheEntry
     public AcceptanceReport SupportFeasibility => SupportFeasibilities?.FirstOrFallback(fallback: false) ?? false;
     public readonly AcceptanceReport BombardFeasibility = false;
 
-    public SquadInfoCacheEntry() : base() { }
+    public SquadInfoUICache() : base() { }
 
-    public SquadInfoCacheEntry(Branch branch, Map map) : base(branch, map)
+    public SquadInfoUICache(Branch branch, Map map) : base(branch, map)
     {
         if (branch.IsBranchOfType(BranchType.Friendly))
         {
             FriendlyProcess = Mathf.Clamp01(branch.FriendlyDaysLeft / (float)BranchUtility.GetDefaultFriendlyDurationDays(branch));
             FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyDaysLeft, Find.WorldGrid.LongLatOf(map.Tile));
         }
-        HonorExpandIcon = branch.HonorDef?.ExpandingIconTexture;
 
+        HonorExpandIcon = branch.HonorDef?.ExpandingIconTexture;
         BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
         if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
         {
@@ -71,5 +71,4 @@ public class SquadInfoCacheEntry : BranchSummaryCacheEntry
         MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate);
         BombardSupportCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling);
     }
-
 }

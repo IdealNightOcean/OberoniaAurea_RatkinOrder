@@ -7,7 +7,7 @@ using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchSummaryCacheEntry
+public class BranchSummaryUICache
 {
     public readonly Branch Branch;
 
@@ -24,9 +24,9 @@ public class BranchSummaryCacheEntry
     public readonly Texture2D HonorBackgroundSmall;
     public readonly Texture2D HonorDecorationSmall;
 
-    public BranchSummaryCacheEntry() { }
+    public BranchSummaryUICache() { }
 
-    public BranchSummaryCacheEntry(Branch branch, Map map)
+    public BranchSummaryUICache(Branch branch, Map map)
     {
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         _ = map ?? throw new ArgumentNullException(nameof(map));
@@ -59,9 +59,9 @@ public class BranchSummaryCacheEntry
         }
     }
 
-    public class SquadWindowEntryComparer : IComparer<BranchSummaryCacheEntry>
+    public class SquadWindowEntryComparer : IComparer<BranchSummaryUICache>
     {
-        public int Compare(BranchSummaryCacheEntry x, BranchSummaryCacheEntry y)
+        public int Compare(BranchSummaryUICache x, BranchSummaryUICache y)
         {
             Branch xBranch = x?.Branch;
             Branch yBranch = y?.Branch;

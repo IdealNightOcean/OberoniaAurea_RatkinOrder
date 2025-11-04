@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchInfoCacheEntry : BranchSummaryCacheEntry
+public class BranchInfoUICache : BranchSummaryUICache
 {
     public int PopulationCeiling;
     public int BuildingCeiling;
@@ -13,10 +13,9 @@ public class BranchInfoCacheEntry : BranchSummaryCacheEntry
     public int DailyPopulationGrowth_Ceiling;
     public string DailyPopulationGrowthExplanation;
 
+    public BranchInfoUICache() : base() { }
 
-    public BranchInfoCacheEntry() : base() { }
-
-    public BranchInfoCacheEntry(Branch branch, Map map) : base(branch, map)
+    public BranchInfoUICache(Branch branch, Map map) : base(branch, map)
     {
         PopulationCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
 

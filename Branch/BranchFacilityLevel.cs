@@ -6,5 +6,5 @@ public enum BranchFacilityLevel : byte
     Poor,
     Normal,
     Good,
-    Excellent,
+    Excellent
 }

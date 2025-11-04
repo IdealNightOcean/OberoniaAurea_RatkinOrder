@@ -81,4 +81,62 @@ public class BranchBuildingDef : BranchConstructionDef
             }
         }
     }
+
+    public IEnumerable<string> GetBaseEffectDescriptions()
+    {
+        if (branchStatOffsets is not null)
+        {
+            foreach (BranchStatModifier modifier in branchStatOffsets)
+            {
+                yield return modifier.ToStringOffset();
+            }
+        }
+
+        if (branchStatFactors is not null)
+        {
+            foreach (BranchStatModifier modifier in branchStatFactors)
+            {
+                yield return modifier.ToStringFactor();
+            }
+        }
+
+        if (customEffectDescriptions is not null)
+        {
+            foreach (string desc in customEffectDescriptions)
+            {
+                yield return desc;
+            }
+        }
+    }
+
+    public IEnumerable<string> GetAdvancedEffectDescriptions()
+    {
+        if (!IsUpgradable)
+        {
+            yield break;
+        }
+        if (advancedProperties.branchStatOffsets is not null)
+        {
+            foreach (BranchStatModifier modifier in advancedProperties.branchStatOffsets)
+            {
+                yield return modifier.ToStringOffset();
+            }
+        }
+
+        if (advancedProperties.branchStatFactors is not null)
+        {
+            foreach (BranchStatModifier modifier in advancedProperties.branchStatFactors)
+            {
+                yield return modifier.ToStringFactor();
+            }
+        }
+
+        if (advancedProperties.customEffectDescriptions is not null)
+        {
+            foreach (string desc in advancedProperties.customEffectDescriptions)
+            {
+                yield return desc;
+            }
+        }
+    }
 }

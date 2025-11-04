@@ -83,11 +83,14 @@ public static class OARO_WindowUtility
 
     /// <summary>
     /// 绘制分部简述
-    /// inRect: (width: 299f, height: 87f)
+    /// inRect: (width: 393f, height: 91f)
     /// </summary>
-    /// <param name="inRect">width: 299f, height: 87f</param>
-    public static void DrawBranchSummary(Rect inRect, BranchSummaryCacheEntry entry)
+    /// <param name="inRect">width: 393f, height: 91f</param>
+    public static void DrawBranchSummary(Rect inRect, BranchSummaryUICache entry)
     {
+        GUI.DrawTexture(inRect, IconLibrary.BranchSummaryBackground);
+        inRect = inRect.ContractedBy(2f);
+
         Rect reusedRect = CenterRectOnY(inRect, inRect.x, 6f, 87f);
         if (entry.HonorStripSmall is not null)
         {
@@ -98,6 +101,7 @@ public static class OARO_WindowUtility
 
         reusedRect = new(leftRect.x + 2f, leftRect.y + 2f, 32f, 20f);
         Text.Anchor = TextAnchor.MiddleCenter;
+        Text.Font = GameFont.Small;
         Widgets.Label(reusedRect, entry.Distance.ToString("F0").Colorize(entry.IsInAffectedRange ? Color.green : Color.white));
 
         if (entry.HonorDecorationSmall is not null)
