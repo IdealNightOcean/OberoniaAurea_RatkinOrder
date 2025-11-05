@@ -71,13 +71,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         else
         {
             listing_Rect.SubLabel(underConstructionBuilding.BuildingDef.label, 0.8f);
-            listing_Rect.Label($"BuildingTicksLeft: {underConstructionBuilding.durationTicksLeft}");
+            listing_Rect.Label($"BuildingTicksLeft: {underConstructionBuilding.DurationTicksLeft}");
         }
     }
 
     public void TickHour(int hourOfDay)
     {
-        if (underConstructionBuilding is not null && (underConstructionBuilding.durationTicksLeft -= 2500) <= 0)
+        if (underConstructionBuilding is not null && (underConstructionBuilding.DurationTicksLeft -= 2500) <= 0)
         {
             try
             {

@@ -33,8 +33,8 @@ public class BranchFacilityHandler : IExposable
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
-    private BranchFacilityDef buildingFacility;
-    private int buildingTicksLeft = -1;
+    private BranchFacilityConstructionRecord buildingFacility;
+    public BranchFacilityConstructionRecord BuildingFacility => buildingFacility;
     public bool IsBusy => buildingFacility is not null;
 
     internal BranchFacilityHandler(Branch branch)
@@ -46,8 +46,7 @@ public class BranchFacilityHandler : IExposable
     {
         Scribe_Collections.Look(ref facilities, "facilities", LookMode.Def, LookMode.Value);
 
-        Scribe_Defs.Look(ref buildingFacility, "buildingFacility");
-        Scribe_Values.Look(ref buildingTicksLeft, "buildingTicksLeft", -1);
+        Scribe_Deep.Look(ref buildingFacility, "buildingFacility");
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -66,7 +65,7 @@ public class BranchFacilityHandler : IExposable
         }
         else
         {
-            listing_Rect.Label($"BuildingFacility: {buildingFacility.label} | {buildingTicksLeft}");
+            listing_Rect.Label($"BuildingFacility: {buildingFacility.FacilityDef.label} | {buildingFacility.DurationTicksLeft}");
         }
     }
 
@@ -75,7 +74,7 @@ public class BranchFacilityHandler : IExposable
 
     public void TickHour()
     {
-        if (buildingTicksLeft > 0 && (buildingTicksLeft -= 2500) <= 0)
+        if (buildingFacility is not null && (buildingFacility.DurationTicksLeft -= 2500) <= 0)
         {
             CompleteFacilityConstruction();
         }
@@ -83,7 +82,7 @@ public class BranchFacilityHandler : IExposable
 
     public AcceptanceReport CanConstructFacility(BranchFacilityDef facilityDef, bool byPlayer, Caravan caravan = null, bool resultOnly = false)
     {
-        if (buildingTicksLeft > 0)
+        if (buildingFacility is not null)
         {
             return resultOnly ? false : "OARO_FacilityAlreadyAssisting".Translate(facilityDef.LabelCap);
         }
@@ -114,9 +113,9 @@ public class BranchFacilityHandler : IExposable
             return;
         }
 
-        buildingFacility = facilityDef;
         BranchFacilityLevel targetLevel = oldLevel.FacilityLevelOffSetBy(1);
-        buildingTicksLeft = branch.GetFacilityTimeCost(facilityDef, targetLevel);
+        int buildingTicksCost = branch.GetFacilityTimeCost(facilityDef, targetLevel);
+        buildingFacility = new(facilityDef, buildingTicksCost);
 
         if (byPlayer)
         {
@@ -127,15 +126,20 @@ public class BranchFacilityHandler : IExposable
         branch.StoresReserveHandler.Notify_BranchConstructStarted(facilityDef);
     }
 
+    public void CancelFacilityConstruction()
+    {
+        buildingFacility = null;
+    }
+
     private void CompleteFacilityConstruction()
     {
         if (buildingFacility is null)
         {
             return;
         }
-        TryActiveNewStage(buildingFacility, GetFacilityLevel(buildingFacility).FacilityLevelOffSetBy(1), addIfMiss: true);
+        BranchFacilityDef facilityDef = buildingFacility.FacilityDef;
+        TryActiveNewStage(facilityDef, GetFacilityLevel(facilityDef).FacilityLevelOffSetBy(1), addIfMiss: true);
 
-        buildingTicksLeft = -1;
         buildingFacility = null;
     }
 

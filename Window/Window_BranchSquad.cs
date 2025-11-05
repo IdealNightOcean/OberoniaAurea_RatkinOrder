@@ -807,7 +807,7 @@ public class Window_BranchSquad : MainTabWindow
             }
         }
 
-        OARO_WindowUtility.DrawBranchSummary(inRect, entry);
+        OARO_WindowUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
     }
 
     private void RefreshSelSquad()

@@ -1,5 +1,8 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using RimWorld.Planet;
 using System.Collections.Generic;
+using System.Reflection.Emit;
 using UnityEngine;
 using Verse;
 
@@ -25,8 +28,8 @@ public class Window_Branch : MainTabWindow
         Demand
     }
     protected override float Margin => 0f;
-    public override Vector2 InitialSize => new(1570f, 907f);
-    public override Vector2 RequestedTabSize => new(1570f, 907f);
+    public override Vector2 InitialSize => new(1586f, 907f);
+    public override Vector2 RequestedTabSize => new(1586f, 907f);
 
     protected override void SetInitialSizeAndPosition()
     {
@@ -36,8 +39,13 @@ public class Window_Branch : MainTabWindow
     }
 
     private Vector2 scrollPosition_Facilities;
+    private Vector2 scrollPosition_CurFacilityStage;
+    private Vector2 scrollPosition_NextFacilityStage;
     private Vector2 scrollPosition_Buildings;
+    private Vector2 scrollPosition_BuildingBaseEffect;
+    private Vector2 scrollPosition_BuildingAdvancedEffect;
 
+    private Caravan caravan;
     private Branch branch;
     private BranchInfoUICache cachedBranchInfo;
 
@@ -51,8 +59,9 @@ public class Window_Branch : MainTabWindow
 
     private bool? selEmptyBuildingSlotIsSpecial;
 
-    private BranchFacilitySummaryUICache selFacilityCache;
-    private BranchFacilityDef SelFacilityDef => selFacilityCache?.Def;
+    private BranchFacilityDef selFacilityDef;
+    private BranchFacilityStageSummaryUICache curFacilityStageCache;
+    private BranchFacilityStageSummaryUICache nextFacilityStageCache;
 
     public Window_Branch()
     {
@@ -83,32 +92,33 @@ public class Window_Branch : MainTabWindow
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect mainRect = inRect; //OARO_WindowUtility.CenterRect(inRect, 1522f, 907f);
+        Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1522f, 907f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(4f);
         float mainInnerRectY = mainInnerRect.yMin;
 
-        Rect reusedRect = default;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 48f, 638f, 152f);
+        Rect reusedRect;
+
+        float offsetMainInnerMidX = mainInnerRect.xMin + mainInnerRect.width * 0.55f;
+        reusedRect = new(offsetMainInnerMidX - 638f * 0.5f, mainInnerRectY + 48f, 638f, 152f);
         GUI.DrawTexture(reusedRect, topTitleBackground);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
-        float mainInnerRectMidX = (mainInnerRect.xMin + mainInnerRect.xMax) / 2;
-        reusedRect = new(mainInnerRectMidX - (12f + 128f), mainInnerRectY + 65f, 128f, 32f);
+        reusedRect = new(offsetMainInnerMidX - (12f + 128f), mainInnerRectY + 65f, 128f, 32f);
         Widgets.Label(reusedRect, branch.FacilityHandler.TotalFacilityLevel.ToString());
 
-        reusedRect = new(mainInnerRectMidX - (12f + 192f), reusedRect.yMax + 10f, 192f, 32f);
+        reusedRect = new(offsetMainInnerMidX - (12f + 192f), reusedRect.yMax + 10f, 192f, 32f);
         Widgets.Label(reusedRect, "OARO_TotalFacilitiesLevel".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
-        reusedRect = new(mainInnerRectMidX + 70f, mainInnerRectY + 36f, 240f, 126f);
+        reusedRect = new(offsetMainInnerMidX + 70f, mainInnerRectY + 36f, 240f, 126f);
         DrawStoresReserves(reusedRect);
 
         //中部区域
-        Rect middleRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 210f, 579f, (538f + 46f));
+        Rect middleRect = new(offsetMainInnerMidX - 578f * 0.5f, mainInnerRectY + 210f, 579f, (538f + 46f));
         DrawMiddleRect(middleRect);
 
         //左丨中分界线
@@ -116,16 +126,18 @@ public class Window_Branch : MainTabWindow
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
         //左侧区域
-        Rect leftRect = new(reusedRect.xMin - (32f + 393f), mainInnerRectY + 198f, 393f, 590f);
+        Rect leftRect = new(reusedRect.xMin - (48f + 393f), mainInnerRectY + 198f, 393f, 590f);
         DrawLeftRect(leftRect);
 
         //中丨右分界线
         reusedRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, middleRect.xMax + 32f, 3f, 717f);
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
-        Rect rightRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, reusedRect.xMax + 32f, 305f, 717f);
+        Rect rightRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, reusedRect.xMax + 32f, 305f, 635f);
         DrawRightRect(reusedRect);
 
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.UpperLeft;
     }
 
     private void DrawStoresReserves(Rect inRect)
@@ -168,17 +180,17 @@ public class Window_Branch : MainTabWindow
         Rect constructionTabRect = new(inRect.x, inRect.y, 193f, 46f);
         if (OARO_WindowUtility.TextButtonImage(constructionTabRect, "OARO_ConstructionTab".Translate(), middleTopButton, middleTopButton_Down))
         {
-            curTab = TabType.Construction;
+            SwitchTab(TabType.Construction);
         }
         Rect demandTabRect = new(constructionTabRect.xMax, inRect.y, 193f, 46f);
         if (OARO_WindowUtility.TextButtonImage(demandTabRect, "OARO_DemandTab".Translate(), middleTopButton, middleTopButton_Down))
         {
-            curTab = TabType.Demand;
+            SwitchTab(TabType.Demand);
         }
         Rect interactionTabRect = new(demandTabRect.xMax, inRect.y, 193f, 46f);
         if (OARO_WindowUtility.TextButtonImage(interactionTabRect, "OARO_InteractionTab".Translate(), middleTopButton, middleTopButton_Down))
         {
-            curTab = TabType.Interaction;
+            SwitchTab(TabType.Interaction);
         }
 
         Rect mainRect = inRect;
@@ -229,7 +241,7 @@ public class Window_Branch : MainTabWindow
         Text.Font = GameFont.Small;
         Widgets.Label(reusedRect, "OARO_BranchBuildingCeiling".Translate(cachedBranchInfo.BuildingCeiling.ToString(), BranchStatDefOf.OARO_BuildingCeiling.maxValue.ToString("F0")));
 
-        float yMin = reusedRect.yMax + 2f;
+        float yMin = reusedRect.yMax + 4f;
         reusedRect = inRect;
         reusedRect.yMin = yMin;
         DrawBuildingList(reusedRect);
@@ -256,7 +268,7 @@ public class Window_Branch : MainTabWindow
         {
             entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryX += entryWidth;
-            //背景
+            GUI.DrawTexture(entryRect, facilityRect);
             entryRect.xMax -= 2f;
             DrawFacility(entryRect, kv.Key, kv.Value);
         }
@@ -299,7 +311,7 @@ public class Window_Branch : MainTabWindow
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
-        bool selected = ((curSelectType == SelectType.Facility) && (SelFacilityDef == facilityDef));
+        bool selected = ((curSelectType == SelectType.Facility) && (selFacilityDef == facilityDef));
         if (selected)
         {
             Widgets.DrawBox(inRect);
@@ -313,7 +325,16 @@ public class Window_Branch : MainTabWindow
             }
             else
             {
-                selFacilityCache = new(facilityDef, facilityLevel);
+                selFacilityDef = facilityDef;
+                curFacilityStageCache = new(facilityDef, facilityLevel);
+                if (facilityLevel < BranchFacilityLevel.Excellent)
+                {
+                    nextFacilityStageCache = new(facilityDef, facilityLevel.FacilityLevelOffSetBy(1));
+                }
+                else
+                {
+                    nextFacilityStageCache = null;
+                }
             }
         }
     }
@@ -388,7 +409,7 @@ public class Window_Branch : MainTabWindow
                 entryX += entryWidth;
             }
 
-            //GUI.DrawTexture
+            GUI.DrawTexture(entryRect, buildingRect);
             entryRect.xMax -= 2f;
             entryRect.yMax -= 2f;
         }
@@ -528,8 +549,7 @@ public class Window_Branch : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMin - (40f + 4f), 45f, 45f);
         GUI.DrawTexture(reusedRect, leftTopSiteIcon, ScaleMode.ScaleToFit);
 
-        reusedRect = new(inRect.x, inRect.y, 393f, 91f);
-        OARO_WindowUtility.DrawBranchSummary(reusedRect, cachedBranchInfo);
+        reusedRect = OARO_WindowUtility.DrawBranchSummary(new Vector2(inRect.x, inRect.y), cachedBranchInfo);
 
         inRect.ContractedBy(2f);
 
@@ -580,11 +600,8 @@ public class Window_Branch : MainTabWindow
             case SelectType.Facility:
                 DrawRight_Facility(inRect);
                 return;
-            case SelectType.Building:
+            case SelectType.Building or SelectType.ConstructingBuilding:
                 DrawRight_Building(inRect);
-                return;
-            case SelectType.ConstructingBuilding:
-                DrawRight_ConstructingBuilding(inRect);
                 return;
             case SelectType.EmptyBuildingSlot:
                 DrawRight_EmptyBuildingSlot(inRect);
@@ -595,12 +612,221 @@ public class Window_Branch : MainTabWindow
 
     private void DrawRight_Facility(Rect inRect)
     {
+        if (selFacilityDef is null)
+        {
+            return;
+        }
 
+        Rect reusedRect = new(inRect.x + 42f, inRect.y + 75f, 105f, 96f);
+        GUI.DrawTexture(reusedRect, selFacilityDef.ExpandingIconTexture, ScaleMode.ScaleToFit);
+
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Text.Font = GameFont.Medium;
+        reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 185f, 48f);
+        Widgets.Label(reusedRect, selFacilityDef.LabelCap);
+
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Text.Font = GameFont.Small;
+        reusedRect = new(reusedRect.x, reusedRect.yMax, 185f, 48f);
+        Widgets.Label(reusedRect, selFacilityDef.description);
+
+        float commonXMin = inRect.x + 32f;
+        float commonWidth = 298f;
+        float stageRectHeight = 24f + 2f + 134f;
+        Rect descRect = new(commonXMin, reusedRect.yMax + 50f, commonWidth, stageRectHeight);
+        if (curFacilityStageCache is not null)
+        {
+            TaggedString label = "OARO_CurFacilityStage".Translate();
+            if (curFacilityStageCache.Level == BranchFacilityLevel.Excellent)
+            {
+                label += " (Max)";
+            }
+            reusedRect = descRect;
+            reusedRect.height = 24f;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(reusedRect, "OARO_CurFacilityStage".Translate());
+            DrawEffectDescriptions(new Vector2(descRect.x, reusedRect.yMax + 2f), label, curFacilityStageCache.StageEffectDesc, ref scrollPosition_CurFacilityStage);
+        }
+
+        descRect = new(commonXMin, descRect.yMax + 48f, commonWidth, stageRectHeight);
+        if (nextFacilityStageCache is not null)
+        {
+            reusedRect = descRect;
+            reusedRect.height = 24f;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(reusedRect, "OARO_NextFacilityStage".Translate());
+            DrawEffectDescriptions(new Vector2(descRect.x, reusedRect.yMax + 2f), "OARO_NextFacilityStage".Translate(), nextFacilityStageCache.StageEffectDesc, ref scrollPosition_NextFacilityStage);
+        }
+
+        BranchFacilityHandler facilityHandler = branch.FacilityHandler;
+        if (facilityHandler.IsBusy)
+        {
+            BranchFacilityConstructionRecord buildingFacility = facilityHandler.BuildingFacility;
+            if (buildingFacility?.FacilityDef == selFacilityDef)
+            {
+                reusedRect = new(commonXMin, reusedRect.yMax + 16f, commonWidth, 24f);
+                Text.Anchor = TextAnchor.MiddleLeft;
+                Widgets.Label(reusedRect, "OARO_Constructing".Translate());
+                Text.Anchor = TextAnchor.MiddleRight;
+                Widgets.Label(reusedRect, "OARO_DaysToCompleted".Translate(buildingFacility.DurationTicksLeft.TicksToDays().ToString("0.##")));
+                reusedRect = new(commonXMin, reusedRect.yMax, commonWidth, 24f);
+
+                //reusedRect = reusedRect.ContractedBy(2f);
+                Widgets.FillableBar(reusedRect, buildingFacility.Progress);
+                reusedRect = new(commonXMin + 2f, reusedRect.yMax, 89f, 30f);
+                if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_CancelConstruct".Translate(), constructButton, constructButton_Down))
+                {
+                    Dialog_NodeTree dialog_Node = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
+                         text: "OARO_CancelConstructWarnning".Translate(),
+                         acceptAction: branch.FacilityHandler.CancelFacilityConstruction);
+                    Find.WindowStack.Add(dialog_Node);
+                }
+
+                reusedRect = new(commonXMin + commonWidth - (2f + 89f), reusedRect.y, 89f, 30f);
+                GUI.DrawTexture(reusedRect, constructButton_Down);
+            }
+            else
+            {
+                reusedRect = new(commonXMin, reusedRect.yMax + 16f, commonWidth, 32f);
+                Widgets.Label(reusedRect, "OARO_OtherFacilityBuilding".Translate());
+            }
+        }
+        else if(nextFacilityStageCache is not null)
+        {
+            reusedRect = new(commonXMin, reusedRect.yMax + 16f, commonWidth, 24f);
+            Text.Anchor = TextAnchor.MiddleLeft;
+            Widgets.Label(reusedRect, "OARO_ExpectedCost".Translate());
+            reusedRect.xMin += 0.33f * commonWidth;
+            Widgets.Label(reusedRect, nextFacilityStageCache.Stage.constructionDays.ToString() + "Day".Translate());
+            reusedRect.xMin += 0.33f * commonWidth;
+            //
+            reusedRect.xMin += 24f;
+            Text.Anchor = TextAnchor.MiddleRight;
+            Widgets.Label(reusedRect, $"× {nextFacilityStageCache.Stage.silverCost}");
+            reusedRect = new(commonXMin + 2f, reusedRect.yMax + 24f, 89f, 30f);
+            GUI.DrawTexture(reusedRect, constructButton_Down);
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(reusedRect, "OARO_CancelConstruct".Translate());
+            reusedRect = new(commonXMin + commonWidth - (2f + 89f), reusedRect.y, 89f, 30f);
+            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_StartConstruct".Translate(), constructButton, constructButton_Down))
+            {
+                AcceptanceReport acceptance = branch.FacilityHandler.CanConstructFacility(selFacilityDef, byPlayer: true, resultOnly: false);
+                if (acceptance)
+                {
+                    branch.FacilityHandler.StartFacilityConstruction(selFacilityDef, byPlayer: true);
+                }
+                else
+                {
+                    Messages.Message("OARO_CanNotStartFacilityConstruction".Translate(acceptance.Reason), MessageTypeDefOf.RejectInput, historical: false);
+                }
+            }
+        }
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.UpperLeft;
+    }
+
+    /// <summary>
+    /// 298,134
+    /// </summary>
+    private Rect DrawEffectDescriptions(Vector2 position, string title, List<string> stageEffectDesc, ref Vector2 scrollPosition)
+    {
+        Rect rect = new(position.x, position.y, 298f, 134f);
+        Rect inRect = rect;
+
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Text.Font = GameFont.Small;
+        GUI.DrawTexture(inRect, effectDescRect, ScaleMode.ScaleToFit);
+
+        Rect viewRect = inRect.ContractedBy(2f);
+
+        float entryX = viewRect.xMin;
+        float entryY = viewRect.yMin;
+        float entryWidth = viewRect.width;
+        float entryHeight = 26f;
+     
+        int entryCount = stageEffectDesc.Count;
+        int useCount = Mathf.Max(6, entryCount);
+        viewRect.height = entryHeight * useCount;
+        
+        Rect entryRect;
+        int index = 0;
+
+        Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect, showScrollbars: false);
+        AdjustEntryRect();
+        Widgets.Label(entryRect, title);
+
+        for (int i = 0; i < entryCount; i++)
+        {
+            AdjustEntryRect();
+            Widgets.Label(entryRect, stageEffectDesc[i]);
+        }
+
+        if (useCount > entryCount)
+        {
+            for (int i = entryCount; i < useCount; i++)
+            {
+                AdjustEntryRect();
+            }
+        }
+        Widgets.EndScrollView();
+
+        Text.Anchor = TextAnchor.UpperLeft;
+        return rect;
+
+        void AdjustEntryRect()
+        {
+            entryRect = new(entryX, entryY, entryWidth, entryHeight);
+            index++;
+            entryY += entryHeight;
+            if ((index & 1) == 0)
+            {
+                GUI.DrawTexture(entryRect, effectDesc_Light);
+            }
+        }
     }
 
     private void DrawRight_Building(Rect inRect)
     {
+        if (selBuildingDefCache is null)
+        {
+            return;
+        }
+        BranchBuildingDef buildingDef = selBuildingDefCache.BuildingDef;
 
+        Rect reusedRect = new(inRect.x + 42f, inRect.y + 75f, 105f, 96f);
+        GUI.DrawTexture(reusedRect, buildingDef.ExpandingIconTexture, ScaleMode.ScaleToFit);
+
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Text.Font = GameFont.Medium;
+        reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 185f, 48f);
+        string buildingLabel = curSelectType == SelectType.Building ? selBuilding.Label : buildingDef.label;
+        Widgets.Label(reusedRect, buildingLabel);
+
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Text.Font = GameFont.Small;
+        reusedRect = new(reusedRect.x, reusedRect.yMax, 185f, 48f);
+        Widgets.Label(reusedRect, buildingDef.description);
+
+        float commonXMin = inRect.x + 32f;
+        float commonWidth = 298f;
+
+        Rect descRect = DrawEffectDescriptions(new Vector2(commonXMin, reusedRect.yMax + 32f), "OARO_BuildingBaseEffect".Translate(), selBuildingDefCache.BaseEffectDesc, ref scrollPosition_BuildingBaseEffect);
+
+        if (buildingDef.IsUpgradable)
+        {
+            Text.Anchor = TextAnchor.MiddleCenter;
+            reusedRect = new(commonXMin, descRect.yMax + 8f, commonWidth, 24f);
+            Widgets.Label(reusedRect, "OARO_BuildingUpgradePop".Translate());
+            reusedRect = new(commonXMin, reusedRect.yMax, commonWidth, 24f);
+            Widgets.Label(reusedRect, "OARO_BuildingUpgradePopGE".Translate(buildingDef.advancedProperties.advancedPopulation.ToString()));
+
+            descRect = DrawEffectDescriptions(new Vector2(commonXMin, reusedRect.yMax + 8f), "OARO_BuildingAdvancedEffect".Translate(), selBuildingDefCache.AdvancedEffectDesc, ref scrollPosition_BuildingAdvancedEffect);
+        }
+
+        if (curSelectType == SelectType.ConstructingBuilding)
+        {
+
+        }
     }
 
     private void DrawRight_ConstructingBuilding(Rect inRect)
@@ -613,12 +839,24 @@ public class Window_Branch : MainTabWindow
 
     }
 
+    private void SwitchTab(TabType tabType)
+    {
+        if (curTab == tabType)
+        {
+            return;
+        }
+        ClearSelect();
+        curTab = tabType;
+    }
+
     private void Deselect()
     {
         switch (curSelectType)
         {
             case SelectType.Facility:
-                selFacilityCache = null;
+                selFacilityDef = null;
+                curFacilityStageCache = null;
+                nextFacilityStageCache = null;
                 return;
             case SelectType.Building:
                 selBuilding = null;
@@ -641,7 +879,9 @@ public class Window_Branch : MainTabWindow
         curSelectType = SelectType.None;
         selBuilding = null;
         selBuildingDefCache = null;
-        selFacilityCache = null;
+        selFacilityDef = null;
+        curFacilityStageCache = null;
+        nextFacilityStageCache = null;
         selEmptyBuildingSlotIsSpecial = null;
     }
 
@@ -653,7 +893,6 @@ public class Window_Branch : MainTabWindow
     private static readonly Texture2D topStoresReserveFrameIII = ContentFinder<Texture2D>.Get("UI/Branch/OARO_TopStoresReserveFrameIII");
 
     private static readonly Texture2D topExclamation = ContentFinder<Texture2D>.Get("UI/Branch/OARO_TopExclamation");
-
 
     private static readonly Texture2D middleTopButton = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MiddleTopButton");
     private static readonly Texture2D middleTopButton_Down = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MiddleTopButton_Down");
@@ -669,6 +908,14 @@ public class Window_Branch : MainTabWindow
     private static readonly Texture2D specialBuildingLace = ContentFinder<Texture2D>.Get("UI/Branch/OARO_SpecialBuildingLace");
 
     private static readonly Texture2D constructionBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_ConstructionBackground");
+    private static readonly Texture2D facilityRect = ContentFinder<Texture2D>.Get("UI/Branch/OARO_FacilityRect");
+    private static readonly Texture2D buildingRect = ContentFinder<Texture2D>.Get("UI/Branch/OARO_BuildingRect");
+
+    private static readonly Texture2D effectDescRect = ContentFinder<Texture2D>.Get("UI/Branch/OARO_EffectRect");
+    private static readonly Texture2D effectDesc_Light = ContentFinder<Texture2D>.Get("UI/Branch/OARO_EffectDesc_Light");
+    private static readonly Texture2D constructButton = ContentFinder<Texture2D>.Get("UI/Branch/OARO_ConstructButton");
+    private static readonly Texture2D constructButton_Down = ContentFinder<Texture2D>.Get("UI/Branch/OARO_ConstructButton_Down");
+
 
     private static readonly Texture2D leftBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_LeftBackground");
     private static readonly Texture2D leftBackgroundLace = ContentFinder<Texture2D>.Get("UI/Branch/OARO_LeftBackgroundLace");

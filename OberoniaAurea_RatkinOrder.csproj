@@ -318,7 +318,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
     <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Window\UICacheComp\BranchBuildingDefSummaryUICache.cs" />
-    <Compile Include="Window\UICacheComp\BranchFacilitySummaryUICache.cs" />
+    <Compile Include="Window\UICacheComp\BranchFacilityStageSummaryUICache.cs" />
     <Compile Include="Window\Window_BranchSquad.cs" />
     <Compile Include="Window\MainTabWindow_InteractionKnights.cs" />
     <Compile Include="Window\Window_Branch.cs" />
