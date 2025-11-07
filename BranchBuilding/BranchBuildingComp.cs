@@ -5,6 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchBuildingComp : IExposable
 {
     protected BranchBuilding parent;
+    public BranchBuilding Parent => parent;
     protected BranchBuildingCompProperties props;
 
     /// <summary>

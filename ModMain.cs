@@ -33,6 +33,8 @@ public class RatkinOrderSettings : ModSettings
 
     public static int MaxConcurrentAcceptedDemand = 2; //最多同时接取需求数
 
+    public static int MaxConcurrentContractPerBranch = 5; //每个分部最多同时存在的合约
+
     public static bool HasMaxLetterLimit = true; //是否启用信件上限
     public static int MaxLetterCount = 100; //收件箱最多存在的信件数
     [Unsaved] private static string maxLetterCountStr;
@@ -82,7 +84,8 @@ public class RatkinOrderSettings : ModSettings
         listing_Rect.CheckboxLabeled("OARO_Setting_NoramlDemandShowMess".Translate(), ref NoramlDemandShowMess);
         listing_Rect.CheckboxLabeled("OARO_CriticalDemandShowMess".Translate(), ref CriticalDemandShowMess);
 
-        MaxConcurrentAcceptedDemand = (int)listing_Rect.SliderLabeled("OARO_MaxConcurrentAcceptedDemand".Translate(MaxConcurrentAcceptedDemand.ToString()), MaxConcurrentAcceptedDemand, 1f, 99f);
+        MaxConcurrentAcceptedDemand = (int)listing_Rect.SliderLabeled("OARO_MaxConcurrentAcceptedDemand".Translate(MaxConcurrentAcceptedDemand.ToString()), MaxConcurrentAcceptedDemand, 1f, 20f);
+        MaxConcurrentContractPerBranch = (int)listing_Rect.SliderLabeled("OARO_MaxConcurrentContractPerBranch".Translate(MaxConcurrentContractPerBranch.ToString()), MaxConcurrentContractPerBranch, 1f, 20f);
 
         listing_Rect.CheckboxLabeled("OARO_HasMaxLetterLimit".Translate(), ref HasMaxLetterLimit);
         if (HasMaxLetterLimit)

@@ -22,8 +22,10 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     public IReadOnlyList<BranchBuilding> Buildings => buildings;
     public BranchBuilding SpecialBuilding => specialBuilding;
 
-    [Unsaved] private List<ITickHour<Branch>> TickHourHandlers;
-    [Unsaved] private List<ITickDay<Branch>> TickDayHandlers;
+    [Unsaved] private List<ITickHour<Branch>> tickHourHandlers;
+    [Unsaved] private List<ITickDay<Branch>> tickDayHandlers;
+    [Unsaved] private List<BranchBuildingComp_Interaction> interactionComps;
+    public List<BranchBuildingComp_Interaction> InteractionComps => interactionComps ??= [];
 
     private BranchBuildingConstructionRecord underConstructionBuilding;
     public BranchBuildingConstructionRecord UnderConstructionBuilding => underConstructionBuilding;
@@ -89,11 +91,11 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             }
         }
 
-        if (TickHourHandlers is not null)
+        if (tickHourHandlers is not null)
         {
-            for (int i = 0; i < TickHourHandlers.Count; i++)
+            for (int i = 0; i < tickHourHandlers.Count; i++)
             {
-                TickHourHandlers[i].TickHour(branch);
+                tickHourHandlers[i].TickHour(branch);
             }
         }
     }
@@ -115,11 +117,11 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             }
         }
 
-        if (TickDayHandlers is not null)
+        if (tickDayHandlers is not null)
         {
-            for (int i = 0; i < TickDayHandlers.Count; i++)
+            for (int i = 0; i < tickDayHandlers.Count; i++)
             {
-                TickDayHandlers[i].TickDay(branch);
+                tickDayHandlers[i].TickDay(branch);
             }
         }
     }
@@ -274,11 +276,11 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (building is ITickHour<Branch> ticksLong)
         {
-            TickHourHandlers?.Remove(ticksLong);
+            tickHourHandlers?.Remove(ticksLong);
         }
         if (building is ITickDay<Branch> newTickDay)
         {
-            TickDayHandlers?.Remove(newTickDay);
+            tickDayHandlers?.Remove(newTickDay);
         }
         if (building is IPostSquadCombatPawnGenerate postPawnGenerate)
         {
@@ -382,13 +384,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (building is ITickHour<Branch> tickLong)
         {
-            TickHourHandlers ??= [];
-            TickHourHandlers.Add(tickLong);
+            tickHourHandlers ??= [];
+            tickHourHandlers.Add(tickLong);
         }
         if (building is ITickDay<Branch> tickDay)
         {
-            TickDayHandlers ??= [];
-            TickDayHandlers.Add(tickDay);
+            tickDayHandlers ??= [];
+            tickDayHandlers.Add(tickDay);
         }
         if (building is IPostSquadCombatPawnGenerate postPawnGenerate)
         {

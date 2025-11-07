@@ -284,7 +284,7 @@ public class Window_BranchSquad : MainTabWindow
         Text.Font = GameFont.Small;
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
-        Widgets.FillableBar(reusedRect, friendlyProcess, middleMiddleBarHighlightTex, middleMiddleEmptyBarTex, doBorder: true);
+        Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.HighlightBarTex_Green, IconLibrary.EmptyBarTex_Black, doBorder: true);
 
         reusedRect = new(reusedRect.x, reusedRect.yMax + 8f, 120f, 24f);
         Widgets.Label(reusedRect, friendlyExpireDate);
@@ -984,8 +984,6 @@ public class Window_BranchSquad : MainTabWindow
     private static readonly Texture2D middleUpGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpGeneralSquadIcon");
 
     private static readonly Texture2D middleMiddleBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleMiddleBackground");
-    private static readonly Texture2D middleMiddleBarHighlightTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.34f, 0.42f, 0.43f));
-    private static readonly Texture2D middleMiddleEmptyBarTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.03f, 0.035f, 0.05f));
     private static readonly Texture2D middleClickToAddButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleClickToAddButton");
     private static readonly Texture2D middleClickToAddButton_Down = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleClickToAddButton_Down");
     private static readonly Texture2D middleSilverButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleSilverButton");

@@ -78,6 +78,7 @@
     <Compile Include="BranchBuilding\BranchBuildingWithComps.cs" />
     <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchStat\BranchStatPart_SupplyRecoveryRate.cs" />
@@ -88,6 +89,7 @@
     <Compile Include="BranchTask\BranchTask.cs" />
     <Compile Include="BranchTask\BranchTask_JurisdictionDuty.cs" />
     <Compile Include="Branch\BranchContract.cs" />
+    <Compile Include="Branch\BranchContractWorker.cs" />
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
@@ -134,7 +136,6 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
     <Compile Include="OrderLetter\OrderLetterType.cs" />
-    <Compile Include="Quest\BranchDemand\Quest_BranchContractWatcher.cs" />
     <Compile Include="Quest\QuestClique\QuestNode_GetNearBranchClique.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_BranchIsTypeOf.cs" />
     <Compile Include="Quest\BranchDemand\Quest_TownConstructionWatcher.cs" />

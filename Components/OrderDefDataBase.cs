@@ -14,6 +14,7 @@ public static class OrderDefDataBase
 
     private static readonly Dictionary<ThingDef, KnightPersonality> joyBuildingToKnightPersonality = [];
 
+
     public static void ClearStaticCache()
     {
         mercyQuestsList.Clear();

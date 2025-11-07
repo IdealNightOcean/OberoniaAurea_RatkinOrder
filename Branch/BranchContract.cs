@@ -1,6 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.QuestGen;
+using RimWorld.Planet;
 using System;
 using Verse;
 using Verse.Grammar;
@@ -12,7 +12,6 @@ public class BranchContract : IExposable
     public enum ContractState : byte
     {
         Invalid,
-        NotAccepted,
         Cooling,
         Ongoing,
         Finished
@@ -22,13 +21,11 @@ public class BranchContract : IExposable
     private int requestCount;
     private string requestReason = string.Empty;
     private ContractState curState;
-    private Quest relatedQuest;
 
     public ThingDef RequestThingDef => def.requestThingDef;
     public int RequestCount => requestCount;
     public string RequestReason => requestReason;
     public ContractState CurState => curState;
-    public Quest RelatedQuest => relatedQuest;
 
     private int expirationTick = -1;
     public int TicksToExpire => expirationTick - Find.TickManager.TicksGame;
@@ -39,8 +36,8 @@ public class BranchContract : IExposable
             return curState switch
             {
                 ContractState.Invalid or ContractState.Finished => true,
-                ContractState.Ongoing => relatedQuest?.State != QuestState.Ongoing,
-                ContractState.NotAccepted or ContractState.Cooling => TicksToExpire <= 0,
+                ContractState.Ongoing => def is null,
+                ContractState.Cooling => TicksToExpire <= 0,
                 _ => true,
             };
         }
@@ -58,14 +55,12 @@ public class BranchContract : IExposable
         Scribe_Values.Look(ref requestReason, "requestReason", string.Empty);
         Scribe_Values.Look(ref curState, "curState", ContractState.Invalid);
         Scribe_Values.Look(ref expirationTick, "expirationTick", -1);
-        Scribe_References.Look(ref relatedQuest, "relatedQuest");
     }
 
     public void PostInit(Branch branch)
     {
         requestCount = def.requestCountRange.RandomInRange;
 
-        relatedQuest = null;
         expirationTick = Find.TickManager.TicksGame + def.DurationTicks;
         try
         {
@@ -76,64 +71,39 @@ public class BranchContract : IExposable
             Log.Error($"Exception occurred while getting contract reason: {ex.Message}");
             requestReason = "ERROR".Colorize(ColorLibrary.RedReadable);
         }
-        curState = ContractState.NotAccepted;
+        curState = ContractState.Ongoing;
     }
 
-    public void OnAccepted(Branch branch)
+    public bool CanFulfill(Caravan caravan)
     {
-        Slate slate = GenerateQuestSlate(branch);
-        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out Quest quest, OARO_QuestScriptDefOf.OARO_Quest_BranchContract, slate, forced: true))
+        if (curState != ContractState.Ongoing || RequestThingDef is null)
         {
-            relatedQuest = quest;
-            curState = ContractState.Ongoing;
+            return false;
         }
-        else
-        {
-            curState = ContractState.Invalid;
-        }
+        return CaravanInventoryUtility.HasThings(caravan, RequestThingDef, requestCount);
     }
 
-    public void OnContractFinished(bool succeed)
+    public void Fulfill(Caravan caravan)
     {
-        int coolingDuration = -1;
-        if (def is not null)
+        if (curState != ContractState.Ongoing || RequestThingDef is null)
         {
-            coolingDuration = succeed ? def.CoolingTicksAfterSucceed : def.CoolingTicksAfterFailed;
+            return;
         }
+        caravan?.RemoveThingsOfDef(RequestThingDef, requestCount);
 
-        def = null;
-        requestCount = 0;
-        relatedQuest = null;
-        expirationTick = -1;
-        curState = ContractState.Cooling;
 
-        if (coolingDuration > 0)
+
+        if (def.CoolingTicksAfterFulfilled > 0)
         {
-            expirationTick = Find.TickManager.TicksGame + coolingDuration;
+            expirationTick = Find.TickManager.TicksGame + def.CoolingTicksAfterFulfilled;
             curState = ContractState.Cooling;
         }
         else
         {
-            curState = succeed ? ContractState.Finished : ContractState.Invalid;
+            curState = ContractState.Finished;
         }
-    }
 
-    private Slate GenerateQuestSlate(Branch branch)
-    {
-        Slate slate = new();
-        slate.SetBasicBranchSlateVar(branch);
-
-        slate.Set(KeyLibrary_SlateStoreAs.ContractDef, def);
-        slate.Set(KeyLibrary_SlateStoreAs.ContractThingDef, RequestThingDef);
-        slate.Set(KeyLibrary_SlateStoreAs.ContractThingCount, requestCount);
-        slate.Set(KeyLibrary_SlateStoreAs.ContractReason, requestReason);
-
-        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-        slate.Set("map", map);
-        float points = StorytellerUtility.DefaultThreatPointsNow(map);
-        slate.Set("points", points);
-
-        return slate;
+        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchContractCompleted, 1f, addIfMiss: true);
     }
 
     private string GetContractReason(Branch branch)

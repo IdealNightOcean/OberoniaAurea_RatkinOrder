@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea_Frame;
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -26,13 +25,16 @@ public class BranchPopulationHandler : IExposable, ITickDay
     public IReadOnlyList<BranchContract> Contracts => contracts;
     private bool hasContractBuff;
     public bool HasContractBuff => hasContractBuff;
-    public int ContractCeiling
+
+    private static readonly int[] contractCeilingArr = [0, 500, 1500, 3000];
+    public int PopulationLimitByIndex(int index) => contractCeilingArr[Mathf.Clamp(index, 0, 4)];
+    public int ContractCeilingByPop
     {
         get
         {
             return population switch
             {
-                >= 3000 => 4,
+                >= 3000 => RatkinOrderSettings.MaxConcurrentContractPerBranch,
                 >= 1500 => 3,
                 >= 500 => 2,
                 _ => 1
@@ -71,15 +73,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
         listing_Rect.Label($"YesterdayChange: {yesterdayChange}");
 
         listing_Rect.Label("AllContracts:");
-        for (int i = 0; i < contracts.Count; i++)
-        {
-            BranchContract contract = contracts[i];
-            if (listing_Rect.ButtonTextLabeled($"{contract.RequestThingDef.label}×{contract.RequestCount} ({contract.CurState})", "Accept"))
-            {
-                contracts[i].OnAccepted(branch);
-                break;
-            }
-        }
     }
 
     public void TickDay()
@@ -92,26 +85,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
         }
     }
 
-    public void Notify_ContractFinished(Quest quest)
-    {
-        for (int i = 0; i < contracts.Count; i++)
-        {
-            if (contracts[i].RelatedQuest == quest)
-            {
-                bool succeeded = quest.State == QuestState.EndedSuccess;
-                hasContractBuff |= succeeded;
-                contracts[i].OnContractFinished(succeeded);
-
-                if (contracts[i].CurState != BranchContract.ContractState.Cooling)
-                {
-                    contracts.RemoveAt(i);
-                }
-
-                GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchContractCompleted, 1f, addIfMiss: true);
-                break;
-            }
-        }
-    }
 
     /// <summary>
     /// 每日人口变化
@@ -145,7 +118,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.ContractAddCheck, cdTicks: 5 * 60000, shouldRemoveWhenExpired: false);
         int startInex = contracts.Count;
-        int endIndex = ContractCeiling;
+        int endIndex = ContractCeilingByPop;
         if (startInex >= endIndex)
         {
             return;
@@ -165,7 +138,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         BranchContract contract = BranchContract.MakeBranchContract(contractDef);
         contract.PostInit(branch);
-        if (contract.CurState == BranchContract.ContractState.NotAccepted)
+        if (contract.CurState == BranchContract.ContractState.Ongoing)
         {
             contracts.Add(contract);
             return true;

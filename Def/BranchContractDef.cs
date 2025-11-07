@@ -14,12 +14,10 @@ public class BranchContractDef : Def
     public RulePackDef requestReasonsRulePack;
 
     public float durationDays = 15f;
-    public float coolingDaysAfterSucceed;
-    public float coolingDaysAfterFailed;
+    public float coolingDaysAfterFulfilled;
 
     public int DurationTicks => (int)(durationDays * 60000);
-    public int CoolingTicksAfterSucceed => (int)(coolingDaysAfterSucceed * 60000);
-    public int CoolingTicksAfterFailed => (int)(coolingDaysAfterFailed * 60000);
+    public int CoolingTicksAfterFulfilled => (int)(coolingDaysAfterFulfilled * 60000);
 
     public override IEnumerable<string> ConfigErrors()
     {

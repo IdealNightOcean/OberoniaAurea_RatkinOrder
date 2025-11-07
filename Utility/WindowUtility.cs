@@ -43,11 +43,11 @@ public static class OARO_WindowUtility
     {
         if (Mouse.IsOver(butRect))
         {
-            GUI.DrawTexture(butRect, downTex);
+            GUI.DrawTexture(butRect, downTex, ScaleMode.ScaleToFit);
         }
         else
         {
-            GUI.DrawTexture(butRect, baseTex);
+            GUI.DrawTexture(butRect, baseTex, ScaleMode.ScaleToFit);
         }
 
         if (!string.IsNullOrEmpty(tooltip))

@@ -14,8 +14,16 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 {
     public readonly BranchInteractionDef Def = def ?? throw new ArgumentNullException(nameof(def));
 
-    public virtual AcceptanceReport CanUseInteraction(Branch branch, Caravan caravan, bool resultOnly)
+    public AcceptanceReport CanUseInteraction(Branch branch, Caravan caravan, bool resultOnly) => CanUseInteraction(branch, null, caravan, resultOnly);
+    public virtual AcceptanceReport CanUseInteraction(Branch branch, BranchBuilding building, Caravan caravan, bool resultOnly)
     {
+        if (!Def.isCommonInteraction)
+        {
+            if (building is null || def.relatedBranchBuilding != building.Def)
+            {
+                return resultOnly ? false : "OARO_Insufficient_BranchBuilding".Translate(def.relatedBranchBuilding.label);
+            }
+        }
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         if (ratkinOrder.Relationship < Def.floorRelationship)
         {
@@ -52,12 +60,22 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         return true;
     }
 
-    public abstract void InteractionEffect(Branch branch, Caravan caravan);
+    protected abstract void InteractionEffect(Branch branch, BranchBuilding building, Caravan caravan);
 
-    public void ApplyInteraction(Branch branch, Caravan caravan)
+    public void ApplyInteraction(Branch branch, Caravan caravan) => ApplyInteraction(branch, null, caravan);
+    public void ApplyInteraction(Branch branch, BranchBuilding building, Caravan caravan)
     {
         try
         {
+            if (!Def.isCommonInteraction)
+            {
+                if (building is null || def.relatedBranchBuilding != building.Def)
+                {
+                    Log.Error("Attempt to apply BranchInteraction with a null or non-related branch building.");
+                    return;
+                }
+            }
+
             if (Def.cdDays > 0 && !string.IsNullOrEmpty(Def.cdRecordKey))
             {
                 branch.CooldownManager.RegisterRecord(Def.cdRecordKey, cdTicks: Def.cdDays * 60000);
@@ -82,7 +100,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 
         try
         {
-            InteractionEffect(branch, caravan);
+            InteractionEffect(branch, building, caravan);
         }
         catch (Exception ex)
         {
