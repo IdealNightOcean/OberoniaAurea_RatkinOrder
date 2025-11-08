@@ -43,11 +43,11 @@ public static class OARO_WindowUtility
     {
         if (Mouse.IsOver(butRect))
         {
-            GUI.DrawTexture(butRect, downTex, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(butRect, downTex);
         }
         else
         {
-            GUI.DrawTexture(butRect, baseTex, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(butRect, baseTex);
         }
 
         if (!string.IsNullOrEmpty(tooltip))
@@ -83,22 +83,22 @@ public static class OARO_WindowUtility
 
     /// <summary>
     /// 绘制分部简述
-    /// inRect: (width: 393f, height: 91f)
+    /// inRect: (width: 392f, height: 90f)
     /// </summary>
-    /// <param name="inRect">width: 393f, height: 91f</param>
+    /// <param name="inRect">width: 392f, height: 90f</param>
     public static Rect DrawBranchSummary(Vector2 position, BranchSummaryUICache entry)
     {
-        Rect rect = new(position.x, position.y, 393f, 91f);
+        Rect rect = new(position.x, position.y, 392f, 90f);
         GUI.DrawTexture(rect, IconLibrary.BranchSummaryBackground);
         Rect inRect = rect.ContractedBy(2f);
 
-        Rect reusedRect = CenterRectOnY(inRect, inRect.x, 6f, 87f);
+        Rect reusedRect = CenterRectOnY(inRect, inRect.x, 5f, 86f);
         if (entry.HonorStripSmall is not null)
         {
             GUI.DrawTexture(reusedRect, entry.HonorStripSmall);
         }
 
-        Rect leftRect = new(inRect.x + 6f, inRect.y, 224f, inRect.height);
+        Rect leftRect = new(inRect.x + 5f, inRect.y, 224f, inRect.height);
 
         reusedRect = new(leftRect.x + 2f, leftRect.y + 2f, 32f, 20f);
         Text.Anchor = TextAnchor.MiddleCenter;

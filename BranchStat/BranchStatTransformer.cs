@@ -12,8 +12,6 @@ public struct BranchStatTransformer
     public float offset = 0f;
     public float factor = 1f;
 
-    public static BranchStatTransformer DefaultTransformer => new();
-
     public BranchStatTransformer() { }
     public BranchStatTransformer(float offset, float factor, float fixedOffset)
     {
@@ -84,7 +82,7 @@ public struct BranchStatTransformer
 
         if (def.statType == BranchStatDef.StatType.Int)
         {
-            result = Mathf.RoundToInt(result);
+            result = Mathf.Round(result);
         }
 
         return result;
@@ -96,13 +94,13 @@ public struct BranchStatTransformer
         {
             return statDef.label
                  + $": {offset.ToStringPercentSigned("0.##").Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}"
-                 + $" / ×{factor.ToStringPercentSigned("0.##").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
+                 + $" / ×{factor.ToStringPercent("0.##").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
         }
         else
         {
             return statDef.label
                  + $": {offset.ToStringWithSign("0.##").Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}"
-                 + $" / ×{factor.ToStringWithSign("0.##").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
+                 + $" / ×{factor.ToString("0.##").Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green)}";
         }
     }
 

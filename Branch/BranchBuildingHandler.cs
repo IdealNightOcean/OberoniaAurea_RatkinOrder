@@ -29,7 +29,9 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     private BranchBuildingConstructionRecord underConstructionBuilding;
     public BranchBuildingConstructionRecord UnderConstructionBuilding => underConstructionBuilding;
+    [Unsaved] public Action<BranchBuildingDef, bool> OnBuildingConstructionChanged;
     public bool IsBusy => underConstructionBuilding is not null;
+
 
     internal BranchBuildingHandler(Branch branch)
     {
@@ -183,7 +185,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         if (constructParam.ByPlayer)
         {
             int silverCost = branch.GetBuildingSilverCost(buildingDef);
-            if (!CaravanInventoryUtility.HasThings(constructParam.caravan, ThingDefOf.Silver, silverCost))
+            if (!CaravanInventoryUtility.HasThings(constructParam.Caravan, ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OARO_NotEnoughSilver".Translate(silverCost);
             }
@@ -204,6 +206,27 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
+    public void CancelBuildingConstruction()
+    {
+        if (underConstructionBuilding is null)
+        {
+            return;
+        }
+
+        try
+        {
+            OnBuildingConstructionChanged?.Invoke(underConstructionBuilding.BuildingDef, false);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+        }
+        finally
+        {
+            underConstructionBuilding = null;
+        }
+    }
+
     public void StartBuildingConstructionDirectly(BranchBuildingConstructParameter constructParam)
     {
         BranchBuildingDef buildingDef = constructParam.BuildingDef;
@@ -215,9 +238,18 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         if (constructParam.ByPlayer)
         {
             int silverCost = branch.GetBuildingSilverCost(constructParam.BuildingDef);
-            OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.caravan, ThingDefOf.Silver, silverCost);
+            OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.Caravan, ThingDefOf.Silver, silverCost);
         }
         branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);
+
+        try
+        {
+            OnBuildingConstructionChanged?.Invoke(buildingDef, true);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+        }
     }
 
     private void AddBuilding(BranchBuildingDef buildingDef, bool inSpecialSlot)
@@ -320,7 +352,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public bool GetBranchStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
     {
-        transformer = BranchStatTransformer.DefaultTransformer;
+        transformer = new();
         BranchStatTransformer tempTransformer;
         bool hasTransformer = false;
 

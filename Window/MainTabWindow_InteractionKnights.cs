@@ -62,7 +62,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
     public override void DoWindowContents(Rect inRect)
     {
         Rect reusedRect = default;
-        Rect mainRect = new(37f, 49f, 1388f, 862f);
+        Rect mainRect = new(37f, 49f, 1385f, 860f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(4f);

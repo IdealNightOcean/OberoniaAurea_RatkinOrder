@@ -13,7 +13,7 @@ public struct BranchBuildingConstructParameter
         set { inSpecialSlot = value; }
     }
     public bool ByPlayer;
-    public Caravan caravan;
+    public Caravan Caravan;
 
     public readonly bool NeedDoubleConfirm => ByPlayer && BuildingDef.ConstructChecker.DoubleComfirm;
     public readonly void DoubleComfirm() => BuildingDef.ConstructChecker.DoubleComfirmAction(this);

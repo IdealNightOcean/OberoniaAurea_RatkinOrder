@@ -1,10 +1,18 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class BranchContractDef : Def
 {
+    private static readonly Type defaultRewardClass = typeof(BranchContractRewardWorker);
+    private static readonly BranchContractRewardWorker defaultRewardWorker = new();
+
+    private Type rewardWorkerClass = defaultRewardClass;
+    private BranchContractRewardWorker rewardWorker;
+    public BranchContractRewardWorker RewardWorker => rewardWorker ??= (rewardWorkerClass == defaultRewardClass ? defaultRewardWorker : (BranchContractRewardWorker)Activator.CreateInstance(rewardWorkerClass));
+
     public ThingDef requestThingDef;
     public IntRange requestCountRange;
 
@@ -25,7 +33,11 @@ public class BranchContractDef : Def
         {
             yield return error;
         }
-
+        if (rewardWorkerClass is null)
+        {
+            rewardWorkerClass = defaultRewardClass;
+            yield return "has a null rewardWorkerClass. Set to default.";
+        }
         if (requestThingDef is null)
         {
             yield return "has an invalid requestThing";

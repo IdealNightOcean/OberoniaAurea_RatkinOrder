@@ -26,6 +26,7 @@ public class BranchContract : IExposable
     public int RequestCount => requestCount;
     public string RequestReason => requestReason;
     public ContractState CurState => curState;
+    public bool ValidOngoing => curState == ContractState.Ongoing && def is not null && RequestThingDef is not null;
 
     private int expirationTick = -1;
     public int TicksToExpire => expirationTick - Find.TickManager.TicksGame;
@@ -74,24 +75,27 @@ public class BranchContract : IExposable
         curState = ContractState.Ongoing;
     }
 
-    public bool CanFulfill(Caravan caravan)
+    public AcceptanceReport CanFulfill(Caravan caravan)
     {
-        if (curState != ContractState.Ongoing || RequestThingDef is null)
+        if (caravan is not null && ValidOngoing)
         {
             return false;
         }
-        return CaravanInventoryUtility.HasThings(caravan, RequestThingDef, requestCount);
+        if (CaravanInventoryUtility.HasThings(caravan, RequestThingDef, requestCount))
+        {
+            return true;
+        }
+        return "OAFrame_NeedCountOfThing".Translate(RequestThingDef.label, requestCount);
     }
 
-    public void Fulfill(Caravan caravan)
+    public void Fulfill(Caravan caravan, Branch branch)
     {
-        if (curState != ContractState.Ongoing || RequestThingDef is null)
+        if (caravan is not null && ValidOngoing)
         {
             return;
         }
         caravan?.RemoveThingsOfDef(RequestThingDef, requestCount);
-
-
+        def.RewardWorker.Reward(this, caravan, branch);
 
         if (def.CoolingTicksAfterFulfilled > 0)
         {

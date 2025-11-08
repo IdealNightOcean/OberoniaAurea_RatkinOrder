@@ -242,7 +242,7 @@ public static class BranchUtility
         if (branch.TransformerHandler.RemoveStatTransformer(statDef))
         {
             bool hasTransformer = false;
-            BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
+            BranchStatTransformer transformer = new();
             BranchStatTransformer tempTransformer;
             if (branch.FacilityHandler.GetBranchStatTransformer(statDef, out tempTransformer))
             {

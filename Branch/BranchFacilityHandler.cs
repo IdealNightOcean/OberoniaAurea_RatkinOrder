@@ -33,9 +33,10 @@ public class BranchFacilityHandler : IExposable
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
-    private BranchFacilityConstructionRecord buildingFacility;
-    public BranchFacilityConstructionRecord BuildingFacility => buildingFacility;
-    public bool IsBusy => buildingFacility is not null;
+    private BranchFacilityConstructionRecord underConstructionFacility;
+    public BranchFacilityConstructionRecord UnderConstructionFacility => underConstructionFacility;
+    [Unsaved] public Action<BranchFacilityDef, bool> OnBuildingConstructionChanged;
+    public bool IsBusy => underConstructionFacility is not null;
 
     internal BranchFacilityHandler(Branch branch)
     {
@@ -46,7 +47,7 @@ public class BranchFacilityHandler : IExposable
     {
         Scribe_Collections.Look(ref facilities, "facilities", LookMode.Def, LookMode.Value);
 
-        Scribe_Deep.Look(ref buildingFacility, "buildingFacility");
+        Scribe_Deep.Look(ref underConstructionFacility, "underConstructionFacility");
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -59,13 +60,13 @@ public class BranchFacilityHandler : IExposable
 
         listing_Rect.Gap(6f);
 
-        if (buildingFacility is null)
+        if (underConstructionFacility is null)
         {
             listing_Rect.Label("BuildingFacility: None");
         }
         else
         {
-            listing_Rect.Label($"BuildingFacility: {buildingFacility.FacilityDef.label} | {buildingFacility.DurationTicksLeft}");
+            listing_Rect.Label($"BuildingFacility: {underConstructionFacility.FacilityDef.label} | {underConstructionFacility.DurationTicksLeft}");
         }
     }
 
@@ -74,7 +75,7 @@ public class BranchFacilityHandler : IExposable
 
     public void TickHour()
     {
-        if (buildingFacility is not null && (buildingFacility.DurationTicksLeft -= 2500) <= 0)
+        if (underConstructionFacility is not null && (underConstructionFacility.DurationTicksLeft -= 2500) <= 0)
         {
             CompleteFacilityConstruction();
         }
@@ -82,7 +83,7 @@ public class BranchFacilityHandler : IExposable
 
     public AcceptanceReport CanConstructFacility(BranchFacilityDef facilityDef, bool byPlayer, Caravan caravan = null, bool resultOnly = false)
     {
-        if (buildingFacility is not null)
+        if (underConstructionFacility is not null)
         {
             return resultOnly ? false : "OARO_FacilityAlreadyAssisting".Translate(facilityDef.LabelCap);
         }
@@ -115,7 +116,7 @@ public class BranchFacilityHandler : IExposable
 
         BranchFacilityLevel targetLevel = oldLevel.FacilityLevelOffSetBy(1);
         int buildingTicksCost = branch.GetFacilityTimeCost(facilityDef, targetLevel);
-        buildingFacility = new(facilityDef, buildingTicksCost);
+        underConstructionFacility = new(facilityDef, buildingTicksCost);
 
         if (byPlayer)
         {
@@ -124,23 +125,48 @@ public class BranchFacilityHandler : IExposable
         }
 
         branch.StoresReserveHandler.Notify_BranchConstructStarted(facilityDef);
+
+        try
+        {
+            OnBuildingConstructionChanged?.Invoke(facilityDef, true);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+        }
     }
 
     public void CancelFacilityConstruction()
     {
-        buildingFacility = null;
+        if (underConstructionFacility is null)
+        {
+            return;
+        }
+
+        try
+        {
+            OnBuildingConstructionChanged?.Invoke(underConstructionFacility.FacilityDef, false);
+        }
+        catch (Exception ex)
+        {
+            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+        }
+        finally
+        {
+            underConstructionFacility = null;
+        }
     }
 
     private void CompleteFacilityConstruction()
     {
-        if (buildingFacility is null)
+        if (underConstructionFacility is null)
         {
             return;
         }
-        BranchFacilityDef facilityDef = buildingFacility.FacilityDef;
+        BranchFacilityDef facilityDef = underConstructionFacility.FacilityDef;
         TryActiveNewStage(facilityDef, GetFacilityLevel(facilityDef).FacilityLevelOffSetBy(1), addIfMiss: true);
 
-        buildingFacility = null;
+        underConstructionFacility = null;
     }
 
     public bool TryActiveNewStage(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel, bool addIfMiss = false)
@@ -198,7 +224,7 @@ public class BranchFacilityHandler : IExposable
 
     public bool GetBranchStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
     {
-        transformer = BranchStatTransformer.DefaultTransformer;
+        transformer = new();
         bool hasTransformer = false;
 
         foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> facility in facilities)

@@ -84,7 +84,7 @@ public class Window_BranchSquad : MainTabWindow
             RefreshSelSquad();
         }
 
-        Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1547f, 904f);
+        Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1544f, 901f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(3f);
@@ -96,7 +96,7 @@ public class Window_BranchSquad : MainTabWindow
         Rect reusedRect;
 
         //顶部缎带
-        reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1568f, 137f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1567f, 136f);
         GUI.DrawTexture(reusedRect, topRibbon);
 
         //顶部标题框
@@ -126,14 +126,14 @@ public class Window_BranchSquad : MainTabWindow
         }
 
         //左|中分界线
-        reusedRect = OARO_WindowUtility.CenterRectOnY(middleRect, middleRect.x - (32f + 3f), 3f, 717f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(middleRect, middleRect.x - (32f + 2f), 2f, 717f);
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
         Rect leftRect = new(reusedRect.xMin - (12f + 415f), areaRectY, 415f, areaRectHeight);
         DrawLeftRect(leftRect);
 
         //中|右分界线
-        reusedRect = OARO_WindowUtility.CenterRectOnY(middleRect, middleRect.xMax + 32f, 3f, 717f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(middleRect, middleRect.xMax + 32f, 2f, 717f);
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
 
@@ -164,7 +164,7 @@ public class Window_BranchSquad : MainTabWindow
         Rect reusedRect;
 
         //名称|内容分割线
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY, 579f, 3f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY, 579f, 2f);
         GUI.DrawTexture(reusedRect, middleCuttingLine);
 
         reusedRect = new(inRectX, reusedRect.yMax + 10f, 23f, 32f);
@@ -233,7 +233,7 @@ public class Window_BranchSquad : MainTabWindow
         else
         {
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 62f, 68f);
-            GUI.DrawTexture(reusedRect, middleUpGeneralSquadIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, IconLibrary.BigGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
 
         //上部右侧部分
@@ -981,7 +981,6 @@ public class Window_BranchSquad : MainTabWindow
     private static readonly Texture2D middleUpRibbon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpRibbon");
     private static readonly Texture2D middleUpBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpBackground");
     private static readonly Texture2D middleUpPeristele = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpPeristele");
-    private static readonly Texture2D middleUpGeneralSquadIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleUpGeneralSquadIcon");
 
     private static readonly Texture2D middleMiddleBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleMiddleBackground");
     private static readonly Texture2D middleClickToAddButton = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MiddleClickToAddButton");

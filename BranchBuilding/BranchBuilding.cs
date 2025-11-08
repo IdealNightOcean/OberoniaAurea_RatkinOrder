@@ -78,7 +78,7 @@ public class BranchBuilding : IExposable
 
     public bool TryGetStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
     {
-        transformer = BranchStatTransformer.DefaultTransformer;
+        transformer = new();
         bool hasTransformer = false;
 
         List<BranchStatModifier> branchStatModifies;

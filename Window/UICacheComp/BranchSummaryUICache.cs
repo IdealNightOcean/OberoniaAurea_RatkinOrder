@@ -52,9 +52,9 @@ public class BranchSummaryUICache
             BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
             if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
             {
-                HonorStripSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorStripSmall_{primaryMedal}").Texture;
-                HonorBackgroundSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorBackgroundSmall_{primaryMedal}").Texture;
-                HonorDecorationSmall = new CachedTexture($"UI/BranchSquad/OARO_HonorDecorationSmall_{primaryMedal}").Texture;
+                HonorStripSmall = new CachedTexture($"UI/BranchCommon/OARO_HonorStripSmall_{primaryMedal}").Texture;
+                HonorBackgroundSmall = new CachedTexture($"UI/BranchCommon/OARO_HonorBackgroundSmall_{primaryMedal}").Texture;
+                HonorDecorationSmall = new CachedTexture($"UI/BranchCommon/OARO_HonorDecorationSmall_{primaryMedal}").Texture;
             }
         }
     }

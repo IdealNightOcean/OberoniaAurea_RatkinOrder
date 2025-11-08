@@ -109,7 +109,7 @@ public class BranchSquad : IExposable, ITickHourOfDay
 
     private void AnnualRetirement()
     {
-        MemberCount -= Mathf.CeilToInt(Rand.Range(0.05f, 0.1f) * MemberCeiling);
+        MemberCount -= Mathf.Ceil(Rand.Range(0.05f, 0.1f) * MemberCeiling);
     }
 
     private void DailyRecovery()

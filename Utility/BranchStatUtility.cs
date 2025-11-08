@@ -29,7 +29,7 @@ public static class BranchStatUtility
                 default: break;
             }
 
-            BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
+            BranchStatTransformer transformer = new();
             bool hasTrans = false;
 
             if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
@@ -130,7 +130,7 @@ public static class BranchStatUtility
         float result;
         try
         {
-            BranchStatTransformer transformer = BranchStatTransformer.DefaultTransformer;
+            BranchStatTransformer transformer = new();
             bool hasTransformer = false;
             if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
             {
@@ -150,7 +150,6 @@ public static class BranchStatUtility
             {
                 result = baseValueOverride ?? statDef.baseValue;
             }
-
             if (statDef.statParts is not null)
             {
                 for (int i = 0; i < statDef.statParts.Count; i++)

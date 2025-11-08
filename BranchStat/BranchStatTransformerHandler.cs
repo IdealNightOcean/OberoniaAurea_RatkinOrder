@@ -15,7 +15,7 @@ public class BranchStatTransformerHandler
     {
         if (statDef is null)
         {
-            transformer = BranchStatTransformer.DefaultTransformer;
+            transformer = new();
             return false;
         }
 
@@ -63,6 +63,7 @@ public class BranchStatTransformerHandler
     {
         MergeStatOffset(modifier.statDef, modifier.value, addIfMiss);
     }
+
     public void MergeStatOffset(BranchStatDef statDef, float toAdd, bool addIfMiss = true)
     {
         if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
@@ -77,11 +78,12 @@ public class BranchStatTransformerHandler
                 branchStatTransformers.Remove(statDef);
             }
         }
-        else if (addIfMiss && toAdd != 0)
+        else if (addIfMiss && toAdd != 0f)
         {
             branchStatTransformers.Add(statDef, new BranchStatTransformer() { offset = toAdd });
         }
     }
+
     public void MergeStatOffsets(IEnumerable<BranchStatModifier> modifiers, bool addIfMiss = true)
     {
         if (modifiers is not null)

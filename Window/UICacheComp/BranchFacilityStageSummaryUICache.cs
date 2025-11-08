@@ -36,11 +36,17 @@ public class BranchFacilityStageSummaryUICache
         }
     }
 
+
+    public int SilverCost;
+    public int TimeCost;
+
     public BranchFacilityStageSummaryUICache() { }
-    public BranchFacilityStageSummaryUICache(BranchFacilityDef def, BranchFacilityLevel level)
+    public BranchFacilityStageSummaryUICache(BranchFacilityDef def, BranchFacilityLevel level, Branch branch)
     {
         Def = def ?? throw new ArgumentNullException(nameof(def));
         Level = level;
         Stage = def.GetLevelStage(level);
+        SilverCost = branch.GetFacilitySilverCost(def, level);
+        TimeCost = branch.GetFacilityTimeCost(def, level);
     }
 }

@@ -89,7 +89,7 @@
     <Compile Include="BranchTask\BranchTask.cs" />
     <Compile Include="BranchTask\BranchTask_JurisdictionDuty.cs" />
     <Compile Include="Branch\BranchContract.cs" />
-    <Compile Include="Branch\BranchContractWorker.cs" />
+    <Compile Include="Branch\BranchContractRewardWorker.cs" />
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />

@@ -36,8 +36,8 @@ public class BranchStatDef : Def
     {
         if (nonNegative)
         {
-            minValue = Mathf.Max(minValue, 0f);
-            maxValue = Mathf.Max(maxValue, 0f);
+            minValue = minValue > 0f ? minValue : 0f;
+            maxValue = maxValue > 0f ? maxValue : 0f;
         }
 
         if (minValue > maxValue)
@@ -47,8 +47,8 @@ public class BranchStatDef : Def
 
         if (statType == StatType.Int)
         {
-            minValue = Mathf.FloorToInt(minValue);
-            maxValue = Mathf.CeilToInt(maxValue);
+            minValue = Mathf.Floor(minValue);
+            maxValue = Mathf.Ceil(maxValue);
         }
 
         baseValue = Mathf.Clamp(baseValue, minValue, maxValue);

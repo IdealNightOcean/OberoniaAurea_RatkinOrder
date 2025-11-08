@@ -22,10 +22,15 @@ public class BranchBuildingDefSummaryUICache
     private string advancedEffectDescJoint;
     public string AvancedEffectDescJoint => advancedEffectDescJoint ??= JointEffectDesc(AdvancedEffectDesc);
 
+    public int SilverCost;
+    public int TimeCost;
+
     public BranchBuildingDefSummaryUICache() { }
-    public BranchBuildingDefSummaryUICache(BranchBuildingDef buildingDef)
+    public BranchBuildingDefSummaryUICache(BranchBuildingDef buildingDef, Branch branch)
     {
         BuildingDef = buildingDef ?? throw new ArgumentNullException(nameof(buildingDef));
+        SilverCost = branch.GetBuildingSilverCost(buildingDef);
+        TimeCost = branch.GetBuildingTimeCost(buildingDef);
     }
     private string JointEffectDesc(List<string> effectDesc)
     {

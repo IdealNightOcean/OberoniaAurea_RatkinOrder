@@ -44,8 +44,5 @@ public class BranchInfoUICache : BranchSummaryUICache
         {
             DailyPopulationGrowthExplanation = "ERROR".Colorize(ColorLibrary.RedReadable);
         }
-
-
     }
-
 }

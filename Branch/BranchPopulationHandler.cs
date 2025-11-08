@@ -27,7 +27,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
     public bool HasContractBuff => hasContractBuff;
 
     private static readonly int[] contractCeilingArr = [0, 500, 1500, 3000];
-    public int PopulationLimitByIndex(int index) => contractCeilingArr[Mathf.Clamp(index, 0, 4)];
+    public int PopulationLimitByIndex(int index) => contractCeilingArr[Mathf.Clamp(index, 0, 3)];
     public int ContractCeilingByPop
     {
         get
@@ -71,8 +71,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
         listing_Rect.Gap(6f);
         listing_Rect.Label($"YesterdayPopulation: {yesterdayPopulation}");
         listing_Rect.Label($"YesterdayChange: {yesterdayChange}");
-
-        listing_Rect.Label("AllContracts:");
     }
 
     public void TickDay()

@@ -33,6 +33,6 @@ public static class IconLibrary
 
 
     public static readonly Texture2D HighlightBarTex_Green = SolidColorMaterials.NewSolidColorTexture(Color.green);
-    public static readonly Texture2D HighlightBarTex_White = SolidColorMaterials.NewSolidColorTexture(new Color(0f, 0f, 0f));
-    public static readonly Texture2D EmptyBarTex_Black = SolidColorMaterials.NewSolidColorTexture(new Color(1f, 1f, 1f));
+    public static readonly Texture2D HighlightBarTex_White = SolidColorMaterials.NewSolidColorTexture(new Color(1f, 1f, 1f));
+    public static readonly Texture2D EmptyBarTex_Black = SolidColorMaterials.NewSolidColorTexture(new Color(0f, 0f, 0f));
 }
