@@ -54,7 +54,7 @@ public abstract class WorldObject_CriticalBranchDemand : WorldObject_InteractWit
         nextCheckTick = Find.TickManager.TicksGame + PeriodicCheckInterval;
     }
 
-    public void InitOrderBranch(Branch branch)
+    public void SetOrderBranch(Branch branch)
     {
         this.branch = branch;
     }

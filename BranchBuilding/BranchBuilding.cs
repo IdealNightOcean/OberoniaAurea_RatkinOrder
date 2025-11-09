@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Reflection;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -23,8 +22,6 @@ public class BranchBuilding : IExposable
 
     public string Label => hasUpgraded ? def.advancedProperties.label : def.label;
 
-    protected BranchBuilding() { }
-
     protected virtual void Initialize(BranchBuildingDef def, Branch branch)
     {
         this.def = def;
@@ -40,13 +37,7 @@ public class BranchBuilding : IExposable
 
     public static BranchBuilding GenerateBranchBuilding(BranchBuildingDef def, Branch branch)
     {
-        BranchBuilding building = (BranchBuilding)Activator.CreateInstance(
-            type: def.buildingClass,
-            bindingAttr: BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.CreateInstance,
-            binder: null,
-            args: null,
-            culture: null);
-
+        BranchBuilding building = (BranchBuilding)Activator.CreateInstance(type: def.buildingClass);
         building.Initialize(def, branch);
         return building;
     }

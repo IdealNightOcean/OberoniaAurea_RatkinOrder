@@ -9,8 +9,7 @@ public class BranchInteractionDef : InteractionDefBase
     private BranchInteractionWorker worker;
     public BranchInteractionWorker Worker => worker ??= (BranchInteractionWorker)Activator.CreateInstance(workerClass, args: this);
 
-    public bool isCommonInteraction;
-    public BranchBuildingDef relatedBranchBuilding;
+    public bool isBuildingInteraction;
 
     public float needSupply = -1f;
     public int floorPopulation = -1;
@@ -24,11 +23,6 @@ public class BranchInteractionDef : InteractionDefBase
         if (workerClass is null)
         {
             yield return "has a null workerClass.";
-        }
-        if (isCommonInteraction && relatedBranchBuilding is not null)
-        {
-            isCommonInteraction = false;
-            yield return "is CommonInteraction but has \"relatedBranchBuilding\". Set \"isCommonInteraction\" to Fasle.";
         }
     }
 }

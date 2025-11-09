@@ -6,6 +6,8 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class IconLibrary
 {
+    public static readonly Texture2D colseX = ContentFinder<Texture2D>.Get("UI/Common/OARO_ColseX");
+
     public static readonly Texture2D Medal_Courage = ContentFinder<Texture2D>.Get("UI/Medal/OARO_Medal_Courage");
     public static readonly Texture2D Medal_Tenacity = ContentFinder<Texture2D>.Get("UI/Medal/OARO_Medal_Tenacity");
     public static readonly Texture2D Medal_Rescue = ContentFinder<Texture2D>.Get("UI/Medal/OARO_Medal_Rescue");

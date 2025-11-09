@@ -27,11 +27,10 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     [Unsaved] private List<BranchBuildingComp_Interaction> interactionComps;
     public List<BranchBuildingComp_Interaction> InteractionComps => interactionComps ??= [];
 
-    private BranchBuildingConstructionRecord underConstructionBuilding;
-    public BranchBuildingConstructionRecord UnderConstructionBuilding => underConstructionBuilding;
+    private UnderConstructionBranchBuilding underConstructionBuilding;
+    public UnderConstructionBranchBuilding UnderConstructionBuilding => underConstructionBuilding;
     [Unsaved] public Action<BranchBuildingDef, bool> OnBuildingConstructionChanged;
     public bool IsBusy => underConstructionBuilding is not null;
-
 
     internal BranchBuildingHandler(Branch branch)
     {
@@ -81,7 +80,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void TickHour(int hourOfDay)
     {
-        if (underConstructionBuilding is not null && (underConstructionBuilding.DurationTicksLeft -= 2500) <= 0)
+        if (underConstructionBuilding is not null && Find.TickManager.TicksGame >= underConstructionBuilding.CompletedTick)
         {
             try
             {
@@ -233,15 +232,15 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         underConstructionBuilding = new(
             def: buildingDef,
             inSpecialSlot: constructParam.InSpecialSlot,
-            durationTicks: branch.GetBuildingTimeCost(underConstructionBuilding.BuildingDef));
-
+            durationTicks: branch.GetBuildingTimeCost(buildingDef));
+        Log.Message("000");
         if (constructParam.ByPlayer)
         {
-            int silverCost = branch.GetBuildingSilverCost(constructParam.BuildingDef);
+            int silverCost = branch.GetBuildingSilverCost(buildingDef);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.Caravan, ThingDefOf.Silver, silverCost);
         }
         branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);
-
+        Log.Message("111");
         try
         {
             OnBuildingConstructionChanged?.Invoke(buildingDef, true);

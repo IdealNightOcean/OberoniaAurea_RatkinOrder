@@ -77,7 +77,7 @@ public class BranchContract : IExposable
 
     public AcceptanceReport CanFulfill(Caravan caravan)
     {
-        if (caravan is not null && ValidOngoing)
+        if (caravan is null || !ValidOngoing)
         {
             return false;
         }
@@ -90,7 +90,7 @@ public class BranchContract : IExposable
 
     public void Fulfill(Caravan caravan, Branch branch)
     {
-        if (caravan is not null && ValidOngoing)
+        if (caravan is null || !ValidOngoing)
         {
             return;
         }
@@ -118,17 +118,35 @@ public class BranchContract : IExposable
         }
         if (def.requestReasonsRulePack is not null)
         {
-            GrammarRequest grammarRequest = new();
-            grammarRequest.Includes.Add(def.requestReasonsRulePack);
-            grammarRequest.Constants.Add("requestDef", RequestThingDef.defName);
-            grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ORDER", branch.RatkinOrder));
-            grammarRequest.Rules.AddRange(ModUtility.RulesForBranch("BRNACH", branch, alsoAddOrderRule: false));
-            grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("ORDERFACTION", branch.RatkinOrder.Faction));
-            grammarRequest.Rules.AddRange(GrammarUtility.RulesForDef("REQUESTTHING", RequestThingDef));
-            grammarRequest.Rules.Add(new Rule_String("requestCount", requestCount.ToString()));
+            string reason;
+            try
+            {
+                GrammarRequest grammarRequest = new();
+                grammarRequest.Includes.Add(def.requestReasonsRulePack);
+                grammarRequest.Constants.Add("requestDef", RequestThingDef.defName);
+                grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ORDER", branch.RatkinOrder));
+                grammarRequest.Rules.AddRange(ModUtility.RulesForBranch("BRNACH", branch, alsoAddOrderRule: false));
+                grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("ORDERFACTION", branch.RatkinOrder.Faction));
+                grammarRequest.Rules.AddRange(GrammarUtility.RulesForDef("REQUESTTHING", RequestThingDef));
+                grammarRequest.Rules.Add(new Rule_String("requestCount", requestCount.ToString()));
+                reason = GrammarResolver.Resolve("r_text", grammarRequest);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An Exception occurred in {nameof(GrammarResolver.Resolve)} at {nameof(GetContractReason)}.\nException:\n{ex.Message}");
+                reason = null;
+            }
 
-            return GrammarResolver.Resolve("r_text", grammarRequest);
+            if (string.IsNullOrEmpty(reason))
+            {
+                return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BRANCHNAME"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("REQUESTCOUNT"));
+            }
+            else
+            {
+                return reason;
+            }
         }
         return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BRANCHNAME"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("REQUESTCOUNT"));
+
     }
 }

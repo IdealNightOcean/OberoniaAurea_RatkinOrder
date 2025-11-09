@@ -74,12 +74,13 @@
     <Compile Include="BranchBuilding\BranchBuildingComp.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_OrderEffectTags.cs" />
     <Compile Include="BranchBuilding\BranchBuildingCompProperties.cs" />
-    <Compile Include="BranchBuilding\BranchBuildingConstructionRecord.cs" />
+    <Compile Include="BranchBuilding\UnderConstructionBranchBuilding.cs" />
     <Compile Include="BranchBuilding\BranchBuildingWithComps.cs" />
     <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
+    <Compile Include="BranchFacility\UnderConstructionFacility.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchStat\BranchStatPart_SupplyRecoveryRate.cs" />
     <Compile Include="BranchStat\BranchStatPart_SquadMemberRecoveryRate.cs" />
@@ -307,8 +308,8 @@
     <Compile Include="Branch\BranchBuildingHandler.cs" />
     <Compile Include="BranchBuilding\BranchBuildingConstructChecker_Memorial.cs" />
     <Compile Include="Def\BranchFacilityDef.cs" />
-    <Compile Include="Branch\BranchFacilityLevel.cs" />
-    <Compile Include="Branch\BranchFacilityLevelStage.cs" />
+    <Compile Include="BranchFacility\BranchFacilityLevel.cs" />
+    <Compile Include="BranchFacility\BranchFacilityLevelStage.cs" />
     <Compile Include="RatkinOrder\BranchManager.cs" />
     <Compile Include="Branch\BranchResidentRecord.cs" />
     <Compile Include="Utility\BranchUtility.cs" />
@@ -438,6 +439,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Window\UICacheComp\BranchInfoUICache.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="BranchFacility\UnderConstructionFacility\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -14,7 +14,7 @@ public class Hediff_BranchMedal : HediffWithComps, ISingleBranchRelated
         Scribe_References.Look(ref branch, "branch");
     }
 
-    public void InitOrderBranch(Branch branch)
+    public void SetOrderBranch(Branch branch)
     {
         this.branch = branch;
         _ = CurStage;

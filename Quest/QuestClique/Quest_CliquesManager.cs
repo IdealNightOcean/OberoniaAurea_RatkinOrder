@@ -22,7 +22,7 @@ public class QuestNode_CliquesManager : QuestNode
         {
             inSignalEnable = QuestGen.slate.Get<string>("inSignal"),
         };
-        questPart_CliquesManager.InitOrderBranch(branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch));
+        questPart_CliquesManager.SetOrderBranch(branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch));
         QuestGen.quest.AddPart(questPart_CliquesManager);
     }
 }
@@ -417,7 +417,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
     }
 
-    public void InitOrderBranch(Branch branch)
+    public void SetOrderBranch(Branch branch)
     {
         this.branch = branch;
     }

@@ -26,9 +26,9 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_Fund".Translate(Def.MinFundNeeded.ToStringPercent("0.##"));
         }
-        if (!string.IsNullOrEmpty(Def.cdRecordKey))
+        if (def.cdDays > 0)
         {
-            int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.cdRecordKey);
+            int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.defName);
             if (cooldownTicksLeft > 0)
             {
                 return resultOnly ? false : "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
@@ -45,38 +45,59 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         return true;
     }
 
-    public abstract void InteractionEffect(RatkinOrder ratkinOrder, Map map);
+    protected abstract void InteractionEffect(RatkinOrder ratkinOrder, Map map);
 
-    public void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    public virtual void TryApplyInteraction(RatkinOrder ratkinOrder, Map map, Action<OrderInteractionDef, RatkinOrder, Map> postApplyAction = null)
+    {
+        if (ApplyInteraction(ratkinOrder, map))
+        {
+            try
+            {
+                postApplyAction?.Invoke(Def, ratkinOrder, map);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An Exception occurred in {nameof(postApplyAction)}.\nException:\n{ex.Message}");
+            }
+        }
+    }
+
+    protected virtual void DoInteractionCost(RatkinOrder ratkinOrder, Map map)
+    {
+        if (Def.needFund > 0f)
+        {
+            ratkinOrder.FundHandler.AdjustFundsImmediately(Def.needFund, Def.label);
+        }
+        else if (Def.fundEventDef is not null)
+        {
+            ratkinOrder.FundHandler.AddFundEvent(Def.fundEventDef);
+        }
+
+        if (Def.cdDays > 0)
+        {
+            ratkinOrder.CooldownManager.RegisterRecord(Def.defName, cdTicks: Def.cdDays * 60000);
+        }
+
+        if (Def.needRecommendation > 0)
+        {
+            RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, Def.needRecommendation);
+        }
+        if (Def.needSilver > 0)
+        {
+            map.DestoryThingsOfDef(ThingDefOf.Silver, Def.needSilver);
+        }
+    }
+
+    protected bool ApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
         try
         {
-            if (Def.needFund > 0f)
-            {
-                ratkinOrder.FundHandler.AdjustFundsImmediately(Def.needFund, Def.label);
-            }
-            else if (Def.fundEventDef is not null)
-            {
-                ratkinOrder.FundHandler.AddFundEvent(Def.fundEventDef);
-            }
-
-            if (Def.cdDays > 0 && !string.IsNullOrEmpty(Def.cdRecordKey))
-            {
-                ratkinOrder.CooldownManager.RegisterRecord(Def.cdRecordKey, cdTicks: Def.cdDays * 60000);
-            }
-
-            if (Def.needRecommendation > 0)
-            {
-                RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, Def.needRecommendation);
-            }
-            if (Def.needSilver > 0)
-            {
-                map.DestoryThingsOfDef(ThingDefOf.Silver, Def.needSilver);
-            }
+            DoInteractionCost(ratkinOrder, map);
         }
         catch (Exception ex)
         {
             Log.Error($"Error processing costs for BranchInteraction [{Def.defName}].\nException:\n{ex}");
+            return false;
         }
 
         try
@@ -86,6 +107,8 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         catch (Exception ex)
         {
             Log.Error($"Error triggering effect for BranchInteraction [{Def.defName}].\nException:\n{ex}");
+            return false;
         }
+        return true;
     }
 }

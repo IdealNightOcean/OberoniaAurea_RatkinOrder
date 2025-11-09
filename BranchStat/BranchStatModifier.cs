@@ -41,11 +41,11 @@ public class BranchStatModifier
         }
         if (statDef.statType == BranchStatDef.StatType.Percent)
         {
-            return statDef.label + ": ×" + value.ToStringPercent("0.##").Colorize((statDef.reverse ^ value < 1f) ? ColorLibrary.RedReadable : Color.green);
+            return statDef.label + ":" + $" ×{value.ToStringPercent("0.##")}".Colorize((statDef.reverse ^ value < 1f) ? ColorLibrary.RedReadable : Color.green);
         }
         else
         {
-            return statDef.label + ": ×" + value.ToString("0.##").Colorize((statDef.reverse ^ value < 1f) ? ColorLibrary.RedReadable : Color.green);
+            return statDef.label + ":" + $" ×{value.ToStringPercent("0.##")}".Colorize((statDef.reverse ^ value < 1f) ? ColorLibrary.RedReadable : Color.green);
         }
     }
 

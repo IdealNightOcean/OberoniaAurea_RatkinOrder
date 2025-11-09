@@ -10,7 +10,7 @@ public interface IOnBranchDestroyed : IOnRatkinOrderRemoved
 public interface ISingleBranchRelated : IOnBranchDestroyed
 {
     Branch Branch { get; }
-    void InitOrderBranch(Branch branch);
+    void SetOrderBranch(Branch branch);
 }
 
 public interface ISingleBranchRelatedReferenceable : ISingleBranchRelated, ILoadReferenceable;

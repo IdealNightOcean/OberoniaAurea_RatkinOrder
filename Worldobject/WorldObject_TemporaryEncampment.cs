@@ -2,14 +2,13 @@
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCaravan_Nameable, ISingleBranchRelated, IThingRequester
 {
-    private static readonly Texture2D TradeCommandTex = ContentFinder<Texture2D>.Get("UI/Commands/FulfillTradeRequest");
+    public static readonly CachedTexture TradeCommandIcon = new CachedTexture("UI/Commands/FulfillTradeRequest");
 
     private Branch branch;
     public Branch Branch => branch;
@@ -33,7 +32,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         Scribe_Values.Look(ref requestCount, "requestCount", 0);
     }
 
-    public void InitOrderBranch(Branch branch)
+    public void SetOrderBranch(Branch branch)
     {
         this.branch = branch;
     }
@@ -98,7 +97,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
             {
                 defaultLabel = "CommandFulfillTradeOffer".Translate(),
                 defaultDesc = "CommandFulfillTradeOfferDesc".Translate(),
-                icon = TradeCommandTex,
+                icon = TradeCommandIcon.Texture,
                 action = delegate { FulfillRequest(caravan); }
             };
             yield return command_FulfillRequest;

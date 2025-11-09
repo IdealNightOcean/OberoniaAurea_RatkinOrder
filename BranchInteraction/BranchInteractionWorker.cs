@@ -14,15 +14,11 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 {
     public readonly BranchInteractionDef Def = def ?? throw new ArgumentNullException(nameof(def));
 
-    public AcceptanceReport CanUseInteraction(Branch branch, Caravan caravan, bool resultOnly) => CanUseInteraction(branch, null, caravan, resultOnly);
-    public virtual AcceptanceReport CanUseInteraction(Branch branch, BranchBuilding building, Caravan caravan, bool resultOnly)
+    public virtual AcceptanceReport CanUseInteraction(Branch branch, Caravan caravan, BranchBuilding building = null, bool resultOnly = false)
     {
-        if (!Def.isCommonInteraction)
+        if (Def.isBuildingInteraction && building is null)
         {
-            if (building is null || def.relatedBranchBuilding != building.Def)
-            {
-                return resultOnly ? false : "OARO_Insufficient_BranchBuilding".Translate(def.relatedBranchBuilding.label);
-            }
+            return resultOnly ? false : "OARO_Insufficient_TargetBranchBuilding".Translate();
         }
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         if (ratkinOrder.Relationship < Def.floorRelationship)
@@ -41,9 +37,9 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_BranchPopulation".Translate(Def.floorPopulation);
         }
-        if (!string.IsNullOrEmpty(Def.cdRecordKey))
+        if (Def.cdDays > 0)
         {
-            int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.cdRecordKey);
+            int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.defName);
             if (cooldownTicksLeft > 0)
             {
                 return resultOnly ? false : "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
@@ -60,51 +56,70 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         return true;
     }
 
-    protected abstract void InteractionEffect(Branch branch, BranchBuilding building, Caravan caravan);
-
-    public void ApplyInteraction(Branch branch, Caravan caravan) => ApplyInteraction(branch, null, caravan);
-    public void ApplyInteraction(Branch branch, BranchBuilding building, Caravan caravan)
+    public virtual void TryApplyInteraction(Branch branch, Caravan caravan, BranchBuilding building = null, Action<BranchInteractionDef, Branch, Caravan, BranchBuilding> postApplyAction = null)
     {
+        if (ApplyInteraction(branch, caravan, building))
+        {
+            try
+            {
+                postApplyAction?.Invoke(Def, branch, caravan, building);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An Exception occurred in {nameof(postApplyAction)}.\nException:\n{ex.Message}");
+            }
+        }
+    }
+
+    protected virtual void DoInteractionCost(Branch branch, Caravan caravan, BranchBuilding building = null)
+    {
+        if (Def.cdDays > 0)
+        {
+            branch.CooldownManager.RegisterRecord(def.defName, cdTicks: Def.cdDays * 60000);
+        }
+        if (Def.needSupply > 0f)
+        {
+            branch.Supply -= Def.needSupply;
+        }
+        if (Def.needRecommendation > 0)
+        {
+            RecommendationUtility.UseRecommendationOfCaravan(branch.RatkinOrder, caravan, Def.needRecommendation);
+        }
+        if (Def.needSilver > 0)
+        {
+            caravan.RemoveThingsOfDef(ThingDefOf.Silver, Def.needSilver);
+        }
+    }
+
+    protected abstract void InteractionEffect(Branch branch, Caravan caravan, BranchBuilding building = null);
+
+    protected bool ApplyInteraction(Branch branch, Caravan caravan, BranchBuilding building = null)
+    {
+        if (Def.isBuildingInteraction && building is null)
+        {
+            Log.Error("Attempt to apply BranchInteraction with a null  branch building.");
+            return false;
+        }
+
         try
         {
-            if (!Def.isCommonInteraction)
-            {
-                if (building is null || def.relatedBranchBuilding != building.Def)
-                {
-                    Log.Error("Attempt to apply BranchInteraction with a null or non-related branch building.");
-                    return;
-                }
-            }
-
-            if (Def.cdDays > 0 && !string.IsNullOrEmpty(Def.cdRecordKey))
-            {
-                branch.CooldownManager.RegisterRecord(Def.cdRecordKey, cdTicks: Def.cdDays * 60000);
-            }
-            if (Def.needSupply > 0f)
-            {
-                branch.Supply -= Def.needSupply;
-            }
-            if (Def.needRecommendation > 0)
-            {
-                RecommendationUtility.UseRecommendationOfCaravan(branch.RatkinOrder, caravan, Def.needRecommendation);
-            }
-            if (Def.needSilver > 0)
-            {
-                caravan.RemoveThingsOfDef(ThingDefOf.Silver, Def.needSilver);
-            }
+            DoInteractionCost(branch, caravan, building);
         }
         catch (Exception ex)
         {
             Log.Error($"Error processing costs for BranchInteraction [{Def.defName}].\nException:\n{ex}");
+            return false;
         }
 
         try
         {
-            InteractionEffect(branch, building, caravan);
+            InteractionEffect(branch, caravan, building);
         }
         catch (Exception ex)
         {
             Log.Error($"Error triggering effect for BranchInteraction [{Def.defName}].\nException:\n{ex}");
+            return false;
         }
+        return true;
     }
 }

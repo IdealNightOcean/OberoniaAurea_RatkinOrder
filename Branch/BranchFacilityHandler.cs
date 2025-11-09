@@ -33,8 +33,8 @@ public class BranchFacilityHandler : IExposable
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
-    private BranchFacilityConstructionRecord underConstructionFacility;
-    public BranchFacilityConstructionRecord UnderConstructionFacility => underConstructionFacility;
+    private UnderConstructionFacility underConstructionFacility;
+    public UnderConstructionFacility UnderConstructionFacility => underConstructionFacility;
     [Unsaved] public Action<BranchFacilityDef, bool> OnBuildingConstructionChanged;
     public bool IsBusy => underConstructionFacility is not null;
 
@@ -75,7 +75,7 @@ public class BranchFacilityHandler : IExposable
 
     public void TickHour()
     {
-        if (underConstructionFacility is not null && (underConstructionFacility.DurationTicksLeft -= 2500) <= 0)
+        if (underConstructionFacility is not null && Find.TickManager.TicksGame >= underConstructionFacility.CompletedTick)
         {
             CompleteFacilityConstruction();
         }
@@ -85,7 +85,7 @@ public class BranchFacilityHandler : IExposable
     {
         if (underConstructionFacility is not null)
         {
-            return resultOnly ? false : "OARO_FacilityAlreadyAssisting".Translate(facilityDef.LabelCap);
+            return resultOnly ? false : "OARO_OtherFacilityConstructing".Translate();
         }
         BranchFacilityLevel oldLevel = GetFacilityLevel(facilityDef);
         if (oldLevel == BranchFacilityLevel.Excellent)

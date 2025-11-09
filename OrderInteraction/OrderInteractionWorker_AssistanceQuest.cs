@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : OrderInteractionWorker(def)
 {
-    public override void InteractionEffect(RatkinOrder ratkinOrder, Map map)
+    protected override void InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
         QuestScriptDef scriptDef = Def.GetModExtension<OrderInteraction_AssistanceQuestExtension>()?.assistanceQuest;
         if (scriptDef is null)

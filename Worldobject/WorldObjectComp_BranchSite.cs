@@ -1,6 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.Planet;
-using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -36,14 +36,56 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
         }
     }
 
-    public void InitOrderBranch(Branch newBranch)
+    public override IEnumerable<Gizmo> GetCaravanGizmos(Caravan caravan)
     {
-        if (branch is not null)
+        foreach (Gizmo gizmo in base.GetCaravanGizmos(caravan))
         {
-            throw new InvalidOperationException($"{nameof(branch)} has already been set and cannot be assigned again.");
+            yield return gizmo;
         }
-        branch = newBranch;
+        if (!IsActive)
+        {
+            yield break;
+        }
+
+        Command_Action command_OpenBranchWindow = new()
+        {
+            defaultLabel = "OARO_Command_OpenBranchWindow".Translate(),
+            defaultDesc = "OARO_Command_OpenBranchWindowDesc".Translate(),
+            action = delegate
+            {
+                Window_Branch branchWindow = new(branch, caravan);
+                Find.WindowStack.Add(branchWindow);
+            }
+        };
+        yield return command_OpenBranchWindow;
     }
+
+    public void SetOrderBranch(Branch newBranch, bool replaceCur)
+    {
+        try
+        {
+            if (branch is not null)
+            {
+                if (replaceCur)
+                {
+                    Branch preBranch = branch;
+                    branch = null;
+                    preBranch.BranchManager.DestoryBranch(preBranch);
+                }
+                else
+                {
+                    Log.Error($"{nameof(branch)} has already been set and cannot be assigned again.");
+                    return;
+                }
+            }
+        }
+        finally
+        {
+            branch = newBranch;
+        }
+    }
+
+    public void SetOrderBranch(Branch newBranch) => SetOrderBranch(newBranch, replaceCur: false);
 
     public override void PostDestroy()
     {

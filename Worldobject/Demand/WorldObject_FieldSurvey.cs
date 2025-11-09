@@ -173,7 +173,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
         };
     }
 
-    public void InitOrderBranch(Branch branch)
+    public void SetOrderBranch(Branch branch)
     {
         this.branch = branch;
     }
@@ -203,7 +203,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
     {
         base.PostAdd();
         (Branch branch, demandType) = QuestPart_BranchDemandWatcher.GetBranchDemand(quest);
-        InitOrderBranch(branch);
+        SetOrderBranch(branch);
 
         meteorologicalDataRequire = demandType == BranchDemand.DemandType.Urgency ? 3 : 2;
 

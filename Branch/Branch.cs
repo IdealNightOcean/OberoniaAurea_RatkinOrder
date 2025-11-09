@@ -165,7 +165,7 @@ public class Branch : IExposable, ILoadReferenceable
         try
         {
             branch = new(ratkinOrder, initCtor: true);
-            worldObject.GetComponent<WorldObjectComp_BranchSite>().InitOrderBranch(branch);
+            worldObject.GetComponent<WorldObjectComp_BranchSite>().SetOrderBranch(branch);
             branch.baseSite = worldObject;
             branch.PostGenerated();
             if (addToManager)

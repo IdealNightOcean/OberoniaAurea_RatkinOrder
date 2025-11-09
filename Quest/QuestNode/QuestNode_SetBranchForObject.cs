@@ -25,7 +25,7 @@ public class QuestNode_SetBranchForObject : QuestNode
         Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
         if (branch is not null)
         {
-            branchRelated.InitOrderBranch(branch);
+            branchRelated.SetOrderBranch(branch);
             if (alsoSetRatkinOrder.GetValue(slate) && target is ISingleRatkinOrderRelated orderRelated)
             {
                 orderRelated.InitRatkinOrder(branch.RatkinOrder);

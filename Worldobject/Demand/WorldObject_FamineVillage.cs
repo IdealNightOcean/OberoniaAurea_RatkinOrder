@@ -66,7 +66,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     {
         base.PostAdd();
         (Branch branch, BranchDemand.DemandType demandType) = QuestPart_BranchDemandWatcher.GetBranchDemand(quest);
-        InitOrderBranch(branch);
+        SetOrderBranch(branch);
         if (demandType == BranchDemand.DemandType.Urgency)
         {
             curTrust = Rand.Range(0.3f, 0.45f);
@@ -101,7 +101,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         }
     }
 
-    public void InitOrderBranch(Branch branch)
+    public void SetOrderBranch(Branch branch)
     {
         this.branch = branch;
     }

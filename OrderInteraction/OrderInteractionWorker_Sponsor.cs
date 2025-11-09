@@ -22,7 +22,7 @@ public class OrderInteractionWorker_Sponsor(OrderInteractionDef def) : OrderInte
         return true;
     }
 
-    public override void InteractionEffect(RatkinOrder ratkinOrder, Map map)
+    protected override void InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
         FundHandler fundHandler = ratkinOrder.FundHandler;
         fundHandler.AddFundEvent(OrderFundEventDefOf.OARO_PlayerSponsor_Immediate);

@@ -143,7 +143,7 @@ public static class DebugRatkinOrders
                                                      mode: DebugMenuOptionMode.Action,
                                                      method: delegate
                                                      {
-                                                         interactionDef.Worker.ApplyInteraction(order, map);
+                                                         interactionDef.Worker.TryApplyInteraction(order, map);
                                                      });
                 interactionOptions.Add(orderDefOption);
             }

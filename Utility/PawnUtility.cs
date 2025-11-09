@@ -54,7 +54,7 @@ public static class OARO_PawnUtility
         if (knightRecord.Branch is not null)
         {
             Hediff_BranchMedal medalHediff = (Hediff_BranchMedal)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_BranchMedal);
-            medalHediff.InitOrderBranch(knightRecord.Branch);
+            medalHediff.SetOrderBranch(knightRecord.Branch);
         }
     }
 
