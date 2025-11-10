@@ -17,8 +17,6 @@ internal static class Game_ClearCaches_Patch
         OrderLetterBox.ClearStaticCache();
         GlobalInteractionManager.ClearStaticCache();
 
-        ResidencyWorker_Deployment.ClearStaticCache();
-
         Thought_VisitingKnight.ClearStaticCache();
         ThoughtWorker_BranchChurch.ClearStaticCache();
     }

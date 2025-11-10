@@ -149,32 +149,4 @@ public static class ModUtility
             yield return worldObjRule;
         }
     }
-
-    public static IEnumerable<T> TakeRandomElements<T>(this IEnumerable<T> iEnum, int count)
-    {
-        if (count <= 0 || iEnum is null)
-        {
-            yield break;
-        }
-        if (iEnum is not IList<T> iList)
-        {
-            iList = iEnum.ToList();
-        }
-
-        int listCount = iList.Count;
-        if (count == 1)
-        {
-            yield return iList[Rand.Range(0, listCount)];
-        }
-        else
-        {
-            int[] indices = Enumerable.Range(0, listCount).ToArray();
-            for (int i = 0; i < count; i++)
-            {
-                int randomIndex = Rand.Range(i, listCount);
-                (indices[i], indices[randomIndex]) = (indices[randomIndex], indices[i]);
-                yield return iList[indices[i]];
-            }
-        }
-    }
 }

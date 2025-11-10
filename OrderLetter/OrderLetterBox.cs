@@ -55,7 +55,7 @@ public class OrderLetterBox : IExposable
         {
             unreadLetters.Clear();
             unreadLetters.AddRange(validLetters);
-            AddLettersToOrderedList(archivedLetters, expiredLetters);
+            OAFrame_CollectionUtility.MergeSortedListsInplace(archivedLetters, expiredLetters, comparerFunc: OrderLetterComparerFunc);
 
             if (RatkinOrderSettings.HasMaxLetterLimit)
             {
@@ -74,7 +74,7 @@ public class OrderLetterBox : IExposable
     public void ReceiveLetter(OrderLetter letter)
     {
         letter.ArrivalTick = Find.TickManager.TicksGame;
-        AddLetterToOrderedList(unreadLetters, letter);
+        OAFrame_CollectionUtility.BinaryInsertion(unreadLetters, letter, comparerFunc: OrderLetterComparerFunc);
     }
 
     public void ReadSingleLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
@@ -109,7 +109,7 @@ public class OrderLetterBox : IExposable
 
     public void ClearAllUnreadLetters()
     {
-        AddLettersToOrderedList(archivedLetters, unreadLetters);
+        OAFrame_CollectionUtility.MergeSortedListsInplace(archivedLetters, unreadLetters, comparerFunc: OrderLetterComparerFunc);
         unreadLetters.Clear();
         if (RatkinOrderSettings.HasMaxLetterLimit)
         {
@@ -143,8 +143,13 @@ public class OrderLetterBox : IExposable
     private void ArchiveLetter(OrderLetter letter)
     {
         unreadLetters.Remove(letter);
-        AddLetterToOrderedList(archivedLetters, letter);
+        OAFrame_CollectionUtility.BinaryInsertion(archivedLetters, letter, comparerFunc: OrderLetterComparerFunc);
     }
+
+    /// <summary>
+    /// 降序比较方法
+    /// </summary>
+    private static int OrderLetterComparerFunc(OrderLetter a, OrderLetter b) => b.ArrivalTick.CompareTo(a.ArrivalTick);
 
     public void ExposeData()
     {
@@ -166,78 +171,4 @@ public class OrderLetterBox : IExposable
             archivedLetters.SortBy(r => -r.ArrivalTick);
         }
     }
-
-    /// <summary>
-    /// 根据OrderLetter.ArrivalTick降序添加信件
-    /// </summary>
-    /// <param name="originList">原列表（降序丨有修改）</param>
-    private void AddLetterToOrderedList(List<OrderLetter> originList, OrderLetter letter)
-    {
-        int leftIndex = 0;
-        int rightIndex = originList.Count;
-        int midIndex;
-        while (leftIndex < rightIndex)
-        {
-            midIndex = (leftIndex + rightIndex) / 2;
-            if (originList[midIndex].ArrivalTick > letter.ArrivalTick)
-            {
-                leftIndex = midIndex + 1;
-            }
-            else
-            {
-                rightIndex = midIndex;
-            }
-        }
-
-        originList.Insert(leftIndex, letter);
-    }
-
-    /// <summary>
-    /// 根据OrderLetter.ArrivalTick降序添加信件
-    /// </summary>
-    /// <param name="originList">被添加列表（降序丨有修改）</param>
-    ///  <param name="lettersToAdd">添加列表（降序丨无修改）</param>
-    private void AddLettersToOrderedList(List<OrderLetter> originList, List<OrderLetter> lettersToAdd)
-    {
-        if (lettersToAdd.Count <= 3)
-        {
-            for (int i = 0; i < lettersToAdd.Count; i++)
-            {
-                AddLetterToOrderedList(originList, lettersToAdd[i]);
-            }
-            return;
-        }
-
-        List<OrderLetter> mergedList = new(originList.Count + lettersToAdd.Count);
-        int j = 0;
-        int k = 0;
-        while (j < originList.Count && k < lettersToAdd.Count)
-        {
-            if (originList[j].ArrivalTick > lettersToAdd[k].ArrivalTick)
-            {
-                mergedList.Add(originList[j]);
-                j++;
-            }
-            else
-            {
-                mergedList.Add(lettersToAdd[k]);
-                k++;
-            }
-        }
-        while (j < originList.Count)
-        {
-            mergedList.Add(originList[j]);
-            j++;
-        }
-
-        while (k < lettersToAdd.Count)
-        {
-            mergedList.Add(lettersToAdd[k]);
-            k++;
-        }
-
-        originList.Clear();
-        originList.AddRange(mergedList);
-    }
-
 }

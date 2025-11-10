@@ -82,6 +82,8 @@
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
     <Compile Include="BranchFacility\UnderConstructionFacility.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
+    <Compile Include="BranchResident\BranchResident_Deployment.cs" />
+    <Compile Include="BranchResident\BranchResident_MedicalAssistance.cs" />
     <Compile Include="BranchStat\BranchStatPart_SupplyRecoveryRate.cs" />
     <Compile Include="BranchStat\BranchStatPart_SquadMemberRecoveryRate.cs" />
     <Compile Include="BranchStat\BranchStatPart_ConstructionCostFactor.cs" />
@@ -311,14 +313,13 @@
     <Compile Include="BranchFacility\BranchFacilityLevel.cs" />
     <Compile Include="BranchFacility\BranchFacilityLevelStage.cs" />
     <Compile Include="RatkinOrder\BranchManager.cs" />
-    <Compile Include="Branch\BranchResidentRecord.cs" />
+    <Compile Include="BranchResident\BranchResident.cs" />
     <Compile Include="Utility\BranchUtility.cs" />
     <Compile Include="Def\BranchBuildingDef.cs" />
     <Compile Include="Branch\BranchFacilityHandler.cs" />
     <Compile Include="Branch\BranchResidentHandler.cs" />
     <Compile Include="BranchBuilding\BranchBuilding.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
-    <Compile Include="Branch\ResidencyWorker_Deployment.cs" />
     <Compile Include="Window\UICacheComp\BranchBuildingDefSummaryUICache.cs" />
     <Compile Include="Window\UICacheComp\BranchFacilityStageSummaryUICache.cs" />
     <Compile Include="Window\Window_BranchSquad.cs" />

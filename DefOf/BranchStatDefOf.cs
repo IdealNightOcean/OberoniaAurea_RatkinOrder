@@ -8,7 +8,7 @@ public static class BranchStatDefOf
     public static BranchStatDef OARO_AffectRadius;
 
     public static BranchStatDef OARO_BuildingCeiling;
-    public static BranchStatDef OARO_DeployeeDailyXp;
+    public static BranchStatDef OARO_DeployeeDailyXpFactor;
 
     public static BranchStatDef OARO_SupplyCeiling; //分部补给容量上限
     public static BranchStatDef OARO_SupplyRecoveryRate; //分部补给恢复速率

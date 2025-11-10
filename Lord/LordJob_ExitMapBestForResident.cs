@@ -19,10 +19,8 @@ public class LordJob_ExitMapBestForDeployment : LordJob_ExitMapBest
                 return;
             }
 
-            targetBranch.ResidentHandler.AddResident(p, totalDeployDays, new ResidencyWorker_Deployment
-            {
-                Skill = targetSkill
-            });
+            BranchResident_Deployment resident = new(p, totalDeployDays, targetSkill);
+            targetBranch.ResidentHandler.AddResident(resident);
         }
     }
 

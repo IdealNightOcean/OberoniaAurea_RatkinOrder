@@ -12,8 +12,10 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
 {
     [Unsaved] private readonly Branch branch;
 
-    private ThingOwner<Pawn> residents;
-    private List<BranchResidentRecord> residentRecords = [];
+    private ThingOwner<Pawn> residentPawns;
+    private List<BranchResident> residentRecords;
+
+    [Unsaved] public readonly SimpleValueCache<float> DailyXpFactorCache;
 
     public IThingHolder ParentHolder
     {
@@ -30,16 +32,17 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
     internal BranchResidentHandler(Branch branch, bool initCtor)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        DailyXpFactorCache = new SimpleValueCache<float>(cacheInterval: 2500, defaultValue: 1f, checker: () => branch.GetStatValue(BranchStatDefOf.OARO_DeployeeDailyXpFactor));
         if (initCtor)
         {
-            residents = new ThingOwner<Pawn>(this);
+            residentPawns = new ThingOwner<Pawn>(this);
             residentRecords = [];
         }
     }
 
     public void ExposeData()
     {
-        Scribe_Deep.Look(ref residents, "residents");
+        Scribe_Deep.Look(ref residentPawns, "residents");
         Scribe_Collections.Look(ref residentRecords, "residentRecords", LookMode.Deep);
     }
 
@@ -47,30 +50,21 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"residents: {residents.Count}");
+        listing_Rect.Label($"residents: {residentPawns.Count}");
         listing_Rect.Label($"residentRecords: {residentRecords.Count}");
     }
 
-    public bool AddResident(Pawn pawn, int daysDeployed, ResidencyWorker worker)
+    public bool AddResident(BranchResident resident)
     {
-        if (pawn is null || worker is null)
+        if (resident?.Resident is null)
         {
             return false;
         }
 
-        if (residents.TryAddOrTransfer(pawn))
+        if (residentPawns.TryAddOrTransfer(resident.Resident))
         {
-            BranchResidentRecord record = new(pawn, daysDeployed, worker);
-            int insertIndex = residentRecords.Count;
-            for (int i = 0; i < residentRecords.Count; i++)
-            {
-                if (ResidencyInsertCompare(residentRecords[i].ResidencyWorker, worker) <= 0)
-                {
-                    insertIndex = i;
-                    break;
-                }
-            }
-            residentRecords.Insert(insertIndex, record);
+            resident.StartResidency(branch);
+            residentRecords.BinaryInsertion(resident, new ResidencyInsertComparer());
             return true;
         }
         return false;
@@ -78,10 +72,9 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
 
     public void TickDay()
     {
-        ResidencyWorker_Deployment.ClearStaticCache();
-        List<BranchResidentRecord> expiredRecords = [];
+        List<BranchResident> expiredRecords = [];
 
-        foreach (BranchResidentRecord record in residentRecords)
+        foreach (BranchResident record in residentRecords)
         {
             if ((record.DeployDaysLeft -= 1) <= 0)
             {
@@ -94,75 +87,90 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             residentRecords.RemoveAll(r => r.DeployDaysLeft <= 0);
             FinishResidency(expiredRecords);
         }
-
-        ResidencyWorker_Deployment.ClearStaticCache();
     }
 
     public void ForceEndAllResidency()
     {
         residentRecords.Clear();
-        Caravan caravan = CaravanMaker.MakeCaravan(residents.InnerListForReading, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
+        Caravan caravan = CaravanMaker.MakeCaravan(residentPawns.InnerListForReading, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
     }
 
-    private void FinishResidency(IEnumerable<BranchResidentRecord> residentRecords)
+    private void FinishResidency(IEnumerable<BranchResident> residentRecords, Caravan caravan = null)
     {
         if (residentRecords is null)
         {
             return;
         }
 
-        foreach (BranchResidentRecord record in residentRecords)
+        List<Pawn> pawns = [];
+        foreach (BranchResident resident in residentRecords)
         {
-            record.ResidencyWorker?.ResidencyEnd(branch, record.Resident, record.TotalDeployDays);
+            pawns.Add(resident.Resident);
+            resident.EndResidency(branch);
         }
 
-        List<Pawn> pawns = residentRecords.Select(rc => rc.Resident)
-                                          .ToList();
+        if (caravan is not null)
+        {
+            foreach (Pawn pawn in pawns)
+            {
+                caravan.AddPawn(pawn, addCarriedPawnToWorldPawnsIfAny: true);
+            }
+            Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
+                               text: "OARO_ResidencyFinishedText_JoinCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                               textLetterDef: LetterDefOf.PositiveEvent, lookTargets: caravan);
+            return;
+        }
+
         Map map = Find.AnyPlayerHomeMap;
         if (map is null)
         {
-            Caravan caravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
-            Find.LetterStack.ReceiveLetter("OARO_LetterLabel_DeployFinished".Translate(),
-                                           "OARO_Letter_DeployFinishedCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
-                                           LetterDefOf.PositiveEvent, caravan);
+            Caravan residentCaravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
+            Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
+                                           text: "OARO_ResidencyFinishedText_NewCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                                           textLetterDef: LetterDefOf.PositiveEvent, lookTargets: residentCaravan);
         }
         else
         {
-            IncidentParms incidentParms = new()
+            IncidentParms arrivalParms = new()
             {
                 target = map,
             };
-            PawnsArrivalModeDefOf.EdgeWalkIn.Worker.TryResolveRaidSpawnCenter(incidentParms);
-            PawnsArrivalModeDefOf.EdgeWalkIn.Worker.Arrive(pawns, incidentParms);
-            Find.LetterStack.ReceiveLetter("OARO_LetterLabel_DeployFinished".Translate(),
-                                           "OARO_Letter_DeployFinishedJoin".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
-                                           LetterDefOf.PositiveEvent, pawns);
+            PawnsArrivalModeDefOf.EdgeWalkIn.Worker.TryResolveRaidSpawnCenter(arrivalParms);
+            PawnsArrivalModeDefOf.EdgeWalkIn.Worker.Arrive(pawns, arrivalParms);
+            Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
+                                           text: "OARO_ResidencyFinishedText_Map".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                                           textLetterDef: LetterDefOf.PositiveEvent, lookTargets: pawns);
         }
     }
 
     internal void PostLoadInit()
     {
-        residents.RemoveAll(p => p.DestroyedOrNull());
+        residentPawns.RemoveAll(p => p.DestroyedOrNull());
         residentRecords.RemoveAll(rc => rc is null || rc.Resident.DestroyedOrNull());
-    }
-
-    private static int ResidencyInsertCompare(ResidencyWorker x, ResidencyWorker y)
-    {
-        if (x is null && y is null) return 0;
-        if (x is null) return -1;
-        if (y is null) return 1;
-
-        return (x.Priority, x.GetType().FullName)
-                  .CompareTo((y.Priority, y.GetType().FullName));
     }
 
     public ThingOwner GetDirectlyHeldThings()
     {
-        return residents;
+        return residentPawns;
     }
 
     public void GetChildHolders(List<IThingHolder> outChildren)
     {
         ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, GetDirectlyHeldThings());
+    }
+
+    /// <summary>
+    /// 二分插入使用的
+    /// </summary>
+    private class ResidencyInsertComparer : IComparer<BranchResident>
+    {
+        public int Compare(BranchResident x, BranchResident y)
+        {
+            if (x is null && y is null) return 0;
+            if (x is null) return 1;
+            if (y is null) return -1;
+
+            return (y.Priority, y.GetType().FullName).CompareTo((x.Priority, x.GetType().FullName));
+        }
     }
 }
