@@ -44,6 +44,10 @@
       <HintPath>..\..\RimWorldReference\NewRatkin-Temp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NightOcean">
+      <HintPath>..\..\NightOcean\obj\Release\netstandard2.0\NightOcean.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="OberoniaAurea_Frame">
       <HintPath>..\OberoniaAurea_Frame\Release\OberoniaAurea_Frame.dll</HintPath>
       <Private>False</Private>
@@ -96,6 +100,8 @@
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
+    <Compile Include="DefOf\BranchResidentDefOf.cs" />
+    <Compile Include="Def\BranchResidentDef.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
     <Compile Include="Window\UICacheComp\BranchSummaryUICache.cs" />
     <Compile Include="Components\KnightRecord.cs" />

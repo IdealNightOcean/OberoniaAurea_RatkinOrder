@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean.Collection;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -13,7 +14,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
     [Unsaved] private readonly Branch branch;
 
     private ThingOwner<Pawn> residentPawns;
-    private List<BranchResident> residentRecords;
+    private Dictionary<BranchResidentDef, BranchResidentLoadBox> residentRecords;
 
     [Unsaved] public readonly SimpleValueCache<float> DailyXpFactorCache;
 
@@ -43,7 +44,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
     public void ExposeData()
     {
         Scribe_Deep.Look(ref residentPawns, "residents");
-        Scribe_Collections.Look(ref residentRecords, "residentRecords", LookMode.Deep);
+        Scribe_Collections.Look(ref residentRecords, "residentRecords", LookMode.Def, LookMode.Deep);
     }
 
     internal void PostBranchGenerated() { }
@@ -56,7 +57,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
 
     public bool AddResident(BranchResident resident)
     {
-        if (resident?.Resident is null)
+        if (resident is null || !resident.Validate())
         {
             return false;
         }
@@ -64,7 +65,14 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         if (residentPawns.TryAddOrTransfer(resident.Resident))
         {
             resident.StartResidency(branch);
-            residentRecords.BinaryInsertion(resident, new ResidencyInsertComparer());
+            if (residentRecords.TryGetValue(resident.Def, out BranchResidentLoadBox residentList))
+            {
+                residentList.records.Add(resident);
+            }
+            else
+            {
+                residentRecords.Add(resident.Def, new BranchResidentLoadBox { records = [resident] });
+            }
             return true;
         }
         return false;
@@ -74,17 +82,14 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
     {
         List<BranchResident> expiredRecords = [];
 
-        foreach (BranchResident record in residentRecords)
+        foreach (BranchResidentLoadBox residentListLoadBox in residentRecords.Values)
         {
-            if ((record.DeployDaysLeft -= 1) <= 0)
-            {
-                expiredRecords.Add(record);
-            }
+            expiredRecords.AddRange(residentListLoadBox.records.ExtractMatching(r => (--r.DeployDaysLeft) <= 0));
         }
 
         if (expiredRecords.Count > 0)
         {
-            residentRecords.RemoveAll(r => r.DeployDaysLeft <= 0);
+            residentRecords.RemoveAll(kv => kv.Value.records.NullOrEmpty());
             FinishResidency(expiredRecords);
         }
     }
@@ -105,8 +110,21 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         List<Pawn> pawns = [];
         foreach (BranchResident resident in residentRecords)
         {
-            pawns.Add(resident.Resident);
-            resident.EndResidency(branch);
+            try
+            {
+                resident.EndResidency(branch);
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An exception occurred in {nameof(BranchResident)}.{nameof(resident.EndResidency)}.\nException:\n{ex.Message}");
+            }
+            finally
+            {
+                if (resident?.Resident is not null)
+                {
+                    pawns.Add(resident.Resident);
+                }
+            }
         }
 
         if (caravan is not null)
@@ -121,7 +139,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             return;
         }
 
-        Map map = Find.AnyPlayerHomeMap;
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
         if (map is null)
         {
             Caravan residentCaravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
@@ -146,31 +164,26 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
     internal void PostLoadInit()
     {
         residentPawns.RemoveAll(p => p.DestroyedOrNull());
-        residentRecords.RemoveAll(rc => rc is null || rc.Resident.DestroyedOrNull());
+        residentRecords.RemoveAll(kv => kv.Key is null || kv.Value is null);
     }
 
-    public ThingOwner GetDirectlyHeldThings()
-    {
-        return residentPawns;
-    }
-
-    public void GetChildHolders(List<IThingHolder> outChildren)
-    {
-        ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, GetDirectlyHeldThings());
-    }
+    public ThingOwner GetDirectlyHeldThings() => residentPawns;
+    public void GetChildHolders(List<IThingHolder> outChildren) => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, GetDirectlyHeldThings());
 
     /// <summary>
-    /// 二分插入使用的
+    /// 用于保存加载的中转类（RimWorld不能保存值为集合类型的字典）
     /// </summary>
-    private class ResidencyInsertComparer : IComparer<BranchResident>
+    private class BranchResidentLoadBox : IExposable
     {
-        public int Compare(BranchResident x, BranchResident y)
-        {
-            if (x is null && y is null) return 0;
-            if (x is null) return 1;
-            if (y is null) return -1;
+        public List<BranchResident> records = [];
 
-            return (y.Priority, y.GetType().FullName).CompareTo((x.Priority, x.GetType().FullName));
+        public void ExposeData()
+        {
+            Scribe_Collections.Look(ref records, "records", LookMode.Deep);
+            if (Scribe.mode == LoadSaveMode.PostLoadInit)
+            {
+                records.RemoveAll(r => r is null || !r.Validate());
+            }
         }
     }
 }

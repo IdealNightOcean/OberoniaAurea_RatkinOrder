@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean.Collection;
+using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -55,7 +56,7 @@ public class OrderLetterBox : IExposable
         {
             unreadLetters.Clear();
             unreadLetters.AddRange(validLetters);
-            OAFrame_CollectionUtility.MergeSortedListsInplace(archivedLetters, expiredLetters, comparerFunc: OrderLetterComparerFunc);
+            ListUtils.MergeSortedListsInplace(archivedLetters, expiredLetters, compareFunc: OrderLetterComparerFunc);
 
             if (RatkinOrderSettings.HasMaxLetterLimit)
             {
@@ -74,7 +75,7 @@ public class OrderLetterBox : IExposable
     public void ReceiveLetter(OrderLetter letter)
     {
         letter.ArrivalTick = Find.TickManager.TicksGame;
-        OAFrame_CollectionUtility.BinaryInsertion(unreadLetters, letter, comparerFunc: OrderLetterComparerFunc);
+        unreadLetters.BinaryInsert(letter, compareFunc: OrderLetterComparerFunc);
     }
 
     public void ReadSingleLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
@@ -109,7 +110,7 @@ public class OrderLetterBox : IExposable
 
     public void ClearAllUnreadLetters()
     {
-        OAFrame_CollectionUtility.MergeSortedListsInplace(archivedLetters, unreadLetters, comparerFunc: OrderLetterComparerFunc);
+        ListUtils.MergeSortedListsInplace(archivedLetters, unreadLetters, compareFunc: OrderLetterComparerFunc);
         unreadLetters.Clear();
         if (RatkinOrderSettings.HasMaxLetterLimit)
         {
@@ -143,7 +144,7 @@ public class OrderLetterBox : IExposable
     private void ArchiveLetter(OrderLetter letter)
     {
         unreadLetters.Remove(letter);
-        OAFrame_CollectionUtility.BinaryInsertion(archivedLetters, letter, comparerFunc: OrderLetterComparerFunc);
+        archivedLetters.BinaryInsert(letter, compareFunc: OrderLetterComparerFunc);
     }
 
     /// <summary>

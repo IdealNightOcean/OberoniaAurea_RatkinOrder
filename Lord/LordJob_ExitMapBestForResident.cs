@@ -19,7 +19,7 @@ public class LordJob_ExitMapBestForDeployment : LordJob_ExitMapBest
                 return;
             }
 
-            BranchResident_Deployment resident = new(p, totalDeployDays, targetSkill);
+            BranchResident_Deployment resident = (BranchResident_Deployment)BranchResident.GenerateBranchResident(BranchResidentDefOf.OARO_Deployment, p, totalDeployDays);
             targetBranch.ResidentHandler.AddResident(resident);
         }
     }

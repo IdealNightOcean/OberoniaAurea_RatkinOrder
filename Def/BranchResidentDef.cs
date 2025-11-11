@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class BranchResidentDef : Def
+{
+    public Type residentClass;
+    public int defaultDeployDays = 1;
+
+    public override IEnumerable<string> ConfigErrors()
+    {
+        foreach (var error in base.ConfigErrors())
+        {
+            yield return error;
+        }
+        if (residentClass is null)
+        {
+            yield return $"has a null {nameof(residentClass)}";
+        }
+    }
+}

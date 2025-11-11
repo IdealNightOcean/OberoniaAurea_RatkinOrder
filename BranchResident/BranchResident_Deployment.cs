@@ -6,20 +6,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchResident_Deployment : BranchResident
 {
-    public override int Priority => 500;
-
-    private SkillDef skill;
-
-    public SkillDef Skill => Skill;
+    public SkillDef Skill;
     protected BranchResident_Deployment() : base() { }
-    public BranchResident_Deployment(Pawn resident, int totalDeployDays, SkillDef skillDef) : base(resident, totalDeployDays)
-    {
-        skill = skillDef;
-    }
+
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Defs.Look(ref skill, "skill");
+        Scribe_Defs.Look(ref Skill, "Skill");
     }
 
     public override void EndResidency(Branch branch)
@@ -30,7 +23,7 @@ public class BranchResident_Deployment : BranchResident
         }
         float deployDays = Mathf.Max(0f, (totalDeployDays - DeployDaysLeft));
 
-        if (skill is not null && resident.skills is not null)
+        if (Skill is not null && resident.skills is not null)
         {
             //  float xpGain = cachedDailyXp * deployDays;
             //  resident.skills.GetSkill(Skill).Learn(xpGain, direct: true);

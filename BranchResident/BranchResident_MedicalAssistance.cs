@@ -6,9 +6,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchResident_MedicalAssistance : BranchResident
 {
-    public override int Priority => 550;
-    protected BranchResident_MedicalAssistance() : base() { }
-    public BranchResident_MedicalAssistance(Pawn resident, int totalDeployDays) : base(resident, totalDeployDays) { }
     public override void StartResidency(Branch branch)
     {
         base.StartResidency(branch);
