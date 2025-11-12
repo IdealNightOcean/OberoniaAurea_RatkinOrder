@@ -24,9 +24,6 @@ public abstract class BranchConstructionDef : Def
         }
     }
 
-    [NoTranslate]
-    protected string expandingIconPath;
-
     protected Texture2D expandingIconTexture;
     public Texture2D ExpandingIconTexture
     {
@@ -34,11 +31,11 @@ public abstract class BranchConstructionDef : Def
         {
             if (expandingIconTexture is null)
             {
-                if (string.IsNullOrEmpty(expandingIconPath))
+                if (string.IsNullOrEmpty(iconPath))
                 {
                     return null;
                 }
-                expandingIconTexture = ContentFinder<Texture2D>.Get(expandingIconPath);
+                expandingIconTexture = ContentFinder<Texture2D>.Get(iconPath + "_Expand");
             }
             return expandingIconTexture;
         }

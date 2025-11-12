@@ -1,21 +1,34 @@
-﻿using RimWorld;
+﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityEngine;
+using System.Text;
 using Verse;
-using static OberoniaAurea.RatkinOrder.BranchMedalRecord;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class BranchMedalHandler : IExposable
 {
-    private List<BranchMedalRecord> medalRecords = new(4);
+    private Dictionary<BranchMedalDef, BranchMedalRecord> medalRecords = new(4);
 
-    [Unsaved] private BranchMedalType allHasTypes = 0;
-    public BranchMedalType AllHasTypes => allHasTypes;
-    public BranchMedalType PrimaryMedal => medalRecords[0].Type;
+    private BranchMedalDef primaryMedal;
+    public BranchMedalDef PrimaryMedal
+    {
+        get
+        {
+            if (primaryMedal is null)
+            {
+                if (!medalRecords.NullOrEmpty())
+                {
+                    primaryMedal = medalRecords.First().Key;
+                }
+            }
+            return primaryMedal;
+        }
+    }
+
     public int MedalTypeCount => medalRecords.Count;
-    public IReadOnlyList<BranchMedalRecord> MedalRecords => medalRecords;
+    public IReadOnlyDictionary<BranchMedalDef, BranchMedalRecord> MedalRecords => medalRecords;
 
     private int totalMedalCount;
     public int TotalMedalCount => totalMedalCount;
@@ -37,71 +50,57 @@ public class BranchMedalHandler : IExposable
     public void ExposeData()
     {
         Scribe_Values.Look(ref totalMedalCount, "totalMedalCount", 0);
-        Scribe_Collections.Look(ref medalRecords, "medalRecords", LookMode.Deep);
+        Scribe_Defs.Look(ref primaryMedal, "primaryMedal");
+        Scribe_Collections.Look(ref medalRecords, "medalRecords", LookMode.Def, LookMode.Deep);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         listing_Rect.Label($"PrimaryMedal: {PrimaryMedal}");
         listing_Rect.Label("Medals:");
-        foreach (BranchMedalRecord mr in medalRecords)
+        foreach (var kv in medalRecords)
         {
-            listing_Rect.SubLabel($"({mr.Type}, {mr.Count})", 0.8f);
+            listing_Rect.SubLabel($"({kv.Key.label} - {kv.Value})", 0.8f);
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasMedal(BranchMedalType medal) => (allHasTypes & medal) != 0;
+    public bool HasMedal(BranchMedalDef medal) => medalRecords.ContainsKey(medal);
 
-    public int GetMedalCount(BranchMedalType medal)
+    public int GetMedalCount(BranchMedalDef medal)
     {
-        if (medal == BranchMedalType.None || !HasMedal(medal))
+        if (medal is null || !HasMedal(medal))
         {
             return 0;
         }
-        for (int i = 0; i < medalRecords.Count; i++)
+        if (medalRecords.TryGetValue(medal, out BranchMedalRecord record))
         {
-            if (medalRecords[i].Type == medal)
-            {
-                return medalRecords[i].Count;
-            }
+            return record.Count;
         }
         return 0;
     }
 
-    public void AddMedal(BranchMedalType medal, short count = 1)
+    public void AddMedal(BranchMedalDef medal, short count = 1)
     {
-        if (medal == BranchMedalType.None)
+        if (medal is null)
         {
             return;
         }
 
-        if (HasMedal(medal))
+        if (medalRecords.TryGetValue(medal, out BranchMedalRecord record))
         {
-            for (int i = 0; i < medalRecords.Count; i++)
-            {
-                BranchMedalRecord record = medalRecords[i];
-                if (record.Type == medal)
-                {
-                    record.Count += count;
-                    medalRecords[i] = record;
-                    totalMedalCount += count;
-                }
-            }
+            record.Count++;
         }
         else
         {
-            medalRecords.Add(new BranchMedalRecord()
+            record = new BranchMedalRecord()
             {
-                Type = medal,
                 Count = count,
                 FirstGotTick = Find.TickManager.TicksGame
-            });
-
-            medalRecords.SortBy(r => (int)r.Type);
-            allHasTypes |= medal;
+            };
         }
 
+        medalRecords[medal] = record;
         totalMedalCount += count;
         medalHediffsDirty = true;
     }
@@ -111,97 +110,51 @@ public class BranchMedalHandler : IExposable
     /// </summary>
     internal void PostBranchGenerated()
     {
-        BranchMedalType primaryMedal = BranchUtility.GetRandomAvailableBranchMedalType();
+        primaryMedal = DefDatabase<BranchMedalDef>.AllDefsListForReading.RandomElement();
         AddMedal(primaryMedal, 1);
     }
 
     internal void PostLoadInit()
     {
-        medalRecords.RemoveAll(r => !r.Validate());
-        totalMedalCount = 0;
-        for (int i = 0; i < medalRecords.Count; i++)
-        {
-            allHasTypes |= medalRecords[i].Type;
-            totalMedalCount += medalRecords[i].Count;
-        }
+        medalRecords.RemoveAll(kv => kv.Key is null || !kv.Value.Validate());
+        totalMedalCount = medalRecords.Sum(kv => kv.Value.Count);
     }
 
     private void RecacheMedalHediffStage()
     {
         HediffStage stage = new()
         {
-            extraTooltip = string.Empty
+            statOffsets = [],
+            statFactors = []
         };
-        for (int i = 0; i < medalRecords.Count; i++)
+
+        StringBuilder medalLabels = new(32);
+        foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> kv in medalRecords)
         {
-            AdjustMedalHediffStage(stage, medalRecords[i].Type, isPrimary: i == 0);
+            try
+            {
+                BranchMedalDef medalDef = kv.Key;
+                bool isPrimaryMedal = primaryMedal == medalDef;
+                medalDef.BuffWorker.AdjuestHediffBuffStage(stage, isPrimaryMedal, kv.Value.Count);
+                if (isPrimaryMedal)
+                {
+                    medalLabels.AppendLine($"{medalDef.LabelCap} (★)".Colorize(medalDef.color));
+                }
+                else
+                {
+                    medalLabels.AppendLine(medalDef.LabelCap.Colorize(medalDef.color));
+                }
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"An exception occurred while processing BuffWorker in {nameof(BranchMedalHandler)}.{nameof(RecacheMedalHediffStage)}.\nException:\n{ex.Message}");
+            }
         }
-        if (string.IsNullOrEmpty(stage.extraTooltip))
+
+        if (medalLabels.Length > 0)
         {
-            stage.extraTooltip = null;
+            stage.extraTooltip = medalLabels.ToString();
         }
         medalHediffStage = stage;
-
-        static void AdjustMedalHediffStage(HediffStage stage, BranchMedalType medalType, bool isPrimary)
-        {
-            Color color = Color.white;
-            switch (medalType)
-            {
-                case BranchMedalType.Tenacity:
-                    {
-                        stage.painFactor *= (isPrimary ? 0.85f : 0.95f);
-                        color = Color.yellow;
-                        break;
-                    }
-                case BranchMedalType.Courage:
-                    {
-                        stage.statOffsets ??= [];
-                        stage.statOffsets.Add(new StatModifier()
-                        {
-                            stat = StatDefOf.MeleeHitChance,
-                            value = isPrimary ? 4f : 2f
-                        });
-                        color = ColorLibrary.RedReadable;
-                        break;
-                    }
-                case BranchMedalType.Rescue:
-                    {
-                        stage.statOffsets ??= [];
-                        stage.statOffsets.Add(new StatModifier()
-                        {
-                            stat = StatDefOf.MedicalTendSpeed,
-                            value = isPrimary ? 0.12f : 0.06f
-                        });
-                        color = Color.cyan;
-                        break;
-                    }
-                case BranchMedalType.Justice:
-                    {
-                        stage.statOffsets ??= [];
-                        stage.statOffsets.Add(new StatModifier()
-                        {
-                            stat = StatDefOf.MoveSpeed,
-                            value = isPrimary ? 0.15f : 0.10f
-                        });
-                        stage.statOffsets.Add(new StatModifier()
-                        {
-                            stat = StatDefOf.WorkSpeedGlobal,
-                            value = isPrimary ? 0.05f : 0.03f
-                        });
-                        color = ColorLibrary.Orange;
-                        break;
-                    }
-                default: return; //无对应则不增加描述
-            }
-
-            if (isPrimary)
-            {
-                stage.extraTooltip += $"{("OARO_BranchMedalType_" + medalType.ToString()).Translate().Colorize(color)} {"★".Colorize(color)}\n";
-            }
-            else
-            {
-                stage.extraTooltip += $"OARO_BranchMedalType_{medalType}".Translate().Colorize(color) + "\n";
-            }
-        }
     }
 }

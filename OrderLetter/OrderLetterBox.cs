@@ -1,4 +1,4 @@
-﻿using NightOcean.Collection;
+using NightOcean.Collection;
 using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
@@ -37,27 +37,31 @@ public class OrderLetterBox : IExposable
 
     public void LetterBoxDay()
     {
-        List<OrderLetter> validLetters = new(8);
-        List<OrderLetter> expiredLetters = new(8);
+        // 优化：避免创建不必要的临时列表，直接在原列表上操作
+        int validLetterCount = 0;
 
+        // 第一遍：统计有效信件数量并移动有效信件到列表前部
         for (int i = 0; i < unreadLetters.Count; i++)
         {
-            if (unreadLetters[i].Expired)
+            if (!unreadLetters[i].Expired)
             {
-                expiredLetters.Add(unreadLetters[i]);
-            }
-            else
-            {
-                validLetters.Add(unreadLetters[i]);
+                unreadLetters[validLetterCount] = unreadLetters[i];
+                validLetterCount++;
             }
         }
 
-        if (expiredLetters.Count > 0)
+        // 如果有过期信件，处理它们
+        if (validLetterCount < unreadLetters.Count)
         {
-            unreadLetters.Clear();
-            unreadLetters.AddRange(validLetters);
-            ListUtils.MergeSortedListsInplace(archivedLetters, expiredLetters, compareFunc: OrderLetterComparerFunc);
+            // 收集过期信件
+            List<OrderLetter> expiredLetters = new List<OrderLetter>(unreadLetters.Count - validLetterCount);
+            for (int i = validLetterCount; i < unreadLetters.Count; i++)
+            {
+                expiredLetters.Add(unreadLetters[i]);
+            }
 
+            unreadLetters.RemoveRange(validLetterCount, unreadLetters.Count - validLetterCount);
+            ListUtils.MergeSortedListsInplace(archivedLetters, expiredLetters, compareFunc: OrderLetterComparerFunc);
             if (RatkinOrderSettings.HasMaxLetterLimit)
             {
                 RemoveOvercapArchivedLetters();
@@ -68,7 +72,9 @@ public class OrderLetterBox : IExposable
         {
             int ticksGame = Find.TickManager.TicksGame;
             int maxLetterRetentionDays = RatkinOrderSettings.MaxLetterRetentionDays;
-            archivedLetters.RemoveAll(r => (ticksGame - r.ArrivalTick) / 60000 >= maxLetterRetentionDays);
+            int retentionTicks = maxLetterRetentionDays * 60000;
+
+            archivedLetters.RemoveAll(r => (ticksGame - r.ArrivalTick) >= retentionTicks);
         }
     }
 

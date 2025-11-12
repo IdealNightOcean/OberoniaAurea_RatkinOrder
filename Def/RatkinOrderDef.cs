@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -17,18 +18,18 @@ public class RatkinOrderDef : Def
 
     public Color? color;
 
-    public List<PawnGroupMaker> pawnGroupMakers;
+    public List<PawnGroupOption> pawnGroupOptions;
 
 
-    public bool TryGetRandomPawnGroupMaker(PawnGroupKindDef pawnGroupKindDef, out PawnGroupMaker pawnGroupMaker)
+    public bool TryGetRandomPawnGroupMaker(PawnGroupKindDef pawnGroupKindDef, out PawnGroupOption groupOption)
     {
-        if (pawnGroupMakers.NullOrEmpty())
+        if (pawnGroupOptions.NullOrEmpty())
         {
-            pawnGroupMaker = null;
+            groupOption = null;
             return false;
         }
-        return pawnGroupMakers.Where(g => g.kindDef == pawnGroupKindDef)
-                              .TryRandomElementByWeight(g => g.commonality, out pawnGroupMaker);
+        return pawnGroupOptions.Where(g => g.kindDef == pawnGroupKindDef)
+                               .TryRandomElementByWeight(g => g.commonality, out groupOption);
     }
 
 }

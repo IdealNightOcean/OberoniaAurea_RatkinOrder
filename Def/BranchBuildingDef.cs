@@ -30,7 +30,7 @@ public class BranchBuildingDef : BranchConstructionDef
     /// 只在isSpecial为true时生效
     /// </summary>
     public bool IsHonorSymbol => honorDef is not null;
-    public HonorBranchDef honorDef;
+    public BranchHonorDef honorDef;
 
     public List<string> effectFlags; //效果标志列表
     public List<BranchStatModifier> branchStatOffsets; //属性修正列表（Offset）

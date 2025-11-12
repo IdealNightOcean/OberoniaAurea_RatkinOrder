@@ -84,7 +84,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         {
             try
             {
-                AddBuilding(underConstructionBuilding.BuildingDef, underConstructionBuilding.InSpecialSlot);
+                AddBuilding(underConstructionBuilding.BuildingDef);
             }
             finally
             {
@@ -127,11 +127,18 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    public bool HasBuilding(BranchBuildingDef buildingDef)
+    public bool HasBuilding(BranchBuildingDef buildingDef, bool strictMatch = false)
     {
-        if (specialBuilding?.Def == buildingDef)
+        if (buildingDef.isSpecial)
         {
-            return true;
+            if (specialBuilding?.Def == buildingDef)
+            {
+                return true;
+            }
+            else if (!strictMatch)
+            {
+                return false;
+            }
         }
 
         for (int i = 0; i < buildings.Count; i++)
@@ -145,26 +152,33 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         return false;
     }
 
-    public (BranchBuilding building, bool inSpecialSlot) GetBuilding(BranchBuildingDef buildingDef)
+    public BranchBuilding GetBuilding(BranchBuildingDef buildingDef, bool strictMatch = false)
     {
-        if (specialBuilding?.Def == buildingDef)
+        if (buildingDef.isSpecial)
         {
-            return (specialBuilding, true);
+            if (specialBuilding?.Def == buildingDef)
+            {
+                return specialBuilding;
+            }
+            else if (!strictMatch)
+            {
+                return null;
+            }
         }
 
         for (int i = 0; i < buildings.Count; i++)
         {
             if (buildings[i].Def == buildingDef)
             {
-                return (buildings[i], false);
+                return buildings[i];
             }
         }
-        return (null, false);
+        return null;
     }
 
     public AcceptanceReport CanConstructBuilding(BranchBuildingConstructParameter constructParam, bool resultOnly = false)
     {
-        if (constructParam.InSpecialSlot && specialBuilding is not null)
+        if (constructParam.BuildingDef.isSpecial && specialBuilding is not null)
         {
             return resultOnly ? false : "OARO_AlreadyHasSpecialBuilding".Translate();
         }
@@ -231,16 +245,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         BranchBuildingDef buildingDef = constructParam.BuildingDef;
         underConstructionBuilding = new(
             def: buildingDef,
-            inSpecialSlot: constructParam.InSpecialSlot,
             durationTicks: branch.GetBuildingTimeCost(buildingDef));
-        Log.Message("000");
         if (constructParam.ByPlayer)
         {
             int silverCost = branch.GetBuildingSilverCost(buildingDef);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.Caravan, ThingDefOf.Silver, silverCost);
         }
         branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);
-        Log.Message("111");
         try
         {
             OnBuildingConstructionChanged?.Invoke(buildingDef, true);
@@ -251,10 +262,9 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    private void AddBuilding(BranchBuildingDef buildingDef, bool inSpecialSlot)
+    private void AddBuilding(BranchBuildingDef buildingDef)
     {
-        inSpecialSlot = inSpecialSlot || buildingDef.isSpecial;
-        if (inSpecialSlot && specialBuilding is not null)
+        if (buildingDef.isSpecial && specialBuilding is not null)
         {
             Log.Error($"Attempted to add a new branch building to the special building slot of {branch}, but one already exists.");
             return;
@@ -269,7 +279,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             Log.Error($"Failed to generate building {buildingDef.defName} for {branch}: {e.Message}");
             return;
         }
-        if (inSpecialSlot)
+        if (buildingDef.isSpecial)
         {
             specialBuilding = newBuilding;
         }
@@ -279,7 +289,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
 
         newBuilding.InitActive();
-        ActiveBuilding(newBuilding, isSpecial: inSpecialSlot);
+        ActiveBuilding(newBuilding);
 
         if (CanUpgradeBuilding(newBuilding))
         {
@@ -290,13 +300,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void RemoveBuilding(BranchBuildingDef buildingDef)
     {
-        (BranchBuilding building, bool inSpecialSlot) = GetBuilding(buildingDef);
+        BranchBuilding building = GetBuilding(buildingDef, strictMatch: true);
         if (building is null)
         {
             return;
         }
 
-        if (inSpecialSlot)
+        if (buildingDef.isSpecial)
         {
             specialBuilding = null;
         }
@@ -377,7 +387,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     {
         if (specialBuilding is not null)
         {
-            ActiveBuilding(specialBuilding, isSpecial: true);
+            ActiveBuilding(specialBuilding);
         }
 
         if (buildings is null)
@@ -393,11 +403,11 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         for (int i = 0; i < buildings.Count; i++)
         {
-            ActiveBuilding(buildings[i], isSpecial: false);
+            ActiveBuilding(buildings[i]);
         }
     }
 
-    private void ActiveBuilding(BranchBuilding building, bool isSpecial)
+    private void ActiveBuilding(BranchBuilding building)
     {
         branch.EffectTags.IncrementTagsValue(building.Def.effectFlags, addIfMiss: true);
         branch.TransformerHandler.MergeStatOffsets(building.Def.branchStatOffsets, addIfMiss: true);
@@ -407,10 +417,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             UpgradeBuilding(building);
         }
 
-        if (isSpecial && building.Def.IsHonorSymbol)
+        if (building.Def.isSpecial)
         {
-            branch.SetBranchType(Branch.BranchType.Honor, active: true);
-            branch.HonorDef = building.Def.honorDef;
+            if (building.Def.IsHonorSymbol)
+            {
+                branch.SetBranchType(Branch.BranchType.Honor, active: true);
+                branch.HonorDef = building.Def.honorDef;
+            }
         }
 
         if (building is ITickHour<Branch> tickLong)

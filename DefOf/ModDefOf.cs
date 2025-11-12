@@ -10,6 +10,8 @@ public static class OARO_ModDefOf
     public static BackstoryDef Ratkin_Knight;
     public static BackstoryDef Ratkin_KnightCommander;
 
+    public static BranchFacilityDef OARO_SupportFacility; //支援设施
+
     public static FactionDef Rakinia;
     public static FactionDef OARO_SubRakinia_Neutral;
 
@@ -18,7 +20,7 @@ public static class OARO_ModDefOf
 
     public static HistoryEventDef OARO_OrderMediateFactionRelation;
 
-    public static HonorBranchDef OARO_Honor_Instructor; //荣誉分部 - 教导骑士
+    public static BranchHonorDef OARO_Honor_Instructor; //荣誉分部 - 教导骑士
 
     public static IncidentDef OARO_RaidNobilityTerritory; //叛乱镇压 - 贵族领地战斗
 

@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -290,18 +290,5 @@ public static class BranchUtility
         int durationDays = 40;
         durationDays += branch.RatkinOrder.Esteem * 2;
         return durationDays;
-    }
-
-    public static BranchMedalRecord.BranchMedalType GetRandomAvailableBranchMedalType() => EnumArraryLibrary.BranchMedalsArr[Rand.Range(1, EnumArraryLibrary.BranchMedalsArr.Length)];
-    public static IEnumerable<BranchMedalRecord.BranchMedalType> GetContainedBranchMedals(BranchMedalRecord.BranchMedalType medalType)
-    {
-        BranchMedalRecord.BranchMedalType[] branchMedalsArr = EnumArraryLibrary.BranchMedalsArr;
-        for (int i = 1; i < branchMedalsArr.Length; i++)
-        {
-            if ((medalType & branchMedalsArr[i]) != 0)
-            {
-                yield return branchMedalsArr[i];
-            }
-        }
     }
 }

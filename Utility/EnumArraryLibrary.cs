@@ -7,7 +7,6 @@ public static class EnumArraryLibrary
 {
     public static readonly EsteemHandler.RelationshipKind[] OrderRelationshipKindsArr = (EsteemHandler.RelationshipKind[])Enum.GetValues(typeof(EsteemHandler.RelationshipKind));
 
-    public static readonly BranchMedalRecord.BranchMedalType[] BranchMedalsArr = (BranchMedalRecord.BranchMedalType[])Enum.GetValues(typeof(BranchMedalRecord.BranchMedalType));
     public const int AvailableBranchMedalTypesCount = 5; // BranchMedalType.None不计数
 
     public static readonly KnightPersonality[] KnightPersonalitiesArr = (KnightPersonality[])Enum.GetValues(typeof(KnightPersonality));

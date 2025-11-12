@@ -48,8 +48,8 @@ public class Branch : IExposable, ILoadReferenceable
 
     public bool HasSupportAuthority;
 
-    [Unsaved] private HonorBranchDef honorDef;
-    public HonorBranchDef HonorDef
+    [Unsaved] private BranchHonorDef honorDef;
+    public BranchHonorDef HonorDef
     {
         get => IsBranchOfType(BranchType.Honor) ? honorDef : null;
         set => honorDef = value;

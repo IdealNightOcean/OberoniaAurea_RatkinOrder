@@ -8,11 +8,6 @@ public static class IconLibrary
 {
     public static readonly Texture2D colseX = ContentFinder<Texture2D>.Get("UI/Common/OARO_ColseX");
 
-    public static readonly Texture2D Medal_Courage = ContentFinder<Texture2D>.Get("UI/Medal/OARO_Medal_Courage");
-    public static readonly Texture2D Medal_Tenacity = ContentFinder<Texture2D>.Get("UI/Medal/OARO_Medal_Tenacity");
-    public static readonly Texture2D Medal_Rescue = ContentFinder<Texture2D>.Get("UI/Medal/OARO_Medal_Rescue");
-    public static readonly Texture2D Medal_Justice = ContentFinder<Texture2D>.Get("UI/Medal/OARO_Medal_Justice");
-
     public static readonly Texture2D BranchSummaryBackground = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BranchSummaryBackground");
 
     public static readonly Texture2D BigStrangeIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigStrangeIcon");
@@ -34,7 +29,7 @@ public static class IconLibrary
     public static readonly Texture2D BigGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigGeneralBranchIcon");
 
 
-    public static readonly Texture2D HighlightBarTex_Green = SolidColorMaterials.NewSolidColorTexture(Color.green);
-    public static readonly Texture2D HighlightBarTex_White = SolidColorMaterials.NewSolidColorTexture(new Color(1f, 1f, 1f));
-    public static readonly Texture2D EmptyBarTex_Black = SolidColorMaterials.NewSolidColorTexture(new Color(0f, 0f, 0f));
+    public static readonly Texture2D BarTex_Green = SolidColorMaterials.NewSolidColorTexture(Color.green);
+    public static readonly Texture2D BarTex_White = SolidColorMaterials.NewSolidColorTexture(Color.white);
+    public static readonly Texture2D BarTex_Black = SolidColorMaterials.NewSolidColorTexture(Color.black);
 }

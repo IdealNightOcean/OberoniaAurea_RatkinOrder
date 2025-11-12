@@ -25,6 +25,10 @@ public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverF
 
     private static void Notify_PawnLeftMap(Pawn pawn)
     {
+        if (!pawn.CanBeKnight())
+        {
+            return;
+        }
         KnightRecord knightRecord = pawn.GetKnightRecord();
         if (knightRecord?.Branch?.Squad is not null)
         {

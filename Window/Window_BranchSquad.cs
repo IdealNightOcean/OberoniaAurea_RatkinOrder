@@ -21,6 +21,7 @@ public class Window_BranchSquad : MainTabWindow
     public override Vector2 RequestedTabSize => new(1627f, 944f);
 
     private Vector2 scrollPosition_Squads;
+    private Vector2 scrollPosition_Medals;
 
     private RatkinOrder ratkinOrder;
     private Map map;
@@ -206,29 +207,28 @@ public class Window_BranchSquad : MainTabWindow
         GUI.DrawTexture(upRect, middleUpBackground, ScaleMode.ScaleToFit);
         Rect upInnerRect = upRect.ContractedBy(frameWidth);
 
+        BranchHonorDef honorDef = SelBranch?.HonorDef;
+        bool selIsHonor = honorDef is not null && SelBranch.IsBranchOfType(BranchType.Honor);
+
         //上部左侧颜色条
         reusedRect = OARO_WindowUtility.CenterRectOnY(upInnerRect, upInnerRect.x, 6f, 144f);
-        if (selSquadInfo.HonorStrip is not null)
+        if (selIsHonor)
         {
-            GUI.DrawTexture(reusedRect, selSquadInfo.HonorStrip);
+            GUI.DrawTexture(reusedRect, honorDef.HonorBarTexture);
         }
 
         //上部左侧部分
         Rect areaRect = new(reusedRect.xMax, upInnerRect.y, 245f, upInnerRect.height);
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.x, 240f, areaRect.height - 5f);
-        if (selSquadInfo.HonorBackground is not null)
+        if (selIsHonor)
         {
-            GUI.DrawTexture(reusedRect, selSquadInfo.HonorBackground, ScaleMode.ScaleToFit);
-        }
-        if (selSquadInfo.HonorDecoration is not null)
-        {
+            GUI.DrawTexture(reusedRect, honorDef.BackgroundTexture, ScaleMode.ScaleToFit);
+
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
-            GUI.DrawTexture(reusedRect, selSquadInfo.HonorDecoration, ScaleMode.ScaleToFit);
-        }
-        if (selSquadInfo.HonorExpandIcon is not null)
-        {
+            GUI.DrawTexture(reusedRect, honorDef.ExpandingDecorationTexture, ScaleMode.ScaleToFit);
+
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 190f, 107f);
-            GUI.DrawTexture(reusedRect, selSquadInfo.HonorExpandIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.ExpandingIconTexture, ScaleMode.ScaleToFit);
         }
         else
         {
@@ -238,7 +238,7 @@ public class Window_BranchSquad : MainTabWindow
 
         //上部右侧部分
         areaRect = Rect.MinMaxRect(areaRect.xMax + 2f, upInnerRect.yMin, upInnerRect.xMax, upInnerRect.yMax);
-        DrawMedal(areaRect);
+        DrawMedalRect(areaRect);
 
         //上部丝带
         areaRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 70f, 629f, 101f);
@@ -284,7 +284,7 @@ public class Window_BranchSquad : MainTabWindow
         Text.Font = GameFont.Small;
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
-        Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.HighlightBarTex_Green, IconLibrary.EmptyBarTex_Black, doBorder: true);
+        Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: true);
 
         reusedRect = new(reusedRect.x, reusedRect.yMax + 8f, 120f, 24f);
         Widgets.Label(reusedRect, friendlyExpireDate);
@@ -606,48 +606,59 @@ public class Window_BranchSquad : MainTabWindow
         return false;
     }
 
-    private void DrawMedal(Rect inRect)
+    private void DrawMedalRect(Rect inRect)
     {
-        if (selSquadInfo.MedalBackground is not null)
+        if (SelBranch is null)
         {
-            GUI.DrawTexture(inRect, selSquadInfo.MedalBackground, ScaleMode.ScaleToFit);
+            return;
+        }
+
+        BranchMedalHandler medalHandler = SelBranch.MedalHandler;
+        if (medalHandler.PrimaryMedal is not null)
+        {
+            GUI.DrawTexture(inRect, medalHandler.PrimaryMedal.BackgroundTexture);
         }
 
         //上侧勋章柱框
         Rect reusedRect = OARO_WindowUtility.CenterRect(inRect, 300f, 112f);
         GUI.DrawTexture(reusedRect, middleUpPeristele);
 
-        if (SelBranch is null)
-        {
-            return;
-        }
-
         //分部勋章
-        Rect medalRect = OARO_WindowUtility.CenterRect(inRect, 192f, 140f);
-        reusedRect = new(medalRect.x, medalRect.y, 80f, 70f);
+        Rect medalOutRect = OARO_WindowUtility.CenterRect(inRect, 192f, 140f);
+        float entryX = medalOutRect.x;
+        float entryY = medalOutRect.y;
+        float entryWidth = 80f;
+        float entryHeight = 70f;
+        float entryXInterval = 32f;
+        int column = 0;
 
-        BranchMedalHandler medalHandler = SelBranch.MedalHandler;
-        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Courage))
-        {
-            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Courage, ScaleMode.ScaleToFit);
-        }
-        reusedRect = new(reusedRect.xMax + 32f, medalRect.y, 80f, 70f);
-        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Tenacity))
-        {
-            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Tenacity, ScaleMode.ScaleToFit);
-        }
+        Rect entryRect;
 
-        reusedRect = new(medalRect.x, reusedRect.yMax, 80f, 70f);
-        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Rescue))
-        {
-            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Rescue, ScaleMode.ScaleToFit);
-        }
+        Rect medalViewRect = medalOutRect;
+        List<BranchMedalDef> allMedalDefs = DefDatabase<BranchMedalDef>.AllDefsListForReading;
+        medalViewRect.height = Mathf.Ceil(allMedalDefs.Count / 2f) * entryHeight;
 
-        reusedRect = new(reusedRect.xMax + 32f, reusedRect.y, 80f, 70f);
-        if (medalHandler.HasMedal(BranchMedalRecord.BranchMedalType.Justice))
+        Widgets.BeginScrollView(medalOutRect, ref scrollPosition_Medals, medalViewRect, showScrollbars: false);
+        for (int i = 0; i < allMedalDefs.Count; i++)
         {
-            GUI.DrawTexture(reusedRect, IconLibrary.Medal_Justice, ScaleMode.ScaleToFit);
+            entryRect = new(entryX, entryY, entryWidth, entryHeight);
+            column++;
+            if (column >= 2)
+            {
+                entryX = medalOutRect.x;
+                entryY += entryHeight;
+            }
+            else
+            {
+                entryX += (entryWidth + entryXInterval);
+            }
+
+            if (medalHandler.HasMedal(allMedalDefs[i]))
+            {
+                GUI.DrawTexture(entryRect, allMedalDefs[i].ExpandingIconTexture, ScaleMode.ScaleToFit);
+            }
         }
+        Widgets.EndScrollView();
     }
 
     private void DrawBombardCount(Rect inRect)
@@ -691,7 +702,7 @@ public class Window_BranchSquad : MainTabWindow
     private void DrawLeftRect(Rect inRect)
     {
         GUI.DrawTexture(inRect, leftBackground);
-        Rect tabRect = new(inRect.x, inRect.y - 32f, inRect.width, 32);
+        Rect tabRect = new(inRect.x, inRect.y - 32f, inRect.width, 32f);
 
         tabs.Clear();
         tabs.Add(new TabRecord("OARO_BranchSquad_All".Translate().CapitalizeFirst(), delegate

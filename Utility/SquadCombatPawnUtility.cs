@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
@@ -9,44 +10,102 @@ public static class SquadCombatPawnUtility
 {
     private static IReadOnlyList<IPostSquadCombatPawnGenerate> tmpBranchPostSquadCombat;
 
-    public static List<Pawn> GenerateCombatPawns(Branch branch, Map map, int memberCount, int commanderCount, bool friendly)
+    public static List<Pawn> GenerateCombatPawns(RatkinOrderCombatParameter parms)
     {
         List<Pawn> pawns = [];
 
-        if (!TryGetRandomBranchPawnGroupMakerOfKind(branch, PawnGroupKindDefOf.Combat, out PawnGroupMaker groupMaker))
+        Branch branch = parms.Branch;
+        if (!TryGetRandomBranchPawnGroupMakerOfKind(branch, PawnGroupKindDefOf.Combat, out PawnGroupOption groupOption))
         {
-            Log.Error($"No usable PawnGroupMaker for {PawnGroupKindDefOf.Combat} found in {branch.RatkinOrder}");
+            Log.Error($"No usable {nameof(PawnGroupOption)} for {PawnGroupKindDefOf.Combat} found in {parms.RatkinOrder}");
             return pawns;
         }
 
         try
         {
             tmpBranchPostSquadCombat = branch.PostSquadCombatPawnGenerate;
+            bool isFriendly = parms.IsFriendly;
 
             Faction faction = branch.RatkinOrder.Faction;
-            int mapTile = map.Tile;
+            int mapTile = parms.Map.Tile;
 
-            if (memberCount > 0 && !groupMaker.options.NullOrEmpty())
+            IReadOnlyList<PawnGenOption> genOptions;
+            if (parms.MemberCount > 0)
             {
-                for (int i = 0; i < memberCount; i++)
+                genOptions = groupOption.GetOptionsWithTag("KnightMember");
+                if (genOptions is not null && genOptions.Count > 0)
                 {
-                    PawnKindDef pawnKind = groupMaker.guards.RandomElementByWeight(g => g.selectionWeight).kind;
-                    KnightRecord knightRecord = new(branch, isCommander: false);
-                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
-                    PostSquadCombatPawnGenerate(pawn, branch, isCommander: false, friendly: friendly);
-                    pawns.Add(pawn);
+                    for (int i = 0; i < parms.MemberCount; i++)
+                    {
+                        try
+                        {
+                            PawnKindDef pawnKind = genOptions.RandomElementByWeight(g => g.selectionWeight).kind;
+                            KnightRecord knightRecord = new(branch, isCommander: false);
+                            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
+                            PostSquadCombatPawnGenerate(pawn, branch, isCommander: false, friendly: isFriendly);
+                            pawns.Add(pawn);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"An exception occurred while generating the knight member in {nameof(GenerateCombatPawns)}.\nException:\n{ex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    Log.Error($"No usable {nameof(PawnGenOption)} with tag \"KnightMember\" for select {nameof(PawnGroupOption)}");
                 }
             }
 
-            if (commanderCount > 0 && !groupMaker.options.NullOrEmpty())
+            if (parms.CommanderCount > 0)
             {
-                for (int i = 0; i < commanderCount; i++)
+                genOptions = groupOption.GetOptionsWithTag("KnightCommander");
+                if (genOptions is not null && genOptions.Count > 0)
                 {
-                    PawnKindDef pawnKind = groupMaker.options.RandomElementByWeight(g => g.selectionWeight).kind;
-                    KnightRecord knightRecord = new(branch, isCommander: true);
-                    Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
-                    PostSquadCombatPawnGenerate(pawn, branch, isCommander: true, friendly: friendly);
-                    pawns.Add(pawn);
+                    for (int i = 0; i < parms.CommanderCount; i++)
+                    {
+                        try
+                        {
+                            PawnKindDef pawnKind = genOptions.RandomElementByWeight(g => g.selectionWeight).kind;
+                            KnightRecord knightRecord = new(branch, isCommander: true);
+                            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
+                            PostSquadCombatPawnGenerate(pawn, branch, isCommander: true, friendly: isFriendly);
+                            pawns.Add(pawn);
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"An exception occurred while generating the knight commander in {nameof(GenerateCombatPawns)}.\nException:\n{ex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    Log.Error($"No usable {nameof(PawnGenOption)} with tag \"KnightCommander\" for select {nameof(PawnGroupOption)}");
+                }
+            }
+
+            if (parms.NonKnightCount > 0)
+            {
+                PawnGroupMaker nonKnightMaker = OAFrame_PawnGenerateUtility.GetRandomPawnGroupMakerOfFaction(faction, PawnGroupKindDefOf.Combat, (g) => !g.options.NullOrEmpty());
+                if (nonKnightMaker is not null)
+                {
+                    for (int i = 0; i < parms.NonKnightCount; i++)
+                    {
+                        try
+                        {
+                            PawnKindDef pawnKind = nonKnightMaker.options.RandomElementByWeight(g => g.selectionWeight).kind;
+                            PawnGenerationRequest generationRequest = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile: mapTile);
+                            pawns.Add(PawnGenerator.GeneratePawn(generationRequest));
+                        }
+                        catch (Exception ex)
+                        {
+                            Log.Error($"An exception occurred while generating the non-knight unit in {nameof(GenerateCombatPawns)}.\nException:\n{ex.Message}");
+                        }
+                    }
+                }
+                else
+                {
+                    Log.Error($"No usable {nameof(PawnGroupMaker)} for {PawnGroupKindDefOf.Combat} found in {faction}");
                 }
             }
         }
@@ -58,17 +117,17 @@ public static class SquadCombatPawnUtility
         return pawns;
     }
 
-    private static bool TryGetRandomBranchPawnGroupMakerOfKind(Branch branch, PawnGroupKindDef groupKind, out PawnGroupMaker groupMaker)
+    private static bool TryGetRandomBranchPawnGroupMakerOfKind(Branch branch, PawnGroupKindDef groupKind, out PawnGroupOption groupOption)
     {
-        if (branch.HonorDef?.TryGetRandomPawnGroupMaker(groupKind, out groupMaker) ?? false)
+        if (branch.HonorDef?.TryGetRandomPawnGroupMaker(groupKind, out groupOption) ?? false)
         {
             return true;
         }
-        if (branch.RatkinOrder.Def.TryGetRandomPawnGroupMaker(groupKind, out groupMaker))
+        if (branch.RatkinOrder.Def.TryGetRandomPawnGroupMaker(groupKind, out groupOption))
         {
             return true;
         }
-        groupMaker = null;
+        groupOption = null;
         return false;
     }
 

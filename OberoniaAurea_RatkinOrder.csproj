@@ -101,7 +101,11 @@
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
     <Compile Include="DefOf\BranchResidentDefOf.cs" />
+    <Compile Include="DefOf\BranchMedalDefOf.cs" />
+    <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
+    <Compile Include="Window\Winows_BranchDemand.cs" />
+    <Compile Include="Window\OrderWindowBase.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
     <Compile Include="Window\UICacheComp\BranchSummaryUICache.cs" />
     <Compile Include="Components\KnightRecord.cs" />
@@ -115,7 +119,7 @@
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
     <Compile Include="Def\BranchConstructionDef.cs" />
     <Compile Include="Def\BranchContractDef.cs" />
-    <Compile Include="Def\HonorBranchDef.cs" />
+    <Compile Include="Def\BranchHonorDef.cs" />
     <Compile Include="Def\BranchInteractionDef.cs" />
     <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\ResidentKnightAcademicDef.cs" />
@@ -172,7 +176,7 @@
     <Compile Include="Quest\Reward\Quest_GiveBranchMedal.cs" />
     <Compile Include="Quest\Reward\Reward_BranchPopulation.cs" />
     <Compile Include="Reformation\ReformationType.cs" />
-    <Compile Include="RatkinOrder\RatkinOrderRaidWorker.cs" />
+    <Compile Include="RatkinOrder\RatkinOrderCombatParameter.cs" />
     <Compile Include="Stat\StatPart_MeditationBase.cs" />
     <Compile Include="Stat\StatPart_MeditationFactor.cs" />
     <Compile Include="Stat\StatWorker_MeditationPointBase.cs" />

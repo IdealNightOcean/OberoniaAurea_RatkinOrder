@@ -6,31 +6,31 @@ using Verse.AI.Group;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class RatkinOrderRaidWorker
+public class RatkinOrderCombatParameter
 {
-    protected Branch branch;
+    private Branch branch;
+    private Map map;
+    public Branch Branch => branch;
+    public Map Map => map;
     public RatkinOrder RatkinOrder => branch?.RatkinOrder;
     public Faction Faction => branch?.RatkinOrder.Faction;
 
-    protected int memberCount;
-    protected int commanderCount;
-    protected float supplyCost;
+    public int MemberCount;
+    public int CommanderCount;
+    public int NonKnightCount;
+    public float SupplyCost;
 
-    protected bool IsFriendly => (Faction?.HostileTo(Faction.OfPlayer) is not true);
+    public bool IsFriendly => (Faction?.HostileTo(Faction.OfPlayer) is not true);
 
-    public Map map;
-    public RaidStrategyDef raidStrategy;
-    public PawnsArrivalModeDef raidArrivalMode;
-    public bool sendStandardLetter = true;
+    public RaidStrategyDef RaidStrategy;
+    public PawnsArrivalModeDef RaidArrivalMode;
+    public bool SendStandardLetter = true;
 
-    public List<Pawn> combatPanws;
-
-    public RatkinOrderRaidWorker(Branch branch, int memberCount, int commanderCount, float supplyCost)
+    public RatkinOrderCombatParameter() { }
+    public RatkinOrderCombatParameter(Branch branch, Map map)
     {
         this.branch = branch;
-        this.memberCount = memberCount;
-        this.commanderCount = commanderCount;
-        this.supplyCost = supplyCost;
+        this.map = map;
     }
 
     public bool TryExecute()
@@ -42,12 +42,12 @@ public class RatkinOrderRaidWorker
 
         Faction faction = Faction;
         bool isFriendly = IsFriendly;
-        PawnsArrivalModeDef raidArrivalMode = this.raidArrivalMode ?? (isFriendly ? PawnsArrivalModeDefOf.EdgeDrop : PawnsArrivalModeDefOf.EdgeWalkIn);
+        PawnsArrivalModeDef raidArrivalMode = RaidArrivalMode ?? (isFriendly ? PawnsArrivalModeDefOf.EdgeDrop : PawnsArrivalModeDefOf.EdgeWalkIn);
         IncidentParms incidentParms = new()
         {
-            target = map,
+            target = Map,
             faction = faction,
-            raidStrategy = raidStrategy ?? (isFriendly ? RaidStrategyDefOf.ImmediateAttackFriendly : RaidStrategyDefOf.ImmediateAttack),
+            raidStrategy = RaidStrategy ?? (isFriendly ? RaidStrategyDefOf.ImmediateAttackFriendly : RaidStrategyDefOf.ImmediateAttack),
             raidArrivalMode = raidArrivalMode,
         };
         if (!raidArrivalMode.Worker.TryResolveRaidSpawnCenter(incidentParms))
@@ -55,10 +55,10 @@ public class RatkinOrderRaidWorker
             return false;
         }
 
-        memberCount = Mathf.Max(0, Mathf.Min(memberCount, branch.Squad.MemberCountInt));
-        commanderCount = Mathf.Max(0, Mathf.Min(commanderCount, branch.Squad.CommanderCountInt));
+        MemberCount = Mathf.Max(0, Mathf.Min(MemberCount, branch.Squad.MemberCountInt));
+        CommanderCount = Mathf.Max(0, Mathf.Min(CommanderCount, branch.Squad.CommanderCountInt));
 
-        combatPanws = SquadCombatPawnUtility.GenerateCombatPawns(branch, map, memberCount, commanderCount, isFriendly);
+        List<Pawn> combatPanws = SquadCombatPawnUtility.GenerateCombatPawns(this);
         if (combatPanws.NullOrEmpty())
         {
             return false;
@@ -68,21 +68,21 @@ public class RatkinOrderRaidWorker
 
         if (isFriendly)
         {
-            LordMaker.MakeNewLord(faction, new LordJob_AssaultColony_NeverFleeOrder(faction), map, combatPanws);
+            LordMaker.MakeNewLord(faction, new LordJob_AssaultColony_NeverFleeOrder(faction), Map, combatPanws);
         }
         else
         {
-            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, incidentParms.spawnCenter), map, combatPanws);
+            LordMaker.MakeNewLord(faction, new LordJob_AssistColony_NeverFleeOrder(faction, incidentParms.spawnCenter), Map, combatPanws);
             Find.TickManager.slower.SignalForceNormalSpeedShort();
             Find.StoryWatcher.statsRecord.numRaidsEnemy++;
-            map.StoryState.lastRaidFaction = faction;
+            Map.StoryState.lastRaidFaction = faction;
         }
 
-        branch.Squad.MemberCount -= memberCount;
-        branch.Squad.CommanderCount -= commanderCount;
-        branch.Supply -= supplyCost;
+        branch.Squad.MemberCount -= MemberCount;
+        branch.Squad.CommanderCount -= CommanderCount;
+        branch.Supply -= SupplyCost;
 
-        if (sendStandardLetter)
+        if (SendStandardLetter)
         {
             ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
                 label: GetLetterLabel(incidentParms, isFriendly),
@@ -110,7 +110,7 @@ public class RatkinOrderRaidWorker
         {
             text = string.Format(parms.raidArrivalMode.textFriendly, parms.faction.def.pawnsPlural, parms.faction.Name.ApplyTag(parms.faction));
             text += "\n\n";
-            text += "OARO_RaidText_BranchInfo".Translate(branch.Name, commanderCount).Resolve();
+            text += "OARO_RaidText_BranchInfo".Translate(branch.Name, CommanderCount).Resolve();
             text += "\n\n";
             text += parms.raidStrategy.arrivalTextFriendly;
             Pawn pawn = pawns.Find(p => p.Faction.leader == p);
@@ -124,7 +124,7 @@ public class RatkinOrderRaidWorker
         {
             text = string.Format(parms.raidArrivalMode.textEnemy, parms.faction.def.pawnsPlural, parms.faction.Name.ApplyTag(parms.faction)).CapitalizeFirst();
             text += "\n\n";
-            text += "OARO_RaidText_BranchInfo".Translate(branch.Name, commanderCount).Resolve();
+            text += "OARO_RaidText_BranchInfo".Translate(branch.Name, CommanderCount).Resolve();
             text += "\n\n";
             text += parms.raidStrategy.arrivalTextEnemy;
             Pawn pawn = pawns.Find(p => p.Faction.leader == p);

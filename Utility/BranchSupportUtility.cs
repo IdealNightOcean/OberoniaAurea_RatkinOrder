@@ -142,7 +142,7 @@ public static class BranchSupportUtility
         return false;
     }
 
-    public static RatkinOrderRaidWorker GenerateCombatRaidWorker(Branch branch, SupportLevel level, Map map)
+    public static RatkinOrderCombatParameter GenerateCombatRaidWorker(Branch branch, SupportLevel level, Map map)
     {
         int memberCount;
         int commanderCount;
@@ -168,15 +168,29 @@ public static class BranchSupportUtility
                 break;
             default: return null;
         }
-
-        if (memberCount <= 0 && commanderCount <= 0)
+        int nonKnightCount = 0;
+        if (branch.FacilityHandler.GetFacilityLevel(OARO_ModDefOf.OARO_SupportFacility) >= BranchFacilityLevel.Good)
         {
+            nonKnightCount += 2;
+        }
+        BranchBuilding building = branch.BuildingHandler.GetBuilding(BranchBuildingDefOf.OARO_Church);
+        if (building is not null)
+        {
+            nonKnightCount += (building.HasUpgraded ? 10 : 6);
+        }
+
+        if (memberCount <= 0 && commanderCount <= 0 && nonKnightCount <= 0)
+        {
+            Log.Error($"No valid members to generate in {nameof(BranchSupportUtility)}.{nameof(GenerateCombatRaidWorker)}: all counts are zero or negative.");
             return null;
         }
 
-        RatkinOrderRaidWorker ratkinOrderRaidWorker = new(branch, memberCount, commanderCount, supplyCost)
+        RatkinOrderCombatParameter ratkinOrderRaidWorker = new(branch, map)
         {
-            map = map
+            MemberCount = memberCount,
+            CommanderCount = commanderCount,
+            NonKnightCount = nonKnightCount,
+            SupplyCost = supplyCost
         };
 
         return ratkinOrderRaidWorker;

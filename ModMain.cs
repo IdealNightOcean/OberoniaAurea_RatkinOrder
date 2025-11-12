@@ -48,12 +48,12 @@ public class RatkinOrderSettings : ModSettings
         Scribe_Values.Look(ref NoramlDemandShowMess, "NoramlDemandShowMess", defaultValue: true);
         Scribe_Values.Look(ref CriticalDemandShowMess, "CriticalDemandShowMess", defaultValue: true);
         Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, "MaxConcurrentAcceptedDemand", 2);
+        Scribe_Values.Look(ref MaxConcurrentContractPerBranch, "MaxConcurrentContractPerBranch", 5);
 
         Scribe_Values.Look(ref HasMaxLetterLimit, "HasMaxLetterLimit", defaultValue: true);
-        Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, "MaxConcurrentAcceptedDemand", 2);
+        Scribe_Values.Look(ref MaxLetterCount, "MaxLetterCount", 100);
         Scribe_Values.Look(ref HasLetterRetentionLimit, "HasLetterRetentionLimit", defaultValue: true);
-        Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, "MaxConcurrentAcceptedDemand", 2);
-
+        Scribe_Values.Look(ref MaxLetterRetentionDays, "MaxLetterRetentionDays", 300);
     }
 
     private static void Reset()
@@ -65,7 +65,7 @@ public class RatkinOrderSettings : ModSettings
         HasMaxLetterLimit = true;
         MaxLetterCount = 100;
         HasLetterRetentionLimit = true;
-        MaxConcurrentAcceptedDemand = 300;
+        MaxLetterRetentionDays = 300;
     }
 
     public void DoSettingsWindowContents(Rect inRect)
@@ -109,6 +109,5 @@ public class RatkinOrderSettings : ModSettings
             viewRectHeight = listing_Rect.MaxColumnHeightSeen + 50f;
         }
         Widgets.EndScrollView();
-
     }
 }

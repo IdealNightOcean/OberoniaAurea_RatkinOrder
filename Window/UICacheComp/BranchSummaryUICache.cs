@@ -1,7 +1,6 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
-using UnityEngine;
 using Verse;
 using static OberoniaAurea.RatkinOrder.Branch;
 
@@ -18,11 +17,6 @@ public class BranchSummaryUICache
     public bool IsInAffectedRange => AffectedRange >= Distance;
     public readonly int CurAllCrewCount = -1;
     public readonly float Potency;
-
-    public readonly Texture2D HonorIcon;
-    public readonly Texture2D HonorStripSmall;
-    public readonly Texture2D HonorBackgroundSmall;
-    public readonly Texture2D HonorDecorationSmall;
 
     public BranchSummaryUICache() { }
 
@@ -45,18 +39,6 @@ public class BranchSummaryUICache
         Distance = branch.DistanceTo(map.Tile);
         AffectedRange = branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
         CurAllCrewCount = branch.Squad.AllCrewCountInt;
-
-        if (branch.IsBranchOfType(BranchType.Honor))
-        {
-            HonorIcon = branch.HonorDef?.IconTexture;
-            BranchMedalRecord.BranchMedalType primaryMedal = branch.MedalHandler.PrimaryMedal;
-            if (primaryMedal != BranchMedalRecord.BranchMedalType.None)
-            {
-                HonorStripSmall = new CachedTexture($"UI/BranchCommon/OARO_HonorStripSmall_{primaryMedal}").Texture;
-                HonorBackgroundSmall = new CachedTexture($"UI/BranchCommon/OARO_HonorBackgroundSmall_{primaryMedal}").Texture;
-                HonorDecorationSmall = new CachedTexture($"UI/BranchCommon/OARO_HonorDecorationSmall_{primaryMedal}").Texture;
-            }
-        }
     }
 
     public class SquadWindowEntryComparer : IComparer<BranchSummaryUICache>

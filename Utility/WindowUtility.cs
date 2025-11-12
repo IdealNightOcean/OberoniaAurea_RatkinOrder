@@ -92,10 +92,13 @@ public static class OARO_WindowUtility
         GUI.DrawTexture(rect, IconLibrary.BranchSummaryBackground);
         Rect inRect = rect.ContractedBy(2f);
 
+        BranchHonorDef honorDef = entry.Branch.HonorDef;
+        bool isHonorBranch = entry.Branch.IsBranchOfType(BranchType.Honor) && honorDef is not null;
+
         Rect reusedRect = CenterRectOnY(inRect, inRect.x, 5f, 86f);
-        if (entry.HonorStripSmall is not null)
+        if (isHonorBranch)
         {
-            GUI.DrawTexture(reusedRect, entry.HonorStripSmall);
+            GUI.DrawTexture(reusedRect, honorDef.HonorBarTexture);
         }
 
         Rect leftRect = new(inRect.x + 5f, inRect.y, 224f, inRect.height);
@@ -105,22 +108,16 @@ public static class OARO_WindowUtility
         Text.Font = GameFont.Small;
         Widgets.Label(reusedRect, entry.Distance.ToString("F0").Colorize(entry.IsInAffectedRange ? Color.green : Color.white));
 
-        if (entry.HonorDecorationSmall is not null)
+        if (isHonorBranch)
         {
             reusedRect = leftRect.ContractedBy(10f);
-            GUI.DrawTexture(reusedRect, entry.HonorDecorationSmall, ScaleMode.ScaleToFit);
-        }
+            GUI.DrawTexture(reusedRect, honorDef.DecorationTexture, ScaleMode.ScaleToFit);
 
-        if (entry.HonorBackgroundSmall is not null)
-        {
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            GUI.DrawTexture(reusedRect, entry.HonorBackgroundSmall);
-        }
+            GUI.DrawTexture(reusedRect, honorDef.BackgroundTexture, ScaleMode.ScaleToFit);
 
-        if (entry.HonorIcon is not null)
-        {
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
-            GUI.DrawTexture(reusedRect, entry.HonorIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.IconTexture, ScaleMode.ScaleToFit);
         }
         else
         {

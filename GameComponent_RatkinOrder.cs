@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -80,8 +80,9 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             uniqueIDManager ??= new UniqueIDManager();
         }
-        catch
+        catch (System.Exception ex)
         {
+            Log.Error($"Unexpected error when initializing UniqueIDManager: {ex.Message}");
             UniqueIDManager.ClearStaticCache();
             uniqueIDManager = new UniqueIDManager();
         }
@@ -90,8 +91,9 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             ratkinOrderManager ??= new RatkinOrderManager();
         }
-        catch
+        catch (System.Exception ex)
         {
+            Log.Error($"Unexpected error when initializing RatkinOrderManager: {ex.Message}");
             RatkinOrderManager.ClearStaticCache();
             ratkinOrderManager = new RatkinOrderManager();
         }
@@ -100,8 +102,9 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             orderLetterBox ??= new OrderLetterBox();
         }
-        catch
+        catch (System.Exception ex)
         {
+            Log.Error($"Unexpected error when initializing OrderLetterBox: {ex.Message}");
             OrderLetterBox.ClearStaticCache();
             orderLetterBox = new OrderLetterBox();
         }
@@ -110,8 +113,9 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             globalInteractionManager ??= new GlobalInteractionManager();
         }
-        catch
+        catch (System.Exception ex)
         {
+            Log.Error($"Unexpected error when initializing GlobalInteractionManager: {ex.Message}");
             GlobalInteractionManager.ClearStaticCache();
             globalInteractionManager = new GlobalInteractionManager();
         }

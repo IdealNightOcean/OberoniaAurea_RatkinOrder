@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.QuestGen;
+using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
@@ -10,7 +11,7 @@ public class QuestNode_GiveBranchMedal : QuestNode
     public SlateRef<string> inSignal;
 
     public SlateRef<Branch> branch;
-    public SlateRef<BranchMedalRecord.BranchMedalType?> potentialTypes;
+    public SlateRef<IEnumerable<BranchMedalDef>> potentialDefs;
     public SlateRef<short> count;
 
     public SlateRef<bool> isReward;
@@ -18,7 +19,7 @@ public class QuestNode_GiveBranchMedal : QuestNode
 
     protected override bool TestRunInt(Slate slate)
     {
-        return potentialTypes.GetValue(slate).HasValue;
+        return potentialDefs.GetValue(slate) is not null;
     }
 
     protected override void RunInt()
@@ -33,8 +34,13 @@ public class QuestNode_GiveBranchMedal : QuestNode
             InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
             Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
             Count = count.GetValue(slate),
-            PotentialTypes = potentialTypes.GetValue(slate).GetValueOrDefault(defaultValue: BranchMedalRecord.BranchMedalType.None),
+            PotentialDefs = [],
         };
+        IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate);
+        if (potentialDefs is not null)
+        {
+            questPart_GiveBranchMedal.PotentialDefs.AddRangeUnique(potentialDefs);
+        }
 
         QuestGen.quest.AddPart(questPart_GiveBranchMedal);
 
@@ -44,7 +50,7 @@ public class QuestNode_GiveBranchMedal : QuestNode
             Reward_BranchMedals reward = new()
             {
                 Branch = questPart_GiveBranchMedal.Branch,
-                PotentialTypes = questPart_GiveBranchMedal.PotentialTypes,
+                PotentialDefs = [.. questPart_GiveBranchMedal.PotentialDefs],
                 Amount = questPart_GiveBranchMedal.Count
             };
 
@@ -78,7 +84,7 @@ public class QuestPart_GiveBranchMedal : QuestPart
 {
     public string InSignalTrigger;
     public Branch Branch;
-    public BranchMedalRecord.BranchMedalType PotentialTypes;
+    public List<BranchMedalDef> PotentialDefs;
     public short Count;
 
     public override void Cleanup()
@@ -86,7 +92,7 @@ public class QuestPart_GiveBranchMedal : QuestPart
         base.Cleanup();
         InSignalTrigger = null;
         Branch = null;
-        PotentialTypes = BranchMedalRecord.BranchMedalType.None;
+        PotentialDefs = null;
         Count = 0;
     }
 
@@ -95,7 +101,7 @@ public class QuestPart_GiveBranchMedal : QuestPart
         base.ExposeData();
         Scribe_Values.Look(ref InSignalTrigger, "InSignalTrigger");
         Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Values.Look(ref PotentialTypes, "PotentialTypes", BranchMedalRecord.BranchMedalType.None);
+        Scribe_Collections.Look(ref PotentialDefs, "PotentialDefs", LookMode.Def);
         Scribe_Values.Look(ref Count, "Count", (short)0);
     }
 
@@ -103,8 +109,8 @@ public class QuestPart_GiveBranchMedal : QuestPart
     {
         if (Count > 0 && Branch is not null && signal.tag == InSignalTrigger)
         {
-            BranchMedalRecord.BranchMedalType medalType = BranchUtility.GetContainedBranchMedals(PotentialTypes).RandomElementWithFallback(BranchMedalRecord.BranchMedalType.None);
-            if (medalType != BranchMedalRecord.BranchMedalType.None)
+            BranchMedalDef medalType = PotentialDefs?.RandomElementWithFallback(null);
+            if (medalType is not null)
             {
                 Branch.MedalHandler.AddMedal(medalType, Count);
             }

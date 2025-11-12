@@ -11,7 +11,7 @@ public class Reward_BranchMedals : Reward
 {
     public short Amount;
     public Branch Branch;
-    public BranchMedalRecord.BranchMedalType PotentialTypes;
+    public List<BranchMedalDef> PotentialDefs;
 
     public override IEnumerable<GenUI.AnonymousStackElement> StackElements
     {
@@ -40,7 +40,8 @@ public class Reward_BranchMedals : Reward
         {
             InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
             Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
-            Count = Amount
+            Count = Amount,
+            PotentialDefs = [.. PotentialDefs]
         };
     }
 
@@ -53,6 +54,6 @@ public class Reward_BranchMedals : Reward
         base.ExposeData();
         Scribe_Values.Look(ref Amount, "Amount", (short)0);
         Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Values.Look(ref PotentialTypes, "PotentialTypes", BranchMedalRecord.BranchMedalType.None);
+        Scribe_Collections.Look(ref PotentialDefs, "PotentialDefs", LookMode.Def);
     }
 }

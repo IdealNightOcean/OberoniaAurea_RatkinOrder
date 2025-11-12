@@ -53,16 +53,15 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
     }
 
-    public void SetPrimaryReserves(BranchConstructionDef def, bool inSpecialSlot = false)
+    public void SetPrimaryReserves(BranchConstructionDef def)
     {
         if (storesReserves.Count == 0)
         {
-            storesReserves.Add(ReserveRecord.GenrateNewRecord(def, inSpecialSlot));
+            storesReserves.Add(ReserveRecord.GenrateNewRecord(def));
         }
 
         if (storesReserves[0].Target == def)
         {
-            storesReserves[0].InSpecialSlot = inSpecialSlot;
             return;
         }
 
@@ -70,16 +69,15 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         {
             if (storesReserves[i].Target == def)
             {
-                storesReserves[i].InSpecialSlot = inSpecialSlot;
                 storesReserves.Swap(0, i);
                 return;
             }
         }
 
-        storesReserves.Insert(0, ReserveRecord.GenrateNewRecord(def, inSpecialSlot));
+        storesReserves.Insert(0, ReserveRecord.GenrateNewRecord(def));
     }
 
-    public void AddNewReserve(BranchConstructionDef def, bool inSpecialSlot = false)
+    public void AddNewReserve(BranchConstructionDef def)
     {
         if (def is null)
         {
@@ -94,7 +92,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
             }
         }
 
-        storesReserves.Add(ReserveRecord.GenrateNewRecord(def, inSpecialSlot));
+        storesReserves.Add(ReserveRecord.GenrateNewRecord(def));
     }
 
     /// <summary>
@@ -201,7 +199,6 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
                 {
                     Branch = branch,
                     BuildingDef = allDefs[i],
-                    InSpecialSlot = false
                 };
                 if (buildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
                 {
@@ -216,7 +213,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
             if (potentialBuildings.Count > 0)
             {
                 BranchBuildingDef targetDef = potentialBuildings.RandomElement();
-                AddNewReserve(targetDef, inSpecialSlot: false);
+                AddNewReserve(targetDef);
                 potentialBuildings = null;
                 return true;
             }
@@ -231,32 +228,25 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     public abstract class ReserveRecord : IExposable
     {
         public abstract BranchConstructionDef Target { get; }
-        protected bool inSpecialSlot;
-        public virtual bool InSpecialSlot
-        {
-            get => inSpecialSlot;
-            set => inSpecialSlot = value;
-        }
 
         public float CostRateReduce;
 
         public ReserveRecord() { }
-        public ReserveRecord(bool inSpecialSlot, float costRateReduce)
+        public ReserveRecord(float costRateReduce)
         {
-            this.inSpecialSlot = inSpecialSlot;
             CostRateReduce = costRateReduce;
         }
 
-        public static ReserveRecord GenrateNewRecord(BranchConstructionDef def, bool inSpecialSlot = false, float costRateReduce = 0f)
+        public static ReserveRecord GenrateNewRecord(BranchConstructionDef def, float costRateReduce = 0f)
         {
             if (def is BranchBuildingDef buildingDef)
             {
-                return new BuildingReserveRecord(buildingDef, inSpecialSlot, costRateReduce);
+                return new BuildingReserveRecord(buildingDef, costRateReduce);
             }
 
             if (def is BranchFacilityDef facilityDef)
             {
-                return new FacilityReserveRecord(facilityDef, inSpecialSlot, costRateReduce);
+                return new FacilityReserveRecord(facilityDef, costRateReduce);
             }
 
             Log.Error("");
@@ -266,7 +256,6 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         public virtual void ExposeData()
         {
             Scribe_Values.Look(ref CostRateReduce, "CostRateReduce", 0f);
-            Scribe_Values.Look(ref inSpecialSlot, "inSpecialSlot", defaultValue: false);
         }
     }
 
@@ -275,20 +264,11 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         private BranchBuildingDef target;
         public override BranchConstructionDef Target => target;
 
-        public override bool InSpecialSlot
-        {
-            get => inSpecialSlot || target.isSpecial;
-            set => inSpecialSlot = value;
-        }
-
         public BuildingReserveRecord() { }
-        public BuildingReserveRecord(BranchBuildingDef def, bool inSpecialSlot, float costRateReduce) : base(inSpecialSlot, costRateReduce)
+        public BuildingReserveRecord(BranchBuildingDef def, float costRateReduce) : base(costRateReduce)
         {
             target = def;
-            InSpecialSlot = def.isSpecial || inSpecialSlot;
         }
-
-        public override string ToString() => $"{target.label} - InSpecialSlot: {InSpecialSlot} - CostRateReduce: {CostRateReduce}";
 
         public override void ExposeData()
         {
@@ -303,7 +283,7 @@ public class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         public override BranchConstructionDef Target => target;
 
         public FacilityReserveRecord() { }
-        public FacilityReserveRecord(BranchFacilityDef def, bool inSpecialSlot, float costRateReduce) : base(inSpecialSlot, costRateReduce)
+        public FacilityReserveRecord(BranchFacilityDef def, float costRateReduce) : base(costRateReduce)
         {
             target = def;
         }

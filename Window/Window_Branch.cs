@@ -9,7 +9,7 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public class Window_Branch : Window
+public class Window_Branch : OrderWindowBase
 {
     private enum TabType
     {
@@ -26,7 +26,6 @@ public class Window_Branch : Window
         ConstructingBuilding,
         EmptyBuildingSlot
     }
-    protected override float Margin => 0f;
     public override Vector2 InitialSize => new(1586f, 907f);
 
     private readonly Branch branch;
@@ -126,23 +125,8 @@ public class Window_Branch : Window
     private Vector2 scrollPosition_CommonInteraction;
     private Vector2 scrollPosition_BuildingInteraction;
 
-    public Window_Branch(Branch branch, Caravan caravan)
+    public Window_Branch(Branch branch, Caravan caravan) : base()
     {
-        forcePause = true;
-        draggable = false;
-        resizeable = false;
-        doCloseButton = false;
-        doCloseX = false;
-
-        layer = WindowLayer.Dialog;  //窗体层级
-        doWindowBackground = false; //绘制泰南的界面背景
-        drawShadow = false; //绘制主体界面阴影
-
-        //声音
-        //注：用的通讯台声音
-        soundAppear = SoundDefOf.CommsWindow_Open;
-        soundClose = SoundDefOf.CommsWindow_Close;
-
         this.caravan = caravan;
         this.branch = branch;
         map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
@@ -188,7 +172,7 @@ public class Window_Branch : Window
         GUI.DrawTexture(reusedRect, topTitleBackground);
 
         reusedRect = new(reusedRect.xMin + 54f, reusedRect.yMax - 27f, 562f, 9f);
-        Widgets.FillableBar(reusedRect, Mathf.Clamp01(branch.FacilityHandler.TotalFacilityLevel / (allFacilityDefCount * 4f)), IconLibrary.HighlightBarTex_Green, IconLibrary.EmptyBarTex_Black, doBorder: false);
+        Widgets.FillableBar(reusedRect, Mathf.Clamp01(branch.FacilityHandler.TotalFacilityLevel / (allFacilityDefCount * 4f)), IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: false);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
@@ -348,7 +332,7 @@ public class Window_Branch : Window
 
         Rect scrollRect = inRect;
         scrollRect.yMin = inRect.yMax - 16f;
-        GUI.DrawTexture(scrollRect, IconLibrary.EmptyBarTex_Black);
+        GUI.DrawTexture(scrollRect, IconLibrary.BarTex_Black);
 
         Widgets.BeginScrollView(inRect, ref scrollPosition_Facilities, viewRect);
         float entryX = inRect.x;
@@ -406,7 +390,7 @@ public class Window_Branch : Window
         {
             reusedRect = inRect;
             reusedRect.yMin = inRect.yMax - 12f;
-            Widgets.FillableBar(reusedRect, UnderConstructionFacility.Progress, IconLibrary.HighlightBarTex_White, IconLibrary.EmptyBarTex_Black, doBorder: true);
+            Widgets.FillableBar(reusedRect, UnderConstructionFacility.Progress, IconLibrary.BarTex_White, IconLibrary.BarTex_Black, doBorder: true);
         }
 
         bool selected = ((curSelectType == SelectType.Facility) && (selFacilityDef == facilityDef));
@@ -462,7 +446,7 @@ public class Window_Branch : Window
         AdjustEntryRect();
         if (buildingHandler.SpecialBuilding is null)
         {
-            if (isBusy && underConstructionBuilding.InSpecialSlot)
+            if (isBusy && underConstructionBuilding.BuildingDef.isSpecial)
             {
                 DrawConstructingBuilding(entryRect);
             }
@@ -483,7 +467,7 @@ public class Window_Branch : Window
             DrawBulding(entryRect, buildings[i], isSpecialSlot: false);
         }
 
-        if (isBusy && !underConstructionBuilding.InSpecialSlot)
+        if (isBusy && !underConstructionBuilding.BuildingDef.isSpecial)
         {
             AdjustEntryRect();
             DrawConstructingBuilding(entryRect);
@@ -622,7 +606,7 @@ public class Window_Branch : Window
         Text.Anchor = TextAnchor.UpperLeft;
 
         reusedRect = new(inRect.x + 2f, inRect.yMax - 12f, inRect.width - 4f, 12f);
-        Widgets.FillableBar(reusedRect, underConstructionBuilding.Progress, IconLibrary.HighlightBarTex_White, IconLibrary.EmptyBarTex_Black, doBorder: true);
+        Widgets.FillableBar(reusedRect, underConstructionBuilding.Progress, IconLibrary.BarTex_White, IconLibrary.BarTex_Black, doBorder: true);
 
         bool selected = curSelectType == SelectType.ConstructingBuilding;
         if (Widgets.ButtonInvisible(inRect))
@@ -1044,18 +1028,19 @@ public class Window_Branch : Window
             reusedRect = descRect;
             reusedRect.height = 24f;
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label(reusedRect, "OARO_CurFacilityStage".Translate());
+            Widgets.Label(reusedRect, label);
             DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 2f), label, curFacilityStageCache.StageEffectDesc, ref scrollPosition_CurFacilityStage);
         }
 
         descRect = new(inRectX, descRect.yMax + 48f, commonWidth, stageRectHeight);
         if (nextFacilityStageCache is not null)
         {
+            TaggedString label = "OARO_NextFacilityStage".Translate();
             reusedRect = descRect;
             reusedRect.height = 24f;
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label(reusedRect, "OARO_NextFacilityStage".Translate());
-            DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 2f), "OARO_NextFacilityStage".Translate(), nextFacilityStageCache.StageEffectDesc, ref scrollPosition_NextFacilityStage);
+            Widgets.Label(reusedRect, label);
+            DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 2f), label, nextFacilityStageCache.StageEffectDesc, ref scrollPosition_NextFacilityStage);
         }
 
         DrawRight_FacilityBottom(new Vector2(inRectX, descRect.yMax + 16f));
@@ -1098,7 +1083,7 @@ public class Window_Branch : Window
                 Widgets.Label(reusedRect, underConstructionFacility.DurationTicksLeft.ToStringTicksToPeriod());
 
                 reusedRect = new(inRectX, reusedRect.yMax, inRectWidth, 24f);
-                Widgets.FillableBar(reusedRect, underConstructionFacility.Progress, IconLibrary.HighlightBarTex_White, IconLibrary.EmptyBarTex_Black, doBorder: true);
+                Widgets.FillableBar(reusedRect, underConstructionFacility.Progress, IconLibrary.BarTex_White, IconLibrary.BarTex_Black, doBorder: true);
 
                 reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
                 Text.Anchor = TextAnchor.MiddleCenter;
@@ -1239,7 +1224,7 @@ public class Window_Branch : Window
         Widgets.Label(reusedRect, underConstructionBuilding.DurationTicksLeft.ToStringTicksToPeriod());
 
         reusedRect = new(inRectX, reusedRect.yMax, inRectWidth, 24f);
-        Widgets.FillableBar(reusedRect, underConstructionBuilding.Progress, IconLibrary.HighlightBarTex_White, IconLibrary.EmptyBarTex_Black, doBorder: true);
+        Widgets.FillableBar(reusedRect, underConstructionBuilding.Progress, IconLibrary.BarTex_White, IconLibrary.BarTex_Black, doBorder: true);
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
         if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
@@ -1257,13 +1242,27 @@ public class Window_Branch : Window
         {
             return;
         }
-        bool selEmptyBuildingSlotIsSpecialValue = selEmptyBuildingSlotIsSpecial.Value;
+        bool isSpecialSlot = selEmptyBuildingSlotIsSpecial.Value;
 
         float inRectX = inRect.xMin;
         Rect optionalOutRect = new(inRectX, inRect.y + 75f, 295f, 372f);
         GUI.DrawTexture(optionalOutRect, optionalBuildingBackground);
         optionalOutRect = optionalOutRect.ContractedBy(2f);
 
+        DrawOptionalBuildingList(optionalOutRect, isSpecialSlot);
+
+        if (selBuildingDefCache is null)
+        {
+            return;
+        }
+
+        Rect detailRect = inRect;
+        detailRect.yMin = optionalOutRect.yMax + 65f;
+        DrawOptionalBuildingDetail(detailRect, isSpecialSlot);
+    }
+
+    private void DrawOptionalBuildingList(Rect optionalOutRect, bool isSpecialSlot)
+    {
         Rect optionalViewRect = optionalOutRect;
         optionalViewRect.xMax -= 16f;
 
@@ -1278,16 +1277,7 @@ public class Window_Branch : Window
 
         Widgets.BeginScrollView(optionalOutRect, ref scrollPosition_OptionalBuildings, optionalViewRect);
         int index = 0;
-        IEnumerable<BranchBuildingDefSummaryUICache> optionalBuildingSummaryUICaches;
-        if (selEmptyBuildingSlotIsSpecialValue)
-        {
-            optionalBuildingSummaryUICaches = optionalBuildingDefs.Values;
-        }
-        else
-        {
-            optionalBuildingSummaryUICaches = optionalBuildingDefs.Values.Where(v => !v.BuildingDef.isSpecial);
-        }
-        foreach (BranchBuildingDefSummaryUICache summaryUICache in optionalBuildingSummaryUICaches)
+        foreach (BranchBuildingDefSummaryUICache summaryUICache in optionalBuildingDefs.Values.Where(v => v.BuildingDef.isSpecial == isSpecialSlot))
         {
             entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
@@ -1306,13 +1296,12 @@ public class Window_Branch : Window
             }
         }
         Widgets.EndScrollView();
+    }
 
-        if (selBuildingDefCache is null)
-        {
-            return;
-        }
-
-        Rect reusedRect = new(inRectX, optionalOutRect.yMax + 65f, inRect.width, 24f);
+    private void DrawOptionalBuildingDetail(Rect inRect, bool isSpecialSlot)
+    {
+        Rect reusedRect = inRect;
+        reusedRect.height = 24f;
         Widgets.Label(reusedRect, "Description".Translate());
 
         reusedRect.yMin = reusedRect.yMax;
@@ -1322,10 +1311,10 @@ public class Window_Branch : Window
         reusedRect = new(reusedRect.x, reusedRect.yMax + 8f, reusedRect.width, 80f);
         Widgets.TextArea(reusedRect, selBuildingDefCache.BuildingDef.description, readOnly: true);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax, 88f, 29f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 2f, 88f, 29f);
         if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_StartConstruct".Translate(), constructButton, constructButton_Down))
         {
-            BranchBuildingConstructParameter constructParameter = new(branch, selBuildingDefCache.BuildingDef, selEmptyBuildingSlotIsSpecialValue)
+            BranchBuildingConstructParameter constructParameter = new(branch, selBuildingDefCache.BuildingDef)
             {
                 ByPlayer = true,
                 Caravan = caravan
@@ -1429,6 +1418,7 @@ public class Window_Branch : Window
         Text.Font = GameFont.Small;
         Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect, showScrollbars: false);
 
+
         entryRect = new(entryX, entryY, entryWidth, entryHeight);
         column++;
         entryY += entryHeight;
@@ -1437,6 +1427,7 @@ public class Window_Branch : Window
             GUI.DrawTexture(entryRect, effectDescEntry_Dark);
         }
         Widgets.Label(entryRect, title);
+
 
         for (int i = 0; i < entryCount; i++)
         {

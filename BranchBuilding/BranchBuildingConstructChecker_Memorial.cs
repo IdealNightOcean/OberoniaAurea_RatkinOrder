@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using Verse;
+﻿using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -9,30 +8,14 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
     public override AcceptanceReport CanConstruct(BranchBuildingConstructParameter constructParam, bool resultOnly = false)
     {
         BranchBuilding_MemorialExtension memorialExtension = constructParam.BuildingDef.GetModExtension<BranchBuilding_MemorialExtension>();
-        if (memorialExtension is not null)
+        if (memorialExtension is null)
         {
-            if (memorialExtension.requireAllTypesOfMedals)
-            {
-                IReadOnlyList<BranchMedalRecord> medalRecords = constructParam.Branch.MedalHandler.MedalRecords;
-                if (medalRecords.Count < EnumArraryLibrary.BranchMedalsArr.Length - 1) // -1是因为有None这个Type
-                {
-                    return "OARO_Insufficient_SquadMedal".Translate();
-                }
-                foreach (BranchMedalRecord record in medalRecords)
-                {
-                    if (record.Count < memorialExtension.medalCount)
-                    {
-                        return "OARO_Insufficient_SquadMedal".Translate();
-                    }
-                }
-                return true;
-            }
-            else if (constructParam.Branch.MedalHandler.GetMedalCount(memorialExtension.medalType) < memorialExtension.medalCount)
-            {
-                return "OARO_Insufficient_SquadMedal".Translate();
-            }
+            return true;
         }
-
+        if (constructParam.Branch.MedalHandler.GetMedalCount(memorialExtension.medalDef) < memorialExtension.medalCount)
+        {
+            return "OARO_Insufficient_SquadMedal".Translate();
+        }
         return true;
     }
 

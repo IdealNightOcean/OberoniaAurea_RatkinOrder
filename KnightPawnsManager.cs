@@ -40,7 +40,7 @@ public static class KnightPawnsManager
 
     public static KnightRecord GetKnightRecord(this Pawn pawn)
     {
-        if (CanBeKnight(pawn) && knights.TryGetValue(pawn, out KnightRecord record))
+        if (knights.TryGetValue(pawn, out KnightRecord record))
         {
             return record;
         }

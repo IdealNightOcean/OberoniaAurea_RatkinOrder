@@ -7,9 +7,8 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public class Window_OrderLetterBox : Window
+public class Window_OrderLetterBox : OrderWindowBase
 {
-    protected override float Margin => 0.0f;
     public override Vector2 InitialSize => new(1316, 872);
 
     private Vector2 scrollPosition_letterList;
@@ -22,21 +21,6 @@ public class Window_OrderLetterBox : Window
 
     public Window_OrderLetterBox() : base()
     {
-        forcePause = true;
-        draggable = false;
-        resizeable = false;
-        doCloseButton = false;
-        doCloseX = false;
-
-        layer = WindowLayer.Dialog;  //窗体层级
-        doWindowBackground = false; //绘制泰南的界面背景
-        drawShadow = false; //绘制主体界面阴影
-
-        //声音
-        //注：用的通讯台声音
-        soundAppear = SoundDefOf.CommsWindow_Open;
-        soundClose = SoundDefOf.CommsWindow_Close;
-
         archivedLetters = OrderLetterBox.Instance.ArchivedLetters;
         UnselectLetter();
     }
