@@ -16,6 +16,7 @@ public class BranchSummaryUICache
     public readonly float AffectedRange = -1f;
     public bool IsInAffectedRange => AffectedRange >= Distance;
     public readonly int CurAllCrewCount = -1;
+    public readonly int CrewCeiling = -1;
     public readonly float Potency;
 
     public BranchSummaryUICache() { }
@@ -37,11 +38,12 @@ public class BranchSummaryUICache
         }
 
         Distance = branch.DistanceTo(map.Tile);
-        AffectedRange = branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
         CurAllCrewCount = branch.Squad.AllCrewCountInt;
+        AffectedRange = branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
+        CrewCeiling = (int)(branch.Squad.MemberCeiling + branch.Squad.CommanderCeiling);
     }
 
-    public class SquadWindowEntryComparer : IComparer<BranchSummaryUICache>
+    public class UIEntryComparer : IComparer<BranchSummaryUICache>
     {
         public int Compare(BranchSummaryUICache x, BranchSummaryUICache y)
         {

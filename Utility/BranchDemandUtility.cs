@@ -113,26 +113,25 @@ public static class BranchDemandUtility
         return (true, demandDef);
     }
 
-    public static bool CanAcceptDemand(Branch branch, BranchDemand demand)
+    public static bool CanAcceptDemand(Branch branch, bool isCritical)
     {
-        if (branch is null || demand is null || demand.HasAccepted)
+        if (branch is null)
+        {
+            return false;
+        }
+        BranchDemand demand = branch.DemandHandler.GetDemand(isCritical);
+        if (demand is null || demand.HasAccepted)
         {
             return false;
         }
 
-        if (AcceptedBranchDemandHandler.Instance.Records.Count >= RatkinOrderSettings.MaxConcurrentAcceptedDemand)
+        if (AcceptedBranchDemandHandler.AcceptanceCount >= RatkinOrderSettings.MaxConcurrentAcceptedDemand)
         {
             return false;
         }
-        return true;
 
-        /*
-        OrderRelationshipKind restrictedRelation = demand.Def.demandType switch
-        {
-            BranchDemandType.Important => OrderRelationshipKind.Trustworthy,
-            BranchDemandType.Core => OrderRelationshipKind.Soulmate,
-            _ => OrderRelationshipKind.Acquaintance,
-        };
+        EsteemHandler.RelationshipKind restrictedRelation = isCritical ? EsteemHandler.RelationshipKind.Trustworthy
+                                                                       : EsteemHandler.RelationshipKind.Acquaintance;
 
         if (branch.IsBranchOfType(BranchType.Friendly))
         {
@@ -145,14 +144,5 @@ public static class BranchDemandUtility
         }
 
         return true;
-        */
-    }
-
-    public static void AcceptDemand(Branch branch, bool isCritical)
-    {
-        if (branch.DemandHandler.TryAcceptedDemand(isCritical))
-        {
-            AcceptedBranchDemandHandler.Instance.AddRecord(new AcceptedBranchDemand(branch, isCritical));
-        }
     }
 }

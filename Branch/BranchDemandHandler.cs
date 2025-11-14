@@ -9,10 +9,10 @@ public class BranchDemandHandler : ITickDay, IExposable
     private readonly Branch branch;
 
     private BranchDemand normalDemand;
-    private BranchDemand criticalDemand;
+    private BranchDemand_Critical criticalDemand;
 
     public BranchDemand NormalDemand => normalDemand;
-    public BranchDemand CriticalDemand => criticalDemand;
+    public BranchDemand_Critical CriticalDemand => criticalDemand;
     public bool HasDemand => normalDemand is not null || criticalDemand is not null;
 
     internal BranchDemandHandler(Branch branch)
@@ -38,9 +38,9 @@ public class BranchDemandHandler : ITickDay, IExposable
             listing_Rect.SubLabel(normalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (BranchDemandUtility.CanAcceptDemand(branch, normalDemand))
+                if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: false))
                 {
-                    BranchDemandUtility.AcceptDemand(branch, isCritical: false);
+                    TryAcceptDemand(isCritical: false);
                 }
             }
         }
@@ -56,9 +56,9 @@ public class BranchDemandHandler : ITickDay, IExposable
             listing_Rect.SubLabel(criticalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (BranchDemandUtility.CanAcceptDemand(branch, criticalDemand))
+                if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: true))
                 {
-                    BranchDemandUtility.AcceptDemand(branch, isCritical: true);
+                    TryAcceptDemand(isCritical: true);
                 }
             }
         }
@@ -130,7 +130,7 @@ public class BranchDemandHandler : ITickDay, IExposable
         {
             try
             {
-                criticalDemand = BranchDemand.MakeBranchDemand(demandDef);
+                criticalDemand = (BranchDemand_Critical)BranchDemand.MakeBranchDemand(demandDef);
                 criticalDemand.PostInit(branch);
                 branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandAdd, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
             }
@@ -176,7 +176,7 @@ public class BranchDemandHandler : ITickDay, IExposable
         }
     }
 
-    public bool TryAcceptedDemand(bool isCritical)
+    public bool TryAcceptDemand(bool isCritical)
     {
         BranchDemand demand = isCritical ? criticalDemand : normalDemand;
         if (demand is null)
@@ -189,6 +189,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             RemoveDemand(isCritical);
             return false;
         }
+        AcceptedBranchDemandHandler.OnAcceptDemand(branch, isCritical);
         return true;
     }
 

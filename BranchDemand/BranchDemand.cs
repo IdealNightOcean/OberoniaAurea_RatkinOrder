@@ -13,7 +13,7 @@ public class BranchDemand : IExposable
         Normal,
         Urgency,
         Supplementary,
-        Critical,
+        Critical
     }
 
     private enum DemandState : byte

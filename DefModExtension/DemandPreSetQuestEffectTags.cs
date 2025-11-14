@@ -7,6 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class DemandPreSetQuestEffectTags : DefModExtension
 {
+    public List<BranchMedalDef> potentialMedals = [];
     public List<QuestEffectTag> fixedTags;
     public List<QuestEffectTag> randomTags;
     public IntRange randomTagsSelectCount = IntRange.One;

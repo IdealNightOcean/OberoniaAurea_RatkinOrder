@@ -457,7 +457,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public static bool TryGetCliquesManager(Quest quest, bool addPartIfMiss, out QuestPart_CliquesManager questPart_CliquesManager)
     {
-        questPart_CliquesManager = quest.PartsListForReading.OfType<QuestPart_CliquesManager>()?.FirstOrFallback(null);
+        questPart_CliquesManager = quest?.PartsListForReading.OfType<QuestPart_CliquesManager>()?.FirstOrFallback(null);
         if (addPartIfMiss && questPart_CliquesManager is null)
         {
             questPart_CliquesManager = new QuestPart_CliquesManager

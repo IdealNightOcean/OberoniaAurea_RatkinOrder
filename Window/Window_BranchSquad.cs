@@ -25,6 +25,7 @@ public class Window_BranchSquad : MainTabWindow
 
     private RatkinOrder ratkinOrder;
     private Map map;
+    private int mapRecommendationLetterCount;
 
     private int selBranchIndex;
     private SquadInfoUICache selSquadInfo;
@@ -862,7 +863,7 @@ public class Window_BranchSquad : MainTabWindow
         }
         if (branchSummaryCaches.Count > 0)
         {
-            branchSummaryCaches.Sort(new BranchSummaryUICache.SquadWindowEntryComparer());
+            branchSummaryCaches.Sort(new BranchSummaryUICache.UIEntryComparer());
             GetCurTapBranchSummary();
         }
     }

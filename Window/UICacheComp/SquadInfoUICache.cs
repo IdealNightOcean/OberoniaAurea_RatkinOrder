@@ -37,7 +37,6 @@ public class SquadInfoUICache : BranchSummaryUICache
         SupportFeasibility = BranchSupportUtility.CanSupport(branch, BranchSupportUtility.SupportLevel.Quarter, map, resultOnly: false);
 
         CommanderCeiling = (int)branch.Squad.CommanderCeiling;
-        CrewCeiling = (int)branch.Squad.MemberCeiling + CommanderCeiling;
 
         MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate);
         BombardSupportCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling);
