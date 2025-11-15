@@ -125,12 +125,12 @@ public class Window_Branch : OrderWindowBase
     private Vector2 scrollPosition_CommonInteraction;
     private Vector2 scrollPosition_BuildingInteraction;
 
-    public Window_Branch(Branch branch, Caravan caravan) : base()
+    public Window_Branch(Branch branch, Caravan caravan, Map map) : base()
     {
         this.caravan = caravan;
         this.branch = branch;
-        map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
-        cachedBranchInfo = new(this.branch, map);
+        this.map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
+        cachedBranchInfo = new(this.branch, this.map);
 
         allFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
     }
@@ -310,7 +310,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect.xMax -= 12f;
         Text.Anchor = TextAnchor.MiddleRight;
         Text.Font = GameFont.Small;
-        Widgets.Label(reusedRect, "OARO_BranchBuildingCeiling".Translate(cachedBranchInfo.BuildingCeiling.ToString(), BranchStatDefOf.OARO_BuildingCeiling.maxValue.ToString("F0")));
+        Widgets.Label(reusedRect, "OARO_BranchBuildingCeiling".Translate() + ": " + $"{cachedBranchInfo.BuildingCeiling}/{BranchStatDefOf.OARO_BuildingCeiling.maxValue:F0}");
 
         float yMin = reusedRect.yMax + 4f;
         reusedRect = inRect;
@@ -950,9 +950,9 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Small;
         reusedRect = new(inRect.x, textRect.yMax + 2f, 264f, 36f);
-        Widgets.Label(reusedRect, "OARO_BranchPopulation".Translate(branch.PopulationHandler.Population.ToString()));
+        Widgets.Label(reusedRect, "OARO_BranchPopulation".Translate() + $"   {branch.PopulationHandler.Population}");
         reusedRect = new(inRect.x, reusedRect.yMax + 2f, 264f, 36f);
-        Widgets.Label(reusedRect, "OARO_BranchPopulationCeiling".Translate(cachedBranchInfo.PopulationCeiling.ToString()));
+        Widgets.Label(reusedRect, "OARO_BranchPopulationCeiling".Translate() + $"   {cachedBranchInfo.PopulationCeiling}");
 
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(reusedRect.xMax + (2f + 10f), textRect.yMax + (2f + 10f), 90f, 24f);
@@ -961,8 +961,8 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleRight;
         Text.Font = GameFont.Medium;
         reusedRect = new(inRect.xMax - (12f + 100f), reusedRect.yMax + 2f, 100f, 24f);
-        Widgets.Label(reusedRect, "OARO_PopulationDailyChange".Translate(cachedBranchInfo.DailyPopulationGrowth_Bottom.ToString(), cachedBranchInfo.DailyPopulationGrowth_Ceiling.ToString())
-                                                              .Colorize(cachedBranchInfo.DailyPopulationGrowth_Bottom > 0 ? Color.green : ColorLibrary.RedReadable));
+        Widgets.Label(reusedRect, "OARO_NumberRangePeople".Translate(cachedBranchInfo.DailyPopulationGrowth_Bottom.ToString(), cachedBranchInfo.DailyPopulationGrowth_Ceiling.ToString())
+                                                          .Colorize(cachedBranchInfo.DailyPopulationGrowth_Bottom > 0 ? Color.green : ColorLibrary.RedReadable));
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 

@@ -2,6 +2,7 @@
 using RimWorld;
 using RimWorld.QuestGen;
 using System;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -90,8 +91,8 @@ public class BranchDemand : IExposable
         Slate slate = new();
         slate.SetBasicBranchSlateVar(branch);
 
-        slate.Set(KeyLibrary_SlateStoreAs.DemandDef, Def);
-        slate.Set(KeyLibrary_SlateStoreAs.DemandType, Def.demandType);
+        slate.Set(KeyLibrary_SlateStoreAs.DemandDef, def);
+        slate.Set(KeyLibrary_SlateStoreAs.DemandType, def.demandType);
 
         Map map = QuestGen_Get.GetMap();
         slate.Set("map", map);
@@ -99,6 +100,21 @@ public class BranchDemand : IExposable
         slate.Set("points", points);
 
         return slate;
+    }
+
+    public string GetFullDesc()
+    {
+        StringBuilder sb = new(def.description);
+        sb.AppendLine();
+        sb.AppendLine();
+        sb.Append("OARO_DemandTarget".Translate());
+        sb.AppendLine(":");
+        sb.AppendLine(def.targetDesc);
+        sb.AppendLine();
+        sb.Append("OARO_DemandReward".Translate());
+        sb.AppendLine(":");
+        sb.AppendLine(def.rewardDesc);
+        return sb.ToString();
     }
 
     public override string ToString()

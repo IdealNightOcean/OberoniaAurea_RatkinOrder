@@ -53,7 +53,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
             defaultDesc = "OARO_Command_OpenBranchWindowDesc".Translate(),
             action = delegate
             {
-                Window_Branch branchWindow = new(branch, caravan);
+                Window_Branch branchWindow = new(branch, caravan, map: null);
                 Find.WindowStack.Add(branchWindow);
             }
         };

@@ -16,6 +16,10 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 
     public virtual AcceptanceReport CanUseInteraction(Branch branch, Caravan caravan, BranchBuilding building = null, bool resultOnly = false)
     {
+        if (branch is null || caravan is null)
+        {
+            return false;
+        }
         if (Def.isBuildingInteraction && building is null)
         {
             return resultOnly ? false : "OARO_Insufficient_TargetBranchBuilding".Translate();
@@ -95,6 +99,10 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 
     protected bool ApplyInteraction(Branch branch, Caravan caravan, BranchBuilding building = null)
     {
+        if (branch is null || caravan is null)
+        {
+            return false;
+        }
         if (Def.isBuildingInteraction && building is null)
         {
             Log.Error("Attempt to apply BranchInteraction with a null  branch building.");

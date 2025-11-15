@@ -62,9 +62,9 @@ public static class OARO_WindowUtility
     {
         bool result = ButtonImage(butRect, baseTex, downTex, doMouseoverSound, tooltip);
 
-        TextAnchor anchor = Text.Anchor;
-        Color color = GUI.color;
-        bool wordWrap = Text.WordWrap;
+        TextAnchor preAnchor = Text.Anchor;
+        Color preColor = GUI.color;
+        bool preWordWrap = Text.WordWrap;
 
         Text.Anchor = TextAnchor.MiddleCenter;
         if (butRect.height < Text.LineHeight * 2f)
@@ -74,9 +74,9 @@ public static class OARO_WindowUtility
 
         Widgets.Label(butRect, label);
 
-        Text.Anchor = anchor;
-        GUI.color = color;
-        Text.WordWrap = wordWrap;
+        Text.Anchor = preAnchor;
+        GUI.color = preColor;
+        Text.WordWrap = preWordWrap;
 
         return result;
     }
@@ -88,6 +88,9 @@ public static class OARO_WindowUtility
     /// <param name="inRect">width: 392f, height: 90f</param>
     public static Rect DrawBranchSummary(Vector2 position, BranchSummaryUICache entry)
     {
+        GameFont preFont = Text.Font;
+        TextAnchor preAnchor = Text.Anchor;
+
         Rect rect = new(position.x, position.y, 392f, 90f);
         GUI.DrawTexture(rect, IconLibrary.BranchSummaryBackground);
         Rect inRect = rect.ContractedBy(2f);
@@ -190,9 +193,9 @@ public static class OARO_WindowUtility
         Rect rightRect = Rect.MinMaxRect(leftRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
         float textX = rightRect.xMin + 24f;
         reusedRect = new(textX, rightRect.y, rightRect.width, 29f);
-        Widgets.Label(reusedRect, "OARO_CurAllCrewCount".Translate(entry.CurAllCrewCount));
+        Widgets.Label(reusedRect, "OARO_AllCrewCountShortInfo".Translate(entry.CurAllCrewCount));
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
-        Widgets.Label(reusedRect, "OARO_BranchPotency".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchPotencyShortInfo".Translate() + ": ");
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
         string supplyState = "OARO_BranchSupplyState".Translate() + "  ";
         supplyState += entry.Branch.Supply switch
@@ -202,8 +205,37 @@ public static class OARO_WindowUtility
             _ => "OARO_BranchSupply_Enough".Translate().Colorize(Color.green),
         };
         Widgets.Label(reusedRect, supplyState);
-        Text.Anchor = TextAnchor.UpperLeft;
 
+        Text.Anchor = preAnchor;
+        Text.Font = preFont;
         return rect;
+    }
+
+    public static void DrawRecommendationInfo(Rect inRect, int count, float textOffset = 0f)
+    {
+        Rect reusedRect = new(inRect.x, inRect.y, inRect.height, inRect.height);
+        GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
+
+        reusedRect = Rect.MinMaxRect(reusedRect.xMax + textOffset, inRect.yMin, inRect.xMax, inRect.yMax);
+        Widgets.Label(reusedRect, $"× {count}");
+    }
+
+    public static void DrawBranchIcon(Rect inRect, Branch branch, bool expand)
+    {
+        if (branch?.HonorDef is null)
+        {
+            GUI.DrawTexture(inRect, expand ? IconLibrary.BigGeneralBranchIcon : IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
+        }
+        else
+        {
+            GUI.DrawTexture(inRect, expand ? branch.HonorDef.ExpandingIconTexture : branch.HonorDef.IconTexture, ScaleMode.ScaleToFit);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void ResetText()
+    {
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.UpperLeft;
     }
 }

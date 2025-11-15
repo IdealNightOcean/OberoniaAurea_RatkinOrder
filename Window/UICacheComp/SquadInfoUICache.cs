@@ -11,7 +11,6 @@ public class SquadInfoUICache : BranchSummaryUICache
     public readonly float FriendlyProcess = 0f;
 
     public readonly int CommanderCeiling = -1;
-    public readonly int CrewCeiling = -1;
     public readonly float MemberRecoveryRate = -1f;
     public readonly int BombardSupportCeiling = -1;
 

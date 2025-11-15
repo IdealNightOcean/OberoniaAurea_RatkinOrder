@@ -38,6 +38,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     public Branch Branch => branch;
 
     private Dictionary<string, QuestClique> allCliques;
+    public IReadOnlyDictionary<string, QuestClique> AllCliques => allCliques;
 
     public string InSignalOutPotency;
     public string OutSignalOutPotency;

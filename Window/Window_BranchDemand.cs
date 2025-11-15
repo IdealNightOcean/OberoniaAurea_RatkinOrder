@@ -7,7 +7,7 @@ using static OberoniaAurea.RatkinOrder.Branch;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public class Winows_BranchDemand : MainTabWindow
+public class Window_BranchDemand : MainTabWindow
 {
     private enum TabType
     {
@@ -36,17 +36,23 @@ public class Winows_BranchDemand : MainTabWindow
     private readonly List<BranchDemandEntryDrawer> branchWithDemandsCache = [];
     private readonly List<BranchDemandEntryDrawer> tabDemandEntryCaches = [];
 
+    private Branch selBranch;
     private bool selCritical;
-    private BranchDemand selNormalDemand;
-    private BranchDemand_Critical selCriticalDemand;
+    private BranchDemand selDemand;
+    private string selFullDesc = string.Empty;
+    private AcceptanceReport selAcceptance;
     private QuestPart_CliquesManager selDemandCliqueManager;
     private QuestPart_CliquesManager SelDemandCliqueManager
     {
         get
         {
-            if (selCriticalDemand is not null && selCriticalDemand.IsOngoing && selDemandCliqueManager is null)
+            if (selDemand is null || !selDemand.IsOngoing || selDemand is not BranchDemand_Critical)
             {
-                QuestPart_CliquesManager.TryGetCliquesManager(selCriticalDemand.RelatedQuest, addPartIfMiss: false, out selDemandCliqueManager);
+                return null;
+            }
+            if (selDemandCliqueManager is null)
+            {
+                QuestPart_CliquesManager.TryGetCliquesManager(selDemand.RelatedQuest, addPartIfMiss: false, out selDemandCliqueManager);
             }
             return selDemandCliqueManager;
         }
@@ -54,8 +60,8 @@ public class Winows_BranchDemand : MainTabWindow
 
     private Vector2 scrollPosition_Demands;
 
-    public Winows_BranchDemand() { }
-    public Winows_BranchDemand(RatkinOrder ratkinOrder, Map map) : base()
+    public Window_BranchDemand() { }
+    public Window_BranchDemand(RatkinOrder ratkinOrder, Map map) : base()
     {
         this.ratkinOrder = ratkinOrder;
         mapRecommendationLetterCount = RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map);
@@ -192,49 +198,47 @@ public class Winows_BranchDemand : MainTabWindow
         reusedRect = demandListRect;
         reusedRect.xMin = reusedRect.xMax - 140f;
         acceptedTab.Clear();
-        acceptedTab.Add(new TabRecord("OARO_BranchDemand_Accepted".Translate().CapitalizeFirst(), delegate
+        acceptedTab.Add(new TabRecord("OARO_HasAccepted".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.Accepted);
         }, curTab == TabType.Accepted));
         TabDrawer.DrawTabs(reusedRect, acceptedTab, maxTabWidth: 140f);
 
-        reusedRect = new(demandListRect.x + 8f, demandListRect.y - (32f + 48f), 450f, 48f);
+        reusedRect = new(demandListRect.x, demandListRect.y - (32f + 48f), 450f, 48f);
         DrawLeftText(reusedRect);
 
         DrawDemandListRect(demandListRect);
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, demandListRect.xMax + 18f, 2f, 716f);
+        GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
-
-        Rect rightRect = new(reusedRect.xMax + 18f, mainInnerRect.y + 156f, 379f, 667f);
+        Rect rightRect = new(reusedRect.xMax + 18f, mainInnerRect.y + 167f, 379f, 667f);
         DrawRightRect(rightRect);
+
+        OARO_WindowUtility.ResetText();
     }
 
     private void DrawLeftText(Rect inRect)
     {
         Text.Font = GameFont.Small;
-        Text.Anchor = TextAnchor.MiddleCenter;
+        Text.Anchor = TextAnchor.MiddleLeft;
 
         Rect reusedRect = inRect;
         reusedRect.width /= 2;
         reusedRect.height /= 2;
-        Widgets.Label(reusedRect, "OARO_OrderEsteem" + ": " + ratkinOrder.Esteem.ToString());
+        Widgets.Label(reusedRect, "OARO_OrderEsteem".Translate() + ": " + ratkinOrder.Esteem.ToString());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = inRect.xMax;
 
         Rect reusedRectII = reusedRect;
-        reusedRectII.width /= 3;
+        reusedRectII.width /= 2;
+        string letterLabel = "OARO_RecommendationLetter".Translate();
+        reusedRectII = new(reusedRect.x, reusedRect.y, Text.CalcSize(letterLabel).x, reusedRect.height);
         Widgets.Label(reusedRectII, "OARO_RecommendationLetter".Translate());
 
-        reusedRectII.xMin = reusedRectII.xMax;
-        reusedRectII.xMax += reusedRect.width / 3;
-        reusedRectII = OARO_WindowUtility.CenterRectOnX(reusedRectII, reusedRectII.y, reusedRectII.height, reusedRectII.height);
-        //GUI.DrawTexture(reusedRectII,);
-
-        reusedRectII = reusedRect;
-        reusedRectII.xMin = reusedRectII.xMax - reusedRect.width / 3;
-        Widgets.Label(reusedRectII, $"× {mapRecommendationLetterCount}");
+        reusedRectII = Rect.MinMaxRect(reusedRectII.xMax + 6f, reusedRect.yMin, reusedRect.xMax, reusedRect.yMax);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRectII, mapRecommendationLetterCount);
 
         reusedRect = inRect;
         reusedRect.width /= 2;
@@ -245,7 +249,7 @@ public class Winows_BranchDemand : MainTabWindow
         reusedRect.xMax = inRect.xMax;
         Widgets.Label(reusedRect, "OARO_CriticalDemandFulfillCount".Translate() + ": " + ratkinOrder.BranchManager.CriticalDemandFulfillCount);
 
-        Text.Anchor = TextAnchor.UpperLeft;
+        OARO_WindowUtility.ResetText();
     }
 
     private void DrawDemandListRect(Rect inRect)
@@ -271,38 +275,219 @@ public class Winows_BranchDemand : MainTabWindow
             BranchDemandEntryDrawer.ButtonResult buttonResult = tabDemandEntryCaches[i].DrawDemandEntry(entryPosition);
             if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckNormal)
             {
-                selCritical = false;
-                selNormalDemand = tabDemandEntryCaches[i].Branch.DemandHandler.GetDemand(selCritical);
+                SelDemand(tabDemandEntryCaches[i].Branch, isCritical: false);
             }
             else if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckCritical)
             {
-                selCritical = true;
-                selCriticalDemand = (BranchDemand_Critical)tabDemandEntryCaches[i].Branch.DemandHandler.GetDemand(selCritical);
-                selDemandCliqueManager = null;
+                SelDemand(tabDemandEntryCaches[i].Branch, isCritical: true);
             }
         }
         Widgets.EndScrollView();
+        OARO_WindowUtility.ResetText();
     }
 
     private void DrawRightRect(Rect inRect)
     {
         GUI.DrawTexture(inRect, rightMainBackground);
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Rect reusedRect = new(inRect.x, inRect.y - 32f, inRect.width, 32f);
+        Widgets.Label(reusedRect, "OARO_AcceptedDemand".Translate());
+        Text.Anchor = TextAnchor.MiddleRight;
+        Widgets.Label(reusedRect, $"{AcceptedBranchDemandHandler.AcceptanceCount}/{RatkinOrderSettings.MaxConcurrentAcceptedDemand}");
+        if (selDemand is null)
+        {
+            return;
+        }
+
+        reusedRect = new(inRect.x + 18f, inRect.y + 10f, inRect.width / 2 - 18f, 28f);
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.LowerLeft;
+        Widgets.Label(reusedRect, selDemand.Def.label);
+
+        reusedRect.xMax = inRect.xMax - 18f;
+        reusedRect.xMin = inRect.xMin + inRect.width / 2;
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.LowerRight;
+        string rightUpText = selDemand.HasAccepted ? "OARO_HasAccepted".Translate().Colorize(Color.green)
+                                                   : "OARO_ExpiredDate".Translate() + ": " + GenDate.SeasonDateStringAt(GenTicks.TicksAbs + selDemand.TicksToExpire, Find.WorldGrid.LongLatOf(map.Tile)).Colorize(Color.cyan);
+        Widgets.Label(reusedRect, rightUpText);
+
+        reusedRect = Rect.MinMaxRect(inRect.xMin + 18f, reusedRect.yMax + 60f, inRect.xMax - 18f, reusedRect.yMax + (60f + 245f));
+        Widgets.TextArea(reusedRect, selFullDesc, readOnly: true);
+
+        if (selDemand.HasAccepted)
+        {
+            reusedRect = Rect.MinMaxRect(inRect.x, reusedRect.yMax + 16f, inRect.xMax, inRect.yMax);
+            if (selCritical && selDemand is BranchDemand_Critical)
+            {
+                DrawRightRect_AcceptedCritical(reusedRect);
+            }
+            else
+            {
+                DarwDemandBranchInfo(reusedRect);
+            }
+        }
+        else
+        {
+            reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 16f, 105f, 57f);
+            if (selAcceptance)
+            {
+                Text.Font = GameFont.Small;
+                Text.Anchor = TextAnchor.MiddleCenter;
+                if (OARO_WindowUtility.TextButtonImage(reusedRect, "Accept".Translate(), acceptButton, acceptButton_Down, doMouseoverSound: true))
+                {
+                    AcceptanceReport curAcceptance = BranchDemandUtility.CanAcceptDemand(selBranch, selCritical, resultOnly: false);
+                    if (curAcceptance)
+                    {
+                        selBranch.DemandHandler.TryAcceptDemand(selCritical);
+                    }
+                    else
+                    {
+                        Messages.Message("OARO_CanNotAcceptBrancDemand".Translate(curAcceptance.Reason), MessageTypeDefOf.RejectInput);
+                    }
+                    SelDemand(selBranch, selCritical);
+                }
+            }
+            else
+            {
+                GUI.DrawTexture(reusedRect, acceptButton_Down);
+                Widgets.Label(reusedRect, "Accept".Translate());
+                if (!string.IsNullOrEmpty(selAcceptance.Reason) && Mouse.IsOver(reusedRect))
+                {
+                    string reason = selAcceptance.Reason;
+                    TooltipHandler.TipRegion(reusedRect, () => reason, 7481051);
+                }
+            }
+            reusedRect = new(inRect.x, reusedRect.yMax + 16f, inRect.width, 40f);
+            DarwDemandBranchInfo(reusedRect);
+        }
+        OARO_WindowUtility.ResetText();
     }
 
-    private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_MainBackground");
-    private static readonly Texture2D leftMainBackground = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_LeftMainBackground");
+    private void DarwDemandBranchInfo(Rect inRect)
+    {
+        Rect reusedRect = new(inRect.x + 40f, inRect.y, 40f, 40f);
+        OARO_WindowUtility.DrawBranchIcon(reusedRect, selBranch, expand: false);
 
-    private static readonly Texture2D demandEntryRect = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_DemandEntryRect");
-    private static readonly Texture2D potencyLace = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_PotencyLace");
-    private static readonly Texture2D checkButton = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_CheckButton");
-    private static readonly Texture2D checkButton_Down = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_CheckButton_Down");
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.LowerRight;
+        string linkText = "OARO_SuperLink".Translate() + ": " + selBranch.Name;
+        Vector2 linkTextSize = Text.CalcSize(linkText);
+        reusedRect = new(inRect.xMax - (40f + linkTextSize.x), reusedRect.y, linkTextSize.x, 20f);
+        Color color;
+        if (Mouse.IsOver(reusedRect))
+        {
+            color = ColorLibrary.LightBlue;
+        }
+        else
+        {
+            color = selBranch.HonorDef?.color ?? Color.white;
+        }
+        Widgets.Label(reusedRect, linkText.Colorize(color));
+        if (Widgets.ButtonInvisible(reusedRect))
+        {
+            Window_Branch branchWinow = new(selBranch, caravan: null, map);
+            Find.WindowStack.Add(branchWinow);
+        }
 
-    private static readonly Texture2D criticalDemandInfoLace = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_CriticalDemandInfoLace");
-    private static readonly Texture2D criticalDemandTagLace = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_CriticalDemandTagLace");
-    private static readonly Texture2D criticalDemandCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_CriticalDemandCuttingLine");
-    private static readonly Texture2D criticalDemandTagBackground = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_CriticalDemandTagBackground");
+        reusedRect = new(inRect.xMax - (40f + 96f), reusedRect.yMax, 96f, 20f);
+        if (selBranch.IsBranchOfType(BranchType.Friendly))
+        {
+            Widgets.Label(reusedRect, "OARO_Friendly".Translate().Colorize(Color.green));
+        }
+        else
+        {
+            Widgets.Label(reusedRect, "OARO_Strange".Translate());
+        }
+    }
 
-    private static readonly Texture2D rightMainBackground = ContentFinder<Texture2D>.Get("UI/BranchDemand/OARO_RightMainBackground");
+    private void DrawRightRect_AcceptedCritical(Rect inRect)
+    {
+        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - (137f + 10f), 356f, 137f);
+        GUI.DrawTexture(reusedRect, criticalDemandPotencyLace);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - (163f + 2f), 354f, 2f);
+        GUI.DrawTexture(reusedRect, rightCuttingLine);
+
+        QuestPart_CliquesManager cliqueManager = SelDemandCliqueManager;
+        Rect cliqueRect = new(inRect.x + 50f, inRect.yMax - (32f + 114f), 146f, 146f);
+        int column = 0;
+        foreach (QuestClique clique in cliqueManager.AllCliques.Values)
+        {
+            reusedRect = new(cliqueRect.x, cliqueRect.y + column * 27f, 27f, 27f);
+            //
+
+            reusedRect.xMax = cliqueRect.xMax;
+            reusedRect.xMin += 27f;
+            Widgets.Label(reusedRect, clique.Name);
+            if ((++column) >= 3)
+            {
+                break;
+            }
+        }
+        reusedRect = new(cliqueRect.x, cliqueRect.yMax - 25f, 92f, 25f);
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_CliqueDetail".Translate(), checkButton, checkButton_Down, doMouseoverSound: true))
+        {
+
+        }
+
+        Rect potencyRect = new(inRect.xMax - (42f + 125f), inRect.yMax - (30f + 120f), 125f, 120f);
+        GUI.DrawTexture(potencyRect, criticalDemandPotencyFrame);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(potencyRect, potencyRect.y + 12f, potencyRect.width, 22f);
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Widgets.Label(reusedRect, "OARO_DemandQuestPotency".Translate());
+
+        Text.Font = GameFont.Medium;
+        reusedRect = OARO_WindowUtility.CenterRectOnX(potencyRect, reusedRect.yMax + 24f, potencyRect.width, 32f);
+        Widgets.Label(reusedRect, cliqueManager.TotalPotency.ToStringPercentSigned());
+
+        OARO_WindowUtility.ResetText();
+    }
+
+    private void SelDemand(Branch branch, bool isCritical)
+    {
+        Deselect();
+        selBranch = branch;
+        selCritical = isCritical;
+        selDemand = branch.DemandHandler.GetDemand(isCritical);
+        if (selDemand is null)
+        {
+            selFullDesc = string.Empty;
+            selAcceptance = false;
+        }
+        else
+        {
+            selAcceptance = BranchDemandUtility.CanAcceptDemand(branch, isCritical, resultOnly: false);
+            selFullDesc = selDemand.GetFullDesc();
+        }
+    }
+
+    private void Deselect()
+    {
+        selBranch = null;
+        selCritical = false;
+        selDemand = null;
+        selFullDesc = string.Empty;
+        selDemandCliqueManager = null;
+    }
+
+    private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_MainBackground");
+    private static readonly Texture2D leftMainBackground = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_LeftMainBackground");
+
+    private static readonly Texture2D demandEntryRect = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_DemandEntryRect");
+    private static readonly Texture2D checkButton = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_CheckButton");
+    private static readonly Texture2D checkButton_Down = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_CheckButton_Down");
+
+    private static readonly Texture2D criticalDemandTagBackground = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_CriticalDemandTagBackground");
+
+    private static readonly Texture2D verticalCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_VerticalCuttingLine");
+
+    private static readonly Texture2D rightMainBackground = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_RightMainBackground");
+    private static readonly Texture2D acceptButton = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_AcceptButton");
+    private static readonly Texture2D acceptButton_Down = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_AcceptButton_Down");
+    private static readonly Texture2D rightCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_RightCuttingLine");
+    private static readonly Texture2D criticalDemandPotencyLace = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_CriticalDemandPotencyLace");
+    private static readonly Texture2D criticalDemandPotencyFrame = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_CriticalDemandPotencyFrame");
 
     private class BranchDemandEntryDrawer
     {
@@ -372,7 +557,7 @@ public class Winows_BranchDemand : MainTabWindow
 
             reusedRect = new(reusedRect.x, reusedRect.yMax + 2f, reusedRect.width, 51f);
             Rect reusedRectII = reusedRect;
-            reusedRectII.yMax = reusedRectII.yMin + reusedRect.height * 0.67f;
+            reusedRectII.yMax = reusedRectII.yMin + reusedRect.height * 0.6f;
             Widgets.Label(reusedRectII, SummaryUICache.AffectedRange.ToString("F0").Colorize(SummaryUICache.IsInAffectedRange ? Color.green : Color.white));
 
             reusedRectII.yMin = reusedRectII.yMax;
@@ -388,8 +573,10 @@ public class Winows_BranchDemand : MainTabWindow
             }
 
             reusedRect = new(reusedRect.xMax + 2f, innerRect.y, 150f, 86f);
+            /*
             reusedRectII = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax - 73f, 175f, 73f);
             GUI.DrawTexture(reusedRectII, potencyLace, ScaleMode.ScaleToFit);
+            */
 
             reusedRectII = reusedRect;
             reusedRectII.height /= 2;
@@ -425,9 +612,9 @@ public class Winows_BranchDemand : MainTabWindow
             Text.Font = GameFont.Small;
 
             Rect reusedRect = OARO_WindowUtility.CenterRectOnX(labelRect, labelRect.yMax + 4f, 92f, 25f);
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_Check".Translate(), checkButton, checkButton_Down))
+            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OAFrame_LookOver".Translate(), checkButton, checkButton_Down))
             {
-
+                curButtonResult = ButtonResult.CheckNormal;
             }
 
             reusedRect = new(labelRect.xMax, labelRect.y, 72f, labelRect.height);
@@ -436,14 +623,12 @@ public class Winows_BranchDemand : MainTabWindow
 
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleRight;
-            reusedRect = new(inRect.xMax - (10f + 128f), inRect.y + 4f, 128f, 16f);
-            string rightUpText = demand.HasAccepted ? "OARO_HasAccepted".Translate()
-                                                    : demand.TicksToExpire.ToStringTicksToPeriod();
+            reusedRect = new(inRect.xMax - (10f + 128f), inRect.y + 4f, 128f, 20f);
+            string rightUpText = demand.HasAccepted ? "OARO_HasAccepted".Translate().Colorize(Color.green)
+                                                    : demand.TicksToExpire.ToStringTicksToPeriod().Colorize(Color.cyan);
             Widgets.Label(reusedRect, rightUpText);
 
             reusedRect = new(inRect.xMax - (10f + 54f), inRect.yMax - (4f + 54f), 54f, 54f);
-
-
 
             Text.Anchor = TextAnchor.UpperLeft;
             Text.Font = GameFont.Small;
@@ -453,42 +638,59 @@ public class Winows_BranchDemand : MainTabWindow
         {
             if (demand is null)
             {
+                GUI.DrawTexture(inRect, IconLibrary.ShadeTexture);
+                Text.Font = GameFont.Medium;
+                Text.Anchor = TextAnchor.MiddleCenter;
+                Widgets.Label(inRect, "OARO_NoDemandOfTypeNow".Translate());
                 return;
             }
 
             Rect infoRect = inRect;
-            infoRect.width = 496f;
+            infoRect.width = 470f;
+            if (demand.Def.BackgroundTexture is not null)
+            {
+                GUI.DrawTexture(infoRect, demand.Def.BackgroundTexture, ScaleMode.ScaleToFit);
+            }
 
-            Rect reusedRect = new(infoRect.x + 4f, infoRect.yMax - (4f + 153f), 153f, 153f);
-            GUI.DrawTexture(reusedRect, criticalDemandInfoLace, ScaleMode.ScaleToFit);
-
-            reusedRect = new(infoRect.x + 48f, infoRect.y + 20f, 128f, 28f);
+            Rect reusedRect = new(infoRect.x + 48f, infoRect.y + 20f, 128f, 28f);
             Text.Font = GameFont.Medium;
-            Text.Anchor = TextAnchor.MiddleCenter;
+            Text.Anchor = TextAnchor.MiddleLeft;
             Widgets.LabelEllipses(reusedRect, demand.Def.label);
 
             reusedRect = new(reusedRect.xMax, infoRect.y + 20f, 72f, 28f);
             Text.Font = GameFont.Small;
-            Text.Anchor = TextAnchor.LowerCenter;
+            Text.Anchor = TextAnchor.LowerLeft;
             Widgets.Label(reusedRect, $"OARO_BranchDemandType_{demand.DemandTypeValue}".Translate());
 
-            reusedRect = new(infoRect.x + 48f, reusedRect.yMax + 20f, 92f, 25f);
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_Check".Translate(), checkButton, checkButton_Down))
+            Rect lookOverRect = new(infoRect.x + 48f, reusedRect.yMax + 20f, 92f, 25f);
+            if (OARO_WindowUtility.TextButtonImage(lookOverRect, "OAFrame_LookOver".Translate(), checkButton, checkButton_Down))
             {
-
                 curButtonResult = ButtonResult.CheckCritical;
             }
 
-            reusedRect = new(reusedRect.xMax + 12f, reusedRect.y, 92f, 25f);
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_Check".Translate(), checkButton, checkButton_Down))
+            reusedRect = new(infoRect.x, infoRect.y + 6f, infoRect.width - 12f, 20f);
+            Text.Anchor = TextAnchor.LowerRight;
+            if (demand.HasAccepted)
             {
+                Widgets.Label(reusedRect, "OARO_HasAccepted".Translate().Colorize(Color.green));
+                reusedRect = new(lookOverRect.xMax + 12f, lookOverRect.y, 92f, 25f);
+                Text.Anchor = TextAnchor.MiddleCenter;
+                if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_CliqueDetail".Translate(), checkButton, checkButton_Down))
+                {
 
+                }
+            }
+            else
+            {
+                Widgets.Label(reusedRect, demand.TicksToExpire.ToStringTicksToPeriod().Colorize(Color.cyan));
             }
 
-            reusedRect = new(infoRect.xMax - (25f + 128f), infoRect.yMax - 52f, 128f, 22f);
-            Widgets.Label(reusedRect, "OARO_PotentialBranchMedalType".Translate());
 
-            Rect medalOutRect = new(infoRect.xMax - (10f + 168f), infoRect.yMax - (3f + 36f), 168f, 36f);
+            Rect medalOutRect = new(infoRect.xMax - (10f + 168f), infoRect.yMax - (6f + 50f), 168f, 50f);
+
+            reusedRect = new(medalOutRect.x, medalOutRect.yMin - 22f, medalOutRect.width, 22f);
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(reusedRect, "OARO_PotentialBranchMedalType".Translate());
 
             Rect medalViewRect = medalOutRect;
             float entryX = medalViewRect.x;
@@ -508,19 +710,11 @@ public class Winows_BranchDemand : MainTabWindow
             }
             Widgets.EndScrollView();
 
-            reusedRect = infoRect;
-            reusedRect.xMin = reusedRect.xMax;
-            reusedRect.xMax += 2f;
-            GUI.DrawTexture(reusedRect, criticalDemandCuttingLine);
-
             Rect tagRect = Rect.MinMaxRect(reusedRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
-            reusedRect = tagRect.ContractedBy(3f);
-            reusedRect.height = 137f;
-            GUI.DrawTexture(reusedRect, criticalDemandTagLace, ScaleMode.ScaleToFit);
 
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.LowerCenter;
-            reusedRect = new(tagRect.x + 8f, tagRect.y + 2f, 96f, 18f);
+            reusedRect = new(tagRect.x + 8f, tagRect.y + 4f, 96f, 20f);
             Widgets.Label(reusedRect, "OARO_BranchDemandTags".Translate());
 
             Rect tagOutRect = Rect.MinMaxRect(tagRect.xMin + 40f, tagRect.yMin + 30f, tagRect.xMax - 40f, tagRect.yMax - 30f);
@@ -528,14 +722,14 @@ public class Winows_BranchDemand : MainTabWindow
             Rect tagViewRect = tagOutRect;
             entryX = tagViewRect.x;
             entryY = tagViewRect.y;
-            entryWidth = (tagOutRect.width - 12f) / 2 - float.Epsilon;
-            entryHeight = (tagOutRect.height - 8f) / 2;
+            entryWidth = (tagOutRect.width - 12f) / 2 - 0.01f;
+            entryHeight = (tagOutRect.height - 8f) / 2 - 0.01f;
             float entryXInterval = 12f;
             float entryYInterval = 8f;
             int column = 0;
             IReadOnlyList<QuestEffectTag> questEffectTags = demand.QuestEffectTags;
             tagViewRect.height = Mathf.Ceil(questEffectTags.Count / 2) * (entryHeight + entryYInterval);
-            Widgets.BeginScrollView(medalOutRect, ref scrollPosition_Tags, medalViewRect, showScrollbars: false);
+            Widgets.BeginScrollView(tagOutRect, ref scrollPosition_Tags, tagViewRect, showScrollbars: false);
 
             entryRect = default;
             Text.Font = GameFont.Small;

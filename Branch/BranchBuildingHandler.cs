@@ -197,6 +197,10 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (constructParam.ByPlayer)
         {
+            if (constructParam.Caravan is null)
+            {
+                return false;
+            }
             int silverCost = branch.GetBuildingSilverCost(buildingDef);
             if (!CaravanInventoryUtility.HasThings(constructParam.Caravan, ThingDefOf.Silver, silverCost))
             {

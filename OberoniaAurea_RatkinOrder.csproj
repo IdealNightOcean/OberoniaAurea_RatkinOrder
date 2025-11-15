@@ -104,7 +104,7 @@
     <Compile Include="DefOf\BranchMedalDefOf.cs" />
     <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
-    <Compile Include="Window\Winows_BranchDemand.cs" />
+    <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
     <Compile Include="Window\UICacheComp\BranchSummaryUICache.cs" />

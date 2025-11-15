@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 using static OberoniaAurea.RatkinOrder.BranchDemand;
 
@@ -34,6 +35,25 @@ public class BranchDemandDef : Def
 
     public int DurationTicks => (int)(durationDays * 60000f);
     public bool IsCritical => demandType == DemandType.Critical;
+
+    [NoTranslate]
+    protected string backgroundPath;
+    protected Texture2D backgroundTexture;
+    public Texture2D BackgroundTexture
+    {
+        get
+        {
+            if (backgroundTexture is null)
+            {
+                if (string.IsNullOrEmpty(backgroundPath))
+                {
+                    return null;
+                }
+                backgroundTexture = ContentFinder<Texture2D>.Get(backgroundPath);
+            }
+            return backgroundTexture;
+        }
+    }
 
     public override IEnumerable<string> ConfigErrors()
     {

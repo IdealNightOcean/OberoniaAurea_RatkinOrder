@@ -113,22 +113,28 @@ public static class BranchDemandUtility
         return (true, demandDef);
     }
 
-    public static bool CanAcceptDemand(Branch branch, bool isCritical)
+    public static AcceptanceReport CanAcceptDemand(Branch branch, bool isCritical, bool resultOnly)
     {
         if (branch is null)
         {
             return false;
         }
         BranchDemand demand = branch.DemandHandler.GetDemand(isCritical);
-        if (demand is null || demand.HasAccepted)
+        if (demand is null)
         {
             return false;
+        }
+        if (demand.HasAccepted)
+        {
+            return resultOnly ? false : "OARO_HasAccepted".Translate();
         }
 
         if (AcceptedBranchDemandHandler.AcceptanceCount >= RatkinOrderSettings.MaxConcurrentAcceptedDemand)
         {
-            return false;
+            return resultOnly ? false : "OARO_ReachMax_ConcurrentAcceptedDemand".Translate();
         }
+
+        return true;
 
         EsteemHandler.RelationshipKind restrictedRelation = isCritical ? EsteemHandler.RelationshipKind.Trustworthy
                                                                        : EsteemHandler.RelationshipKind.Acquaintance;
@@ -140,7 +146,7 @@ public static class BranchDemandUtility
 
         if (branch.RatkinOrder.Relationship < restrictedRelation)
         {
-            return false;
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(restrictedRelation.GetLabel());
         }
 
         return true;

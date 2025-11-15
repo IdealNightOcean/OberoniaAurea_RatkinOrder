@@ -96,6 +96,10 @@ public class BranchFacilityHandler : IExposable
 
         if (byPlayer)
         {
+            if (caravan is null)
+            {
+                return false;
+            }
             int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
             if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))
             {
@@ -118,7 +122,7 @@ public class BranchFacilityHandler : IExposable
         int buildingTicksCost = branch.GetFacilityTimeCost(facilityDef, targetLevel);
         underConstructionFacility = new(facilityDef, buildingTicksCost);
 
-        if (byPlayer)
+        if (byPlayer && caravan is not null)
         {
             int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, silverCost);

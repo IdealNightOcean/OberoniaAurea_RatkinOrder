@@ -38,7 +38,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             listing_Rect.SubLabel(normalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: false))
+                if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: false, resultOnly: true))
                 {
                     TryAcceptDemand(isCritical: false);
                 }
@@ -56,7 +56,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             listing_Rect.SubLabel(criticalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
             {
-                if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: true))
+                if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: true, resultOnly: true))
                 {
                     TryAcceptDemand(isCritical: true);
                 }

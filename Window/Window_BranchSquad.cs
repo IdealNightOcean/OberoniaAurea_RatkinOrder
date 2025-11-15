@@ -268,7 +268,7 @@ public class Window_BranchSquad : MainTabWindow
 
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
             friendlyProcess = selSquadInfo.FriendlyProcess;
-            friendlyExpireDate = "OARO_FriendlyExpireDate".Translate(selSquadInfo.FriendlyExpireDateStr);
+            friendlyExpireDate = "OARO_UntilDate".Translate() + $"   {selSquadInfo.FriendlyExpireDateStr}";
         }
         else
         {
@@ -276,7 +276,7 @@ public class Window_BranchSquad : MainTabWindow
 
             relation = "OARO_Strange".Translate();
             friendlyProcess = 0f;
-            friendlyExpireDate = "OARO_FriendlyExpireDateN".Translate();
+            friendlyExpireDate = "OARO_UntilDate".Translate() + "   ---";
         }
 
         reusedRect = new(middleInnerRect.x + 136f, middleInnerRect.y + 4f, 54f, 32f);
@@ -379,15 +379,15 @@ public class Window_BranchSquad : MainTabWindow
             Widgets.Label(reusedRect, "OARO_MemberCountInfo".Translate(SelBranch.Squad.AllCrewCountInt, selSquadInfo.CrewCeiling));
             reusedRect.yMin = reusedRect.yMax;
             reusedRect.yMax += 24f;
-            Widgets.Label(reusedRect, "OARO_MemberRecoveryInfo".Translate(selSquadInfo.MemberRecoveryRate.ToStringWithSign("F1"))
-                                                               .Colorize(selSquadInfo.MemberRecoveryRate < 0 ? ColorLibrary.RedReadable : Color.green));
+            Widgets.Label(reusedRect, "OARO_PeoplePreDay".Translate(selSquadInfo.MemberRecoveryRate.ToStringWithSign("F1"))
+                                                         .Colorize(selSquadInfo.MemberRecoveryRate < 0 ? ColorLibrary.RedReadable : Color.green));
         }
         else
         {
             Widgets.Label(reusedRect, "OARO_MemberCountInfoN".Translate());
             reusedRect.yMin = reusedRect.yMax;
             reusedRect.yMax += 24f;
-            Widgets.Label(reusedRect, "OARO_MemberRecoveryInfoN".Translate());
+            Widgets.Label(reusedRect, "OARO_PeoplePreDayN".Translate());
         }
 
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -405,14 +405,14 @@ public class Window_BranchSquad : MainTabWindow
             GUI.DrawTexture(reusedRect, middleCheckButton_Down);
         }
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 50f, 26f, 23f);
-        GUI.DrawTexture(reusedRect, recommendationIcon);
+        GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 6f, 64f, 24f);
         Widgets.Label(reusedRect, "OARO_RecommendationLetter".Translate());
 
         //中部右下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 186f, middleBottomHeight);
         reusedRect = new(areaRect.x + 4f, areaRect.y + 8f, 70f, 24f);
-        Widgets.Label(reusedRect, "OARO_IncludeCommanderCountInfo".Translate());
+        Widgets.Label(reusedRect, "OARO_IncludeCommander".Translate());
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, reusedRect.xMax + 10f, 29f, 27f);
         GUI.DrawTexture(reusedRect, middleCommanderIcon);
@@ -420,11 +420,11 @@ public class Window_BranchSquad : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.xMax - 54f, 50f, 24f);
         if (SelBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_IncludeCommanderCountNum".Translate(SelBranch.Squad.CommanderCountInt, selSquadInfo.CommanderCeiling));
+            Widgets.Label(reusedRect, "OARO_FilledTotalFormatPeople".Translate(SelBranch.Squad.CommanderCountInt, selSquadInfo.CommanderCeiling));
         }
         else
         {
-            Widgets.Label(reusedRect, "OARO_IncludeCommanderCountNumN".Translate());
+            Widgets.Label(reusedRect, "OARO_FilledTotalFormatPeopleN".Translate());
         }
 
         //下部区域
@@ -598,7 +598,7 @@ public class Window_BranchSquad : MainTabWindow
                 }
             }
             reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
-            GUI.DrawTexture(reusedRect, recommendationIcon);
+            GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon);
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(reusedRect.xMax + 8f, reusedRect.y, 80f, 24f);
             Widgets.Label(reusedRect, "OARO_RequestUnlockSupport".Translate());
@@ -669,11 +669,11 @@ public class Window_BranchSquad : MainTabWindow
         int bombardSupportCeiling = selSquadInfo.BombardSupportCeiling;
         if (SelBranch is not null)
         {
-            Widgets.Label(areaRect, "OARO_BombardSupportCeiling".Translate(bombardSupportCeiling.ToString()));
+            Widgets.Label(areaRect, $"× {bombardSupportCeiling}");
         }
         else
         {
-            Widgets.Label(areaRect, "OARO_BombardSupportCeilingN".Translate());
+            Widgets.Label(areaRect, "× --");
         }
         areaRect = inRect;
         areaRect.xMin += 8f;
@@ -777,14 +777,11 @@ public class Window_BranchSquad : MainTabWindow
         reusedRect.xMin = reusedRect.xMax + 2f;
         reusedRect.xMax = inRect.xMin + 180f;
         Text.Anchor = TextAnchor.LowerLeft;
-        Widgets.Label(reusedRect, "OARO_SupportSquadNum".Translate());
+        Widgets.Label(reusedRect, "OARO_SupportSquadNum".Translate() + $" /");
 
-        reusedRect = new(inRect.xMax - 64f, reusedRect.y, 32f, 24f);
+        reusedRect = new(inRect.xMax - 64f, reusedRect.y, 58f, 24f);
         Text.Anchor = TextAnchor.LowerRight;
-        Widgets.Label(reusedRect, $"× {5}");
-
-        reusedRect = new(reusedRect.x - (4f + 26f), reusedRect.y, 26f, 24f);
-        GUI.DrawTexture(reusedRect, recommendationIcon);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, mapRecommendationLetterCount);
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
@@ -1028,6 +1025,5 @@ public class Window_BranchSquad : MainTabWindow
     private static readonly Texture2D branchSupplyEnough = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchSupply_Enough");
 
     private static readonly Texture2D branchBaseSiteIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_BranchBaseIcon");
-    private static readonly Texture2D recommendationIcon = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_RecommendationIcon");
     private static readonly Texture2D verticalCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_VerticalCuttingLine");
 }

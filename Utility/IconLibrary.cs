@@ -8,7 +8,10 @@ public static class IconLibrary
 {
     public static readonly Texture2D colseX = ContentFinder<Texture2D>.Get("UI/Common/OARO_ColseX");
 
+    public static readonly Texture2D RecommendationIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_RecommendationIcon");
+
     public static readonly Texture2D BranchSummaryBackground = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BranchSummaryBackground");
+    public static readonly Texture2D ShadeTexture = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_Shade");
 
     public static readonly Texture2D BigStrangeIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigStrangeIcon");
     public static readonly Texture2D SmallStrangeIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallStrangeIcon");
