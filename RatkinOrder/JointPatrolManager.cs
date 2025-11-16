@@ -1,181 +1,85 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
-using RimWorld.QuestGen;
+﻿using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class JointPatrolManager : IExposable
+public partial class JointPatrolManager : IExposable
 {
     private const int JointPatrolDurationPrepDays = 3;
     private const int JointPatrolDurationDays = 7;
-
-    public enum PatrolType : byte
-    {
-        Popedom,
-        Kingdom,
-        Border
-    }
-    public enum PatrolEndType : byte
-    {
-        Nothing,
-        Normal,
-        Friendly,
-        Accident,
-        Disaster
-    }
-
-    public class JointBranchRecord : IExposable
-    {
-        public Branch Branch;
-        public bool HadPassby;
-        private float reconnaissance;
-        public float Reconnbissance => reconnaissance;
-
-        public bool IsExploration;
-        public ThingDef TargetOre;
-        private int expectedOreCount;
-        private bool reachMax;
-        public (int, bool) ExpectedResult => (expectedOreCount, reachMax);
-
-        public void ExposeData()
-        {
-            Scribe_References.Look(ref Branch, "Branch");
-            Scribe_Values.Look(ref HadPassby, "HadPassby", defaultValue: false);
-            Scribe_Values.Look(ref reconnaissance, "reconnaissance", 0f);
-
-            Scribe_Values.Look(ref IsExploration, "IsExploration", defaultValue: false);
-            Scribe_Defs.Look(ref TargetOre, "TargetOre");
-            Scribe_Values.Look(ref expectedOreCount, "expectedOreCount", 0);
-            Scribe_Values.Look(ref reachMax, "reachMax", defaultValue: false);
-        }
-
-        /// <summary>
-        /// 4小时更新一次 (10000 tick)
-        /// </summary>
-        public void RecordUpdate()
-        {
-            GetReconnaissance();
-            if (IsExploration)
-            {
-                GetExpectedOreCount();
-            }
-        }
-
-        private void GetReconnaissance()
-        {
-            reconnaissance = (Branch.Squad.MemberCount * 10f)
-                  * (1f + Branch.MedalHandler.MedalTypeCount * 0.1f)
-                  * (1f + Branch.FacilityHandler.TotalFacilityLevel * 0.02f)
-                  * (Branch.IsBranchOfType(Branch.BranchType.Honor) ? 1.2f : 1f);
-        }
-
-        private void GetExpectedOreCount()
-        {
-            float rewardValue = Branch.Squad.MemberCount * 50f * Rand.Range(0.5f, 1.75f)
-                                * (Branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ExplorationTraining) ? 1.5f : 1f)
-                                * (Branch.IsBranchOfType(Branch.BranchType.Friendly) ? 1.2f : 1f);
-
-            Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: false);
-            if (map is null)
-            {
-                rewardValue *= 0.75f;
-            }
-            else
-            {
-                float distance = Branch.DistanceTo(map.Tile);
-                if (distance > 30f)
-                {
-                    rewardValue -= Mathf.Min((distance - 30f) * 0.01f, 0.25f);
-                }
-            }
-
-            rewardValue = Mathf.Clamp(rewardValue, 0f, 2000f);
-            bool hasReachMax = rewardValue >= 2000f;
-            int rewardCount = (int)Mathf.Clamp(rewardValue / StatExtension.GetStatValueAbstract(TargetOre, StatDefOf.MarketValue), 0, 500);
-            hasReachMax = hasReachMax || rewardCount >= 500;
-
-            (expectedOreCount, reachMax) = (rewardCount, hasReachMax);
-        }
-    }
-
-
-    [Unsaved] private readonly List<(PatrolEndType, float)> patrolEndChances;
-    [Unsaved] private int nextEndChancesGetTick = -1;
-    public List<(PatrolEndType, float)> PatrolEndChances
-    {
-        get
-        {
-            if (Find.TickManager.TicksGame > nextEndChancesGetTick)
-            {
-                RecachePatrolEndChances();
-            }
-            return patrolEndChances;
-        }
-    }
 
     private readonly RatkinOrder ratkinOrder;
     private BranchManager BranchManager => ratkinOrder.BranchManager;
 
     private bool isPatrolStarted = false;
+    public bool IsPatrolStarted => isPatrolStarted;
     [Unsaved] private bool isPatrolEnded = false;
 
     private int tickToNextStage = 180000;
     private int tickToNextCheck = 60000;
 
-    public bool IsPatrolStarted => isPatrolStarted;
-
-    private int adjustCeiling;
-    private int adjustCount;
     private int burdenSquadCount;
-
-    public int AdjustCeiling => adjustCeiling;
-    public int AdjustCount => adjustCount;
     public int BurdenSquadCount => burdenSquadCount;
 
-    private PatrolType patrolType;
-    public PatrolType PatrolTypeValue => patrolType;
+    private PatrolLevel patrolLevel;
+    public PatrolLevel PatrolLevelValue => patrolLevel;
 
     private List<JointBranchRecord> participants = [];
     [Unsaved] private HashSet<Branch> participantsHash = [];
     public IReadOnlyList<JointBranchRecord> Participants => participants;
+
+    private List<JointIncidentRecord> incidentRecords = [];
+    public IReadOnlyList<JointIncidentRecord> IncidentRecords => incidentRecords;
+
+    [Unsaved] private IReadOnlyDictionary<JointPatrolIncidentDef.IncidentType, List<JointPatrolIncidentDef>> potentialIncidents;
+    public IReadOnlyDictionary<JointPatrolIncidentDef.IncidentType, List<JointPatrolIncidentDef>> PotentialIncidents
+    {
+        get
+        {
+            potentialIncidents ??= DefDatabase<JointPatrolIncidentDef>.AllDefsListForReading.Where(d => !d.patrolLevelLimits.HasValue || d.patrolLevelLimits.Value == patrolLevel)
+                                                                                            .GroupBy(d => d.incidentType)
+                                                                                            .ToDictionary(g => g.Key, g => g.ToList());
+            return potentialIncidents;
+        }
+    }
 
     private float curReconnaissance;
     public float NeedReconnaissanceValue
     {
         get
         {
-            return patrolType switch
+            return patrolLevel switch
             {
-                PatrolType.Popedom => BranchManager.TotalKnights * 0.16f * 10f,
-                PatrolType.Kingdom => BranchManager.TotalKnights * 0.3f * 10f,
-                PatrolType.Border => BranchManager.TotalKnights * 0.44f * 10f,
+                PatrolLevel.Popedom => BranchManager.TotalKnights * 0.16f * 10f,
+                PatrolLevel.Kingdom => BranchManager.TotalKnights * 0.3f * 10f,
+                PatrolLevel.Border => BranchManager.TotalKnights * 0.44f * 10f,
                 _ => 0f,
             };
         }
     }
 
-    public StringBuilder endResultText = new();
-
     public JointPatrolManager(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        PatrolEndType[] patrolEndTypeArr = EnumArraryLibrary.PatrolEndTypeArr;
-        patrolEndChances = new List<(PatrolEndType, float)>(patrolEndTypeArr.Length)
-        {
-            (PatrolEndType.Nothing, 1f)
-        };
+    }
 
-        for (int i = 1; i < patrolEndTypeArr.Length; i++)
-        {
-            patrolEndChances.Add((patrolEndTypeArr[i], 0f));
-        }
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref isPatrolStarted, "isPatrolStarted", defaultValue: false);
+        Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
+        Scribe_Values.Look(ref tickToNextCheck, "tickToStart", 60000);
+
+        Scribe_Values.Look(ref patrolLevel, "CurPatrolType", PatrolLevel.Popedom);
+        Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
+
+        Scribe_Values.Look(ref curReconnaissance, "curReconnaissance", 0f);
+
+        Scribe_Collections.Look(ref participants, "participants", LookMode.Deep);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_JointPatrolManager(ratkinOrder));
@@ -186,11 +90,9 @@ public class JointPatrolManager : IExposable
         listing_Rect.Label($"TickToNextStage: {tickToNextStage}");
         listing_Rect.Label($"TickToNextCheck: {tickToNextCheck}");
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"AdjustCeiling: {adjustCeiling}");
-        listing_Rect.Label($"AdjustCount: {adjustCount}");
         listing_Rect.Label($"BurdenSquadCount: {burdenSquadCount}");
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"CurPatrolType: {patrolType}");
+        listing_Rect.Label($"CurPatrolType: {patrolLevel}");
         listing_Rect.Label($"CurReconnaissance: {curReconnaissance}");
     }
 
@@ -232,11 +134,6 @@ public class JointPatrolManager : IExposable
             }
             return;
         }
-
-        if (isPatrolStarted && tickToNextStage > 60000 && ratkinOrder.Relationship >= RelationshipKind.Acquaintance)
-        {
-            BranchSquadPassBy();
-        }
     }
 
     public bool IsParticipant(Branch branch) => participantsHash.Contains(branch);
@@ -269,22 +166,22 @@ public class JointPatrolManager : IExposable
     public bool TryStartPatrolPrep()
     {
         /*
-        * 选择联巡类型
+        * 选择联巡等级
         */
         try
         {
-            (PatrolType, int)[] typeChance =
+            (PatrolLevel, int)[] typeChance =
             [
-                (PatrolType.Popedom, 300),
-                (PatrolType.Kingdom, 200 + (int)(ratkinOrder.Funds / 0.01f * 5f)),
-                (PatrolType.Border, 10 + (int)(ratkinOrder.Funds / 0.01f * 6f + ratkinOrder.ReformationManager.ReformationsCount * 10f)),
+                (PatrolLevel.Popedom, 300),
+                (PatrolLevel.Kingdom, 200 + (int)(ratkinOrder.Funds / 0.01f * 5f)),
+                (PatrolLevel.Border, 10 + (int)(ratkinOrder.Funds / 0.01f * 6f + ratkinOrder.ReformationManager.ReformationsCount * 10f)),
             ];
-            patrolType = typeChance.RandomElementByWeight(r => r.Item2).Item1;
+            patrolLevel = typeChance.RandomElementByWeight(r => r.Item2).Item1;
         }
         catch (Exception ex)
         {
             Log.Error("Failed to set group patrol type: " + ex);
-            patrolType = PatrolType.Popedom;
+            patrolLevel = PatrolLevel.Popedom;
         }
 
         /*
@@ -346,16 +243,7 @@ public class JointPatrolManager : IExposable
         * 开始联巡准备
         */
         tickToNextStage = JointPatrolDurationPrepDays * 60000;
-        adjustCount = 0;
-        adjustCeiling = 0;
-        if (ratkinOrder.Relationship == RelationshipKind.Trustworthy)
-        {
-            adjustCeiling = ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ComprehensiveJointPatrolPreparation) ? 3 : 2;
-        }
-        else if (ratkinOrder.Relationship == RelationshipKind.Soulmate)
-        {
-            adjustCeiling = ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ComprehensiveJointPatrolPreparation) ? 6 : 4;
-        }
+
         return true;
     }
 
@@ -411,8 +299,6 @@ public class JointPatrolManager : IExposable
             return;
         }
 
-        RecachePatrolEndChances();
-
         curReconnaissance = 0f;
         StringBuilder endText = new();
         foreach (JointBranchRecord record in participants)
@@ -425,170 +311,52 @@ public class JointPatrolManager : IExposable
     {
         record.RecordUpdate();
         curReconnaissance += record.Reconnbissance;
-        if (record.IsExploration)
-        {
-            OrderLetter letter = OrderLetterUtility.MakeOrderLetter("OARO_LetterLabel_SquadExplorationResult".Translate(), "OARO_Letter_SquadExplorationResult".Translate(), OrderLetter.LetterType.Official, record.Branch.RatkinOrder, record.Branch.Name);
-            letter.RelatedThings = [new ThingDefCount(record.TargetOre, record.ExpectedResult.Item1)];
-            OrderLetterBox.Instance.ReceiveLetter(letter);
-        }
 
-        PatrolEndType endType = patrolEndChances.RandomElementByWeight(t => t.Item2).Item1;
-        switch (endType)
-        {
-            case PatrolEndType.Nothing: break;
-            case PatrolEndType.Normal: break;
-            case PatrolEndType.Friendly: break;
-            case PatrolEndType.Accident: break;
-            case PatrolEndType.Disaster: break;
-        }
+
     }
 
-    private (float fundGain, float reformProgressGain) GetJointPatrolEndResult()
+    private void PeriodicPatrolIncidentChecker()
     {
-        float reconnaissanceRate = Mathf.Clamp(curReconnaissance / NeedReconnaissanceValue, 0f, 2f);
-        float rewardMulti = patrolType switch
+        if (!isPatrolStarted)
         {
-            PatrolType.Popedom => 1f,
-            PatrolType.Kingdom => 2f,
-            PatrolType.Border => 4f,
-            _ => 1f,
-        };
-        float gainFund = 0f;
-        float gainReformProgress = 0f;
-        if (reconnaissanceRate < 0.5f)
-        {
-            gainFund = (reconnaissanceRate - 0.5f) * 0.002f * rewardMulti;
+            return;
         }
-        else if (reconnaissanceRate > 1f)
+        int ticksGame = Find.TickManager.TicksGame;
+        for (int i = 0; i < participants.Count; i++)
         {
-            gainFund = (reconnaissanceRate - 1f) * 0.0005f * rewardMulti;
-            gainReformProgress = (reconnaissanceRate - 1f) * 0.0005f * rewardMulti;
-            reconnaissanceRate -= 1f;
-        }
-        gainReformProgress += 5f * (1f + rewardMulti) * reconnaissanceRate;
-
-        return (gainFund, gainReformProgress);
-    }
-
-    private void RecachePatrolEndChances()
-    {
-        nextEndChancesGetTick = Find.TickManager.TicksGame + 30000;
-        float preparedMulti = ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ComprehensiveJointPatrolPreparation) ? 0.5f : 1f;
-
-        patrolEndChances.Clear();
-        switch (patrolType)
-        {
-            case PatrolType.Popedom:
-                patrolEndChances.Add((PatrolEndType.Nothing, 0.69f));
-                patrolEndChances.Add((PatrolEndType.Normal, 0.15f));
-                patrolEndChances.Add((PatrolEndType.Friendly, 0.08f));
-                patrolEndChances.Add((PatrolEndType.Accident, 0.07f * preparedMulti));
-                patrolEndChances.Add((PatrolEndType.Disaster, 0.01f * preparedMulti));
-                return;
-            case PatrolType.Kingdom:
-                patrolEndChances.Add((PatrolEndType.Nothing, 0.60f));
-                patrolEndChances.Add((PatrolEndType.Normal, 0.15f));
-                patrolEndChances.Add((PatrolEndType.Friendly, 0.1f));
-                patrolEndChances.Add((PatrolEndType.Accident, 0.12f * preparedMulti));
-                patrolEndChances.Add((PatrolEndType.Disaster, 0.03f * preparedMulti));
-                return;
-            case PatrolType.Border:
-                patrolEndChances.Add((PatrolEndType.Nothing, 0.52f));
-                patrolEndChances.Add((PatrolEndType.Normal, 0.16f));
-                patrolEndChances.Add((PatrolEndType.Friendly, 0.12f));
-                patrolEndChances.Add((PatrolEndType.Accident, 0.14f * preparedMulti));
-                patrolEndChances.Add((PatrolEndType.Disaster, 0.06f * preparedMulti));
-                return;
-            default:
-                patrolEndChances.Add((PatrolEndType.Nothing, 1f));
-                PatrolEndType[] patrolEndTypeArr = EnumArraryLibrary.PatrolEndTypeArr;
-                for (int i = 1; i < patrolEndTypeArr.Length; i++)
-                {
-                    patrolEndChances.Add((patrolEndTypeArr[i], 0f));
-                }
-                return;
-        }
-    }
-
-    private void BranchSquadPassBy()
-    {
-        List<(JointBranchRecord, int)> potentialPass = [];
-        foreach (JointBranchRecord record in participants)
-        {
-            if (!record.HadPassby)
+            if (ticksGame > participants[i].NextIncidentCheckTick)
             {
-                potentialPass.Add((record, record.Branch.IsBranchOfType(Branch.BranchType.Friendly) ? 3 : 1));
+                participants[i].NextIncidentCheckTick = ticksGame + Rand.Range(2 * 2500, 4 * 2500);
+                if (Rand.Chance(0.05f))
+                {
+                    return;
+                }
             }
         }
+    }
 
-        if (potentialPass.Count == 0)
+    private void TryTriggerPatrolIncident(JointBranchRecord record)
+    {
+        JointPatrolIncidentDef.IncidentType selIncidentType = JointPatrolIncidentDef.GetPotentialIncidentType(record);
+        if (!PotentialIncidents.TryGetValue(selIncidentType, out List<JointPatrolIncidentDef> potentialIncidentsOfType))
         {
             return;
         }
 
-        JointBranchRecord targetRecord = potentialPass.RandomElementByWeight(s => s.Item2).Item1;
-        potentialPass = null;
-        targetRecord.HadPassby = true;
-
-        Branch targetBranch = targetRecord.Branch;
-        bool targetFriendly = targetBranch.IsBranchOfType(Branch.BranchType.Friendly);
-        int relationShipDiff = ratkinOrder.Relationship - RelationshipKind.Acquaintance;
-
-        List<(int, float)> passByTypeList =
-        [
-            (0, Mathf.Max(0f, 75f - (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) - (targetFriendly ? 50f : 0f))),
-            (1, Mathf.Max(0f, 20f + (relationShipDiff > 0 ? relationShipDiff * 5f : 0f) + (targetFriendly ? 30f : 0f))),
-            (2, Mathf.Max(5f, 20f + (ratkinOrder.Relationship >= RelationshipKind.Soulmate ?  5f : 0f) + (targetFriendly ? 20f : 0f))),
-        ];
-
-        int passByType = passByTypeList.RandomElementByWeight(t => t.Item2).Item1;
-        passByTypeList = null;
-
-        switch (passByType)
+        Branch branch = record.Branch;
+        JointPatrolIncidentDef selIncident = potentialIncidentsOfType.Where(p => p.CanApply(branch)).RandomElementWithFallback(fallback: null);
+        if (selIncident is null)
         {
-            case 1:
-                Slate slate = new();
-                slate.SetBasicBranchSlateVar(targetBranch, alsoSetOrder: true);
-                if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_TemporaryEncampment, slate, forced: false))
-                {
-                    return;
-                }
-                else
-                {
-                    goto default;
-                }
-            case 2:
-                if (false)
-                {
-                    return;
-                }
-                else
-                {
-                    goto default;
-                }
-            default:
-                {
-                    Messages.Message("OARO_Message_GroupPatrolPassBy".Translate(targetBranch.Name), MessageTypeDefOf.NeutralEvent, historical: true);
-                    return;
-                }
+            return;
         }
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Values.Look(ref adjustCeiling, "adjustCeiling", 0);
-        Scribe_Values.Look(ref adjustCount, "adjustCount", 0);
-
-        Scribe_Values.Look(ref isPatrolStarted, "isPatrolStarted", defaultValue: false);
-        Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
-        Scribe_Values.Look(ref tickToNextCheck, "tickToStart", 60000);
-
-        Scribe_Values.Look(ref patrolType, "CurPatrolType", PatrolType.Popedom);
-        Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
-
-        Scribe_Values.Look(ref curReconnaissance, "curReconnaissance", 0f);
-
-        Scribe_Collections.Look(ref participants, "participants", LookMode.Deep);
+        selIncident.ApplyIncident(branch, out string description);
+        incidentRecords.Add(new JointIncidentRecord()
+        {
+            Def = selIncident,
+            RelatedBranch = branch,
+            Description = description,
+            TriggerTick = Find.TickManager.TicksGame
+        });
     }
 
     internal void PostLoadInit()

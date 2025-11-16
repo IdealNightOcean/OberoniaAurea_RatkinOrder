@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class UniqueIDManager : IExposable
 {
-    private Dictionary<string, int> uniqueIDs = new()
+    private Dictionary<string, int> uniqueIDs = new(2)
         {
             { "RatkinOrder", 0 },
             { "Branch", 0 }

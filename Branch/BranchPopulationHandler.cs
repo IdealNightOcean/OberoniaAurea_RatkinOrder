@@ -17,9 +17,19 @@ public class BranchPopulationHandler : IExposable, ITickDay
     }
 
     private int yesterdayPopulation;
-    private int yesterdayChange;
+    private int yesterdayPopChange;
     private readonly SimpleValueCache<float> naturalPopulationCeilingCache;
     public float PopulationRatio => population / naturalPopulationCeilingCache.GetCachedResult();
+
+
+    private float publicSecurity = 1f;
+    public float PublicSecurity
+    {
+        get => publicSecurity;
+        set => publicSecurity = Mathf.Clamp(value, 0.5f, 1.5f);
+    }
+    private float yesterdayPublicSecurity = 1f;
+    private float yesterdayPublicSecChange;
 
     private List<BranchContract> contracts = [];
     public IReadOnlyList<BranchContract> Contracts => contracts;
@@ -55,7 +65,12 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         Scribe_Values.Look(ref population, "population", 0);
         Scribe_Values.Look(ref yesterdayPopulation, "yesterdayPopulation", 0);
-        Scribe_Values.Look(ref yesterdayChange, "yesterdayChange", 0);
+        Scribe_Values.Look(ref yesterdayPopChange, "yesterdayChange", 0);
+
+        Scribe_Values.Look(ref publicSecurity, "publicSecurity", 1f);
+        Scribe_Values.Look(ref yesterdayPublicSecurity, "yesterdayPublicSecurity", 1f);
+        Scribe_Values.Look(ref yesterdayPublicSecChange, "yesterdayPublicSecChange", 0f);
+
         Scribe_Collections.Look(ref contracts, "contracts", LookMode.Deep);
         Scribe_Values.Look(ref hasContractBuff, "hasContractBuff", defaultValue: false);
 
@@ -70,13 +85,15 @@ public class BranchPopulationHandler : IExposable, ITickDay
         listing_Rect.Label($"Population: {population}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"YesterdayPopulation: {yesterdayPopulation}");
-        listing_Rect.Label($"YesterdayChange: {yesterdayChange}");
+        listing_Rect.Label($"YesterdayChange: {yesterdayPopChange}");
     }
 
     public void TickDay()
     {
         DailyPopulationChange();
         DailyContractCheck();
+        DailyPublicSecurityCheck();
+
         if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.ContractAddCheck))
         {
             ContractAddCheck();
@@ -94,7 +111,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
         dailyGrowth *= Rand.Range(0.75f, 1.25f);
 
         population += Mathf.RoundToInt(dailyGrowth);
-        yesterdayChange = population - yesterdayPopulation;
+        yesterdayPopChange = population - yesterdayPopulation;
         yesterdayPopulation = population;
     }
 
@@ -110,6 +127,21 @@ public class BranchPopulationHandler : IExposable, ITickDay
             }
         }
         hasContractBuff = false;
+    }
+
+    private void DailyPublicSecurityCheck()
+    {
+        if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.PublicSecurityCheck))
+        {
+            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.PublicSecurityCheck, cdTicks: 3 * 60000, shouldRemoveWhenExpired: false);
+            if (Rand.Chance(0.2f))
+            {
+                PublicSecurity -= (publicSecurity * 0.05f) * Rand.Range(0.5f, 1.5f);
+            }
+        }
+
+        yesterdayPublicSecChange = publicSecurity - yesterdayPopulation;
+        yesterdayPublicSecurity = publicSecurity;
     }
 
     private void ContractAddCheck()
@@ -148,5 +180,8 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         population = (int)(naturalPopulationCeilingCache.GetCachedResult() * Rand.Range(0.3f, 0.7f));
         yesterdayPopulation = population;
+
+        publicSecurity = 1f;
+        yesterdayPublicSecurity = 1f;
     }
 }

@@ -22,7 +22,8 @@ public class BranchTaskDef : Def
     [Unsaved] private BranchTaskStartChecker startChecker;
     public BranchTaskStartChecker StartChecker => startChecker ??= (startCheckerClass == DefaultStartCheckerClass) ? DefaultStartChecker : (BranchTaskStartChecker)Activator.CreateInstance(startCheckerClass);
 
-    public TaskPriority priority = TaskPriority.Low;
+    public TaskPriority priority;
+    public BranchTaskType taskType;
 
     public bool isOutdoorTask; //是否为户外任务
     public bool canInterrupted = true;

@@ -17,6 +17,7 @@ public static class KeyLibrary_CDRecord
     public const string NormalDemandPeriodic = "NormalDemandPeriodic"; // 普通需求周期检查
     public const string NormalDemandAdd = "NormalDemandAdd"; // 普通需求添加
 
+    public const string PublicSecurityCheck = "PublicSecurityCheck"; //分部治安度检测
     public const string ContractAddCheck = "ContractAddCheck"; //分部合约检测
 
     public const string DemandFriendlyInform = "DemandFriendlyInform"; // 友好分部需求告知
@@ -28,5 +29,5 @@ public static class KeyLibrary_CDRecord
 
     public const string MercyQuestTryTriggered = "MercyQuestTryTriggered"; //善行任务触发
 
-    public const string AttackedOnTask = "AttackedOnTask"; //在任务中被攻击
+    public const string BeAttackedOnTask = "BeAttackedOnTask"; //在任务中被攻击
 }

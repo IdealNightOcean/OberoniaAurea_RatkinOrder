@@ -9,6 +9,8 @@ public class BranchMedalDef : Def
 {
     private static readonly Type defaultBuffWorkerClass = typeof(BranchMedalBuffWorker);
 
+    public BranchTaskType focusedTaskType;
+
     public Color color;
 
     protected Type buffWorkerClass = defaultBuffWorkerClass;

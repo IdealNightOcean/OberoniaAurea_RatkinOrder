@@ -9,6 +9,8 @@ public class BranchTask : IExposable
 {
     private BranchTaskDef def;
     public BranchTaskDef Def => def;
+    public string Label => def.label;
+    public BranchTaskType TaskType => def.taskType;
 
     private bool isOngoing;
     public bool IsOngoing => isOngoing;

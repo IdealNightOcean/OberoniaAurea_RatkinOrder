@@ -27,6 +27,8 @@ public class BranchMedalHandler : IExposable
         }
     }
 
+    public BranchTaskType FocusedTaskType => PrimaryMedal?.focusedTaskType ?? BranchTaskType.General;
+
     public int MedalTypeCount => medalRecords.Count;
     public IReadOnlyDictionary<BranchMedalDef, BranchMedalRecord> MedalRecords => medalRecords;
 

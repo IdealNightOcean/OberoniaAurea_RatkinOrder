@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -7,17 +8,24 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 {
+    public enum RadicalismDegree
+    {
+        StabilityFocused, // 维稳
+        Standard,         // 常规
+        Aggressive        // 激进
+    }
 
     [Unsaved] private readonly Branch branch;
 
-    private BranchTask curTask;
-    private int restEndTick = -1;
+    public BranchTaskType FocusedTaskType;
+    public RadicalismDegree CurRadicalismDegree;
 
+    private BranchTask curTask;
     public BranchTask CurTask => curTask;
     public bool HasTask => curTask is not null;
-    public bool IsRestNow => Find.TickManager.TicksGame < restEndTick;
 
-    public string TaskLabel => curTask?.Def.label;
+    private int restEndTick = -1;
+    public bool IsRestNow => Find.TickManager.TicksGame < restEndTick;
 
     private BranchTaskDef autoTargetTask;
     private int autoStartFailCount;
@@ -30,11 +38,25 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         autoStartTaskChance = BaseAutoStartTaskChance(branch);
     }
 
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref FocusedTaskType, "FocusedTaskType", BranchTaskType.General);
+        Scribe_Values.Look(ref CurRadicalismDegree, "CurRadicalismDegree", RadicalismDegree.Standard);
+
+        Scribe_Deep.Look(ref curTask, "curTask");
+        Scribe_Values.Look(ref restEndTick, "squadRestEndTick", -1);
+
+        Scribe_Defs.Look(ref autoTargetTask, "autoTargetTask");
+        Scribe_Values.Look(ref autoStartFailCount, "autoStartFailCount", 0);
+        Scribe_Values.Look(ref autoStartTaskChance, "autoStartTaskChance", 0f);
+    }
+
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
+        listing_Rect.Label($"FocusedTaskType: {FocusedTaskType}");
         if (HasTask)
         {
-            listing_Rect.Label($"CurTask: {TaskLabel}");
+            listing_Rect.Label($"CurTask: {curTask.Label}");
 
             listing_Rect.SubLabel($"StartTask: {curTask.StartTick}", 0.8f);
             listing_Rect.SubLabel($"DurationTick: {curTask.DurationTick}", 0.8f);
@@ -92,6 +114,14 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             return resultOnly ? false : "OARO_BranchOnJointPatrolNow".Translate();
         }
 
+        int beAttackedCooling = branch.CooldownManager.GetCooldownTicksLeft(KeyLibrary_CDRecord.BeAttackedOnTask);
+        if (beAttackedCooling > 0)
+        {
+            return resultOnly ? false : "OARO_Cooling_BeAttackedOnTask".Translate().Colorize(ColorLibrary.RedReadable)
+                                        + " "
+                                        + "WaitTime".Translate(beAttackedCooling.ToStringTicksToPeriod());
+        }
+
         if (!HasTask)
         {
             if (!newTaskDef.ignoreRest && IsRestNow)
@@ -99,7 +129,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
                 return resultOnly ? false : "OARO_SquadIsRestNow".Translate();
             }
 
-            return newTaskDef?.StartChecker.CanStartNow(branch) ?? true;
+            return newTaskDef?.StartChecker.CanStartNow(branch, resultOnly) ?? true;
         }
 
         if (newTaskDef is null)
@@ -264,7 +294,8 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (autoStartFailCount >= 10 || autoTargetTask is null)
         {
-            autoTargetTask = DefDatabase<BranchTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen).RandomElementByWeightWithFallback(WeightSelector, BranchTaskDefOf.OARO_JurisdictionDutyPrep);
+            autoTargetTask = DefDatabase<BranchTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen && FocusedTaskType == t.taskType)
+                                                               .RandomElementByWeightWithFallback((d) => d.StartChecker?.RandomlyChosenWeight(branch) ?? 0f, BranchTaskDefOf.OARO_JurisdictionDutyPrep);
         }
 
         if (Rand.Chance(usedChance) && autoTargetTask is not null)
@@ -278,18 +309,6 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
                 autoStartFailCount++;
             }
         }
-
-        float WeightSelector(BranchTaskDef def) => def.StartChecker?.RandomlyChosenWeight(branch) ?? 0f;
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Deep.Look(ref curTask, "curTask");
-        Scribe_Values.Look(ref restEndTick, "squadRestEndTick", -1);
-
-        Scribe_Defs.Look(ref autoTargetTask, "autoTargetTask");
-        Scribe_Values.Look(ref autoStartFailCount, "autoStartFailCount", 0);
-        Scribe_Values.Look(ref autoStartTaskChance, "autoStartTaskChance", 0f);
     }
 
     internal void PostLoadInit()

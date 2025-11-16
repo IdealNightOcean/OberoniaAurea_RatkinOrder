@@ -30,7 +30,7 @@ public class QuestNode_AddBranchClique : QuestNode_AddGeneralClique
         questClique.InitForBranch(branch);
         if (!initPotency.GetValue(slate).HasValue)
         {
-            questClique.Potency = QuestClique.BranchPotencyToCliquePotency(50);
+            questClique.Potency = QuestClique.BranchPotencyToCliquePotency(branch.Potency);
         }
         if (!initWillingness.GetValue(slate).HasValue)
         {

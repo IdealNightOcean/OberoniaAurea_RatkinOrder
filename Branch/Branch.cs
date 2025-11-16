@@ -62,6 +62,9 @@ public class Branch : IExposable, ILoadReferenceable
         set => supply = Mathf.Clamp(value, 0f, supplyCeilingCache.GetCachedResult());
     }
 
+    [Unsaved] private SimpleValueCache<float> potencyCache;
+    public float Potency => potencyCache.GetCachedResult();
+
     [Unsaved] private bool isIdleNow = true;
     [Unsaved] private bool isOutdoorNow = true;
     [Unsaved] private string curWorkState = string.Empty;
@@ -136,6 +139,7 @@ public class Branch : IExposable, ILoadReferenceable
         RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
         TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
         supplyCeilingCache = new(cacheInterval: 60000, defaultValue: BranchStatDefOf.OARO_SupplyCeiling.baseValue, () => this.GetStatValue(BranchStatDefOf.OARO_SupplyCeiling));
+        potencyCache = new(cacheInterval: 2500, defaultValue: 1f, GetCurPotency);
 
         if (initCtor)
         {
@@ -315,6 +319,12 @@ public class Branch : IExposable, ILoadReferenceable
         squad.Rename(ordinal, nameCore);
     }
 
+    public void Destroy()
+    {
+        residentHandler.ForceEndAllResidency();
+        baseSite?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
+    }
+
     private void UpdateWorkState()
     {
         CooldownManager.RegisterRecord(KeyLibrary_CDRecord.BranchWorkState, cdTicks: 6 * 2500);
@@ -323,7 +333,7 @@ public class Branch : IExposable, ILoadReferenceable
         {
             isIdleNow = false;
             isOutdoorNow = taskHandler.CurTask.Def.isOutdoorTask;
-            curWorkState = taskHandler.TaskLabel;
+            curWorkState = taskHandler.CurTask.Label;
             return;
         }
 
@@ -347,10 +357,13 @@ public class Branch : IExposable, ILoadReferenceable
         curWorkState = "OARO_BranchWorkState_Idle".Translate();
     }
 
-    public void Destroy()
+    private float GetCurPotency()
     {
-        residentHandler.ForceEndAllResidency();
-        baseSite?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
+        float curPotency = squad.AllCrewCount * 7f
+                         * (0.9f + facilityHandler.TotalFacilityLevel * 0.025f + medalHandler.TotalMedalCount * 0.015f)
+                         * (IsBranchOfType(BranchType.Honor) ? 1.25f : 1f);
+
+        return curPotency * 0.01f;
     }
 
     private void PostGenerated()
@@ -368,6 +381,7 @@ public class Branch : IExposable, ILoadReferenceable
 
         residentHandler.PostBranchGenerated();
 
+        taskHandler.FocusedTaskType = medalHandler.FocusedTaskType;
         curWorkState = "OARO_SquadState_Idle".Translate();
     }
 

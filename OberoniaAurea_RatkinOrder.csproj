@@ -94,6 +94,7 @@
     <Compile Include="BranchStat\BranchStatPart_NaturalPopulationCeiling.cs" />
     <Compile Include="BranchStat\BranchStatPart_DailyPopulationGrowth.cs" />
     <Compile Include="BranchTask\BranchTask.cs" />
+    <Compile Include="BranchTask\BranchTaskType.cs" />
     <Compile Include="BranchTask\BranchTask_JurisdictionDuty.cs" />
     <Compile Include="Branch\BranchContract.cs" />
     <Compile Include="Branch\BranchContractRewardWorker.cs" />
@@ -104,6 +105,8 @@
     <Compile Include="DefOf\BranchMedalDefOf.cs" />
     <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
+    <Compile Include="Def\JointPatrolIncidentDef.cs" />
+    <Compile Include="JointPatrolManager_SubType.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
@@ -136,8 +139,8 @@
     <Compile Include="Hediff\Hediff_Knight.cs" />
     <Compile Include="Hediff\Hediff_ResidentKnightBuff.cs" />
     <Compile Include="Job\JobDriver_PlagueSample.cs" />
-    <Compile Include="KeyLibrary\KeyLibrary_EffectTag.cs" />
-    <Compile Include="KeyLibrary\KeyLibrary_QuestCliqueKey.cs" />
+    <Compile Include="DataLibrary\KeyLibrary_EffectTag.cs" />
+    <Compile Include="DataLibrary\KeyLibrary_QuestCliqueKey.cs" />
     <Compile Include="KnightPawnsManager.cs" />
     <Compile Include="Letter\ChoiceLetter_AutoUpgradeRelationship.cs" />
     <Compile Include="GlobalInteraction\AroundKnightGroup.cs" />
@@ -241,14 +244,14 @@
     <Compile Include="Thought\ThoughtWorker_ResidentKnightSocial.cs" />
     <Compile Include="Thought\Thought_VisitingKnight.cs" />
     <Compile Include="Utility\BranchConstructUtility.cs" />
-    <Compile Include="Utility\EnumArraryLibrary.cs" />
-    <Compile Include="Utility\IconLibrary.cs" />
+    <Compile Include="DataLibrary\EnumArraryLibrary.cs" />
+    <Compile Include="DataLibrary\IconLibrary.cs" />
     <Compile Include="Utility\KnightPersonalityUtility.cs" />
     <Compile Include="Utility\WindowUtility.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
     <Compile Include="Utility\QuestUtility.cs" />
     <Compile Include="Utility\RelationshipUtility.cs" />
-    <Compile Include="KeyLibrary\KeyLibrary_InteractRecord.cs" />
+    <Compile Include="DataLibrary\KeyLibrary_InteractRecord.cs" />
     <Compile Include="Components\OrderDefDataBase.cs" />
     <Compile Include="Window\DevWindow\DevWindowBase.cs" />
     <Compile Include="Window\Dialog_NodeTreeWithRatkinOrderInfo.cs" />
@@ -353,9 +356,9 @@
     <Compile Include="Utility\MapUtility.cs" />
     <Compile Include="Utility\OrderHallUtility.cs" />
     <Compile Include="Utility\TalkActionUtility.cs" />
-    <Compile Include="KeyLibrary\KeyLibrary_CDRecord.cs" />
+    <Compile Include="DataLibrary\KeyLibrary_CDRecord.cs" />
     <Compile Include="Utility\RecommendationUtility.cs" />
-    <Compile Include="KeyLibrary\KeyLibrary_SlateStoreAs.cs" />
+    <Compile Include="DataLibrary\KeyLibrary_SlateStoreAs.cs" />
     <Compile Include="Utility\TickUtility.cs" />
     <Compile Include="Utility\ModUtility.cs" />
     <Compile Include="Utility\GlobalInteractionUtility.cs" />

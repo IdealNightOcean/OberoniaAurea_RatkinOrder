@@ -460,7 +460,7 @@ public class Window_Branch : OrderWindowBase
             DrawBulding(entryRect, buildingHandler.SpecialBuilding, isSpecialSlot: true);
         }
 
-        IReadOnlyList<BranchBuilding> buildings = branch.BuildingHandler.Buildings;
+        IReadOnlyList<BranchBuilding> buildings = branch.BuildingHandler.NormalBuildings;
         for (int i = 0; i < buildings.Count; i++)
         {
             AdjustEntryRect();
@@ -1539,7 +1539,7 @@ public class Window_Branch : OrderWindowBase
     {
         optionalBuildingDefs = new(Mathf.RoundToInt(DefDatabase<BranchBuildingDef>.DefCount * 0.5f));
         BranchBuildingHandler buildingHandler = branch.BuildingHandler;
-        HashSet<BranchBuildingDef> existBuildingDefs = buildingHandler.Buildings.Select(b => b.Def).ToHashSet();
+        HashSet<BranchBuildingDef> existBuildingDefs = buildingHandler.NormalBuildings.Select(b => b.Def).ToHashSet();
         if (buildingHandler.SpecialBuilding is not null)
         {
             existBuildingDefs.Add(buildingHandler.SpecialBuilding.Def);

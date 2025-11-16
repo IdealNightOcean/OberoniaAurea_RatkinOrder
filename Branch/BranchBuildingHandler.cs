@@ -3,6 +3,8 @@ using RimWorld;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Runtime.CompilerServices;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -13,14 +15,51 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     [Unsaved] private SimpleValueCache<int> buildingCeilingCache;
     public int BuildingCeiling => buildingCeilingCache.GetCachedResult();
-    public bool HasUnusedNormalSlots => buildings.Count < BuildingCeiling;
-    public bool IsNormalBuildingFullyCompleted => buildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
+    public bool HasUnusedNormalSlots => noramlBuildings.Count < BuildingCeiling;
+    public bool IsNormalBuildingFullyCompleted => noramlBuildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
 
-    private List<BranchBuilding> buildings = [];
+    private List<BranchBuilding> noramlBuildings = [];
     private BranchBuilding specialBuilding;
 
-    public IReadOnlyList<BranchBuilding> Buildings => buildings;
+    public IReadOnlyList<BranchBuilding> NormalBuildings => noramlBuildings;
     public BranchBuilding SpecialBuilding => specialBuilding;
+    public IEnumerable<BranchBuilding> AllBuldings
+    {
+        get
+        {
+            if (specialBuilding is not null)
+            {
+                yield return specialBuilding;
+            }
+            foreach (BranchBuilding building in noramlBuildings)
+            {
+                yield return building;
+            }
+        }
+    }
+
+    [Unsaved] private HashSet<BranchBuildingDef> allBuildingDefsHash;
+    [Unsaved] private bool buildingDefsDirty = true;
+    private HashSet<BranchBuildingDef> AllBuildingDefsHash
+    {
+        get
+        {
+            if (buildingDefsDirty)
+            {
+                if (allBuildingDefsHash is null)
+                {
+                    allBuildingDefsHash = new(noramlBuildings.Count + 1);
+                }
+                else
+                {
+                    allBuildingDefsHash.Clear();
+                }
+                buildingDefsDirty = false;
+                allBuildingDefsHash.AddRange(AllBuldings.Select(b => b.Def));
+            }
+            return allBuildingDefsHash;
+        }
+    }
 
     [Unsaved] private List<ITickHour<Branch>> tickHourHandlers;
     [Unsaved] private List<ITickDay<Branch>> tickDayHandlers;
@@ -40,7 +79,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref buildings, "buildings", LookMode.Deep);
+        Scribe_Collections.Look(ref noramlBuildings, "noramlBuildings", LookMode.Deep);
         Scribe_Deep.Look(ref specialBuilding, "specialBuilding");
 
         Scribe_Deep.Look(ref underConstructionBuilding, "underConstructionBuilding");
@@ -59,8 +98,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"NormalBuildings: {buildings.Count}");
-        foreach (BranchBuilding building in buildings)
+        listing_Rect.Label($"NormalBuildings: {noramlBuildings.Count}");
+        foreach (BranchBuilding building in noramlBuildings)
         {
             listing_Rect.SubLabel(building.Def.label, 0.8f);
         }
@@ -109,12 +148,12 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             UpgradeBuilding(specialBuilding);
         }
 
-        for (int i = 0; i < buildings.Count; i++)
+        for (int i = 0; i < noramlBuildings.Count; i++)
         {
-            if (CanUpgradeBuilding(buildings[i]))
+            if (CanUpgradeBuilding(noramlBuildings[i]))
             {
-                buildings[i].InitUpgraded();
-                UpgradeBuilding(buildings[i]);
+                noramlBuildings[i].InitUpgraded();
+                UpgradeBuilding(noramlBuildings[i]);
             }
         }
 
@@ -127,30 +166,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    public bool HasBuilding(BranchBuildingDef buildingDef, bool strictMatch = false)
-    {
-        if (buildingDef.isSpecial)
-        {
-            if (specialBuilding?.Def == buildingDef)
-            {
-                return true;
-            }
-            else if (!strictMatch)
-            {
-                return false;
-            }
-        }
-
-        for (int i = 0; i < buildings.Count; i++)
-        {
-            if (buildings[i].Def == buildingDef)
-            {
-                return true;
-            }
-        }
-
-        return false;
-    }
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool HasBuilding(BranchBuildingDef buildingDef) => AllBuildingDefsHash.Contains(buildingDef);
 
     public BranchBuilding GetBuilding(BranchBuildingDef buildingDef, bool strictMatch = false)
     {
@@ -166,11 +183,11 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             }
         }
 
-        for (int i = 0; i < buildings.Count; i++)
+        for (int i = 0; i < noramlBuildings.Count; i++)
         {
-            if (buildings[i].Def == buildingDef)
+            if (noramlBuildings[i].Def == buildingDef)
             {
-                return buildings[i];
+                return noramlBuildings[i];
             }
         }
         return null;
@@ -289,8 +306,9 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
         else
         {
-            buildings.Add(newBuilding);
+            noramlBuildings.Add(newBuilding);
         }
+        buildingDefsDirty = true;
 
         newBuilding.InitActive();
         ActiveBuilding(newBuilding);
@@ -316,8 +334,9 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
         else
         {
-            buildings.Remove(building);
+            noramlBuildings.Remove(building);
         }
+        buildingDefsDirty = true;
 
         if (building is ITickHour<Branch> ticksLong)
         {
@@ -375,9 +394,9 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             transformer.MergeWith(tempTransformer);
         }
 
-        for (int i = 0; i < buildings.Count; i++)
+        for (int i = 0; i < noramlBuildings.Count; i++)
         {
-            if (buildings[i].TryGetStatTransformer(statDef, out tempTransformer))
+            if (noramlBuildings[i].TryGetStatTransformer(statDef, out tempTransformer))
             {
                 hasTransformer = true;
                 transformer.MergeWith(tempTransformer);
@@ -394,20 +413,20 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
             ActiveBuilding(specialBuilding);
         }
 
-        if (buildings is null)
+        if (noramlBuildings is null)
         {
-            buildings = [];
+            noramlBuildings = [];
             return;
         }
 
-        if (buildings.RemoveAll(b => b is null) > 0)
+        if (noramlBuildings.RemoveAll(b => b is null) > 0)
         {
             Log.Error($"{branch} has null buildings after loading, Removed.");
         }
 
-        for (int i = 0; i < buildings.Count; i++)
+        for (int i = 0; i < noramlBuildings.Count; i++)
         {
-            ActiveBuilding(buildings[i]);
+            ActiveBuilding(noramlBuildings[i]);
         }
     }
 

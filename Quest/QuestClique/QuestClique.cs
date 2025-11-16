@@ -116,7 +116,7 @@ public class QuestClique : IExposable
     /// </summary>
     public static float BranchPotencyToCliquePotency(float branchPotency)
     {
-        return Mathf.Clamp(branchPotency, 0f, 0.5f);
+        return Mathf.Clamp(branchPotency * 0.07f, 0.05f, 1f);
     }
 
     public static string GetBranchCliqueKey(Branch branch) => branch is null ? string.Empty : "BranchClique_" + branch.GetUniqueLoadID();
