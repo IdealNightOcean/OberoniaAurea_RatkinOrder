@@ -101,12 +101,16 @@
     <Compile Include="Branch\BranchMedalRecord.cs" />
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
+    <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
     <Compile Include="DefOf\BranchResidentDefOf.cs" />
     <Compile Include="DefOf\BranchMedalDefOf.cs" />
     <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
-    <Compile Include="JointPatrolManager_SubType.cs" />
+    <Compile Include="JointPatrol\JointPatrolIncidentPart.cs" />
+    <Compile Include="JointPatrol\JointPatrolIncidentPart_Fund.cs" />
+    <Compile Include="JointPatrol\JointPatrolIncidentPart_JointPatrolPotency.cs" />
+    <Compile Include="JointPatrol\JointPatrolManager_SubType.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
@@ -401,7 +405,7 @@
     <Compile Include="Interface\ITicks.cs" />
     <Compile Include="MapComponent_RatkinOrder.cs" />
     <Compile Include="BranchTask\BranchTaskStartChecker.cs" />
-    <Compile Include="RatkinOrder\JointPatrolManager.cs" />
+    <Compile Include="JointPatrol\JointPatrolManager.cs" />
     <Compile Include="Utility\BranchSupportUtility.cs" />
     <Compile Include="Def\BranchTaskDef.cs" />
     <Compile Include="Branch\BranchTaskHandler.cs" />

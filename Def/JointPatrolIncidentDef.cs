@@ -94,30 +94,3 @@ public class JointPatrolIncidentDef : Def
         effectExplain = explainSB.ToString();
     }
 }
-
-public abstract class JointPatrolIncidentPart
-{
-    public abstract void ApplyPart(JointPatrolIncidentDef def, Branch branch, StringBuilder effectExplain);
-}
-
-public class JointPatrolIncidentPart_Fund : JointPatrolIncidentPart
-{
-    [MustTranslate]
-    public string changeReason;
-    public float change;
-
-    public override void ApplyPart(JointPatrolIncidentDef def, Branch branch, StringBuilder effectExplain)
-    {
-        branch.RatkinOrder.FundHandler.AdjustFundsImmediately(change, changeReason);
-        effectExplain.AppendLine("OARO_ChangeOffset_Fund".Translate(change.ToStringPercentSigned("0.##")));
-    }
-}
-
-public class JointPatrolIncidentPart_JointPatrolPotency : JointPatrolIncidentPart
-{
-    private float potencyOffset;
-    public override void ApplyPart(JointPatrolIncidentDef def, Branch branch, StringBuilder effectExplain)
-    {
-
-    }
-}
