@@ -116,7 +116,11 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             }
             catch (Exception ex)
             {
-                Log.Error($"An exception occurred in {nameof(BranchResident)}.{nameof(resident.EndResidency)}.\nException:\n{ex.Message}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "end residency",
+                    typeName: nameof(BranchResidentHandler),
+                    methodName: nameof(FinishResidency),
+                    needStackTrace: true);
             }
             finally
             {

@@ -169,7 +169,11 @@ public class OrderHallHandler : IExposable
         }
         catch (Exception ex)
         {
-            Log.Error($"Exception occurred on {nameof(OrderHallHandler)}.{nameof(RecacheOrderHallBuildings)}.\nException:\n{ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"recache order hall buildings",
+                typeName: nameof(OrderHallHandler),
+                methodName: nameof(RecacheOrderHallBuildings),
+                needStackTrace: true);
         }
     }
 }

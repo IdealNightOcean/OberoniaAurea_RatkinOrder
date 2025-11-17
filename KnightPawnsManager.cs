@@ -50,11 +50,7 @@ public static class KnightPawnsManager
     public static bool TryGetKnightRecord(this Pawn pawn, out KnightRecord record)
     {
         record = null;
-        if (CanBeKnight(pawn) && knights.TryGetValue(pawn, out record))
-        {
-            return true;
-        }
-        return false;
+        return CanBeKnight(pawn) && knights.TryGetValue(pawn, out record);
     }
 
     public static RatkinOrder GetKnightOrder(this Pawn pawn)

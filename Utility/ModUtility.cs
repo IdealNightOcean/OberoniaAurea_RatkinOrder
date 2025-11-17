@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.Planet;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -147,6 +148,19 @@ public static class ModUtility
         foreach (Rule worldObjRule in GrammarUtility.RulesForWorldObject(prefix + "Site", branch.BaseSite))
         {
             yield return worldObjRule;
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void LogExceptionError(Exception ex, string errorDesc, string typeName, string methodName, bool needStackTrace = false)
+    {
+        if (needStackTrace)
+        {
+            Log.Error($"An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex}");
+        }
+        else
+        {
+            Log.Error($"An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex.Message}");
         }
     }
 }

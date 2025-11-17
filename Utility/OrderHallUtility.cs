@@ -45,7 +45,11 @@ public static class OrderHallUtility
         }
         catch (Exception ex)
         {
-            Log.Error($"Exception occurred on {nameof(OrderHallUtility)}.{nameof(GetOrderHallLevel)}.\nException:\n{ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"get order hall level",
+                typeName: nameof(OrderHallUtility),
+                methodName: nameof(GetOrderHallLevel),
+                needStackTrace: true);
             return maxPotentialLevel;
         }
     }

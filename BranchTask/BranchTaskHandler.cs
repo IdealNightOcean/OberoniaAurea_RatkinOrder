@@ -1,6 +1,6 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
 
@@ -8,72 +8,81 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 {
-    private float BaseAutoStartTaskChance => Squad.IsBranchSquadOfType(Branch.BranchType.Mobile) ? 0.05f : 0.02f;
+    public enum RadicalismDegree
+    {
+        StabilityFocused, // 维稳
+        Standard,         // 常规
+        Aggressive        // 激进
+    }
 
     [Unsaved] private readonly Branch branch;
 
-    private BranchTask curTask;
-    private int curTaskStartTick = -1;
-    private int curTaskTickLeft = -1;
-    private int squadRestEndTick = -1;
+    public BranchTaskType FocusedTaskType;
+    public RadicalismDegree CurRadicalismDegree;
 
+    private BranchTask curTask;
     public BranchTask CurTask => curTask;
     public bool HasTask => curTask is not null;
-    public int CurTaskDuration => curTaskStartTick > 0 ? Find.TickManager.TicksGame - curTaskStartTick : 0;
-    public bool IsCurTaskOngoing => curTaskTickLeft > 0;
-    public bool IsRestNow => Find.TickManager.TicksGame < squadRestEndTick;
 
-    public string TaskState => curTask?.Def.LabelCap;
-    public bool BlockSupport => curTask?.Def.blockSupport ?? false; //是否阻止恢复
-    public bool BlockRecover => curTask?.Def.blockRecover ?? false; //是否阻止恢复
-    public bool BlockBombard => curTask?.Def.blockBombard ?? false; //是否阻止恢复
+    private int restEndTick = -1;
+    public bool IsRestNow => Find.TickManager.TicksGame < restEndTick;
 
-
-    private SquadTaskDef autoTargetTask;
+    private BranchTaskDef autoTargetTask;
     private int autoStartFailCount;
     private float autoStartTaskChance;
     public float AutoStartTaskChance => autoStartTaskChance;
 
-    public BranchTaskHandler(Branch branch)
+    internal BranchTaskHandler(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        autoStartTaskChance = BaseAutoStartTaskChance;
+        autoStartTaskChance = BaseAutoStartTaskChance(branch);
+    }
+
+    public void ExposeData()
+    {
+        Scribe_Values.Look(ref FocusedTaskType, "FocusedTaskType", BranchTaskType.General);
+        Scribe_Values.Look(ref CurRadicalismDegree, "CurRadicalismDegree", RadicalismDegree.Standard);
+
+        Scribe_Deep.Look(ref curTask, "curTask");
+        Scribe_Values.Look(ref restEndTick, "squadRestEndTick", -1);
+
+        Scribe_Defs.Look(ref autoTargetTask, "autoTargetTask");
+        Scribe_Values.Look(ref autoStartFailCount, "autoStartFailCount", 0);
+        Scribe_Values.Look(ref autoStartTaskChance, "autoStartTaskChance", 0f);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label("CurTask:");
+        listing_Rect.Label($"FocusedTaskType: {FocusedTaskType}");
         if (HasTask)
         {
-            listing_Rect.SubLabel(TaskState, 0.8f);
-            listing_Rect.SubLabel($"CurTaskStartTick: {curTaskStartTick}", 0.8f);
-            listing_Rect.SubLabel($"CurTaskTickLeft: {curTaskTickLeft}", 0.8f);
+            listing_Rect.Label($"CurTask: {curTask.Label}");
 
-            listing_Rect.Gap(3f);
-            listing_Rect.SubLabel($"BlockSupport: {BlockSupport}", 0.8f);
-            listing_Rect.SubLabel($"BlockRecover: {BlockRecover}", 0.8f);
-            listing_Rect.SubLabel($"BlockBombard: {BlockBombard}", 0.8f);
+            listing_Rect.SubLabel($"StartTask: {curTask.StartTick}", 0.8f);
+            listing_Rect.SubLabel($"DurationTick: {curTask.DurationTick}", 0.8f);
+            listing_Rect.SubLabel($"DurationLeft: {curTask.DurationLeft}", 0.8f);
+            listing_Rect.SubLabel($"Progress: {curTask.Progress}", 0.8f);
+            listing_Rect.SubLabel($"IsOngoing: {curTask.IsOngoing}", 0.8f);
         }
         else
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.Label("CurTask: None");
         }
 
         listing_Rect.Gap(6f);
         listing_Rect.Label($"IsRestNow: {IsRestNow}");
-        listing_Rect.Label($"SquadRestEndTick: {squadRestEndTick}");
+        listing_Rect.Label($"RestEndTick: {restEndTick}");
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label("AutoTargetTask:");
-        if (autoTargetTask is not null)
+        if (autoTargetTask is null)
         {
-            listing_Rect.SubLabel($"{autoTargetTask.label}", 0.8f);
-            listing_Rect.SubLabel($"AutoStartFailCount: {autoStartFailCount}", 0.8f);
+            listing_Rect.Label("AutoTargetTask: None");
             listing_Rect.SubLabel($"AutoStartTaskChance: {autoStartTaskChance}", 0.8f);
         }
         else
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.Label($"AutoTargetTask: {autoTargetTask.label}");
+            listing_Rect.SubLabel($"AutoStartFailCount: {autoStartFailCount}", 0.8f);
             listing_Rect.SubLabel($"AutoStartTaskChance: {autoStartTaskChance}", 0.8f);
         }
     }
@@ -82,9 +91,8 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
     {
         if (HasTask)
         {
-            curTask.TickHour(Squad);
-            curTaskTickLeft -= 2500;
-            if (curTaskTickLeft <= 0)
+            curTask.TickHour(branch);
+            if (curTask.DurationLeft <= 0)
             {
                 FinishCurTask();
             }
@@ -99,8 +107,21 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    public AcceptanceReport CanSwitchToTask(SquadTaskDef newTaskDef, bool ignorePriority = false, bool resultOnly = false)
+    public AcceptanceReport CanSwitchToTask(BranchTaskDef newTaskDef, bool ignorePriority = false, bool resultOnly = false)
     {
+        if (branch.IsOnJointPatrol())
+        {
+            return resultOnly ? false : "OARO_BranchOnJointPatrolNow".Translate();
+        }
+
+        int beAttackedCooling = branch.CooldownManager.GetCooldownTicksLeft(KeyLibrary_CDRecord.BeAttackedOnTask);
+        if (beAttackedCooling > 0)
+        {
+            return resultOnly ? false : "OARO_Cooling_BeAttackedOnTask".Translate().Colorize(ColorLibrary.RedReadable)
+                                        + " "
+                                        + "WaitTime".Translate(beAttackedCooling.ToStringTicksToPeriod());
+        }
+
         if (!HasTask)
         {
             if (!newTaskDef.ignoreRest && IsRestNow)
@@ -108,12 +129,12 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
                 return resultOnly ? false : "OARO_SquadIsRestNow".Translate();
             }
 
-            return newTaskDef?.StartChecker.CanStartNow(Squad) ?? true;
+            return newTaskDef?.StartChecker.CanStartNow(branch, resultOnly) ?? true;
         }
 
         if (newTaskDef is null)
         {
-            if (IsCurTaskOngoing && !curTask.Def.canInterrupt)
+            if (curTask.IsOngoing && !curTask.Def.canInterrupted)
             {
                 return resultOnly ? false : "OARO_TaskCannotBeInterrupted".Translate();
             }
@@ -121,21 +142,21 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             return true;
         }
 
-        SquadTaskDef curTaskDef = curTask.Def;
+        BranchTaskDef curTaskDef = curTask.Def;
 
         if (newTaskDef == curTaskDef)
         {
             return resultOnly ? false : "OARO_AlreadyDoingSameTask".Translate();
         }
 
-        if (IsCurTaskOngoing && !curTaskDef.canInterrupt)
+        if (curTask.IsOngoing && !curTaskDef.canInterrupted)
         {
             return resultOnly ? false : "OARO_TaskCannotBeInterrupted".Translate();
         }
 
-        if (newTaskDef == curTaskDef.nextTaskStatus)
+        if (newTaskDef == curTaskDef.nextTask)
         {
-            return newTaskDef.StartChecker.CanStartNow(Squad, resultOnly);
+            return newTaskDef.StartChecker.CanStartNow(branch, resultOnly);
         }
 
         if (!ignorePriority && curTaskDef.priority >= newTaskDef.priority)
@@ -143,7 +164,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             return resultOnly ? false : "OARO_TaskPriorityHigherOrEqual".Translate();
         }
 
-        return newTaskDef.StartChecker.CanStartNow(Squad, resultOnly);
+        return newTaskDef.StartChecker.CanStartNow(branch, resultOnly);
     }
 
     public void FinishCurTask()
@@ -153,125 +174,88 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             return;
         }
 
-        curTaskTickLeft = 0;
-        if (curTask.Def.nextTaskStatus is null)
+        if (curTask.Def.nextTask is null)
         {
-            EndCurrentTask(startRest: true);
+            EndCurTask(startRest: true);
         }
         else
         {
-            TrySwitchToTask(curTask.Def.nextTaskStatus);
+            TrySwitchToTask(curTask.Def.nextTask, endCurIfCantSwitch: true);
         }
     }
 
-    public bool TrySwitchToTask(SquadTaskDef newTaskDef)
+    public bool TrySwitchToTask(BranchTaskDef newTaskDef, bool forced = false, bool endCurIfCantSwitch = false)
     {
-
-        if (CanSwitchToTask(newTaskDef, resultOnly: true))
+        if (forced || CanSwitchToTask(newTaskDef, resultOnly: true))
         {
-            EndCurrentTask(startRest: false);
-            return StartTask(newTaskDef);
+            if (newTaskDef is null)
+            {
+                EndCurTask(startRest: true);
+                return true;
+            }
+            else
+            {
+                EndCurTask(startRest: false);
+                return StartTask(newTaskDef);
+            }
         }
-        else if (!IsCurTaskOngoing)
+
+        if (endCurIfCantSwitch)
         {
-            EndCurrentTask(startRest: true);
+            EndCurTask(startRest: true);
         }
 
         return false;
     }
 
-    public bool StartTask(SquadTaskDef newTaskDef)
+    private bool StartTask(BranchTaskDef newTaskDef)
     {
         try
         {
-            if (newTaskDef is null)
-            {
-                EndCurrentTask(startRest: true);
-                return true;
-            }
-
-            curTask = BranchTask.MakeTask(newTaskDef);
-            curTaskStartTick = Find.TickManager.TicksGame;
-            curTaskTickLeft = curTask.TaskDurationTick(Squad);
-            curTask.TaskStart(Squad);
-
-            autoStartTaskChance = BaseAutoStartTaskChance;
-            if (newTaskDef == autoTargetTask)
-            {
-                ClearAutoTargetTask();
-            }
-            return true;
-
+            curTask = BranchTask.GenerateTask(newTaskDef);
+            curTask.StartTask(branch);
         }
         catch (Exception ex)
         {
             Log.Error($"Fail to switch to task {newTaskDef}: {ex}");
-            ClearCurTask();
+            curTask = null;
             return false;
         }
-    }
 
-    public bool StartTask(BranchTask newTask)
-    {
-        try
+        branch.EffectTags.IncrementTagsValue(newTaskDef.effectFlags, addIfMiss: true);
+        autoStartTaskChance = BaseAutoStartTaskChance(branch);
+        if (newTaskDef == autoTargetTask)
         {
-            if (newTask is null)
-            {
-                EndCurrentTask(startRest: true);
-                return true;
-            }
-
-            curTask = newTask;
-            curTaskStartTick = Find.TickManager.TicksGame;
-            curTaskTickLeft = curTask.TaskDurationTick(Squad);
-            curTask.TaskStart(Squad);
-
-            autoStartTaskChance = BaseAutoStartTaskChance;
-            if (newTask.Def == autoTargetTask)
-            {
-                ClearAutoTargetTask();
-            }
-            return true;
-
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"Fail to switch to task {newTask.Def}: {ex}");
-            EndCurrentTask(startRest: false);
-            return false;
-        }
-    }
-
-    public void EndCurrentTask(bool startRest)
-    {
-        bool interrupt = IsCurTaskOngoing;
-        if (HasTask)
-        {
-            curTask.TaskEnd(Squad, interrupt);
-            if (startRest)
-            {
-                squadRestEndTick = Find.TickManager.TicksGame + curTask.SquadRestTick(Squad, interrupt);
-            }
+            ClearAutoTargetTask();
         }
 
-        ClearCurTask();
+        branch.WorkStateDirty = true;
+        return true;
     }
 
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private void ClearCurTask()
+    public void EndCurTask(bool startRest)
     {
+        if (!HasTask)
+        {
+            return;
+        }
+
+        branch.EffectTags.DecrementTagsValue(curTask.Def.effectFlags);
+        curTask.EndTask(branch);
+        if (startRest)
+        {
+            restEndTick = Find.TickManager.TicksGame + curTask.BranchRestTick(branch);
+        }
+
         curTask = null;
-        curTaskStartTick = -1;
-        curTaskTickLeft = -1;
+        branch.WorkStateDirty = true;
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     private void ClearAutoTargetTask()
     {
         autoTargetTask = null;
         autoStartFailCount = 0;
-        autoStartTaskChance = BaseAutoStartTaskChance;
+        autoStartTaskChance = BaseAutoStartTaskChance(branch);
     }
 
     private string GetTaskAutoStartDesc()
@@ -289,7 +273,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             return "OARO_SquadRestNow".Translate(autoStartTaskChance.ToStringPercent()).Colorize(Color.green);
         }
 
-        if (autoTargetTask.StartChecker.CanStartNow(Squad, resultOnly: true))
+        if (autoTargetTask.StartChecker.CanStartNow(branch, resultOnly: true))
         {
             return "OARO_FullyTargetTaskDefPerp".Translate(autoStartTaskChance.ToStringPercent()).Colorize(Color.yellow);
         }
@@ -301,16 +285,17 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     private void TryAutoStartNewTask()
     {
-        autoStartTaskChance += Squad.IsBranchSquadOfType(Branch.BranchType.Mobile) ? 0.01f : 0.005f;
+        autoStartTaskChance += branch.IsBranchOfType(Branch.BranchType.Mobile) ? 0.01f : 0.005f;
         float usedChance = autoStartTaskChance;
-        if (Squad.SquadStat.MemberPercentage >= 1f && Squad.SquadStat.Supply >= 1f)
+        if (branch.Supply >= 1f && branch.Squad.MemberPercentage >= 1f)
         {
             usedChance += 0.5f;
         }
 
         if (autoStartFailCount >= 10 || autoTargetTask is null)
         {
-            autoTargetTask = DefDatabase<SquadTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen).RandomElementByWeightWithFallback(WeightSelector, SquadTaskDefOf.OARO_Squad_JurisdictionDutyPerp);
+            autoTargetTask = DefDatabase<BranchTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen && FocusedTaskType == t.taskType)
+                                                               .RandomElementByWeightWithFallback((d) => d.StartChecker?.RandomlyChosenWeight(branch) ?? 0f, BranchTaskDefOf.OARO_JurisdictionDutyPrep);
         }
 
         if (Rand.Chance(usedChance) && autoTargetTask is not null)
@@ -324,19 +309,15 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
                 autoStartFailCount++;
             }
         }
-
-        float WeightSelector(SquadTaskDef def) => def.StartChecker?.RandomlyChosenWeight(Squad) ?? 0f;
     }
 
-    public void ExposeData()
+    internal void PostLoadInit()
     {
-        Scribe_Deep.Look(ref curTask, "curTask");
-        Scribe_Values.Look(ref curTaskStartTick, "curTaskStartTick", -1);
-        Scribe_Values.Look(ref curTaskTickLeft, "curTaskTickLeft", -1);
-        Scribe_Values.Look(ref squadRestEndTick, "squadRestEndTick", -1);
-
-        Scribe_Defs.Look(ref autoTargetTask, "autoTargetTask");
-        Scribe_Values.Look(ref autoStartFailCount, "autoStartFailCount", 0);
-        Scribe_Values.Look(ref autoStartTaskChance, "autoStartTaskChance", 0f);
+        if (curTask is not null)
+        {
+            branch.EffectTags.IncrementTagsValue(curTask.Def.effectFlags, addIfMiss: true);
+        }
     }
+
+    private static float BaseAutoStartTaskChance(Branch branch) => branch.IsBranchOfType(Branch.BranchType.Mobile) ? 0.05f : 0.02f;
 }

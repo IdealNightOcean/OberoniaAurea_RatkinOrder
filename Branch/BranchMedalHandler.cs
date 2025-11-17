@@ -27,7 +27,7 @@ public class BranchMedalHandler : IExposable
         }
     }
 
-    public BranchTaskType FocusedTaskType => PrimaryMedal?.focusedTaskType ?? BranchTaskType.General;
+    public BranchTaskType ProtogenicTaskType => PrimaryMedal?.focusedTaskType ?? BranchTaskType.General;
 
     public int MedalTypeCount => medalRecords.Count;
     public IReadOnlyDictionary<BranchMedalDef, BranchMedalRecord> MedalRecords => medalRecords;
@@ -149,7 +149,11 @@ public class BranchMedalHandler : IExposable
             }
             catch (Exception ex)
             {
-                Log.Error($"An exception occurred while processing BuffWorker in {nameof(BranchMedalHandler)}.{nameof(RecacheMedalHediffStage)}.\nException:\n{ex.Message}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "processing BuffWorker",
+                    typeName: nameof(BranchMedalHandler),
+                    methodName: nameof(RecacheMedalHediffStage),
+                    needStackTrace: true);
             }
         }
 

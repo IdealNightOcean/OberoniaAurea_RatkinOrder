@@ -47,7 +47,11 @@ public static class SquadCombatPawnUtility
                         }
                         catch (Exception ex)
                         {
-                            Log.Error($"An exception occurred while generating the knight member in {nameof(GenerateCombatPawns)}.\nException:\n{ex.Message}");
+                            ModUtility.LogExceptionError(ex,
+                                errorDesc: "generating the knight member",
+                                typeName: nameof(SquadCombatPawnUtility),
+                                methodName: nameof(GenerateCombatPawns),
+                                needStackTrace: true);
                         }
                     }
                 }
@@ -74,7 +78,11 @@ public static class SquadCombatPawnUtility
                         }
                         catch (Exception ex)
                         {
-                            Log.Error($"An exception occurred while generating the knight commander in {nameof(GenerateCombatPawns)}.\nException:\n{ex.Message}");
+                            ModUtility.LogExceptionError(ex,
+                                errorDesc: "generating the knight commander",
+                                typeName: nameof(SquadCombatPawnUtility),
+                                methodName: nameof(GenerateCombatPawns),
+                                needStackTrace: true);
                         }
                     }
                 }
@@ -99,7 +107,11 @@ public static class SquadCombatPawnUtility
                         }
                         catch (Exception ex)
                         {
-                            Log.Error($"An exception occurred while generating the non-knight unit in {nameof(GenerateCombatPawns)}.\nException:\n{ex.Message}");
+                            ModUtility.LogExceptionError(ex,
+                                errorDesc: "generating the non-knight unit",
+                                typeName: nameof(SquadCombatPawnUtility),
+                                methodName: nameof(GenerateCombatPawns),
+                                needStackTrace: true);
                         }
                     }
                 }

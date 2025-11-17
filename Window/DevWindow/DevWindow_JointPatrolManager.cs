@@ -7,7 +7,7 @@ public class DevWindow_JointPatrolManager : DevWindowBase
 {
     private readonly RatkinOrder ratkinOrder;
     private readonly JointPatrolManager jointPatrolManager;
-    private readonly float needReconnaissanceValue;
+    private readonly float neededTaskPotency;
 
     public DevWindow_JointPatrolManager(RatkinOrder ratkinOrder) : base()
     {
@@ -15,7 +15,7 @@ public class DevWindow_JointPatrolManager : DevWindowBase
         jointPatrolManager = ratkinOrder.BranchManager.JointPatrolManager;
         optionalTitle = ratkinOrder.Name;
 
-        needReconnaissanceValue = jointPatrolManager.NeedReconnaissanceValue;
+        neededTaskPotency = jointPatrolManager.NeededTaskPotency;
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -40,7 +40,7 @@ public class DevWindow_JointPatrolManager : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         jointPatrolManager.DrawDevWindow(listing_Rect);
-        listing_Rect.Label($"NeedReconnaissanceValue: {needReconnaissanceValue}");
+        listing_Rect.Label($"NeedReconnaissanceValue: {neededTaskPotency}");
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");

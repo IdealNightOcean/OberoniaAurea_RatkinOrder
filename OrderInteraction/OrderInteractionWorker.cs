@@ -57,7 +57,11 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
             }
             catch (Exception ex)
             {
-                Log.Error($"An Exception occurred in {nameof(postApplyAction)}.\nException:\n{ex.Message}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"call-back: {nameof(postApplyAction)}",
+                    typeName: nameof(OrderInteractionWorker),
+                    methodName: nameof(TryApplyInteraction),
+                    needStackTrace: true);
             }
         }
     }
@@ -96,7 +100,11 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         }
         catch (Exception ex)
         {
-            Log.Error($"Error processing costs for BranchInteraction [{Def.defName}].\nException:\n{ex}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"{nameof(DoInteractionCost)}for BranchInteraction [{Def?.defName}]",
+                typeName: nameof(OrderInteractionWorker),
+                methodName: nameof(ApplyInteraction),
+                needStackTrace: true);
             return false;
         }
 
@@ -106,7 +114,11 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         }
         catch (Exception ex)
         {
-            Log.Error($"Error triggering effect for BranchInteraction [{Def.defName}].\nException:\n{ex}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"{nameof(InteractionEffect)}for BranchInteraction [{Def?.defName}]",
+                typeName: nameof(OrderInteractionWorker),
+                methodName: nameof(ApplyInteraction),
+                needStackTrace: true);
             return false;
         }
         return true;

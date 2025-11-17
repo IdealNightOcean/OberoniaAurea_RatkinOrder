@@ -360,7 +360,7 @@ public class Branch : IExposable, ILoadReferenceable
     private float GetCurPotency()
     {
         float curPotency = squad.AllCrewCount * 7f
-                         * (0.9f + facilityHandler.TotalFacilityLevel * 0.025f + medalHandler.TotalMedalCount * 0.015f)
+                         * (0.9f + facilityHandler.TotalFacilityLevel.Value * 0.025f + medalHandler.TotalMedalCount * 0.015f)
                          * (IsBranchOfType(BranchType.Honor) ? 1.25f : 1f);
 
         return curPotency * 0.01f;
@@ -381,7 +381,7 @@ public class Branch : IExposable, ILoadReferenceable
 
         residentHandler.PostBranchGenerated();
 
-        taskHandler.FocusedTaskType = medalHandler.FocusedTaskType;
+        taskHandler.FocusedTaskType = medalHandler.ProtogenicTaskType;
         curWorkState = "OARO_SquadState_Idle".Translate();
     }
 

@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -38,28 +39,8 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    [Unsaved] private HashSet<BranchBuildingDef> allBuildingDefsHash;
-    [Unsaved] private bool buildingDefsDirty = true;
-    private HashSet<BranchBuildingDef> AllBuildingDefsHash
-    {
-        get
-        {
-            if (buildingDefsDirty)
-            {
-                if (allBuildingDefsHash is null)
-                {
-                    allBuildingDefsHash = new(noramlBuildings.Count + 1);
-                }
-                else
-                {
-                    allBuildingDefsHash.Clear();
-                }
-                buildingDefsDirty = false;
-                allBuildingDefsHash.AddRange(AllBuldings.Select(b => b.Def));
-            }
-            return allBuildingDefsHash;
-        }
-    }
+
+    [Unsaved] public readonly LazyMutableCollection<HashSet<BranchBuildingDef>, BranchBuildingDef> AllBuildingDefsHash;
 
     [Unsaved] private List<ITickHour<Branch>> tickHourHandlers;
     [Unsaved] private List<ITickDay<Branch>> tickDayHandlers;
@@ -75,6 +56,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
         buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: (int)BranchStatDefOf.OARO_BuildingCeiling.baseValue, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
+        AllBuildingDefsHash = new LazyMutableCollection<HashSet<BranchBuildingDef>, BranchBuildingDef>(refreshFunc: () => AllBuldings.Select(b => b.Def));
     }
 
     public void ExposeData()
@@ -167,7 +149,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasBuilding(BranchBuildingDef buildingDef) => AllBuildingDefsHash.Contains(buildingDef);
+    public bool HasBuilding(BranchBuildingDef buildingDef) => AllBuildingDefsHash.Value.Contains(buildingDef);
 
     public BranchBuilding GetBuilding(BranchBuildingDef buildingDef, bool strictMatch = false)
     {
@@ -253,7 +235,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
         catch (Exception ex)
         {
-            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+            ModUtility.LogExceptionError(ex, nameof(OnBuildingConstructionChanged), nameof(BranchBuildingHandler), nameof(CancelBuildingConstruction), needStackTrace: true);
         }
         finally
         {
@@ -279,7 +261,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
         catch (Exception ex)
         {
-            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+            ModUtility.LogExceptionError(ex, nameof(OnBuildingConstructionChanged), nameof(BranchBuildingHandler), nameof(StartBuildingConstructionDirectly), needStackTrace: true);
         }
     }
 
@@ -308,7 +290,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         {
             noramlBuildings.Add(newBuilding);
         }
-        buildingDefsDirty = true;
+        AllBuildingDefsHash.MarkDirty();
 
         newBuilding.InitActive();
         ActiveBuilding(newBuilding);
@@ -336,7 +318,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         {
             noramlBuildings.Remove(building);
         }
-        buildingDefsDirty = true;
+        AllBuildingDefsHash.MarkDirty();
 
         if (building is ITickHour<Branch> ticksLong)
         {

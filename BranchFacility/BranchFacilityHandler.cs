@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -16,20 +17,7 @@ public class BranchFacilityHandler : IExposable
     private Dictionary<BranchFacilityDef, BranchFacilityLevel> facilities = [];
     public IReadOnlyDictionary<BranchFacilityDef, BranchFacilityLevel> Facilities => facilities;
 
-    [Unsaved] private int totalFacilityLevel;
-    [Unsaved] private bool facilityLevelDirty = true;
-    public int TotalFacilityLevel
-    {
-        get
-        {
-            if (facilityLevelDirty)
-            {
-                totalFacilityLevel = facilities.Sum(kv => (int)kv.Value);
-                facilityLevelDirty = false;
-            }
-            return totalFacilityLevel;
-        }
-    }
+    [Unsaved] public readonly LazyMutable<int> TotalFacilityLevel;
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
@@ -41,6 +29,7 @@ public class BranchFacilityHandler : IExposable
     internal BranchFacilityHandler(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        TotalFacilityLevel = new(() => facilities.Sum(kv => (int)kv.Value));
     }
 
     public void ExposeData()
@@ -136,7 +125,11 @@ public class BranchFacilityHandler : IExposable
         }
         catch (Exception ex)
         {
-            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"call-back: {nameof(OnBuildingConstructionChanged)}",
+                typeName: nameof(BranchFacilityHandler),
+                methodName: nameof(StartFacilityConstruction),
+                needStackTrace: true);
         }
     }
 
@@ -153,7 +146,11 @@ public class BranchFacilityHandler : IExposable
         }
         catch (Exception ex)
         {
-            Log.Error($"An Exception occurred in {nameof(OnBuildingConstructionChanged)}.\nException:\n{ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"call-back: {nameof(OnBuildingConstructionChanged)}",
+                typeName: nameof(BranchFacilityHandler),
+                methodName: nameof(CancelFacilityConstruction),
+                needStackTrace: true);
         }
         finally
         {
@@ -204,7 +201,7 @@ public class BranchFacilityHandler : IExposable
         ActiveStage(facilityDef, targetLevel);
 
         facilities[facilityDef] = targetLevel;
-        facilityLevelDirty = true;
+        TotalFacilityLevel.MarkDirty();
         if (targetLevel == BranchFacilityLevel.Excellent)
         {
             IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);

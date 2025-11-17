@@ -172,7 +172,7 @@ public class Window_Branch : OrderWindowBase
         GUI.DrawTexture(reusedRect, topTitleBackground);
 
         reusedRect = new(reusedRect.xMin + 54f, reusedRect.yMax - 27f, 562f, 9f);
-        Widgets.FillableBar(reusedRect, Mathf.Clamp01(branch.FacilityHandler.TotalFacilityLevel / (allFacilityDefCount * 4f)), IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: false);
+        Widgets.FillableBar(reusedRect, Mathf.Clamp01(branch.FacilityHandler.TotalFacilityLevel.Value / (allFacilityDefCount * 4f)), IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: false);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;

@@ -133,7 +133,7 @@ public class BranchContract : IExposable
             }
             catch (Exception ex)
             {
-                Log.Error($"An Exception occurred in {nameof(GrammarResolver.Resolve)} at {nameof(GetContractReason)}.\nException:\n{ex.Message}");
+                ModUtility.LogExceptionError(ex, nameof(GrammarResolver.Resolve), nameof(BranchContract), nameof(GetContractReason));
                 reason = null;
             }
 

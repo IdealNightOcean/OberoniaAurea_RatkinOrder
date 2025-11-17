@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 using Verse;
+using static OberoniaAurea.RatkinOrder.JointBranchRecord;
+using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -20,11 +22,14 @@ public class JointPatrolIncidentDef : Def
 
     public BranchTaskType? restrictTaskType;
 
-    public JointPatrolManager.PatrolLevel? patrolLevelLimits;
+    public PatrolLevel? patrolLevelLimits;
 
     public Branch.BranchType? restrictBranchType;
 
     public BranchBuildingDef relatedBuilding;
+
+    [MustTranslate]
+    public List<string> customDescriptions;
 
     public List<JointPatrolIncidentPart> parts;
 
@@ -46,14 +51,45 @@ public class JointPatrolIncidentDef : Def
     }
 
 
-    public static IncidentType GetPotentialIncidentType(JointPatrolManager.JointBranchRecord record)
+    public JointIncidentRecord ApplyIncident(JointBranchRecord record)
+    {
+        if (record?.Branch is null)
+        {
+            return null;
+        }
+
+        StringBuilder explainSB = new();
+        if (!customDescriptions.NullOrEmpty())
+        {
+            explainSB.AppendLine(customDescriptions.RandomElement().Formatted(record.Branch.Name.Named("BRANCHNAME")));
+            explainSB.AppendLine();
+        }
+
+        if (!parts.NullOrEmpty())
+        {
+            for (int i = 0; i < parts.Count; i++)
+            {
+                parts[i].ApplyPart(this, record, explainSB);
+            }
+        }
+
+        return new JointIncidentRecord()
+        {
+            Def = this,
+            RelatedBranch = record.Branch,
+            Description = explainSB.ToString(),
+            TriggerTick = Find.TickManager.TicksGame
+        };
+    }
+
+    public static IncidentType GetPotentialIncidentType(JointBranchRecord record)
     {
         List<(IncidentType, float)> typeSelector = new(5)
                 {
                     (IncidentType.Building,10f),
                     (IncidentType.Disaster,2f)
                 };
-        if (record.HasInteraction(JointPatrolManager.PatrolInteractionType.Information))
+        if (record.HasInteraction(PatrolInteractionType.Information))
         {
             typeSelector.AddRange(
                 [
@@ -78,19 +114,21 @@ public class JointPatrolIncidentDef : Def
         return typeSelector.RandomElementByWeight(t => t.Item2).Item1;
     }
 
-    public void ApplyIncident(Branch branch, out string effectExplain)
+    public override IEnumerable<string> ConfigErrors()
     {
-        effectExplain = string.Empty;
-        if (parts is null)
+        foreach (string error in base.ConfigErrors())
         {
-            return;
+            yield return error;
         }
 
-        StringBuilder explainSB = new();
-        for (int i = 0; i < parts.Count; i++)
+        if (incidentType == IncidentType.Building && relatedBuilding is null)
         {
-            parts[i].ApplyPart(this, branch, explainSB);
+            yield return "Incident type is 'Building', but RelatedBuilding is null.";
         }
-        effectExplain = explainSB.ToString();
+        if (relatedBuilding is not null && incidentType != IncidentType.Building)
+        {
+            incidentType = IncidentType.Building;
+            yield return "RelatedBuilding is specified, but incident type is not 'Building'. Type has been updated to 'Building'.";
+        }
     }
 }

@@ -855,7 +855,11 @@ public class Window_BranchSquad : MainTabWindow
             }
             catch (Exception ex)
             {
-                Log.Error($"An exception occurred in {nameof(RecacheBranchSummary)} when generating a {nameof(BranchSummaryUICache)}.\nException:\n{ex.Message}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "recache branch summary",
+                    typeName: nameof(Window_BranchSquad),
+                    methodName: nameof(RecacheBranchSummary),
+                    needStackTrace: true);
             }
         }
         if (branchSummaryCaches.Count > 0)
@@ -935,7 +939,11 @@ public class Window_BranchSquad : MainTabWindow
         }
         catch (Exception ex)
         {
-            Log.Error($"An Exception occured on {nameof(SelectSquad)}.\nException:\n{ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "select squad",
+                typeName: nameof(Window_BranchSquad),
+                methodName: nameof(SelectSquad),
+                needStackTrace: true);
             DeselectSquad();
             return false;
         }

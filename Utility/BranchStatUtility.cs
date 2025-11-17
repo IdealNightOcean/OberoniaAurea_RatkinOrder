@@ -90,7 +90,11 @@ public static class BranchStatUtility
         }
         catch (Exception ex)
         {
-            Log.Error($"Failed to generate BranchStat modification explanation: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]\nException:\n" + ex);
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"generating BranchStat modification explanation: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
+                typeName: nameof(BranchStatUtility),
+                methodName: nameof(GetStatModifyExplanation),
+                needStackTrace: true);
             explanation = new("ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable));
         }
 
@@ -167,7 +171,11 @@ public static class BranchStatUtility
         catch (Exception ex)
         {
             result = baseValueOverride ?? statDef?.baseValue ?? 0f;
-            Log.Error($"Failed to calculate new BranchStat value: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}].\nException:\n" + ex);
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"calculating new BranchStat value: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
+                typeName: nameof(BranchStatUtility),
+                methodName: nameof(GetNewStatValue),
+                needStackTrace: true);
         }
 
         return result;
@@ -196,7 +204,11 @@ public static class BranchStatUtility
         catch (Exception ex)
         {
             result = baseValueOverride ?? statDef?.baseValue ?? 0f;
-            Log.Error($"Failed to calculate new BranchStat value: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}].\nException:\n" + ex);
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"calculating new BranchStat value: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
+                typeName: nameof(BranchStatUtility),
+                methodName: nameof(GetNewStatValueFormTrans),
+                needStackTrace: true);
         }
         return result;
     }
