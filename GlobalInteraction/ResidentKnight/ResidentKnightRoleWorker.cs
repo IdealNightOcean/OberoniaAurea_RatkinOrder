@@ -1,7 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
-using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -15,8 +14,8 @@ public class ResidentKnightRoleWorker(ResidentKnightRoleDef def)
     /// 修正是针对殖民者的，而非担任该职位的Pawn
     /// </summary>
     /// <param name="pawn">担任该职位的Pawn</param>
-    public virtual IEnumerable<StatModifier> RoleStatOffsets(Pawn rolePawn) { return Enumerable.Empty<StatModifier>(); }
-    public virtual IEnumerable<StatModifier> RoleStatFactors(Pawn rolePawn) { return Enumerable.Empty<StatModifier>(); }
+    public virtual IEnumerable<StatModifier> RoleStatOffsets(Pawn rolePawn) { return null; }
+    public virtual IEnumerable<StatModifier> RoleStatFactors(Pawn rolePawn) { return null; }
 
     public virtual void PostActiveRole(Pawn rolePawn)
     {

@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -10,8 +11,9 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 using IncidentType = JointPatrolIncidentDef.IncidentType;
+using PatrolInteractionType = JointBranchRecord.PatrolInteractionType;
 
-public partial class JointPatrolManager : IExposable
+public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetentionHolder
 {
     private const int JointPatrolDurationPrepDays = 3;
     private const int JointPatrolDurationDays = 7;
@@ -33,15 +35,18 @@ public partial class JointPatrolManager : IExposable
     public PatrolLevel PatrolLevelValue => patrolLevel;
 
     private List<JointBranchRecord> participants = [];
-    public IReadOnlyList<JointBranchRecord> Participants => participants;
-    [Unsaved] private HashSet<Branch> participantsHash;
+
+    [Unsaved] private Dictionary<Branch, JointBranchRecord> participantsDict = [];
+    public IReadOnlyDictionary<Branch, JointBranchRecord> ParticipantsDict => participantsDict;
+    private List<Pawn> participatingResidentKnights = [];
+    private ThingOwner<Pawn> innerContainer;
+
+    private Dictionary<PatrolInteractionType, int> patrolInteractionAcquired = [];
 
     private List<JointIncidentRecord> incidentRecords = [];
     public IReadOnlyList<JointIncidentRecord> IncidentRecords => incidentRecords;
 
     [Unsaved] private LazyMutable<IReadOnlyDictionary<BranchTaskType, float>> taskPotencys;
-
-
     [Unsaved] private readonly LazyMutable<IReadOnlyDictionary<IncidentType, List<JointPatrolIncidentDef>>> potentialIncidents;
 
     public float NeededTaskPotency
@@ -51,8 +56,8 @@ public partial class JointPatrolManager : IExposable
             return patrolLevel switch
             {
                 PatrolLevel.Popedom => BranchManager.TotalKnights * 0.16f * 10f * 0.25f,
-                PatrolLevel.Kingdom => BranchManager.TotalKnights * 0.3f * 10f,
-                PatrolLevel.Border => BranchManager.TotalKnights * 0.44f * 10f,
+                PatrolLevel.Kingdom => BranchManager.TotalKnights * 0.3f * 10f * 0.25f,
+                PatrolLevel.Border => BranchManager.TotalKnights * 0.44f * 10f * 0.25f,
                 _ => 0f,
             };
         }
@@ -61,6 +66,7 @@ public partial class JointPatrolManager : IExposable
     public JointPatrolManager(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
+        innerContainer = new ThingOwner<Pawn>(this);
 
         taskPotencys = new(refreshFunc: () => participants.GroupBy(p => p.FocusedTaskType)
                                                           .ToDictionary(g => g.Key, g => g.Sum(gp => gp.TaskPotency.Value)));
@@ -69,6 +75,7 @@ public partial class JointPatrolManager : IExposable
         potentialIncidents = new(refreshFunc: () => DefDatabase<JointPatrolIncidentDef>.AllDefsListForReading.Where(d => !d.patrolLevelLimits.HasValue || d.patrolLevelLimits.Value == patrolLevel)
                                                                                                              .GroupBy(d => d.incidentType)
                                                                                                              .ToDictionary(g => g.Key, g => g.ToList()));
+
     }
 
     public void ExposeData()
@@ -81,6 +88,7 @@ public partial class JointPatrolManager : IExposable
         Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
 
         Scribe_Collections.Look(ref participants, "participants", LookMode.Deep);
+        Scribe_Collections.Look(ref patrolInteractionAcquired, "patrolInteractionAcquired", LookMode.Value, LookMode.Value);
         Scribe_Collections.Look(ref incidentRecords, "incidentRecords", LookMode.Deep);
     }
 
@@ -92,7 +100,7 @@ public partial class JointPatrolManager : IExposable
         tickToNextCheck = 60000;
 
         participants.Clear();
-        participantsHash.Clear();
+        participantsDict.Clear();
 
         taskPotencys.Reset();
         potentialIncidents.Reset();
@@ -152,20 +160,32 @@ public partial class JointPatrolManager : IExposable
         }
     }
 
-    public bool IsParticipant(Branch branch) => participantsHash.Contains(branch);
+    public bool IsParticipant(Branch branch) => participantsDict.ContainsKey(branch);
 
     private void AddParticipant(Branch branch)
     {
-        if (participantsHash.Add(branch))
+        if (curState == PatrolState.Invalid)
         {
-            participants.Add(new JointBranchRecord() { Branch = branch });
+            return;
+        }
+
+        if (!participantsDict.ContainsKey(branch))
+        {
+            JointBranchRecord record = new() { Branch = branch };
+            participants.Add(record);
+            participantsDict[branch] = record;
             branch.WorkStateDirty = true;
         }
     }
 
     private void RemoveParticipant(Branch branch)
     {
-        if (participantsHash.Remove(branch))
+        if (curState == PatrolState.Invalid)
+        {
+            return;
+        }
+
+        if (participantsDict.Remove(branch))
         {
             for (int i = 0; i < participants.Count; i++)
             {
@@ -176,10 +196,49 @@ public partial class JointPatrolManager : IExposable
                     break;
                 }
             }
+
+            if (curState == PatrolState.Prepare)
+            {
+                participatingResidentKnights.RemoveAll(ShouldRemoveResidentKnight);
+            }
+            else
+            {
+                List<Pawn> pawnToRemove = innerContainer.InnerListForReading.Where(ShouldRemoveResidentKnight).ToList();
+                if (!pawnToRemove.NullOrEmpty())
+                {
+                    foreach (Pawn p in pawnToRemove)
+                    {
+                        innerContainer.Remove(p);
+                    }
+                }
+            }
+        }
+
+        bool ShouldRemoveResidentKnight(Pawn knight)
+        {
+            return !ResidentKnightsManager.TryGetKnightRecord(participatingResidentKnights[i], out ResidentKnightRecord residentRecord)
+                    || residentRecord.Branch == branch;
         }
     }
 
-    public bool TryStartPatrolPrep()
+    public void BringResidentKnightBackTeam(ResidentKnightRecord record)
+    {
+        if (curState == PatrolState.Invalid)
+        {
+            return;
+        }
+
+        if (!participantsDict.ContainsKey(record?.Branch))
+        {
+            return;
+        }
+        if (!participatingResidentKnights.Contains(record.Knight))
+        {
+            participatingResidentKnights.Add(record.Knight);
+        }
+    }
+
+    private bool TryStartPatrolPrep()
     {
         ClearPatrolData(forState: PatrolState.Prepare);
         /*
@@ -303,11 +362,16 @@ public partial class JointPatrolManager : IExposable
         }
 
         int ticksGame = Find.TickManager.TicksGame;
+        bool hasMilitary = true;
         foreach (JointBranchRecord record in participants)
         {
             record.Branch.Supply -= 0.5f;
             record.TaskPotency.MarkDirty();
             record.NextIncidentCheckTick = ticksGame + Rand.Range(2 * 2500, 4 * 2500);
+            if (hasMilitary)
+            {
+                record.ActiveInteraction(PatrolInteractionType.Military, applyCost: false);
+            }
         }
     }
 
@@ -431,6 +495,41 @@ public partial class JointPatrolManager : IExposable
         }
     }
 
+    public AcceptanceReport CanActiveParticipantInteraction(JointBranchRecord record, PatrolInteractionType interaction, Map map, bool resultOnly)
+    {
+        if (curState != PatrolState.Ongoing)
+        {
+            return false;
+        }
+        if (patrolInteractionAcquired.TryGetValue(interaction, out int acquiredCount))
+        {
+            if (acquiredCount > RatkinOrderSettings.MaxAcquiredPatrolInteractionPreType)
+            {
+                return resultOnly ? false : "OARO_ReachMax_AcquiredPatrolInteractionPreType".Translate();
+            }
+        }
+        return record.CanActiveInteraction(interaction, map, resultOnly);
+    }
+
+    public void TryActiveParticipantInteraction(JointBranchRecord record, PatrolInteractionType interaction, Map map)
+    {
+        if (curState != PatrolState.Ongoing)
+        {
+            return;
+        }
+        if (record.ActiveInteraction(interaction, applyCost: true, map))
+        {
+            if (patrolInteractionAcquired.TryGetValue(interaction, out int acquiredCount))
+            {
+                patrolInteractionAcquired[interaction] = acquiredCount + 1;
+            }
+            else
+            {
+                patrolInteractionAcquired[interaction] = 1;
+            }
+        }
+    }
+
     internal void PostLoadInit()
     {
         if (curState != PatrolState.Invalid)
@@ -439,7 +538,12 @@ public partial class JointPatrolManager : IExposable
             {
                 Log.Error($"Some participant branches of {ratkinOrder} were null after loading and have been removed.");
             }
-            participantsHash = participants.Select(r => r.Branch).ToHashSet();
+            participantsDict = participants.GroupBy(r => r.Branch).ToDictionary(g => g.Key, g => g.First());
         }
     }
+
+    public IThingHolder ParentHolder => null;
+    public void GetChildHolders(List<IThingHolder> outChildren) => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, participatingResidentKnights);
+    public ThingOwner GetDirectlyHeldThings() => participatingResidentKnights;
+
 }

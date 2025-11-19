@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using NightOcean;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,31 +32,11 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public static IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
     public static IReadOnlyDictionary<ResidentKnightRoleDef, Pawn> RolesToKnights => RolesToKnights;
 
-    [Unsaved] private static KnightPersonality allHasPersonalityTypes;
-    [Unsaved] private static int instructorKnightsCount;
-    [Unsaved] private static int nextResidentKnightCheckTick = -1;
-    public static KnightPersonality AllHasPersonalityTypes
-    {
-        get
-        {
-            if (Find.TickManager.TicksGame > nextResidentKnightCheckTick)
-            {
-                RecheckResidentKnight();
-            }
-            return allHasPersonalityTypes;
-        }
-    }
-    public static int InstructorKnightsCount
-    {
-        get
-        {
-            if (Find.TickManager.TicksGame > nextResidentKnightCheckTick)
-            {
-                RecheckResidentKnight();
-            }
-            return instructorKnightsCount;
-        }
-    }
+    [Unsaved] private static LazyMutable<KnightPersonality> allHasPersonalityTypes;
+    public static KnightPersonality AllHasPersonalityTypes => allHasPersonalityTypes.Value;
+
+    [Unsaved] private static LazyMutable<int> instructorKnightsCount;
+    public static int InstructorKnightsCount => instructorKnightsCount.Value;
 
     [Unsaved] private static readonly Dictionary<StatDef, float> statOffsets = [];
     [Unsaved] private static readonly Dictionary<StatDef, float> statFactors = [];
@@ -79,13 +60,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     private List<ResidentKnightRoleDef> rolesToKnightKeys;
     private List<Pawn> rolesToKnightValues;
 
-    public ResidentKnightsManager()
+    internal ResidentKnightsManager()
     {
         ResetStaticValue();
         buffHediffStage = new HediffStage();
     }
 
-    public static void ResetStaticValue()
+    internal static void ResetStaticValue()
     {
         residentKnights.Clear();
         rolesToKnights.Clear();
@@ -93,10 +74,8 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         statFactors.Clear();
         buffHediffStage = null;
 
-        allHasPersonalityTypes = KnightPersonality.None;
-        instructorKnightsCount = 0;
-        nextResidentKnightCheckTick = -1;
-        nextBuffStatRegainTick = -1;
+        allHasPersonalityTypes = new(() => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
+        instructorKnightsCount = new(() => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
     }
 
     public void ExposeData()
@@ -148,11 +127,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public static void TickDay()
     {
-        float gainPoints = 0f;
-        foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
+        foreach (ResidentKnightRecord record in residentKnights.Values)
         {
-            gainPoints = kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationDailyGain);
-            kv.Value.MeditationPoints += gainPoints;
+            if (record.IsValid)
+            {
+                float gainPoints = record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationDailyGain);
+                record.MeditationPoints += gainPoints;
+            }
         }
     }
 
@@ -204,6 +185,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         {
             residentKnights.Remove(p);
         }
+        OnKnightChanged();
 
         if (rolesToRemove.Count > 0)
         {
@@ -229,11 +211,12 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static void AddResidentKnight(Pawn pawn, KnightRecord knightRecord, ResidentKnightAcademicDef genealAcademicDef = null)
+    public static void AddResidentKnight(Pawn pawn, ResidentKnightAcademicDef genealAcademicDef = null)
     {
         if (!residentKnights.ContainsKey(pawn))
         {
-            residentKnights.Add(pawn, new ResidentKnightRecord(knightRecord, genealAcademicDef));
+            residentKnights.Add(pawn, new ResidentKnightRecord(pawn, genealAcademicDef));
+            OnKnightChanged();
         }
     }
 
@@ -244,6 +227,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             return;
         }
         residentKnights.Remove(pawn);
+        OnKnightChanged();
         if (record.CurRole is not null)
         {
             rolesToKnights.Remove(record.CurRole);
@@ -320,18 +304,10 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         return false;
     }
 
-    private static void RecheckResidentKnight()
+    private static void OnKnightChanged()
     {
-        nextResidentKnightCheckTick = Find.TickManager.TicksGame + 30000;
-        allHasPersonalityTypes = KnightPersonality.None;
-        foreach (ResidentKnightRecord record in residentKnights.Values)
-        {
-            allHasPersonalityTypes |= record.Personality;
-            if (record.Branch.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor)
-            {
-                instructorKnightsCount++;
-            }
-        }
+        allHasPersonalityTypes.MarkDirty();
+        instructorKnightsCount.MarkDirty();
     }
 
     private static void RegainRoleBuffStat()
@@ -343,6 +319,11 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         foreach (KeyValuePair<ResidentKnightRoleDef, Pawn> rolePawn in rolesToKnights)
         {
             (ResidentKnightRoleDef roldDef, Pawn pawn) = rolePawn;
+            if (!residentKnights.TryGetValue(pawn, out ResidentKnightRecord record) || !record.IsValid)
+            {
+                continue;
+            }
+
             AddStatModifier(roldDef.statOffsets, isFactor: false);
             AddStatModifier(roldDef.RoleWorker.RoleStatOffsets(pawn), isFactor: false);
 

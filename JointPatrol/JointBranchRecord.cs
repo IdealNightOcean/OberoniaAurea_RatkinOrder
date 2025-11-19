@@ -1,4 +1,6 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using UnityEngine;
 using Verse;
@@ -11,9 +13,9 @@ public class JointBranchRecord : IExposable
     public enum PatrolInteractionType : byte
     {
         None = 0,
-        Military = 1,
-        Information = 2,
-        Diplomacy = 4
+        Military = 1, //军备维护
+        Information = 2, //地区信息
+        Diplomacy = 4 //改善当地关系
     }
 
     private static readonly PatrolInteractionType allInteraction = PatrolInteractionType.Military | PatrolInteractionType.Information | PatrolInteractionType.Diplomacy;
@@ -56,19 +58,65 @@ public class JointBranchRecord : IExposable
         Scribe_Values.Look(ref potencyOffset, "potencyOffset", 0f);
     }
 
-    public void ActiveInteraction(PatrolInteractionType interaction)
+    public AcceptanceReport CanActiveInteraction(PatrolInteractionType interaction, Map map, bool resultOnly)
     {
         if (HasInteraction(interaction))
         {
-            return;
+            return resultOnly ? false : "OARO_AlreadyHas_PatrolInteraction".Translate();
+        }
+        if (map is null)
+        {
+            return false;
+        }
+        int neededSilver = interaction switch
+        {
+            PatrolInteractionType.Military => (int)(3000 + TaskPotency.Value * 10),
+            PatrolInteractionType.Information => (int)(4000 + TaskPotency.Value * 20),
+            PatrolInteractionType.Diplomacy => (int)(8000 + TaskPotency.Value * 20),
+            _ => -1
+        };
+
+        if (neededSilver > 0 && !OAFrame_MapUtility.HasEnoughThingsOfDef(map, ThingDefOf.Silver, neededSilver))
+        {
+            return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, neededSilver);
+        }
+
+        return true;
+    }
+
+    public bool ActiveInteraction(PatrolInteractionType interaction, bool applyCost, Map map = null)
+    {
+        if (HasInteraction(interaction))
+        {
+            return false;
+        }
+
+        if (applyCost && map is not null)
+        {
+            int neededSilver = interaction switch
+            {
+                PatrolInteractionType.Military => (int)(3000 + TaskPotency.Value * 10),
+                PatrolInteractionType.Information => (int)(4000 + TaskPotency.Value * 20),
+                PatrolInteractionType.Diplomacy => (int)(8000 + TaskPotency.Value * 20),
+                _ => -1
+            };
+            if (neededSilver > 0)
+            {
+                map.DestoryThingsOfDef(ThingDefOf.Silver, neededSilver);
+            }
         }
 
         CurInteractions |= interaction;
+        if (interaction == PatrolInteractionType.Military)
+        {
+            potencyFactor += 0.25f;
+        }
 
         if (CurInteractions == allInteraction)
         {
             Branch.SetFriendly(friendly: true);
         }
+        return true;
     }
 
     public bool HasInteraction(PatrolInteractionType interaction) => (CurInteractions & interaction) != 0;

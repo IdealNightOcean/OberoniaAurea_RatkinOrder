@@ -42,6 +42,8 @@ public class RatkinOrderSettings : ModSettings
     public static int MaxLetterRetentionDays = 300; //信件最长保留时间（天）
     [Unsaved] private static string maxLetterRetentionDaysStr;
 
+    public static int MaxAcquiredPatrolInteractionPreType = 3; //每种巡逻互动类型的最大累积次数
+
     public override void ExposeData()
     {
         base.ExposeData();
