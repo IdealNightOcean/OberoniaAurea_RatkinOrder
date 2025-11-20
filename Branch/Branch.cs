@@ -179,7 +179,11 @@ public class Branch : IExposable, ILoadReferenceable
         }
         catch (Exception ex)
         {
-            Log.Error($"Failed to create a new branch for {ratkinOrder} at {worldObject}: " + ex);
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"generating a new branch for {ratkinOrder} at {worldObject}",
+                typeName: nameof(Branch),
+                methodName: nameof(GenerateBranchFor),
+                needStackTrace: true);
             return null;
         }
 
@@ -309,7 +313,7 @@ public class Branch : IExposable, ILoadReferenceable
         int unitsDigit = ordinal % 10;
         GrammarRequest grammarRequest = new()
         {
-            Includes = { OARO_ModDefOf.OARO_NameBuilder_BranchName }
+            Includes = { OARO_RulePackDefOf.OARO_NameBuilder_BranchName }
         };
         grammarRequest.Constants.Add("unitsDigit", unitsDigit.ToString());
         grammarRequest.Rules.Add(new Rule_String("ordinal", ordinal.ToString()));

@@ -6,9 +6,9 @@ public partial class JointPatrolManager
 {
     public enum PatrolState : byte
     {
+        Invalid,
         Prepare,
-        Ongoing,
-        Invalid
+        Ongoing
     }
 
     public enum PatrolLevel : byte
@@ -33,7 +33,4 @@ public partial class JointPatrolManager
             Scribe_References.Look(ref RelatedBranch, "RelatedBranch");
         }
     }
-
-
-
 }

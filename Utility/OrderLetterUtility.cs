@@ -29,6 +29,12 @@ public static class OrderLetterUtility
         return orderLetter;
     }
 
+    public static void ReceiveLetter(TaggedString label, TaggedString text, LetterType letterType, RatkinOrder relatedOrder, string sender = null)
+    {
+        OrderLetter orderLetter = MakeOrderLetter(label, text, letterType, relatedOrder, sender);
+        OrderLetterBox.Instance.ReceiveLetter(orderLetter);
+    }
+
     public static void ReadLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
     {
         if (!forceSlience && IsTransToRimLetter(letter.LetterTypeValue))

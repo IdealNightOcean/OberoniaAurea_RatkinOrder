@@ -56,7 +56,7 @@ public class BranchSquad : IExposable, ITickHourOfDay
         int unitsDigit = ordinal % 10;
         GrammarRequest grammarRequest = new()
         {
-            Includes = { OARO_ModDefOf.OARO_NameBuilder_SquadName }
+            Includes = { OARO_RulePackDefOf.OARO_NameBuilder_SquadName }
         };
         grammarRequest.Constants.Add("unitsDigit", unitsDigit.ToString());
         grammarRequest.Rules.Add(new Rule_String("ordinal", ordinal.ToString()));

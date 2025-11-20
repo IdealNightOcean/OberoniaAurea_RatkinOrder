@@ -40,7 +40,7 @@ public static class OrderDefDataBase
     {
         if (scriptDef is null)
         {
-            Log.Error($"Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: scriptDef cannot be null.");
+            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: scriptDef cannot be null.");
             return;
         }
         mercyQuestsList.Add(scriptDef);
@@ -49,12 +49,12 @@ public static class OrderDefDataBase
     {
         if (buildingDef is null)
         {
-            Log.Error($"Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: buildingDef cannot be null.");
+            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: buildingDef cannot be null.");
             return;
         }
         if (personality == KnightPersonality.None)
         {
-            Log.Error($"Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
             return;
         }
         joyBuildingToKnightPersonality[buildingDef] = personality;
@@ -64,12 +64,12 @@ public static class OrderDefDataBase
     {
         if (personality == KnightPersonality.None)
         {
-            Log.Error($"Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
             return;
         }
         if (academicDef is null)
         {
-            Log.Error($"Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: academicDef cannot be null.");
+            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: academicDef cannot be null.");
             return;
         }
 

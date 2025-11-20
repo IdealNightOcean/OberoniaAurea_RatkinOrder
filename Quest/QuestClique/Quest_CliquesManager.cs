@@ -85,6 +85,30 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
     }
 
+    protected override void Enable(SignalArgs receivedArgs)
+    {
+        base.Enable(receivedArgs);
+        if (allCliques.NullOrEmpty())
+        {
+            return;
+        }
+
+        StringBuilder branchCliqueInfoSB = new("OARO_BranchCliquesInfoText_Header".Translate(branch.RatkinOrder.Name.Named("ORDERNAME")));
+        branchCliqueInfoSB.AppendLine();
+        foreach (Branch cliqueBranch in allCliques.Values.Where(c => c.IsBranchClique).Select(c => c.RelatedBranch).OrderBy(b => b?.RatkinOrder.LoadID ?? int.MinValue))
+        {
+            branchCliqueInfoSB.AppendLine($"{cliqueBranch.RatkinOrder.Name} - {cliqueBranch.Name}".Colorize(cliqueBranch.IsBranchOfType(Branch.BranchType.Friendly) ? Color.green : Color.white));
+        }
+
+        OrderLetterUtility.ReceiveLetter(
+            label: "OARO_BranchCliquesInfoLabel".Translate(quest.name.Named("QUESTNAME")),
+            text: branchCliqueInfoSB.ToTaggedString(),
+            letterType: OrderLetter.LetterType.Official,
+            relatedOrder: branch.RatkinOrder,
+            sender: branch.Name
+        );
+    }
+
     public override void QuestPartTick()
     {
         if (--ticksToNextCheck < 0)
@@ -115,7 +139,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
         if (showErrorIfMiss)
         {
-            Log.Error("No clique found in quest.");
+            Log.Error($"[OARO] No clique found in quest_{quest.id}.");
         }
         clique = null;
         return false;
@@ -402,7 +426,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             if (!clique.IsCommunicable)
             {
-                Log.Error($"Trying to commiunicate with an incommunicable clique {clique.Name}.");
+                Log.Error($"[OARO] Trying to commiunicate with an incommunicable clique {clique.Name}.");
                 return;
             }
 

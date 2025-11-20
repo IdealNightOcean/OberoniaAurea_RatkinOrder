@@ -15,10 +15,6 @@ public class BranchManager : IExposable, ITickDay
     private List<Branch> allBranches = [];
     public IReadOnlyList<Branch> AllBranches => allBranches;
 
-    private JointPatrolManager jointPatrolManager;
-    public JointPatrolManager JointPatrolManager => jointPatrolManager;
-    public bool IsJointPatrolActived => jointPatrolManager is not null;
-
     [Unsaved] private readonly SimpleValueCache<int> totalKnightsCache;
     public int TotalKnights => totalKnightsCache.GetCachedResult();
 
@@ -102,7 +98,6 @@ public class BranchManager : IExposable, ITickDay
         Scribe_Values.Look(ref invitedBranchCreationsCount, "invitedBranchCreationsCount", 0);
 
         Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: [ratkinOrder, false]);
-        Scribe_Deep.Look(ref jointPatrolManager, "jointPatrolManager", ctorArgs: [ratkinOrder]);
 
         Scribe_Values.Look(ref normalDemandFulfillCount, "normalDemandFulfillCount", 0);
         Scribe_Values.Look(ref criticalDemandFulfillCount, "criticalDemandFulfillCount", 0);
@@ -116,17 +111,9 @@ public class BranchManager : IExposable, ITickDay
         }
     }
 
-    public void TickLong()
-    {
-        jointPatrolManager?.TickLong();
-    }
-
     public void TickDay()
     {
         DailyConstructCheck();
-
-        jointPatrolManager?.TickDay();
-
         PeriodicCriticalDemandTrigger();
     }
 
@@ -134,12 +121,12 @@ public class BranchManager : IExposable, ITickDay
     {
         if (branch is null)
         {
-            Log.Error("Attempted to add a null branch.");
+            Log.Error("[OARO] Attempted to add a null branch.");
             return;
         }
         if (branch.RatkinOrder != ratkinOrder)
         {
-            Log.Error("Attempted to add a branch belonging to another RatkinOrder.");
+            Log.Error("[OARO] Attempted to add a branch belonging to another RatkinOrder.");
             return;
         }
 
@@ -167,7 +154,7 @@ public class BranchManager : IExposable, ITickDay
     {
         if (!allBranches.Remove(branch))
         {
-            Log.Error($"Attempted to destroy a branch that does not exist in {ratkinOrder.Name} ({ratkinOrder.GetUniqueLoadID()}). Branch ID: {branch.GetUniqueLoadID()}.");
+            Log.Error($"[OARO] Attempted to destroy a branch that does not exist in {ratkinOrder.Name} ({ratkinOrder.GetUniqueLoadID()}). Branch ID: {branch.GetUniqueLoadID()}.");
             return;
         }
 
@@ -178,11 +165,6 @@ public class BranchManager : IExposable, ITickDay
         GlobalInteractionManager.Instance.Notify_BranchDestroyed(branch);
         MapComponent_RatkinOrder.OnBranchDestroyed(branch);
         Find.QuestManager.OnBranchDestroyed(branch);
-    }
-
-    internal void Notify_JointPatrolEnd()
-    {
-        jointPatrolManager = null;
     }
 
     internal void Notify_DemandQuestCompleted(bool isCritical)
@@ -332,7 +314,7 @@ public class BranchManager : IExposable, ITickDay
     {
         if (allBranches.RemoveAll(b => b is null) > 0)
         {
-            Log.Error($"Some branches of {ratkinOrder} were null after loading and have been removed.");
+            Log.Error($"[OARO] Some branches of {ratkinOrder} were null after loading and have been removed.");
         }
 
         for (int i = 0; i < allBranches.Count; i++)

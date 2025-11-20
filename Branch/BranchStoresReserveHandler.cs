@@ -34,7 +34,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     {
         if (storesReserves.RemoveAll(r => r.Target is null) > 0)
         {
-            Log.Error($"Some Reserves of {branch} were null after loading and have been removed.");
+            Log.Error($"[OARO] Some Reserves of {branch} were null after loading and have been removed.");
         }
     }
 

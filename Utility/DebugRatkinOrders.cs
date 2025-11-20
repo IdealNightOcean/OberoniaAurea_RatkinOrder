@@ -14,7 +14,7 @@ public static class DebugRatkinOrders
     /// 打开骑士团调试窗口
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Dev-Win RatkinOrder",
+                 name: "Dev窗口：骑士团",
                  displayPriority: 500,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
@@ -27,7 +27,7 @@ public static class DebugRatkinOrders
     /// 打开BranchManager调试窗口
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Dev-Win BranchManager",
+                 name: "Dev窗口：骑士团分部",
                  displayPriority: 490,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
@@ -40,7 +40,7 @@ public static class DebugRatkinOrders
     /// 添加骑士团
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Add a new RatkinOrder",
+                 name: "添加一个骑士团",
                  displayPriority: 480,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
@@ -92,7 +92,7 @@ public static class DebugRatkinOrders
     /// 移除骑士团
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Remove a RatkinOrder",
+                 name: "移除一个骑士团",
                  displayPriority: 470,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
@@ -102,10 +102,10 @@ public static class DebugRatkinOrders
     }
 
     /// <summary>
-    /// 全局骑士团交互管理器调试窗口
+    /// 全局交互管理器调试窗口
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Dev-Win GlobalOrderInteraction",
+                 name: "Dev窗口： 全局交互管理",
                  displayPriority: 460,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
@@ -123,7 +123,7 @@ public static class DebugRatkinOrders
     /// 触发骑士团交互
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Trigger order interaction",
+                 name: "触发骑士团交互",
                  displayPriority: 450,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.PlayingOnMap)]
@@ -155,7 +155,7 @@ public static class DebugRatkinOrders
     /// 添加分部需求
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Add new branch demand",
+                 name: "添加分部需求",
                  displayPriority: 440,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
@@ -208,10 +208,10 @@ public static class DebugRatkinOrders
     }
 
     /// <summary>
-    /// 添加分部合约
+    /// 添加分部人口需求（合约）
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Add new branch contract",
+                 name: " 添加分部人口需求（合约）",
                  displayPriority: 440,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.Playing)]
@@ -240,7 +240,7 @@ public static class DebugRatkinOrders
     /// 添加常驻骑士
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Add a new resident knight",
+                 name: "添加常驻骑士",
                  displayPriority: 430,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.PlayingOnMap)]
@@ -257,7 +257,7 @@ public static class DebugRatkinOrders
     /// 触发善行任务（实际前置任务）
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Trigger MercyQuest",
+                 name: "触发善行任务事件",
                  displayPriority: 430,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.PlayingOnMap)]
@@ -276,10 +276,10 @@ public static class DebugRatkinOrders
     }
 
     /// <summary>
-    /// 触发袭击
+    /// 触发分部袭击
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
-                 name: "Trigger Branch Raid",
+                 name: "触发分部袭击",
                  displayPriority: 420,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.PlayingOnMap)]
@@ -299,6 +299,25 @@ public static class DebugRatkinOrders
                 raidLevelOptions.Add(levelOption);
             }
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(raidLevelOptions));
+        }
+    }
+
+
+    /// <summary>
+    /// 开始分部联巡
+    /// </summary>
+    [DebugAction(category: "OberoniaAurea",
+                 name: "开始分部联巡",
+                 displayPriority: 410,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.Playing)]
+    private static void StartJointPatrol()
+    {
+        RatkinOrderOptions(SelectRaidLevel);
+
+        void SelectRaidLevel(RatkinOrder ratkinOrder)
+        {
+            ratkinOrder.JointPatrolManager.TryStartPatrolPrep();
         }
     }
 

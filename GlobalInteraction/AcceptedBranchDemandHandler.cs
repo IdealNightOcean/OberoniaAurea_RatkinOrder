@@ -21,7 +21,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         Scribe_Collections.Look(ref records, "records", LookMode.Deep);
         if (records.RemoveAll(r => r is null || r.Branch is null) > 0)
         {
-            Log.Error($"Some {nameof(AcceptedBranchDemand)} were null or invalided after loading and have been removed.");
+            Log.Error($"[OARO] Some {nameof(AcceptedBranchDemand)} were null or invalided after loading and have been removed.");
         }
     }
 

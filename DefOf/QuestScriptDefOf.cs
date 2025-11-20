@@ -18,7 +18,7 @@ public class OARO_QuestScriptDefOf
 
     public static QuestScriptDef OARO_Quest_OrderRelationshipUpgrade;
 
-    public static QuestScriptDef OARO_Quest_BranchContract; //分部人口需求
+    public static QuestScriptDef OARO_Quest_ResidentKnightBackPlayer; //常驻骑士回归玩家
 
     static OARO_QuestScriptDefOf()
     {

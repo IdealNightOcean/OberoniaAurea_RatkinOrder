@@ -12,7 +12,18 @@ public class ResidentKnightAcademicDef : Def
 
     public List<ResidentKnightAcademicStage> academicStages = [];
 
+    public bool isHonorAcademic;
+
     public int MaxStageLevel => academicStages.Count;
+
+    public ResidentKnightAcademicStage GetStage(int level)
+    {
+        if (level < 1 || level > academicStages.Count)
+        {
+            return null;
+        }
+        return academicStages[level - 1];
+    }
 
     public override IEnumerable<string> ConfigErrors()
     {
@@ -39,6 +50,25 @@ public class ResidentKnightAcademicDef : Def
 
 public class ResidentKnightAcademicStage
 {
-    public Hediff buffHediff;
-    public float buffHediffStage;
+    public HediffDef buffHediff;
+    public int buffHediffStage;
+
+
+    //只执行一次，在升级时执行
+    public virtual void OnAcademicLevelUp(Pawn pawn)
+    {
+        if (buffHediff is not null)
+        {
+            Hediff_ResidentKnightBuff hediff = pawn.health.hediffSet.GetFirstHediffOfDef(buffHediff) as Hediff_ResidentKnightBuff;
+            if (hediff is not null)
+            {
+
+            }
+            else
+            {
+                hediff = pawn.health.AddHediff(buffHediff) as Hediff_ResidentKnightBuff;
+                hediff?.SetBuffStage(buffHediffStage);
+            }
+        }
+    }
 }

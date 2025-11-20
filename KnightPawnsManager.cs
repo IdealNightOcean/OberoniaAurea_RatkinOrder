@@ -18,7 +18,7 @@ public static class KnightPawnsManager
     {
         if (!pawn.CanBeKnight())
         {
-            Log.Error($"Failed to register pawn ({pawn}) to KnightPawnsManager: this pawn cannot be a knight.");
+            Log.Error($"[OARO] Failed to register pawn ({pawn}) to KnightPawnsManager: this pawn cannot be a knight.");
             return;
         }
         knights[pawn] = knightRecord;

@@ -269,7 +269,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
     {
         if (buildingDef.isSpecial && specialBuilding is not null)
         {
-            Log.Error($"Attempted to add a new branch building to the special building slot of {branch}, but one already exists.");
+            Log.Error($"[OARO] Attempted to add a new branch building to the special building slot of {branch}, but one already exists.");
             return;
         }
         BranchBuilding newBuilding;
@@ -277,9 +277,13 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         {
             newBuilding = BranchBuilding.GenerateBranchBuilding(buildingDef, branch);
         }
-        catch (Exception e)
+        catch (Exception ex)
         {
-            Log.Error($"Failed to generate building {buildingDef.defName} for {branch}: {e.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"generating building {buildingDef.defName} for {branch}",
+                typeName: nameof(BranchBuildingHandler),
+                methodName: nameof(AddBuilding),
+                needStackTrace: true);
             return;
         }
         if (buildingDef.isSpecial)
@@ -403,7 +407,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (noramlBuildings.RemoveAll(b => b is null) > 0)
         {
-            Log.Error($"{branch} has null buildings after loading, Removed.");
+            Log.Error($"[OARO] {branch} has null buildings after loading, Removed.");
         }
 
         for (int i = 0; i < noramlBuildings.Count; i++)

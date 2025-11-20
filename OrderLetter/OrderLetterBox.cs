@@ -92,23 +92,27 @@ public class OrderLetterBox : IExposable
         }
         catch (Exception ex)
         {
-            Log.Error($"Error when reading letter, force archived. {ex.Message}");
+            ModUtility.LogExceptionError(ex, errorDesc: "reading letter", typeName: nameof(OrderLetterBox), methodName: nameof(ReadSingleLetter));
         }
-        ArchiveLetter(letter);
+        finally
+        {
+            ArchiveLetter(letter);
+        }
     }
 
     public void ReadAllUnreadLetters(Building_OrderLetterBox letterBox, bool forceSlience = false)
     {
-        try
+
+        for (int i = 0; i < unreadLetters.Count; i++)
         {
-            for (int i = 0; i < unreadLetters.Count; i++)
+            try
             {
                 OrderLetterUtility.ReadLetter(unreadLetters[i], letterBox, forceSlience);
             }
-        }
-        catch (Exception ex)
-        {
-            Log.Error($"Error when reading all unread letters, force archived. {ex.Message}");
+            catch (Exception ex)
+            {
+                ModUtility.LogExceptionError(ex, errorDesc: "reading letter", typeName: nameof(OrderLetterBox), methodName: nameof(ReadAllUnreadLetters));
+            }
         }
 
         ClearAllUnreadLetters();

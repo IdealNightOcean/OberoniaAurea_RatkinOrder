@@ -52,7 +52,11 @@ public class BranchBuildingWithComps : BranchBuilding
             }
             catch (Exception ex)
             {
-                Log.Error("Could not instantiate or initialize a BranchBuildingComp: " + ex);
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "instantiate or initialize a BranchBuildingComp",
+                    typeName: nameof(BranchBuildingWithComps),
+                    methodName: nameof(InitializeComps),
+                    needStackTrace: true);
                 comps.Remove(buildingComp);
             }
         }

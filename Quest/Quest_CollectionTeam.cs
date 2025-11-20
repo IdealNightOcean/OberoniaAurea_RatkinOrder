@@ -385,7 +385,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             base.Enable(receivedArgs);
             if (!TryGetTeamArrive())
             {
-                Log.Error($"Failed to get team arrival in {nameof(QuestPart_CollectionTeam)}.");
+                Log.Error($"[OARO] Failed to get team arrival in {nameof(QuestPart_CollectionTeam)}.");
                 Disable();
                 quest.End(QuestEndOutcome.Unknown, sendLetter: false, playSound: false);
             }

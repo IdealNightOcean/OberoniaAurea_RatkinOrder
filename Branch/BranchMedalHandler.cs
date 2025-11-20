@@ -82,7 +82,7 @@ public class BranchMedalHandler : IExposable
         return 0;
     }
 
-    public void AddMedal(BranchMedalDef medal, short count = 1)
+    public void AddMedal(BranchMedalDef medal, int count = 1)
     {
         if (medal is null)
         {

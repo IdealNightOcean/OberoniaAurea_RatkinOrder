@@ -88,7 +88,11 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         }
         catch (System.Exception ex)
         {
-            Log.Error($"Failed to generate Tax Collector Treat quest: {ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "generating Tax Collector Treat quest",
+                typeName: nameof(QuestPart_LordJob_TaxCollector),
+                methodName: nameof(TryTriggerQuest),
+                needStackTrace: true);
             return false;
         }
     }

@@ -12,7 +12,7 @@ public class DevWindow_JointPatrolManager : DevWindowBase
     public DevWindow_JointPatrolManager(RatkinOrder ratkinOrder) : base()
     {
         this.ratkinOrder = ratkinOrder;
-        jointPatrolManager = ratkinOrder.BranchManager.JointPatrolManager;
+        jointPatrolManager = ratkinOrder.JointPatrolManager;
         optionalTitle = ratkinOrder.Name;
 
         neededTaskPotency = jointPatrolManager.NeededTaskPotency;
@@ -45,27 +45,19 @@ public class DevWindow_JointPatrolManager : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label($"All Participants: {jointPatrolManager.Participants.Count}");
+        listing_Rect.Label($"All Participants: {jointPatrolManager.ParticipantsDict.Count}");
         Text.Font = GameFont.Small;
         listing_Rect.Gap(6f);
 
-        int selectIndex = -1;
-        for (int i = 0; i < jointPatrolManager.Participants.Count; i++)
+        foreach (JointBranchRecord record in jointPatrolManager.ParticipantsDict.Values)
         {
-            if (listing_Rect.ButtonText(jointPatrolManager.Participants[i].Branch.Name, null, 0.8f))
+            if (listing_Rect.ButtonText(record.Branch.Name, null, 0.8f))
             {
-                selectIndex = i;
-                break;
+                record.Branch.OpenDevWindow();
+                Close();
+                EndContents();
+                return;
             }
-        }
-
-        if (selectIndex >= 0)
-        {
-            Close();
-            EndContents();
-            jointPatrolManager.Participants[selectIndex].Branch.OpenDevWindow();
-            selectIndex = -1;
-            return;
         }
 
         if (Event.current.type == EventType.Layout)

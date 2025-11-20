@@ -104,6 +104,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
     <Compile Include="DefOf\BranchResidentDefOf.cs" />
     <Compile Include="DefOf\BranchMedalDefOf.cs" />
+    <Compile Include="DefOf\RulePackDefOf.cs" />
     <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
@@ -115,6 +116,8 @@
     <Compile Include="JointPatrol\JointPatrolIncidentPart_PublicSecurity.cs" />
     <Compile Include="JointPatrol\JointPatrolIncidentPart_Supply.cs" />
     <Compile Include="JointPatrol\JointPatrolManager_SubType.cs" />
+    <Compile Include="Lord\LordJob_ExitMapBestForJointPatrol.cs" />
+    <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />

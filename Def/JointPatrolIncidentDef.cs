@@ -10,7 +10,7 @@ public class JointPatrolIncidentDef : Def
 {
     public enum IncidentType
     {
-        Normal,
+        Neutral,
         Positive,
         Negative,
         Building,
@@ -93,7 +93,7 @@ public class JointPatrolIncidentDef : Def
         {
             typeSelector.AddRange(
                 [
-                    (IncidentType.Normal,32f),
+                    (IncidentType.Neutral,32f),
                     (IncidentType.Positive,33f)
                 ]);
         }
@@ -101,7 +101,7 @@ public class JointPatrolIncidentDef : Def
         {
             typeSelector.AddRange(
                 [
-                    (IncidentType.Normal,25f),
+                    (IncidentType.Neutral,25f),
                     (IncidentType.Positive,25f),
                     (IncidentType.Positive,15f)
                 ]);

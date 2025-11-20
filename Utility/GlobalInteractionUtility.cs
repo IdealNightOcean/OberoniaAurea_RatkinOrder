@@ -108,7 +108,7 @@ public static class GlobalInteractionUtility
         }
 
         int noAdditionalCostAcademicCeiling = record.NoAdditionalCostAcademicCeiling();
-        if (record.TotalAcademicLevel < noAdditionalCostAcademicCeiling)
+        if (record.TotalAcademicLevel.Value < noAdditionalCostAcademicCeiling)
         {
             return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.ToString());
         }
@@ -202,10 +202,10 @@ public static class GlobalInteractionUtility
     {
         GrammarRequest grammarRequest = new()
         {
-            Includes = { OARO_ModDefOf.OARO_Dialog_AroundKnightGroupVisitInvalid }
+            Includes = { OARO_RulePackDefOf.OARO_Dialog_AroundKnightGroupVisitInvalid }
         };
-        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ratkinOrder", branch.RatkinOrder));
-        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch("branch", branch, alsoAddOrderRule: false));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ORDER", branch.RatkinOrder));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch("BRANCH", branch, alsoAddOrderRule: false));
         grammarRequest.Constants.Add("isProactive", isProactive.ToString());
         TaggedString talkText = GrammarResolver.Resolve("r_text", grammarRequest);
 

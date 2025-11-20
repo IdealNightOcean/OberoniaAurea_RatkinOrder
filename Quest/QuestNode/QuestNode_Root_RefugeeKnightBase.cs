@@ -24,7 +24,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         QuestGen.quest.AddPart(questPart_CriticalRatkinOrder);
     }
 
-    override protected void ClearQuestParameter()
+    protected override void ClearQuestParameter()
     {
         base.ClearQuestParameter();
         ratkinOrder = null;

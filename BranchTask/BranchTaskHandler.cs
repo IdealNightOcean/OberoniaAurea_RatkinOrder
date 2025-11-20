@@ -217,7 +217,11 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         }
         catch (Exception ex)
         {
-            Log.Error($"Fail to switch to task {newTaskDef}: {ex}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"switch to task {newTaskDef} for branch {branch}",
+                typeName: nameof(BranchTaskHandler),
+                methodName: nameof(StartTask),
+                needStackTrace: true);
             curTask = null;
             return false;
         }

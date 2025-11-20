@@ -136,7 +136,11 @@ public class BranchDemandHandler : ITickDay, IExposable
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to create or initialize critical demand: {ex.Message}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "generate or initialize critical demand",
+                    typeName: nameof(BranchDemandHandler),
+                    methodName: nameof(AddNewDemand),
+                    needStackTrace: true);
                 criticalDemand = null;
             }
         }
@@ -151,7 +155,11 @@ public class BranchDemandHandler : ITickDay, IExposable
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to create or initialize normal demand: {ex.Message}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "generate or initialize normal demand",
+                    typeName: nameof(BranchDemandHandler),
+                    methodName: nameof(AddNewDemand),
+                    needStackTrace: true);
                 normalDemand = null;
             }
         }

@@ -158,6 +158,7 @@ public class Window_Branch : OrderWindowBase
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(4f);
+        float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
         Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRectY + 1f, 20f, 20f);
@@ -167,43 +168,34 @@ public class Window_Branch : OrderWindowBase
             return;
         }
 
-        float offsetMainInnerMidX = mainInnerRect.xMin + mainInnerRect.width * 0.53f;
-        reusedRect = new(offsetMainInnerMidX - 637f * 0.5f, mainInnerRectY + 48f, 638f, 151f);
-        GUI.DrawTexture(reusedRect, topTitleBackground);
+        float offsetMainInnerMidX = mainInnerRectX + 824f;
 
-        reusedRect = new(reusedRect.xMin + 54f, reusedRect.yMax - 27f, 562f, 9f);
+        reusedRect = new(mainInnerRectX + 546f, mainInnerRectY + 171f, 562f, 9f);
         Widgets.FillableBar(reusedRect, Mathf.Clamp01(branch.FacilityHandler.TotalFacilityLevel.Value / (allFacilityDefCount * 4f)), IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: false);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = new(offsetMainInnerMidX - (12f + 128f), mainInnerRectY + 65f, 128f, 32f);
-        Widgets.Label(reusedRect, $"{branch.FacilityHandler.TotalFacilityLevel}/{allFacilityDefCount * 4}");
+        reusedRect = new(mainInnerRectX + (755f - 128f), mainInnerRectY + 65f, 128f, 32f);
+        Widgets.Label(reusedRect, $"{branch.FacilityHandler.TotalFacilityLevel.Value}/{allFacilityDefCount * 4}");
 
-        reusedRect = new(offsetMainInnerMidX - (12f + 192f), reusedRect.yMax + 10f, 192f, 32f);
+        reusedRect = new(mainInnerRectX + (755f - 192f), reusedRect.yMax + 10f, 192f, 32f);
         Widgets.Label(reusedRect, "OARO_TotalFacilitiesLevel".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
-        reusedRect = new(offsetMainInnerMidX + 70f, mainInnerRectY + 36f, 240f, 126f);
+        reusedRect = new(mainInnerRectX + 828f, mainInnerRectY + 36f, 241f, 125f);
         DrawStoresReserves(reusedRect);
 
         //中部区域
-        Rect middleRect = new(offsetMainInnerMidX - 578f * 0.5f, mainInnerRectY + 210f, 579f, (538f + 46f));
+        Rect middleRect = new(offsetMainInnerMidX - 579f * 0.5f, mainInnerRectY + 210f, 579f, (538f + 46f));
         DrawMiddleRect(middleRect);
 
-        //左丨中分界线
-        reusedRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, middleRect.xMin - (32f + 2f), 2f, 717f);
-        GUI.DrawTexture(reusedRect, verticalCuttingLine);
-
         //左侧区域
-        Rect leftRect = new(reusedRect.xMin - (48f + 392f), mainInnerRectY + 198f, 392f, 589f);
+        Rect leftRect = new(mainInnerRect.x + 65f, mainInnerRectY + 196f, 392f, 589f);
         DrawLeftRect(leftRect);
 
-        //中丨右分界线
-        reusedRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, middleRect.xMax + 32f, 2f, 717f);
-        GUI.DrawTexture(reusedRect, verticalCuttingLine);
-
-        Rect rightRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, reusedRect.xMax + 32f, 305f, 635f);
+        //右侧区域
+        Rect rightRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, middleRect.xMax + 66f, 305f, 635f);
         DrawRightRect(rightRect);
 
         Text.Font = GameFont.Small;
@@ -213,27 +205,26 @@ public class Window_Branch : OrderWindowBase
     private void DrawStoresReserves(Rect inRect)
     {
         IReadOnlyList<BranchStoresReserveHandler.ReserveRecord> storesReserves = branch.StoresReserveHandler.StoresReserves;
-        Rect reusedRect = new(inRect.x, inRect.y, 105f, 125f);
-        GUI.DrawTexture(reusedRect, topStoresReserveFrameI);
+        Rect reusedRect;
+
         if (storesReserves.Count > 0)
         {
-            reusedRect = new(reusedRect.x + 4f, reusedRect.y + 30f, 80f, 80f);
+            reusedRect = new(inRect.x + 2f, inRect.y + 28f, 82f, 82f);
+            reusedRect = reusedRect.ContractedBy(10f);
             GUI.DrawTexture(reusedRect, storesReserves[0].Target.IconTexture);
         }
 
-        reusedRect = new(inRect.x + 100f, inRect.yMax - 84f, 72f, 84f);
-        GUI.DrawTexture(reusedRect, topStoresReserveFrameII);
         if (storesReserves.Count > 1)
         {
-            reusedRect = new(reusedRect.x + 2f, reusedRect.y + 16f, 55f, 55f);
+            reusedRect = new(inRect.x + 102f, inRect.y + 55f, 55f, 55f);
+            reusedRect = reusedRect.ContractedBy(6f);
             GUI.DrawTexture(reusedRect, storesReserves[1].Target.IconTexture);
         }
 
-        reusedRect = new(inRect.xMax - 68f, inRect.yMax - 80f, 68f, 80f);
-        GUI.DrawTexture(reusedRect, topStoresReserveFrameIII);
         if (storesReserves.Count > 2)
         {
-            reusedRect = new(reusedRect.x + 2f, reusedRect.y + 12f, 55f, 55f);
+            reusedRect = new(inRect.x + 175f, inRect.y + 56f, 55f, 55f);
+            reusedRect = reusedRect.ContractedBy(6f);
             GUI.DrawTexture(reusedRect, storesReserves[2].Target.IconTexture);
         }
 
@@ -920,8 +911,6 @@ public class Window_Branch : OrderWindowBase
 
     private void DrawLeftRect(Rect inRect)
     {
-        GUI.DrawTexture(inRect, leftBackground);
-
         Rect reusedRect;
         Rect titleRect = new(inRect.x, inRect.y - (24f + 40f), inRect.width, 40f);
         Text.Anchor = TextAnchor.MiddleLeft;
@@ -939,11 +928,6 @@ public class Window_Branch : OrderWindowBase
         inRect.ContractedBy(2f);
 
         Rect textRect = new(inRect.x, reusedRect.yMax + 2f, inRect.width, 420f);
-        reusedRect = OARO_WindowUtility.CenterRect(textRect, 381f, 416f);
-        GUI.DrawTexture(reusedRect, leftBackgroundLace);
-
-        reusedRect = OARO_WindowUtility.CenterRectOnX(textRect, textRect.yMax - 134f, 361f, 134f);
-        GUI.DrawTexture(reusedRect, leftDownBackgroundPattern);
 
         Widgets.TextArea(textRect, "", readOnly: true);
 
@@ -1295,6 +1279,7 @@ public class Window_Branch : OrderWindowBase
                 }
             }
         }
+        optionalViewRect.yMax = entryY;
         Widgets.EndScrollView();
     }
 
@@ -1642,11 +1627,6 @@ public class Window_Branch : OrderWindowBase
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MainBackground");
-    private static readonly Texture2D topTitleBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_TopTitleBackground");
-
-    private static readonly Texture2D topStoresReserveFrameI = ContentFinder<Texture2D>.Get("UI/Branch/OARO_TopStoresReserveFrameI");
-    private static readonly Texture2D topStoresReserveFrameII = ContentFinder<Texture2D>.Get("UI/Branch/OARO_TopStoresReserveFrameII");
-    private static readonly Texture2D topStoresReserveFrameIII = ContentFinder<Texture2D>.Get("UI/Branch/OARO_TopStoresReserveFrameIII");
 
     private static readonly Texture2D middleTopButton = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MiddleTopButton");
     private static readonly Texture2D middleTopButton_Down = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MiddleTopButton_Down");
@@ -1692,12 +1672,7 @@ public class Window_Branch : OrderWindowBase
 
     private static readonly Texture2D optionalBuildingDescCuttingLine = ContentFinder<Texture2D>.Get("UI/Branch/OARO_OptionalBuildingDescCuttingLine");
 
-
-    private static readonly Texture2D leftBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_LeftBackground");
-    private static readonly Texture2D leftBackgroundLace = ContentFinder<Texture2D>.Get("UI/Branch/OARO_LeftBackgroundLace");
     private static readonly Texture2D leftTopSiteIcon = ContentFinder<Texture2D>.Get("UI/Branch/OARO_LeftTopSiteIcon");
-    private static readonly Texture2D leftDownBackgroundPattern = ContentFinder<Texture2D>.Get("UI/Branch/OARO_LeftDownBackgroundPattern");
 
     private static readonly Texture2D smallExclamation = ContentFinder<Texture2D>.Get("UI/Branch/OARO_SmallExclamation"); //小感叹号
-    private static readonly Texture2D verticalCuttingLine = ContentFinder<Texture2D>.Get("UI/Branch/OARO_VerticalCuttingLine");
 }

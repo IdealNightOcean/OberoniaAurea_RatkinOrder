@@ -109,7 +109,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         }
         if (Def.isBuildingInteraction && building is null)
         {
-            Log.Error("Attempt to apply BranchInteraction with a null  branch building.");
+            Log.Error("[OARO] Attempt to apply BranchInteraction with a null  branch building.");
             return false;
         }
 

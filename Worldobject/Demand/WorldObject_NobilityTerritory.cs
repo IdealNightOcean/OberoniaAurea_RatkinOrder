@@ -94,7 +94,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     {
         GrammarRequest namerRequest = new()
         {
-            Includes = { OARO_ModDefOf.OARO_Namer_Nobility }
+            Includes = { OARO_RulePackDefOf.OARO_Namer_Nobility }
         };
         nobilityName = GrammarResolver.Resolve("r_name", namerRequest);
         Name = nobilityName;
@@ -741,7 +741,11 @@ public sealed class MapParent_NobilityTerritory : MapParent_Enterable
         }
         catch (Exception ex)
         {
-            Log.Error($"Error in {nameof(PostMapGenerate)}: {ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "generating Nobility Territory assault map.",
+                typeName: nameof(MapParent_NobilityTerritory),
+                methodName: nameof(PostMapGenerate),
+                needStackTrace: true);
         }
     }
 

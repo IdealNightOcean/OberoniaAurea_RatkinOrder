@@ -82,7 +82,11 @@ public class GameComponent_RatkinOrder : GameComponent
         }
         catch (System.Exception ex)
         {
-            Log.Error($"Unexpected error when initializing UniqueIDManager: {ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing UniqueIDManager",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
             UniqueIDManager.ClearStaticCache();
             uniqueIDManager = new UniqueIDManager();
         }
@@ -93,7 +97,11 @@ public class GameComponent_RatkinOrder : GameComponent
         }
         catch (System.Exception ex)
         {
-            Log.Error($"Unexpected error when initializing RatkinOrderManager: {ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing RatkinOrderManager",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
             RatkinOrderManager.ClearStaticCache();
             ratkinOrderManager = new RatkinOrderManager();
         }
@@ -104,7 +112,11 @@ public class GameComponent_RatkinOrder : GameComponent
         }
         catch (System.Exception ex)
         {
-            Log.Error($"Unexpected error when initializing OrderLetterBox: {ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing OrderLetterBox",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
             OrderLetterBox.ClearStaticCache();
             orderLetterBox = new OrderLetterBox();
         }
@@ -115,7 +127,11 @@ public class GameComponent_RatkinOrder : GameComponent
         }
         catch (System.Exception ex)
         {
-            Log.Error($"Unexpected error when initializing GlobalInteractionManager: {ex.Message}");
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing GlobalInteractionManager",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
             GlobalInteractionManager.ClearStaticCache();
             globalInteractionManager = new GlobalInteractionManager();
         }

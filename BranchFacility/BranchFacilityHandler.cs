@@ -276,7 +276,7 @@ public class BranchFacilityHandler : IExposable
     {
         if (facilities.RemoveAll(kv => kv.Key is null || kv.Value == BranchFacilityLevel.None) > 0)
         {
-            Log.Error($"{branch} has null or None facilities after loading, Removed.");
+            Log.Error($"[OARO] {branch} has null or None facilities after loading, Removed.");
         }
 
         int excellentFacilityCount = 0;

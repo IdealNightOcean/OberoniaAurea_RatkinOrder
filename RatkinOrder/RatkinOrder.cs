@@ -56,6 +56,10 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     private BranchManager branchManager;
     public BranchManager BranchManager => branchManager;
 
+    //联巡管理
+    private JointPatrolManager jointPatrolManager;
+    public JointPatrolManager JointPatrolManager => jointPatrolManager;
+
     private RatkinOrder()
     {
         TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
@@ -72,6 +76,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
         fundHandler = new FundHandler(this);
         reformationManager = new ReformationManager(this);
         branchManager = new BranchManager(this);
+        jointPatrolManager = new JointPatrolManager(this);
 
         loadID = UniqueIDManager.GetUniqueID("RatkinOrder");
     }
@@ -89,6 +94,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
         Scribe_Deep.Look(ref fundHandler, "fundHandler", ctorArgs: this);
         Scribe_Deep.Look(ref reformationManager, "reformationManager", ctorArgs: this);
         Scribe_Deep.Look(ref branchManager, "branchManager", ctorArgs: this);
+        Scribe_Deep.Look(ref jointPatrolManager, "jointPatrolManager", ctorArgs: this);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Order(this));
@@ -99,7 +105,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
 
         if (this.IsHashIntervalTick(1000))
         {
-            branchManager.TickLong();
+            jointPatrolManager.TickLong();
 
             if (this.IsHashIntervalTick(60000))
             {
@@ -109,6 +115,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
                 if (TickUtility.YearPassed() > curYearPassed)
                 {
                     curYearPassed = TickUtility.YearPassed();
+
                 }
             }
         }

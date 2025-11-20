@@ -9,7 +9,8 @@ public class UniqueIDManager : IExposable
     private Dictionary<string, int> uniqueIDs = new(2)
         {
             { "RatkinOrder", 0 },
-            { "Branch", 0 }
+            { "Branch", 0 },
+            { "ResidentKnight", 0}
         };
 
     private bool wasLoaded;

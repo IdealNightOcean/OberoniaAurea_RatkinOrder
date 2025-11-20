@@ -179,9 +179,10 @@ public static class BranchSupportUtility
             nonKnightCount += (building.HasUpgraded ? 10 : 6);
         }
 
-        if (memberCount <= 0 && commanderCount <= 0 && nonKnightCount <= 0)
+        int totalCount = memberCount + commanderCount + nonKnightCount;
+        if (totalCount <= 0)
         {
-            Log.Error($"No valid members to generate in {nameof(BranchSupportUtility)}.{nameof(GenerateCombatRaidWorker)}: all counts are zero or negative.");
+            Log.Error($"[OARO] No valid members to generate in {nameof(BranchSupportUtility)}.{nameof(GenerateCombatRaidWorker)}: all counts are zero or negative.");
             return null;
         }
 

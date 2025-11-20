@@ -101,7 +101,7 @@ public class RatkinOrderManager : IExposable
     {
         if (allRatkinOrders.RemoveAll(r => r is null) > 0)
         {
-            Log.Error($"Some Ratkin Orders were null after loading and have been removed.");
+            Log.Error($"[OARO] Some Ratkin Orders were null after loading and have been removed.");
         }
         for (int i = 0; i < allRatkinOrders.Count; i++)
         {

@@ -95,7 +95,7 @@ public class DevWindow_Order : DevWindowBase
         {
             Close();
             EndContents();
-            ratkinOrder.BranchManager.JointPatrolManager.OpenDevWindow();
+            ratkinOrder.JointPatrolManager.OpenDevWindow();
             return;
         }
 

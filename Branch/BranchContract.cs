@@ -69,7 +69,7 @@ public class BranchContract : IExposable
         }
         catch (Exception ex)
         {
-            Log.Error($"Exception occurred while getting contract reason: {ex.Message}");
+            ModUtility.LogExceptionError(ex, "getting contract reason", nameof(BranchContract), nameof(PostInit));
             requestReason = "ERROR".Colorize(ColorLibrary.RedReadable);
         }
         curState = ContractState.Ongoing;

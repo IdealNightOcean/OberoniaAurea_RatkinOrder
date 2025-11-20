@@ -1,12 +1,14 @@
 ﻿using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
+using RimWorld.QuestGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using UnityEngine;
 using Verse;
+using Verse.AI.Group;
+using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -17,7 +19,6 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 {
     private const int JointPatrolDurationPrepDays = 3;
     private const int JointPatrolDurationDays = 7;
-    //PatrolStateprivatePatrolState PatrolStatestaticPatrolState PatrolStatereadonlyPatrolState PatrolStateBranchTaskTypePatrolState[] PatrolStatepatrolTaskTypePatrolState = [PatrolStateBranchTaskTypePatrolState.PatrolStateCrimeFightingPatrolState, PatrolStateBranchTaskTypePatrolState.PatrolStateStabilityMaintenancePatrolState, PatrolStateBranchTaskTypePatrolState.PatrolStateAssistancePatrolState, PatrolStateBranchTaskTypePatrolState.PatrolStateSupervisionPatrolState];
 
     private readonly RatkinOrder ratkinOrder;
     private BranchManager BranchManager => ratkinOrder.BranchManager;
@@ -26,7 +27,6 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public PatrolState CurState => curState;
 
     private int tickToNextStage = JointPatrolDurationPrepDays * 60000;
-    private int tickToNextCheck = 60000;
 
     private int burdenSquadCount;
     public int BurdenSquadCount => burdenSquadCount;
@@ -38,7 +38,9 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     [Unsaved] private Dictionary<Branch, JointBranchRecord> participantsDict = [];
     public IReadOnlyDictionary<Branch, JointBranchRecord> ParticipantsDict => participantsDict;
-    private List<Pawn> participatingResidentKnights = [];
+
+    private List<ResidentKnightRecord> participatingResidentKnights = [];
+    public IReadOnlyList<ResidentKnightRecord> ParticipatingResidentKnights => participatingResidentKnights;
     private ThingOwner<Pawn> innerContainer;
 
     private Dictionary<PatrolInteractionType, int> patrolInteractionAcquired = [];
@@ -48,6 +50,12 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     [Unsaved] private LazyMutable<IReadOnlyDictionary<BranchTaskType, float>> taskPotencys;
     [Unsaved] private readonly LazyMutable<IReadOnlyDictionary<IncidentType, List<JointPatrolIncidentDef>>> potentialIncidents;
+
+    private int sacrificeCount;
+    public int SacrificeCount => sacrificeCount;
+
+    private string completionSummary = string.Empty;
+    public string CompletionSummary => completionSummary;
 
     public float NeededTaskPotency
     {
@@ -66,7 +74,11 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public JointPatrolManager(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        innerContainer = new ThingOwner<Pawn>(this);
+        innerContainer = new ThingOwner<Pawn>(this)
+        {
+            removeContentsIfDestroyed = true,
+            contentsLookMode = LookMode.Deep
+        };
 
         taskPotencys = new(refreshFunc: () => participants.GroupBy(p => p.FocusedTaskType)
                                                           .ToDictionary(g => g.Key, g => g.Sum(gp => gp.TaskPotency.Value)));
@@ -82,36 +94,19 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         Scribe_Values.Look(ref curState, "curState", PatrolState.Invalid);
         Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
-        Scribe_Values.Look(ref tickToNextCheck, "tickToStart", 60000);
 
         Scribe_Values.Look(ref patrolLevel, "CurPatrolType", PatrolLevel.Popedom);
         Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
+        Scribe_Values.Look(ref sacrificeCount, "sacrificeCount", 0);
+
+        Scribe_Values.Look(ref completionSummary, "completionSummary", string.Empty);
 
         Scribe_Collections.Look(ref participants, "participants", LookMode.Deep);
         Scribe_Collections.Look(ref patrolInteractionAcquired, "patrolInteractionAcquired", LookMode.Value, LookMode.Value);
+        Scribe_Collections.Look(ref participatingResidentKnights, "participatingResidentKnights", LookMode.Reference);
         Scribe_Collections.Look(ref incidentRecords, "incidentRecords", LookMode.Deep);
-    }
 
-    private void ClearPatrolData(PatrolState forState)
-    {
-        burdenSquadCount = 0;
-
-        tickToNextStage = JointPatrolDurationPrepDays * 60000;
-        tickToNextCheck = 60000;
-
-        participants.Clear();
-        participantsDict.Clear();
-
-        taskPotencys.Reset();
-        potentialIncidents.Reset();
-        if (forState == PatrolState.Prepare)
-        {
-            incidentRecords.Clear();
-        }
-        else
-        {
-            patrolLevel = default;
-        }
+        Scribe_Deep.Look(ref innerContainer, "innerContainer");
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_JointPatrolManager(ratkinOrder));
@@ -120,11 +115,18 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         listing_Rect.Label($"CurState: {curState}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"TickToNextStage: {tickToNextStage}");
-        listing_Rect.Label($"TickToNextCheck: {tickToNextCheck}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"BurdenSquadCount: {burdenSquadCount}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"CurPatrolType: {patrolLevel}");
+        if (curState != PatrolState.Invalid)
+        {
+            listing_Rect.Label($"ParticipantsCount: {participantsDict.Count}");
+            if (listing_Rect.ButtonText("next stage"))
+            {
+                tickToNextStage = 0;
+            }
+        }
     }
 
     public void TickLong()
@@ -134,20 +136,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             return;
         }
 
-        if (curState == PatrolState.Ongoing)
-        {
-            PeriodicPatrolIncidentChecker();
-        }
-    }
-
-    public void TickDay()
-    {
-        if (curState == PatrolState.Invalid)
-        {
-            return;
-        }
-
-        if ((tickToNextStage -= 60000) <= 0)
+        if ((tickToNextStage -= 1000) <= 0)
         {
             if (curState == PatrolState.Ongoing)
             {
@@ -158,14 +147,101 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 StartJointPatrol();
             }
         }
+        else if (curState == PatrolState.Ongoing)
+        {
+            PeriodicPatrolIncidentChecker();
+        }
     }
 
     public bool IsParticipant(Branch branch) => participantsDict.ContainsKey(branch);
+    public void ChangeParticipant(IEnumerable<Branch> toAdd, IEnumerable<Branch> toRemove)
+    {
+        if (curState != PatrolState.Prepare)
+        {
+            Log.Error("[OARO] Trying to change participant branch when joint patrol has started.");
+            return;
+        }
 
-    private void AddParticipant(Branch branch)
+        if (toRemove is not null)
+        {
+            foreach (Branch branch in toRemove)
+            {
+                RemoveParticipant(branch);
+            }
+        }
+
+        if (toAdd is not null)
+        {
+            foreach (Branch branch in toAdd)
+            {
+                AddParticipant(branch);
+            }
+        }
+    }
+
+    public AcceptanceReport CanActiveParticipantInteraction(JointBranchRecord record, PatrolInteractionType interaction, Map map, bool resultOnly)
+    {
+        if (curState != PatrolState.Ongoing)
+        {
+            return false;
+        }
+        if (patrolInteractionAcquired.TryGetValue(interaction, out int acquiredCount))
+        {
+            if (acquiredCount > RatkinOrderSettings.MaxAcquiredPatrolInteractionPreType)
+            {
+                return resultOnly ? false : "OARO_ReachMax_AcquiredPatrolInteractionPreType".Translate();
+            }
+        }
+        return record.CanActiveInteraction(interaction, map, resultOnly);
+    }
+
+    public void TryActiveParticipantInteraction(JointBranchRecord record, PatrolInteractionType interaction, Map map)
+    {
+        if (curState != PatrolState.Ongoing)
+        {
+            return;
+        }
+        if (record.ActiveInteraction(interaction, applyCost: true, map))
+        {
+            if (patrolInteractionAcquired.TryGetValue(interaction, out int acquiredCount))
+            {
+                patrolInteractionAcquired[interaction] = acquiredCount + 1;
+            }
+            else
+            {
+                patrolInteractionAcquired[interaction] = 1;
+            }
+        }
+    }
+
+    public void OnKnightSacrifice(int sacrificeCount) => this.sacrificeCount = Mathf.Max(this.sacrificeCount + sacrificeCount);
+
+    public bool BringResidentKnightBackTeam(ResidentKnightRecord record)
     {
         if (curState == PatrolState.Invalid)
         {
+            Log.Error("[OARO] Trying to bring back resident knight when joint patrol is invalid.");
+            return false;
+        }
+
+        if (!participantsDict.ContainsKey(record?.Branch))
+        {
+            return false;
+        }
+        if (!participatingResidentKnights.Contains(record))
+        {
+            participatingResidentKnights.Add(record);
+            return true;
+        }
+        return false;
+    }
+    public void OnResidentKnightBackTeam(Pawn knight) => innerContainer.TryAddOrTransfer(knight);
+
+    private void AddParticipant(Branch branch)
+    {
+        if (curState != PatrolState.Prepare)
+        {
+            Log.Error("[OARO] Trying to add participant branch when joint patrol has started or ended.");
             return;
         }
 
@@ -177,7 +253,6 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             branch.WorkStateDirty = true;
         }
     }
-
     private void RemoveParticipant(Branch branch)
     {
         if (curState == PatrolState.Invalid)
@@ -197,11 +272,9 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 }
             }
 
-            if (curState == PatrolState.Prepare)
-            {
-                participatingResidentKnights.RemoveAll(ShouldRemoveResidentKnight);
-            }
-            else
+            participatingResidentKnights.RemoveAll(r => r?.Branch == branch);
+
+            if (curState == PatrolState.Ongoing)
             {
                 List<Pawn> pawnToRemove = innerContainer.InnerListForReading.Where(ShouldRemoveResidentKnight).ToList();
                 if (!pawnToRemove.NullOrEmpty())
@@ -211,36 +284,60 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                         innerContainer.Remove(p);
                     }
                 }
+                participatingResidentKnights.RemoveAll(r => r?.Branch == branch);
             }
         }
 
         bool ShouldRemoveResidentKnight(Pawn knight)
         {
-            return !ResidentKnightsManager.TryGetKnightRecord(participatingResidentKnights[i], out ResidentKnightRecord residentRecord)
-                    || residentRecord.Branch == branch;
+            return !ResidentKnightsManager.TryGetKnightRecord(knight, out ResidentKnightRecord residentRecord) || residentRecord.Branch == branch;
         }
     }
 
-    public void BringResidentKnightBackTeam(ResidentKnightRecord record)
+    private void ClearPatrolData(PatrolState forState)
     {
-        if (curState == PatrolState.Invalid)
+        if (curState == PatrolState.Ongoing)
         {
+            Log.Error("[OARO] Trying to clear joint patrol data when joint patrol is ongoing.");
             return;
         }
 
-        if (!participantsDict.ContainsKey(record?.Branch))
+        burdenSquadCount = 0;
+
+        tickToNextStage = JointPatrolDurationPrepDays * 60000;
+
+        participants.Clear();
+        participantsDict.Clear();
+
+        participatingResidentKnights.Clear();
+        if (innerContainer.Count > 0)
         {
-            return;
+            Log.Error("[OARO] Trying to clear joint patrol data when inner container is not empty during prepare state.");
         }
-        if (!participatingResidentKnights.Contains(record.Knight))
+        innerContainer.Clear();
+
+        taskPotencys.Reset();
+        potentialIncidents.Reset();
+
+        if (forState == PatrolState.Prepare)
         {
-            participatingResidentKnights.Add(record.Knight);
+            patrolLevel = default;
+            sacrificeCount = 0;
+            completionSummary = string.Empty;
+            incidentRecords.Clear();
         }
     }
 
-    private bool TryStartPatrolPrep()
+    public void TryStartPatrolPrep()
     {
+        if (curState != PatrolState.Invalid)
+        {
+            Log.Error("[OARO] Trying to start joint patrol prep when joint patrol is already started.");
+            return;
+        }
+
         ClearPatrolData(forState: PatrolState.Prepare);
+        curState = PatrolState.Prepare;
         /*
         * PatrolState选择联巡等级PatrolState
         */
@@ -256,7 +353,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         catch (Exception ex)
         {
-            Log.Error("Failed to set group patrol type: " + ex.Message);
+            ModUtility.LogExceptionError(ex, "set joint patrol level", nameof(JointPatrolManager), nameof(TryStartPatrolPrep), needStackTrace: true);
             patrolLevel = PatrolLevel.Popedom;
         }
         potentialIncidents.MarkDirty();
@@ -286,24 +383,24 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         * PatrolState终止分队当前任务丨移除无法准备联巡的分队PatrolState
         */
         List<Branch> toRemove = [];
-        foreach (JointBranchRecord record in participants)
+        foreach (Branch branch in participantsDict.Keys)
         {
             try
             {
-                if (record.Branch.TaskHandler.HasTask)
+                if (branch.TaskHandler.HasTask)
                 {
-                    record.Branch.TaskHandler.EndCurTask(startRest: false);
+                    branch.TaskHandler.EndCurTask(startRest: false);
                 }
             }
             catch
             {
-                toRemove.Add(record.Branch);
+                toRemove.Add(branch);
             }
         }
 
         if (toRemove.Count > 0)
         {
-            Log.Error($"Some branches cannot prepare for the Joint Patrol of {ratkinOrder}.");
+            Log.Error($"[OARO] Some branches cannot prepare for the Joint Patrol of {ratkinOrder}.");
             foreach (Branch branch in toRemove)
             {
                 RemoveParticipant(branch);
@@ -313,46 +410,30 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         //PatrolState无任一分队参与联巡则返回falsePatrolState
         if (participants.NullOrEmpty())
         {
-            return false;
+            Log.Error($"[OARO] No branch can participate in the Joint Patrol of {ratkinOrder}.");
+            curState = PatrolState.Invalid;
+            ClearPatrolData(forState: PatrolState.Invalid);
+            return;
         }
 
         /*
         * PatrolState开始联巡准备PatrolState
         */
+        curState = PatrolState.Prepare;
         tickToNextStage = JointPatrolDurationPrepDays * 60000;
 
-        return true;
-    }
-
-    public void ChangeParticipant(IEnumerable<Branch> toAdd, IEnumerable<Branch> toRemove)
-    {
-        if (curState != PatrolState.Prepare)
-        {
-            Log.Error("Trying to change participant branch when joint patrol has started.");
-            return;
-        }
-
-        if (toRemove is not null)
-        {
-            foreach (Branch branch in toRemove)
-            {
-                RemoveParticipant(branch);
-            }
-        }
-
-        if (toAdd is not null)
-        {
-            foreach (Branch branch in toAdd)
-            {
-                AddParticipant(branch);
-            }
-        }
+        return;
     }
 
     private void StartJointPatrol()
     {
+        if (curState != PatrolState.Prepare)
+        {
+            Log.Error("[OARO] Trying to start joint patrol when joint patrol is not in prepare state.");
+            return;
+        }
+
         tickToNextStage = JointPatrolDurationDays * 60000;
-        tickToNextCheck = 60000;
         curState = PatrolState.Ongoing;
 
         int overcap = participants.Count - burdenSquadCount;
@@ -373,78 +454,241 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 record.ActiveInteraction(PatrolInteractionType.Military, applyCost: false);
             }
         }
+
+        participatingResidentKnights.RemoveAll(r => !r.IsValid && !r.Knight.Spawned);
+
+
+        if (participatingResidentKnights.Count > 0)
+        {
+            Dictionary<Map, List<Pawn>> lordMapDict = participatingResidentKnights.Select(r => r.Knight).GroupBy(p => p.Map).ToDictionary(g => g.Key, g => g.ToList());
+            foreach (KeyValuePair<Map, List<Pawn>> kv in lordMapDict)
+            {
+                LordMaker.MakeNewLord(ratkinOrder.Faction, new LordJob_ExitMapBestForJointPatrol(ratkinOrder), kv.Key, startingPawns: kv.Value);
+            }
+        }
     }
 
     private void EndJointPatrol()
     {
-        if (curState == PatrolState.Invalid)
+        if (curState != PatrolState.Ongoing)
         {
+            Log.Error("[OARO] Trying to end joint patrol when joint patrol is not ongoing.");
             return;
         }
 
         curState = PatrolState.Invalid;
 
-        StringBuilder endText = new();
-        foreach (JointBranchRecord record in participants)
+        try
         {
-            record.NextIncidentCheckTick = int.MaxValue;
-            record.TaskPotency.MarkDirty();
+            BringResidentKnightBackPlayer();
         }
-        taskPotencys.MarkDirty();
-        IReadOnlyDictionary<BranchTaskType, float> endTaskPotencys = taskPotencys.Value;
-        IReadOnlyDictionary<BranchTaskType, List<Branch>> taskTypeBranches = participants.GroupBy(p => p.FocusedTaskType)
-                                                                                         .ToDictionary(g => g.Key, g => g.Select(p => p.Branch).ToList());
-        float neededTaskPotency = NeededTaskPotency;
-
-        List<Branch> taskBranches;
-
-
-        if (CompletedTaskOfType(BranchTaskType.CrimeFighting))
+        catch (Exception ex1)
         {
+            ModUtility.LogExceptionError(ex1, "bring resident knights back to player", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+        }
 
-            if (taskTypeBranches.TryGetValue(BranchTaskType.CrimeFighting, out taskBranches))
+        try
+        {
+            participants.RemoveAll(r => r is null || r.Branch is null);
+            participantsDict.RemoveAll(kv => kv.Key is null || kv.Value is null);
+
+            foreach (JointBranchRecord record in participants)
             {
+                record.NextIncidentCheckTick = int.MaxValue;
+                record.TaskPotency.MarkDirty();
+            }
+            taskPotencys.MarkDirty();
 
+            float fundGain = 0f;
+            float reformationGain = 0f;
+            int populationGain = 0;
+            float publicSecurityGain = 0f;
+            float participantPublicSecurityGain = 0f;
+
+            float neededTaskPotency = NeededTaskPotency;
+            IReadOnlyDictionary<BranchTaskType, float> endTaskPotencys = taskPotencys.Value;
+            IReadOnlyDictionary<BranchTaskType, List<Branch>> taskTypeBranches = participants.GroupBy(p => p.FocusedTaskType)
+                                                                                             .ToDictionary(g => g.Key, g => g.Select(p => p.Branch).ToList());
+            List<Branch> taskBranches = [];
+            List<BranchTaskType> succeedTaksTypes = [];
+            List<BranchTaskType> failedTaksTypes = [];
+            try
+            {
+                if (CompletedTaskOfType(BranchTaskType.CrimeFighting))
+                {
+                    participantPublicSecurityGain += Rand.Range(0.05f, 0.15f);
+                    fundGain += 0.05f;
+                    TaskOfTypeSuccess(BranchTaskType.CrimeFighting, BranchMedalDefOf.OARO_Courage);
+                }
+                else
+                {
+                    TaskOfTypeFail(BranchTaskType.CrimeFighting);
+                }
+
+                if (CompletedTaskOfType(BranchTaskType.StabilityMaintenance))
+                {
+                    populationGain += Rand.Range(50, 150);
+                    fundGain += 0.05f;
+                    TaskOfTypeSuccess(BranchTaskType.StabilityMaintenance, BranchMedalDefOf.OARO_Tenacity);
+                }
+                else
+                {
+                    TaskOfTypeFail(BranchTaskType.StabilityMaintenance);
+                }
+
+                if (CompletedTaskOfType(BranchTaskType.Assistance))
+                {
+                    populationGain += Rand.Range(50, 150);
+                    reformationGain += 10f;
+                    TaskOfTypeSuccess(BranchTaskType.Assistance, BranchMedalDefOf.OARO_Rescue);
+                }
+                else
+                {
+                    TaskOfTypeFail(BranchTaskType.Assistance);
+                }
+
+                if (CompletedTaskOfType(BranchTaskType.Supervision))
+                {
+                    participantPublicSecurityGain += Rand.Range(0.05f, 0.15f);
+                    reformationGain += 10f;
+                    TaskOfTypeSuccess(BranchTaskType.Supervision, BranchMedalDefOf.OARO_Justice);
+                }
+                else
+                {
+                    TaskOfTypeFail(BranchTaskType.Supervision);
+                }
+            }
+            catch (Exception subEx1)
+            {
+                ModUtility.LogExceptionError(subEx1, "calculate joint patrol task results", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+            }
+
+            switch (patrolLevel)
+            {
+                case PatrolLevel.Kingdom:
+                    fundGain *= 2f;
+                    reformationGain *= 2f;
+                    break;
+                case PatrolLevel.Border:
+                    fundGain *= 3f;
+                    reformationGain *= 3f;
+                    break;
+                default:
+                    break;
+            }
+
+            int publicSecurityUpCount = 0;
+            int publicSecurityDownCount = 0;
+            try
+            {
+                ratkinOrder.FundHandler.AdjustFundsImmediately(fundGain, "OARO_Fund_JointPatrolCompletion".Translate());
+                ratkinOrder.ReformationManager.ReformProgress += reformationGain;
+
+                foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
+                {
+                    float publicSecurityChange = participantsDict.ContainsKey(branch) ? participantPublicSecurityGain + publicSecurityGain : publicSecurityGain;
+                    branch.PopulationHandler.PublicSecurity += publicSecurityChange;
+                    if (publicSecurityChange > 0f)
+                    {
+                        publicSecurityUpCount++;
+                    }
+                    else if (publicSecurityChange < 0f)
+                    {
+                        publicSecurityDownCount++;
+                    }
+                }
+
+                foreach (KeyValuePair<Branch, JointBranchRecord> kv in participantsDict)
+                {
+                    kv.Key.PopulationHandler.Population += populationGain;
+                    if (kv.Value.HasInteraction(PatrolInteractionType.Diplomacy))
+                    {
+                        BranchMedalDef medalDef = DefDatabase<BranchMedalDef>.GetRandom();
+                        kv.Key.MedalHandler.AddMedal(medalDef);
+                    }
+                }
+            }
+            catch (Exception subEx2)
+            {
+                ModUtility.LogExceptionError(subEx2, "apply joint patrol results", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+            }
+
+            try
+            {
+                GrammarRequest grammarRequest = new()
+                {
+                    Includes = { OARO_RulePackDefOf.OARO_JointPatrolCompletion }
+                };
+                grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ORDER", ratkinOrder));
+                grammarRequest.Rules.Add(new Rule_String("patrolLevel", $"OARO_JointPatrolLevel_{patrolLevel}".Translate()));
+                grammarRequest.Rules.Add(new Rule_String("participantsCount", participants.Count.ToString()));
+
+                grammarRequest.Constants.Add("sacrificeCount", sacrificeCount.ToString());
+                grammarRequest.Rules.Add(new Rule_String("sacrificeCount", sacrificeCount.ToString()));
+
+                grammarRequest.Rules.Add(new Rule_String("fundGain", fundGain.ToStringPercentSigned("0.##").Colorize(fundGain > 0f ? Color.green : ColorLibrary.RedReadable)));
+                grammarRequest.Rules.Add(new Rule_String("reformationGain", reformationGain.ToStringWithSign("0.##").Colorize(reformationGain > 0f ? Color.green : ColorLibrary.RedReadable)));
+                grammarRequest.Rules.Add(new Rule_String("publicSecurityUpCount", publicSecurityUpCount.ToString()));
+                grammarRequest.Rules.Add(new Rule_String("publicSecurityDownCount", publicSecurityDownCount.ToString()));
+                grammarRequest.Rules.Add(new Rule_String("totalPopulationGain", (populationGain * participants.Count).ToString()));
+
+                grammarRequest.Constants.Add("succeedTaksTypeCount", succeedTaksTypes.Count.ToString());
+                grammarRequest.Constants.Add("failedTaksTypeCount", failedTaksTypes.Count.ToString());
+                grammarRequest.Rules.Add(new Rule_String("succeedTaksTypeCount", succeedTaksTypes.Count.ToString()));
+                grammarRequest.Rules.Add(new Rule_String("failedTaksTypeCount", failedTaksTypes.Count.ToString()));
+
+                grammarRequest.Rules.Add(new Rule_String("succeedTaksTypeNames", string.Join(", ", succeedTaksTypes.Select(t => $"OARO_JointPatrolTaskType_{t}".Translate()))));
+                grammarRequest.Rules.Add(new Rule_String("failedTaksTypeNames", string.Join(", ", failedTaksTypes.Select(t => $"OARO_JointPatrolTaskType_{t}".Translate()))));
+                completionSummary = GrammarResolver.Resolve("r_text", grammarRequest);
+            }
+            catch (Exception subEx3)
+            {
+                ModUtility.LogExceptionError(subEx3, "generate joint patrol completion summary", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+                completionSummary = "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
+            }
+
+            OrderLetterUtility.ReceiveLetter(
+                label: "OARO_JointPatrolCompletionSummary".Translate(ratkinOrder.Name.Named("ORDERNAME")),
+                text: completionSummary,
+                letterType: OrderLetter.LetterType.Official,
+                relatedOrder: ratkinOrder,
+                sender: ratkinOrder.Name);
+
+            bool CompletedTaskOfType(BranchTaskType taskType)
+            {
+                if (endTaskPotencys?.TryGetValue(taskType, out float taskPotency) ?? false)
+                {
+                    return taskPotency > neededTaskPotency;
+                }
+                return false;
+            }
+
+            void TaskOfTypeSuccess(BranchTaskType taskType, BranchMedalDef medalDef)
+            {
+                succeedTaksTypes.Add(taskType);
+                if (taskTypeBranches?.TryGetValue(taskType, out taskBranches) ?? false)
+                {
+                    foreach (Branch branch in taskBranches)
+                    {
+                        branch?.MedalHandler.AddMedal(medalDef);
+                    }
+                }
+            }
+
+            void TaskOfTypeFail(BranchTaskType taskType)
+            {
+                fundGain -= 0.03f;
+                publicSecurityGain -= 0.025f;
+                failedTaksTypes.Add(taskType);
             }
         }
-
-        if (CompletedTaskOfType(BranchTaskType.StabilityMaintenance))
+        catch (Exception ex2)
         {
-            if (taskTypeBranches.TryGetValue(BranchTaskType.StabilityMaintenance, out taskBranches))
-            {
-
-            }
+            ModUtility.LogExceptionError(ex2, "finalize joint patrol", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
         }
 
-        if (CompletedTaskOfType(BranchTaskType.Assistance))
-        {
-            if (taskTypeBranches.TryGetValue(BranchTaskType.Assistance, out taskBranches))
-            {
-
-            }
-        }
-
-        if (CompletedTaskOfType(BranchTaskType.Supervision))
-        {
-            if (taskTypeBranches.TryGetValue(BranchTaskType.Supervision, out taskBranches))
-            {
-
-            }
-        }
-
-        ratkinOrder.BranchManager.Notify_JointPatrolEnd();
-
+        curState = PatrolState.Invalid;
         ClearPatrolData(forState: PatrolState.Invalid);
-
-
-        bool CompletedTaskOfType(BranchTaskType taskType)
-        {
-            if (endTaskPotencys.TryGetValue(taskType, out float taskPotency))
-            {
-                return taskPotency > neededTaskPotency;
-            }
-            return false;
-        }
     }
 
     private void PeriodicPatrolIncidentChecker()
@@ -495,55 +739,46 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
     }
 
-    public AcceptanceReport CanActiveParticipantInteraction(JointBranchRecord record, PatrolInteractionType interaction, Map map, bool resultOnly)
+    private void BringResidentKnightBackPlayer()
     {
-        if (curState != PatrolState.Ongoing)
+        if (curState != PatrolState.Invalid)
         {
-            return false;
+            Log.Error("[OARO] Trying to bring back resident knight when joint patrol is not ended.");
+            return;
         }
-        if (patrolInteractionAcquired.TryGetValue(interaction, out int acquiredCount))
-        {
-            if (acquiredCount > RatkinOrderSettings.MaxAcquiredPatrolInteractionPreType)
-            {
-                return resultOnly ? false : "OARO_ReachMax_AcquiredPatrolInteractionPreType".Translate();
-            }
-        }
-        return record.CanActiveInteraction(interaction, map, resultOnly);
-    }
-
-    public void TryActiveParticipantInteraction(JointBranchRecord record, PatrolInteractionType interaction, Map map)
-    {
-        if (curState != PatrolState.Ongoing)
+        if (innerContainer.Count == 0)
         {
             return;
         }
-        if (record.ActiveInteraction(interaction, applyCost: true, map))
-        {
-            if (patrolInteractionAcquired.TryGetValue(interaction, out int acquiredCount))
-            {
-                patrolInteractionAcquired[interaction] = acquiredCount + 1;
-            }
-            else
-            {
-                patrolInteractionAcquired[interaction] = 1;
-            }
-        }
+
+        List<Pawn> residentKnights = innerContainer.InnerListForReading.ToList();
+        Slate slate = new();
+        slate.SetBasicOrderSlateVar(ratkinOrder);
+        slate.Set("residentKnights", residentKnights);
+        OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnightBackPlayer, slate, forced: true);
+
+        innerContainer.Clear();
     }
 
     internal void PostLoadInit()
     {
+        // 使用非短路的 | 运算符，以确保两个列表都会被清理
+        if (participatingResidentKnights.RemoveAll(k => k is null) > 0 | innerContainer.RemoveAll(p => p is null) > 0)
+        {
+            Log.Error($"[OARO] Some participating resident knights of {ratkinOrder} were null after loading and have been removed.");
+        }
         if (curState != PatrolState.Invalid)
         {
-            if (participants.RemoveAll(r => r.Branch is null) > 0)
+            if (participants.RemoveAll(r => r is null || r.Branch is null) > 0)
             {
-                Log.Error($"Some participant branches of {ratkinOrder} were null after loading and have been removed.");
+                Log.Error($"[OARO] Some participant branches of {ratkinOrder} were null after loading and have been removed.");
             }
             participantsDict = participants.GroupBy(r => r.Branch).ToDictionary(g => g.Key, g => g.First());
         }
     }
 
     public IThingHolder ParentHolder => null;
-    public void GetChildHolders(List<IThingHolder> outChildren) => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, participatingResidentKnights);
-    public ThingOwner GetDirectlyHeldThings() => participatingResidentKnights;
+    public void GetChildHolders(List<IThingHolder> outChildren) => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, innerContainer);
+    public ThingOwner GetDirectlyHeldThings() => innerContainer;
 
 }

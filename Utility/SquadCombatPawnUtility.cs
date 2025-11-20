@@ -17,7 +17,7 @@ public static class SquadCombatPawnUtility
         Branch branch = parms.Branch;
         if (!TryGetRandomBranchPawnGroupMakerOfKind(branch, PawnGroupKindDefOf.Combat, out PawnGroupOption groupOption))
         {
-            Log.Error($"No usable {nameof(PawnGroupOption)} for {PawnGroupKindDefOf.Combat} found in {parms.RatkinOrder}");
+            Log.Error($"[OARO] No usable {nameof(PawnGroupOption)} for {PawnGroupKindDefOf.Combat} found in {parms.RatkinOrder}");
             return pawns;
         }
 
@@ -57,7 +57,7 @@ public static class SquadCombatPawnUtility
                 }
                 else
                 {
-                    Log.Error($"No usable {nameof(PawnGenOption)} with tag \"KnightMember\" for select {nameof(PawnGroupOption)}");
+                    Log.Error($"[OARO] No usable {nameof(PawnGenOption)} with tag \"KnightMember\" for select {nameof(PawnGroupOption)}");
                 }
             }
 
@@ -88,7 +88,7 @@ public static class SquadCombatPawnUtility
                 }
                 else
                 {
-                    Log.Error($"No usable {nameof(PawnGenOption)} with tag \"KnightCommander\" for select {nameof(PawnGroupOption)}");
+                    Log.Error($"[OARO] No usable {nameof(PawnGenOption)} with tag \"KnightCommander\" for select {nameof(PawnGroupOption)}");
                 }
             }
 
@@ -117,7 +117,7 @@ public static class SquadCombatPawnUtility
                 }
                 else
                 {
-                    Log.Error($"No usable {nameof(PawnGroupMaker)} for {PawnGroupKindDefOf.Combat} found in {faction}");
+                    Log.Error($"[OARO] No usable {nameof(PawnGroupMaker)} for {PawnGroupKindDefOf.Combat} found in {faction}");
                 }
             }
         }
@@ -156,7 +156,11 @@ public static class SquadCombatPawnUtility
                 catch (Exception ex)
                 {
                     string processorTypeName = tmpBranchPostSquadCombat[i]?.GetType()?.FullName ?? "UnknownProcessor";
-                    Log.Error($"Exception occurred while executing post-squad assist processor: ProcessorType={processorTypeName}, ErrorMessage: {ex.Message}");
+                    ModUtility.LogExceptionError(ex,
+                        errorDesc: $"executing post-squad assist processor: {processorTypeName}",
+                        typeName: nameof(SquadCombatPawnUtility),
+                        methodName: nameof(PostSquadCombatPawnGenerate),
+                        needStackTrace: true);
                     continue;
                 }
             }

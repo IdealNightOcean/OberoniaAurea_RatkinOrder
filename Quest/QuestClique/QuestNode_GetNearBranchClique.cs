@@ -20,7 +20,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
     {
         if (!QuestPart_CliquesManager.TryGetCliquesManager(QuestGen.quest, addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
         {
-            Log.Error($"Failed to get QuestPart_CliquesManager from {QuestGen.quest}.");
+            Log.Error($"[OARO] Failed to get QuestPart_CliquesManager from {QuestGen.quest}.");
             return;
         }
 
@@ -76,6 +76,22 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
                     yield break;
                 }
             }
+
+            //需求骑士团友好派系
+            foreach (Branch branch in demandBranch.BranchManager.FriendlyBranches)
+            {
+                if (!ValidateBranch(branch) || addedDemandOrderBranch.Contains(branch))
+                {
+                    continue;
+                }
+
+                yield return branch;
+                leftCount--;
+                if (leftCount <= 0)
+                {
+                    yield break;
+                }
+            }
         }
 
         // 其它骑士团附近派系
@@ -87,25 +103,6 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
             }
             foreach (Branch branch in demandOrder.GetAllAffectedBranchForOrder(centerTile, ValidateBranch))
             {
-                yield return branch;
-                leftCount--;
-                if (leftCount <= 0)
-                {
-                    yield break;
-                }
-            }
-        }
-
-        //需求骑士团友好派系
-        if (demandBranch is not null)
-        {
-            foreach (Branch branch in demandBranch.BranchManager.FriendlyBranches)
-            {
-                if (!ValidateBranch(branch) || addedDemandOrderBranch.Contains(branch))
-                {
-                    continue;
-                }
-
                 yield return branch;
                 leftCount--;
                 if (leftCount <= 0)

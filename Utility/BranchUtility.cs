@@ -37,9 +37,10 @@ public static class BranchUtility
     /// <summary>
     /// 该分部是否正在边境轮巡
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOnJointPatrol(this Branch branch)
     {
-        return branch.BranchManager.IsJointPatrolActived && branch.BranchManager.JointPatrolManager.IsParticipant(branch);
+        return branch.RatkinOrder.JointPatrolManager.CurState != JointPatrolManager.PatrolState.Invalid && branch.RatkinOrder.JointPatrolManager.IsParticipant(branch);
     }
 
     /// <summary>

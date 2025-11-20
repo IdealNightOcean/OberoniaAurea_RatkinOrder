@@ -91,7 +91,7 @@ public class OrderHallHandler : IExposable
     {
         if (pedestal is null)
         {
-            Log.Error("Cannot set null OrderCodePedestal as main OrderCodePedestal.");
+            Log.Error("[OARO] Cannot set null OrderCodePedestal as main OrderCodePedestal.");
             return false;
         }
         if (pedestal == mainOrderCodePedestal)

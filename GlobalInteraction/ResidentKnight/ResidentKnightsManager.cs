@@ -26,11 +26,11 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     }
 
     private static Dictionary<Pawn, ResidentKnightRecord> residentKnights = [];
-    private static Dictionary<ResidentKnightRoleDef, Pawn> rolesToKnights = [];
+    private static Dictionary<ResidentKnightRoleDef, ResidentKnightRecord> rolesToKnights = [];
 
     public static int KnightsCount => residentKnights.Count;
     public static IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
-    public static IReadOnlyDictionary<ResidentKnightRoleDef, Pawn> RolesToKnights => RolesToKnights;
+    public static IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnightRecord> RolesToKnights => RolesToKnights;
 
     [Unsaved] private static LazyMutable<KnightPersonality> allHasPersonalityTypes;
     public static KnightPersonality AllHasPersonalityTypes => allHasPersonalityTypes.Value;
@@ -57,8 +57,9 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     private List<Pawn> residentKnightKeys;
     private List<ResidentKnightRecord> residentKnightValues;
+
     private List<ResidentKnightRoleDef> rolesToKnightKeys;
-    private List<Pawn> rolesToKnightValues;
+    private List<ResidentKnightRecord> rolesToKnightValues;
 
     internal ResidentKnightsManager()
     {
@@ -91,15 +92,26 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         Scribe_Collections.Look(ref residentKnights, "residentKnights", LookMode.Reference, LookMode.Deep, ref residentKnightKeys, ref residentKnightValues);
         Scribe_Collections.Look(ref rolesToKnights, "rolesToKnights", LookMode.Def, LookMode.Reference, ref rolesToKnightKeys, ref rolesToKnightValues);
 
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        if (Scribe.mode == LoadSaveMode.Saving || Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            rolesToKnights.RemoveAll(kv => kv.Key is null || kv.Value is null);
-            nextBuffStatRegainTick = -1;
-
             residentKnightKeys = null;
             residentKnightValues = null;
             rolesToKnightKeys = null;
             rolesToKnightValues = null;
+        }
+
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            if (residentKnights.RemoveAll(kv => kv.Key is null || kv.Value is null) > 0)
+            {
+                Log.Error("[OARO] Some resident knight records were removed due to null keys or values during loading.");
+            }
+            if (rolesToKnights.RemoveAll(kv => kv.Key is null || kv.Value is null) > 0)
+            {
+                Log.Error("[OARO] Some role to knight records were removed due to null keys or values during loading.");
+            }
+
+            nextBuffStatRegainTick = -1;
         }
     }
 
@@ -123,7 +135,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public static bool TryGetKnightRecord(Pawn pawn, out ResidentKnightRecord record) => residentKnights.TryGetValue(pawn, out record);
 
-    public static bool TryGetKnightOfRole(ResidentKnightRoleDef roleDef, out Pawn knight) => rolesToKnights.TryGetValue(roleDef, out knight);
+    public static bool TryGetKnightOfRole(ResidentKnightRoleDef roleDef, out ResidentKnightRecord record) => rolesToKnights.TryGetValue(roleDef, out record);
 
     public static void TickDay()
     {
@@ -211,11 +223,11 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static void AddResidentKnight(Pawn pawn, ResidentKnightAcademicDef genealAcademicDef = null)
+    public static void AddResidentKnight(Pawn pawn, Branch branch)
     {
         if (!residentKnights.ContainsKey(pawn))
         {
-            residentKnights.Add(pawn, new ResidentKnightRecord(pawn, genealAcademicDef));
+            residentKnights.Add(pawn, new ResidentKnightRecord(pawn, branch));
             OnKnightChanged();
         }
     }
@@ -252,10 +264,9 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             return false;
         }
 
-        ResidentKnightRecord curRolePawnRecord = null;
-        if (rolesToKnights.TryGetValue(roleDef, out Pawn curRolePawn))
+        if (rolesToKnights.TryGetValue(roleDef, out ResidentKnightRecord curRolePawnRecord))
         {
-            if (curRolePawn == pawn)
+            if (curRolePawnRecord.Knight == pawn)
             {
                 return true;
             }
@@ -268,24 +279,24 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         ResidentKnightRoleDef pOldRole = pawnRecord.CurRole;
 
         //新增职位
-        if (curRolePawn is null && pOldRole is null)
+        if (curRolePawnRecord is null && pOldRole is null)
         {
             pawnRecord.CurRole = roleDef;
-            rolesToKnights[roleDef] = pawn;
+            rolesToKnights[roleDef] = pawnRecord;
             return true;
         }
 
         //两人交接职位
-        if (curRolePawn is not null && pOldRole is null)
+        if (curRolePawnRecord is not null && pOldRole is null)
         {
             curRolePawnRecord.CurRole = null;
             pawnRecord.CurRole = roleDef;
-            rolesToKnights[roleDef] = pawn;
+            rolesToKnights[roleDef] = pawnRecord;
             return true;
         }
 
         //本人职位改变
-        if (curRolePawn is null && pOldRole is not null)
+        if (curRolePawnRecord is null && pOldRole is not null)
         {
             pawnRecord.CurRole = roleDef;
             rolesToKnights.Remove(pOldRole);
@@ -293,11 +304,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
 
         //双方交换职位
-        if (curRolePawn is not null && pOldRole is not null)
+        if (curRolePawnRecord is not null && pOldRole is not null)
         {
             curRolePawnRecord.CurRole = pOldRole;
+            rolesToKnights[pOldRole] = curRolePawnRecord;
+
             pawnRecord.CurRole = roleDef;
-            rolesToKnights[roleDef] = pawn;
+            rolesToKnights[roleDef] = pawnRecord;
             return true;
         }
 
@@ -316,13 +329,9 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         statFactors.Clear();
         nextBuffStatRegainTick = Find.TickManager.TicksGame + 60000;
 
-        foreach (KeyValuePair<ResidentKnightRoleDef, Pawn> rolePawn in rolesToKnights)
+        foreach (KeyValuePair<ResidentKnightRoleDef, ResidentKnightRecord> kv in rolesToKnights)
         {
-            (ResidentKnightRoleDef roldDef, Pawn pawn) = rolePawn;
-            if (!residentKnights.TryGetValue(pawn, out ResidentKnightRecord record) || !record.IsValid)
-            {
-                continue;
-            }
+            (ResidentKnightRoleDef roldDef, Pawn pawn) = (kv.Key, kv.Value.Knight);
 
             AddStatModifier(roldDef.statOffsets, isFactor: false);
             AddStatModifier(roldDef.RoleWorker.RoleStatOffsets(pawn), isFactor: false);

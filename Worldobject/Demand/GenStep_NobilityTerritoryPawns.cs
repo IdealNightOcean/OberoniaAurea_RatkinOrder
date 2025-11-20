@@ -41,7 +41,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
         if (!MapGenerator.TryGetVar("SettlementRect", out CellRect settlementRect))
         {
             baseCenter = settlementRect.CenterCell;
-            Log.Error($"No rect of settlement rect set when running {nameof(GenStep_NobilityTerritoryPawns)}!");
+            Log.Error($"[OARO] No rect of settlement rect set when running {nameof(GenStep_NobilityTerritoryPawns)}!");
         }
         else
         {

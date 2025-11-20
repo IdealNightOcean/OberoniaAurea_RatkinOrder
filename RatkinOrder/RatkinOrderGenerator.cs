@@ -26,7 +26,11 @@ public static class RatkinOrderGenerator
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to generate RatkinOrder for faction {faction.loadID}: {ex}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"generating RatkinOrder for faction {faction.loadID}",
+                    typeName: nameof(RatkinOrderGenerator),
+                    methodName: nameof(StartNewGame),
+                    needStackTrace: true);
                 continue;
             }
         }
@@ -73,7 +77,7 @@ public static class RatkinOrderGenerator
             ratkinOrderDef ??= faction.def.GetModExtension<RatkinOrderFactionExtension>().ratkinOrderDef;
             if (ratkinOrderDef is null)
             {
-                Log.Error("Tried to create RatkinOrder for faction_" + faction.loadID + " but the faction has no RatkinOrderDef.");
+                Log.Error("[OARO] Tried to create RatkinOrder for faction_" + faction.loadID + " but the faction has no RatkinOrderDef.");
                 return null;
             }
             ratkinOrder = new RatkinOrder(ratkinOrderDef, faction)
@@ -84,7 +88,11 @@ public static class RatkinOrderGenerator
         }
         catch (Exception ex)
         {
-            Log.Error("Could not create RatkinOrder for faction_" + faction.loadID + ": " + ex);
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"generating RatkinOrder for faction_{faction.loadID}",
+                typeName: nameof(RatkinOrderGenerator),
+                methodName: nameof(GenerateRatkinOrderForFaction),
+                needStackTrace: true);
             return null;
         }
 
@@ -94,7 +102,11 @@ public static class RatkinOrderGenerator
         }
         catch (Exception ex)
         {
-            Log.Error("Could not initialize RatkinOrder for faction_" + faction.loadID + ": " + ex);
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"initializing RatkinOrder for faction_{faction.loadID}",
+                typeName: nameof(RatkinOrderGenerator),
+                methodName: nameof(GenerateRatkinOrderForFaction),
+                needStackTrace: true);
             return null;
         }
 
@@ -125,7 +137,11 @@ public static class RatkinOrderGenerator
             }
             catch (Exception ex)
             {
-                Log.Error($"Failed to create a new branch for {ratkinOrder} at {settlement}: " + ex);
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"Failed to generating a new branch for {ratkinOrder} at {settlement}",
+                    typeName: nameof(RatkinOrderGenerator),
+                    methodName: nameof(InitBranchForNewOrder),
+                    needStackTrace: true);
                 continue;
             }
         }

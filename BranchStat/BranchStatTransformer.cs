@@ -37,7 +37,7 @@ public struct BranchStatTransformer
     {
         if (toRemove.factor == 0f)
         {
-            Log.Error($"Unmerge failed: 'toRemove' has 0 factor.");
+            Log.Error($"[OARO] Unmerge failed: 'toRemove' has 0 factor.");
             throw new ArgumentOutOfRangeException(
                 paramName: nameof(toRemove.factor),
                 message: "factor of 'toRemove' cannot be 0. Unmerge operation requires a non-zero factor to avoid calculation errors.");
@@ -54,7 +54,7 @@ public struct BranchStatTransformer
     {
         if (value == 0f)
         {
-            Log.Error($"Unmerge failed: value is 0.");
+            Log.Error($"[OARO] Unmerge failed: value is 0.");
             throw new ArgumentOutOfRangeException(
                 paramName: nameof(value),
                 message: "Unmerge operation requires a non-zero factor to avoid calculation errors.");

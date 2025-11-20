@@ -102,7 +102,7 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
     {
         if (reformations.Remove(null))
         {
-            Log.Error($"Some reformations of {ratkinOrder} were null after loading and have been removed.");
+            Log.Error($"[OARO] Some reformations of {ratkinOrder} were null after loading and have been removed.");
         }
         foreach (OrderReformationDef def in reformations)
         {
@@ -112,7 +112,11 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
             }
             catch (Exception ex)
             {
-                Log.Error($"Fail to reactive reformation {def.label} after load: {ex}");
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "reactive reformation {def.label} after load",
+                    typeName: nameof(ReformationManager),
+                    methodName: nameof(PostLoadInit),
+                    needStackTrace: true);
             }
         }
     }

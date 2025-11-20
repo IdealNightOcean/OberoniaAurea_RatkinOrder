@@ -90,7 +90,7 @@ public static class ModUtility
 
         if (!pawnsArrivalModeDef.Worker.CanUseOnMap(map))
         {
-            Log.Error($"Tried to do pawns arrive on map {map} but could not find a legal arrival mode, current method: {pawnsArrivalModeDef.defName}");
+            Log.Error($"[OARO] Tried to do pawns arrive on map: {map} but could not find a legal arrival mode, current method: {pawnsArrivalModeDef.defName}");
             return false;
         }
 
@@ -139,13 +139,13 @@ public static class ModUtility
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         if (alsoAddOrderRule)
         {
-            foreach (Rule orderObjRule in RulesForRatkinOrder(prefix + "Order", ratkinOrder))
+            foreach (Rule orderObjRule in RulesForRatkinOrder(prefix + "ORDER", ratkinOrder))
             {
                 yield return orderObjRule;
             }
         }
         yield return new Rule_String(prefix + "name", branch.Name.Colorize(ratkinOrder.Color));
-        foreach (Rule worldObjRule in GrammarUtility.RulesForWorldObject(prefix + "Site", branch.BaseSite))
+        foreach (Rule worldObjRule in GrammarUtility.RulesForWorldObject(prefix + "SITE", branch.BaseSite))
         {
             yield return worldObjRule;
         }
@@ -156,11 +156,11 @@ public static class ModUtility
     {
         if (needStackTrace)
         {
-            Log.Error($"An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex}");
+            Log.Error($"[OARO] An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex}");
         }
         else
         {
-            Log.Error($"An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex.Message}");
+            Log.Error($"[OARO] An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex.Message}");
         }
     }
 }

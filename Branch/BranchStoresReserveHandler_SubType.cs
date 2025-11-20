@@ -28,7 +28,7 @@ public partial class BranchStoresReserveHandler
                 return new FacilityReserveRecord(facilityDef, costRateReduce);
             }
 
-            Log.Error("");
+            Log.Error($"[OARO] Unknown BranchConstructionDef type: {def.GetType().FullName}");
             return null;
         }
 

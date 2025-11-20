@@ -74,7 +74,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
                 }
                 else
                 {
-                    Log.Error($"{nameof(branch)} has already been set and cannot be assigned again.");
+                    Log.Error($"[OARO] {nameof(branch)} has already been set and cannot be assigned again.");
                     return;
                 }
             }
