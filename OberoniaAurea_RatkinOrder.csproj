@@ -104,6 +104,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
     <Compile Include="DefOf\BranchResidentDefOf.cs" />
     <Compile Include="DefOf\BranchMedalDefOf.cs" />
+    <Compile Include="DefOf\OrderInteractionDefOf.cs" />
     <Compile Include="DefOf\RulePackDefOf.cs" />
     <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
@@ -347,6 +348,7 @@
     <Compile Include="Window\MainTabWindow_InteractionKnights.cs" />
     <Compile Include="Window\Window_Branch.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
+    <Compile Include="Window\Window_RatkinOrder.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_TownConstruction.cs" />
     <Compile Include="Worldobject\Demand\GenStep_NobilityTerritoryPawns.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_NobilityTerritory.cs" />

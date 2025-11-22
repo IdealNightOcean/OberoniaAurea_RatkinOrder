@@ -70,7 +70,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
     private ResidentKnightRecord()
     {
         knightRecord = new(valueFactory: () => KnightPawnsManager.GetKnightRecord(knight), isThreadSafe: false);
-        TotalAcademicLevel = new(initValue: 0, () => honorAcademicLevel + genealAcademicDefs.Values.Sum());
+        TotalAcademicLevel = new(refreshFunc: () => honorAcademicLevel + genealAcademicDefs.Values.Sum());
     }
 
     public ResidentKnightRecord(Pawn knight, Branch branch) : base()

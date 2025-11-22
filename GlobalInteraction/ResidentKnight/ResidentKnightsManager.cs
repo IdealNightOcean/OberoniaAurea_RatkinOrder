@@ -1,20 +1,24 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 {
+    public static ResidentKnightsManager Instance { get; private set; }
+
     public static int ResidentKnightCeiling
     {
         get
         {
             int ceiling = 1;
-            ceiling += OrderHallHandler.OrderHallLevel switch
+            ceiling += OrderHallHandler.Instance.OrderHallLevel switch
             {
                 < 3 => 0,
                 < 5 => 3,
@@ -25,25 +29,25 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    private static Dictionary<Pawn, ResidentKnightRecord> residentKnights = [];
-    private static Dictionary<ResidentKnightRoleDef, ResidentKnightRecord> rolesToKnights = [];
+    private Dictionary<Pawn, ResidentKnightRecord> residentKnights = [];
+    private Dictionary<ResidentKnightRoleDef, ResidentKnightRecord> rolesToKnights = [];
 
-    public static int KnightsCount => residentKnights.Count;
-    public static IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
-    public static IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnightRecord> RolesToKnights => RolesToKnights;
+    public int KnightsCount => residentKnights.Count;
+    public IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
+    public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnightRecord> RolesToKnights => RolesToKnights;
 
-    [Unsaved] private static LazyMutable<KnightPersonality> allHasPersonalityTypes;
-    public static KnightPersonality AllHasPersonalityTypes => allHasPersonalityTypes.Value;
+    [Unsaved] private LazyMutable<KnightPersonality> allHasPersonalityTypes;
+    public KnightPersonality AllHasPersonalityTypes => allHasPersonalityTypes.Value;
 
-    [Unsaved] private static LazyMutable<int> instructorKnightsCount;
-    public static int InstructorKnightsCount => instructorKnightsCount.Value;
+    [Unsaved] private LazyMutable<int> instructorKnightsCount;
+    public int InstructorKnightsCount => instructorKnightsCount.Value;
 
-    [Unsaved] private static readonly Dictionary<StatDef, float> statOffsets = [];
-    [Unsaved] private static readonly Dictionary<StatDef, float> statFactors = [];
-    [Unsaved] private static HediffStage buffHediffStage;
-    [Unsaved] private static int nextBuffStatRegainTick = -1;
+    [Unsaved] private readonly Dictionary<StatDef, float> statOffsets = [];
+    [Unsaved] private readonly Dictionary<StatDef, float> statFactors = [];
+    [Unsaved] private HediffStage buffHediffStage;
+    [Unsaved] private int nextBuffStatRegainTick = -1;
 
-    public static HediffStage BuffHediffStage
+    public HediffStage BuffHediffStage
     {
         get
         {
@@ -63,21 +67,14 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     internal ResidentKnightsManager()
     {
-        ResetStaticValue();
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
+        Instance = this;
+
         buffHediffStage = new HediffStage();
-    }
-
-    internal static void ResetStaticValue()
-    {
-        residentKnights.Clear();
-        rolesToKnights.Clear();
-        statOffsets.Clear();
-        statFactors.Clear();
-        buffHediffStage = null;
-
         allHasPersonalityTypes = new(() => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
         instructorKnightsCount = new(() => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
     }
+    public static void ClearStaticCache() => Instance = null;
 
     public void ExposeData()
     {
@@ -115,7 +112,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static void DrawDevWindow(Listing_Standard listing_Rect)
+    public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         listing_Rect.Label("ResidentKnights:");
         if (residentKnights.NullOrEmpty())
@@ -131,13 +128,16 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static bool IsResidentKnight(Pawn pawn) => residentKnights.ContainsKey(pawn);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool IsResidentKnight(Pawn pawn) => residentKnights.ContainsKey(pawn);
 
-    public static bool TryGetKnightRecord(Pawn pawn, out ResidentKnightRecord record) => residentKnights.TryGetValue(pawn, out record);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetKnightRecord(Pawn pawn, out ResidentKnightRecord record) => residentKnights.TryGetValue(pawn, out record);
 
-    public static bool TryGetKnightOfRole(ResidentKnightRoleDef roleDef, out ResidentKnightRecord record) => rolesToKnights.TryGetValue(roleDef, out record);
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public bool TryGetKnightOfRole(ResidentKnightRoleDef roleDef, out ResidentKnightRecord record) => rolesToKnights.TryGetValue(roleDef, out record);
 
-    public static void TickDay()
+    public void TickDay()
     {
         foreach (ResidentKnightRecord record in residentKnights.Values)
         {
@@ -149,7 +149,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    private static void RemoveAllInvalidRecord(Predicate<ResidentKnightRecord> extraRemove = null)
+    private void RemoveAllInvalidRecord(Predicate<ResidentKnightRecord> extraRemove = null)
     {
         HashSet<Pawn> pawnsToRemove = [];
         HashSet<ResidentKnightRoleDef> rolesToRemove = [];
@@ -213,7 +213,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder) => RemoveAllInvalidRecord((record) => record.Branch.RatkinOrder == ratkinOrder);
     public void Notify_BranchDestroyed(Branch branch) => RemoveAllInvalidRecord((record) => record.Branch == branch);
 
-    public static void Notify_MercyQuestSucceed()
+    public void Notify_MercyQuestSucceed()
     {
         float gainPoints = 0f;
         foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
@@ -223,7 +223,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static void AddResidentKnight(Pawn pawn, Branch branch)
+    public void AddResidentKnight(Pawn pawn, Branch branch)
     {
         if (!residentKnights.ContainsKey(pawn))
         {
@@ -232,7 +232,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static void RemoveResidentKnight(Pawn pawn)
+    public void RemoveResidentKnight(Pawn pawn)
     {
         if (pawn is null || !residentKnights.TryGetValue(pawn, out ResidentKnightRecord record))
         {
@@ -247,7 +247,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static bool TrySetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
+    public bool TrySetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
     {
         if (SetResidentKnight(pawn, roleDef, replaceCurRole))
         {
@@ -257,7 +257,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         return false;
     }
 
-    private static bool SetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
+    private bool SetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
     {
         if (!residentKnights.TryGetValue(pawn, out ResidentKnightRecord pawnRecord))
         {
@@ -317,13 +317,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         return false;
     }
 
-    private static void OnKnightChanged()
+    private void OnKnightChanged()
     {
         allHasPersonalityTypes.MarkDirty();
         instructorKnightsCount.MarkDirty();
     }
 
-    private static void RegainRoleBuffStat()
+    private void RegainRoleBuffStat()
     {
         statOffsets.Clear();
         statFactors.Clear();
@@ -343,7 +343,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         buffHediffStage.statOffsets = statOffsets.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
         buffHediffStage.statFactors = statFactors.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
 
-        static void AddStatModifier(IEnumerable<StatModifier> modifiers, bool isFactor)
+        void AddStatModifier(IEnumerable<StatModifier> modifiers, bool isFactor)
         {
             if (modifiers is null)
             {

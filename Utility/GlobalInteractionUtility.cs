@@ -17,7 +17,7 @@ public static class GlobalInteractionUtility
     /// </summary>
     public static AcceptanceReport CanRecruitKnight(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
-        if (OrderHallHandler.OrderHallRoom is null)
+        if (OrderHallHandler.Instance.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -57,7 +57,7 @@ public static class GlobalInteractionUtility
             return false;
         }
 
-        if (OrderHallHandler.OrderHallRoom is null)
+        if (OrderHallHandler.Instance.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -68,7 +68,7 @@ public static class GlobalInteractionUtility
         }
 
         int residentKnightCeiling = ResidentKnightsManager.ResidentKnightCeiling;
-        if (ResidentKnightsManager.KnightsCount >= residentKnightCeiling)
+        if (ResidentKnightsManager.Instance.KnightsCount >= residentKnightCeiling)
         {
             return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(residentKnightCeiling);
         }
@@ -151,7 +151,7 @@ public static class GlobalInteractionUtility
             return false;
         }
 
-        if (OrderHallHandler.OrderHallRoom is null)
+        if (OrderHallHandler.Instance.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -161,7 +161,7 @@ public static class GlobalInteractionUtility
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipKind.Friendly.GetLabel());
         }
 
-        if (AroundKnightGroupsManager.SeasonInvitationUsed >= SeasonInvitationLimit())
+        if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed >= SeasonInvitationLimit())
         {
             if (RecommendationUtility.CurRecommendationOfMap(knightGroup.RatkinOrder, map) < 1)
             {
@@ -180,8 +180,8 @@ public static class GlobalInteractionUtility
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
         if (Rand.Chance(chance) && AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
         {
-            AroundKnightGroupsManager.SeasonInvitationUsed++;
-            if (AroundKnightGroupsManager.SeasonInvitationUsed > SeasonInvitationLimit())
+            AroundKnightGroupsManager.Instance.SeasonInvitationUsed++;
+            if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed > SeasonInvitationLimit())
             {
                 RecommendationUtility.UseRecommendationOfMap(knightGroup.RatkinOrder, map, 1);
             }
@@ -256,7 +256,7 @@ public static class GlobalInteractionUtility
             ApplyStepChange(0.1f, "OARO_AroundKnights_TravelTimeShort");
         }
 
-        stepChange = (OrderHallHandler.OrderHallLevel - 2) * 0.05f;
+        stepChange = (OrderHallHandler.Instance.OrderHallLevel - 2) * 0.05f;
         if (stepChange > 0f)
         {
             ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");
@@ -335,7 +335,7 @@ public static class GlobalInteractionUtility
     /// </summary>
     private static int SeasonInvitationLimit()
     {
-        return OrderHallHandler.OrderHallLevel switch
+        return OrderHallHandler.Instance.OrderHallLevel switch
         {
             < 2 => 0,
             2 => 1,

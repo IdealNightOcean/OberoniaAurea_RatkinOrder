@@ -216,7 +216,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     public void OnKnightSacrifice(int sacrificeCount) => this.sacrificeCount = Mathf.Max(this.sacrificeCount + sacrificeCount);
 
-    public bool BringResidentKnightBackTeam(ResidentKnightRecord record)
+    public bool MarkResidentKnightBackTeam(ResidentKnightRecord record)
     {
         if (curState == PatrolState.Invalid)
         {
@@ -250,7 +250,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             JointBranchRecord record = new() { Branch = branch };
             participants.Add(record);
             participantsDict[branch] = record;
-            branch.WorkStateDirty = true;
+            branch.MarkWorkStateDirty();
         }
     }
     private void RemoveParticipant(Branch branch)
@@ -260,19 +260,13 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             return;
         }
 
-        if (participantsDict.Remove(branch))
+        if (participantsDict.TryGetValue(branch, out JointBranchRecord record))
         {
-            for (int i = 0; i < participants.Count; i++)
-            {
-                if (participants[i].Branch == branch)
-                {
-                    participants.RemoveAt(i);
-                    branch.WorkStateDirty = true;
-                    break;
-                }
-            }
+            participantsDict.Remove(branch);
+            participants.Remove(record);
+            branch.MarkWorkStateDirty();
 
-            participatingResidentKnights.RemoveAll(r => r?.Branch == branch);
+            participatingResidentKnights.RemoveAll(r => r is null || r.Branch == branch);
 
             if (curState == PatrolState.Ongoing)
             {
@@ -284,13 +278,12 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                         innerContainer.Remove(p);
                     }
                 }
-                participatingResidentKnights.RemoveAll(r => r?.Branch == branch);
             }
         }
 
         bool ShouldRemoveResidentKnight(Pawn knight)
         {
-            return !ResidentKnightsManager.TryGetKnightRecord(knight, out ResidentKnightRecord residentRecord) || residentRecord.Branch == branch;
+            return !ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnightRecord residentRecord) || residentRecord.Branch == branch;
         }
     }
 
@@ -312,7 +305,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         participatingResidentKnights.Clear();
         if (innerContainer.Count > 0)
         {
-            Log.Error("[OARO] Trying to clear joint patrol data when inner container is not empty during prepare state.");
+            Log.Error("[OARO] Trying to clear joint patrol data when inner container is not empty.");
         }
         innerContainer.Clear();
 
@@ -455,9 +448,18 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
         }
 
+        BringResidentKnightBackTeam();
+    }
+
+    private void BringResidentKnightBackTeam()
+    {
+        if (curState != PatrolState.Ongoing)
+        {
+            Log.Error("[OARO] Trying to start joint patrol when joint patrol is not in ongoing state.");
+            return;
+        }
+
         participatingResidentKnights.RemoveAll(r => !r.IsValid && !r.Knight.Spawned);
-
-
         if (participatingResidentKnights.Count > 0)
         {
             Dictionary<Map, List<Pawn>> lordMapDict = participatingResidentKnights.Select(r => r.Knight).GroupBy(p => p.Map).ToDictionary(g => g.Key, g => g.ToList());
@@ -780,5 +782,4 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public IThingHolder ParentHolder => null;
     public void GetChildHolders(List<IThingHolder> outChildren) => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, innerContainer);
     public ThingOwner GetDirectlyHeldThings() => innerContainer;
-
 }

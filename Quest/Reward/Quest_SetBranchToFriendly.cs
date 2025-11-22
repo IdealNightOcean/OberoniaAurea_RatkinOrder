@@ -83,7 +83,7 @@ public class QuestPart_SetBranchToFriendly : QuestPart, IOnBranchDestroyed
     {
         if (signal.tag == InSignalTrigger)
         {
-            Branch?.SetFriendly(friendly: true, durationDays: DurationDays, showMessage: ShowMessage);
+            Branch?.SetFriendly(active: true, durationDays: DurationDays, showMessage: ShowMessage);
         }
     }
 

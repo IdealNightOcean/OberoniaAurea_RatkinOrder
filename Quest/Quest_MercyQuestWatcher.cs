@@ -43,7 +43,7 @@ public class QuestPart_MercyQuestWatcher : QuestPart
         base.Cleanup();
         if (quest.State == QuestState.EndedSuccess)
         {
-            MercyQuestHandler.Notify_MercyQuestSucceed(quest);
+            MercyQuestHandler.Instance.Notify_MercyQuestSucceed(quest);
         }
         SubFaction = null;
         ParentFaction = null;

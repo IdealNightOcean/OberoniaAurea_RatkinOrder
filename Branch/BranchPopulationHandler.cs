@@ -73,11 +73,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
         Scribe_Collections.Look(ref contracts, "contracts", LookMode.Deep);
         Scribe_Values.Look(ref hasContractBuff, "hasContractBuff", defaultValue: false);
-
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
-        {
-            contracts.RemoveAll(c => c is null);
-        }
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -183,5 +178,13 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
         publicSecurity = 1f;
         yesterdayPublicSecurity = 1f;
+    }
+
+    internal void PostLoadInit()
+    {
+        if (contracts.RemoveAll(c => c is null) > 0)
+        {
+            Log.Error($"[OARO] Some of contracts in {branch} were null after loading. Removed.");
+        }
     }
 }

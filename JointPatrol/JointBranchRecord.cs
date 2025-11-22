@@ -45,7 +45,7 @@ public class JointBranchRecord : IExposable
 
     public JointBranchRecord()
     {
-        TaskPotency = new(initValue: 0f, refreshFunc: PotencyUpdate);
+        TaskPotency = new(refreshFunc: PotencyUpdate);
     }
 
     public void ExposeData()
@@ -114,7 +114,7 @@ public class JointBranchRecord : IExposable
 
         if (CurInteractions == allInteraction)
         {
-            Branch.SetFriendly(friendly: true);
+            Branch.SetFriendly(active: true);
         }
         return true;
     }

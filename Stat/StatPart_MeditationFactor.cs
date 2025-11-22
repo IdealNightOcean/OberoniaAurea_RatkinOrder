@@ -11,16 +11,16 @@ public class StatPart_MeditationFactor : StatPart
     public override void TransformValue(StatRequest req, ref float val)
     {
         Pawn pawn = req.Thing as Pawn;
-        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.MainOrderCodePedestal?.Map)
+        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.Instance.MainOrderCodePedestal?.Map)
         {
             return;
         }
-        if (!ResidentKnightsManager.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
         {
             return;
         }
 
-        val += OrderHallHandler.OrderHallLevel switch
+        val += OrderHallHandler.Instance.OrderHallLevel switch
         {
             < 2 => 0f,
             < 4 => 0.05f,
@@ -54,11 +54,11 @@ public class StatPart_MeditationFactor : StatPart
 
         val += ((pawn.GetStatValue(StatDefOf.LearningRateFactor) - 1f) * 0.1f);
 
-        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.AllHasPersonalityTypes;
+        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.Instance.AllHasPersonalityTypes;
         val += KnightPersonalityUtility.GetContainedPersonalities(resonatePersonality).Count() * 0.1f;
 
 
-        if (OrderHallHandler.KnightJoyBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+        if (OrderHallHandler.Instance.KnightJoyBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
         {
             val += joyBuildingDefs.Count * 0.1f;
         }
@@ -67,11 +67,11 @@ public class StatPart_MeditationFactor : StatPart
     public override string ExplanationPart(StatRequest req)
     {
         Pawn pawn = req.Thing as Pawn;
-        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.MainOrderCodePedestal?.Map)
+        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.Instance.MainOrderCodePedestal?.Map)
         {
             return null;
         }
-        if (!ResidentKnightsManager.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
         {
             return null;
         }
@@ -79,7 +79,7 @@ public class StatPart_MeditationFactor : StatPart
         float stepChange;
         StringBuilder sb = new();
 
-        stepChange = OrderHallHandler.OrderHallLevel switch
+        stepChange = OrderHallHandler.Instance.OrderHallLevel switch
         {
             < 2 => 0f,
             < 4 => 0.05f,
@@ -122,13 +122,13 @@ public class StatPart_MeditationFactor : StatPart
         stepChange = ((pawn.GetStatValue(StatDefOf.LearningRateFactor) - 1f) * 0.1f);
         sb.AppendLine(StatDefOf.LearningRateFactor.label + ": " + stepChange.ToStringPercentSigned("0.##"));
 
-        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.AllHasPersonalityTypes;
+        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.Instance.AllHasPersonalityTypes;
         foreach (KnightPersonality rp in KnightPersonalityUtility.GetContainedPersonalities(resonatePersonality))
         {
             sb.AppendLine("OARO_ChangeOffset_ResonatePersonality".Translate($"OARO_KnightPersonality_{rp}".Translate(), 0.1f.ToStringPercentSigned("0.##")));
         }
 
-        if (OrderHallHandler.KnightJoyBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+        if (OrderHallHandler.Instance.KnightJoyBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
         {
             foreach (ThingDef building in joyBuildingDefs)
             {

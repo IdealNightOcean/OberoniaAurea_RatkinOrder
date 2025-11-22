@@ -12,12 +12,14 @@ public class OrderHallHandler : IExposable
     private const int HallLevelRecacheInterval = 15000;
     private const int HallBuildingsRecacheInterval = 30000;
 
-    private static OrderCodePedestal mainOrderCodePedestal;
-    public static OrderCodePedestal MainOrderCodePedestal => mainOrderCodePedestal;
+    public static OrderHallHandler Instance { get; private set; }
 
-    [Unsaved] private static Room orderHallRoom;
-    [Unsaved] private static int nextHallRoomCacheTick = -1;
-    public static Room OrderHallRoom
+    private OrderCodePedestal mainOrderCodePedestal;
+    public OrderCodePedestal MainOrderCodePedestal => mainOrderCodePedestal;
+
+    [Unsaved] private Room orderHallRoom;
+    [Unsaved] private int nextHallRoomCacheTick = -1;
+    public Room OrderHallRoom
     {
         get
         {
@@ -31,17 +33,12 @@ public class OrderHallHandler : IExposable
     }
 
     [Unsaved]
-    private static readonly SimpleValueCache<int> orderHallLevelCache = new(cacheInterval: HallLevelRecacheInterval,
-                                                                   defaultValue: 0,
-                                                                   checker: static delegate
-                                                                   {
-                                                                       return OrderHallUtility.GetOrderHallLevel(OrderHallRoom);
-                                                                   });
-    public static int OrderHallLevel => orderHallLevelCache.GetCachedResult();
+    private readonly SimpleValueCache<int> orderHallLevelCache;
+    public int OrderHallLevel => orderHallLevelCache.GetCachedResult();
 
-    [Unsaved] private static int nextHallBuildingCacheTick = -1;
-    [Unsaved] private static int academicFurnituresCount;
-    public static int AcademicFurnituresCount
+    [Unsaved] private int nextHallBuildingCacheTick = -1;
+    [Unsaved] private int academicFurnituresCount;
+    public int AcademicFurnituresCount
     {
         get
         {
@@ -53,8 +50,8 @@ public class OrderHallHandler : IExposable
         }
     }
 
-    [Unsaved] private static readonly Dictionary<KnightPersonality, HashSet<ThingDef>> knightJoyBuildingDefsByPersonality = new(EnumArraryLibrary.AvailablePersonalitiesCount);
-    public static IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightJoyBuildingDefsByPersonality
+    [Unsaved] private readonly Dictionary<KnightPersonality, HashSet<ThingDef>> knightJoyBuildingDefsByPersonality = new(EnumArraryLibrary.AvailablePersonalitiesCount);
+    public IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightJoyBuildingDefsByPersonality
     {
         get
         {
@@ -66,14 +63,17 @@ public class OrderHallHandler : IExposable
         }
     }
 
-    public OrderHallHandler() => ResetStaticValue();
-
-    public static void ResetStaticValue()
+    public OrderHallHandler()
     {
-        mainOrderCodePedestal = null;
-        OnPedestalChange();
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(OrderHallHandler));
+        Instance = this;
+        orderHallLevelCache = new(cacheInterval: HallLevelRecacheInterval,
+                                  defaultValue: 0,
+                                  checker: () => OrderHallUtility.GetOrderHallLevel(OrderHallRoom));
     }
-    public static void OnPedestalChange()
+    public static void ClearStaticCache() => Instance = null;
+
+    public void OnPedestalChange()
     {
         academicFurnituresCount = 0;
         nextHallRoomCacheTick = -1;
@@ -87,7 +87,7 @@ public class OrderHallHandler : IExposable
         Scribe_References.Look(ref mainOrderCodePedestal, "mainOrderCodePedestal");
     }
 
-    public static bool TrySetMainPedestal(OrderCodePedestal pedestal, bool replaceCur)
+    public bool TrySetMainPedestal(OrderCodePedestal pedestal, bool replaceCur)
     {
         if (pedestal is null)
         {
@@ -109,7 +109,7 @@ public class OrderHallHandler : IExposable
         return true;
     }
 
-    public static bool TryUnsetMainPedestal(OrderCodePedestal pedestal)
+    public bool TryUnsetMainPedestal(OrderCodePedestal pedestal)
     {
         if (pedestal is null || pedestal != mainOrderCodePedestal)
         {
@@ -121,7 +121,7 @@ public class OrderHallHandler : IExposable
         return true;
     }
 
-    private static void RecacheOrderHallBuildings()
+    private void RecacheOrderHallBuildings()
     {
         nextHallBuildingCacheTick = Find.TickManager.TicksGame + HallBuildingsRecacheInterval;
 

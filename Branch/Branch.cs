@@ -68,15 +68,15 @@ public class Branch : IExposable, ILoadReferenceable
     [Unsaved] private bool isIdleNow = true;
     [Unsaved] private bool isOutdoorNow = true;
     [Unsaved] private string curWorkState = string.Empty;
-    [Unsaved] public bool WorkStateDirty = true;
+    [Unsaved] private bool workStateDirty = true;
     public bool IsIdleNow
     {
         get
         {
-            if (WorkStateDirty)
+            if (workStateDirty)
             {
                 UpdateWorkState();
-                WorkStateDirty = false;
+                workStateDirty = false;
             }
             return isIdleNow;
         }
@@ -86,10 +86,10 @@ public class Branch : IExposable, ILoadReferenceable
     {
         get
         {
-            if (WorkStateDirty)
+            if (workStateDirty)
             {
                 UpdateWorkState();
-                WorkStateDirty = false;
+                workStateDirty = false;
             }
             return isOutdoorNow;
         }
@@ -99,10 +99,10 @@ public class Branch : IExposable, ILoadReferenceable
     {
         get
         {
-            if (WorkStateDirty)
+            if (workStateDirty)
             {
                 UpdateWorkState();
-                WorkStateDirty = false;
+                workStateDirty = false;
             }
             return curWorkState;
         }
@@ -137,10 +137,6 @@ public class Branch : IExposable, ILoadReferenceable
     private Branch(RatkinOrder ratkinOrder, bool initCtor)
     {
         RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
-        TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
-        supplyCeilingCache = new(cacheInterval: 60000, defaultValue: BranchStatDefOf.OARO_SupplyCeiling.baseValue, () => this.GetStatValue(BranchStatDefOf.OARO_SupplyCeiling));
-        potencyCache = new(cacheInterval: 2500, defaultValue: 1f, GetCurPotency);
-
         if (initCtor)
         {
             cooldownManager = new();
@@ -155,6 +151,13 @@ public class Branch : IExposable, ILoadReferenceable
             residentHandler = new(this, initCtor: true);
             storesReserveHandler = new(this);
         }
+
+        TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
+        supplyCeilingCache = new(cacheInterval: 2500,
+                                 defaultValue: BranchStatDefOf.OARO_SupplyCeiling.baseValue,
+                                 checker: () => this.GetStatValue(BranchStatDefOf.OARO_SupplyCeiling));
+
+        potencyCache = new(cacheInterval: 2500, defaultValue: 1f, GetCurPotency);
         loadID = UniqueIDManager.GetUniqueID("Branch");
     }
 
@@ -233,38 +236,7 @@ public class Branch : IExposable, ILoadReferenceable
         }
     }
 
-    private void TickHour()
-    {
-        int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
-
-        facilityHandler.TickHour();
-        buildingHandler.TickHour(hourOfDay);
-
-        if (!buildingHandler.IsBusy && !facilityHandler.IsBusy)
-        {
-            storesReserveHandler.TickHour(hourOfDay);
-        }
-
-        squad.TickHour(hourOfDay);
-
-        if (!CooldownManager.IsInCooldown(KeyLibrary_CDRecord.BranchWorkState))
-        {
-            WorkStateDirty = true;
-        }
-    }
-
-    private void TickDay()
-    {
-        if (friendlyDaysLeft > 0 && (friendlyDaysLeft--) <= 0)
-        {
-            SetFriendly(false);
-        }
-
-        buildingHandler.TickDay();
-        populationHandler.TickDay();
-        demandHandler.TickDay();
-        residentHandler.TickDay();
-    }
+    public void MarkWorkStateDirty() => workStateDirty = true;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsBranchOfType(BranchType type) => (curType & type) != 0;
@@ -276,9 +248,9 @@ public class Branch : IExposable, ILoadReferenceable
         else { curType &= ~type; }
     }
 
-    public void SetFriendly(bool friendly, int durationDays = -1, bool showMessage = true)
+    public void SetFriendly(bool active, int durationDays = -1, bool showMessage = true)
     {
-        if (friendly)
+        if (active)
         {
             if (friendlyDaysLeft <= 0)
             {
@@ -304,6 +276,39 @@ public class Branch : IExposable, ILoadReferenceable
                 Messages.Message("OARO_Mess_BranchBeNonFriendly".Translate(name), baseSite, MessageTypeDefOf.NegativeEvent);
             }
         }
+    }
+
+    private void TickHour()
+    {
+        int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
+
+        facilityHandler.TickHour();
+        buildingHandler.TickHour();
+
+        if (!buildingHandler.IsBusy && !facilityHandler.IsBusy)
+        {
+            storesReserveHandler.TickHour(hourOfDay);
+        }
+
+        squad.TickHour(hourOfDay);
+
+        if (!CooldownManager.IsInCooldown(KeyLibrary_CDRecord.BranchWorkState))
+        {
+            MarkWorkStateDirty();
+        }
+    }
+
+    private void TickDay()
+    {
+        if (friendlyDaysLeft > 0 && (friendlyDaysLeft--) <= 0)
+        {
+            SetFriendly(false);
+        }
+
+        buildingHandler.TickDay();
+        populationHandler.TickDay();
+        demandHandler.TickDay();
+        residentHandler.TickDay();
     }
 
     public void Rename(int ordinal, string nameCore)
@@ -359,6 +364,8 @@ public class Branch : IExposable, ILoadReferenceable
         }
 
         curWorkState = "OARO_BranchWorkState_Idle".Translate();
+
+        workStateDirty = false;
     }
 
     private float GetCurPotency()
@@ -386,7 +393,6 @@ public class Branch : IExposable, ILoadReferenceable
         residentHandler.PostBranchGenerated();
 
         taskHandler.FocusedTaskType = medalHandler.ProtogenicTaskType;
-        curWorkState = "OARO_SquadState_Idle".Translate();
     }
 
     internal void PostLoadInit()
@@ -395,6 +401,7 @@ public class Branch : IExposable, ILoadReferenceable
 
         facilityHandler.PostLoadInit();
         buildingHandler.PostLoadInit();
+        populationHandler.PostLoadInit();
 
         residentHandler.PostLoadInit();
         storesReserveHandler.PostLoadInit();

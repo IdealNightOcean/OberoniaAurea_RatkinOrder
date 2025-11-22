@@ -173,7 +173,7 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
 
     private string ResidentKnightAcademic(Pawn pawn)
     {
-        if (!ResidentKnightsManager.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
         {
             return null;
         }

@@ -41,11 +41,10 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         Instance = null;
 
         AcceptedBranchDemandHandler.ClearStaticCache();
-
-        OrderHallHandler.ResetStaticValue();
-        ResidentKnightsManager.ResetStaticValue();
-        AroundKnightGroupsManager.ResetStaticValue();
-        MercyQuestHandler.ResetStaticValue();
+        OrderHallHandler.ClearStaticCache();
+        ResidentKnightsManager.ClearStaticCache();
+        AroundKnightGroupsManager.ClearStaticCache();
+        MercyQuestHandler.ClearStaticCache();
     }
 
     public void ExposeData()
@@ -60,11 +59,11 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         Scribe_Deep.Look(ref mercyQuestHandler, "mercyQuestHandler");
     }
 
-    public static void TickDay()
+    public void TickDay()
     {
-        AroundKnightGroupsManager.TickDay();
-        ResidentKnightsManager.TickDay();
-        MercyQuestHandler.PeriodicTriggerMercyQuest();
+        aroundKnightGroupsManager.TickDay();
+        residentKnightsManager.TickDay();
+        mercyQuestHandler.PeriodicTriggerMercyQuest();
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)

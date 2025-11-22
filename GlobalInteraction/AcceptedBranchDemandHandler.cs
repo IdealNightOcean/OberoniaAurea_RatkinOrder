@@ -1,4 +1,6 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -6,16 +8,21 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
 {
-    private static List<AcceptedBranchDemand> records = [];
-    public static IReadOnlyList<AcceptedBranchDemand> Records => records;
-    public static int AcceptanceCount => records.Count;
-    public static void ClearStaticCache() => records.Clear();
-    public AcceptedBranchDemandHandler() => ResetStaticValue();
+    public static AcceptedBranchDemandHandler Instance { get; private set; }
 
-    public static void ResetStaticValue()
+    private List<AcceptedBranchDemand> records = [];
+    public IReadOnlyList<AcceptedBranchDemand> Records => records;
+    public int AcceptanceCount => records.Count;
+
+    [Unsaved] public Action<Branch, bool> PostDemandAccepted;
+
+    public AcceptedBranchDemandHandler()
     {
-        records.Clear();
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
+        Instance = this;
     }
+    public static void ClearStaticCache() => Instance = null;
+
     public void ExposeData()
     {
         Scribe_Collections.Look(ref records, "records", LookMode.Deep);
@@ -25,12 +32,24 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         }
     }
 
-    public static void OnAcceptDemand(Branch branch, bool isCritical)
+    public void OnAcceptDemand(Branch branch, bool isCritical)
     {
         records.Add(new AcceptedBranchDemand(branch, isCritical));
+        try
+        {
+            PostDemandAccepted?.Invoke(branch, isCritical);
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"process {nameof(PostDemandAccepted)} action",
+                typeName: nameof(AcceptedBranchDemandHandler),
+                methodName: nameof(OnAcceptDemand),
+                needStackTrace: true);
+        }
     }
 
-    public static void Notify_DemandQuestClean(Quest quest)
+    public void Notify_DemandQuestClean(Quest quest)
     {
         AcceptedBranchDemand toRmove = null;
         foreach (AcceptedBranchDemand acceptedDemand in records)

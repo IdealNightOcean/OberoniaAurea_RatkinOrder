@@ -16,6 +16,6 @@ public class BranchContractRewardWorker
         silver.stackCount = rewardMarkerValueInt;
         CaravanInventoryUtility.GiveThing(caravan, silver);
 
-        branch.SetFriendly(friendly: true);
+        branch.SetFriendly(active: true);
     }
 }

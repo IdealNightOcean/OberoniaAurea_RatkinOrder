@@ -23,4 +23,10 @@ public abstract class OrderWindowBase : Window
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
     }
+
+    public override void Close(bool doCloseSound = true)
+    {
+        OARO_WindowUtility.ResetText();
+        base.Close(doCloseSound);
+    }
 }

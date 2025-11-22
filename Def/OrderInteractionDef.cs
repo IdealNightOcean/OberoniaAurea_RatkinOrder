@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -19,6 +20,24 @@ public class OrderInteractionDef : InteractionDefBase
     public OrderFundEventDef fundEventDef;
 
     public float MinFundNeeded => needFund > 0f ? needFund : (fundEventDef is null ? 0f : fundEventDef.changeRange.min);
+
+    public AcceptanceReport CanUseInteraction(RatkinOrder ratkinOrder, Map map, bool resultOnly)
+    {
+        if (ratkinOrder is null || Worker is null)
+        {
+            return false;
+        }
+        return Worker.CanUseInteraction(ratkinOrder, map, resultOnly);
+    }
+
+    public void TryApplyInteraction(RatkinOrder ratkinOrder, Map map, Action<OrderInteractionDef, RatkinOrder, Map> postApplyAction = null)
+    {
+        if (ratkinOrder is null || Worker is null)
+        {
+            return;
+        }
+        Worker.TryApplyInteraction(ratkinOrder, map, postApplyAction);
+    }
 
     public override IEnumerable<string> ConfigErrors()
     {

@@ -102,7 +102,6 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     {
         if (hourOfDay == 5)
         {
-
             float maxReduce = 0.3f;// ThoroughPreparation ? 0.4f : 0.3f;
             float reduceMulti = 1f;// ThoroughPreparation ? 2f : 1f;
             for (int i = 0; i < storesReserves.Count; i++)

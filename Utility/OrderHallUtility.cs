@@ -18,7 +18,7 @@ public static class OrderHallUtility
         int maxPotentialLevel = 0;
         try
         {
-            if (room is null || room != OrderHallHandler.OrderHallRoom)
+            if (room is null || room != OrderHallHandler.Instance.OrderHallRoom)
             {
                 return 0;
             }

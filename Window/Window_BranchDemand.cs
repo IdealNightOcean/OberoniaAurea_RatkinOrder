@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using NightOcean;
+using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -7,7 +8,7 @@ using static OberoniaAurea.RatkinOrder.Branch;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public class Window_BranchDemand : MainTabWindow
+public class Window_BranchDemand : OrderWindowBase
 {
     private enum TabType
     {
@@ -17,17 +18,12 @@ public class Window_BranchDemand : MainTabWindow
 
         Accepted
     }
-    private RatkinOrder ratkinOrder;
-    private Map map;
-    private int mapRecommendationLetterCount;
+
     public override Vector2 InitialSize => new(1360f, 930f);
-    public override Vector2 RequestedTabSize => new(1360f, 930f);
-    protected override void SetInitialSizeAndPosition()
-    {
-        Vector2 initialSize = InitialSize;
-        windowRect = new Rect((UI.screenWidth - initialSize.x) / 2f, (UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
-        windowRect = windowRect.Rounded();
-    }
+
+    private readonly RatkinOrder ratkinOrder;
+    private readonly Map map;
+    private readonly LazyMutable<int> mapRecommendationLetterCount;
 
     private TabType curTab;
     private readonly List<TabRecord> tabs = new(3);
@@ -60,29 +56,11 @@ public class Window_BranchDemand : MainTabWindow
 
     private Vector2 scrollPosition_Demands;
 
-    public Window_BranchDemand() { }
     public Window_BranchDemand(RatkinOrder ratkinOrder, Map map) : base()
     {
         this.ratkinOrder = ratkinOrder;
-        mapRecommendationLetterCount = RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map);
-        IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
-        for (int i = 0; i < allBranches.Count; i++)
-        {
-            if (allBranches[i].DemandHandler.HasDemand)
-            {
-                branchWithDemandsCache.Add(new BranchDemandEntryDrawer(allBranches[i], map));
-            }
-        }
-        curTab = TabType.All;
-        GetCurTapBranchSummary();
-    }
-
-    public override void PreOpen()
-    {
-        base.PreOpen();
-        ratkinOrder = RatkinOrderManager.AllRatkinOrders[0];
-        map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
-        mapRecommendationLetterCount = RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map);
+        this.map = map;
+        mapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(this.ratkinOrder, this.map));
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
         for (int i = 0; i < allBranches.Count; i++)
         {
@@ -143,7 +121,7 @@ public class Window_BranchDemand : MainTabWindow
                 case TabType.Accepted:
                     {
                         HashSet<Branch> branches = [];
-                        IReadOnlyList<AcceptedBranchDemand> acceptedRecords = AcceptedBranchDemandHandler.Records;
+                        IReadOnlyList<AcceptedBranchDemand> acceptedRecords = AcceptedBranchDemandHandler.Instance.Records;
                         for (int i = 0; i < acceptedRecords.Count; i++)
                         {
                             if (branches.Add(acceptedRecords[i].Branch))
@@ -238,7 +216,7 @@ public class Window_BranchDemand : MainTabWindow
         Widgets.Label(reusedRectII, "OARO_RecommendationLetter".Translate());
 
         reusedRectII = Rect.MinMaxRect(reusedRectII.xMax + 6f, reusedRect.yMin, reusedRect.xMax, reusedRect.yMax);
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRectII, mapRecommendationLetterCount);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRectII, mapRecommendationLetterCount.Value);
 
         reusedRect = inRect;
         reusedRect.width /= 2;
@@ -294,7 +272,7 @@ public class Window_BranchDemand : MainTabWindow
         Rect reusedRect = new(inRect.x, inRect.y - 32f, inRect.width, 32f);
         Widgets.Label(reusedRect, "OARO_AcceptedDemand".Translate());
         Text.Anchor = TextAnchor.MiddleRight;
-        Widgets.Label(reusedRect, $"{AcceptedBranchDemandHandler.AcceptanceCount}/{RatkinOrderSettings.MaxConcurrentAcceptedDemand}");
+        Widgets.Label(reusedRect, $"{AcceptedBranchDemandHandler.Instance.AcceptanceCount}/{RatkinOrderSettings.MaxConcurrentAcceptedDemand}");
         if (selDemand is null)
         {
             return;

@@ -40,7 +40,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
 
-        curOrderHallLevel = Mathf.Max(1, OrderHallHandler.OrderHallLevel);
+        curOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
         topShieldTexture = new CachedTexture($"UI/InteractionKnights/OARO_TopShield_{curOrderHallLevel}").Texture;
 
         RecacheAroundKnightGroups();

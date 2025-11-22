@@ -129,7 +129,7 @@ public static class BranchDemandUtility
             return resultOnly ? false : "OARO_HasAccepted".Translate();
         }
 
-        if (AcceptedBranchDemandHandler.AcceptanceCount >= RatkinOrderSettings.MaxConcurrentAcceptedDemand)
+        if (AcceptedBranchDemandHandler.Instance.AcceptanceCount >= RatkinOrderSettings.MaxConcurrentAcceptedDemand)
         {
             return resultOnly ? false : "OARO_ReachMax_ConcurrentAcceptedDemand".Translate();
         }

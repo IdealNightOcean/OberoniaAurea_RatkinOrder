@@ -8,7 +8,7 @@ using static OberoniaAurea.RatkinOrder.Branch;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public class Window_BranchSquad : MainTabWindow
+public class Window_BranchSquad : OrderWindowBase
 {
     private enum TabType
     {
@@ -18,14 +18,13 @@ public class Window_BranchSquad : MainTabWindow
     }
     protected override float Margin => 0f;
     public override Vector2 InitialSize => new(1627f, 944f);
-    public override Vector2 RequestedTabSize => new(1627f, 944f);
 
     private Vector2 scrollPosition_Squads;
     private Vector2 scrollPosition_Medals;
 
-    private RatkinOrder ratkinOrder;
-    private Map map;
-    private int mapRecommendationLetterCount;
+    private readonly RatkinOrder ratkinOrder;
+    private readonly Map map;
+    private int mapRecommendationCount;
 
     private int selBranchIndex;
     private SquadInfoUICache selSquadInfo;
@@ -38,29 +37,10 @@ public class Window_BranchSquad : MainTabWindow
     private readonly List<BranchSummaryUICache> branchSummaryCaches = [];
     private readonly List<BranchSummaryUICache> tabSummaryCaches = [];
 
-    public Window_BranchSquad()
+    public Window_BranchSquad(RatkinOrder ratkinOrder, Map map) : base()
     {
-        forcePause = true;
-        draggable = false;
-        resizeable = false;
-        doCloseButton = false;
-        doCloseX = false;
-
-        layer = WindowLayer.Dialog;  //窗体层级
-        doWindowBackground = false; //绘制泰南的界面背景
-        drawShadow = false; //绘制主体界面阴影
-
-        //声音
-        //注：用的通讯台声音
-        soundAppear = SoundDefOf.CommsWindow_Open;
-        soundClose = SoundDefOf.CommsWindow_Close;
-
-
-    }
-
-    public override void PreOpen()
-    {
-        base.PreOpen();
+        this.ratkinOrder = ratkinOrder;
+        this.map = map;
         RecacheBranchSummary();
     }
 
@@ -70,13 +50,6 @@ public class Window_BranchSquad : MainTabWindow
         DeselectSquad();
         branchSummaryCaches.Clear();
         tabSummaryCaches.Clear();
-    }
-
-    public override void Close(bool doCloseSound = true)
-    {
-        Text.Font = GameFont.Small;
-        Text.Anchor = TextAnchor.UpperLeft;
-        base.Close(doCloseSound);
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -178,13 +151,12 @@ public class Window_BranchSquad : MainTabWindow
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
-        if (DrawButtonWithDisableReason(butRect: reusedRect,
-                                        label: "OARO_CheckBranchSite".Translate(),
-                                        baseTex: middleCheckButton,
-                                        downTex: middleCheckButton_Down,
-                                        acceptance: SelBranch is not null,
-                                        showReason: false,
-                                        tipUniqueID: -1))
+        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
+                                                          label: "OARO_CheckBranchSite".Translate(),
+                                                          baseTex: middleCheckButton,
+                                                          downTex: middleCheckButton_Down,
+                                                          acceptance: SelBranch is not null,
+                                                          doMouseoverSound: true))
         {
             CameraJumper.TryJumpAndSelect(SelBranch.BaseSite);
             return true;
@@ -298,13 +270,12 @@ public class Window_BranchSquad : MainTabWindow
 
         reusedRect.xMin = reusedRect.xMax + 8f;
         reusedRect.xMax = areaRect.xMax - 2f;
-        if (DrawButtonWithDisableReason(butRect: reusedRect,
-                                        label: "OARO_ClickToAdd".Translate(),
-                                        baseTex: middleClickToAddButton,
-                                        downTex: middleClickToAddButton_Down,
-                                        acceptance: SelBranch is not null,
-                                        showReason: false,
-                                        tipUniqueID: -1))
+        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
+                                                          label: "OARO_ClickToAdd".Translate(),
+                                                          baseTex: middleClickToAddButton,
+                                                          downTex: middleClickToAddButton_Down,
+                                                          acceptance: SelBranch is not null,
+                                                          doMouseoverSound: true))
         {
 
         }
@@ -549,13 +520,12 @@ public class Window_BranchSquad : MainTabWindow
         reusedRect.xMax += 140f;
 
         reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
-        if (DrawButtonWithDisableReason(butRect: reusedRect,
-                               label: "OARO_BombardSupport".Translate(),
-                               baseTex: middleSupportButton,
-                               downTex: middleSupportButton_Down,
-                               acceptance: selSquadInfo.BombardFeasibility,
-                               showReason: hasSupportAuthority,
-                               tipUniqueID: 945641))
+        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
+                                                          label: "OARO_BombardSupport".Translate(),
+                                                          baseTex: middleSupportButton,
+                                                          downTex: middleSupportButton_Down,
+                                                          acceptance: selSquadInfo.BombardFeasibility,
+                                                          doMouseoverSound: true))
         {
 
         }
@@ -564,13 +534,12 @@ public class Window_BranchSquad : MainTabWindow
         reusedRect.xMin = areaRect.xMax - 140f;
         reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
 
-        if (DrawButtonWithDisableReason(butRect: reusedRect,
-                                       label: "OARO_MilitarySupport".Translate(),
-                                       baseTex: middleSupportButton,
-                                       downTex: middleSupportButton_Down,
-                                       acceptance: selSquadInfo.SupportFeasibility,
-                                       showReason: hasSupportAuthority,
-                                       tipUniqueID: 8831443))
+        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
+                                                          label: "OARO_MilitarySupport".Translate(),
+                                                          baseTex: middleSupportButton,
+                                                          downTex: middleSupportButton_Down,
+                                                          acceptance: selSquadInfo.SupportFeasibility,
+                                                          doMouseoverSound: true))
         {
 
         }
@@ -781,7 +750,7 @@ public class Window_BranchSquad : MainTabWindow
 
         reusedRect = new(inRect.xMax - 64f, reusedRect.y, 58f, 24f);
         Text.Anchor = TextAnchor.LowerRight;
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, mapRecommendationLetterCount);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, mapRecommendationCount);
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
@@ -841,9 +810,6 @@ public class Window_BranchSquad : MainTabWindow
 
     private void RecacheBranchSummary()
     {
-        map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(map));
-        ratkinOrder = RatkinOrderManager.AllRatkinOrders[0] ?? throw new ArgumentNullException(nameof(ratkinOrder));
-
         DeselectSquad();
         branchSummaryCaches.Clear();
         foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
@@ -953,30 +919,6 @@ public class Window_BranchSquad : MainTabWindow
     {
         selBranchIndex = -1;
         selSquadInfo = new();
-    }
-
-    private static bool DrawButtonWithDisableReason(Rect butRect, string label, Texture2D baseTex, Texture2D downTex, AcceptanceReport acceptance, int tipUniqueID, bool showReason = true)
-    {
-        if (acceptance)
-        {
-            return OARO_WindowUtility.TextButtonImage(butRect, label, baseTex, downTex);
-        }
-        else
-        {
-            GUI.DrawTexture(butRect, downTex);
-            Widgets.Label(butRect, label);
-
-            if (showReason)
-            {
-                string reason = acceptance.Reason;
-                if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(butRect))
-                {
-                    TooltipHandler.TipRegion(butRect, () => reason, tipUniqueID);
-                }
-            }
-
-            return false;
-        }
     }
 
     protected override void SetInitialSizeAndPosition()

@@ -233,7 +233,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             ClearAutoTargetTask();
         }
 
-        branch.WorkStateDirty = true;
+        branch.MarkWorkStateDirty();
         return true;
     }
 
@@ -252,7 +252,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         }
 
         curTask = null;
-        branch.WorkStateDirty = true;
+        branch.MarkWorkStateDirty();
     }
 
     private void ClearAutoTargetTask()

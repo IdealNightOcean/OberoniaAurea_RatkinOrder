@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea_Frame;
 using System;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
 using Verse.Grammar;
@@ -103,10 +102,6 @@ public class BranchSquad : IExposable, ITickHourOfDay
         }
     }
 
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsBranchSquadOfType(Branch.BranchType type) => (branch.CurType & type) == type;
-
     private void AnnualRetirement()
     {
         MemberCount -= Mathf.Ceil(Rand.Range(0.05f, 0.1f) * MemberCeiling);
@@ -130,12 +125,5 @@ public class BranchSquad : IExposable, ITickHourOfDay
         {
             MemberCount += BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate);
         }
-
-        /*
-        if (squadStat.Supply < squadStat.SupplyCeiling)
-        {
-            squadStat.Supply += BranchStatUtility.GetStatValue(Branch, BranchStatDefOf.OARO_SupplyRecoveryRate);
-        }
-        */
     }
 }

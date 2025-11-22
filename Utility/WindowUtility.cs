@@ -39,6 +39,9 @@ public static class OARO_WindowUtility
         return new Dialog_NodeTreeWithRatkinOrderInfo(OAFrame_DiaUtility.ConfirmDiaNode(text, acceptText, acceptAction, rejectText, rejectAction), ratkinOrder);
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static void DrawTextureOriginalSize(Vector2 position, Texture2D texture) => GUI.DrawTexture(new(position.x, position.y, texture.width, texture.height), texture);
+
     public static bool ButtonImage(Rect butRect, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
     {
         if (Mouse.IsOver(butRect))
@@ -79,6 +82,40 @@ public static class OARO_WindowUtility
         Text.WordWrap = preWordWrap;
 
         return result;
+    }
+
+    public static bool TextButtonImageDisableable(Rect butRect, string label, AcceptanceReport acceptance, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
+    {
+        if (acceptance)
+        {
+            return TextButtonImage(butRect, label, baseTex, downTex, doMouseoverSound, tooltip);
+        }
+        else
+        {
+            GUI.DrawTexture(butRect, downTex);
+            if (!string.IsNullOrEmpty(acceptance.Reason))
+            {
+                TooltipHandler.TipRegion(butRect, acceptance.Reason);
+            }
+
+            TextAnchor preAnchor = Text.Anchor;
+            Color preColor = GUI.color;
+            bool preWordWrap = Text.WordWrap;
+
+            Text.Anchor = TextAnchor.MiddleCenter;
+            if (butRect.height < Text.LineHeight * 2f)
+            {
+                Text.WordWrap = false;
+            }
+
+            Widgets.Label(butRect, label);
+
+            Text.Anchor = preAnchor;
+            GUI.color = preColor;
+            Text.WordWrap = preWordWrap;
+
+            return false;
+        }
     }
 
     /// <summary>

@@ -197,7 +197,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             RemoveDemand(isCritical);
             return false;
         }
-        AcceptedBranchDemandHandler.OnAcceptDemand(branch, isCritical);
+        AcceptedBranchDemandHandler.Instance.OnAcceptDemand(branch, isCritical);
         return true;
     }
 

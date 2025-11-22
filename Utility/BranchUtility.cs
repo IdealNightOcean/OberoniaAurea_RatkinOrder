@@ -13,7 +13,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchUtility
 {
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInAffectedRange(this Branch branch, PlanetTile tile)
     {

@@ -11,6 +11,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 {
+    public static AroundKnightGroupsManager Instance { get; private set; }
+
     private static readonly SimpleCurve newGroupChaceCurve = new(
     [
         new CurvePoint(0, 0.2f),
@@ -19,26 +21,24 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         new CurvePoint(20, 0f)
     ]);
 
-    private static List<AroundKnightGroup> aroundKnightGroups = [];
-    public static IReadOnlyList<AroundKnightGroup> AroundKnightGroups => aroundKnightGroups;
+    private List<AroundKnightGroup> aroundKnightGroups = [];
+    public static IReadOnlyList<AroundKnightGroup> AroundKnightGroups => Instance?.aroundKnightGroups;
 
-    private static Season season;
+    private Season season;
 
-    private static int seasonInvitationUsed;
-    public static int SeasonInvitationUsed
+    private int seasonInvitationUsed;
+    public int SeasonInvitationUsed
     {
         get { return seasonInvitationUsed; }
         set { seasonInvitationUsed = value > 0 ? value : 0; }
     }
 
-    public AroundKnightGroupsManager() => ResetStaticValue();
-
-    public static void ResetStaticValue()
+    public AroundKnightGroupsManager()
     {
-        aroundKnightGroups.Clear();
-        season = Season.Undefined;
-        seasonInvitationUsed = 0;
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AroundKnightGroupsManager));
+        Instance = this;
     }
+    public static void ClearStaticCache() => Instance = null;
 
     public void ExposeData()
     {
@@ -49,20 +49,20 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static void DrawDevWindow(Listing_Standard listing_Rect)
+    public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         if (listing_Rect.ButtonText("Create NewKnight Groups", widthPct: 0.6f))
         {
             CreateNewKnightGroups();
         }
-        if (aroundKnightGroups.NullOrEmpty())
+        if (AroundKnightGroups is null || AroundKnightGroups.Count == 0)
         {
             listing_Rect.Label("None");
         }
         else
         {
             listing_Rect.Gap(6f);
-            foreach (AroundKnightGroup knightGroup in aroundKnightGroups)
+            foreach (AroundKnightGroup knightGroup in AroundKnightGroups)
             {
                 listing_Rect.Label(knightGroup.ToString());
                 //按规则邀请
@@ -95,7 +95,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public static void TickDay()
+    public void TickDay()
     {
         Season curSeason = GenDate.Season(GenTicks.TicksAbs, Vector2.zero);
         if (season != curSeason)
@@ -112,11 +112,24 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         RemoveExpiredKnightGroups();
     }
 
-    public static void RemoveKnightGroup(AroundKnightGroup knightGroup) => aroundKnightGroups.Remove(knightGroup);
+    public static void RemoveKnightGroup(AroundKnightGroup knightGroup)
+    {
+        if (Instance is null)
+        {
+            Log.Error($"[OARO] Attempted to use {nameof(AroundKnightGroupsManager)} before initialization.");
+            return;
+        }
+        Instance.aroundKnightGroups.Remove(knightGroup);
+    }
 
     public static bool TriggerVisitQuest(AroundKnightGroup knightGroup, Map map)
     {
-        aroundKnightGroups.Remove(knightGroup);
+        if (Instance is null)
+        {
+            Log.Error($"[OARO] Attempted to use {nameof(AroundKnightGroupsManager)} before initialization.");
+            return false;
+        }
+        Instance.aroundKnightGroups.Remove(knightGroup);
 
         Slate slate = new();
         slate.SetBasicBranchSlateVar(knightGroup.Branch);
@@ -135,7 +148,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
     }
 
-    private static void CreateNewKnightGroups()
+    private void CreateNewKnightGroups()
     {
         HashSet<Branch> curBranch = aroundKnightGroups.Select(r => r.Branch).ToHashSet();
         ConcurrentBag<Branch> potentialBranches = [];
@@ -159,8 +172,9 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    private static void RemoveExpiredKnightGroups()
+    private void RemoveExpiredKnightGroups()
     {
+
         int firstIndexToRemove = 0;
         for (int i = 0; i < aroundKnightGroups.Count; i++)
         {

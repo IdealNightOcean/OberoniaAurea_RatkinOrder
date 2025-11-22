@@ -12,7 +12,7 @@ public class ThoughtWorker_ResidentKnight : ThoughtWorker
             return ThoughtState.Inactive;
         }
 
-        if (ResidentKnightsManager.TryGetKnightRecord(p, out ResidentKnightRecord pRecord))
+        if (ResidentKnightsManager.Instance.TryGetKnightRecord(p, out ResidentKnightRecord pRecord))
         {
             return ThoughtState.ActiveAtStage((int)pRecord.CurRank);
         }

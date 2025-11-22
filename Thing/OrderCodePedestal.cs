@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderCodePedestal : ThingWithComps
 {
-    public bool IsMainPedestal => this == OrderHallHandler.MainOrderCodePedestal;
+    public bool IsMainPedestal => this == OrderHallHandler.Instance.MainOrderCodePedestal;
 
     public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
     {
@@ -13,11 +13,11 @@ public class OrderCodePedestal : ThingWithComps
         {
             if (BeingTransportedOnGravship)
             {
-                OrderHallHandler.OnPedestalChange();
+                OrderHallHandler.Instance.OnPedestalChange();
             }
             else
             {
-                OrderHallHandler.TryUnsetMainPedestal(this);
+                OrderHallHandler.Instance.TryUnsetMainPedestal(this);
             }
         }
         base.DeSpawn(mode);
@@ -28,7 +28,7 @@ public class OrderCodePedestal : ThingWithComps
         base.PostSwapMap();
         if (Spawned && IsMainPedestal)
         {
-            OrderHallHandler.OnPedestalChange();
+            OrderHallHandler.Instance.OnPedestalChange();
         }
     }
 
@@ -49,7 +49,7 @@ public class OrderCodePedestal : ThingWithComps
             {
                 defaultLabel = "OARO_CodePedestal_Unset".Translate(),
                 defaultDesc = "OARO_CodePedestal_UnsetDesc".Translate(),
-                action = delegate { OrderHallHandler.TryUnsetMainPedestal(this); }
+                action = delegate { OrderHallHandler.Instance.TryUnsetMainPedestal(this); }
             };
             yield return command_UnsetAsMain;
 
@@ -57,7 +57,7 @@ public class OrderCodePedestal : ThingWithComps
             {
                 defaultLabel = "OARO_CodePedestal_RecheckHallLevel".Translate(),
                 defaultDesc = "OARO_CodePedestal_RecheckHallLevelDesc".Translate(),
-                action = OrderHallHandler.OnPedestalChange
+                action = OrderHallHandler.Instance.OnPedestalChange
             };
             yield return command_RecheckHallLevel;
         }
@@ -67,14 +67,14 @@ public class OrderCodePedestal : ThingWithComps
             {
                 defaultLabel = "OARO_CodePedestal_SetAsMain".Translate(),
                 defaultDesc = "OARO_CodePedestal_SetAsMainDesc".Translate(),
-                action = delegate { OrderHallHandler.TrySetMainPedestal(this, replaceCur: false); }
+                action = delegate { OrderHallHandler.Instance.TrySetMainPedestal(this, replaceCur: false); }
             };
 
             Command_Action command_SetAsOrReplaceMain = new()
             {
                 defaultLabel = "OARO_CodePedestal_ForceSetAsMain".Translate(),
                 defaultDesc = "OARO_CodePedestal_ForceSetAsMainDesc".Translate(),
-                action = delegate { OrderHallHandler.TrySetMainPedestal(this, replaceCur: true); }
+                action = delegate { OrderHallHandler.Instance.TrySetMainPedestal(this, replaceCur: true); }
             };
 
             yield return command_SetAsMain;

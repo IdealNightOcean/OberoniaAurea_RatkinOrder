@@ -10,7 +10,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
+public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 {
     [Unsaved] private readonly Branch branch;
 
@@ -99,7 +99,7 @@ public class BranchBuildingHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    public void TickHour(int hourOfDay)
+    public void TickHour()
     {
         if (underConstructionBuilding is not null && Find.TickManager.TicksGame >= underConstructionBuilding.CompletedTick)
         {
