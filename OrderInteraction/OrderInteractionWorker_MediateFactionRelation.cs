@@ -9,11 +9,11 @@ public class OrderInteractionWorker_MediateFactionRelation(OrderInteractionDef d
     {
         if (ratkinOrder.Faction.PlayerRelationKind != FactionRelationKind.Neutral)
         {
-            return "OARO_OrderFaction_NotNeutral".Translate();
+            return resultOnly ? false : "OARO_OrderFaction_NotNeutral".Translate();
         }
         if (ratkinOrder.Faction.PlayerGoodwill >= 0)
         {
-            return "OARO_OrderFaction_NonNegativeGoodWill".Translate();
+            return resultOnly ? false : "OARO_OrderFaction_NonNegativeGoodWill".Translate();
         }
         return base.CanUseInteraction(ratkinOrder, map, resultOnly);
     }

@@ -38,7 +38,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             }
         }
     }
-
+    public int AllBuldingsCount => noramlBuildings.Count + (specialBuilding is null ? 0 : 1);
 
     [Unsaved] public readonly LazyMutableCollection<HashSet<BranchBuildingDef>, BranchBuildingDef> AllBuildingDefsHash;
 
@@ -47,8 +47,8 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     [Unsaved] private List<BranchBuildingComp_Interaction> interactionComps;
     public List<BranchBuildingComp_Interaction> InteractionComps => interactionComps ??= [];
 
-    private UnderConstructionBranchBuilding underConstructionBuilding;
-    public UnderConstructionBranchBuilding UnderConstructionBuilding => underConstructionBuilding;
+    private UnderConstructionRecord<BranchBuildingDef> underConstructionBuilding;
+    public UnderConstructionRecord<BranchBuildingDef> UnderConstructionBuilding => underConstructionBuilding;
     [Unsaved] public Action<BranchBuildingDef, bool> OnBuildingConstructionChanged;
     public bool IsBusy => underConstructionBuilding is not null;
 
@@ -94,7 +94,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         }
         else
         {
-            listing_Rect.SubLabel(underConstructionBuilding.BuildingDef.label, 0.8f);
+            listing_Rect.SubLabel(underConstructionBuilding.TargetDef.label, 0.8f);
             listing_Rect.Label($"BuildingTicksLeft: {underConstructionBuilding.DurationTicksLeft}");
         }
     }
@@ -105,7 +105,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             try
             {
-                AddBuilding(underConstructionBuilding.BuildingDef);
+                AddBuilding(underConstructionBuilding.TargetDef);
             }
             finally
             {
@@ -231,7 +231,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
         try
         {
-            OnBuildingConstructionChanged?.Invoke(underConstructionBuilding.BuildingDef, false);
+            OnBuildingConstructionChanged?.Invoke(underConstructionBuilding.TargetDef, false);
         }
         catch (Exception ex)
         {
@@ -247,7 +247,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     {
         BranchBuildingDef buildingDef = constructParam.BuildingDef;
         underConstructionBuilding = new(
-            def: buildingDef,
+            targetDef: buildingDef,
             durationTicks: branch.GetBuildingTimeCost(buildingDef));
         if (constructParam.ByPlayer)
         {

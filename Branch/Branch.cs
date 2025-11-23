@@ -134,6 +134,8 @@ public class Branch : IExposable, ILoadReferenceable
     public BranchResidentHandler ResidentHandler => residentHandler;
     public BranchStoresReserveHandler StoresReserveHandler => storesReserveHandler;
 
+    public bool IsConstructionBusy => facilityHandler.IsBusy || buildingHandler.IsBusy;
+
     private Branch(RatkinOrder ratkinOrder, bool initCtor)
     {
         RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
@@ -163,8 +165,9 @@ public class Branch : IExposable, ILoadReferenceable
 
     public static Branch GenerateBranchFor(RatkinOrder ratkinOrder, WorldObject worldObject, bool addToManager = true)
     {
-        if (!BranchUtility.CanBeSiteForNewBranch(ratkinOrder, worldObject))
+        if (!worldObject.CanBeSiteForNewBranch(ratkinOrder))
         {
+            Log.Error($"[OARO] {nameof(worldObject)} cannot be used as a {nameof(BaseSite)} for a new {nameof(Branch)}.");
             return null;
         }
 
@@ -285,7 +288,7 @@ public class Branch : IExposable, ILoadReferenceable
         facilityHandler.TickHour();
         buildingHandler.TickHour();
 
-        if (!buildingHandler.IsBusy && !facilityHandler.IsBusy)
+        if (!IsConstructionBusy)
         {
             storesReserveHandler.TickHour(hourOfDay);
         }

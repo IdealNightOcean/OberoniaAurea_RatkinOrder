@@ -66,7 +66,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
     public override void GameComponentTick()
     {
-        RatkinOrderManager.Tick();
+        ratkinOrderManager.Tick();
     }
 
     /// <summary>

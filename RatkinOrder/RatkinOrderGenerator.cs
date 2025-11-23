@@ -52,7 +52,7 @@ public static class RatkinOrderGenerator
         {
             return false;
         }
-        return !RatkinOrderManager.FactionHasRatkinOrder(faction);
+        return !RatkinOrderManager.Instance.FactionHasRatkinOrder(faction);
     }
 
     public static bool TryGenerateNewRatkinOrderForFaction(Faction faction, out RatkinOrder newOrder)
@@ -110,7 +110,7 @@ public static class RatkinOrderGenerator
             return null;
         }
 
-        RatkinOrderManager.AddRatkinOrder(ratkinOrder);
+        RatkinOrderManager.Instance.AddRatkinOrder(ratkinOrder);
         return ratkinOrder;
     }
 
@@ -156,7 +156,7 @@ public static class RatkinOrderGenerator
             return def.fixedName;
         }
 
-        return NameGenerator.GenerateName(def.nameMaker, RatkinOrderManager.AllRatkinOrders.Select(o => o.Name));
+        return NameGenerator.GenerateName(def.nameMaker, RatkinOrderManager.Instance.AllRatkinOrders.Select(o => o.Name));
     }
 
 }

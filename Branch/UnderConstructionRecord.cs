@@ -3,25 +3,26 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class UnderConstructionBranchBuilding : IExposable
+public class UnderConstructionRecord<T> : IExposable where T : BranchConstructionDef, new()
 {
-    private BranchBuildingDef buildingDef;
+    private T targetDef;
     private int durationTicks = -1;
     public int CompletedTick = -1;
-    public BranchBuildingDef BuildingDef => buildingDef;
+    public T TargetDef => targetDef;
     public int DurationTicksLeft => CompletedTick - Find.TickManager.TicksGame;
     public float Progress => durationTicks > 0 ? Mathf.Clamp01(1f - DurationTicksLeft / (float)durationTicks) : 0f;
 
-    public UnderConstructionBranchBuilding() { }
-    public UnderConstructionBranchBuilding(BranchBuildingDef def, int durationTicks)
+    public UnderConstructionRecord() { }
+    public UnderConstructionRecord(T targetDef, int durationTicks)
     {
-        buildingDef = def;
+        this.targetDef = targetDef;
         this.durationTicks = durationTicks;
         CompletedTick = Find.TickManager.TicksGame + durationTicks;
     }
-    public void ExposeData()
+
+    public virtual void ExposeData()
     {
-        Scribe_Defs.Look(ref buildingDef, "buildingDef");
+        Scribe_Defs.Look(ref targetDef, "targetDef");
         Scribe_Values.Look(ref durationTicks, "durationTicks", -1);
         Scribe_Values.Look(ref CompletedTick, "CompletedTick", -1);
     }

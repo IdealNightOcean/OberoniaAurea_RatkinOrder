@@ -78,13 +78,12 @@
     <Compile Include="BranchBuilding\BranchBuildingComp.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_OrderEffectTags.cs" />
     <Compile Include="BranchBuilding\BranchBuildingCompProperties.cs" />
-    <Compile Include="BranchBuilding\UnderConstructionBranchBuilding.cs" />
     <Compile Include="BranchBuilding\BranchBuildingWithComps.cs" />
     <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
-    <Compile Include="BranchFacility\UnderConstructionFacility.cs" />
+    <Compile Include="Branch\UnderConstructionRecord.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchResident\BranchResident_Deployment.cs" />
     <Compile Include="BranchResident\BranchResident_MedicalAssistance.cs" />
@@ -118,6 +117,7 @@
     <Compile Include="JointPatrol\JointPatrolIncidentPart_Supply.cs" />
     <Compile Include="JointPatrol\JointPatrolManager_SubType.cs" />
     <Compile Include="Lord\LordJob_ExitMapBestForJointPatrol.cs" />
+    <Compile Include="OrderInteraction\OrderInteractionWorker_InviteBranchCreation.cs" />
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
@@ -464,8 +464,6 @@
   <ItemGroup>
     <Compile Include="Window\UICacheComp\BranchInfoUICache.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="BranchFacility\UnderConstructionFacility\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

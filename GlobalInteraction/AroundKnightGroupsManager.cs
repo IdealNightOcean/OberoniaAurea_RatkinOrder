@@ -152,7 +152,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
     {
         HashSet<Branch> curBranch = aroundKnightGroups.Select(r => r.Branch).ToHashSet();
         ConcurrentBag<Branch> potentialBranches = [];
-        RatkinOrderManager.AllRatkinOrders.AsParallel().ForAll((r) =>
+        RatkinOrderManager.Instance.AllRatkinOrders.AsParallel().ForAll((r) =>
         {
             IEnumerable<Branch> affectedBranches = r.BranchManager.AllBranches.Where(b => !curBranch.Contains(b));
             foreach (Branch branch in affectedBranches)

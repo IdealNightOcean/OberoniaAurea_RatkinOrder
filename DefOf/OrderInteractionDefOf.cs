@@ -7,4 +7,5 @@ public static class OrderInteractionDefOf
 {
     public static OrderInteractionDef OARO_EnhanceRelationship;
     public static OrderInteractionDef OARO_SponsorOrder;
+    public static OrderInteractionDef OARO_InviteBranchCreation;
 }

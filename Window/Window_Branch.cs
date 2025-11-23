@@ -44,8 +44,8 @@ public class Window_Branch : OrderWindowBase
     private BranchBuilding selBuilding;
     private BranchBuildingDefSummaryUICache selBuildingDefCache;
     private BranchBuildingDef SelBuildingDef => selBuildingDefCache?.BuildingDef;
-    private UnderConstructionBranchBuilding UnderConstructionBuilding => branch.BuildingHandler.UnderConstructionBuilding;
-    private UnderConstructionFacility UnderConstructionFacility => branch.FacilityHandler.UnderConstructionFacility;
+    private UnderConstructionRecord<BranchBuildingDef> UnderConstructionBuilding => branch.BuildingHandler.UnderConstructionBuilding;
+    private UnderConstructionRecord<BranchFacilityDef> UnderConstructionFacility => branch.FacilityHandler.UnderConstructionFacility;
 
     private bool? selEmptyBuildingSlotIsSpecial;
 
@@ -377,7 +377,7 @@ public class Window_Branch : OrderWindowBase
             GUI.DrawTexture(reusedRect, maxFacilityLevelLace, ScaleMode.ScaleToFit);
         }
 
-        if (UnderConstructionFacility?.FacilityDef == facilityDef)
+        if (UnderConstructionFacility?.TargetDef == facilityDef)
         {
             reusedRect = inRect;
             reusedRect.yMin = inRect.yMax - 12f;
@@ -415,7 +415,7 @@ public class Window_Branch : OrderWindowBase
     private void DrawBuildingList(Rect inRect)
     {
         BranchBuildingHandler buildingHandler = branch.BuildingHandler;
-        UnderConstructionBranchBuilding underConstructionBuilding = UnderConstructionBuilding;
+        UnderConstructionRecord<BranchBuildingDef> underConstructionBuilding = UnderConstructionBuilding;
         bool isBusy = underConstructionBuilding is not null;
 
         int potentialBuildingCount = 1 + cachedBranchInfo.BuildingCeiling;
@@ -437,7 +437,7 @@ public class Window_Branch : OrderWindowBase
         AdjustEntryRect();
         if (buildingHandler.SpecialBuilding is null)
         {
-            if (isBusy && underConstructionBuilding.BuildingDef.isSpecial)
+            if (isBusy && underConstructionBuilding.TargetDef.isSpecial)
             {
                 DrawConstructingBuilding(entryRect);
             }
@@ -458,7 +458,7 @@ public class Window_Branch : OrderWindowBase
             DrawBulding(entryRect, buildings[i], isSpecialSlot: false);
         }
 
-        if (isBusy && !underConstructionBuilding.BuildingDef.isSpecial)
+        if (isBusy && !underConstructionBuilding.TargetDef.isSpecial)
         {
             AdjustEntryRect();
             DrawConstructingBuilding(entryRect);
@@ -574,7 +574,7 @@ public class Window_Branch : OrderWindowBase
 
     private void DrawConstructingBuilding(Rect inRect)
     {
-        UnderConstructionBranchBuilding underConstructionBuilding = UnderConstructionBuilding;
+        UnderConstructionRecord<BranchBuildingDef> underConstructionBuilding = UnderConstructionBuilding;
         if (underConstructionBuilding is null)
         {
             return;
@@ -586,7 +586,7 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, underConstructionBuilding.DurationTicksLeft.ToStringTicksToPeriod());
 
-        BranchBuildingDef buildingDef = underConstructionBuilding.BuildingDef;
+        BranchBuildingDef buildingDef = underConstructionBuilding.TargetDef;
         reusedRect = inRect.ContractedBy(5f);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x + 15f, 40f, 40f);
         GUI.DrawTexture(reusedRect, buildingDef.IconTexture, ScaleMode.ScaleToFit);
@@ -1057,8 +1057,8 @@ public class Window_Branch : OrderWindowBase
         BranchFacilityHandler facilityHandler = branch.FacilityHandler;
         if (facilityHandler.IsBusy)
         {
-            UnderConstructionFacility underConstructionFacility = UnderConstructionFacility;
-            if (underConstructionFacility?.FacilityDef == selFacilityDef)
+            UnderConstructionRecord<BranchFacilityDef> underConstructionFacility = UnderConstructionFacility;
+            if (underConstructionFacility?.TargetDef == selFacilityDef)
             {
                 reusedRect = new(inRectX, inRect.y, inRect.width, 24f);
                 Text.Anchor = TextAnchor.MiddleLeft;
@@ -1141,7 +1141,7 @@ public class Window_Branch : OrderWindowBase
             {
                 return;
             }
-            buildingDef = UnderConstructionBuilding.BuildingDef;
+            buildingDef = UnderConstructionBuilding.TargetDef;
             buildingLabel = buildingDef.LabelCap;
         }
 
@@ -1189,7 +1189,7 @@ public class Window_Branch : OrderWindowBase
     /// </summary>
     private void DrawRight_ConstructingBuildingBottom(Vector2 position)
     {
-        UnderConstructionBranchBuilding underConstructionBuilding = UnderConstructionBuilding;
+        UnderConstructionRecord<BranchBuildingDef> underConstructionBuilding = UnderConstructionBuilding;
         if (underConstructionBuilding is null)
         {
             return;
@@ -1531,7 +1531,7 @@ public class Window_Branch : OrderWindowBase
         }
         if (buildingHandler.UnderConstructionBuilding is not null)
         {
-            existBuildingDefs.Add(buildingHandler.UnderConstructionBuilding.BuildingDef);
+            existBuildingDefs.Add(buildingHandler.UnderConstructionBuilding.TargetDef);
         }
         foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefs)
         {
@@ -1605,7 +1605,7 @@ public class Window_Branch : OrderWindowBase
         if (curSelectType == SelectType.EmptyBuildingSlot)
         {
             DeselectConstruct();
-            if (UnderConstructionBuilding?.BuildingDef == buildingDef)
+            if (UnderConstructionBuilding?.TargetDef == buildingDef)
             {
                 selBuildingDefCache = new BranchBuildingDefSummaryUICache(buildingDef, branch);
                 curSelectType = SelectType.ConstructingBuilding;

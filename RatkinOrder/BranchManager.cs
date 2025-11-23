@@ -59,7 +59,7 @@ public class BranchManager : IExposable, ITickDay
         }
     }
 
-    public IEnumerable<(Branch Branch, BranchStoresReserveHandler.ReserveRecord reserve)> AllPrimaryReserves
+    public IEnumerable<KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord>> AllPrimaryReserves
     {
         get
         {
@@ -67,13 +67,14 @@ public class BranchManager : IExposable, ITickDay
             {
                 if (branch.StoresReserveHandler.PrimaryReserves is not null)
                 {
-                    yield return (branch, branch.StoresReserveHandler.PrimaryReserves);
+                    yield return new(branch, branch.StoresReserveHandler.PrimaryReserves);
                 }
             }
         }
     }
 
-    public int invitedBranchCreationsCount;
+    private int invitedBranchCreationsCount;
+    public int InvitedBranchCreationsCount => invitedBranchCreationsCount;
     public int SilverNeededForNextBranchCreation => 7500 + 5000 * invitedBranchCreationsCount;
 
     private int normalDemandFulfillCount;
@@ -164,6 +165,7 @@ public class BranchManager : IExposable, ITickDay
         if (branch == honorMobileBranch) { honorMobileBranch = null; }
         GlobalInteractionManager.Instance.Notify_BranchDestroyed(branch);
         MapComponent_RatkinOrder.OnBranchDestroyed(branch);
+  
         Find.QuestManager.OnBranchDestroyed(branch);
     }
 
@@ -179,6 +181,8 @@ public class BranchManager : IExposable, ITickDay
         }
     }
 
+    public void Notify_NewBranchInviteCreated() => invitedBranchCreationsCount++;
+
     private void DailyConstructCheck()
     {
         if (ratkinOrder.Funds < 0.7f)
@@ -186,7 +190,7 @@ public class BranchManager : IExposable, ITickDay
             return;
         }
 
-        List<(Branch branch, BranchStoresReserveHandler.ReserveRecord reserve)> potentialReserve = AllPrimaryReserves.Where(pr => pr.reserve.CostRateReduce >= 0.3f).ToList();
+        List<KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord>> potentialReserve = AllPrimaryReserves.Where(pr => pr.Value.CostRateReduce >= 0.3f).ToList();
 
         for (int i = potentialReserve.Count - 1; i >= 0; i--)
         {

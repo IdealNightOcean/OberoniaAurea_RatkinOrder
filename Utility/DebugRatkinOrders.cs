@@ -98,7 +98,7 @@ public static class DebugRatkinOrders
                  allowedGameStates = AllowedGameStates.Playing)]
     private static void RemoveRatkinOrder()
     {
-        RatkinOrderOptions((ratkinOrder) => RatkinOrderManager.RemoveRatkinOrder(ratkinOrder));
+        RatkinOrderOptions((ratkinOrder) => RatkinOrderManager.Instance.RemoveRatkinOrder(ratkinOrder));
     }
 
     /// <summary>
@@ -324,7 +324,7 @@ public static class DebugRatkinOrders
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)
     {
         List<DebugMenuOption> orderOptions = [];
-        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.AllRatkinOrders)
+        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.Instance.AllRatkinOrders)
         {
             DebugMenuOption orderOption = new(label: ratkinOrder.Name,
                                               mode: DebugMenuOptionMode.Action,
@@ -338,7 +338,7 @@ public static class DebugRatkinOrders
     private static void OrderBranchOptions(Action<Branch> branchAction)
     {
         List<DebugMenuOption> orderOptions = [];
-        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.AllRatkinOrders)
+        foreach (RatkinOrder ratkinOrder in RatkinOrderManager.Instance.AllRatkinOrders)
         {
             DebugMenuOption orderOption = new(label: ratkinOrder.Name,
                                               mode: DebugMenuOptionMode.Action,

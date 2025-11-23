@@ -21,8 +21,8 @@ public class BranchFacilityHandler : IExposable
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
-    private UnderConstructionFacility underConstructionFacility;
-    public UnderConstructionFacility UnderConstructionFacility => underConstructionFacility;
+    private UnderConstructionRecord<BranchFacilityDef> underConstructionFacility;
+    public UnderConstructionRecord<BranchFacilityDef> UnderConstructionFacility => underConstructionFacility;
     [Unsaved] public Action<BranchFacilityDef, bool> OnBuildingConstructionChanged;
     public bool IsBusy => underConstructionFacility is not null;
 
@@ -55,7 +55,7 @@ public class BranchFacilityHandler : IExposable
         }
         else
         {
-            listing_Rect.Label($"BuildingFacility: {underConstructionFacility.FacilityDef.label} | {underConstructionFacility.DurationTicksLeft}");
+            listing_Rect.Label($"BuildingFacility: {underConstructionFacility.TargetDef.label} | {underConstructionFacility.DurationTicksLeft}");
         }
     }
 
@@ -142,7 +142,7 @@ public class BranchFacilityHandler : IExposable
 
         try
         {
-            OnBuildingConstructionChanged?.Invoke(underConstructionFacility.FacilityDef, false);
+            OnBuildingConstructionChanged?.Invoke(underConstructionFacility.TargetDef, false);
         }
         catch (Exception ex)
         {
@@ -164,7 +164,7 @@ public class BranchFacilityHandler : IExposable
         {
             return;
         }
-        BranchFacilityDef facilityDef = underConstructionFacility.FacilityDef;
+        BranchFacilityDef facilityDef = underConstructionFacility.TargetDef;
         TryActiveNewStage(facilityDef, GetFacilityLevel(facilityDef).FacilityLevelOffSetBy(1), addIfMiss: true);
 
         underConstructionFacility = null;

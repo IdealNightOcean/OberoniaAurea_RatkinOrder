@@ -54,7 +54,7 @@ public class DevWindow_BranchManager : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         listing_Rect.Label($"BranchCount: {allBranches.Count}");
-        listing_Rect.Label($"InvitedBranchCreationsCount: {branchManager.invitedBranchCreationsCount}");
+        listing_Rect.Label($"InvitedBranchCreationsCount: {branchManager.InvitedBranchCreationsCount}");
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("MobileBranch:");

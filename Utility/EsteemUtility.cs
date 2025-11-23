@@ -12,7 +12,7 @@ public static class EsteemUtility
     /// </summary>
     public static void AdjustAllOrdersEsteem(int change, bool byPlayer, bool showPlayerChangeMessage = true, string reason = null)
     {
-        foreach (RatkinOrder order in RatkinOrderManager.AllRatkinOrders)
+        foreach (RatkinOrder order in RatkinOrderManager.Instance.AllRatkinOrders)
         {
             order.EsteemHandler.AdjustEsteem(change, byPlayer, showPlayerChangeMessage: false, reason);
         }
@@ -95,7 +95,7 @@ public static class EsteemUtility
         return esteemDesc.Item1.Translate(ratkinOrder.Name).Colorize(esteemDesc.Item2);
     }
 
-    private static int GetIndex(int esteem)
+    public static int GetIndex(int esteem)
     {
         return esteem switch
         {

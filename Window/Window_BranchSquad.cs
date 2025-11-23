@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using NightOcean;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -24,7 +25,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     private readonly RatkinOrder ratkinOrder;
     private readonly Map map;
-    private int mapRecommendationCount;
+    private readonly LazyMutable<int> mapRecommendationCount;
 
     private int selBranchIndex;
     private SquadInfoUICache selSquadInfo;
@@ -41,6 +42,7 @@ public class Window_BranchSquad : OrderWindowBase
     {
         this.ratkinOrder = ratkinOrder;
         this.map = map;
+        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(this.ratkinOrder, this.map));
         RecacheBranchSummary();
     }
 
@@ -750,7 +752,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect = new(inRect.xMax - 64f, reusedRect.y, 58f, 24f);
         Text.Anchor = TextAnchor.LowerRight;
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, mapRecommendationCount);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, mapRecommendationCount.Value);
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
@@ -811,6 +813,7 @@ public class Window_BranchSquad : OrderWindowBase
     private void RecacheBranchSummary()
     {
         DeselectSquad();
+        mapRecommendationCount.MarkDirty();
         branchSummaryCaches.Clear();
         foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
         {

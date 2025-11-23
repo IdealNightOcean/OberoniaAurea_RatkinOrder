@@ -1,4 +1,3 @@
-using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -105,7 +104,7 @@ public static class BranchUtility
     public static List<Branch> GetAllAffectedBranch(PlanetTile tile)
     {
         ConcurrentBag<Branch> result = [];
-        RatkinOrderManager.AllRatkinOrders
+        RatkinOrderManager.Instance.AllRatkinOrders
             .AsParallel()
             .ForAll(order =>
             {
@@ -122,7 +121,7 @@ public static class BranchUtility
     public static List<Branch> GetAllAffectedBranch(PlanetTile tile, Predicate<Branch> predicate)
     {
         ConcurrentBag<Branch> result = [];
-        RatkinOrderManager.AllRatkinOrders
+        RatkinOrderManager.Instance.AllRatkinOrders
             .AsParallel()
             .ForAll(order =>
             {
@@ -137,7 +136,7 @@ public static class BranchUtility
         return result.ToList();
     }
 
-    public static bool CanBeSiteForNewBranch(this RatkinOrder ratkinOrder, WorldObject worldObject)
+    public static bool CanBeSiteForNewBranch(this WorldObject worldObject, RatkinOrder ratkinOrder)
     {
         if (ratkinOrder is null || worldObject is null)
         {
@@ -156,49 +155,45 @@ public static class BranchUtility
         return true;
     }
 
-    public static AcceptanceReport CanInviteBranchCreation(this RatkinOrder ratkinOrder, Map map, PlanetTile tile, bool resultOnly)
+    public static AcceptanceReport IsValidTileForInviteBranchCreation(RatkinOrder ratkinOrder, Map map, PlanetTile tile, bool resultOnly)
     {
-        if (map is null || ratkinOrder is null)
+        if (map is null || ratkinOrder is null || !tile.Valid)
         {
             return false;
         }
-        if (OAFrame_MapUtility.AmountSendableSilver(map) < ratkinOrder.BranchManager.SilverNeededForNextBranchCreation)
+
+        if (tile.LayerDef != PlanetLayerDefOf.Surface)
         {
-            return resultOnly ? false : "NeedSilverLaunchable".Translate(ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
+            return resultOnly ? false : "OARO_SurfaceOnly".Translate();
         }
 
-        WorldObject curWO = null;
-        List<WorldObject> worldObjects = Find.WorldObjects.AllWorldObjects;
-        for (int i = 0; i < worldObjects.Count; i++)
+        List<WorldObject> allWorldObjects = Find.WorldObjects.AllWorldObjects;
+
+        WorldObject curWO = allWorldObjects.Where(w => w.Tile == tile).FirstOrFallback(fallback: null);
+        if (curWO is null)
         {
-            if (worldObjects[i].Tile == tile)
+            if (allWorldObjects.Any(w => w.Tile.Layer == tile.Layer && Find.WorldGrid.ApproxDistanceInTiles(w.Tile, tile) <= 4f))
             {
-                curWO = worldObjects[i];
-                break;
+                return resultOnly ? false : "OARO_TooCloseToOtherWorldObjects".Translate(4.ToString());
             }
+            return true;
         }
-        return (curWO is null) || CanBeSiteForNewBranch(ratkinOrder, curWO);
+
+        return curWO.CanBeSiteForNewBranch(ratkinOrder);
     }
 
-    public static bool InviteBranchCreation(this RatkinOrder ratkinOrder, Map map, WorldObject worldObject)
+    public static Branch GenerateBranchOnTile(RatkinOrder ratkinOrder, Map map, PlanetTile tile, WorldObject worldObject = null)
     {
-        throw new NotImplementedException();
-    }
-
-    public static void InviteBranchCreationForNewWorldObject(this RatkinOrder ratkinOrder, Map map, WorldObjectDef worldObjectDef, PlanetTile tile)
-    {
-        WorldObject worldObject = WorldObjectMaker.MakeWorldObject(worldObjectDef);
-        worldObject.Tile = tile;
-        worldObject.SetFaction(ratkinOrder.Faction);
-
-        if (InviteBranchCreation(ratkinOrder, map, worldObject))
+        if (worldObject is null)
         {
-            Find.WorldObjects.Add(worldObject);
+
         }
-        else
+        else if (!worldObject.CanBeSiteForNewBranch(ratkinOrder))
         {
-            worldObject.Destroy();
+            return null;
         }
+
+        return Branch.GenerateBranchFor(ratkinOrder, worldObject, addToManager: true);
     }
 
     public static string GenerateBranchNameCore(RatkinOrder ratkinOrder)

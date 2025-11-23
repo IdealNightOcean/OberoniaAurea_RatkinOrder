@@ -13,7 +13,7 @@ internal class Faction_RelationKindChanged_Patch
     {
         if (other.IsPlayerSafe())
         {
-            RatkinOrderManager.GetRatkinOrderForFaction(__instance)?.EsteemHandler.Notify_FactionRelationChanged(__instance.PlayerRelationKind);
+            RatkinOrderManager.Instance.GetRatkinOrderForFaction(__instance)?.EsteemHandler.Notify_FactionRelationChanged(__instance.PlayerRelationKind);
         }
     }
 }
