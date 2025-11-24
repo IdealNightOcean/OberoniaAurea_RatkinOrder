@@ -78,8 +78,7 @@ public class RatkinOrderCombatParameter
             Map.StoryState.lastRaidFaction = faction;
         }
 
-        branch.Squad.MemberCount -= MemberCount;
-        branch.Squad.CommanderCount -= CommanderCount;
+        branch.Squad.AdjustCrew(member: -MemberCount, commander: -CommanderCount);
         branch.Supply -= SupplyCost;
 
         if (SendStandardLetter)

@@ -76,10 +76,10 @@
   <ItemGroup>
     <Compile Include="Ability\AbilityComp_GiveRatkinHediff.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingComp_Memorial.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_OrderEffectTags.cs" />
     <Compile Include="BranchBuilding\BranchBuildingCompProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingWithComps.cs" />
-    <Compile Include="BranchBuilding\BranchBuilding_Memorial.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
@@ -207,7 +207,6 @@
     <Compile Include="BranchStat\BranchStatPart_BuildingCeiling.cs" />
     <Compile Include="BranchBuilding\BranchBuildingConstructParameter.cs" />
     <Compile Include="BranchDemand\BranchDemand.cs" />
-    <Compile Include="DefModExtension\BranchBuilding_MemorialExtension.cs" />
     <Compile Include="DefModExtension\EncampmentSupplyExtension.cs" />
     <Compile Include="DefModExtension\FermentingBarrelExtension.cs" />
     <Compile Include="DefModExtension\MercyQuestFlag.cs" />

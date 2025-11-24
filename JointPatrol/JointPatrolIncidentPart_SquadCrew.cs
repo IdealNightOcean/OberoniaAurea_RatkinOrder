@@ -11,12 +11,12 @@ public class JointPatrolIncidentPart_SquadCrew : JointPatrolIncidentPart
     {
         if (memberChange != 0)
         {
-            record.Branch.Squad.MemberCount += memberChange;
+            record.Branch.Squad.AdjustCrew(member: memberChange, commander: 0f);
             effectExplain.AppendLine("OARO_ChangeOffset_SquadMemberCount".Translate(memberChange.ToStringWithSign()));
         }
         if (commanderChange != 0)
         {
-            record.Branch.Squad.CommanderCount += commanderChange;
+            record.Branch.Squad.AdjustCrew(member: 0f, commander: commanderChange);
             effectExplain.AppendLine("OARO_ChangeOffset_SquadCommanderCount".Translate(commanderChange.ToStringWithSign()));
         }
     }

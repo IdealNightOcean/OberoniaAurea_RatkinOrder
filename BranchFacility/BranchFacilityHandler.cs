@@ -23,7 +23,8 @@ public class BranchFacilityHandler : IExposable
 
     private UnderConstructionRecord<BranchFacilityDef> underConstructionFacility;
     public UnderConstructionRecord<BranchFacilityDef> UnderConstructionFacility => underConstructionFacility;
-    [Unsaved] public Action<BranchFacilityDef, bool> OnBuildingConstructionChanged;
+    public Action<BranchFacilityDef, bool> PostConstructionChanged { get; set; }
+
     public bool IsBusy => underConstructionFacility is not null;
 
     internal BranchFacilityHandler(Branch branch)
@@ -121,12 +122,12 @@ public class BranchFacilityHandler : IExposable
 
         try
         {
-            OnBuildingConstructionChanged?.Invoke(facilityDef, true);
+            PostConstructionChanged?.Invoke(facilityDef, true);
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"call-back: {nameof(OnBuildingConstructionChanged)}",
+                errorDesc: $"call-back: {nameof(PostConstructionChanged)}",
                 typeName: nameof(BranchFacilityHandler),
                 methodName: nameof(StartFacilityConstruction),
                 needStackTrace: true);
@@ -142,12 +143,12 @@ public class BranchFacilityHandler : IExposable
 
         try
         {
-            OnBuildingConstructionChanged?.Invoke(underConstructionFacility.TargetDef, false);
+            PostConstructionChanged?.Invoke(underConstructionFacility.TargetDef, false);
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"call-back: {nameof(OnBuildingConstructionChanged)}",
+                errorDesc: $"call-back: {nameof(PostConstructionChanged)}",
                 typeName: nameof(BranchFacilityHandler),
                 methodName: nameof(CancelFacilityConstruction),
                 needStackTrace: true);

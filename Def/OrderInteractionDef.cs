@@ -30,13 +30,12 @@ public class OrderInteractionDef : InteractionDefBase
         return Worker.CanUseInteraction(ratkinOrder, map, resultOnly);
     }
 
-    public void TryApplyInteraction(RatkinOrder ratkinOrder, Map map, Action<OrderInteractionDef, RatkinOrder, Map> postApplyAction = null)
+    public void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
-        if (ratkinOrder is null || Worker is null)
+        if (ratkinOrder is not null)
         {
-            return;
+            Worker?.TryApplyInteraction(ratkinOrder, map); ;
         }
-        Worker.TryApplyInteraction(ratkinOrder, map, postApplyAction);
     }
 
     public override IEnumerable<string> ConfigErrors()

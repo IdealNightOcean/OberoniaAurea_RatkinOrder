@@ -49,7 +49,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     private UnderConstructionRecord<BranchBuildingDef> underConstructionBuilding;
     public UnderConstructionRecord<BranchBuildingDef> UnderConstructionBuilding => underConstructionBuilding;
-    [Unsaved] public Action<BranchBuildingDef, bool> OnBuildingConstructionChanged;
+    public Action<BranchBuildingDef, bool> PostConstructionChanged { get; set; }
     public bool IsBusy => underConstructionBuilding is not null;
 
     internal BranchBuildingHandler(Branch branch)
@@ -231,11 +231,11 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
         try
         {
-            OnBuildingConstructionChanged?.Invoke(underConstructionBuilding.TargetDef, false);
+            PostConstructionChanged?.Invoke(underConstructionBuilding.TargetDef, false);
         }
         catch (Exception ex)
         {
-            ModUtility.LogExceptionError(ex, nameof(OnBuildingConstructionChanged), nameof(BranchBuildingHandler), nameof(CancelBuildingConstruction), needStackTrace: true);
+            ModUtility.LogExceptionError(ex, nameof(PostConstructionChanged), nameof(BranchBuildingHandler), nameof(CancelBuildingConstruction), needStackTrace: true);
         }
         finally
         {
@@ -257,21 +257,27 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);
         try
         {
-            OnBuildingConstructionChanged?.Invoke(buildingDef, true);
+            PostConstructionChanged?.Invoke(buildingDef, true);
         }
         catch (Exception ex)
         {
-            ModUtility.LogExceptionError(ex, nameof(OnBuildingConstructionChanged), nameof(BranchBuildingHandler), nameof(StartBuildingConstructionDirectly), needStackTrace: true);
+            ModUtility.LogExceptionError(ex, nameof(PostConstructionChanged), nameof(BranchBuildingHandler), nameof(StartBuildingConstructionDirectly), needStackTrace: true);
         }
     }
 
-    private void AddBuilding(BranchBuildingDef buildingDef)
+    public void AddBuilding(BranchBuildingDef buildingDef)
     {
         if (buildingDef.isSpecial && specialBuilding is not null)
         {
             Log.Error($"[OARO] Attempted to add a new branch building to the special building slot of {branch}, but one already exists.");
             return;
         }
+        else if (HasBuilding(buildingDef))
+        {
+            Log.Error($"[OARO] Attempted to add a new branch building to {branch}, but one already exists.");
+            return;
+        }
+
         BranchBuilding newBuilding;
         try
         {

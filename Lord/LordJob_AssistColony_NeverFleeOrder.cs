@@ -30,11 +30,11 @@ public class LordJob_AssistColony_NeverFleeOrder : LordJob_AssistColony_NeverFle
         {
             if (knightRecord.IsCommander)
             {
-                knightRecord.Branch.Squad.CommanderCount += 1f;
+                knightRecord.Branch.Squad.AdjustCrew(member: 0f, commander: 1f);
             }
             else
             {
-                knightRecord.Branch.Squad.MemberCount += 1f;
+                knightRecord.Branch.Squad.AdjustCrew(member: 1f, commander: 0f);
             }
         }
     }

@@ -28,7 +28,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
 
             branch.Supply = 0f;
             int memberLoss = (int)(Rand.Range(0.1f, 0.75f) * branch.Squad.MemberCount);
-            branch.Squad.MemberCount -= memberLoss;
+            branch.Squad.AdjustCrew(member: -memberLoss, commander: 0f);
             endSB.AppendLine("OARO_Task_AttackedOnTask".Translate(memberLoss.ToString()).Colorize(ColorLibrary.RedReadable));
         }
         else

@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -36,29 +37,25 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
 
-    // 认可度 | 关系 | 推荐信
-    private EsteemHandler esteemHandler;
+
+    private EsteemHandler esteemHandler; // 认可度 | 关系 | 推荐信
+    private FundHandler fundHandler; //资金
+    private ReformationManager reformationManager; //自新
+    private BranchManager branchManager; //分部管理
+    private JointPatrolManager jointPatrolManager; //联巡管理
+
     public EsteemHandler EsteemHandler => esteemHandler;
+    public FundHandler FundHandler => fundHandler;
+    public ReformationManager ReformationManager => reformationManager;
+    public BranchManager BranchManager => branchManager;
+    public JointPatrolManager JointPatrolManager => jointPatrolManager;
+
     public int Esteem => esteemHandler.Esteem;
     public EsteemHandler.RelationshipKind Relationship => esteemHandler.Relationship;
-
-    //资金
-    private FundHandler fundHandler;
-    public FundHandler FundHandler => fundHandler;
     public float Funds => fundHandler.Funds;
-
-    //自新
-    private ReformationManager reformationManager;
-    public ReformationManager ReformationManager => reformationManager;
     public float ReformProgress => reformationManager.ReformProgress;
 
-    //分部管理
-    private BranchManager branchManager;
-    public BranchManager BranchManager => branchManager;
-
-    //联巡管理
-    private JointPatrolManager jointPatrolManager;
-    public JointPatrolManager JointPatrolManager => jointPatrolManager;
+    public Action<OrderInteractionDef, RatkinOrder, Map> PostApplyOrderInteraction { get; set; }
 
     private RatkinOrder()
     {
@@ -124,6 +121,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     public void OnRemoved()
     {
         branchManager.Notify_MyOrderRemoved();
+        jointPatrolManager.Notify_MyOrderRemoved();
     }
 
     internal void PostGenerated()

@@ -60,18 +60,18 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         return true;
     }
 
-    public virtual void TryApplyInteraction(Branch branch, Caravan caravan, BranchBuilding building = null, Action<BranchInteractionDef, Branch, Caravan, BranchBuilding> postApplyAction = null)
+    public virtual void TryApplyInteraction(Branch branch, Caravan caravan, BranchBuilding building = null)
     {
         if (ApplyInteraction(branch, caravan, building))
         {
             try
             {
-                postApplyAction?.Invoke(Def, branch, caravan, building);
+                branch.PostApplyBranchInteraction?.Invoke(Def, branch, caravan, building);
             }
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: $"call-back: {nameof(postApplyAction)}",
+                    errorDesc: $"call-back: {nameof(Branch)}.{nameof(Branch.PostApplyBranchInteraction)}",
                     typeName: nameof(BranchInteractionWorker),
                     methodName: nameof(TryApplyInteraction),
                     needStackTrace: true);

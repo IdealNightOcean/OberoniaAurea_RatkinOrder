@@ -154,7 +154,7 @@ public static class OARO_WindowUtility
             GUI.DrawTexture(reusedRect, honorDef.DecorationTexture, ScaleMode.ScaleToFit);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            GUI.DrawTexture(reusedRect, honorDef.BackgroundTexture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.BackgroundTexture);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
             GUI.DrawTexture(reusedRect, honorDef.IconTexture, ScaleMode.ScaleToFit);

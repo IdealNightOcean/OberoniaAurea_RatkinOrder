@@ -302,6 +302,32 @@ public static class DebugRatkinOrders
         }
     }
 
+    /// <summary>
+    /// 添加新建筑材料储备
+    /// </summary>
+    [DebugAction(category: "OberoniaAurea",
+                 name: "添加新建筑材料储备",
+                 displayPriority: 410,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.Playing)]
+    private static void AddNewStoresReservee()
+    {
+        OrderBranchOptions(SelectBuildngDef);
+
+        void SelectBuildngDef(Branch branch)
+        {
+            List<DebugMenuOption> buildngDefOptions = [];
+            foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefsListForReading)
+            {
+                DebugMenuOption levelOption = new(label: buildingDef.label,
+                                                  mode: DebugMenuOptionMode.Action,
+                                                  method: () => branch.StoresReserveHandler.AddNewReserve(buildingDef));
+
+                buildngDefOptions.Add(levelOption);
+            }
+            Find.WindowStack.Add(new Dialog_DebugOptionListLister(buildngDefOptions));
+        }
+    }
 
     /// <summary>
     /// 开始分部联巡

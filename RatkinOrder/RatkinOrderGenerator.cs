@@ -1,6 +1,8 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.Planet;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
@@ -86,9 +88,9 @@ public static class RatkinOrderGenerator
             };
             ratkinOrder.PostGenerated();
         }
-        catch (Exception ex)
+        catch (Exception ex1)
         {
-            ModUtility.LogExceptionError(ex,
+            ModUtility.LogExceptionError(ex1,
                 errorDesc: $"generating RatkinOrder for faction_{faction.loadID}",
                 typeName: nameof(RatkinOrderGenerator),
                 methodName: nameof(GenerateRatkinOrderForFaction),
@@ -100,9 +102,9 @@ public static class RatkinOrderGenerator
         {
             InitBranchForNewOrder(ratkinOrder);
         }
-        catch (Exception ex)
+        catch (Exception ex2)
         {
-            ModUtility.LogExceptionError(ex,
+            ModUtility.LogExceptionError(ex2,
                 errorDesc: $"initializing RatkinOrder for faction_{faction.loadID}",
                 typeName: nameof(RatkinOrderGenerator),
                 methodName: nameof(GenerateRatkinOrderForFaction),
@@ -135,16 +137,49 @@ public static class RatkinOrderGenerator
                     atLeastOneSite = true;
                 }
             }
-            catch (Exception ex)
+            catch (Exception ex1)
             {
-                ModUtility.LogExceptionError(ex,
+                ModUtility.LogExceptionError(ex1,
                     errorDesc: $"Failed to generating a new branch for {ratkinOrder} at {settlement}",
                     typeName: nameof(RatkinOrderGenerator),
                     methodName: nameof(InitBranchForNewOrder),
                     needStackTrace: true);
-                continue;
             }
         }
+
+        BranchManager branchManager = ratkinOrder.BranchManager;
+
+        /*
+         * 初始化骑士团荣誉分部
+         */
+        List<BranchBuildingDef> honorBuildingDefs = DefDatabase<BranchBuildingDef>.AllDefs.Where(b => b.IsHonorSymbol).ToList();
+        foreach (Branch branch in branchManager.AllBranches)
+        {
+            if (Rand.Chance(0.92f))
+            {
+                continue;
+            }
+            BranchBuildingDef honorBuildingDef = null;
+            try
+            {
+                honorBuildingDef = honorBuildingDefs.RandomElement();
+                branch.BuildingHandler.AddBuilding(honorBuildingDef);
+            }
+            catch (Exception ex2)
+            {
+                ModUtility.LogExceptionError(ex2,
+                    errorDesc: $"Failed to add a honor building ({honorBuildingDef}) for {branch}",
+                    typeName: nameof(RatkinOrderGenerator),
+                    methodName: nameof(InitBranchForNewOrder),
+                    needStackTrace: true);
+            }
+        }
+
+        /*
+         * 初始化骑士团关注分部
+         */
+        branchManager.ChangeFollowedBranches(branchManager.AllBranches.TakeRandomElements(3));
+
         return atLeastOneSite;
     }
 

@@ -18,19 +18,12 @@ public class BranchSquad : IExposable, ITickHourOfDay
     public float MemberCeiling => memberCeilingCache.GetCachedResult();
     public float CommanderCeiling => commanderCeilingCache.GetCachedResult();
 
-    public float MemberCount
-    {
-        get => memberCount;
-        set => memberCount = Mathf.Clamp(value, 0f, MemberCeiling);
-    }
+    public float MemberCount => memberCount;
+
     public int MemberCountInt => Mathf.FloorToInt(memberCount); //分队成员数量（整数）
     public float MemberPercentage => memberCount / MemberCeiling;
 
-    public float CommanderCount
-    {
-        get => commanderCount;
-        set => commanderCount = Mathf.Clamp(value, 0f, CommanderCeiling);
-    }
+    public float CommanderCount => commanderCount;
     public int CommanderCountInt => Mathf.FloorToInt(commanderCount); //分队骑士长数量（整数）
     public float CommanderPercentage => commanderCount / CommanderCeiling;
 
@@ -67,6 +60,7 @@ public class BranchSquad : IExposable, ITickHourOfDay
     {
         memberCount = MemberCeiling;
         commanderCount = CommanderCeiling;
+        branch.BranchManager.TotalKnightsCount.MarkDirty();
     }
 
     public void ExposeData()
@@ -83,11 +77,11 @@ public class BranchSquad : IExposable, ITickHourOfDay
         listing_Rect.Label($"Name: {name}");
         if (listing_Rect.ButtonTextLabeled($"MemberCount: {MemberCountInt}", "Member +1"))
         {
-            MemberCount += 1f;
+            AdjustCrew(member: 1f, commander: 0f);
         }
         if (listing_Rect.ButtonTextLabeled($"CommanderCount: {CommanderCountInt}", "Commander +1"))
         {
-            CommanderCount += 1f;
+            AdjustCrew(member: 0f, commander: 1f);
         }
         listing_Rect.Gap(6f);
         listing_Rect.Label($"MemberCeiling: {MemberCeiling:F2}");
@@ -102,9 +96,23 @@ public class BranchSquad : IExposable, ITickHourOfDay
         }
     }
 
+    public void AdjustCrew(float member, float commander)
+    {
+        if (member != 0f)
+        {
+            memberCount = Mathf.Clamp(memberCount + member, 0f, MemberCeiling);
+            branch.BranchManager.TotalKnightsCount.MarkDirty();
+        }
+        if (commander != 0f)
+        {
+            commanderCount = Mathf.Clamp(commanderCount + commander, 0f, CommanderCeiling);
+            branch.BranchManager.TotalKnightsCount.MarkDirty();
+        }
+    }
+
     private void AnnualRetirement()
     {
-        MemberCount -= Mathf.Ceil(Rand.Range(0.05f, 0.1f) * MemberCeiling);
+        AdjustCrew(member: -Rand.Range(0.05f, 0.1f) * MemberCeiling, commander: 0f);
     }
 
     private void DailyRecovery()
@@ -118,12 +126,12 @@ public class BranchSquad : IExposable, ITickHourOfDay
         {
             if (commanderCount < CommanderCeiling)
             {
-                CommanderCount += BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate);
+                AdjustCrew(member: 0f, commander: BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate));
             }
         }
         else if (memberCount < MemberCeiling)
         {
-            MemberCount += BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate);
+            AdjustCrew(member: BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate), commander: 0f);
         }
     }
 }

@@ -1,7 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
-using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -27,7 +26,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
         return true;
     }
 
-    public override void TryApplyInteraction(RatkinOrder ratkinOrder, Map map, Action<OrderInteractionDef, RatkinOrder, Map> postApplyAction = null)
+    public override void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
         CameraJumper.TryJump(CameraJumper.GetWorldTarget(new GlobalTargetInfo(map.Tile)));
         Find.WorldSelector.ClearSelection();
@@ -59,7 +58,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
                     {
                         return;
                     }
-                    base.TryApplyInteraction(ratkinOrder, map, postApplyAction);
+                    base.TryApplyInteraction(ratkinOrder, map);
                 });
 
             Find.WindowStack.Add(nodeTree);

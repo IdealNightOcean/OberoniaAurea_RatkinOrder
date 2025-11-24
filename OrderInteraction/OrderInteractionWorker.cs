@@ -47,18 +47,18 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
 
     protected abstract void InteractionEffect(RatkinOrder ratkinOrder, Map map);
 
-    public virtual void TryApplyInteraction(RatkinOrder ratkinOrder, Map map, Action<OrderInteractionDef, RatkinOrder, Map> postApplyAction = null)
+    public virtual void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
         if (ApplyInteraction(ratkinOrder, map))
         {
             try
             {
-                postApplyAction?.Invoke(Def, ratkinOrder, map);
+                ratkinOrder.PostApplyOrderInteraction?.Invoke(Def, ratkinOrder, map);
             }
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: $"call-back: {nameof(postApplyAction)}",
+                    errorDesc: $"call-back: {nameof(RatkinOrder)}.{nameof(RatkinOrder.PostApplyOrderInteraction)}",
                     typeName: nameof(OrderInteractionWorker),
                     methodName: nameof(TryApplyInteraction),
                     needStackTrace: true);

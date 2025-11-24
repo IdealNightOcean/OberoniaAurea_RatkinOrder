@@ -120,7 +120,7 @@ public static class RelationshipUtility
             {
                 return resultOnly ? false : "OARO_Insufficient_TotalRecommendation".Translate(totalRecommendation, ratkinOrder.Name);
             }
-            if (friendlyBranchesCount > 0 && ratkinOrder.BranchManager.FriendlyBranchesCount < friendlyBranchesCount)
+            if (friendlyBranchesCount > 0 && ratkinOrder.BranchManager.FriendlyBranchesCount.Value < friendlyBranchesCount)
             {
                 return resultOnly ? false : "OARO_Insufficient_FriendlyBranches".Translate(friendlyBranchesCount);
             }
@@ -197,7 +197,7 @@ public static class RelationshipUtility
         }
 
         //友好分部
-        int friendlyBranchCount = ratkinOrder.BranchManager.FriendlyBranchesCount;
+        int friendlyBranchCount = ratkinOrder.BranchManager.FriendlyBranchesCount.Value;
         if (friendlyBranchCount > 0)
         {
             AddExplain(1f + friendlyBranchCount * 0.1f, "OARO_ChangeFactor_FriendlyBranchesCount");

@@ -17,7 +17,6 @@ public class Window_BranchSquad : OrderWindowBase
         Near,
         Friendly
     }
-    protected override float Margin => 0f;
     public override Vector2 InitialSize => new(1627f, 944f);
 
     private Vector2 scrollPosition_Squads;
@@ -67,10 +66,15 @@ public class Window_BranchSquad : OrderWindowBase
         Rect mainInnerRect = mainRect.ContractedBy(3f);
 
         float mainInnerRectY = mainInnerRect.yMin;
-
         float areaRectY = mainInnerRectY + 205f;
         float areaRectHeight = 657f;
-        Rect reusedRect;
+
+        Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRectY + 1f, 20f, 20f);
+        if (Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true))
+        {
+            Close();
+            return;
+        }
 
         //顶部缎带
         reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1567f, 136f);
@@ -197,7 +201,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.x, 240f, areaRect.height - 5f);
         if (selIsHonor)
         {
-            GUI.DrawTexture(reusedRect, honorDef.BackgroundTexture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.BackgroundTexture);
 
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
             GUI.DrawTexture(reusedRect, honorDef.ExpandingDecorationTexture, ScaleMode.ScaleToFit);
@@ -549,7 +553,7 @@ public class Window_BranchSquad : OrderWindowBase
         if (!hasSupportAuthority)
         {
             reusedRect = Rect.MinMaxRect(areaRect.xMin - 102f, supportOptRect.yMax, areaRect.xMax + 3f, areaRect.yMax + 5f);
-            GUI.DrawTexture(reusedRect, middleLockShade, ScaleMode.ScaleToFit, true);
+            GUI.DrawTexture(reusedRect, middleLockShade, ScaleMode.StretchToFill, alphaBlend: true);
             reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
             if (selSquadInfo.CanUnlockSupportAuthority)
             {
@@ -712,7 +716,7 @@ public class Window_BranchSquad : OrderWindowBase
         for (int i = 0; i < squadCount; i++)
         {
             entryRect = new(entryX, entryY, 393f, 91f);
-            entryY += 91;
+            entryY += 89f;
 
             DrawSquadEntry(entryRect, tabSummaryCaches[i], i);
         }
@@ -722,7 +726,7 @@ public class Window_BranchSquad : OrderWindowBase
             for (int i = squadCount; i < usedCount; i++)
             {
                 entryRect = new(entryX, entryY, 393f, 91f);
-                entryY += 91f;
+                entryY += 89f;
 
                 GUI.DrawTexture(entryRect, IconLibrary.BranchSummaryBackground);
             }

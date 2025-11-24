@@ -34,11 +34,11 @@ public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverF
         {
             if (knightRecord.IsCommander)
             {
-                knightRecord.Branch.Squad.CommanderCount += 1f;
+                knightRecord.Branch.Squad.AdjustCrew(member: 0f, commander: 1f);
             }
             else
             {
-                knightRecord.Branch.Squad.MemberCount += 1f;
+                knightRecord.Branch.Squad.AdjustCrew(member: 1f, commander: 0f);
             }
         }
     }

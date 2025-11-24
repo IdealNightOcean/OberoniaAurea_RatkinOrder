@@ -1,12 +1,13 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
-using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
+
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 public class BranchManager : IExposable, ITickDay
 {
@@ -15,8 +16,7 @@ public class BranchManager : IExposable, ITickDay
     private List<Branch> allBranches = [];
     public IReadOnlyList<Branch> AllBranches => allBranches;
 
-    [Unsaved] private readonly SimpleValueCache<int> totalKnightsCache;
-    public int TotalKnights => totalKnightsCache.GetCachedResult();
+    [Unsaved] public readonly LazyMutable<int> TotalKnightsCount;
 
     public IEnumerable<Branch> HonorBranches
     {
@@ -45,8 +45,7 @@ public class BranchManager : IExposable, ITickDay
         }
     }
 
-    [Unsaved] private SimpleValueCache<int> friendlyBranchesCountCache;
-    public int FriendlyBranchesCount => friendlyBranchesCountCache.GetCachedResult();
+    [Unsaved] public readonly LazyMutable<int> FriendlyBranchesCount;
 
     private Branch honorMobileBranch;
     private Branch normalMobileBranch;
@@ -73,6 +72,10 @@ public class BranchManager : IExposable, ITickDay
         }
     }
 
+    private List<Branch> followedBranches = [];
+    public IReadOnlyList<Branch> FollowedBranches => followedBranches;
+
+
     private int invitedBranchCreationsCount;
     public int InvitedBranchCreationsCount => invitedBranchCreationsCount;
     public int SilverNeededForNextBranchCreation => 7500 + 5000 * invitedBranchCreationsCount;
@@ -82,26 +85,24 @@ public class BranchManager : IExposable, ITickDay
     public int NormalDemandFulfillCount => normalDemandFulfillCount;
     public int CriticalDemandFulfillCount => criticalDemandFulfillCount;
 
-    public BranchManager(RatkinOrder ratkinOrder)
+    internal BranchManager(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        friendlyBranchesCountCache = new SimpleValueCache<int>(cacheInterval: 60000, () => FriendlyBranches.Count());
-        totalKnightsCache = new SimpleValueCache<int>(cacheInterval: 60000, () => allBranches.Sum(b => b.Squad.AllCrewCountInt));
+        FriendlyBranchesCount = new LazyMutable<int>(refreshFunc: () => FriendlyBranches.Count());
+        TotalKnightsCount = new LazyMutable<int>(refreshFunc: () => allBranches.Sum(b => b.Squad.AllCrewCountInt));
     }
 
-    public void OpenDevWindow()
-    {
-        Find.WindowStack.Add(new DevWindow_BranchManager(ratkinOrder));
-    }
+    public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_BranchManager(ratkinOrder));
 
     public void ExposeData()
     {
         Scribe_Values.Look(ref invitedBranchCreationsCount, "invitedBranchCreationsCount", 0);
 
-        Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: [ratkinOrder, false]);
-
         Scribe_Values.Look(ref normalDemandFulfillCount, "normalDemandFulfillCount", 0);
         Scribe_Values.Look(ref criticalDemandFulfillCount, "criticalDemandFulfillCount", 0);
+
+        Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: [ratkinOrder, false]);
+        Scribe_Collections.Look(ref followedBranches, "followedBranches", LookMode.Reference);
     }
 
     public void Tick()
@@ -134,6 +135,11 @@ public class BranchManager : IExposable, ITickDay
         if (!allBranches.Contains(branch))
         {
             allBranches.Add(branch);
+            TotalKnightsCount.MarkDirty();
+            if (branch.IsBranchOfType(BranchType.Friendly))
+            {
+                FriendlyBranchesCount.MarkDirty();
+            }
         }
     }
 
@@ -155,30 +161,49 @@ public class BranchManager : IExposable, ITickDay
     {
         if (!allBranches.Remove(branch))
         {
-            Log.Error($"[OARO] Attempted to destroy a branch that does not exist in {ratkinOrder.Name} ({ratkinOrder.GetUniqueLoadID()}). Branch ID: {branch.GetUniqueLoadID()}.");
+            Log.Error($"[OARO] Attempted to destroy a branch that does not exist in {ratkinOrder}. Branch: {branch}.");
             return;
         }
+        followedBranches.Remove(branch);
+        if (branch == normalMobileBranch) { normalMobileBranch = null; }
+        if (branch == honorMobileBranch) { honorMobileBranch = null; }
 
         branch.Destroy();
 
-        if (branch == normalMobileBranch) { normalMobileBranch = null; }
-        if (branch == honorMobileBranch) { honorMobileBranch = null; }
+        TotalKnightsCount.MarkDirty();
+        if (branch.IsBranchOfType(BranchType.Friendly))
+        {
+            FriendlyBranchesCount.MarkDirty();
+        }
+
+        ratkinOrder.JointPatrolManager.Notify_BranchDestroyed(branch);
         GlobalInteractionManager.Instance.Notify_BranchDestroyed(branch);
         MapComponent_RatkinOrder.OnBranchDestroyed(branch);
-  
         Find.QuestManager.OnBranchDestroyed(branch);
     }
 
-    internal void Notify_DemandQuestCompleted(bool isCritical)
+    public void ChangeFollowedBranches(IEnumerable<Branch> branches)
+    {
+        followedBranches.Clear();
+        if (branches is null)
+        {
+            return;
+        }
+        foreach (Branch branch in branches)
+        {
+            if (branch.RatkinOrder == ratkinOrder)
+            {
+                followedBranches.Add(branch);
+            }
+        }
+    }
+
+    public void Notify_DemandQuestCompleted(bool isCritical)
     {
         if (isCritical)
-        {
             criticalDemandFulfillCount++;
-        }
         else
-        {
             normalDemandFulfillCount++;
-        }
     }
 
     public void Notify_NewBranchInviteCreated() => invitedBranchCreationsCount++;
@@ -319,6 +344,10 @@ public class BranchManager : IExposable, ITickDay
         if (allBranches.RemoveAll(b => b is null) > 0)
         {
             Log.Error($"[OARO] Some branches of {ratkinOrder} were null after loading and have been removed.");
+        }
+        if (followedBranches.RemoveAll(b => b is null) > 0)
+        {
+            Log.Error($"[OARO] Some followed branches of {ratkinOrder} were null after loading and have been removed.");
         }
 
         for (int i = 0; i < allBranches.Count; i++)

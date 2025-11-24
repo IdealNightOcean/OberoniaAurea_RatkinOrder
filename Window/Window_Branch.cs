@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -128,23 +129,26 @@ public class Window_Branch : OrderWindowBase
     public Window_Branch(Branch branch, Caravan caravan, Map map) : base()
     {
         this.caravan = caravan;
-        this.branch = branch;
+        this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
         this.map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
         cachedBranchInfo = new(this.branch, this.map);
 
         allFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
+
+        this.branch.BuildingHandler.PostConstructionChanged += PostConstructionChanged_Building;
+        this.branch.PostApplyBranchInteraction += PostApplyBranchInteraction;
     }
 
-    public override void PreOpen()
+    public override void Close(bool doCloseSound = true)
     {
-        base.PreOpen();
-        branch.BuildingHandler.OnBuildingConstructionChanged += OnConstructionBuildingChanged;
+        branch.BuildingHandler.PostConstructionChanged -= PostConstructionChanged_Building;
+        branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+        base.Close(doCloseSound);
     }
 
     public override void PostClose()
     {
         base.PostClose();
-        branch.BuildingHandler.OnBuildingConstructionChanged -= OnConstructionBuildingChanged;
 
         ClearConstructCache();
         ClearContractCache();
@@ -810,30 +814,18 @@ public class Window_Branch : OrderWindowBase
             }
 
             (BranchInteractionDef interactionDef, AcceptanceReport acceptance) = commonInteractionAcceptances[i];
-            if (acceptance)
+            if (OARO_WindowUtility.TextButtonImageDisableable(
+                butRect: entryRect,
+                label: interactionDef.label,
+                acceptance: acceptance,
+                baseTex: commonInteractionButton,
+                downTex: commonInteractionButton_Down,
+                doMouseoverSound: true))
             {
-                if (OARO_WindowUtility.TextButtonImage(entryRect, interactionDef.label, commonInteractionButton, commonInteractionButton_Down, doMouseoverSound: true))
-                {
-                    interactionDef.Worker.TryApplyInteraction(
-                        branch: branch,
-                        caravan: caravan,
-                        postApplyAction: (BranchInteractionDef, Branch, Caravan, BranchBuilding) => interactionAcceptanceDirty = true);
-                    break;
-                }
+                interactionDef.Worker.TryApplyInteraction(branch: branch, caravan: caravan);
+                break;
             }
-            else
-            {
-                GUI.DrawTexture(entryRect, commonInteractionButton_Down);
-                Widgets.Label(entryRect, interactionDef.label);
-                if (Mouse.IsOver(entryRect))
-                {
-                    string reason = acceptance.Reason;
-                    if (!string.IsNullOrEmpty(reason))
-                    {
-                        TooltipHandler.TipRegion(reusedRect, () => reason, 76940332);
-                    }
-                }
-            }
+
         }
         Text.Anchor = TextAnchor.UpperLeft;
         Widgets.EndScrollView();
@@ -886,26 +878,18 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(inRect, interactionComp.Def.label);
 
         reusedRect = new(inRect.xMax - 72f, inRect.y, 72f, inRect.height);
-        if (acceptance && OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_Interaction".Translate(), buildingInteractionButton, buildingInteractionButton_Down))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OARO_Interaction".Translate(),
+            acceptance: acceptance,
+            baseTex: buildingInteractionButton,
+            downTex: buildingInteractionButton_Down,
+            doMouseoverSound: true))
         {
             interactionComp.Def.Worker.TryApplyInteraction(
                 branch: branch,
                 caravan: caravan,
-                building: interactionComp.Parent,
-                postApplyAction: (BranchInteractionDef, Branch, Caravan, BranchBuilding) => interactionAcceptanceDirty = true);
-        }
-        else
-        {
-            GUI.DrawTexture(reusedRect, buildingInteractionButton_Down);
-            Widgets.Label(reusedRect, "OARO_Interaction".Translate());
-            if (Mouse.IsOver(reusedRect))
-            {
-                string reason = acceptance.Reason;
-                if (!string.IsNullOrEmpty(reason))
-                {
-                    TooltipHandler.TipRegion(reusedRect, () => reason, 71726326);
-                }
-            }
+                building: interactionComp.Parent);
         }
     }
 
@@ -949,7 +933,6 @@ public class Window_Branch : OrderWindowBase
                                                           .Colorize(cachedBranchInfo.DailyPopulationGrowth_Bottom > 0 ? Color.green : ColorLibrary.RedReadable));
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
-
 
         if (Mouse.IsOver(reusedRect))
         {
@@ -1596,7 +1579,7 @@ public class Window_Branch : OrderWindowBase
         }
     }
 
-    private void OnConstructionBuildingChanged(BranchBuildingDef buildingDef, bool added)
+    private void PostConstructionChanged_Building(BranchBuildingDef buildingDef, bool added)
     {
         if (curSelectType == SelectType.ConstructingBuilding)
         {
@@ -1625,6 +1608,9 @@ public class Window_Branch : OrderWindowBase
             optionalBuildingDefs[buildingDef] = new BranchBuildingDefSummaryUICache(buildingDef, branch);
         }
     }
+
+    private void PostApplyBranchInteraction(BranchInteractionDef interactionDef, Branch branch, Caravan caravan, BranchBuilding building) => interactionAcceptanceDirty = true;
+
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MainBackground");
 

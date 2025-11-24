@@ -44,6 +44,24 @@ public class BranchBuildingDef : BranchConstructionDef
     /// </summary>
     public List<BranchBuildingCompProperties> comps;
 
+    public T GetCompProperties<T>() where T : BranchBuildingCompProperties
+    {
+        if (comps is null)
+        {
+            return null;
+        }
+
+        for (int i = 0; i < comps.Count; i++)
+        {
+            if (comps[i] is T compT)
+            {
+                return compT;
+            }
+        }
+
+        return null;
+    }
+
     public override IEnumerable<string> ConfigErrors()
     {
         foreach (string error in base.ConfigErrors())

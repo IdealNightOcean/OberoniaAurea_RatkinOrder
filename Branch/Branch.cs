@@ -136,6 +136,8 @@ public class Branch : IExposable, ILoadReferenceable
 
     public bool IsConstructionBusy => facilityHandler.IsBusy || buildingHandler.IsBusy;
 
+    public Action<BranchInteractionDef, Branch, Caravan, BranchBuilding> PostApplyBranchInteraction { get; set; }
+
     private Branch(RatkinOrder ratkinOrder, bool initCtor)
     {
         RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
@@ -253,11 +255,13 @@ public class Branch : IExposable, ILoadReferenceable
 
     public void SetFriendly(bool active, int durationDays = -1, bool showMessage = true)
     {
+        bool activeNow = IsBranchOfType(BranchType.Friendly);
         if (active)
         {
-            if (friendlyDaysLeft <= 0)
+            if (!activeNow)
             {
                 SetBranchType(BranchType.Friendly, true);
+                BranchManager.FriendlyBranchesCount.MarkDirty();
             }
             if (durationDays < 0)
             {
@@ -270,9 +274,10 @@ public class Branch : IExposable, ILoadReferenceable
                 Messages.Message("OARO_Mess_BranchBeFriendly".Translate(name, friendlyDaysLeft), baseSite, MessageTypeDefOf.PositiveEvent);
             }
         }
-        else
+        else if (activeNow)
         {
             SetBranchType(BranchType.Friendly, false);
+            BranchManager.FriendlyBranchesCount.MarkDirty();
             friendlyDaysLeft = -1;
             if (showMessage)
             {
