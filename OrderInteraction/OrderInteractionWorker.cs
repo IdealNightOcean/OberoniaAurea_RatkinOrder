@@ -26,7 +26,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_Fund".Translate(Def.MinFundNeeded.ToStringPercent("0.##"));
         }
-        if (def.cdDays > 0)
+        if (def.hasCoolDown)
         {
             int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.defName);
             if (cooldownTicksLeft > 0)
@@ -77,9 +77,9 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
             ratkinOrder.FundHandler.AddFundEvent(Def.fundEventDef);
         }
 
-        if (Def.cdDays > 0)
+        if (Def.useDefaultCD)
         {
-            ratkinOrder.CooldownManager.RegisterRecord(Def.defName, cdTicks: Def.cdDays * 60000);
+            ratkinOrder.CooldownManager.RegisterRecord(Def.defName, cdTicks: Def.defaultCdDays * 60000);
         }
 
         if (Def.needRecommendation > 0)

@@ -42,8 +42,8 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     [Unsaved] public readonly LazyMutableCollection<HashSet<BranchBuildingDef>, BranchBuildingDef> AllBuildingDefsHash;
 
-    [Unsaved] private List<ITickHour<Branch>> tickHourHandlers;
-    [Unsaved] private List<ITickDay<Branch>> tickDayHandlers;
+    [Unsaved] private List<ITickHour> tickHourHandlers;
+    [Unsaved] private List<ITickDay> tickDayHandlers;
     [Unsaved] private List<BranchBuildingComp_Interaction> interactionComps;
     public List<BranchBuildingComp_Interaction> InteractionComps => interactionComps ??= [];
 
@@ -117,7 +117,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             for (int i = 0; i < tickHourHandlers.Count; i++)
             {
-                tickHourHandlers[i].TickHour(branch);
+                tickHourHandlers[i].TickHour();
             }
         }
     }
@@ -143,7 +143,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             for (int i = 0; i < tickDayHandlers.Count; i++)
             {
-                tickDayHandlers[i].TickDay(branch);
+                tickDayHandlers[i].TickDay();
             }
         }
     }
@@ -330,11 +330,11 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         }
         AllBuildingDefsHash.MarkDirty();
 
-        if (building is ITickHour<Branch> ticksLong)
+        if (building is ITickHour ticksLong)
         {
             tickHourHandlers?.Remove(ticksLong);
         }
-        if (building is ITickDay<Branch> newTickDay)
+        if (building is ITickDay newTickDay)
         {
             tickDayHandlers?.Remove(newTickDay);
         }
@@ -441,12 +441,12 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             }
         }
 
-        if (building is ITickHour<Branch> tickLong)
+        if (building is ITickHour tickLong)
         {
             tickHourHandlers ??= [];
             tickHourHandlers.Add(tickLong);
         }
-        if (building is ITickDay<Branch> tickDay)
+        if (building is ITickDay tickDay)
         {
             tickDayHandlers ??= [];
             tickDayHandlers.Add(tickDay);

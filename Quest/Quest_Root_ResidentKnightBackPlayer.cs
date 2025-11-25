@@ -130,7 +130,12 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
         base.Notify_PreCleanup();
         TaggedString label = "OARO_LetterLabel_ResidentKnightReturnFromJointPatrol".Translate();
         TaggedString text = resultSummarySB.ToString();
-        OrderLetterUtility.MakeOrderLetter(label, text, OrderLetter.LetterType.Official, relatedOrder: ratkinOrder, sender: ratkinOrder?.NameColored);
+        OrderLetterUtility.MakeOrderLetter(
+            label: label,
+            text: text,
+            def: OrderLetterDefOf.OARO_OfficialPositiveEvent,
+            relatedOrder: ratkinOrder,
+            sender: ratkinOrder?.NameColored);
     }
 
     public override void QuestPartTick()

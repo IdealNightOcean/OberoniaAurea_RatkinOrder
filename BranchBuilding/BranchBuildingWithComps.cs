@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -7,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchBuildingWithComps : BranchBuilding
 {
     private List<BranchBuildingComp> comps;
-    private Dictionary<Type, BranchBuildingComp> compByType;
+    private Dictionary<Type, BranchBuildingComp[]> compsByType;
 
     public override void ExposeData()
     {
@@ -39,7 +40,7 @@ public class BranchBuildingWithComps : BranchBuilding
         }
         int compsCount = def.comps.Count;
         comps = new(compsCount);
-        compByType = new(compsCount);
+        compsByType = new(compsCount);
         for (int i = 0; i < compsCount; i++)
         {
             BranchBuildingComp buildingComp = null;
@@ -47,19 +48,22 @@ public class BranchBuildingWithComps : BranchBuilding
             {
                 buildingComp = (BranchBuildingComp)Activator.CreateInstance(def.comps[i].compClass);
                 comps.Add(buildingComp);
-                compByType.Add(buildingComp.GetType(), buildingComp);
                 buildingComp.Initialize(this, def.comps[i]);
             }
             catch (Exception ex)
             {
+                comps.Remove(buildingComp);
+
                 ModUtility.LogExceptionError(ex,
                     errorDesc: "instantiate or initialize a BranchBuildingComp",
                     typeName: nameof(BranchBuildingWithComps),
                     methodName: nameof(InitializeComps),
                     needStackTrace: true);
-                comps.Remove(buildingComp);
             }
         }
+
+        compsByType = comps.GroupBy(c => c.GetType()).ToDictionary(g => g.Key, g => g.ToArray());
+
     }
 
     public override void InitActive()
@@ -143,7 +147,25 @@ public class BranchBuildingWithComps : BranchBuilding
             return null;
         }
 
-        compByType.TryGetValue(typeof(T), out BranchBuildingComp targetComp);
-        return (T)targetComp;
+        if (compsByType is not null)
+        {
+            if (compsByType.TryGetValue(typeof(T), out BranchBuildingComp[] potentialComps))
+            {
+                return (T)potentialComps[0];
+            }
+            if (typeof(T).IsSealedWithCache())
+            {
+                return null;
+            }
+        }
+
+        for (int i = 0; i < compCount; i++)
+        {
+            if (comps[i] is T targetCompIII)
+            {
+                return targetCompIII;
+            }
+        }
+        return null;
     }
 }

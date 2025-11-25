@@ -93,7 +93,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             return;
         }
 
-        StringBuilder branchCliqueInfoSB = new("OARO_BranchCliquesInfoText_Header".Translate(branch.RatkinOrder.Name.Named("ORDERNAME")));
+        StringBuilder branchCliqueInfoSB = new("OARO_BranchCliquesInfoText_Header".Translate(branch.RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)));
         branchCliqueInfoSB.AppendLine();
         foreach (Branch cliqueBranch in allCliques.Values.Where(c => c.IsBranchClique).Select(c => c.RelatedBranch).OrderBy(b => b?.RatkinOrder.LoadID ?? int.MinValue))
         {
@@ -101,9 +101,9 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
 
         OrderLetterUtility.ReceiveLetter(
-            label: "OARO_BranchCliquesInfoLabel".Translate(quest.name.Named("QUESTNAME")),
+            label: "OARO_BranchCliquesInfoLabel".Translate(quest.name.Named("QuestName")),
             text: branchCliqueInfoSB.ToTaggedString(),
-            letterType: OrderLetter.LetterType.Official,
+            def: OrderLetterDefOf.OARO_OfficialPositiveEvent,
             relatedOrder: branch.RatkinOrder,
             sender: branch.Name
         );

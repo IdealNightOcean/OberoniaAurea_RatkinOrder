@@ -12,7 +12,7 @@ public abstract class SpecialLetterDefBase : Def
     [MustTranslate]
     public string text;
 
-    public OrderLetter.LetterType letterType = OrderLetter.LetterType.Normal;
+    public OrderLetterDef relatedOrderLetterDef;
 
     public bool absolutelyUnique;
 }

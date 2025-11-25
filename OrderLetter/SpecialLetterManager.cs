@@ -17,7 +17,12 @@ public class SpecialLetterManager : IExposable
         {
             if (!recievedSpecialLetters.Contains(letterDef))
             {
-                OrderLetter specialLetter = OrderLetterUtility.MakeOrderLetter(letterDef.label, letterDef.text, letterDef.letterType, sender: letterDef.sender, relatedOrder: null);
+                OrderLetter specialLetter = OrderLetterUtility.MakeOrderLetter(
+                    label: letterDef.label,
+                    text: letterDef.text,
+                    def: letterDef.relatedOrderLetterDef,
+                    sender: letterDef.sender,
+                    relatedOrder: null);
                 OrderLetterBox.Instance.ReceiveLetter(specialLetter);
                 recievedSpecialLetters.Add(letterDef);
             }
@@ -35,7 +40,12 @@ public class SpecialLetterManager : IExposable
         {
             if (!recievedCertainDateLetters.Contains(letterDef) && todayDate >= letterDef.EarliestDate && todayDate <= letterDef.LatestDate)
             {
-                OrderLetter certainDateLetter = OrderLetterUtility.MakeOrderLetter(letterDef.label, letterDef.text, letterDef.letterType, sender: letterDef.sender, relatedOrder: null);
+                OrderLetter certainDateLetter = OrderLetterUtility.MakeOrderLetter(
+                    label: letterDef.label,
+                    text: letterDef.text,
+                    def: letterDef.relatedOrderLetterDef,
+                    sender: letterDef.sender,
+                    relatedOrder: null);
                 OrderLetterBox.Instance.ReceiveLetter(certainDateLetter);
                 recievedCertainDateLetters.Add(letterDef);
             }

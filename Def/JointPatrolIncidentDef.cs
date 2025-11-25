@@ -61,7 +61,7 @@ public class JointPatrolIncidentDef : Def
         StringBuilder explainSB = new();
         if (!customDescriptions.NullOrEmpty())
         {
-            explainSB.AppendLine(customDescriptions.RandomElement().Formatted(record.Branch.Name.Named("BRANCHNAME")));
+            explainSB.AppendLine(customDescriptions.RandomElement().Formatted(record.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)));
             explainSB.AppendLine();
         }
 

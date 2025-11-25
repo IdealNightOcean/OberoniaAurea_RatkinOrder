@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingCompProperties_Interaction : BranchBuildingCompProperties
 {
     public BranchInteractionDef def;
+    [MustTranslate]
+    public string labelOverride;
 
     public BranchBuildingCompProperties_Interaction()
     {
@@ -24,6 +27,8 @@ public class BranchBuildingComp_Interaction : BranchBuildingComp
 {
     private BranchBuildingCompProperties_Interaction Props => (BranchBuildingCompProperties_Interaction)props;
     public BranchInteractionDef Def => Props.def;
+
+    public string InteractionLabel => Props.labelOverride ?? Def.label;
 
 
     public override void PostPostActive()

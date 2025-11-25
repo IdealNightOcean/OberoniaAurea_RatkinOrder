@@ -1,6 +1,6 @@
 ﻿using RimWorld;
+using System;
 using Verse;
-using static OberoniaAurea.RatkinOrder.OrderLetter;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -14,45 +14,59 @@ public static class OrderLetterUtility
         Find.WindowStack.Add(new Window_OrderLetterBox());
     }
 
-    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, LetterType letterType, RatkinOrder relatedOrder, string sender = null)
+    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null)
     {
-        OrderLetter orderLetter = new()
-        {
-            Label = label,
-            Text = text,
-            Sender = sender ?? "OARO_Letter_UnkownSender",
-            LetterTypeValue = letterType,
-            RelatedOrder = relatedOrder,
-            RelatedFaction = relatedOrder.Faction
-        };
+        OrderLetter orderLetter = (OrderLetter)Activator.CreateInstance(def.letterClass);
+
+        orderLetter.Def = def;
+        orderLetter.Label = label;
+        orderLetter.Text = text;
+        orderLetter.Sender = sender ?? "OARO_Letter_UnkownSender".Translate();
+        orderLetter.RelatedOrder = relatedOrder;
+        orderLetter.RelatedFaction = relatedOrder.Faction;
 
         return orderLetter;
     }
 
-    public static void ReceiveLetter(TaggedString label, TaggedString text, LetterType letterType, RatkinOrder relatedOrder, string sender = null)
+    public static void ReceiveLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null, int delayDays = -1)
     {
-        OrderLetter orderLetter = MakeOrderLetter(label, text, letterType, relatedOrder, sender);
-        OrderLetterBox.Instance.ReceiveLetter(orderLetter);
+        OrderLetter orderLetter = MakeOrderLetter(label, text, def, relatedOrder, sender);
+        OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays);
     }
 
     public static void ReadLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
     {
-        if (!forceSlience && IsTransToRimLetter(letter.LetterTypeValue))
+        if (!forceSlience && IsTransToRimLetter(letter.Def))
         {
-            Letter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.RelatedLetterDef ?? LetterDefOf.NeutralEvent, lookTargets: null, letter.RelatedFaction);
+            ChoiceLetter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.Def.relatedLetterDef ?? LetterDefOf.NeutralEvent, lookTargets: null, letter.RelatedFaction);
+            if (rimLetter is ChoiceLetter_RatkinOrder rimOrderLetter)
+            {
+                rimOrderLetter.relatedOrder = letter.RelatedOrder;
+            }
             Find.LetterStack.ReceiveLetter(rimLetter);
         }
         letter.PostReaded(letterBox);
     }
 
-    public static bool IsTransToRimLetter(LetterType letterType)
+    public static bool IsTransToRimLetter(OrderLetterDef def)
     {
-        return letterType switch
+        if (!def.canShowAsRimLetter)
         {
-            LetterType.Normal => LetterBox.autoTransNormal,
-            LetterType.Urgent => LetterBox.autoTransUrgent,
-            LetterType.Official => LetterBox.autoTransOfficial,
-            _ => false,
-        };
+            return false;
+        }
+        if (def.forceShowAsRimLetter)
+        {
+            return true;
+        }
+        else
+        {
+            return def.letterType switch
+            {
+                OrderLetterType.Normal => LetterBox.autoTransNormal,
+                OrderLetterType.Urgent => LetterBox.autoTransUrgent,
+                OrderLetterType.Official => LetterBox.autoTransOfficial,
+                _ => false,
+            };
+        }
     }
 }

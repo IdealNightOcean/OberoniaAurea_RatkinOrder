@@ -17,6 +17,7 @@ public class OrderLetterBox : IExposable
 
     [Unsaved] private float nextCanClickTime = -1;
 
+    protected List<OrderLetter> delayLetters = []; //待发邮件
     protected List<OrderLetter> unreadLetters = []; // 未读邮件
     protected List<OrderLetter> archivedLetters = []; // 已读邮件
 
@@ -37,6 +38,15 @@ public class OrderLetterBox : IExposable
 
     public void LetterBoxDay()
     {
+        int ticksGame = Find.TickManager.TicksGame;
+        if (delayLetters.Count > 0)
+        {
+            foreach (OrderLetter letter in delayLetters.ExtractMatching(d => d.ArrivalTick <= ticksGame))
+            {
+                ReceiveLetter(letter);
+            }
+        }
+
         // 优化：避免创建不必要的临时列表，直接在原列表上操作
         int validLetterCount = 0;
 
@@ -54,7 +64,7 @@ public class OrderLetterBox : IExposable
         if (validLetterCount < unreadLetters.Count)
         {
             // 收集过期信件
-            List<OrderLetter> expiredLetters = new List<OrderLetter>(unreadLetters.Count - validLetterCount);
+            List<OrderLetter> expiredLetters = new(unreadLetters.Count - validLetterCount);
             for (int i = validLetterCount; i < unreadLetters.Count; i++)
             {
                 expiredLetters.Add(unreadLetters[i]);
@@ -70,7 +80,6 @@ public class OrderLetterBox : IExposable
 
         if (RatkinOrderSettings.HasLetterRetentionLimit)
         {
-            int ticksGame = Find.TickManager.TicksGame;
             int maxLetterRetentionDays = RatkinOrderSettings.MaxLetterRetentionDays;
             int retentionTicks = maxLetterRetentionDays * 60000;
 
@@ -78,10 +87,18 @@ public class OrderLetterBox : IExposable
         }
     }
 
-    public void ReceiveLetter(OrderLetter letter)
+    public void ReceiveLetter(OrderLetter letter, int delayDays = -1)
     {
-        letter.ArrivalTick = Find.TickManager.TicksGame;
-        unreadLetters.BinaryInsert(letter, compareFunc: OrderLetterComparerFunc);
+        if (delayDays > 0)
+        {
+            letter.ArrivalTick = Find.TickManager.TicksGame + delayDays * 60000;
+            delayLetters.Add(letter);
+        }
+        else
+        {
+            letter.ArrivalTick = Find.TickManager.TicksGame;
+            unreadLetters.BinaryInsert(letter, compareFunc: OrderLetterComparerFunc);
+        }
     }
 
     public void ReadSingleLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)
@@ -170,11 +187,13 @@ public class OrderLetterBox : IExposable
 
         Scribe_Deep.Look(ref specialLetterManager, "specialLetterManager");
 
+        Scribe_Collections.Look(ref delayLetters, "delayLetters", LookMode.Deep);
         Scribe_Collections.Look(ref unreadLetters, "unreadLetters", LookMode.Deep);
         Scribe_Collections.Look(ref archivedLetters, "archivedLetters", LookMode.Deep);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
+            delayLetters.RemoveAll(l => l is null);
             unreadLetters.RemoveAll(l => l is null);
             archivedLetters.RemoveAll(l => l is null);
 

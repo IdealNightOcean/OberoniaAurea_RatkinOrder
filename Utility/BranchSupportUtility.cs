@@ -129,8 +129,8 @@ public static class BranchSupportUtility
                 {
                     OrderLetter orderLetter = OrderLetterUtility.MakeOrderLetter(
                         label: "OARO_BranchDemand_SupportTriggerLabel".Translate(),
-                        text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.Name.Named("BRANCHNAME"), demandDef.label.Named("DEMAND")),
-                        letterType: OrderLetter.LetterType.Official,
+                        text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.label.Named("DEMAND")),
+                        def: OrderLetterDefOf.OARO_OfficialPositiveEvent,
                         relatedOrder: branch.RatkinOrder,
                         sender: branch.Name);
 

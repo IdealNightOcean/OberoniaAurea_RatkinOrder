@@ -9,7 +9,7 @@ public class BranchInteractionDef : InteractionDefBase
     private BranchInteractionWorker worker;
     public BranchInteractionWorker Worker => worker ??= (BranchInteractionWorker)Activator.CreateInstance(workerClass, args: this);
 
-    public bool isBuildingInteraction;
+    public bool onlyBuildingInteraction;
 
     public float needSupply = -1f;
     public int floorPopulation = -1;

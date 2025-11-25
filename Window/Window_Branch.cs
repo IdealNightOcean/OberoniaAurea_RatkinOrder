@@ -875,7 +875,7 @@ public class Window_Branch : OrderWindowBase
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x + 15f, 36f, 36f);
         GUI.DrawTexture(reusedRect, interactionComp.Parent.Def.IconTexture, ScaleMode.ScaleToFit);
 
-        Widgets.Label(inRect, interactionComp.Def.label);
+        Widgets.Label(inRect, interactionComp.InteractionLabel);
 
         reusedRect = new(inRect.xMax - 72f, inRect.y, 72f, inRect.height);
         if (OARO_WindowUtility.TextButtonImageDisableable(
@@ -1549,7 +1549,7 @@ public class Window_Branch : OrderWindowBase
     {
         interactionAcceptanceDirty = false;
         commonInteractionAcceptances.Clear();
-        foreach (BranchInteractionDef interactionDef in DefDatabase<BranchInteractionDef>.AllDefs.Where(d => !d.isBuildingInteraction))
+        foreach (BranchInteractionDef interactionDef in DefDatabase<BranchInteractionDef>.AllDefs.Where(d => !d.onlyBuildingInteraction))
         {
             AcceptanceReport acceptanceReport;
             try

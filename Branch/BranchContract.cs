@@ -114,7 +114,7 @@ public class BranchContract : IExposable
     {
         if (!string.IsNullOrEmpty(def.fixedRequestReasons))
         {
-            return def.fixedRequestReasons.Formatted(branch.Name.Named("BRANCHNAME"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("REQUESTCOUNT"));
+            return def.fixedRequestReasons.Formatted(branch.Name.Named("BranchName"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
         }
         if (def.requestReasonsRulePack is not null)
         {
@@ -139,14 +139,14 @@ public class BranchContract : IExposable
 
             if (string.IsNullOrEmpty(reason))
             {
-                return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BRANCHNAME"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("REQUESTCOUNT"));
+                return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BranchName"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
             }
             else
             {
                 return reason;
             }
         }
-        return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BRANCHNAME"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("REQUESTCOUNT"));
+        return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BranchName"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
 
     }
 }

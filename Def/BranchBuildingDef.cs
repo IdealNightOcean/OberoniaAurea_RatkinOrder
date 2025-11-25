@@ -38,10 +38,6 @@ public class BranchBuildingDef : BranchConstructionDef
     [MustTranslate]
     public List<string> customEffectDescriptions;
 
-    /// <summary>
-    /// comp列表，每个运行时类型只能有一个
-    /// 重复会导致报错 + 只有第一个生效
-    /// </summary>
     public List<BranchBuildingCompProperties> comps;
 
     public T GetCompProperties<T>() where T : BranchBuildingCompProperties
@@ -71,24 +67,24 @@ public class BranchBuildingDef : BranchConstructionDef
 
         if (!isSpecial && IsHonorSymbol)
         {
-            yield return "\"isHonorSymbol\" only works when \"isSpecial\" is true.";
+            yield return $"'{nameof(IsHonorSymbol)}' only works when '{nameof(isSpecial)}' is true.";
         }
 
         if (buildingClass is null)
         {
             buildingClass = defaultType;
-            yield return "has null buildingClass. Set to default.";
+            yield return $"has null '{nameof(buildingClass)}'. Set to default.";
         }
         if (constructCheckerClass is null)
         {
             constructCheckerClass = defaultConstructCheckerClass;
-            yield return "has null constructCheckerClass. Set to default.";
+            yield return $"has null '{nameof(constructCheckerClass)}'. Set to default.";
         }
         if (comps is not null && comps.Count > 0)
         {
             if (!typeof(BranchBuildingWithComps).IsAssignableFrom(buildingClass))
             {
-                yield return "has components but it's buildingClass is not a BranchBuildingWithComps";
+                yield return $"has {nameof(comps)} defined, but its '{nameof(buildingClass)}' is not '{nameof(BranchBuildingWithComps)}' or its subclass.";
             }
             for (int i = 0; i < comps.Count; i++)
             {

@@ -19,6 +19,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 {
     private const int JointPatrolDurationPrepDays = 3;
     private const int JointPatrolDurationDays = 7;
+    public static readonly BranchTaskType[] PatrolTaskTypes = [BranchTaskType.CrimeFighting, BranchTaskType.StabilityMaintenance, BranchTaskType.Assistance, BranchTaskType.Supervision];
 
     private readonly RatkinOrder ratkinOrder;
     private BranchManager BranchManager => ratkinOrder.BranchManager;
@@ -666,9 +667,9 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
 
             OrderLetterUtility.ReceiveLetter(
-                label: "OARO_JointPatrolCompletionSummary".Translate(ratkinOrder.Name.Named("ORDERNAME")),
+                label: "OARO_JointPatrolCompletionSummary".Translate(ratkinOrder.Name.Named("ORDER_name")),
                 text: completionSummary,
-                letterType: OrderLetter.LetterType.Official,
+                def: OrderLetterDefOf.OARO_OfficialNeutralEvent,
                 relatedOrder: ratkinOrder,
                 sender: ratkinOrder.Name);
 

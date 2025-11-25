@@ -1,0 +1,15 @@
+﻿namespace OberoniaAurea.RatkinOrder;
+
+public static class KeyLibrary_FormatArgName
+{
+    public const string SUBJECT = "SUBJECT";
+    public const string THING = "THING";
+    public const string STUFF = "STUFF";
+    public const string PAWN = "PAWN";
+
+    public const string OrderName = "OrderName";
+    public const string BranchName = "BranchName";
+    public const string ThingsInfo = "ThingsInfo";
+    public const string Quality = "Quality";
+
+}
