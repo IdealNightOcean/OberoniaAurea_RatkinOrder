@@ -28,15 +28,15 @@ public class BranchDemandHandler : ITickDay, IExposable
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label("NormalDemand");
+        listing_Rect.Label("日常需求: ");
         if (normalDemand is null)
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.SubLabel("无", 0.8f);
         }
         else
         {
             listing_Rect.SubLabel(normalDemand.ToString(), 0.8f);
-            if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
+            if (listing_Rect.ButtonText("Accept".Translate(), widthPct: 0.6f))
             {
                 if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: false, resultOnly: true))
                 {
@@ -45,16 +45,16 @@ public class BranchDemandHandler : ITickDay, IExposable
             }
         }
 
-        listing_Rect.Label("CriticalDemand");
+        listing_Rect.Label("关键需求: ");
         if (criticalDemand is null)
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.SubLabel("None".Translate(), 0.8f);
         }
         else
         {
             listing_Rect.SubLabel(criticalDemand.Def.label, 0.8f);
             listing_Rect.SubLabel(criticalDemand.ToString(), 0.8f);
-            if (listing_Rect.ButtonText("Accept", widthPct: 0.6f))
+            if (listing_Rect.ButtonText("Accept".Translate(), widthPct: 0.6f))
             {
                 if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: true, resultOnly: true))
                 {
@@ -87,7 +87,7 @@ public class BranchDemandHandler : ITickDay, IExposable
         CheckDemand();
         if (normalDemand is null && !branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandPeriodic))
         {
-            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandPeriodic, cdTicks: 3 * 18000, shouldRemoveWhenExpired: true);
+            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandPeriodic, cdTicks: 3 * 18000, removeWhenExpired: true);
             PeriodicTriggerNewNormalDemand();
         }
     }
@@ -132,7 +132,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             {
                 criticalDemand = (BranchDemand_Critical)BranchDemand.MakeBranchDemand(demandDef);
                 criticalDemand.PostInit(branch);
-                branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandAdd, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
+                branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandAdd, cdTicks: 30 * 60000, removeWhenExpired: true);
             }
             catch (Exception ex)
             {
@@ -151,7 +151,7 @@ public class BranchDemandHandler : ITickDay, IExposable
                 normalDemand = BranchDemand.MakeBranchDemand(demandDef);
                 normalDemand.PostInit(branch);
 
-                branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandAdd, cdTicks: 20 * 60000, shouldRemoveWhenExpired: true);
+                branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandAdd, cdTicks: 20 * 60000, removeWhenExpired: true);
             }
             catch (Exception ex)
             {
@@ -173,13 +173,14 @@ public class BranchDemandHandler : ITickDay, IExposable
             }
             if (Rand.Bool && !branch.RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.DemandFriendlyInform))
             {
-                branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.DemandFriendlyInform, cdTicks: 12 * 60000, shouldRemoveWhenExpired: true);
+                branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.DemandFriendlyInform, cdTicks: 12 * 60000, removeWhenExpired: true);
 
                 OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
                                                    text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.Named("DEMAND")),
-                                                   def: OrderLetterDefOf.OARO_OfficialNeutralEvent,
+                                                   def: OrderLetterDefOf.OARO_OfficialLetter,
                                                    relatedOrder: branch.RatkinOrder,
-                                                   sender: branch.Name);
+                                                   sender: branch.Name,
+                                                   relatedLetterType: OrderLetter.RelatedLetterType.Positive);
             }
         }
     }

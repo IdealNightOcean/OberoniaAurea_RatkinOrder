@@ -55,7 +55,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     public float Funds => fundHandler.Funds;
     public float ReformProgress => reformationManager.ReformProgress;
 
-    public Action<OrderInteractionDef, RatkinOrder, Map> PostApplyOrderInteraction { get; set; }
+    public Action<OrderInteractionDef, RatkinOrder, Map, bool> PostApplyOrderInteraction { get; set; }
 
     private RatkinOrder()
     {
@@ -136,6 +136,6 @@ public class RatkinOrder : IExposable, ILoadReferenceable
         branchManager.PostLoadInit();
     }
 
-    public string GetUniqueLoadID() => "RatkinOrder_" + loadID;
-    public override string ToString() => "RatkinOrder_" + loadID;
+    public string GetUniqueLoadID() => $"{nameof(RatkinOrder)}_{loadID}";
+    public override string ToString() => $"{nameof(RatkinOrder)}_{loadID}";
 }

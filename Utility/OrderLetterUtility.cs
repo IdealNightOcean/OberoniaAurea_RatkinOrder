@@ -4,6 +4,8 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+using RelatedLetterType = OrderLetter.RelatedLetterType;
+
 [StaticConstructorOnStartup]
 public static class OrderLetterUtility
 {
@@ -14,7 +16,7 @@ public static class OrderLetterUtility
         Find.WindowStack.Add(new Window_OrderLetterBox());
     }
 
-    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null)
+    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null, RelatedLetterType relatedLetterType = RelatedLetterType.Neutral)
     {
         OrderLetter orderLetter = (OrderLetter)Activator.CreateInstance(def.letterClass);
 
@@ -24,13 +26,21 @@ public static class OrderLetterUtility
         orderLetter.Sender = sender ?? "OARO_Letter_UnkownSender".Translate();
         orderLetter.RelatedOrder = relatedOrder;
         orderLetter.RelatedFaction = relatedOrder.Faction;
+        orderLetter.RelatedLetterTypeValue = relatedLetterType;
 
         return orderLetter;
     }
 
-    public static void ReceiveLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null, int delayDays = -1)
+    public static void ReceiveLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null, int delayDays = -1, RelatedLetterType relatedLetterType = RelatedLetterType.Neutral)
     {
-        OrderLetter orderLetter = MakeOrderLetter(label, text, def, relatedOrder, sender);
+        OrderLetter orderLetter = MakeOrderLetter(
+            label: label,
+            text: text,
+            def: def,
+            relatedOrder: relatedOrder,
+            sender: sender,
+            relatedLetterType: relatedLetterType);
+
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays);
     }
 
@@ -38,7 +48,7 @@ public static class OrderLetterUtility
     {
         if (!forceSlience && IsTransToRimLetter(letter.Def))
         {
-            ChoiceLetter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.Def.relatedLetterDef ?? LetterDefOf.NeutralEvent, lookTargets: null, letter.RelatedFaction);
+            ChoiceLetter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.RelatedLetterDef, lookTargets: null, letter.RelatedFaction);
             if (rimLetter is ChoiceLetter_RatkinOrder rimOrderLetter)
             {
                 rimOrderLetter.relatedOrder = letter.RelatedOrder;

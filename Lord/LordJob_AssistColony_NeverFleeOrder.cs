@@ -25,7 +25,7 @@ public class LordJob_AssistColony_NeverFleeOrder : LordJob_AssistColony_NeverFle
         {
             return;
         }
-        KnightRecord knightRecord = pawn.GetKnightRecord();
+        KnightRecord knightRecord = KnightPawnsManager.Instance.GetKnightRecord(pawn);
         if (knightRecord?.Branch?.Squad is not null)
         {
             if (knightRecord.IsCommander)

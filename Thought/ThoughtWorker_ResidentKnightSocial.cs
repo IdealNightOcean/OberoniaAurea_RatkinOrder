@@ -12,8 +12,8 @@ public class ThoughtWorker_KnightPersonalitySocial : ThoughtWorker
             return ThoughtState.Inactive;
         }
 
-        if (KnightPawnsManager.TryGetKnightRecord(p, out KnightRecord pRecord)
-          && KnightPawnsManager.TryGetKnightRecord(otherPawn, out KnightRecord otherRecord))
+        if (KnightPawnsManager.Instance.TryGetKnightRecord(p, out KnightRecord pRecord)
+          && KnightPawnsManager.Instance.TryGetKnightRecord(otherPawn, out KnightRecord otherRecord))
         {
             if (KnightPersonalityUtility.IsResonatePersonality(pRecord.Personality, otherRecord.Personality))
             {

@@ -12,7 +12,7 @@ public class OrderLetterDef : Def
 
     public OrderLetterType letterType;
     public LetterDef relatedLetterDef;
-    public bool canShowAsRimLetter;
+    public bool canShowAsRimLetter = true;
     public bool forceShowAsRimLetter;
 
     public override IEnumerable<string> ConfigErrors()
@@ -24,17 +24,12 @@ public class OrderLetterDef : Def
         if (letterClass is null)
         {
             letterClass = defaultLetterClass;
-            yield return "has a null 'letterClass'. Set as Default.";
+            yield return "has a null 'letterClass'. Set to Default.";
         }
         if (!canShowAsRimLetter && forceShowAsRimLetter)
         {
             forceShowAsRimLetter = false;
             yield return "Cannot 'forceShowAsRimLetter' because 'canShowAsRimLetter' is false";
-        }
-        if (canShowAsRimLetter && relatedLetterDef is null)
-        {
-            canShowAsRimLetter = false;
-            yield return "'canShowAsRimLetter' but 'relatedLetterDef' is null";
         }
     }
 }

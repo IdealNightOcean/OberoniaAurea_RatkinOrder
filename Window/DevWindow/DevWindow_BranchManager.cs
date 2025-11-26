@@ -53,32 +53,32 @@ public class DevWindow_BranchManager : DevWindowBase
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
-        listing_Rect.Label($"BranchCount: {allBranches.Count}");
-        listing_Rect.Label($"InvitedBranchCreationsCount: {branchManager.InvitedBranchCreationsCount}");
+        listing_Rect.Label($"分部总数: {allBranches.Count}");
+        listing_Rect.Label($"邀请建立分部数: {branchManager.InvitedBranchCreationsCount}");
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label("MobileBranch:");
+        listing_Rect.Label("机动分队:");
         listing_Rect.SubLabel(mobileBranchName, 0.8f);
 
         listing_Rect.Gap(6f);
-        if (listing_Rect.ButtonText("Honor Branches", null, 0.8f))
+        if (listing_Rect.ButtonText("荣誉分队", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllHonorBranchesName()));
         }
-        if (listing_Rect.ButtonText("Friendly Branches", null, 0.8f))
+        if (listing_Rect.ButtonText("友好分队", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllFriendlyBranchesName()));
         }
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
-        listing_Rect.Label($"NormalDemandFulfillCount: {branchManager.NormalDemandFulfillCount}");
-        listing_Rect.Label($"CriticalDemandFulfillCount: {branchManager.CriticalDemandFulfillCount}");
+        listing_Rect.Label($"日常需求完成数: {branchManager.NormalDemandFulfillCount}");
+        listing_Rect.Label($"关键需求完成数: {branchManager.CriticalDemandFulfillCount}");
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("All Branches");
+        listing_Rect.Label("所有分部");
         Text.Font = GameFont.Small;
         listing_Rect.Gap(6f);
         int selectIndex = -1;

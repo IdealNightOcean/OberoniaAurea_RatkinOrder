@@ -26,7 +26,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
         return true;
     }
 
-    public override void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    protected override void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
         CameraJumper.TryJump(CameraJumper.GetWorldTarget(new GlobalTargetInfo(map.Tile)));
         Find.WorldSelector.ClearSelection();
@@ -58,7 +58,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
                     {
                         return;
                     }
-                    base.TryApplyInteraction(ratkinOrder, map);
+                    base.ApplyInteraction(ratkinOrder, map);
                 });
 
             Find.WindowStack.Add(nodeTree);
@@ -68,14 +68,15 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
         bool CanSelectTarget(GlobalTargetInfo t) => BranchUtility.IsValidTileForInviteBranchCreation(ratkinOrder, map, t.Tile, resultOnly: true);
     }
 
+    protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)
+    {
+        ratkinOrder.BranchManager.Notify_NewBranchInviteCreated();
+        return (true, true);
+    }
+
     protected override void DoInteractionCost(RatkinOrder ratkinOrder, Map map)
     {
         base.DoInteractionCost(ratkinOrder, map);
         map.DestoryThingsOfDef(ThingDefOf.Silver, ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
-    }
-
-    protected override void InteractionEffect(RatkinOrder ratkinOrder, Map map)
-    {
-        ratkinOrder.BranchManager.Notify_NewBranchInviteCreated();
     }
 }

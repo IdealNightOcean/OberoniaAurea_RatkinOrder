@@ -74,18 +74,18 @@ public class BranchSquad : IExposable, ITickHourOfDay
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"Name: {name}");
-        if (listing_Rect.ButtonTextLabeled($"MemberCount: {MemberCountInt}", "Member +1"))
+        listing_Rect.Label($"名称: {name}");
+        if (listing_Rect.ButtonTextLabeled($"普通骑士: {MemberCountInt}", "Member +1"))
         {
             AdjustCrew(member: 1f, commander: 0f);
         }
-        if (listing_Rect.ButtonTextLabeled($"CommanderCount: {CommanderCountInt}", "Commander +1"))
+        if (listing_Rect.ButtonTextLabeled($"骑士长: {CommanderCountInt}", "Commander +1"))
         {
             AdjustCrew(member: 0f, commander: 1f);
         }
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"MemberCeiling: {MemberCeiling:F2}");
-        listing_Rect.Label($"CommanderCeiling: {CommanderCeiling:F2}");
+        listing_Rect.Label($"普通骑士上限: {MemberCeiling:F2}");
+        listing_Rect.Label($"骑士长上限: {CommanderCeiling:F2}");
     }
 
     public void TickHour(int hourOfDay)

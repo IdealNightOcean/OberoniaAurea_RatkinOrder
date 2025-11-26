@@ -35,7 +35,8 @@ public class BranchBuilding_Trader : BranchBuildingWithComps, ITickDay
         }
 
         int refreshInterval = trderSetter.refreshIntervalDays > 0 ? trderSetter.refreshIntervalDays * 60000 : -1;
-        trader = new(traderKindDef, branch.BaseSite, branch.RatkinOrder.Faction, refreshInterval);
+        trader = new(traderKindDef, branch.BaseSite, branch.RatkinOrder.Faction, refreshInterval: refreshInterval);
+        trader?.GenerateThings();
     }
 
     public override void ExposeData()

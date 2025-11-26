@@ -37,38 +37,38 @@ public class DevWindow_Order : DevWindowBase
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
         listing_Rect.Label($"ID: {ratkinOrder.LoadID}");
-        listing_Rect.Label($"Name: {ratkinOrder.Name}");
-        listing_Rect.Label($"Faction: {ratkinOrder.Faction.Name}");
+        listing_Rect.Label($"名称: {ratkinOrder.Name}");
+        listing_Rect.Label($"所属派系: {ratkinOrder.Faction.Name} ({ratkinOrder.Faction})");
         Text.Font = GameFont.Small;
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Esteem:");
+        listing_Rect.Label("认可丨关系丨推荐:");
         Text.Font = GameFont.Small;
         ratkinOrder.EsteemHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Fund:");
+        listing_Rect.Label("资金:");
         Text.Font = GameFont.Small;
         ratkinOrder.FundHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Reformation:");
+        listing_Rect.Label("自新:");
         Text.Font = GameFont.Small;
         ratkinOrder.ReformationManager.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
-        if (listing_Rect.ButtonText("EffectTags", null, 0.8f))
+        if (listing_Rect.ButtonText("效果标志 EffectTags", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.EffectTags.GetDetailString()));
         }
-        if (listing_Rect.ButtonText("StatTransformers", null, 0.8f))
+        if (listing_Rect.ButtonText("修正 StatTransformers", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.TransformerHandler.GetDetailString()));
         }
@@ -76,9 +76,9 @@ public class DevWindow_Order : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Branch Manager:");
+        listing_Rect.Label("分部总览:");
         Text.Font = GameFont.Small;
-        if (listing_Rect.ButtonText("BranchManager DevWin", null, 0.8f))
+        if (listing_Rect.ButtonText("Dev窗口 - 分部总览", null, 0.8f))
         {
             Close();
             EndContents();
@@ -89,9 +89,9 @@ public class DevWindow_Order : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Squad Group Patrol Manager:");
+        listing_Rect.Label("联合巡逻:");
         Text.Font = GameFont.Small;
-        if (listing_Rect.ButtonText("GroupPatrolManager DevWin", null, 0.8f))
+        if (listing_Rect.ButtonText("Dev窗口 - 分部总览", null, 0.8f))
         {
             Close();
             EndContents();

@@ -24,14 +24,14 @@ public class DevWindow_Branch : DevWindowBase
         Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect);
         listing_Rect.Begin(viewRect);
 
-        if (listing_Rect.ButtonText("BranchManager DevWin", null, 0.8f))
+        if (listing_Rect.ButtonText("Dev窗口 - 分部总览", null, 0.8f))
         {
             Close();
             EndContents();
             branch.BranchManager.OpenDevWindow();
             return;
         }
-        if (listing_Rect.ButtonText("Order DevWin", null, 0.8f))
+        if (listing_Rect.ButtonText("Dev窗口 - 骑士团总览", null, 0.8f))
         {
             Close();
             EndContents();
@@ -43,89 +43,91 @@ public class DevWindow_Branch : DevWindowBase
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
         listing_Rect.Label($"ID: {branch.LoadID}");
-        listing_Rect.Label($"Name: {branch.Name}");
+        listing_Rect.Label($"名称: {branch.Name}");
         Text.Font = GameFont.Small;
 
         listing_Rect.Gap(12f);
         listing_Rect.Label("————————————————");
-        listing_Rect.Label($"WorkState: {branch.CurWorkState}");
+        listing_Rect.Label($"状态描述 WorkState: {branch.CurWorkState}");
+        listing_Rect.Label($"是否空闲: {branch.IsIdleNow}");
+        listing_Rect.Label($"是否外出: {branch.IsOutdoorNow}");
 
         listing_Rect.Gap(6f);
         if (branch.BaseSite is not null)
         {
-            if (listing_Rect.ButtonTextLabeled($"BaseSite: {branch.BaseSite}", "Jump to"))
+            if (listing_Rect.ButtonTextLabeled($"站点: {branch.BaseSite}", "Jump to"))
             {
                 CameraJumper.TryJumpAndSelect(branch.BaseSite);
             }
         }
-        if (listing_Rect.ButtonText("EffectTags", null, 0.8f))
+        if (listing_Rect.ButtonText("效果标志 EffectTags", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(branch.EffectTags.GetDetailString()));
         }
-        if (listing_Rect.ButtonText("StatTransformers", null, 0.8f))
+        if (listing_Rect.ButtonText("修正 StatTransformers", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(branch.TransformerHandler.GetDetailString()));
         }
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label($"Squad:");
+        listing_Rect.Label($"分队:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.Squad.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Medal:");
+        listing_Rect.Label("印记:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.MedalHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Facility:");
+        listing_Rect.Label("设施:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.FacilityHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Building:");
+        listing_Rect.Label("建筑:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.BuildingHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Population:");
+        listing_Rect.Label("人口管理:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.PopulationHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Task:");
+        listing_Rect.Label("任务:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.TaskHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Demand:");
+        listing_Rect.Label("需求:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.DemandHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Resident:");
+        listing_Rect.Label("驻派:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.ResidentHandler.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("StoresReserve:");
+        listing_Rect.Label("建材储备:");
         Text.Font = GameFont.Small;
         listing_Rect.Label("————————————————");
         branch.StoresReserveHandler.DrawDevWindow(listing_Rect);

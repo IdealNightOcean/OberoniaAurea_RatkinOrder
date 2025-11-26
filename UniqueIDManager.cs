@@ -10,7 +10,8 @@ public class UniqueIDManager : IExposable
         {
             { "RatkinOrder", 0 },
             { "Branch", 0 },
-            { "ResidentKnight", 0}
+            { "KnightRecord", 0 },
+            { "ResidentKnight", 0 }
         };
 
     private bool wasLoaded;

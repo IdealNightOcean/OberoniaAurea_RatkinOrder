@@ -180,18 +180,6 @@ public static class RecommendationUtility
     }
 
     /// <summary>
-    /// 招募常驻骑士所需推荐信数量
-    /// </summary>
-    public static int RecommendationNeed_ApplyResidentKnight(RatkinOrder ratkinOrder)
-    {
-        return ratkinOrder.Esteem switch
-        {
-            > 50 => 3,
-            _ => 2
-        };
-    }
-
-    /// <summary>
     /// 提升常驻骑士阶位所需推荐信数量
     /// </summary>
     /// <param name="targetRank">目标阶位</param>

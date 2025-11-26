@@ -47,59 +47,6 @@ public static class GlobalInteractionUtility
 
     }
 
-    /// <summary>
-    /// 能否申请新的常驻骑士
-    /// </summary>
-    public static AcceptanceReport CanApplyResidentKnight(RatkinOrder ratkinOrder, Map map, bool resultOnly)
-    {
-        if (map is null || ratkinOrder is null)
-        {
-            return false;
-        }
-
-        if (OrderHallHandler.Instance.OrderHallRoom is null)
-        {
-            return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
-        }
-
-        if (ratkinOrder.Relationship < RelationshipKind.Friendly)
-        {
-            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipKind.Friendly.GetLabel());
-        }
-
-        int residentKnightCeiling = ResidentKnightsManager.ResidentKnightCeiling;
-        if (ResidentKnightsManager.Instance.KnightsCount >= residentKnightCeiling)
-        {
-            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(residentKnightCeiling);
-        }
-        int recommendationNeed = RecommendationUtility.RecommendationNeed_ApplyResidentKnight(ratkinOrder);
-        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < recommendationNeed)
-        {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed, ratkinOrder.Name);
-        }
-
-        return true;
-    }
-
-    /// <summary>
-    /// 申请新的常驻骑士
-    /// </summary>
-    public static void ApplyResidentKnight(RatkinOrder ratkinOrder, Map map)
-    {
-        Slate slate = new();
-        slate.SetBasicOrderSlateVar(ratkinOrder);
-        slate.Set("map", map);
-
-        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnight, slate, forced: false))
-        {
-            int recommendationNeed = RecommendationUtility.RecommendationNeed_ApplyResidentKnight(ratkinOrder);
-            if (recommendationNeed > 0)
-            {
-                RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
-            }
-        }
-    }
-
     public static AcceptanceReport CanUpgradeResidentKnightRank(ResidentKnightRecord record, Map map, bool resultOnly = false)
     {
         if (record.CurRank == ResidentKnightRecord.Rank.Crown)

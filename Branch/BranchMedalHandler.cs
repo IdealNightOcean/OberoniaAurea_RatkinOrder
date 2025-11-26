@@ -58,8 +58,8 @@ public class BranchMedalHandler : IExposable
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"PrimaryMedal: {PrimaryMedal}");
-        listing_Rect.Label("Medals:");
+        listing_Rect.Label($"主印记: {PrimaryMedal}");
+        listing_Rect.Label("所有印记:");
         foreach (var kv in medalRecords)
         {
             listing_Rect.SubLabel($"({kv.Key.label} - {kv.Value})", 0.8f);

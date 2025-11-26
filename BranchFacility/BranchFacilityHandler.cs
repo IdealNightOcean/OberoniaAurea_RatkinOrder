@@ -42,7 +42,8 @@ public class BranchFacilityHandler : IExposable
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"TotalFacilityLevel: {TotalFacilityLevel}");
+        listing_Rect.Label($"总设施等级: {TotalFacilityLevel.Value}");
+        listing_Rect.Label("所有设施等级");
         foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> facility in facilities)
         {
             listing_Rect.SubLabel($"{facility.Key.label}: {facility.Value}", 0.8f);
@@ -52,11 +53,11 @@ public class BranchFacilityHandler : IExposable
 
         if (underConstructionFacility is null)
         {
-            listing_Rect.Label("BuildingFacility: None");
+            listing_Rect.Label("在建设施: 无");
         }
         else
         {
-            listing_Rect.Label($"BuildingFacility: {underConstructionFacility.TargetDef.label} | {underConstructionFacility.DurationTicksLeft}");
+            listing_Rect.Label($"在建设施: {underConstructionFacility.TargetDef.label} | {underConstructionFacility.DurationTicksLeft}");
         }
     }
 
@@ -93,7 +94,7 @@ public class BranchFacilityHandler : IExposable
             int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
             if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))
             {
-                return resultOnly ? false : "OARO_NotEnoughSilver".Translate(silverCost);
+                return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverCost.ToString());
             }
         }
 

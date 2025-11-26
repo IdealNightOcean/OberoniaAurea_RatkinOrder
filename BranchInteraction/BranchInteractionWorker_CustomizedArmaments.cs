@@ -9,7 +9,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef def) : BranchInteractionWorker(def)
 {
-    private DiaNode WeaponNode(InteractionParms parms)
+    private DiaNode WeaponNode(BranchInteractionParms parms)
     {
         List<ThingDef> customizableThings = Def.GetModExtension<CustomizableArmament_Extension>()?.customizableThings ?? [];
 
@@ -29,7 +29,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         return rootNode;
     }
 
-    private DiaNode StuffNode(InteractionParms parms, ThingDef thingDef)
+    private DiaNode StuffNode(BranchInteractionParms parms, ThingDef thingDef)
     {
         DiaNode rootNode = new("OARO_CustomizedArmaments_Stuff".Translate());
         foreach (ThingDef stuffDef in GenStuff.AllowedStuffsFor(thingDef))
@@ -50,7 +50,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         return rootNode;
     }
 
-    private DiaNode QualityNode(InteractionParms parms, ThingDef thingDef, ThingDef stuffDef)
+    private DiaNode QualityNode(BranchInteractionParms parms, ThingDef thingDef, ThingDef stuffDef)
     {
         int caravanSilver = parms.Caravan.GetCountOfThingDef(thingDef);
         DiaNode rootNode = new("OARO_CustomizedArmaments_Quality".Translate());
@@ -79,7 +79,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         return rootNode;
     }
 
-    private DiaNode ConfirmNode(InteractionParms parms, ThingDef thingDef, ThingDef stuffDef, QualityCategory quality)
+    private DiaNode ConfirmNode(BranchInteractionParms parms, ThingDef thingDef, ThingDef stuffDef, QualityCategory quality)
     {
         int needSilver = GetPrice(thingDef, stuffDef, quality);
         int coolingDays = GetDelayDays(quality);
@@ -92,7 +92,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
             rejectAction: null);
     }
 
-    private void Customization(InteractionParms parms, ThingDef thingDef, ThingDef stuffDef, QualityCategory quality)
+    private void Customization(BranchInteractionParms parms, ThingDef thingDef, ThingDef stuffDef, QualityCategory quality)
     {
         int coolingDays = GetDelayDays(quality);
 
@@ -104,28 +104,30 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
             label: "OARO_CustomizedArmaments_CompletedLabel".Translate(),
             text: "OARO_CustomizedArmaments_CompletedText".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
-            def: OrderLetterDefOf.OARO_OfficialPositive_SimpleAttachments,
+            def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,
-            sender: branch.Name);
+            sender: branch.Name,
+            relatedLetterType: OrderLetter.RelatedLetterType.Positive);
 
         orderLetter.Attachments = [thing];
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, coolingDays);
 
         parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, GetPrice(thingDef, stuffDef, quality));
-        branch.CooldownManager.RegisterRecord(Def.label, cdTicks: coolingDays * 60000);
+        branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: coolingDays * 60000);
 
-        PostApplyInteraction(parms);
+        PostApplyInteraction(parms, succeeded: true);
 
     }
 
-    /// <summary>始终返回 <see langword="false"/> 以阻止 <see cref="ApplyInteraction"/> 执行回调方法 <see cref="PostApplyInteraction"/></summary>
-    /// <returns>始终返回 <see langword="false"/></returns>
-    protected override bool InteractionEffect(InteractionParms parms)
+    /// <returns>
+    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="ApplyInteraction"/> 执行回调方法 <see cref="PostApplyInteraction"/></para>
+    /// </returns>
+    protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(WeaponNode(parms), parms.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
 
-        return false;
+        return (true, false);
     }
 
     private static int GetPrice(ThingDef thingDef, ThingDef stuffDef, QualityCategory quality)

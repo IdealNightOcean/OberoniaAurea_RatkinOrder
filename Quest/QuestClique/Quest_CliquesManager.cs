@@ -103,10 +103,10 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         OrderLetterUtility.ReceiveLetter(
             label: "OARO_BranchCliquesInfoLabel".Translate(quest.name.Named("QuestName")),
             text: branchCliqueInfoSB.ToTaggedString(),
-            def: OrderLetterDefOf.OARO_OfficialPositiveEvent,
+            def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: branch.RatkinOrder,
-            sender: branch.Name
-        );
+            sender: branch.Name,
+            relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 
     public override void QuestPartTick()

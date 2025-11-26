@@ -237,7 +237,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_StoresReservesConstruction".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
         reusedRect = new(reusedRect.xMin - 13f, reusedRect.y, 13f, 22f);
-        GUI.DrawTexture(reusedRect, smallExclamation);
+        GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
     }
 
     private void DrawMiddleRect(Rect inRect)
@@ -779,7 +779,7 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
-        GUI.DrawTexture(reusedRect, smallExclamation);
+        GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
 
         Rect commonOutRect = commonRect;
         commonOutRect.yMin = commonRect.yMax - commonEntryHeight * 2f;
@@ -822,7 +822,7 @@ public class Window_Branch : OrderWindowBase
                 downTex: commonInteractionButton_Down,
                 doMouseoverSound: true))
             {
-                interactionDef.Worker.TryApplyInteraction(branch: branch, caravan: caravan);
+                interactionDef.Worker.TryApplyInteraction(new BranchInteractionParms(branch, caravan));
                 break;
             }
 
@@ -845,7 +845,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
         Widgets.Label(reusedRect, label);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
-        GUI.DrawTexture(reusedRect, smallExclamation);
+        GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
 
         Rect buildingOutRect = Rect.MinMaxRect(buildingRect.x, buildingRect.yMin + 45f, buildingRect.xMax, buildingRect.yMax);
 
@@ -886,10 +886,7 @@ public class Window_Branch : OrderWindowBase
             downTex: buildingInteractionButton_Down,
             doMouseoverSound: true))
         {
-            interactionComp.Def.Worker.TryApplyInteraction(
-                branch: branch,
-                caravan: caravan,
-                building: interactionComp.Parent);
+            interactionComp.TryApplyInteraction(caravan);
         }
     }
 
@@ -1017,7 +1014,7 @@ public class Window_Branch : OrderWindowBase
     }
 
     /// <summary>
-    /// (298f, 78f)
+    /// 长298f, 宽78f
     /// </summary>
     private void DrawRight_FacilityBottom(Vector2 position)
     {
@@ -1168,7 +1165,7 @@ public class Window_Branch : OrderWindowBase
     }
 
     /// <summary>
-    /// (298f, xx)
+    /// 长：298f, 宽：xx
     /// </summary>
     private void DrawRight_ConstructingBuildingBottom(Vector2 position)
     {
@@ -1361,7 +1358,7 @@ public class Window_Branch : OrderWindowBase
     }
 
     /// <summary>
-    /// (298f, 158f)
+    /// 长298f, 宽158f
     /// </summary>
     private Rect DrawEffectDescriptions(Vector2 position, string title, List<string> stageEffectDesc, ref Vector2 scrollPosition)
     {
@@ -1554,7 +1551,7 @@ public class Window_Branch : OrderWindowBase
             AcceptanceReport acceptanceReport;
             try
             {
-                acceptanceReport = interactionDef.Worker.CanUseInteraction(branch, caravan, resultOnly: false);
+                acceptanceReport = interactionDef.Worker.CanUseInteraction(new BranchInteractionParms(branch, caravan), resultOnly: false);
             }
             catch
             {
@@ -1569,7 +1566,7 @@ public class Window_Branch : OrderWindowBase
             AcceptanceReport acceptanceReport;
             try
             {
-                acceptanceReport = interactionComp.Def.Worker?.CanUseInteraction(branch, caravan, interactionComp.Parent, resultOnly: false) ?? false;
+                acceptanceReport = interactionComp.CanUseInteraction(caravan, resultOnly: false);
             }
             catch
             {
@@ -1609,8 +1606,7 @@ public class Window_Branch : OrderWindowBase
         }
     }
 
-    private void PostApplyBranchInteraction(BranchInteractionDef interactionDef, Branch branch, Caravan caravan, BranchBuilding building) => interactionAcceptanceDirty = true;
-
+    private void PostApplyBranchInteraction(BranchInteractionDef interactionDef, BranchInteractionParms parms, bool succeeded) => interactionAcceptanceDirty = true;
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MainBackground");
 
@@ -1659,6 +1655,4 @@ public class Window_Branch : OrderWindowBase
     private static readonly Texture2D optionalBuildingDescCuttingLine = ContentFinder<Texture2D>.Get("UI/Branch/OARO_OptionalBuildingDescCuttingLine");
 
     private static readonly Texture2D leftTopSiteIcon = ContentFinder<Texture2D>.Get("UI/Branch/OARO_LeftTopSiteIcon");
-
-    private static readonly Texture2D smallExclamation = ContentFinder<Texture2D>.Get("UI/Branch/OARO_SmallExclamation"); //小感叹号
 }

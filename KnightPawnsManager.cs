@@ -1,20 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using OberoniaAurea_Frame;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class KnightPawnsManager
+public class KnightPawnsManager : IExposable
 {
-    private static readonly Dictionary<Pawn, KnightRecord> knights = new(32);
-    public static void ClearStaticCache()
+    public static KnightPawnsManager Instance { get; private set; }
+
+    private Dictionary<Pawn, KnightRecord> knights = new(32);
+
+    private List<Pawn> knightKeys;
+    private List<KnightRecord> knightValues;
+
+    public KnightPawnsManager()
     {
-        knights.Clear();
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(KnightPawnsManager));
+        Instance = this;
+    }
+    public static void ClearStaticCache() => Instance = null;
+
+    public void ExposeData()
+    {
+        Scribe_Collections.Look(ref knights, "knights", LookMode.Reference, LookMode.Deep, ref knightKeys, ref knightValues);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            if (knights.Remove(null) | (knights.RemoveAll(kv => kv.Value is null || kv.Value.RatkinOrder is null) > 0))
+            {
+                Log.Error($"[OARO] Some knight records of {nameof(KnightPawnsManager)} were null or invalid after loading and have been removed.");
+            }
+        }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool CanBeKnight(this Pawn pawn) => pawn is not null && pawn.RaceProps.Humanlike;
-    public static void RegisterKnight(Pawn pawn, KnightRecord knightRecord)
+    public void RegisterKnight(Pawn pawn, KnightRecord knightRecord)
     {
         if (!pawn.CanBeKnight())
         {
@@ -24,21 +43,21 @@ public static class KnightPawnsManager
         knights[pawn] = knightRecord;
     }
 
-    public static bool DeregisterKnight(Pawn pawn) => knights.Remove(pawn);
+    public bool DeregisterKnight(Pawn pawn) => knights.Remove(pawn);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsKnight(this Pawn pawn) => CanBeKnight(pawn) && knights.ContainsKey(pawn);
+    public bool IsKnight(Pawn pawn) => pawn.CanBeKnight() && knights.ContainsKey(pawn);
 
-    public static bool IsKnightCommander(this Pawn pawn)
+    public bool IsKnightCommander(Pawn pawn)
     {
-        if (CanBeKnight(pawn) && knights.TryGetValue(pawn, out KnightRecord record))
+        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
         {
             return record.IsCommander;
         }
         return false;
     }
 
-    public static KnightRecord GetKnightRecord(this Pawn pawn)
+    public KnightRecord GetKnightRecord(Pawn pawn)
     {
         if (knights.TryGetValue(pawn, out KnightRecord record))
         {
@@ -47,55 +66,45 @@ public static class KnightPawnsManager
         return null;
     }
 
-    public static bool TryGetKnightRecord(this Pawn pawn, out KnightRecord record)
+    public bool TryGetKnightRecord(Pawn pawn, out KnightRecord record)
     {
         record = null;
-        return CanBeKnight(pawn) && knights.TryGetValue(pawn, out record);
+        return pawn.CanBeKnight() && knights.TryGetValue(pawn, out record);
     }
 
-    public static RatkinOrder GetKnightOrder(this Pawn pawn)
+    public RatkinOrder GetKnightOrder(Pawn pawn)
     {
-        if (CanBeKnight(pawn) && knights.TryGetValue(pawn, out KnightRecord record))
+        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
         {
             return record.RatkinOrder;
         }
         return null;
     }
 
-    public static Branch GetKnightBranch(this Pawn pawn)
+    public Branch GetKnightBranch(Pawn pawn)
     {
-        if (CanBeKnight(pawn) && knights.TryGetValue(pawn, out KnightRecord record))
+        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
         {
             return record.Branch;
         }
         return null;
     }
 
-    public static bool IsKnightOfOrder(this Pawn pawn, RatkinOrder ratkinOrder)
+    public bool IsKnightOfOrder(Pawn pawn, RatkinOrder ratkinOrder)
     {
-        if (CanBeKnight(pawn) && knights.TryGetValue(pawn, out KnightRecord record))
+        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
         {
             return record.RatkinOrder == ratkinOrder;
         }
         return false;
     }
 
-    public static bool IsKnightOfBranch(this Pawn pawn, Branch branch)
+    public bool IsKnightOfBranch(Pawn pawn, Branch branch)
     {
-        if (CanBeKnight(pawn) && knights.TryGetValue(pawn, out KnightRecord record))
+        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
         {
             return record.Branch == branch;
         }
         return false;
-    }
-
-    public static Hediff_Knight GetKnightHediff(this Pawn pawn)
-    {
-        if (!pawn.CanBeKnight())
-        {
-            return null;
-        }
-
-        return pawn.health.hediffSet.GetFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_OrderKnight) as Hediff_Knight;
     }
 }

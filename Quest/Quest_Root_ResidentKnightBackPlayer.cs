@@ -133,16 +133,17 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
         OrderLetterUtility.MakeOrderLetter(
             label: label,
             text: text,
-            def: OrderLetterDefOf.OARO_OfficialPositiveEvent,
+            def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: ratkinOrder,
-            sender: ratkinOrder?.NameColored);
+            sender: ratkinOrder?.NameColored,
+            relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 
     public override void QuestPartTick()
     {
         if (--ticksToNextMapCheck < 0)
         {
-            ticksToNextMapCheck = 1000;
+            ticksToNextMapCheck = 10000;
             mapParent = quest.GetAvailableMapParent(mapParent);
             if (mapParent is not null)
             {
@@ -190,14 +191,14 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
         {
             float gainPoints = 1000f * record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
             record.MeditationPoints += gainPoints;
-            return "OARO_JointPatrol_OnlyMeditationPoints".Translate(pawn.Named("PAWN"), gainPoints.ToString("F0"));
+            return "OARO_JointPatrol_OnlyMeditationPoints".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN), gainPoints.ToString("F0"));
         }
         else
         {
             float gainPoints = 500f * record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
             record.MeditationPoints += gainPoints;
             record.UpgradeAcademicLevel(academicDef, usePoints: false);
-            return "OARO_JointPatrol_MeditationPointsAndAcademic".Translate(pawn.Named("PAWN"), gainPoints.ToString("F0"), academicDef.Named("ACADEMIC"));
+            return "OARO_JointPatrol_MeditationPointsAndAcademic".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN), gainPoints.ToString("F0"), academicDef.Named("ACADEMIC"));
         }
     }
 }

@@ -10,10 +10,15 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeBase
 {
     protected RatkinOrder ratkinOrder;
+    protected Branch branch;
 
     protected void InitRatkinOrder()
     {
         ratkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
+        if (ratkinOrder is null)
+        {
+            return;
+        }
         QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, ratkinOrder);
         QuestPart_CriticalRatkinOrder questPart_CriticalRatkinOrder = new()
         {
@@ -24,10 +29,28 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         QuestGen.quest.AddPart(questPart_CriticalRatkinOrder);
     }
 
+    protected void InitBranch(bool alsoInitOrder)
+    {
+        branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+        if (branch is null)
+        {
+            return;
+        }
+        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, ratkinOrder);
+        QuestPart_CriticalBranch questPart_CriticalBranch = new()
+        {
+            Branch = branch,
+            EndQuest = true,
+            EndOutcome = QuestEndOutcome.Fail
+        };
+        QuestGen.quest.AddPart(questPart_CriticalBranch);
+    }
+
     protected override void ClearQuestParameter()
     {
         base.ClearQuestParameter();
         ratkinOrder = null;
+        branch = null;
     }
 
     protected override Faction GetOrGenerateFaction()
@@ -39,6 +62,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
     protected override List<Pawn> GeneratePawns(string lodgerRecruitedSignal = null)
     {
         Quest quest = QuestGen.quest;
+
         List<Pawn> pawns = [];
         int adultCount = questParameter.LodgerCount - questParameter.ChildCount;
 
@@ -49,7 +73,6 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             DevelopmentalStage developmentalStages = i < adultCount ? DevelopmentalStage.Adult : DevelopmentalStage.Child;
             PawnGenerationRequest generationRequest = OARO_PawnUtility.DefaultKnightGenerationRequest(fixedPawnKind, questParameter.faction, tile: questParameter.map.Tile, forceNew: true);
             generationRequest.AllowedDevelopmentalStages = developmentalStages;
-
 
             Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(generationRequest, new KnightRecord(ratkinOrder));
             if (!pawn.IsWorldPawn())
@@ -74,9 +97,9 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             if (questParameter.allowJoinOffer)
             {
                 quest.PawnJoinOffer(pawn,
-                "LetterJoinOfferLabel".Translate(pawn.Named("PAWN")),
-                "LetterJoinOfferTitle".Translate(pawn.Named("PAWN")),
-                "LetterJoinOfferText".Translate(pawn.Named("PAWN"),
+                "LetterJoinOfferLabel".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
+                "LetterJoinOfferTitle".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
+                "LetterJoinOfferText".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN),
                 questParameter.map.Parent.Named("MAP")),
                 delegate
                 {
@@ -103,10 +126,5 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             }
         }
         return pawns;
-    }
-
-    protected override void PostPawnGenerated(Pawn pawn)
-    {
-        pawn.InitKnightHediff(new KnightRecord(ratkinOrder));
     }
 }

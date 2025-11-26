@@ -45,25 +45,20 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         return true;
     }
 
-    protected abstract void InteractionEffect(RatkinOrder ratkinOrder, Map map);
-
-    public virtual void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    public void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
-        if (ApplyInteraction(ratkinOrder, map))
+        if (ratkinOrder is null)
         {
-            try
-            {
-                ratkinOrder.PostApplyOrderInteraction?.Invoke(Def, ratkinOrder, map);
-            }
-            catch (Exception ex)
-            {
-                ModUtility.LogExceptionError(ex,
-                    errorDesc: $"call-back: {nameof(RatkinOrder)}.{nameof(RatkinOrder.PostApplyOrderInteraction)}",
-                    typeName: nameof(OrderInteractionWorker),
-                    methodName: nameof(TryApplyInteraction),
-                    needStackTrace: true);
-            }
+            Log.Error("[OARO] RatkinOrder is null, cannot apply interaction.");
+            return;
         }
+        if (map is null)
+        {
+            Log.Error("[OARO] Map is null, cannot apply interaction.");
+            return;
+        }
+
+        ApplyInteraction(ratkinOrder, map);
     }
 
     protected virtual void DoInteractionCost(RatkinOrder ratkinOrder, Map map)
@@ -92,35 +87,64 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         }
     }
 
-    protected bool ApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    protected virtual void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    {
+        (bool succeeded, bool doPostApply) = (false, false);
+        try
+        {
+            (succeeded, doPostApply) = InteractionEffect(ratkinOrder, map);
+        }
+        catch (Exception ex)
+        {
+            (succeeded, doPostApply) = (false, true);
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"{nameof(InteractionEffect)} for BranchInteraction [{Def?.defName}]",
+                typeName: nameof(OrderInteractionWorker),
+                methodName: nameof(ApplyInteraction),
+                needStackTrace: true);
+        }
+
+        if (succeeded)
+        {
+            try
+            {
+                DoInteractionCost(ratkinOrder, map);
+            }
+            catch (Exception ex)
+            {
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"{nameof(DoInteractionCost)} for BranchInteraction [{Def?.defName}]",
+                    typeName: nameof(OrderInteractionWorker),
+                    methodName: nameof(ApplyInteraction),
+                    needStackTrace: true);
+            }
+        }
+
+        if (doPostApply)
+        {
+            PostApplyInteraction(ratkinOrder, map, succeeded);
+        }
+    }
+
+    /// <returns>
+    /// <para>- succeeded：是否成功执行交互逻辑</para>
+    /// <para>- doPostApply：是否需要执行后续回调 <see cref="PostApplyInteraction"/></para>
+    /// </returns>
+    protected virtual (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map) => (true, true);
+
+    protected void PostApplyInteraction(RatkinOrder ratkinOrder, Map map, bool succeeded)
     {
         try
         {
-            DoInteractionCost(ratkinOrder, map);
+            ratkinOrder.PostApplyOrderInteraction?.Invoke(Def, ratkinOrder, map, succeeded);
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"{nameof(DoInteractionCost)}for BranchInteraction [{Def?.defName}]",
+                errorDesc: $"call-back: {nameof(RatkinOrder)}.{nameof(RatkinOrder.PostApplyOrderInteraction)}",
                 typeName: nameof(OrderInteractionWorker),
-                methodName: nameof(ApplyInteraction),
+                methodName: nameof(TryApplyInteraction),
                 needStackTrace: true);
-            return false;
         }
-
-        try
-        {
-            InteractionEffect(ratkinOrder, map);
-        }
-        catch (Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"{nameof(InteractionEffect)}for BranchInteraction [{Def?.defName}]",
-                typeName: nameof(OrderInteractionWorker),
-                methodName: nameof(ApplyInteraction),
-                needStackTrace: true);
-            return false;
-        }
-        return true;
     }
 }

@@ -5,10 +5,11 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
-using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
+
+using static OberoniaAurea.RatkinOrder.Branch;
+using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 public static class BranchDemandUtility
 {

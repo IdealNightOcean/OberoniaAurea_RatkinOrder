@@ -203,7 +203,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 
             if (knightGroup is not null)
             {
-                GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.KnightGroupProactiveVisit, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
+                GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.KnightGroupProactiveVisit, cdTicks: 30 * 60000, removeWhenExpired: true);
                 QuizAutoVisit(knightGroup);
             }
         }

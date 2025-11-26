@@ -18,8 +18,9 @@ public class OrderInteractionWorker_MediateFactionRelation(OrderInteractionDef d
         return base.CanUseInteraction(ratkinOrder, map, resultOnly);
     }
 
-    protected override void InteractionEffect(RatkinOrder ratkinOrder, Map map)
+    protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
         ratkinOrder.Faction.TryAffectGoodwillWith(Faction.OfPlayer, -ratkinOrder.Faction.PlayerGoodwill, reason: OARO_ModDefOf.OARO_OrderMediateFactionRelation);
+        return (true, true);
     }
 }

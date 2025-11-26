@@ -237,23 +237,6 @@ public static class DebugRatkinOrders
     }
 
     /// <summary>
-    /// 添加常驻骑士
-    /// </summary>
-    [DebugAction(category: "OberoniaAurea",
-                 name: "添加常驻骑士",
-                 displayPriority: 430,
-                 actionType = DebugActionType.Action,
-                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
-    private static void ApplyNewResidentKnight()
-    {
-        RatkinOrderOptions(delegate (RatkinOrder ratkinOrder)
-        {
-            GlobalInteractionUtility.ApplyResidentKnight(ratkinOrder: ratkinOrder,
-                                                              map: OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
-        });
-    }
-
-    /// <summary>
     /// 触发善行任务（实际前置任务）
     /// </summary>
     [DebugAction(category: "OberoniaAurea",
@@ -283,18 +266,18 @@ public static class DebugRatkinOrders
                  displayPriority: 420,
                  actionType = DebugActionType.Action,
                  allowedGameStates = AllowedGameStates.PlayingOnMap)]
-    private static void TriggerBranchRaid()
+    private static void TriggerBranchCombatDeploy()
     {
         OrderBranchOptions(SelectRaidLevel);
 
         void SelectRaidLevel(Branch branch)
         {
             List<DebugMenuOption> raidLevelOptions = [];
-            foreach (BranchSupportUtility.SupportLevel level in EnumUtility.GetValues<BranchSupportUtility.SupportLevel>())
+            foreach (BranchSupportUtility.DeploymentLevel level in EnumUtility.GetValues<BranchSupportUtility.DeploymentLevel>())
             {
                 DebugMenuOption levelOption = new(label: level.ToString(),
                                                   mode: DebugMenuOptionMode.Action,
-                                                  method: () => BranchSupportUtility.DoCombatSupport(branch, level, Find.CurrentMap));
+                                                  method: () => BranchSupportUtility.DoCombatKnightSupport(branch, Find.CurrentMap, level, sendStandardLetter: true));
 
                 raidLevelOptions.Add(levelOption);
             }

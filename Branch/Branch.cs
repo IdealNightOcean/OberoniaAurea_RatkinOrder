@@ -110,7 +110,7 @@ public class Branch : IExposable, ILoadReferenceable
 
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
-    [Unsaved] public readonly List<IPostSquadCombatPawnGenerate> PostSquadCombatPawnGenerate = [];
+    [Unsaved] public readonly List<IPostBranchCombatKnightGenerate> PostSquadCombatPawnGenerate = [];
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
 
@@ -136,7 +136,7 @@ public class Branch : IExposable, ILoadReferenceable
 
     public bool IsConstructionBusy => facilityHandler.IsBusy || buildingHandler.IsBusy;
 
-    public Action<BranchInteractionDef, Branch, Caravan, BranchBuilding> PostApplyBranchInteraction { get; set; }
+    public Action<BranchInteractionDef, BranchInteractionParms, bool> PostApplyBranchInteraction { get; set; }
 
     private Branch(RatkinOrder ratkinOrder, bool initCtor)
     {
@@ -415,6 +415,6 @@ public class Branch : IExposable, ILoadReferenceable
         storesReserveHandler.PostLoadInit();
     }
 
-    public string GetUniqueLoadID() => "Branch_" + loadID;
-    public override string ToString() => "Branch_" + loadID;
+    public string GetUniqueLoadID() => $"{nameof(Branch)}_{loadID}";
+    public override string ToString() => $"{nameof(Branch)}_{loadID}";
 }

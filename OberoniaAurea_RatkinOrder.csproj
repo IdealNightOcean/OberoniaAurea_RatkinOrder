@@ -84,10 +84,12 @@
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
+    <Compile Include="BranchInteraction\BranchInteractionParms.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker_PurchaseKnightlyArmaments.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker_CustomizedArmaments.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker_BuildingTrader.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker_MiningExploration.cs" />
+    <Compile Include="BranchInteraction\BranchInteractionWorker_RandomTrade.cs" />
     <Compile Include="Branch\UnderConstructionRecord.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchResident\BranchResident_Deployment.cs" />
@@ -127,9 +129,12 @@
     <Compile Include="JointPatrol\JointPatrolIncidentPart_Supply.cs" />
     <Compile Include="JointPatrol\JointPatrolManager_SubType.cs" />
     <Compile Include="Lord\LordJob_ExitMapBestForJointPatrol.cs" />
+    <Compile Include="OrderInteraction\OrderInteractionWorker_EnhanceRelationship.cs" />
+    <Compile Include="OrderInteraction\OrderInteractionWorker_InviteResidentKnight.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_InviteBranchCreation.cs" />
     <Compile Include="OrderLetter\OrderLetter_SimpleAttachments.cs" />
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
+    <Compile Include="Window\Dialog_BranchTrade.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
@@ -159,7 +164,6 @@
     <Compile Include="Hediff\Hediff_PainLevelAsStage.cs" />
     <Compile Include="Hediff\Hediff_HonorGlorious.cs" />
     <Compile Include="Hediff\Hediff_BranchMedal.cs" />
-    <Compile Include="Hediff\Hediff_Knight.cs" />
     <Compile Include="Hediff\Hediff_ResidentKnightBuff.cs" />
     <Compile Include="Job\JobDriver_PlagueSample.cs" />
     <Compile Include="DataLibrary\KeyLibrary_EffectTag.cs" />
@@ -199,7 +203,7 @@
     <Compile Include="Quest\Reward\Quest_GiveBranchMedal.cs" />
     <Compile Include="Quest\Reward\Reward_BranchPopulation.cs" />
     <Compile Include="Reformation\ReformationType.cs" />
-    <Compile Include="RatkinOrder\RatkinOrderCombatParameter.cs" />
+    <Compile Include="RatkinOrder\CombatKnightGenerateParms.cs" />
     <Compile Include="Stat\StatPart_MeditationBase.cs" />
     <Compile Include="Stat\StatPart_MeditationFactor.cs" />
     <Compile Include="Stat\StatWorker_MeditationPointBase.cs" />
@@ -416,8 +420,8 @@
     <Compile Include="Reformation\OrderReformationWorker.cs" />
     <Compile Include="ScenPart_InitialOrderRelationshipLevel.cs" />
     <Compile Include="Lord\LordJob_AssistColony_NeverFleeOrder.cs" />
-    <Compile Include="Interface\IPostSquadCombatPawnGenerate.cs" />
-    <Compile Include="Utility\SquadCombatPawnUtility.cs" />
+    <Compile Include="Interface\IPostBranchCombatKnightGenerate.cs" />
+    <Compile Include="Utility\KnightPawnGenerateUtility.cs" />
     <Compile Include="Lord\LordJob_ExitMapBestForResident.cs" />
     <Compile Include="HarmonyPatch\Game_ClearCaches_Patch.cs" />
     <Compile Include="DefOf\ModDefOf.cs" />

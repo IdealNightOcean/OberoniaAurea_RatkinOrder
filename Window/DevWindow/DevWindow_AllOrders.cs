@@ -22,7 +22,7 @@ public class DevWindow_AllOrders : DevWindowBase
         };
         Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect);
         listing_Rect.Begin(viewRect);
-        listing_Rect.Label("All Ratkin Orders:");
+        listing_Rect.Label("所有骑士团:");
 
         int selectIndex = -1;
         for (int i = 0; i < allRatkinOrders.Count; i++)

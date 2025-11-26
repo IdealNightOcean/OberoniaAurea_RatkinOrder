@@ -13,6 +13,7 @@ public abstract class SpecialLetterDefBase : Def
     public string text;
 
     public OrderLetterDef relatedOrderLetterDef;
+    public OrderLetter.RelatedLetterType relatedLetterType;
 
     public bool absolutelyUnique;
 }

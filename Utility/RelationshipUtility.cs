@@ -135,21 +135,22 @@ public static class RelationshipUtility
     /// <summary>
     /// 提升骑士团关系（玩家）
     /// </summary>
-    public static void UpgradeRelationship(RatkinOrder ratkinOrder, Map map)
+    public static bool UpgradeRelationshipByPlayer(this RatkinOrder ratkinOrder, Map map)
     {
         if (ratkinOrder.Relationship == RelationshipKind.Soulmate)
         {
-            return;
+            return false;
         }
 
         if (ratkinOrder.Relationship < RelationshipKind.Friendly)
         {
             ratkinOrder.RelationshipKindOffsetBy(1, "OARO_Relationship_PlayerUpgraded".Translate(), sendLetter: true);
-            ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
+            ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, removeWhenExpired: true);
+            return true;
         }
         else if (TryTriggerRelationshipQuest(ratkinOrder, map))
         {
-            ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
+            ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RelationshipUpgraded, cdTicks: 5 * 60000, removeWhenExpired: true);
 
             RelationshipKind targetRelation = ratkinOrder.Relationship.RelationshipKindOffsetBy(1);
             int recommendationNeed = RecommendationUtility.RecommendationNeed_OrderRelationUpgrade(targetRelation);
@@ -157,11 +158,10 @@ public static class RelationshipUtility
             {
                 RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
             }
+            return true;
         }
-        else
-        {
 
-        }
+        return false;
     }
 
     /// <summary>
@@ -231,7 +231,7 @@ public static class RelationshipUtility
             return;
         }
 
-        ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AutoRelationshipUpgraded, cdTicks: 10 * 60000, shouldRemoveWhenExpired: true);
+        ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AutoRelationshipUpgraded, cdTicks: 10 * 60000, removeWhenExpired: true);
         ChoiceLetter_AutoUpgradeRelationship letter = (ChoiceLetter_AutoUpgradeRelationship)LetterMaker.MakeLetter(
             label: "OARO_LetterLabel_AutoUpgradeRelationship",
             text: "OARO_Letter_AutoUpgradeRelationship".Translate(ratkinOrder.Name),

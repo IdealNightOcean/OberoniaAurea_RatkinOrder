@@ -30,19 +30,6 @@ public static class ModUtility
         }
     }
 
-    public static bool AnyThingOfDef(Room room, ThingDef thingDef)
-    {
-        List<Region> regions = room.Regions;
-        for (int i = 0; i < regions.Count; i++)
-        {
-            if (regions[i].ListerThings.AnyThingWithDef(thingDef))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static Faction GenerateSubRatkinFaction(FactionDef subFactionDef, FactionDef parentFactionDef = null, Faction parentFaction = null, bool addToManager = true)
     {
         if (parentFactionDef is null && parentFaction is not null)

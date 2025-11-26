@@ -21,8 +21,9 @@ public class SpecialLetterManager : IExposable
                     label: letterDef.label,
                     text: letterDef.text,
                     def: letterDef.relatedOrderLetterDef,
+                    relatedOrder: null,
                     sender: letterDef.sender,
-                    relatedOrder: null);
+                    relatedLetterType: letterDef.relatedLetterType);
                 OrderLetterBox.Instance.ReceiveLetter(specialLetter);
                 recievedSpecialLetters.Add(letterDef);
             }
@@ -45,7 +46,8 @@ public class SpecialLetterManager : IExposable
                     text: letterDef.text,
                     def: letterDef.relatedOrderLetterDef,
                     sender: letterDef.sender,
-                    relatedOrder: null);
+                    relatedOrder: null,
+                    relatedLetterType: letterDef.relatedLetterType);
                 OrderLetterBox.Instance.ReceiveLetter(certainDateLetter);
                 recievedCertainDateLetters.Add(letterDef);
             }
@@ -66,7 +68,7 @@ public class SpecialLetterManager : IExposable
 
         if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
         {
-            recievedCertainDateLetters.RemoveWhere(l => l is null);
+            recievedSpecialLetters.RemoveWhere(l => l is null);
             recievedCertainDateLetters.RemoveWhere(l => l is null);
         }
     }

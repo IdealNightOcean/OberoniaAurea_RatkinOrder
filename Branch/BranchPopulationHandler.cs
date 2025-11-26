@@ -77,10 +77,22 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"Population: {population}");
+        listing_Rect.Label($"人口数: {population}");
+        listing_Rect.Label($"昨日人口数: {yesterdayPopulation}");
+        listing_Rect.Label($"昨日人口变化: {yesterdayPopChange}");
+
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"YesterdayPopulation: {yesterdayPopulation}");
-        listing_Rect.Label($"YesterdayChange: {yesterdayPopChange}");
+        listing_Rect.Label($"治安度: {publicSecurity.ToStringPercent()}");
+        listing_Rect.Label($"昨日治安度: {yesterdayPublicSecurity.ToStringPercent()}");
+        listing_Rect.Label($"昨日治安度变化: {yesterdayPublicSecChange.ToStringPercent()}");
+
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"有无平民需求（合约）完成Buff: {hasContractBuff}");
+        listing_Rect.Label($"平民需求（合约）: {contracts.Count}");
+        foreach (BranchContract contract in contracts)
+        {
+            listing_Rect.SubLabel($"{contract.RequestThingDef.label} × {contract.RequestCount}", 0.8f);
+        }
     }
 
     public void TickDay()
@@ -128,7 +140,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.PublicSecurityCheck))
         {
-            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.PublicSecurityCheck, cdTicks: 3 * 60000, shouldRemoveWhenExpired: false);
+            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.PublicSecurityCheck, cdTicks: 3 * 60000, removeWhenExpired: false);
             if (Rand.Chance(0.2f))
             {
                 PublicSecurity -= (publicSecurity * 0.05f) * Rand.Range(0.5f, 1.5f);
@@ -141,7 +153,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
     private void ContractAddCheck()
     {
-        branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.ContractAddCheck, cdTicks: 5 * 60000, shouldRemoveWhenExpired: false);
+        branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.ContractAddCheck, cdTicks: 5 * 60000, removeWhenExpired: false);
         int startInex = contracts.Count;
         int endIndex = ContractCeilingByPop;
         if (startInex >= endIndex)

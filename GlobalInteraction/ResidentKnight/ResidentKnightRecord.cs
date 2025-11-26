@@ -16,19 +16,19 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         Honor,
         Crown
     }
+    public static Rank RankOffsetBy(Rank rank, int offset) => (Rank)Mathf.Clamp((int)rank + offset, 0, 3);
 
     private int loadID = -1;
     public int LoadID => loadID;
 
-    public static Rank RankOffsetBy(Rank rank, int offset) => (Rank)Mathf.Clamp((int)rank + offset, 0, 3);
-
     private Pawn knight;
     public Pawn Knight => knight;
 
-    [Unsaved] private readonly Lazy<KnightRecord> knightRecord;
-    public KnightRecord KnightRecord => knightRecord.Value;
+    private KnightRecord knightRecord;
+    public KnightRecord KnightRecord => knightRecord;
 
-    public bool IsValid => !knight.DestroyedOrNull() && !knight.Dead && KnightRecord is not null;
+    public bool IsValid => !knight.DestroyedOrNull() && !knight.Dead && knightRecord is not null;
+    public bool ShouldRemove => knight is null || knightRecord is null;
 
     public Branch Branch => KnightRecord.Branch;
 
@@ -54,7 +54,9 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
     public void ExposeData()
     {
+        Scribe_Values.Look(ref loadID, "loadID", -1);
         Scribe_References.Look(ref knight, "knight");
+        Scribe_References.Look(ref knightRecord, "knightRecord");
 
         Scribe_Values.Look(ref CurRank, "CurRank", Rank.Regular);
         Scribe_Values.Look(ref MeditationPoints, "MeditationPoints", 0f);
@@ -69,7 +71,6 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
     private ResidentKnightRecord()
     {
-        knightRecord = new(valueFactory: () => KnightPawnsManager.GetKnightRecord(knight), isThreadSafe: false);
         TotalAcademicLevel = new(refreshFunc: () => honorAcademicLevel + genealAcademicDefs.Values.Sum());
     }
 
@@ -211,5 +212,5 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         return neededPoints;
     }
 
-    public string GetUniqueLoadID() => "ResidentKnight_" + loadID;
+    public string GetUniqueLoadID() => $"{nameof(ResidentKnightRecord)}_{loadID}";
 }

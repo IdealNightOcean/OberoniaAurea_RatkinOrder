@@ -60,12 +60,6 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
         QuestGen.quest.AddPart(questPart_KnightVisitWatcher);
     }
 
-    protected override Faction GetOrGenerateFaction()
-    {
-        QuestGen.slate.Set("isMainFaction", true);
-        return QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.OrderFaction);
-    }
-
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_Negative");

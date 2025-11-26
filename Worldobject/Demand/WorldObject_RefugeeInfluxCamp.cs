@@ -116,8 +116,8 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         population = originalPopulation;
         distEfficiency = 0.5f;
         famineRisk = 0f;
-        cooldownManager.RegisterRecord("PeriodicCheck", cdTicks: 30000, shouldRemoveWhenExpired: true);
-        cooldownManager.RegisterRecord("GrainArrival", cdTicks: 5 * 30000, shouldRemoveWhenExpired: true);
+        cooldownManager.RegisterRecord("PeriodicCheck", cdTicks: 30000, removeWhenExpired: true);
+        cooldownManager.RegisterRecord("GrainArrival", cdTicks: 5 * 30000, removeWhenExpired: true);
 
         QuestClique refugeeClique = new(RefugeeCliqueKey)
         {
@@ -371,7 +371,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
     private void GrainArrival()
     {
         int grainCdTicks = HasQuestEffectTag("RemoteArea") ? 6 * 60000 : 5 * 60000;
-        cooldownManager.RegisterRecord("GrainArrival", cdTicks: grainCdTicks, shouldRemoveWhenExpired: true);
+        cooldownManager.RegisterRecord("GrainArrival", cdTicks: grainCdTicks, removeWhenExpired: true);
 
         int corruptionLevel;
         if (cliquesManager.IsCliqueActive("WholesaleTrader"))
@@ -493,7 +493,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
 
     private void ExileRefugees()
     {
-        cooldownManager.RegisterRecord("ForceDist", cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
+        cooldownManager.RegisterRecord("ForceDist", cdTicks: 5 * 60000, removeWhenExpired: true);
         forceDist = true;
         AdjuestRefugeeWillingness(-0.25f);
         AdjustPopulation(-100);
@@ -560,7 +560,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
 
         void Distribute()
         {
-            cooldownManager.RegisterRecord("DistributionFood", cdTicks: 5 * 60000, shouldRemoveWhenExpired: true);
+            cooldownManager.RegisterRecord("DistributionFood", cdTicks: 5 * 60000, removeWhenExpired: true);
             FamineRisk -= 0.55f;
             AdjuestRefugeeWillingness(0.2f);
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_DistributionFoodResult".Translate(0.55f.ToStringPercent("0.##"), 0.2f.ToStringPercent("0.##"))));

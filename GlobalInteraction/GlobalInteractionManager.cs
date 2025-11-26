@@ -28,12 +28,98 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
         cooldownManager = new();
         simpleInteractRecord = new();
+    }
 
+    public void StratNewGame()
+    {
         orderHallHandler = new();
         acceptedBranchDemandHandler = new();
         residentKnightsManager = new();
         aroundKnightGroupsManager = new();
         mercyQuestHandler = new();
+    }
+
+    public void LoadedGame()
+    {
+        EnsureComponentsInit();
+    }
+
+    private void EnsureComponentsInit()
+    {
+        try
+        {
+            orderHallHandler ??= new OrderHallHandler();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing OrderHallHandler",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            OrderHallHandler.ClearStaticCache();
+            orderHallHandler = new OrderHallHandler();
+        }
+
+        try
+        {
+            acceptedBranchDemandHandler ??= new AcceptedBranchDemandHandler();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing AcceptedBranchDemandHandler",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            AcceptedBranchDemandHandler.ClearStaticCache();
+            acceptedBranchDemandHandler = new AcceptedBranchDemandHandler();
+        }
+
+        try
+        {
+            residentKnightsManager ??= new ResidentKnightsManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing ResidentKnightsManager",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            ResidentKnightsManager.ClearStaticCache();
+            residentKnightsManager = new ResidentKnightsManager();
+        }
+
+        try
+        {
+            aroundKnightGroupsManager ??= new AroundKnightGroupsManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing AroundKnightGroupsManager",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            AroundKnightGroupsManager.ClearStaticCache();
+            aroundKnightGroupsManager = new AroundKnightGroupsManager();
+        }
+
+        try
+        {
+            mercyQuestHandler ??= new MercyQuestHandler();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing MercyQuestHandler",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            MercyQuestHandler.ClearStaticCache();
+            mercyQuestHandler = new MercyQuestHandler();
+        }
     }
 
     public static void ClearStaticCache()

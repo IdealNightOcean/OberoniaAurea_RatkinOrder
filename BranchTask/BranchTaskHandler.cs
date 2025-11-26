@@ -53,37 +53,37 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"FocusedTaskType: {FocusedTaskType}");
+        listing_Rect.Label($"专注任务类型: {FocusedTaskType}");
         if (HasTask)
         {
-            listing_Rect.Label($"CurTask: {curTask.Label}");
+            listing_Rect.Label($"当前任务: {curTask.Label}");
 
-            listing_Rect.SubLabel($"StartTask: {curTask.StartTick}", 0.8f);
-            listing_Rect.SubLabel($"DurationTick: {curTask.DurationTick}", 0.8f);
-            listing_Rect.SubLabel($"DurationLeft: {curTask.DurationLeft}", 0.8f);
-            listing_Rect.SubLabel($"Progress: {curTask.Progress}", 0.8f);
-            listing_Rect.SubLabel($"IsOngoing: {curTask.IsOngoing}", 0.8f);
+            listing_Rect.SubLabel($"开始Tick: {curTask.StartTick}", 0.8f);
+            listing_Rect.SubLabel($"总持续Tick: {curTask.DurationTick}", 0.8f);
+            listing_Rect.SubLabel($"剩余Tick: {curTask.DurationLeft}", 0.8f);
+            listing_Rect.SubLabel($"任务进度: {curTask.Progress}", 0.8f);
+            listing_Rect.SubLabel($"进行中: {curTask.IsOngoing}", 0.8f);
         }
         else
         {
-            listing_Rect.Label("CurTask: None");
+            listing_Rect.Label("当前任务: 无");
         }
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"IsRestNow: {IsRestNow}");
-        listing_Rect.Label($"RestEndTick: {restEndTick}");
+        listing_Rect.Label($"是否休息中: {IsRestNow}");
+        listing_Rect.Label($"休息结束Tick: {restEndTick}");
 
         listing_Rect.Gap(6f);
         if (autoTargetTask is null)
         {
-            listing_Rect.Label("AutoTargetTask: None");
-            listing_Rect.SubLabel($"AutoStartTaskChance: {autoStartTaskChance}", 0.8f);
+            listing_Rect.Label("主动执勤目标任务: 无");
+            listing_Rect.SubLabel($"主动执勤概率: {autoStartTaskChance}", 0.8f);
         }
         else
         {
-            listing_Rect.Label($"AutoTargetTask: {autoTargetTask.label}");
-            listing_Rect.SubLabel($"AutoStartFailCount: {autoStartFailCount}", 0.8f);
-            listing_Rect.SubLabel($"AutoStartTaskChance: {autoStartTaskChance}", 0.8f);
+            listing_Rect.Label($"主动执勤目标任务: {autoTargetTask.label}");
+            listing_Rect.SubLabel($"主动执勤尝试失败次数: {autoStartFailCount}", 0.8f);
+            listing_Rect.SubLabel($"主动执勤概率: {autoStartTaskChance}", 0.8f);
         }
     }
 

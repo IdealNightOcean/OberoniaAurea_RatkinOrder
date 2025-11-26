@@ -24,7 +24,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
         if (Rand.Chance(attackedChane) && !branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.BeAttackedOnTask))
         {
             attackedOnTask = true;
-            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.BeAttackedOnTask, cdTicks: 30 * 60000, shouldRemoveWhenExpired: true);
+            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.BeAttackedOnTask, cdTicks: 30 * 60000, removeWhenExpired: true);
 
             branch.Supply = 0f;
             int memberLoss = (int)(Rand.Range(0.1f, 0.75f) * branch.Squad.MemberCount);

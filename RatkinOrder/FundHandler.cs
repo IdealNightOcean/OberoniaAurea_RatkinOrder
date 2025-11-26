@@ -190,7 +190,7 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
         }
         else if (Rand.Chance(0.1f))
         {
-            RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.FundFortune, cdTicks: 15 * 60000, shouldRemoveWhenExpired: true);
+            RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.FundFortune, cdTicks: 15 * 60000, removeWhenExpired: true);
             OrderFundEventDef fortuneEventDef = Rand.Bool ? OrderFundEventDefOf.OARO_FundFortune_Positive : OrderFundEventDefOf.OARO_FundFortune_Negative;
             hasFortune = true;
             AddFundEvent(fortuneEventDef);

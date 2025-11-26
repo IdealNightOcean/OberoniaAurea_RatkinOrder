@@ -10,12 +10,7 @@ internal static class Game_ClearCaches_Patch
     [HarmonyPostfix]
     public static void Postfix()
     {
-        UniqueIDManager.ClearStaticCache();
-
-        KnightPawnsManager.ClearStaticCache();
-        RatkinOrderManager.ClearStaticCache();
-        OrderLetterBox.ClearStaticCache();
-        GlobalInteractionManager.ClearStaticCache();
+        GameComponent_RatkinOrder.ClearStaticCache();
 
         Thought_VisitingKnight.ClearStaticCache();
         ThoughtWorker_BranchChurch.ClearStaticCache();

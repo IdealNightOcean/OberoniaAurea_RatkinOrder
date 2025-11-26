@@ -15,8 +15,11 @@ public enum KnightPersonality : byte
 }
 
 
-public class KnightRecord : IExposable
+public class KnightRecord : IExposable, ILoadReferenceable
 {
+    private int loadID = -1;
+    public int LoadID => loadID;
+
     private RatkinOrder ratkinOrder;
     private Branch branch;
     private bool isCommander;
@@ -39,14 +42,20 @@ public class KnightRecord : IExposable
         this.branch = branch;
         this.personality = personality == KnightPersonality.None ? KnightPersonalityUtility.GetRandomAvailablePersonality() : personality;
         this.isCommander = isCommander;
-    }
 
+        loadID = UniqueIDManager.GetUniqueID("KnightRecord");
+    }
 
     public void ExposeData()
     {
+        Scribe_Values.Look(ref loadID, "loadID", -1);
+
         Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
         Scribe_References.Look(ref branch, "branch");
         Scribe_Values.Look(ref isCommander, "isCommander", defaultValue: false);
         Scribe_Values.Look(ref personality, "personality", defaultValue: KnightPersonality.None);
     }
+
+    public string GetUniqueLoadID() => $"{nameof(KnightRecord)}_{loadID}";
+    public override string ToString() => $"{nameof(KnightRecord)}_{loadID}";
 }

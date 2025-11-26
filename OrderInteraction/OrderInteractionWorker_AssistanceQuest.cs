@@ -7,17 +7,18 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : OrderInteractionWorker(def)
 {
-    protected override void InteractionEffect(RatkinOrder ratkinOrder, Map map)
+    protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
         QuestScriptDef scriptDef = Def.GetModExtension<OrderInteraction_AssistanceQuestExtension>()?.assistanceQuest;
         if (scriptDef is null)
         {
-            return;
+            return (false, false);
         }
 
         Slate slate = new();
         slate.SetBasicOrderSlateVar(ratkinOrder);
         slate.Set("map", map);
-        OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, scriptDef, slate, forced: true);
+        bool succeeded = OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, scriptDef, slate, forced: true);
+        return (false, true);
     }
 }

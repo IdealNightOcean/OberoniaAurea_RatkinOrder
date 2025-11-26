@@ -78,34 +78,18 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public void ExposeData()
     {
-        if (Scribe.mode == LoadSaveMode.Saving)
-        {
-            residentKnightKeys = residentKnights.Keys.ToList();
-            residentKnightValues = residentKnights.Values.ToList();
-            rolesToKnightKeys = rolesToKnights.Keys.ToList();
-            rolesToKnightValues = rolesToKnights.Values.ToList();
-        }
-
         Scribe_Collections.Look(ref residentKnights, "residentKnights", LookMode.Reference, LookMode.Deep, ref residentKnightKeys, ref residentKnightValues);
         Scribe_Collections.Look(ref rolesToKnights, "rolesToKnights", LookMode.Def, LookMode.Reference, ref rolesToKnightKeys, ref rolesToKnightValues);
 
-        if (Scribe.mode == LoadSaveMode.Saving || Scribe.mode == LoadSaveMode.PostLoadInit)
-        {
-            residentKnightKeys = null;
-            residentKnightValues = null;
-            rolesToKnightKeys = null;
-            rolesToKnightValues = null;
-        }
-
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (residentKnights.RemoveAll(kv => kv.Key is null || kv.Value is null) > 0)
+            if (residentKnights.Remove(null) | (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0))
             {
-                Log.Error("[OARO] Some resident knight records were removed due to null keys or values during loading.");
+                Log.Error($"[OARO] Some resident knight records of {nameof(ResidentKnightsManager)} were null or invalid after loading and have been removed.");
             }
-            if (rolesToKnights.RemoveAll(kv => kv.Key is null || kv.Value is null) > 0)
+            if (rolesToKnights.Remove(null) | (rolesToKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0))
             {
-                Log.Error("[OARO] Some role to knight records were removed due to null keys or values during loading.");
+                Log.Error($"[OARO] Some resident knight roles of {nameof(ResidentKnightsManager)} were null or invalid after loading and have been removed.");
             }
 
             nextBuffStatRegainTick = -1;
@@ -114,16 +98,30 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label("ResidentKnights:");
+        listing_Rect.Label($"常驻骑士总数: {residentKnights.Count}");
         if (residentKnights.NullOrEmpty())
         {
-            listing_Rect.SubLabel("None", widthPct: 0.8f);
+            listing_Rect.SubLabel("None".Translate(), widthPct: 0.8f);
         }
         else
         {
             foreach (var kv in residentKnights)
             {
                 listing_Rect.SubLabel(kv.Key.Name + ": " + kv.Value.ToString(), widthPct: 0.8f);
+            }
+        }
+
+        listing_Rect.Gap(12f);
+        listing_Rect.Label($"常驻骑士职位: {rolesToKnights.Count}");
+        if (rolesToKnights.NullOrEmpty())
+        {
+            listing_Rect.SubLabel("None".Translate(), widthPct: 0.8f);
+        }
+        else
+        {
+            foreach (var kv in rolesToKnights)
+            {
+                listing_Rect.SubLabel(kv.Key.label + ": " + kv.Value.Knight.Name, widthPct: 0.8f);
             }
         }
     }

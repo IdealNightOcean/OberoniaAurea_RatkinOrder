@@ -13,7 +13,7 @@ internal static class RemoveAndDiscardPawnViaGC_Patch
     {
         if (p.CanBeKnight())
         {
-            KnightPawnsManager.DeregisterKnight(p);
+            KnightPawnsManager.Instance.DeregisterKnight(p);
         }
     }
 }

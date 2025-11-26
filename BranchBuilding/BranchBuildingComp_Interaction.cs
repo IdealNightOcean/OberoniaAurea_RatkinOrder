@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RimWorld.Planet;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -30,6 +31,19 @@ public class BranchBuildingComp_Interaction : BranchBuildingComp
 
     public string InteractionLabel => Props.labelOverride ?? Def.label;
 
+    public AcceptanceReport CanUseInteraction(Caravan caravan, bool resultOnly)
+    {
+        if (Def is null)
+        {
+            return false;
+        }
+        return Def.Worker.CanUseInteraction(new BranchInteractionParms(parent.Branch, caravan, parent), resultOnly: resultOnly);
+    }
+
+    public void TryApplyInteraction(Caravan caravan)
+    {
+        Def?.Worker.TryApplyInteraction(new BranchInteractionParms(parent.Branch, caravan, parent));
+    }
 
     public override void PostPostActive()
     {
@@ -38,6 +52,6 @@ public class BranchBuildingComp_Interaction : BranchBuildingComp
 
     public override void PostPostDeactive()
     {
-        parent.Branch.BuildingHandler.InteractionComps.Add(this);
+        parent.Branch.BuildingHandler.InteractionComps.Remove(this);
     }
 }

@@ -7,13 +7,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteractionDef def) : BranchInteractionWorker(def)
 {
-    protected override void ApplyInteraction(InteractionParms parms)
+    protected override void ApplyInteraction(BranchInteractionParms parms)
     {
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(StuffNode(parms), parms.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
     }
 
-    private DiaNode StuffNode(InteractionParms parms)
+    private DiaNode StuffNode(BranchInteractionParms parms)
     {
         DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_Stuff".Translate());
 
@@ -36,7 +36,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         return rootNode;
     }
 
-    private DiaNode QualityNode(InteractionParms parms, ThingDef stuff)
+    private DiaNode QualityNode(BranchInteractionParms parms, ThingDef stuff)
     {
         int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
         DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_Quality".Translate());
@@ -84,7 +84,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         return rootNode;
     }
 
-    private void GiveKnightlyArmaments(InteractionParms parms, QualityCategory quality, ThingDef stuffDef, int price)
+    private void GiveKnightlyArmaments(BranchInteractionParms parms, QualityCategory quality, ThingDef stuffDef, int price)
     {
         parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, price);
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
@@ -92,11 +92,15 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
             ratkinOrder: parms.Branch.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
 
+        base.ApplyInteraction(parms);
+    }
+
+    protected override void DoInteractionCost(BranchInteractionParms parms)
+    {
+        base.DoInteractionCost(parms);
         if (!parms.Branch.EffectTags.HasTag("PurchaseKnightlyArmamentsNoCD"))
         {
-            parms.Branch.CooldownManager.RegisterRecord(Def.label, cdTicks: 15 * 60000, shouldRemoveWhenExpired: true);
+            parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: Def.defaultCdDays * 60000, removeWhenExpired: true);
         }
-
-        base.ApplyInteraction(parms);
     }
 }

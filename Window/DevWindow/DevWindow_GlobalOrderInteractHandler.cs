@@ -17,18 +17,18 @@ internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
         listing_Rect.Begin(viewRect);
 
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Main Order Code Pedestal:");
+        listing_Rect.Label("主团规台:");
         Text.Font = GameFont.Small;
         if (OrderHallHandler.Instance.MainOrderCodePedestal is null)
         {
-            listing_Rect.Label("None");
+            listing_Rect.Label("None".Translate());
         }
         else
         {
-            listing_Rect.Label($"Thing: {OrderHallHandler.Instance.MainOrderCodePedestal}");
-            listing_Rect.Label($"Map: {OrderHallHandler.Instance.MainOrderCodePedestal.MapHeld}");
-            listing_Rect.Label($"OrderHallLevel: {OrderHallHandler.Instance.OrderHallLevel}");
-            if (listing_Rect.ButtonText("Jump to", widthPct: 0.4f))
+            listing_Rect.Label($"物品 Thing: {OrderHallHandler.Instance.MainOrderCodePedestal}");
+            listing_Rect.Label($"地图 Map: {OrderHallHandler.Instance.MainOrderCodePedestal.MapHeld}");
+            listing_Rect.Label($"骑士大厅等级: {OrderHallHandler.Instance.OrderHallLevel}");
+            if (listing_Rect.ButtonText("JumpTo".Translate(), widthPct: 0.4f))
             {
                 CameraJumper.TryJumpAndSelect(OrderHallHandler.Instance.MainOrderCodePedestal);
             }
@@ -37,14 +37,14 @@ internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Resident Knights:");
+        listing_Rect.Label("常驻骑士:");
         Text.Font = GameFont.Small;
         ResidentKnightsManager.Instance.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         Text.Font = GameFont.Medium;
-        listing_Rect.Label("Around Knight Groups:");
+        listing_Rect.Label("附近骑士小组:");
         Text.Font = GameFont.Small;
         AroundKnightGroupsManager.Instance.DrawDevWindow(listing_Rect);
 

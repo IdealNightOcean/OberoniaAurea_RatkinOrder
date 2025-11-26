@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.Planet;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -10,17 +9,17 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def) : BranchInteractionWorker(def)
 {
-    public override AcceptanceReport CanUseInteraction(Branch branch, Caravan caravan, BranchBuilding building = null, bool resultOnly = false)
+    public override AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly = false)
     {
         if (OARO_ModDefOf.Rakinia_RockRatkin is null || OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_RockRatkin, FactionValidationParams.NonHostileNormalFaction) is null)
         {
             return resultOnly ? false : "OARO_NoNonHostileRockRatkin".Translate();
         }
 
-        return base.CanUseInteraction(branch, caravan, building, resultOnly);
+        return base.CanUseInteraction(parms, resultOnly);
     }
 
-    protected override void ApplyInteraction(InteractionParms parms)
+    protected override void ApplyInteraction(BranchInteractionParms parms)
     {
         int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
         DiaNode rootNode = new("OARO_MiningExploration_Root".Translate());
@@ -53,7 +52,7 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
         Find.WindowStack.Add(nodeTree);
     }
 
-    private void MetallicDelivery(InteractionParms parms, ThingDef metallicDef)
+    private void MetallicDelivery(BranchInteractionParms parms, ThingDef metallicDef)
     {
         int stackCount = Mathf.CeilToInt(4000f / metallicDef.GetStatValueAbstract(StatDefOf.MarketValue));
         Thing thing = ThingMaker.MakeThing(metallicDef);
@@ -63,9 +62,10 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
             label: "OARO_MiningExploration_Label".Translate(),
             text: "OARO_MiningExploration_Text".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
-            def: OrderLetterDefOf.OARO_OfficialPositive_SimpleAttachments,
+            def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,
-            sender: branch.Name);
+            sender: branch.Name,
+            relatedLetterType: OrderLetter.RelatedLetterType.Positive);
 
         orderLetter.Attachments = [thing];
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays: Rand.Range(8, 12));

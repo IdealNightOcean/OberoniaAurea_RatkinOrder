@@ -8,11 +8,19 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public class OrderLetter : IExposable
 {
+    public enum RelatedLetterType
+    {
+        Neutral,
+        Positive,
+        Negative
+    }
+
     public OrderLetterDef Def;
 
     public Faction RelatedFaction;
     public RatkinOrder RelatedOrder;
     public int ArrivalTick = -1;
+    public RelatedLetterType RelatedLetterTypeValue;
 
     protected bool hasReaded;
     protected TaggedString label;
@@ -55,6 +63,25 @@ public class OrderLetter : IExposable
 
     public int ExpiredDays = 60;
     public bool Expired => Find.TickManager.TicksGame - ArrivalTick > ExpiredDays * 60000;
+
+    public LetterDef RelatedLetterDef
+    {
+        get
+        {
+            if (Def.relatedLetterDef is not null)
+            {
+                return Def.relatedLetterDef;
+            }
+
+            return RelatedLetterTypeValue switch
+            {
+                RelatedLetterType.Neutral => OARO_LetterDefOf.OARO_Order_NeutralLetter,
+                RelatedLetterType.Positive => OARO_LetterDefOf.OARO_Order_PositiveLetter,
+                RelatedLetterType.Negative => OARO_LetterDefOf.OARO_Order_NegativeLetter,
+                _ => OARO_LetterDefOf.OARO_Order_NeutralLetter,
+            };
+        }
+    }
 
     public void OnReaded() => hasReaded = true;
     public virtual void PostReaded(Building_OrderLetterBox letterBox = null) { }

@@ -669,9 +669,10 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             OrderLetterUtility.ReceiveLetter(
                 label: "OARO_JointPatrolCompletionSummary".Translate(ratkinOrder.Name.Named("ORDER_name")),
                 text: completionSummary,
-                def: OrderLetterDefOf.OARO_OfficialNeutralEvent,
+                def: OrderLetterDefOf.OARO_OfficialLetter,
                 relatedOrder: ratkinOrder,
-                sender: ratkinOrder.Name);
+                sender: ratkinOrder.Name,
+                relatedLetterType: OrderLetter.RelatedLetterType.Neutral);
 
             bool CompletedTaskOfType(BranchTaskType taskType)
             {

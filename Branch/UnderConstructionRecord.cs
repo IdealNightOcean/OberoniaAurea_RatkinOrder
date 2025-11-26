@@ -9,8 +9,8 @@ public class UnderConstructionRecord<T> : IExposable where T : BranchConstructio
     private int durationTicks = -1;
     public int CompletedTick = -1;
     public T TargetDef => targetDef;
-    public int DurationTicksLeft => CompletedTick - Find.TickManager.TicksGame;
-    public float Progress => durationTicks > 0 ? Mathf.Clamp01(1f - DurationTicksLeft / (float)durationTicks) : 0f;
+    public int DurationTicksLeft => Mathf.Max(0, CompletedTick - Find.TickManager.TicksGame);
+    public float Progress => durationTicks > 0 ? 1f - DurationTicksLeft / (float)durationTicks : 0f;
 
     public UnderConstructionRecord() { }
     public UnderConstructionRecord(T targetDef, int durationTicks)

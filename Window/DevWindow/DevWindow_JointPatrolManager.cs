@@ -7,15 +7,12 @@ public class DevWindow_JointPatrolManager : DevWindowBase
 {
     private readonly RatkinOrder ratkinOrder;
     private readonly JointPatrolManager jointPatrolManager;
-    private readonly float neededTaskPotency;
 
     public DevWindow_JointPatrolManager(RatkinOrder ratkinOrder) : base()
     {
         this.ratkinOrder = ratkinOrder;
         jointPatrolManager = ratkinOrder.JointPatrolManager;
         optionalTitle = ratkinOrder.Name;
-
-        neededTaskPotency = jointPatrolManager.NeededTaskPotency;
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -40,23 +37,30 @@ public class DevWindow_JointPatrolManager : DevWindowBase
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");
         jointPatrolManager.DrawDevWindow(listing_Rect);
-        listing_Rect.Label($"NeedReconnaissanceValue: {neededTaskPotency}");
+        listing_Rect.Label($"当前阶段: {jointPatrolManager.CurState}");
+        listing_Rect.Label($"距下一阶段Tick: {jointPatrolManager.TickToNextStage}");
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label("————————————————");
-        Text.Font = GameFont.Medium;
-        listing_Rect.Label($"All Participants: {jointPatrolManager.ParticipantsDict.Count}");
-        Text.Font = GameFont.Small;
-        listing_Rect.Gap(6f);
-
-        foreach (JointBranchRecord record in jointPatrolManager.ParticipantsDict.Values)
+        if (jointPatrolManager.CurState != JointPatrolManager.PatrolState.Invalid)
         {
-            if (listing_Rect.ButtonText(record.Branch.Name, null, 0.8f))
+            listing_Rect.Label($"所需联巡效能: {jointPatrolManager.NeededTaskPotency}");
+
+            listing_Rect.Gap(6f);
+            listing_Rect.Label("————————————————");
+
+            Text.Font = GameFont.Medium;
+            listing_Rect.Label($"全部参与分部: {jointPatrolManager.ParticipantsDict.Count}");
+            Text.Font = GameFont.Small;
+            listing_Rect.Gap(6f);
+
+            foreach (JointBranchRecord record in jointPatrolManager.ParticipantsDict.Values)
             {
-                record.Branch.OpenDevWindow();
-                Close();
-                EndContents();
-                return;
+                if (listing_Rect.ButtonText(record.Branch.Name, null, 0.8f))
+                {
+                    record.Branch.OpenDevWindow();
+                    Close();
+                    EndContents();
+                    return;
+                }
             }
         }
 

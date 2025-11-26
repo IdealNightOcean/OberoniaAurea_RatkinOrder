@@ -78,7 +78,7 @@ public class BranchManager : IExposable, ITickDay
 
     private int invitedBranchCreationsCount;
     public int InvitedBranchCreationsCount => invitedBranchCreationsCount;
-    public int SilverNeededForNextBranchCreation => 7500 + 5000 * invitedBranchCreationsCount;
+    public int SilverNeededForNextBranchCreation => 2500 + 5000 * invitedBranchCreationsCount;
 
     private int normalDemandFulfillCount;
     private int criticalDemandFulfillCount;

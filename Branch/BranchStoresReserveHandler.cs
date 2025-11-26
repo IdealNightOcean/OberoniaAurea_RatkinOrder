@@ -40,6 +40,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
+        listing_Rect.Label($"建材储备目标数: {storesReserves.Count}");
         if (storesReserves.Count > 0)
         {
             for (int i = 0; i < storesReserves.Count; i++)
@@ -49,7 +50,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
         else
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.SubLabel("None".Translate(), 0.8f);
         }
     }
 

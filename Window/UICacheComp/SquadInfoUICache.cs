@@ -33,7 +33,7 @@ public class SquadInfoUICache : BranchSummaryUICache
         CanUnlockSupportAuthority = BranchUtility.CanUnlockSupportAuthority(branch, map, resultOnly: false);
         CanRequestCombatReadiness = branch.TaskHandler.CanSwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, resultOnly: false);
         BombardFeasibility = BranchSupportUtility.CanBombard(branch, map, resultOnly: false);
-        SupportFeasibility = BranchSupportUtility.CanSupport(branch, BranchSupportUtility.SupportLevel.Quarter, map, resultOnly: false);
+        SupportFeasibility = BranchSupportUtility.CanCombatKnightSupport(branch, map, BranchSupportUtility.DeploymentLevel.Quarter, resultOnly: false);
 
         CommanderCeiling = (int)branch.Squad.CommanderCeiling;
 

@@ -14,26 +14,17 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 {
     public readonly BranchInteractionDef Def = def ?? throw new ArgumentNullException(nameof(def));
 
-    protected readonly struct InteractionParms(Branch branch, Caravan caravan, BranchBuilding building)
+    public virtual AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly = false)
     {
-        public readonly Branch Branch = branch;
-        public readonly Caravan Caravan = caravan;
-        public readonly BranchBuilding Building = building;
-
-        public readonly RatkinOrder RatkinOrder => Branch?.RatkinOrder;
-        public readonly Faction Faction => RatkinOrder?.Faction;
-    }
-
-    public virtual AcceptanceReport CanUseInteraction(Branch branch, Caravan caravan, BranchBuilding building = null, bool resultOnly = false)
-    {
-        if (branch is null || caravan is null)
+        if (parms.Branch is null || parms.Caravan is null)
         {
             return false;
         }
-        if (Def.onlyBuildingInteraction && building is null)
+        if (Def.onlyBuildingInteraction && parms.Building is null)
         {
             return resultOnly ? false : "OARO_Require_TargetBranchBuilding".Translate();
         }
+        Branch branch = parms.Branch;
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         if (ratkinOrder.Relationship < Def.floorRelationship)
         {
@@ -53,45 +44,44 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         }
         if (Def.hasCoolDown)
         {
-            int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(Def.defName);
+            int cooldownTicksLeft = branch.CooldownManager.GetCooldownTicksLeft(Def.defName);
             if (cooldownTicksLeft > 0)
             {
                 return resultOnly ? false : "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
             }
         }
-        if (Def.needRecommendation > 0 && CaravanInventoryUtility.HasThings(caravan, OARO_ThingDefOf.OARO_OrderRecommendation, Def.needRecommendation, (t) => ((OrderRecommendation)t).RatkinOrder == ratkinOrder))
+        if (Def.needRecommendation > 0 && CaravanInventoryUtility.HasThings(parms.Caravan, OARO_ThingDefOf.OARO_OrderRecommendation, Def.needRecommendation, (t) => ((OrderRecommendation)t).RatkinOrder == ratkinOrder))
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
         }
-        if (Def.needSilver > 0 && !CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, Def.needSilver))
+        if (Def.needSilver > 0 && !CaravanInventoryUtility.HasThings(parms.Caravan, ThingDefOf.Silver, Def.needSilver))
         {
             return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, Def.needSilver);
         }
         return true;
     }
 
-    public void TryApplyInteraction(Branch branch, Caravan caravan, BranchBuilding building = null)
+    public void TryApplyInteraction(BranchInteractionParms parms)
     {
-        if (branch is null || caravan is null)
+        if (parms.Branch is null || parms.Caravan is null)
         {
             return;
         }
-        if (Def.onlyBuildingInteraction && building is null)
+        if (Def.onlyBuildingInteraction && parms.Building is null)
         {
             Log.Error("[OARO] Attempt to apply BranchInteraction with a null branch building.");
             return;
         }
-        InteractionParms parms = new(branch, caravan, building);
         ApplyInteraction(parms);
     }
 
-    protected virtual void DoInteractionCost(InteractionParms parms)
+    protected virtual void DoInteractionCost(BranchInteractionParms parms)
     {
         Branch branch = parms.Branch;
 
-        if (Def.useDefaultCD)
+        if (Def.useDefaultCD && Def.defaultCdDays > 0)
         {
-            branch.CooldownManager.RegisterRecord(def.defName, cdTicks: Def.defaultCdDays * 60000);
+            branch.CooldownManager.RegisterRecord(def.defName, cdTicks: Def.defaultCdDays * 60000, removeWhenExpired: true);
         }
         if (Def.needSupply > 0f)
         {
@@ -107,50 +97,56 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         }
     }
 
-    protected virtual bool InteractionEffect(InteractionParms parms) => true;
+    /// <returns>
+    /// <para>- succeeded：是否成功执行交互逻辑</para>
+    /// <para>- doPostApply：是否需要执行后续回调 <see cref="PostApplyInteraction"/></para>
+    /// </returns>
+    protected virtual (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms) => (true, true);
 
-    protected virtual void ApplyInteraction(InteractionParms parms)
+    protected virtual void ApplyInteraction(BranchInteractionParms parms)
     {
+        (bool succeeded, bool doPostApply) = (false, false);
         try
         {
-            DoInteractionCost(parms);
+            (succeeded, doPostApply) = InteractionEffect(parms);
         }
         catch (Exception ex)
         {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"{nameof(DoInteractionCost)} for BranchInteraction[{Def?.defName}]",
-                typeName: nameof(BranchInteractionWorker),
-                methodName: nameof(ApplyInteraction),
-                needStackTrace: true);
-        }
-
-        bool applied = false;
-        try
-        {
-            applied = InteractionEffect(parms);
-        }
-        catch (Exception ex)
-        {
+            (succeeded, doPostApply) = (false, true);
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"{nameof(InteractionEffect)} for BranchInteraction[{Def?.defName}]",
                 typeName: nameof(BranchInteractionWorker),
                 methodName: nameof(ApplyInteraction),
                 needStackTrace: true);
-            applied = false;
         }
 
-        if (applied)
+        if (succeeded)
         {
-            PostApplyInteraction(parms);
+            try
+            {
+                DoInteractionCost(parms);
+            }
+            catch (Exception ex)
+            {
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"{nameof(DoInteractionCost)} for BranchInteraction[{Def?.defName}]",
+                    typeName: nameof(BranchInteractionWorker),
+                    methodName: nameof(ApplyInteraction),
+                    needStackTrace: true);
+            }
+        }
+
+        if (doPostApply)
+        {
+            PostApplyInteraction(parms, succeeded);
         }
     }
 
-    protected void PostApplyInteraction(InteractionParms parms) => PostApplyInteraction(parms.Branch, parms.Caravan, parms.Building);
-    protected void PostApplyInteraction(Branch branch, Caravan caravan, BranchBuilding building = null)
+    protected void PostApplyInteraction(BranchInteractionParms parms, bool succeeded)
     {
         try
         {
-            branch.PostApplyBranchInteraction?.Invoke(Def, branch, caravan, building);
+            parms.Branch?.PostApplyBranchInteraction?.Invoke(Def, parms, succeeded);
         }
         catch (Exception ex)
         {

@@ -48,7 +48,7 @@ public class Window_RatkinOrder : MainTabWindow
     public Window_RatkinOrder()
     {
         map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(map));
-        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(selectedOrder, this.map));
+        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(selectedOrder, map));
         selectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
                    ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
                                                           + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
@@ -732,13 +732,13 @@ public class Window_RatkinOrder : MainTabWindow
         underConstructionBuilding = allBranches.Where(b => b.BuildingHandler.IsBusy).Select(b => (b, b.BuildingHandler.UnderConstructionBuilding)).FirstOrFallback();
         reserveRecordShow = selectedOrder.BranchManager.AllPrimaryReserves.Take(2).ToList();
 
-        RefreshRatkinInteractionCache(null, selectedOrder, this.map);
+        RefreshRatkinInteractionCache(null, selectedOrder, map, succeeded: false);
 
         selectedOrder.PostApplyOrderInteraction -= RefreshRatkinInteractionCache;
         selectedOrder.PostApplyOrderInteraction += RefreshRatkinInteractionCache;
     }
 
-    private void RefreshRatkinInteractionCache(OrderInteractionDef interactionDef, RatkinOrder ratkinOrder, Map map)
+    private void RefreshRatkinInteractionCache(OrderInteractionDef interactionDef, RatkinOrder ratkinOrder, Map map, bool succeeded)
     {
         independentInteractionAcceptances.Clear();
         otherInteractionAcceptances.Clear();

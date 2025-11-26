@@ -51,8 +51,9 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"residents: {residentPawns.Count}");
-        listing_Rect.Label($"residentRecords: {residentRecords.Count}");
+        listing_Rect.Label($"驻派人员总数: {residentPawns.Count}");
+        listing_Rect.Label($"驻派记录总数: {residentRecords.Count}");
+        listing_Rect.SubLabel("二者应该相等，否则大概率有问题。", 0.8f);
     }
 
     public bool AddResident(BranchResident resident)

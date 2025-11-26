@@ -69,10 +69,10 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label("SpecialBuilding:");
+        listing_Rect.Label("特殊建筑:");
         if (specialBuilding is null)
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.SubLabel("None".Translate(), 0.8f);
         }
         else
         {
@@ -80,22 +80,20 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         }
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"NormalBuildings: {noramlBuildings.Count}");
+        listing_Rect.Label($"普通建筑: {noramlBuildings.Count}");
         foreach (BranchBuilding building in noramlBuildings)
         {
             listing_Rect.SubLabel(building.Def.label, 0.8f);
         }
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label("UnderConstructionBuilding:");
         if (underConstructionBuilding is null)
         {
-            listing_Rect.SubLabel("None", 0.8f);
+            listing_Rect.Label("在建建筑: 无");
         }
         else
         {
-            listing_Rect.SubLabel(underConstructionBuilding.TargetDef.label, 0.8f);
-            listing_Rect.Label($"BuildingTicksLeft: {underConstructionBuilding.DurationTicksLeft}");
+            listing_Rect.Label($"在建设施: {underConstructionBuilding.TargetDef.label} | {underConstructionBuilding.DurationTicksLeft}");
         }
     }
 
@@ -203,7 +201,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             int silverCost = branch.GetBuildingSilverCost(buildingDef);
             if (!CaravanInventoryUtility.HasThings(constructParam.Caravan, ThingDefOf.Silver, silverCost))
             {
-                return resultOnly ? false : "OARO_NotEnoughSilver".Translate(silverCost);
+                return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverCost.ToString());
             }
         }
 
@@ -338,7 +336,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             tickDayHandlers?.Remove(newTickDay);
         }
-        if (building is IPostSquadCombatPawnGenerate postPawnGenerate)
+        if (building is IPostBranchCombatKnightGenerate postPawnGenerate)
         {
             branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
         }
@@ -451,7 +449,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             tickDayHandlers ??= [];
             tickDayHandlers.Add(tickDay);
         }
-        if (building is IPostSquadCombatPawnGenerate postPawnGenerate)
+        if (building is IPostBranchCombatKnightGenerate postPawnGenerate)
         {
             branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
         }

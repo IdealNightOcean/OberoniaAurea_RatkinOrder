@@ -48,7 +48,7 @@ public class MercyQuestHandler : IExposable
             return;
         }
 
-        GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, shouldRemoveWhenExpired: true);
+        GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, removeWhenExpired: true);
 
         Map map;
         if (Rand.Chance(1f - GetMercyQuestChance(mercyQuestBaseChance)) || (map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false)) is null)

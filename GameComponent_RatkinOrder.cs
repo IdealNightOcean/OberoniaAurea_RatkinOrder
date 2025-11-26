@@ -12,6 +12,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
     private UniqueIDManager uniqueIDManager;
 
+    private KnightPawnsManager knightPawnsManager;
     private RatkinOrderManager ratkinOrderManager;
     private OrderLetterBox orderLetterBox;
     private GlobalInteractionManager globalInteractionManager;
@@ -36,6 +37,16 @@ public class GameComponent_RatkinOrder : GameComponent
         Instance = this;
     }
 
+    public static void ClearStaticCache()
+    {
+        UniqueIDManager.ClearStaticCache();
+
+        KnightPawnsManager.ClearStaticCache();
+        RatkinOrderManager.ClearStaticCache();
+        OrderLetterBox.ClearStaticCache();
+        GlobalInteractionManager.ClearStaticCache();
+    }
+
     public override void ExposeData()
     {
         base.ExposeData();
@@ -52,6 +63,7 @@ public class GameComponent_RatkinOrder : GameComponent
     public override void StartedNewGame()
     {
         EnsureComponentsInit();
+        globalInteractionManager.StratNewGame();
         RatkinOrderGenerator.StartNewGame();
     }
 
@@ -62,6 +74,7 @@ public class GameComponent_RatkinOrder : GameComponent
     public override void LoadedGame()
     {
         EnsureComponentsInit();
+        globalInteractionManager.LoadedGame();
     }
 
     public override void GameComponentTick()
@@ -89,6 +102,21 @@ public class GameComponent_RatkinOrder : GameComponent
                 needStackTrace: true);
             UniqueIDManager.ClearStaticCache();
             uniqueIDManager = new UniqueIDManager();
+        }
+
+        try
+        {
+            knightPawnsManager ??= new KnightPawnsManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing KnightPawnsManager",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            KnightPawnsManager.ClearStaticCache();
+            knightPawnsManager = new KnightPawnsManager();
         }
 
         try
