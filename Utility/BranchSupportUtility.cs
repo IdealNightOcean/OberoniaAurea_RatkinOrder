@@ -242,7 +242,7 @@ public static class BranchSupportUtility
         parms.MemberCount = parms.Branch is null ? parms.MemberCount : Mathf.Min(parms.MemberCount, parms.Branch.Squad.MemberCountInt);
         parms.CommanderCount = parms.Branch is null ? parms.CommanderCount : Mathf.Min(parms.CommanderCount, parms.Branch.Squad.CommanderCountInt);
 
-        List<Pawn> combatPanws = KnightPawnGenerateUtility.GenerateBranchCombatKnights(parms);
+        List<Pawn> combatPanws = KnightGenerateUtility.GenerateCombatantKnights(parms);
         if (combatPanws.NullOrEmpty())
         {
             return false;

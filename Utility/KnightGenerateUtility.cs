@@ -1,17 +1,57 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class KnightPawnGenerateUtility
+public static class KnightGenerateUtility
 {
-    private static readonly List<IPostBranchCombatKnightGenerate> tmpIPostBranchCombatKnightGenerate = [];
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Pawn GenerateKnight(PawnKindDef pawnKind, KnightRecord knightRecord, PlanetTile? tile = null, bool forceNew = true)
+    {
+        PawnGenerationRequest generationRequest = DefaultKnightGenerationRequest(pawnKind, knightRecord.RatkinOrder.Faction, tile, forceNew);
+        Pawn pawn = PawnGenerator.GeneratePawn(generationRequest);
+        PostKnightGenerate(pawn, knightRecord);
+        return pawn;
+    }
 
-    public static List<Pawn> GenerateBranchCombatKnights(CombatKnightGenerateParms parms, bool doBranchPostProcess = true)
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static Pawn GenerateKnight(PawnGenerationRequest generationRequest, KnightRecord knightRecord)
+    {
+        Pawn pawn = PawnGenerator.GeneratePawn(generationRequest);
+        PostKnightGenerate(pawn, knightRecord);
+        return pawn;
+    }
+
+    public static void PostKnightGenerate(Pawn pawn, KnightRecord knightRecord)
+    {
+        KnightPawnsManager.Instance.RegisterKnight(pawn, knightRecord);
+        if (knightRecord.Branch is not null)
+        {
+            Hediff_BranchMedal medalHediff = (Hediff_BranchMedal)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_BranchMedal);
+            medalHediff.SetOrderBranch(knightRecord.Branch);
+        }
+        if (knightRecord.IsCombatant)
+        {
+            PostCombatantGenerate(pawn, knightRecord);
+        }
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static PawnGenerationRequest DefaultKnightGenerationRequest(PawnKindDef pawnKind, Faction faction, PlanetTile? tile = null, bool forceNew = true)
+    {
+        PawnGenerationRequest generationRequest = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile, forceNew: forceNew);
+        generationRequest.ForcedTraits = [OARO_ModDefOf.OARO_OrderKnight];
+        generationRequest.AllowAddictions = false;
+        return generationRequest;
+    }
+
+    public static List<Pawn> GenerateCombatantKnights(CombatKnightGenerateParms parms)
     {
         List<Pawn> pawns = [];
 
@@ -25,23 +65,15 @@ public static class KnightPawnGenerateUtility
 
         try
         {
-            doBranchPostProcess = doBranchPostProcess && branch is not null;
-            if (doBranchPostProcess)
-            {
-                tmpIPostBranchCombatKnightGenerate.Clear();
-                tmpIPostBranchCombatKnightGenerate.AddRange(branch.PostSquadCombatPawnGenerate);
-            }
-
-            bool isFriendly = parms.IsFriendly;
-
             Faction faction = parms.Faction;
+            bool isFriendly = parms.IsFriendly;
             int mapTile = parms.Map.Tile;
 
             IReadOnlyList<PawnGenOption> genOptions;
             int memberCount = branch is null ? parms.MemberCount : Mathf.Min(parms.MemberCount, branch.Squad.MemberCountInt);
             if (memberCount > 0)
             {
-                genOptions = groupOption.GetOptionsWithTag("KnightMember");
+                genOptions = groupOption.GetRandomGroupOptionsWithTag("KnightMember");
                 if (genOptions is not null && genOptions.Count > 0)
                 {
                     for (int i = 0; i < memberCount; i++)
@@ -49,19 +81,16 @@ public static class KnightPawnGenerateUtility
                         try
                         {
                             PawnKindDef pawnKind = genOptions.RandomElementByWeight(g => g.selectionWeight).kind;
-                            KnightRecord knightRecord = new(ratkinOrder, branch, isCommander: false);
-                            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
-                            if (doBranchPostProcess)
-                                PostBranchCombatKnightGenerate(pawn, branch, isCommander: false, friendly: isFriendly);
-
+                            KnightRecord knightRecord = new(ratkinOrder, branch, isCombatant: true, isCommander: false);
+                            Pawn pawn = GenerateKnight(pawnKind, knightRecord, tile: mapTile);
                             pawns.Add(pawn);
                         }
-                        catch (Exception ex)
+                        catch (Exception subEx1)
                         {
-                            ModUtility.LogExceptionError(ex,
-                                errorDesc: "generating the knight member",
-                                typeName: nameof(KnightPawnGenerateUtility),
-                                methodName: nameof(GenerateBranchCombatKnights),
+                            ModUtility.LogExceptionError(subEx1,
+                                errorDesc: "generate the knight member",
+                                typeName: nameof(KnightGenerateUtility),
+                                methodName: nameof(GenerateCombatantKnights),
                                 needStackTrace: true);
                         }
                     }
@@ -75,7 +104,7 @@ public static class KnightPawnGenerateUtility
             int commanderCount = branch is null ? parms.CommanderCount : Mathf.Min(parms.CommanderCount, branch.Squad.CommanderCountInt);
             if (commanderCount > 0)
             {
-                genOptions = groupOption.GetOptionsWithTag("KnightCommander");
+                genOptions = groupOption.GetRandomGroupOptionsWithTag("KnightCommander");
                 if (genOptions is not null && genOptions.Count > 0)
                 {
                     for (int i = 0; i < commanderCount; i++)
@@ -83,19 +112,16 @@ public static class KnightPawnGenerateUtility
                         try
                         {
                             PawnKindDef pawnKind = genOptions.RandomElementByWeight(g => g.selectionWeight).kind;
-                            KnightRecord knightRecord = new(ratkinOrder, branch, isCommander: true);
-                            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
-                            if (doBranchPostProcess)
-                                PostBranchCombatKnightGenerate(pawn, branch, isCommander: true, friendly: isFriendly);
-
+                            KnightRecord knightRecord = new(ratkinOrder, branch, isCombatant: true, isCommander: true);
+                            Pawn pawn = GenerateKnight(pawnKind, knightRecord, tile: mapTile);
                             pawns.Add(pawn);
                         }
-                        catch (Exception ex)
+                        catch (Exception subEx2)
                         {
-                            ModUtility.LogExceptionError(ex,
-                                errorDesc: "generating the knight commander",
-                                typeName: nameof(KnightPawnGenerateUtility),
-                                methodName: nameof(GenerateBranchCombatKnights),
+                            ModUtility.LogExceptionError(subEx2,
+                                errorDesc: "generate the knight commander",
+                                typeName: nameof(KnightGenerateUtility),
+                                methodName: nameof(GenerateCombatantKnights),
                                 needStackTrace: true);
                         }
                     }
@@ -120,12 +146,12 @@ public static class KnightPawnGenerateUtility
                             Pawn pawn = PawnGenerator.GeneratePawn(generationRequest);
                             pawns.Add(pawn);
                         }
-                        catch (Exception ex)
+                        catch (Exception subEx3)
                         {
-                            ModUtility.LogExceptionError(ex,
-                                errorDesc: "generating the non-knight unit",
-                                typeName: nameof(KnightPawnGenerateUtility),
-                                methodName: nameof(GenerateBranchCombatKnights),
+                            ModUtility.LogExceptionError(subEx3,
+                                errorDesc: "generate the non-knight unit",
+                                typeName: nameof(KnightGenerateUtility),
+                                methodName: nameof(GenerateCombatantKnights),
                                 needStackTrace: true);
                         }
                     }
@@ -136,9 +162,13 @@ public static class KnightPawnGenerateUtility
                 }
             }
         }
-        finally
+        catch (Exception ex)
         {
-            tmpIPostBranchCombatKnightGenerate.Clear();
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "generate combatant knights",
+                typeName: nameof(KnightGenerateUtility),
+                methodName: nameof(GenerateCombatantKnights),
+                needStackTrace: true);
         }
 
         return pawns;
@@ -162,27 +192,9 @@ public static class KnightPawnGenerateUtility
         return false;
     }
 
-    private static void PostBranchCombatKnightGenerate(Pawn p, Branch branch, bool isCommander, bool friendly)
+    private static void PostCombatantGenerate(Pawn p, KnightRecord record)
     {
-        if (tmpIPostBranchCombatKnightGenerate is not null && tmpIPostBranchCombatKnightGenerate.Count > 0)
-        {
-            for (int i = 0; i < tmpIPostBranchCombatKnightGenerate.Count; i++)
-            {
-                try
-                {
-                    tmpIPostBranchCombatKnightGenerate[i].PostBranchCombatKnightGenerate(p, branch, isCommander: isCommander, friendly: friendly);
-                }
-                catch (Exception ex)
-                {
-                    string processorTypeName = tmpIPostBranchCombatKnightGenerate[i]?.GetType()?.FullName ?? "UnknownProcessor";
-                    ModUtility.LogExceptionError(ex,
-                        errorDesc: $"executing post-squad assist processor: {processorTypeName}",
-                        typeName: nameof(KnightPawnGenerateUtility),
-                        methodName: nameof(PostBranchCombatKnightGenerate),
-                        needStackTrace: true);
-                    continue;
-                }
-            }
-        }
+        record.RatkinOrder.ReformationManager.PostCombatantGenerate(p, record);
+        record.Branch?.PostCombatantGenerate(p, record);
     }
 }

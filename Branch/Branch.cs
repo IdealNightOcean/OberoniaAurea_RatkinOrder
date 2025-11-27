@@ -110,7 +110,7 @@ public class Branch : IExposable, ILoadReferenceable
 
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
-    [Unsaved] public readonly List<IPostBranchCombatKnightGenerate> PostSquadCombatPawnGenerate = [];
+    [Unsaved] public readonly List<IPostCombatantGenerate> IPostCombatantGenerate = [];
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
 
@@ -286,6 +286,54 @@ public class Branch : IExposable, ILoadReferenceable
         }
     }
 
+    public void Rename(int ordinal, string nameCore)
+    {
+        this.ordinal = ordinal;
+        this.nameCore = nameCore;
+        int unitsDigit = ordinal % 10;
+        GrammarRequest grammarRequest = new()
+        {
+            Includes = { OARO_RulePackDefOf.OARO_NameBuilder_BranchName }
+        };
+        grammarRequest.Constants.Add("unitsDigit", unitsDigit.ToString());
+        grammarRequest.Rules.Add(new Rule_String("ordinal", ordinal.ToString()));
+        grammarRequest.Rules.Add(new Rule_String("nameCore", nameCore));
+        name = GrammarResolver.Resolve("r_name", grammarRequest);
+
+        squad.Rename(ordinal, nameCore);
+    }
+
+    public void Destroy()
+    {
+        residentHandler.ForceEndAllResidency();
+        baseSite?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
+    }
+
+    public void PostCombatantGenerate(Pawn p, KnightRecord record)
+    {
+        if (IPostCombatantGenerate is null || IPostCombatantGenerate.Count == 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < IPostCombatantGenerate.Count; i++)
+        {
+            try
+            {
+                IPostCombatantGenerate[i].PostCombatantGenerate(p, record);
+            }
+            catch (Exception ex)
+            {
+                string processorTypeName = IPostCombatantGenerate[i]?.GetType()?.FullName ?? "UnknownProcessor";
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"execute post-combatant-generate processor: {processorTypeName}",
+                    typeName: nameof(Branch),
+                    methodName: nameof(PostCombatantGenerate),
+                    needStackTrace: true);
+            }
+        }
+    }
+
     private void TickHour()
     {
         int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
@@ -317,29 +365,6 @@ public class Branch : IExposable, ILoadReferenceable
         populationHandler.TickDay();
         demandHandler.TickDay();
         residentHandler.TickDay();
-    }
-
-    public void Rename(int ordinal, string nameCore)
-    {
-        this.ordinal = ordinal;
-        this.nameCore = nameCore;
-        int unitsDigit = ordinal % 10;
-        GrammarRequest grammarRequest = new()
-        {
-            Includes = { OARO_RulePackDefOf.OARO_NameBuilder_BranchName }
-        };
-        grammarRequest.Constants.Add("unitsDigit", unitsDigit.ToString());
-        grammarRequest.Rules.Add(new Rule_String("ordinal", ordinal.ToString()));
-        grammarRequest.Rules.Add(new Rule_String("nameCore", nameCore));
-        name = GrammarResolver.Resolve("r_name", grammarRequest);
-
-        squad.Rename(ordinal, nameCore);
-    }
-
-    public void Destroy()
-    {
-        residentHandler.ForceEndAllResidency();
-        baseSite?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
     }
 
     private void UpdateWorkState()

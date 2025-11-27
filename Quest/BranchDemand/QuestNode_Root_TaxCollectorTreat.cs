@@ -24,7 +24,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
         return QuestGen.slate.Get<Faction>("faction");
     }
 
-    protected override void InitQuestParameter()
+    protected override bool InitQuestParameter()
     {
         Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction);
         questParameter = new()
@@ -52,6 +52,8 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
         };
         QuestGen.quest.AddPart(questPart_InvolvedFactions);
         QuestGen.quest.ReserveFaction(subFaction);
+
+        return true;
     }
 
     protected override List<Pawn> GeneratePawns(string lodgerRecruitedSignal = null)

@@ -41,10 +41,10 @@ public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
         Find.LetterStack.RemoveLetter(this);
 
         Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-        if (map is null || !AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
+        if (map is null || !AroundKnightGroupsManager.Instance.TriggerVisitQuest(knightGroup, map))
         {
-            AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
-            GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: true);
+            AroundKnightGroupsManager.Instance.RemoveKnightGroup(knightGroup);
+            GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup, isProactive: true);
         }
     }
 

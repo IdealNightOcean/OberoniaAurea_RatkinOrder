@@ -126,7 +126,7 @@ public static class ModUtility
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         if (alsoAddOrderRule)
         {
-            foreach (Rule orderObjRule in RulesForRatkinOrder(prefix + "ORDER", ratkinOrder))
+            foreach (Rule orderObjRule in RulesForRatkinOrder(prefix + KeyLibrary_FormatArgName.ORDER, ratkinOrder))
             {
                 yield return orderObjRule;
             }

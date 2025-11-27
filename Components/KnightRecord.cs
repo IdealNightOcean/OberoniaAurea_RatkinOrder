@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -22,17 +23,20 @@ public class KnightRecord : IExposable, ILoadReferenceable
 
     private RatkinOrder ratkinOrder;
     private Branch branch;
-    private bool isCommander;
     private KnightPersonality personality = KnightPersonality.None;
+    private bool isCommander;
+    private bool isCombatant;
 
     public RatkinOrder RatkinOrder => ratkinOrder;
     public Branch Branch => branch;
-    public bool IsCommander => isCommander;
     public KnightPersonality Personality => personality;
+    public bool IsCommander => isCommander;
+    public bool IsCombatant => isCombatant;
+    public bool IsFriendly => ratkinOrder.Faction?.HostileTo(Faction.OfPlayer) is not true;
 
     public KnightRecord() { }
-    public KnightRecord(Branch branch, KnightPersonality personality = KnightPersonality.None, bool isCommander = true) : this(branch.RatkinOrder, branch, personality, isCommander) { }
-    public KnightRecord(RatkinOrder ratkinOrder, Branch branch = null, KnightPersonality personality = KnightPersonality.None, bool isCommander = true)
+    public KnightRecord(Branch branch, KnightPersonality personality = KnightPersonality.None, bool isCombatant = false, bool isCommander = false) : this(branch.RatkinOrder, branch, personality, isCombatant, isCommander) { }
+    public KnightRecord(RatkinOrder ratkinOrder, Branch branch = null, KnightPersonality personality = KnightPersonality.None, bool isCombatant = false, bool isCommander = false)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         if (branch is not null && branch.RatkinOrder != ratkinOrder)
@@ -42,6 +46,7 @@ public class KnightRecord : IExposable, ILoadReferenceable
         this.branch = branch;
         this.personality = personality == KnightPersonality.None ? KnightPersonalityUtility.GetRandomAvailablePersonality() : personality;
         this.isCommander = isCommander;
+        this.isCombatant = isCombatant && branch is not null;
 
         loadID = UniqueIDManager.GetUniqueID("KnightRecord");
     }
@@ -52,8 +57,10 @@ public class KnightRecord : IExposable, ILoadReferenceable
 
         Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
         Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref isCommander, "isCommander", defaultValue: false);
         Scribe_Values.Look(ref personality, "personality", defaultValue: KnightPersonality.None);
+
+        Scribe_Values.Look(ref isCommander, "isCommander", defaultValue: false);
+        Scribe_Values.Look(ref isCombatant, "isCombatant", defaultValue: false);
     }
 
     public string GetUniqueLoadID() => $"{nameof(KnightRecord)}_{loadID}";

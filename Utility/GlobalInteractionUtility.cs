@@ -125,7 +125,7 @@ public static class GlobalInteractionUtility
     public static void InviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
     {
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
-        if (Rand.Chance(chance) && AroundKnightGroupsManager.TriggerVisitQuest(knightGroup, map))
+        if (Rand.Chance(chance) && AroundKnightGroupsManager.Instance.TriggerVisitQuest(knightGroup, map))
         {
             AroundKnightGroupsManager.Instance.SeasonInvitationUsed++;
             if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed > SeasonInvitationLimit())
@@ -135,8 +135,8 @@ public static class GlobalInteractionUtility
         }
         else
         {
-            AroundKnightGroupsManager.RemoveKnightGroup(knightGroup);
-            AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
+            AroundKnightGroupsManager.Instance.RemoveKnightGroup(knightGroup);
+            AroundKnightGroupVisitInvalidDialog(knightGroup, isProactive: false);
         }
     }
 
@@ -145,14 +145,16 @@ public static class GlobalInteractionUtility
     /// 包括邀请失败和任务触发失败
     /// </summary>
     /// <param name="isProactive">是否为骑士小组主动</param>
-    public static void AroundKnightGroupVisitInvalidDialog(Branch branch, bool isProactive)
+    public static void AroundKnightGroupVisitInvalidDialog(AroundKnightGroup knightGroup, bool isProactive)
     {
+        Branch branch = knightGroup.Branch;
+
         GrammarRequest grammarRequest = new()
         {
             Includes = { OARO_RulePackDefOf.OARO_Dialog_AroundKnightGroupVisitInvalid }
         };
-        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ORDER", branch.RatkinOrder));
-        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch("BRANCH", branch, alsoAddOrderRule: false));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, branch.RatkinOrder));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(KeyLibrary_FormatArgName.BRANCNH, branch, alsoAddOrderRule: false));
         grammarRequest.Constants.Add("isProactive", isProactive.ToString());
         TaggedString talkText = GrammarResolver.Resolve("r_text", grammarRequest);
 

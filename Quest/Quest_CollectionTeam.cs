@@ -497,8 +497,8 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
                 Pawn pawn;
                 if (isKnight)
                 {
-                    KnightRecord knightRecord = new(RatkinOrder, Branch);
-                    pawn = OARO_PawnUtility.GenerateOrderKnight(pawnKind, knightRecord, tile: mapTile);
+                    KnightRecord knightRecord = new(RatkinOrder, Branch, isCombatant: false, isCommander: false);
+                    pawn = KnightGenerateUtility.GenerateKnight(pawnKind, knightRecord, tile: mapTile);
                 }
                 else
                 {

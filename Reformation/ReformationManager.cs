@@ -12,6 +12,8 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
 {
     [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
 
+    [Unsaved] public readonly List<IPostCombatantGenerate> IPostCombatantGenerate = [];
+
     private float reformProgress;
     public float ReformProgress
     {
@@ -88,6 +90,31 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
         }
 
         return true;
+    }
+
+    public void PostCombatantGenerate(Pawn p, KnightRecord record)
+    {
+        if (IPostCombatantGenerate is null || IPostCombatantGenerate.Count == 0)
+        {
+            return;
+        }
+
+        for (int i = 0; i < IPostCombatantGenerate.Count; i++)
+        {
+            try
+            {
+                IPostCombatantGenerate[i].PostCombatantGenerate(p, record);
+            }
+            catch (Exception ex)
+            {
+                string processorTypeName = IPostCombatantGenerate[i]?.GetType()?.FullName ?? "UnknownProcessor";
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"execute post-combatant-generate processor: {processorTypeName}",
+                    typeName: nameof(ReformationManager),
+                    methodName: nameof(PostCombatantGenerate),
+                    needStackTrace: true);
+            }
+        }
     }
 
     private void ActiveReformation(OrderReformationDef def)

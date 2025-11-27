@@ -11,7 +11,6 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_RefugeeKnightBase
 {
-    private Branch branch;
     private DemandType demandType;
     private bool giveNormalRecommendation;
 
@@ -19,9 +18,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
     private string outSigalMoodFailed;
     private HediffDef specialHediff;
 
-    public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.RatkinKnight;
-
-    protected override void InitQuestParameter()
+    protected override bool InitQuestParameter()
     {
         questParameter = new QuestParameter()
         {
@@ -38,7 +35,15 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         Slate slate = QuestGen.slate;
         slate.Set(UniqueLeavingLetterSlate, true);
 
+        outSigalMoodFailed = QuestGenUtility.HardcodedSignalWithQuestID("Mood_Failed");
+        outSigalPerfecState = QuestGenUtility.HardcodedSignalWithQuestID("Quest_PerfectState");
         giveNormalRecommendation = Rand.Chance(0.25f);
+
+        if (!InitRatkinOrder(initBranch: true))
+        {
+            return false;
+        }
+
         demandType = slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
         if (demandType == DemandType.Supplementary)
         {
@@ -48,23 +53,19 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         {
             questParameter.LodgerCount = Rand.RangeInclusive(3, 4);
         }
-
-        outSigalMoodFailed = QuestGenUtility.HardcodedSignalWithQuestID("Mood_Failed");
-        outSigalPerfecState = QuestGenUtility.HardcodedSignalWithQuestID("Quest_PerfectState");
-
-        branch = slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
             Branch = branch,
             DemandType = demandType
         };
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
+
+        return true;
     }
 
     protected override void ClearQuestParameter()
     {
         base.ClearQuestParameter();
-        branch = null;
         demandType = default;
         specialHediff = null;
 
@@ -72,9 +73,9 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         outSigalPerfecState = null;
     }
 
-    protected override void PostPawnGenerated(Pawn pawn)
+    protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
     {
-        base.PostPawnGenerated(pawn);
+        base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
         OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
 
         if (demandType == DemandType.Supplementary || specialHediff is null)

@@ -1,11 +1,12 @@
 ﻿using RimWorld.QuestGen;
-using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_Root_ResidentKnight : QuestNode_Root_RefugeeKnightBase
 {
-    protected override void InitQuestParameter()
+    protected override bool IsCombatant => true;
+
+    protected override bool InitQuestParameter()
     {
         questParameter = new()
         {
@@ -23,17 +24,17 @@ public class QuestNode_Root_ResidentKnight : QuestNode_Root_RefugeeKnightBase
             questDurationTicks = 60 * 60000
         };
 
-        InitRatkinOrder();
+        if (!InitRatkinOrder(initBranch: true))
+        {
+            return false;
+        }
+
         if (ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             questParameter.questDurationTicks = 120 * 60000;
         }
-    }
 
-    protected override void PostPawnGenerated(Pawn pawn)
-    {
-        base.PostPawnGenerated(pawn);
-        pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_ResidentKnight);
+        return true;
     }
 
     protected override void PawnArrival(string lodgerArrivalSignal)

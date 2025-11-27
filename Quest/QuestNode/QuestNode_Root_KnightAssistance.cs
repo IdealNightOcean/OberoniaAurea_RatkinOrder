@@ -5,9 +5,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_Root_KnightAssistance_Clergy : QuestNode_Root_KnightAssistanceCommon
 {
-    protected override void PostPawnGenerated(Pawn pawn)
+    protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
     {
-        base.PostPawnGenerated(pawn);
+        base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
 
         Thing medicines = ThingMaker.MakeThing(ThingDefOf.MedicineIndustrial);
         medicines.stackCount = 15;
@@ -17,10 +17,15 @@ public class QuestNode_Root_KnightAssistance_Clergy : QuestNode_Root_KnightAssis
 
 public class QuestNode_Root_KnightAssistance_Craftsman : QuestNode_Root_KnightAssistanceCommon
 {
-    protected override void InitQuestParameter()
+    protected override bool InitQuestParameter()
     {
-        base.InitQuestParameter();
+        if (!base.InitQuestParameter())
+        {
+            return false;
+        }
+
         questParameter.LodgerCount = 2;
+        return true;
     }
 }
 
@@ -29,9 +34,9 @@ public class QuestNode_Root_KnightAssistance_PigeonStationKnight : QuestNode_Roo
 
 public class QuestNode_Root_KnightAssistance_Noble : QuestNode_Root_KnightAssistanceCommon
 {
-    protected override void PostPawnGenerated(Pawn pawn)
+    protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
     {
-        base.PostPawnGenerated(pawn);
+        base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
 
         pawn.abilities.GainAbility(AbilityDefOf.SludgeSpew);
     }

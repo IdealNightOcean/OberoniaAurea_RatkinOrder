@@ -51,13 +51,13 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        if (listing_Rect.ButtonText("Create NewKnight Groups", widthPct: 0.6f))
+        if (listing_Rect.ButtonText("创建新的附近小队", widthPct: 0.6f))
         {
             CreateNewKnightGroups();
         }
         if (AroundKnightGroups is null || AroundKnightGroups.Count == 0)
         {
-            listing_Rect.Label("None");
+            listing_Rect.Label("None".Translate());
         }
         else
         {
@@ -66,7 +66,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
             {
                 listing_Rect.Label(knightGroup.ToString());
                 //按规则邀请
-                if (listing_Rect.ButtonText("Invite", widthPct: 0.4f))
+                if (listing_Rect.ButtonText("尝试邀请", widthPct: 0.4f))
                 {
                     Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
                     AcceptanceReport acceptanceReport = GlobalInteractionUtility.CanInviteAroundKnightGroup(knightGroup, map, resultOnly: false);
@@ -81,13 +81,13 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
                     break;
                 }
                 //直接触发邀请任务
-                if (listing_Rect.ButtonText("Trigger Directly", widthPct: 0.4f))
+                if (listing_Rect.ButtonText("强制触发拜访", widthPct: 0.4f))
                 {
                     Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
                     if (map is null || !TriggerVisitQuest(knightGroup, map))
                     {
                         RemoveKnightGroup(knightGroup);
-                        GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup.Branch, isProactive: false);
+                        GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup, isProactive: false);
                     }
                     break;
                 }
@@ -112,7 +112,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         RemoveExpiredKnightGroups();
     }
 
-    public static void RemoveKnightGroup(AroundKnightGroup knightGroup)
+    public void RemoveKnightGroup(AroundKnightGroup knightGroup)
     {
         if (Instance is null)
         {
@@ -122,17 +122,10 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         Instance.aroundKnightGroups.Remove(knightGroup);
     }
 
-    public static bool TriggerVisitQuest(AroundKnightGroup knightGroup, Map map)
+    public bool TriggerVisitQuest(AroundKnightGroup knightGroup, Map map)
     {
-        if (Instance is null)
-        {
-            Log.Error($"[OARO] Attempted to use {nameof(AroundKnightGroupsManager)} before initialization.");
-            return false;
-        }
-        Instance.aroundKnightGroups.Remove(knightGroup);
-
         Slate slate = new();
-        slate.SetBasicBranchSlateVar(knightGroup.Branch);
+        slate.SetBasicBranchSlateVar(knightGroup.Branch, alsoSetOrder: true);
         slate.Set("map", map);
         slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsCount, knightGroup.MemberCount);
         slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsDelay, knightGroup.TravelTicks);

@@ -336,9 +336,9 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             tickDayHandlers?.Remove(newTickDay);
         }
-        if (building is IPostBranchCombatKnightGenerate postPawnGenerate)
+        if (building is IPostCombatantGenerate postPawnGenerate)
         {
-            branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
+            branch.IPostCombatantGenerate.Add(postPawnGenerate);
         }
 
         branch.EffectTags.DecrementTagsValue(buildingDef.effectFlags);
@@ -449,9 +449,9 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             tickDayHandlers ??= [];
             tickDayHandlers.Add(tickDay);
         }
-        if (building is IPostBranchCombatKnightGenerate postPawnGenerate)
+        if (building is IPostCombatantGenerate postPawnGenerate)
         {
-            branch.PostSquadCombatPawnGenerate.Add(postPawnGenerate);
+            branch.IPostCombatantGenerate.Add(postPawnGenerate);
         }
 
         building.PostActive();

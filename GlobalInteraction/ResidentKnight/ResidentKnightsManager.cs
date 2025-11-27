@@ -105,7 +105,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
         else
         {
-            foreach (var kv in residentKnights)
+            foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
             {
                 listing_Rect.SubLabel(kv.Key.Name + ": " + kv.Value.ToString(), widthPct: 0.8f);
             }
@@ -119,7 +119,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
         else
         {
-            foreach (var kv in rolesToKnights)
+            foreach (KeyValuePair<ResidentKnightRoleDef, ResidentKnightRecord> kv in rolesToKnights)
             {
                 listing_Rect.SubLabel(kv.Key.label + ": " + kv.Value.Knight.Name, widthPct: 0.8f);
             }
@@ -226,6 +226,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         if (!residentKnights.ContainsKey(pawn))
         {
             residentKnights.Add(pawn, new ResidentKnightRecord(pawn, branch));
+            pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_ResidentKnight);
             OnKnightChanged();
         }
     }
@@ -237,12 +238,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             return;
         }
         residentKnights.Remove(pawn);
-        OnKnightChanged();
+        pawn.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_ResidentKnight);
         if (record.CurRole is not null)
         {
             rolesToKnights.Remove(record.CurRole);
             nextBuffStatRegainTick = -1;
         }
+        OnKnightChanged();
     }
 
     public bool TrySetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)

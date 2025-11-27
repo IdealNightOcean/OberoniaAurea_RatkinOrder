@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.Planet;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using Verse;
@@ -9,41 +8,51 @@ namespace OberoniaAurea.RatkinOrder;
 
 public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeBase
 {
+    protected const string PawnGenGroupTag = "Options";
+
+    protected override PawnKindDef FixedPawnKind => null;
+    protected virtual PawnGroupKindDef PawnGroupKind => OARO_PawnGroupKindDefOf.OARO_KnightRefugee;
+
+    protected virtual bool IsCombatant => false;
+    protected virtual bool IsCommander => false;
+
     protected RatkinOrder ratkinOrder;
     protected Branch branch;
 
-    protected void InitRatkinOrder()
+    protected bool InitRatkinOrder(bool initBranch)
     {
-        ratkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
+        Quest quest = QuestGen.quest;
+        if (initBranch)
+        {
+            branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+            if (branch is null)
+            {
+                return false;
+            }
+
+            QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, ratkinOrder);
+            QuestPart_CriticalBranch questPart_CriticalBranch = new()
+            {
+                Branch = branch,
+                EndQuest = true,
+                EndOutcome = QuestEndOutcome.Fail
+            };
+            quest.AddPart(questPart_CriticalBranch);
+        }
+        ratkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder) ?? branch?.RatkinOrder;
         if (ratkinOrder is null)
         {
-            return;
+            return false;
         }
-        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, ratkinOrder);
+        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, ratkinOrder);
         QuestPart_CriticalRatkinOrder questPart_CriticalRatkinOrder = new()
         {
             RatkinOrder = ratkinOrder,
             EndQuest = true,
             EndOutcome = QuestEndOutcome.Fail
         };
-        QuestGen.quest.AddPart(questPart_CriticalRatkinOrder);
-    }
-
-    protected void InitBranch(bool alsoInitOrder)
-    {
-        branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        if (branch is null)
-        {
-            return;
-        }
-        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(QuestGen.quest, ratkinOrder);
-        QuestPart_CriticalBranch questPart_CriticalBranch = new()
-        {
-            Branch = branch,
-            EndQuest = true,
-            EndOutcome = QuestEndOutcome.Fail
-        };
-        QuestGen.quest.AddPart(questPart_CriticalBranch);
+        quest.AddPart(questPart_CriticalRatkinOrder);
+        return true;
     }
 
     protected override void ClearQuestParameter()
@@ -64,66 +73,44 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         Quest quest = QuestGen.quest;
 
         List<Pawn> pawns = [];
+
+        PawnKindDef fixedPawnKind = FixedPawnKind;
+        IReadOnlyList<PawnGenOption> pawnGenOptions = null;
+        if (fixedPawnKind is null)
+        {
+            KnightGenerateUtility.TryGetRandomPawnGroupMakerForOrder(ratkinOrder, branch, PawnGroupKind, out PawnGroupOption pawnGroupOption);
+            if (pawnGroupOption is null)
+            {
+                Log.Error($"[OARO] No usable {nameof(PawnGroupOption)} for {PawnGroupKind} found in {ratkinOrder}");
+            }
+            else
+            {
+                pawnGenOptions = pawnGroupOption.GetRandomGroupOptionsWithTag(PawnGenGroupTag);
+            }
+
+            if (pawnGenOptions is null || pawnGenOptions.Count == 0)
+            {
+                Log.Error($"[OARO] No usable {nameof(PawnGenOption)} with tag \"{PawnGenGroupTag}\" for select {nameof(PawnGroupOption)}");
+                fixedPawnKind = null;
+            }
+        }
+
         int adultCount = questParameter.LodgerCount - questParameter.ChildCount;
 
-        PawnKindDef fixedPawnKind = FixedPawnKind ?? PawnKindDefOf.Refugee;
-        ThoughtDef thoughtToAdd = ThoughtToAdd;
+        bool isCombatant = IsCombatant;
+        bool isCommander = IsCommander;
         for (int i = 0; i < questParameter.LodgerCount; i++)
         {
-            DevelopmentalStage developmentalStages = i < adultCount ? DevelopmentalStage.Adult : DevelopmentalStage.Child;
-            PawnGenerationRequest generationRequest = OARO_PawnUtility.DefaultKnightGenerationRequest(fixedPawnKind, questParameter.faction, tile: questParameter.map.Tile, forceNew: true);
-            generationRequest.AllowedDevelopmentalStages = developmentalStages;
+            PawnKindDef pawnKind = fixedPawnKind ?? pawnGenOptions.RandomElementByWeight(g => g.selectionWeight).kind;
+            PawnGenerationRequest generationRequest = KnightGenerateUtility.DefaultKnightGenerationRequest(pawnKind, questParameter.faction, tile: questParameter.map.Tile, forceNew: true);
+            generationRequest.AllowedDevelopmentalStages = (i < adultCount ? DevelopmentalStage.Adult : DevelopmentalStage.Child);
 
-            Pawn pawn = OARO_PawnUtility.GenerateOrderKnight(generationRequest, new KnightRecord(ratkinOrder));
-            if (!pawn.IsWorldPawn())
-            {
-                Find.WorldPawns.PassToWorld(pawn);
-            }
+            Pawn pawn = quest.GeneratePawn(generationRequest);
+            KnightGenerateUtility.PostKnightGenerate(pawn, new KnightRecord(ratkinOrder, branch, isCombatant: isCombatant, isCommander: isCommander));
 
             pawns.Add(pawn);
 
-            PostPawnGenerated(pawn);
-            if (thoughtToAdd is not null)
-            {
-                QuestPart_AddMemoryThought questPart_AddMemoryThought = new()
-                {
-                    inSignal = QuestGen.slate.Get<string>("inSignal"),
-                    pawn = pawn,
-                    def = thoughtToAdd
-                };
-                quest.AddPart(questPart_AddMemoryThought);
-            }
-
-            if (questParameter.allowJoinOffer)
-            {
-                quest.PawnJoinOffer(pawn,
-                "LetterJoinOfferLabel".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
-                "LetterJoinOfferTitle".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
-                "LetterJoinOfferText".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                questParameter.map.Parent.Named("MAP")),
-                delegate
-                {
-                    quest.JoinPlayer(questParameter.map.Parent, Gen.YieldSingle(pawn), joinPlayer: true);
-                    quest.Letter(LetterDefOf.PositiveEvent,
-                                 inSignal: null,
-                                 chosenPawnSignal: null,
-                                 relatedFaction: null,
-                                 useColonistsOnMap: null,
-                                 useColonistsFromCaravanArg: false,
-                                 QuestPart.SignalListenMode.OngoingOnly,
-                                 lookTargets: null,
-                                 filterDeadPawnsFromLookTargets: false,
-                                 label: "LetterLabelMessageRecruitSuccess".Translate() + ": " + pawn.LabelShortCap,
-                                 text: "MessageRecruitJoinOfferAccepted".Translate(pawn.Named("RECRUITEE")));
-                    quest.SignalPass(null, null, lodgerRecruitedSignal);
-                },
-                delegate
-                {
-                    quest.RecordHistoryEvent(HistoryEventDefOf.CharityRefused_ThreatReward_Joiner);
-                },
-                inSignal: null, outSignalPawnAccepted: null, outSignalPawnRejected: null,
-                charity: true);
-            }
+            PostPawnGenerated(pawn, lodgerRecruitedSignal);
         }
         return pawns;
     }

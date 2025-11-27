@@ -115,6 +115,7 @@
     <Compile Include="DefOf\BranchMedalDefOf.cs" />
     <Compile Include="DefOf\OrderInteractionDefOf.cs" />
     <Compile Include="DefOf\OrderLetterDefOf.cs" />
+    <Compile Include="DefOf\PawnGroupKindDefOf.cs" />
     <Compile Include="DefOf\RulePackDefOf.cs" />
     <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
@@ -420,8 +421,8 @@
     <Compile Include="Reformation\OrderReformationWorker.cs" />
     <Compile Include="ScenPart_InitialOrderRelationshipLevel.cs" />
     <Compile Include="Lord\LordJob_AssistColony_NeverFleeOrder.cs" />
-    <Compile Include="Interface\IPostBranchCombatKnightGenerate.cs" />
-    <Compile Include="Utility\KnightPawnGenerateUtility.cs" />
+    <Compile Include="Interface\IPostCombatantGenerate.cs" />
+    <Compile Include="Utility\KnightGenerateUtility.cs" />
     <Compile Include="Lord\LordJob_ExitMapBestForResident.cs" />
     <Compile Include="HarmonyPatch\Game_ClearCaches_Patch.cs" />
     <Compile Include="DefOf\ModDefOf.cs" />

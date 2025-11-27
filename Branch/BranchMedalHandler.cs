@@ -60,7 +60,7 @@ public class BranchMedalHandler : IExposable
     {
         listing_Rect.Label($"主印记: {PrimaryMedal}");
         listing_Rect.Label("所有印记:");
-        foreach (var kv in medalRecords)
+        foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> kv in medalRecords)
         {
             listing_Rect.SubLabel($"({kv.Key.label} - {kv.Value})", 0.8f);
         }

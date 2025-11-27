@@ -13,10 +13,10 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
     private PawnKindDef _fixedPawnKind;
     private ThoughtDef _thoughtToAdd;
 
-    public override PawnKindDef FixedPawnKind => _fixedPawnKind;
+    protected override PawnKindDef FixedPawnKind => _fixedPawnKind;
     protected override ThoughtDef ThoughtToAdd => _thoughtToAdd;
 
-    protected override void InitQuestParameter()
+    protected override bool InitQuestParameter()
     {
         questParameter = new()
         {
@@ -40,7 +40,7 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
         slate.Set(UniqueQuestDescSlate, true);
         slate.Set(UniqueLeavingLetterSlate, true);
 
-        InitRatkinOrder();
+        return InitRatkinOrder(initBranch: true);
     }
 
     protected override void ClearQuestParameter()

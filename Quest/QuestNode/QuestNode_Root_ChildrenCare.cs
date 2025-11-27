@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
 {
-    public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.OARO_RatkinVillageChild;
+    protected override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.OARO_RatkinVillageChild;
     protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_ChildrenCare;
 
     protected override Faction GetOrGenerateFaction()
@@ -24,7 +24,7 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
         return subFaction;
     }
 
-    protected override void InitQuestParameter()
+    protected override bool InitQuestParameter()
     {
         int lodgerCount = Rand.RangeInclusive(4, 6);
         questParameter = new QuestParameter()
@@ -42,6 +42,8 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
 
         QuestGen.slate.Set("uniqueQuestDesc", true);
         QuestGen.slate.Set("uniqueLeavingLetter", true);
+
+        return true;
     }
 
     protected override void AddQuestAward(QuestPart_Choice.Choice choice)

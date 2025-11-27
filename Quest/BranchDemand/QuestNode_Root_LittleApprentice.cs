@@ -17,7 +17,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
     private string skillSuccessSignal;
     private string skillCheckedSignal;
 
-    public override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.OARO_RatkinVillageChild;
+    protected override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.OARO_RatkinVillageChild;
     protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_ChildrenCare;
 
     protected override Faction GetOrGenerateFaction()
@@ -34,7 +34,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         return subFaction;
     }
 
-    protected override void InitQuestParameter()
+    protected override bool InitQuestParameter()
     {
         questParameter = new QuestParameter()
         {
@@ -57,6 +57,8 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         staySignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_Stay");
         skillSuccessSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillSuccess");
         skillCheckedSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillChecked");
+
+        return true;
     }
 
     protected override void ClearQuestParameter()

@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -16,7 +15,7 @@ public class QuestPart_ResidentKnightWatcher : QuestPart
 
     public override void Cleanup()
     {
-        Knight?.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_ResidentKnight);
+        ResidentKnightsManager.Instance.RemoveResidentKnight(Knight);
         Knight = null;
     }
 }
