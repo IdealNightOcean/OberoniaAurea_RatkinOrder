@@ -18,21 +18,45 @@ public class JointPatrolIncidentDef : Def
         Disaster
     }
 
+    /// <summary>
+    /// 事件类型
+    /// </summary>
     public IncidentType incidentType;
 
+    /// <summary>
+    /// 专注任务限制
+    /// </summary>
     public BranchTaskType? restrictTaskType;
 
+    /// <summary>
+    /// 联巡等级限制
+    /// </summary>
     public PatrolLevel? patrolLevelLimits;
 
+    /// <summary>
+    /// 分部类型限制
+    /// </summary>
     public Branch.BranchType? restrictBranchType;
 
+    /// <summary>
+    /// 分部建筑限制
+    /// </summary>
     public BranchBuildingDef relatedBuilding;
 
+    /// <summary>
+    /// 事件描述列表
+    /// </summary>
     [MustTranslate]
     public List<string> customDescriptions;
 
+    /// <summary>
+    /// 事件功能列表
+    /// </summary>
     public List<JointPatrolIncidentPart> parts;
 
+    /// <summary>
+    /// 能否触发小事件
+    /// </summary>
     public bool CanApply(Branch branch)
     {
         if (restrictTaskType.HasValue && branch.TaskHandler.FocusedTaskType != restrictTaskType.Value)
@@ -50,7 +74,9 @@ public class JointPatrolIncidentDef : Def
         return true;
     }
 
-
+    /// <summary>
+    /// 触发小事件
+    /// </summary>
     public JointIncidentRecord ApplyIncident(JointBranchRecord record)
     {
         if (record?.Branch is null)
@@ -82,6 +108,9 @@ public class JointPatrolIncidentDef : Def
         };
     }
 
+    /// <summary>
+    /// 根据联巡参与者获取随机的联巡小事件类型（<see cref="IncidentType"/>）
+    /// </summary>
     public static IncidentType GetPotentialIncidentType(JointBranchRecord record)
     {
         List<(IncidentType, float)> typeSelector = new(5)
@@ -123,12 +152,12 @@ public class JointPatrolIncidentDef : Def
 
         if (incidentType == IncidentType.Building && relatedBuilding is null)
         {
-            yield return "Incident type is 'Building', but RelatedBuilding is null.";
+            yield return $"Incident type is '{nameof(IncidentType.Building)}', but '{nameof(relatedBuilding)}' is null.";
         }
         if (relatedBuilding is not null && incidentType != IncidentType.Building)
         {
             incidentType = IncidentType.Building;
-            yield return "RelatedBuilding is specified, but incident type is not 'Building'. Type has been updated to 'Building'.";
+            yield return $"'{nameof(relatedBuilding)}' is specified, but incident type is not '{nameof(IncidentType.Building)}'. Type has been set to '{nameof(IncidentType.Building)}'.";
         }
     }
 }

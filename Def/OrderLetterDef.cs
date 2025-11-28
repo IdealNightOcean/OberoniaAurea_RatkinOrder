@@ -8,12 +8,29 @@ public class OrderLetterDef : Def
 {
     private static readonly Type defaultLetterClass = typeof(OrderLetter);
 
+    /// <summary>
+    /// 信件功能类
+    /// </summary>
     public Type letterClass = defaultLetterClass;
 
+    /// <summary>
+    /// 信件类型
+    /// </summary>
     public OrderLetterType letterType;
-    public LetterDef relatedLetterDef;
+
+    /// <summary>
+    /// 能否被转化为原版信件
+    /// </summary>
     public bool canShowAsRimLetter = true;
+
+    /// <summary>强制转化为原版信件</summary>
+    /// <remarks>- 只在 <see cref="canShowAsRimLetter"/> 为 <see langword="true"/> 时生效</remarks>
     public bool forceShowAsRimLetter;
+
+    /// <summary>相关原版信件Def</summary>
+    /// <remarks>- 只在 <see cref="canShowAsRimLetter"/> 为 <see langword="true"/> 时生效</remarks>
+    public LetterDef relatedLetterDef;
+
 
     public override IEnumerable<string> ConfigErrors()
     {
@@ -24,12 +41,12 @@ public class OrderLetterDef : Def
         if (letterClass is null)
         {
             letterClass = defaultLetterClass;
-            yield return "has a null 'letterClass'. Set to Default.";
+            yield return $"has a null '{nameof(letterClass)}'. Set to Default.";
         }
         if (!canShowAsRimLetter && forceShowAsRimLetter)
         {
             forceShowAsRimLetter = false;
-            yield return "Cannot 'forceShowAsRimLetter' because 'canShowAsRimLetter' is false";
+            yield return $"Cannot '{nameof(forceShowAsRimLetter)}' because '{nameof(canShowAsRimLetter)}' is false";
         }
     }
 }

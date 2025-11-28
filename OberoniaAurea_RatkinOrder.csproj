@@ -135,6 +135,7 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_InviteBranchCreation.cs" />
     <Compile Include="OrderLetter\OrderLetter_SimpleAttachments.cs" />
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
+    <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
@@ -192,7 +193,7 @@
     <Compile Include="Quest\QuestClique\QuestNode_AddGeneralClique.cs" />
     <Compile Include="Quest\QuestClique\Quest_CliquesManager.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_AddEffectTags.cs" />
-    <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistance.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistance_Clergy.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_KnightAssistanceCommon.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_Root_RefugeeKnightBase.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_SetRatkinOrderForObject.cs" />
@@ -221,7 +222,7 @@
     <Compile Include="BranchStat\BranchStatModifier.cs" />
     <Compile Include="BranchStat\BranchStatPart.cs" />
     <Compile Include="BranchStat\BranchStatPart_BuildingCeiling.cs" />
-    <Compile Include="BranchBuilding\BranchBuildingConstructParameter.cs" />
+    <Compile Include="BranchBuilding\BranchBuildingConstructParms.cs" />
     <Compile Include="BranchDemand\BranchDemand.cs" />
     <Compile Include="DefModExtension\EncampmentSupplyExtension.cs" />
     <Compile Include="DefModExtension\FermentingBarrelExtension.cs" />

@@ -5,6 +5,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public abstract class BranchConstructionDef : Def
 {
+    /// <summary>
+    /// 图标路径
+    /// </summary>
     [NoTranslate]
     protected string iconPath;
     protected Texture2D iconTexture;
@@ -24,6 +27,9 @@ public abstract class BranchConstructionDef : Def
         }
     }
 
+    /// <summary>
+    /// 拓展图标路径
+    /// </summary>
     protected Texture2D expandingIconTexture;
     public Texture2D ExpandingIconTexture
     {

@@ -6,7 +6,14 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchResidentDef : Def
 {
+    /// <summary>
+    /// 部署功能类
+    /// </summary>
     public Type residentClass;
+
+    /// <summary>
+    /// 默认部署天数
+    /// </summary>
     public int defaultDeployDays = 1;
 
     public override IEnumerable<string> ConfigErrors()

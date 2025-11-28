@@ -7,9 +7,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnightBase
 {
-    public SlateRef<PawnKindDef> fixedPawnKind;
-    public SlateRef<ThoughtDef> thoughtToAdd;
-
     private PawnKindDef _fixedPawnKind;
     private ThoughtDef _thoughtToAdd;
 
@@ -34,8 +31,9 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
         };
 
         Slate slate = QuestGen.slate;
-        _fixedPawnKind = fixedPawnKind.GetValue(slate);
-        _thoughtToAdd = thoughtToAdd.GetValue(slate);
+        questParameter.LodgerCount = slate.Get("assistantCount", defaultValue: 1);
+        _fixedPawnKind = slate.Get<PawnKindDef>("assistantPawnkind", defaultValue: OARO_PawnKindDefOf.RatkinKnight);
+        _thoughtToAdd = slate.Get<ThoughtDef>("thoughtToAdd", defaultValue: null);
 
         slate.Set(UniqueQuestDescSlate, true);
         slate.Set(UniqueLeavingLetterSlate, true);

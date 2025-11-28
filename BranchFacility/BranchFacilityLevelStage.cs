@@ -6,13 +6,33 @@ namespace OberoniaAurea.RatkinOrder;
 // xml相关
 public class BranchFacilityLevelStage
 {
+    /// <summary>
+    /// 建设白银花费（基础）
+    /// </summary>
     public int silverCost;
+
+    /// <summary> 
+    /// 建设所需天数（基础）
+    /// </summary>
     public int constructionDays;
 
+    /// <summary>
+    /// 效果标志列表
+    /// </summary>
     public List<string> effectFlags;
-    public List<BranchStatModifier> branchStatOffsets; //属性修正列表（Offset）
-    public List<BranchStatModifier> branchStatFactors; //属性修正列表（Factor）
 
+    /// <summary>
+    /// 属性修正列表（Offset）
+    /// </summary>
+    public List<BranchStatModifier> branchStatOffsets;
+
+    /// <summary>
+    /// 属性修正列表（Factor）
+    /// </summary>
+    public List<BranchStatModifier> branchStatFactors;
+
+    /// <summary>额外自定义的效果描述</summary>
+    /// <remarks>- 显示在修正效果之后</remarks>
     [MustTranslate]
     public List<string> customEffectDescriptions;
 

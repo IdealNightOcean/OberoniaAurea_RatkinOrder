@@ -1,5 +1,4 @@
-﻿using NightOcean;
-using OberoniaAurea_Frame;
+﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -40,7 +39,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     }
     public int AllBuldingsCount => noramlBuildings.Count + (specialBuilding is null ? 0 : 1);
 
-    [Unsaved] public readonly LazyMutableCollection<HashSet<BranchBuildingDef>, BranchBuildingDef> AllBuildingDefsHash;
+    [Unsaved] public readonly Lazy<HashSet<BranchBuildingDef>> AllBuildingDefsHash;
 
     [Unsaved] private List<ITickHour> tickHourHandlers;
     [Unsaved] private List<ITickDay> tickDayHandlers;
@@ -56,7 +55,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
         buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: (int)BranchStatDefOf.OARO_BuildingCeiling.baseValue, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
-        AllBuildingDefsHash = new LazyMutableCollection<HashSet<BranchBuildingDef>, BranchBuildingDef>(refreshFunc: () => AllBuldings.Select(b => b.Def));
+        AllBuildingDefsHash = new Lazy<HashSet<BranchBuildingDef>>(valueFactory: () => AllBuldings.Select(b => b.Def).ToHashSet());
     }
 
     public void ExposeData()
@@ -173,7 +172,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         return null;
     }
 
-    public AcceptanceReport CanConstructBuilding(BranchBuildingConstructParameter constructParam, bool resultOnly = false)
+    public AcceptanceReport CanConstructBuilding(BranchBuildingConstructParms constructParam, bool resultOnly = false)
     {
         if (constructParam.BuildingDef.isSpecial && specialBuilding is not null)
         {
@@ -208,7 +207,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         return buildingDef.ConstructChecker.CanConstruct(constructParam, resultOnly);
     }
 
-    public void StartBuildingConstruction(BranchBuildingConstructParameter constructParam)
+    public void StartBuildingConstruction(BranchBuildingConstructParms constructParam)
     {
         if (constructParam.NeedDoubleConfirm)
         {
@@ -241,7 +240,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         }
     }
 
-    public void StartBuildingConstructionDirectly(BranchBuildingConstructParameter constructParam)
+    public void StartBuildingConstructionDirectly(BranchBuildingConstructParms constructParam)
     {
         BranchBuildingDef buildingDef = constructParam.BuildingDef;
         underConstructionBuilding = new(
@@ -298,7 +297,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             noramlBuildings.Add(newBuilding);
         }
-        AllBuildingDefsHash.MarkDirty();
+        AllBuildingDefsHash.Value.Add(buildingDef);
 
         newBuilding.InitActive();
         ActiveBuilding(newBuilding);
@@ -326,7 +325,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             noramlBuildings.Remove(building);
         }
-        AllBuildingDefsHash.MarkDirty();
+        AllBuildingDefsHash.Value.Remove(buildingDef);
 
         if (building is ITickHour ticksLong)
         {

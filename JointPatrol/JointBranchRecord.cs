@@ -125,7 +125,7 @@ public class JointBranchRecord : IExposable
     {
         float potency = (Branch.Squad.MemberCount * 10f)
               * (1f + Branch.MedalHandler.MedalTypeCount * 0.1f)
-              * (1f + Branch.FacilityHandler.TotalFacilityLevel.Value * 0.02f)
+              * (1f + Branch.FacilityHandler.TotalFacilityLevel * 0.02f)
               * (Branch.IsBranchOfType(Branch.BranchType.Honor) ? 1.2f : 1f)
               * PotencyFactor;
         return Mathf.Max(0f, potency + PotencyOffset);

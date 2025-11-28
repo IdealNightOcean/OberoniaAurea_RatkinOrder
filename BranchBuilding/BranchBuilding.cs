@@ -43,7 +43,7 @@ public class BranchBuilding : IExposable
     }
 
     /// <summary>
-    /// 仅在添加建筑时触发
+    /// 仅在首次添加建筑时触发
     /// </summary>
     public virtual void InitActive() { }
 
@@ -58,7 +58,7 @@ public class BranchBuilding : IExposable
     public virtual void PostDeactive() { }
 
     /// <summary>
-    /// 仅在建筑升级时触发
+    /// 仅在首次建筑升级时触发
     /// </summary>
     public virtual void InitUpgraded() { }
 

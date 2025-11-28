@@ -10,15 +10,31 @@ public class OrderInteractionDef : InteractionDefBase
     private OrderInteractionWorker worker;
     public OrderInteractionWorker Worker => worker ??= (OrderInteractionWorker)Activator.CreateInstance(workerClass, args: this);
 
-    public float needFund = -1f;
     /// <summary>
-    /// 只在 needFund > 0f 时生效
-    /// needFund > 0f 时
-    /// 如有fundEventDef，则执行FundHandler.AddFundEvent(如有fundEventDef);
-    /// 如无fundEventDef，则执行FundHandler.AdjustFundsImmediately(needFund);
+    /// 是否在骑士团主界面UI上显式
     /// </summary>
+    public bool displayOnUI;
+
+    /// <summary>是否在骑士团主界面UI上特殊显式</summary>
+    /// <remarks>
+    /// <para>- 只在 <see cref="displayOnUI"/> 为 <see langword="true"/> 时生效</para>
+    /// <para>- 若为 <see langword="true"/> 则在骑士团主界面相关部分手动指定显示</para>
+    /// <para>- 若为 <see langword="false"/> 则在骑士团主界面相关部分集中显示</para>
+    /// </remarks>
+    public bool specialDisplayOnUI;
+
+    /// <summary>
+    /// 需求骑士团资金数
+    /// </summary>
+    public float needFund = -1f;
+
+    /// <summary>事件触发的资金事件</summary>
+    /// <remarks>- 只在 <see cref="needFund"/>><see langword="0f"/> 时生效</remarks>
     public OrderFundEventDef fundEventDef;
 
+    /// <summary>
+    /// 最低骑士团资金需求
+    /// </summary>
     public float MinFundNeeded => needFund > 0f ? needFund : (fundEventDef is null ? 0f : fundEventDef.changeRange.min);
 
     public AcceptanceReport CanUseInteraction(RatkinOrder ratkinOrder, Map map, bool resultOnly)
@@ -46,12 +62,12 @@ public class OrderInteractionDef : InteractionDefBase
         }
         if (workerClass is null)
         {
-            yield return "has a null workerClass.";
+            yield return $"has a null {nameof(workerClass)}.";
         }
 
         if (needFund > 0f && fundEventDef is not null)
         {
-            yield return "can't set both needFund and fundEventDef.";
+            yield return $"can't set both {nameof(needFund)} and {nameof(fundEventDef)}.";
         }
     }
 }

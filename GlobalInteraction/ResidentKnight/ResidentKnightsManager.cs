@@ -372,4 +372,18 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             }
         }
     }
+
+    public void OnSquadBeAttackedOnTask(RatkinOrder ratkinOrder, Branch branch)
+    {
+        foreach ((Pawn p, ResidentKnightRecord record) in ResidentKnights)
+        {
+            if (record.RatkinOrder != ratkinOrder || p.needs is null || p.needs.mood is null)
+            {
+                continue;
+            }
+            int forceStage = record.Branch == branch ? 1 : 0;
+            Thought_Memory memory = ThoughtMaker.MakeThought(OARO_ThoughtDefOf.OARO_Thought_ResidentKnight_SquadBeAttackedOnTask, forceStage);
+            p.needs.mood.thoughts.memories.TryGainMemory(memory);
+        }
+    }
 }

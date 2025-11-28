@@ -195,7 +195,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
                     return;
                 }
 
-                BranchBuildingConstructParameter constructParam = new()
+                BranchBuildingConstructParms constructParam = new()
                 {
                     Branch = branch,
                     BuildingDef = allDefs[i],

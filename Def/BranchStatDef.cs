@@ -16,21 +16,52 @@ public class BranchStatDef : Def
     private BranchStatWorker worker;
     public BranchStatWorker Worker => worker ??= new BranchStatWorker(this);
 
-    public StatType statType = StatType.Float; //属性类型
     /// <summary>
-    /// 一般的Stat越大越好（如影响距离）
-    /// 反转的Stat越小越好（如建设花费系数）
+    /// 属性类型，标记应该如何显示属性数值
     /// </summary>
+    public StatType statType = StatType.Float;
+
+    /// <summary>是否反转好坏</summary>
+    /// <remarks>
+    /// <para>- 一般的Stat越大越好（如影响距离）</para> 
+    /// <para>- 反转的Stat越小越好（如建设花费系数）</para> 
+    /// </remarks>
     public bool reverse;
 
-    public float baseValue = 0f; //基础值
+    /// <summary>
+    /// 基础值
+    /// </summary>
+    public float baseValue = 0f;
 
+    /// <summary>
+    /// 该Stat是否可以缓存
+    /// </summary>
     public bool cacheable = true;
-    public float minValue = int.MinValue; //最小值
-    public float maxValue = int.MaxValue; //最大值
-    public bool nonNegative = false; //是否为非负数
-    public int cacheDuration = 10000; //缓存持续时间 (单位：tick)
-    public List<BranchStatPart> statParts; //属性修正器列表
+
+    /// <summary>
+    /// 最小值
+    /// </summary>
+    public float minValue = int.MinValue;
+
+    /// <summary>
+    /// 最大值
+    /// </summary>
+    public float maxValue = int.MaxValue;
+
+    /// <summary>
+    /// 是否为[非]负数
+    /// </summary>
+    public bool nonNegative = false;
+
+    /// <summary>
+    /// 缓存持续时间（Tick）
+    /// </summary>
+    public int cacheDuration = 10000;
+
+    /// <summary>
+    /// 额外Stat修正器列表（<see cref="BranchStatPart"/>），可为 <see langword="null"/>
+    /// </summary>
+    public List<BranchStatPart> statParts;
 
     public override void PostLoad()
     {

@@ -19,23 +19,50 @@ public class BranchDemandDef : Def
 
     public Type demandClass = defaultWorkClass;
 
+    /// <summary>
+    /// 需求类型
+    /// </summary>
     public DemandType demandType;
 
     /// <summary>
-    /// 未接取时的持续时间，超过该时间仍未接取则会被移除
+    /// 需求在[接取前]的持续时间（Day）
     /// </summary>
+    /// <remarks>超过该时间仍未接取则会被移除</remarks>
     public float durationDays;
+
+    /// <summary>
+    /// 需求相关的<see cref="QuestScriptDef"/>
+    /// </summary>
     public QuestScriptDef relatedQuestDef;
+
+    /// <summary>
+    /// 需求随机权重
+    /// </summary>
     public float baseSelectWeight = 100f;
 
+    /// <summary>
+    /// 目标描述
+    /// </summary>
     [MustTranslate]
     public string targetDesc;
+
+    /// <summary>
+    /// 奖励描述
+    /// </summary>
     [MustTranslate]
     public string rewardDesc;
 
     public int DurationTicks => (int)(durationDays * 60000f);
+
+    /// <summary>
+    /// 是否为关键需求（<see cref="DemandType.Critical"/>）
+    /// </summary>
     public bool IsCritical => demandType == DemandType.Critical;
 
+    /// <summary>
+    /// 关键需求背景图标
+    /// </summary>
+    /// <remarks>- 目前仅在 <see cref="demandType"/> 为 <see cref="DemandType.Critical"/> 时使用</remarks>
     [NoTranslate]
     protected string backgroundPath;
     protected Texture2D backgroundTexture;
@@ -65,20 +92,20 @@ public class BranchDemandDef : Def
         if (weighterClass is null)
         {
             weighterClass = defaultWeighterClass;
-            yield return "has a null weighterClass. Set to default.";
+            yield return $"has a null {nameof(weighterClass)}. Set to default.";
         }
         if (demandClass is null)
         {
             demandClass = defaultWorkClass;
-            yield return "has a null demandClass. Set to default.";
+            yield return $"has a null {nameof(demandClass)}. Set to default.";
         }
         if (relatedQuestDef is null)
         {
-            yield return "has a null relatedQuestDef.";
+            yield return $"has a null {nameof(relatedQuestDef)}.";
         }
         if (durationDays <= 0f)
         {
-            yield return "should has a positive durationnDays.";
+            yield return $"should has a positive {nameof(durationDays)}.";
         }
     }
 }

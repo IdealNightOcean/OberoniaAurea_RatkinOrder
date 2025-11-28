@@ -9,18 +9,35 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchHonorDef : Def
 {
+    /// <summary>
+    /// 荣誉颜色
+    /// </summary>
     public Color color;
 
+    /// <summary>
+    /// 荣誉Buff（<see cref="HediffDef"/>）
+    /// </summary>
     public HediffDef buffHediff;
 
+    /// <summary>
+    /// 荣誉课业（<see cref="ResidentKnightAcademicDef"/>）
+    /// </summary>
     public ResidentKnightAcademicDef academicDef;
 
+    /// <summary>
+    /// 荣誉分部特殊的人物生成组
+    /// </summary>
     public List<PawnGroupOption> pawnGroupOptions;
 
+    /// <summary>
+    /// 荣誉图标路径
+    /// </summary>
     [NoTranslate]
     protected string iconPath;
-
     protected Texture2D iconTexture;
+    /// <summary>
+    /// 荣誉图标
+    /// </summary>
     public Texture2D IconTexture
     {
         get
@@ -38,6 +55,9 @@ public class BranchHonorDef : Def
     }
 
     protected Texture2D expandingIconTexture;
+    /// <summary>
+    /// 拓展的荣誉图标路径
+    /// </summary>
     public Texture2D ExpandingIconTexture
     {
         get
@@ -54,9 +74,15 @@ public class BranchHonorDef : Def
         }
     }
 
+    /// <summary>
+    /// 荣誉装饰框图标路径
+    /// </summary>
     [NoTranslate]
     protected string decorationPath;
     protected Texture2D decorationTexture;
+    /// <summary>
+    /// 荣誉装饰框图标路径
+    /// </summary>
     public Texture2D DecorationTexture
     {
         get
@@ -73,6 +99,9 @@ public class BranchHonorDef : Def
         }
     }
     protected Texture2D expandingDecorationTexture;
+    /// <summary>
+    /// 扩展的荣誉装饰框图标
+    /// </summary>
     public Texture2D ExpandingDecorationTexture
     {
         get
@@ -89,14 +118,22 @@ public class BranchHonorDef : Def
         }
     }
 
-    [NoTranslate]
-    protected string honorBarPath;
+
     protected Texture2D honorBarTexture;
+    /// <summary>
+    /// 荣誉颜色标识图标，颜色使用<see cref="color"/>
+    /// </summary>
     public Texture2D HonorBarTexture => honorBarTexture ??= SolidColorMaterials.NewSolidColorTexture(color);
 
+    /// <summary>
+    /// 荣誉背景图标路径
+    /// </summary>
     [NoTranslate]
     protected string backgroundPath;
     protected Texture2D backgroundTexture;
+    /// <summary>
+    /// 荣誉背景图标
+    /// </summary>
     public Texture2D BackgroundTexture
     {
         get

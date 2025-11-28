@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -12,28 +13,26 @@ public class BranchMedalHandler : IExposable
     private Dictionary<BranchMedalDef, BranchMedalRecord> medalRecords = new(4);
 
     private BranchMedalDef primaryMedal;
-    public BranchMedalDef PrimaryMedal
-    {
-        get
-        {
-            if (primaryMedal is null)
-            {
-                if (!medalRecords.NullOrEmpty())
-                {
-                    primaryMedal = medalRecords.First().Key;
-                }
-            }
-            return primaryMedal;
-        }
-    }
+    public BranchMedalDef PrimaryMedal => primaryMedal ??= medalRecords?.FirstOrFallback().Key;
 
     public BranchTaskType ProtogenicTaskType => PrimaryMedal?.focusedTaskType ?? BranchTaskType.General;
 
     public int MedalTypeCount => medalRecords.Count;
     public IReadOnlyDictionary<BranchMedalDef, BranchMedalRecord> MedalRecords => medalRecords;
 
-    private int totalMedalCount;
-    public int TotalMedalCount => totalMedalCount;
+    [Unsaved] private int totalMedalCount = -1;
+    public int TotalMedalCount
+    {
+        get
+        {
+            if (totalMedalCount < 0)
+            {
+                totalMedalCount = Mathf.Max(0, medalRecords.Sum(kv => kv.Value.Count));
+            }
+            return totalMedalCount;
+        }
+        private set { totalMedalCount = value; }
+    }
 
     [Unsaved] private HediffStage medalHediffStage;
     [Unsaved] private bool medalHediffsDirty = true;
@@ -51,7 +50,6 @@ public class BranchMedalHandler : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref totalMedalCount, "totalMedalCount", 0);
         Scribe_Defs.Look(ref primaryMedal, "primaryMedal");
         Scribe_Collections.Look(ref medalRecords, "medalRecords", LookMode.Def, LookMode.Deep);
     }
@@ -91,7 +89,7 @@ public class BranchMedalHandler : IExposable
 
         if (medalRecords.TryGetValue(medal, out BranchMedalRecord record))
         {
-            record.Count++;
+            record.Count += count;
         }
         else
         {
@@ -118,8 +116,11 @@ public class BranchMedalHandler : IExposable
 
     internal void PostLoadInit()
     {
-        medalRecords.RemoveAll(kv => kv.Key is null || !kv.Value.Validate());
-        totalMedalCount = medalRecords.Sum(kv => kv.Value.Count);
+        if (medalRecords.Remove(null) | (medalRecords.RemoveAll(kv => !kv.Value.Validate()) > 0))
+        {
+            Log.Error($"[OARO] Some Medal Records of were null or invalid after loading and have been removed.");
+        }
+        totalMedalCount = -1;
     }
 
     private void RecacheMedalHediffStage()

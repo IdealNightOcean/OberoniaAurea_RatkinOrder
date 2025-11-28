@@ -22,6 +22,7 @@ public class Window_RatkinOrder : MainTabWindow
     }
 
     private Vector2 scrollPosition_Orders;
+    private Vector2 scrollPosition_NormalInteractions;
     private Vector2 scrollPosition_FollowedBranches;
     private CachedTexture esteemTexture;
 
@@ -38,8 +39,8 @@ public class Window_RatkinOrder : MainTabWindow
     private (int urgency, int supplementary, int acceptable) normalDemandsCache;
     private (int friendly, int acceptable) criticalDemandsCache;
 
-    private readonly Dictionary<OrderInteractionDef, AcceptanceReport> independentInteractionAcceptances = [];
-    private readonly List<KeyValuePair<OrderInteractionDef, AcceptanceReport>> otherInteractionAcceptances = [];
+    private readonly Dictionary<OrderInteractionDef, AcceptanceReport> specialInteractionAcceptances = [];
+    private readonly List<KeyValuePair<OrderInteractionDef, AcceptanceReport>> normalInteractionAcceptances = [];
 
     private List<KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord>> reserveRecordShow = [];
     private (Branch, UnderConstructionRecord<BranchBuildingDef>) underConstructionBuilding;
@@ -153,22 +154,22 @@ public class Window_RatkinOrder : MainTabWindow
     private void DrawLeftRect(Rect inRect)
     {
         float inRectX = inRect.xMin;
-        float inRectY = inRect.yMin;
+        float inRectY = inRect.yMin - 80f;
 
         Rect reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 206f, 400f, 32f);
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(reusedRect, selectedOrder.Name);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + (407f - esteemTexture.Texture.height - 12f), esteemTexture.Texture.width, esteemTexture.Texture.height);
-        GUI.DrawTexture(reusedRect, esteemTexture.Texture);
-
         Text.Font = GameFont.Small;
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 407f, 100f, 20f);
         Widgets.Label(reusedRect, "OARO_OrderWin_Relationship".Translate());
 
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + (407f - esteemTexture.Texture.height - 12f), esteemTexture.Texture.width, esteemTexture.Texture.height);
+        GUI.DrawTexture(reusedRect, esteemTexture.Texture);
+
         Text.Font = GameFont.Medium;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 430f, 100f, 24f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 428f, 100f, 28f);
         Widgets.Label(reusedRect, selectedOrder.Relationship.GetLabel().Colorize(selectedOrder.Relationship.GetColor()));
 
         Text.Font = GameFont.Small;
@@ -256,6 +257,56 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = new(inRectX + (420f - 110f), inRectY + 770f, 100f, 18f);
         Widgets.Label(reusedRect, totalPopulation.ToString());
 
+        reusedRect = new(inRectX + 63f, inRectY + 796f, 373f, 75f);
+        DrawNormalInteraction(reusedRect);
+
+        OARO_WindowUtility.ResetText();
+    }
+
+    private void DrawNormalInteraction(Rect inRect)
+    {
+        Rect viewRect = inRect;
+        viewRect.width -= 16f;
+
+        float inRectXmin = inRect.xMin;
+        float entryX = inRectXmin;
+        float entryY = inRect.yMin;
+        float entryWidth = inRect.width / 3f - 0.01f;
+        float entryHeight = 24f;
+
+        viewRect.height = (normalInteractionAcceptances.Count / 3 + 1) * entryHeight;
+
+        Widgets.BeginScrollView(inRect, ref scrollPosition_NormalInteractions, viewRect);
+
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        int column = 0;
+        foreach (KeyValuePair<OrderInteractionDef, AcceptanceReport> kv in normalInteractionAcceptances)
+        {
+            Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
+            if ((++column) >= 3)
+            {
+                column = 0;
+                entryX = inRectXmin;
+                entryY += entryHeight;
+            }
+            else
+            {
+                entryX += entryWidth;
+            }
+            if (OARO_WindowUtility.TextButtonImageDisableable(
+                butRect: entryRect,
+                label: kv.Key.label,
+                acceptance: kv.Value,
+                baseTex: normalInteractionButton,
+                downTex: normalInteractionButton_Down,
+                doMouseoverSound: true))
+            {
+                kv.Key.Worker.TryApplyInteraction(selectedOrder, map);
+            }
+        }
+
+        Widgets.EndScrollView();
         OARO_WindowUtility.ResetText();
     }
 
@@ -312,7 +363,7 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = new(inRectX, inRectY + 621f, inRectWidth, 20f);
+        reusedRect = new(inRectX, inRectY + 621f, inRectWidth, 28f);
         Widgets.Label(reusedRect, "OARO_OrderWin_BranchDemand".Translate());
 
         Text.Font = GameFont.Small;
@@ -525,7 +576,7 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        Rect reusedRect = new(inRectX, inRectY + 101f, inRectWidth, 24f);
+        Rect reusedRect = new(inRectX, inRectY + 99f, inRectWidth, 28f);
         Widgets.Label(reusedRect, "OARO_OrderWin_BranchConstruction".Translate());
 
         Text.Font = GameFont.Small;
@@ -585,7 +636,7 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = new(inRectX + 36f, inRectY + 391f, 369f, 50f);
+        reusedRect = new(inRectX + 36f, inRectY + 391f, 368f, 50f);
         if (OARO_WindowUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: string.Empty,
@@ -630,7 +681,7 @@ public class Window_RatkinOrder : MainTabWindow
         Widgets.Label(reusedRect, branch.Name);
 
         Text.Anchor = TextAnchor.MiddleRight;
-        Widgets.Label(reusedRect, "OARO_OrderWin_BranchFacilityLevel".Translate(branch.FacilityHandler.TotalFacilityLevel.Value.ToString()));
+        Widgets.Label(reusedRect, "OARO_OrderWin_BranchFacilityLevel".Translate(branch.FacilityHandler.TotalFacilityLevel.ToString()));
 
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(innerRectX + 4f, innerRectY + 25f, 252f - 8f, 24f);
@@ -740,45 +791,38 @@ public class Window_RatkinOrder : MainTabWindow
 
     private void RefreshRatkinInteractionCache(OrderInteractionDef interactionDef, RatkinOrder ratkinOrder, Map map, bool succeeded)
     {
-        independentInteractionAcceptances.Clear();
-        otherInteractionAcceptances.Clear();
+        specialInteractionAcceptances.Clear();
+        normalInteractionAcceptances.Clear();
         if (selectedOrder is null)
         {
             return;
         }
 
-        HashSet<OrderInteractionDef> independentInteractions =
-            [
-                OrderInteractionDefOf.OARO_EnhanceRelationship,
-                OrderInteractionDefOf.OARO_SponsorOrder,
-                OrderInteractionDefOf.OARO_InviteBranchCreation
-            ];
-
-        foreach (OrderInteractionDef def in independentInteractions)
-        {
-            try
-            {
-                AcceptanceReport acceptanceReport = def.CanUseInteraction(selectedOrder, this.map, resultOnly: false);
-                independentInteractionAcceptances.Add(def, acceptanceReport);
-            }
-            catch
-            {
-                Log.ErrorOnce($"[OARO] An exception occurred in {nameof(Window_RatkinOrder)}.{nameof(RefreshRatkinInteractionCache)}", 8645612);
-            }
-        }
-
         foreach (OrderInteractionDef def in DefDatabase<OrderInteractionDef>.AllDefsListForReading)
         {
-            if (!independentInteractions.Contains(def))
+            AcceptanceReport acceptanceReport = false;
+            try
             {
-                try
+                acceptanceReport = def.CanUseInteraction(selectedOrder, this.map, resultOnly: false);
+            }
+            catch (Exception ex)
+            {
+                acceptanceReport = false;
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"try get acceptance report of {def}",
+                    typeName: nameof(Window_RatkinOrder),
+                    methodName: nameof(RefreshRatkinInteractionCache),
+                    needStackTrace: true);
+            }
+            finally
+            {
+                if (def.specialDisplayOnUI)
                 {
-                    AcceptanceReport acceptanceReport = def.CanUseInteraction(selectedOrder, this.map, resultOnly: false);
-                    otherInteractionAcceptances.Add(new KeyValuePair<OrderInteractionDef, AcceptanceReport>(def, acceptanceReport));
+                    specialInteractionAcceptances[def] = acceptanceReport;
                 }
-                catch
+                else
                 {
-                    Log.ErrorOnce($"[OARO] An exception occurred in {nameof(Window_RatkinOrder)}.{nameof(RefreshRatkinInteractionCache)}", 8645613);
+                    normalInteractionAcceptances.Add(new KeyValuePair<OrderInteractionDef, AcceptanceReport>(def, acceptanceReport));
                 }
             }
         }
@@ -786,7 +830,7 @@ public class Window_RatkinOrder : MainTabWindow
 
     private AcceptanceReport GetIndependentAcceptanceReport(OrderInteractionDef def)
     {
-        if (independentInteractionAcceptances.TryGetValue(def, out AcceptanceReport acceptance))
+        if (specialInteractionAcceptances.TryGetValue(def, out AcceptanceReport acceptance))
         {
             return acceptance;
         }
@@ -813,8 +857,8 @@ public class Window_RatkinOrder : MainTabWindow
         normalDemandsCache = default;
         criticalDemandsCache = default;
 
-        independentInteractionAcceptances.Clear();
-        otherInteractionAcceptances.Clear();
+        specialInteractionAcceptances.Clear();
+        normalInteractionAcceptances.Clear();
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_MainBackground");
@@ -825,6 +869,9 @@ public class Window_RatkinOrder : MainTabWindow
     private static readonly Texture2D leftBigButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_LeftBigButton_Down");
     private static readonly Texture2D annualFirstSponsorButton = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_AnnualFirstSponsorButton");
     private static readonly Texture2D annualFirstSponsorButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_AnnualFirstSponsorButton_Down");
+    private static readonly Texture2D normalInteractionButton = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_NormalInteractionButton");
+    private static readonly Texture2D normalInteractionButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_NormalInteractionButton_Down");
+
     private static readonly Texture2D squadButton = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_SquadButton");
     private static readonly Texture2D squadButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_SquadButton_Down");
     private static readonly Texture2D constructButton = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_ConstructButton");

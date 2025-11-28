@@ -175,12 +175,12 @@ public class Window_Branch : OrderWindowBase
         float offsetMainInnerMidX = mainInnerRectX + 824f;
 
         reusedRect = new(mainInnerRectX + 546f, mainInnerRectY + 171f, 562f, 9f);
-        Widgets.FillableBar(reusedRect, Mathf.Clamp01(branch.FacilityHandler.TotalFacilityLevel.Value / (allFacilityDefCount * 4f)), IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: false);
+        Widgets.FillableBar(reusedRect, Mathf.Clamp01(branch.FacilityHandler.TotalFacilityLevel / (allFacilityDefCount * 4f)), IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: false);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
         reusedRect = new(mainInnerRectX + (755f - 128f), mainInnerRectY + 65f, 128f, 32f);
-        Widgets.Label(reusedRect, $"{branch.FacilityHandler.TotalFacilityLevel.Value}/{allFacilityDefCount * 4}");
+        Widgets.Label(reusedRect, $"{branch.FacilityHandler.TotalFacilityLevel}/{allFacilityDefCount * 4}");
 
         reusedRect = new(mainInnerRectX + (755f - 192f), reusedRect.yMax + 10f, 192f, 32f);
         Widgets.Label(reusedRect, "OARO_TotalFacilitiesLevel".Translate());
@@ -1279,7 +1279,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 2f, 88f, 29f);
         if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_StartConstruct".Translate(), constructButton, constructButton_Down))
         {
-            BranchBuildingConstructParameter constructParameter = new(branch, selBuildingDefCache.BuildingDef)
+            BranchBuildingConstructParms constructParameter = new(branch, selBuildingDefCache.BuildingDef)
             {
                 ByPlayer = true,
                 Caravan = caravan

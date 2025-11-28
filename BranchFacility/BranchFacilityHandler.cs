@@ -1,11 +1,11 @@
-﻿using NightOcean;
-using OberoniaAurea_Frame;
+﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -17,7 +17,19 @@ public class BranchFacilityHandler : IExposable
     private Dictionary<BranchFacilityDef, BranchFacilityLevel> facilities = [];
     public IReadOnlyDictionary<BranchFacilityDef, BranchFacilityLevel> Facilities => facilities;
 
-    [Unsaved] public readonly LazyMutable<int> TotalFacilityLevel;
+    [Unsaved] private int totalFacilityLevel = -1;
+    public int TotalFacilityLevel
+    {
+        get
+        {
+            if (totalFacilityLevel < 0)
+            {
+                totalFacilityLevel = Mathf.Max(0, facilities.Sum(kv => (int)kv.Value));
+            }
+            return totalFacilityLevel;
+        }
+        private set { totalFacilityLevel = value; }
+    }
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
@@ -30,7 +42,6 @@ public class BranchFacilityHandler : IExposable
     internal BranchFacilityHandler(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        TotalFacilityLevel = new(() => facilities.Sum(kv => (int)kv.Value));
     }
 
     public void ExposeData()
@@ -42,7 +53,7 @@ public class BranchFacilityHandler : IExposable
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"总设施等级: {TotalFacilityLevel.Value}");
+        listing_Rect.Label($"总设施等级: {TotalFacilityLevel}");
         listing_Rect.Label("所有设施等级");
         foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> facility in facilities)
         {
@@ -167,14 +178,14 @@ public class BranchFacilityHandler : IExposable
             return;
         }
         BranchFacilityDef facilityDef = underConstructionFacility.TargetDef;
-        TryActiveNewStage(facilityDef, GetFacilityLevel(facilityDef).FacilityLevelOffSetBy(1), addIfMiss: true);
+        TryAdjustFacilityStage(facilityDef, GetFacilityLevel(facilityDef).FacilityLevelOffSetBy(1), addIfMiss: true);
 
         underConstructionFacility = null;
     }
 
-    public bool TryActiveNewStage(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel, bool addIfMiss = false)
+    public bool TryAdjustFacilityStage(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel, bool addIfMiss = false)
     {
-        if (facilityDef is null || targetLevel == BranchFacilityLevel.None)
+        if (facilityDef is null)
         {
             return false;
         }
@@ -184,7 +195,7 @@ public class BranchFacilityHandler : IExposable
             return false;
         }
 
-        if (oldLevel == BranchFacilityLevel.Excellent || oldLevel >= targetLevel)
+        if (oldLevel == targetLevel)
         {
             return false;
         }
@@ -200,10 +211,17 @@ public class BranchFacilityHandler : IExposable
             }
         }
 
-        ActiveStage(facilityDef, targetLevel);
+        if (targetLevel == BranchFacilityLevel.None)
+        {
+            facilities.Remove(facilityDef);
+        }
+        else
+        {
+            ActiveStage(facilityDef, targetLevel);
+            facilities[facilityDef] = targetLevel;
+        }
 
-        facilities[facilityDef] = targetLevel;
-        TotalFacilityLevel.MarkDirty();
+        TotalFacilityLevel += (targetLevel - oldLevel);
         if (targetLevel == BranchFacilityLevel.Excellent)
         {
             IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
@@ -291,6 +309,7 @@ public class BranchFacilityHandler : IExposable
             }
         }
 
+        totalFacilityLevel = -1;
         IsFacilityFullyCompleted = facilities.Count == excellentFacilityCount;
     }
 
@@ -300,7 +319,7 @@ public class BranchFacilityHandler : IExposable
         for (int i = 0; i < allFacilities.Count; i++)
         {
             BranchFacilityLevel initLevel = Rand.Chance(0.3f) ? BranchFacilityLevel.Normal : BranchFacilityLevel.Poor;
-            TryActiveNewStage(allFacilities[i], initLevel, addIfMiss: true);
+            TryAdjustFacilityStage(allFacilities[i], initLevel, addIfMiss: true);
         }
     }
 }

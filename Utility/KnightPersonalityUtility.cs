@@ -5,7 +5,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class KnightPersonalityUtility
 {
-
     public static KnightPersonality GetRandomAvailablePersonality() => EnumArraryLibrary.KnightPersonalitiesArr[Rand.Range(1, EnumArraryLibrary.KnightPersonalitiesArr.Length)];
     public static IEnumerable<KnightPersonality> GetContainedPersonalities(KnightPersonality personality)
     {

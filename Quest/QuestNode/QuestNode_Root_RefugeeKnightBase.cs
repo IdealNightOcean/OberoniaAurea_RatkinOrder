@@ -91,7 +91,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             if (pawnGenOptions is null || pawnGenOptions.Count == 0)
             {
                 Log.Error($"[OARO] No usable {nameof(PawnGenOption)} with tag \"{PawnGenGroupTag}\" for select {nameof(PawnGroupOption)}");
-                fixedPawnKind = null;
+                fixedPawnKind = OARO_PawnKindDefOf.RatkinKnight;
             }
         }
 

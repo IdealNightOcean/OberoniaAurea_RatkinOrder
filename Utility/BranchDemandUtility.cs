@@ -62,7 +62,7 @@ public static class BranchDemandUtility
         [
             ("OARO_BranchCriticalDemandAdd_Base", () => 0.05f),
             ("OARO_ChangeOffset_HonorBranch", () => branch.IsBranchOfType(BranchType.Honor) ? 0.02f : 0f),
-            ("OARO_BranchCriticalDemandAdd_Facility", () => branch.FacilityHandler.TotalFacilityLevel.Value * 0.005f),
+            ("OARO_BranchCriticalDemandAdd_Facility", () => branch.FacilityHandler.TotalFacilityLevel * 0.005f),
             ("OARO_BranchCriticalDemandAdd_Medal", () => branch.MedalHandler.TotalMedalCount * 0.005f),
             ("OARO_BranchCriticalDemandAdd_Member", () => (1f - branch.Squad.MemberPercentage) * 0.05f),
             ("OARO_BranchCriticalDemandAdd_Fund", () => (1f - branch.RatkinOrder.Funds) * 0.1f),
@@ -98,20 +98,22 @@ public static class BranchDemandUtility
         return chance;
     }
 
-    public static (bool, BranchDemandDef) TryAddRandomDemandToBranch(Branch branch, DemandType demandType, bool ignoreCD = false, bool replaceCur = false)
+    public static bool TryAddRandomDemandToBranch(out BranchDemandDef demandDef, Branch branch, DemandType demandType, bool ignoreCD = false, bool replaceCur = false)
     {
+        demandDef = null;
+
         if (branch is null || !branch.DemandHandler.CanAddDemand(isCriticalDemand: demandType == DemandType.Critical, ignoreCD, replaceCur))
         {
-            return (false, null);
+            return false;
         }
 
-        BranchDemandDef demandDef = GetRandomBranchDemandOfType(branch, demandType);
+        demandDef = GetRandomBranchDemandOfType(branch, demandType);
         if (demandDef is null)
         {
-            return (false, null);
+            return false;
         }
         branch.DemandHandler.AddNewDemand(demandDef);
-        return (true, demandDef);
+        return true;
     }
 
     public static AcceptanceReport CanAcceptDemand(Branch branch, bool isCritical, bool resultOnly)

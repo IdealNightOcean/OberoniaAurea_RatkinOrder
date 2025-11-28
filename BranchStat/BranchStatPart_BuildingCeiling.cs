@@ -8,7 +8,7 @@ public class BranchStatPart_BuildingCeiling : BranchStatPart
 {
     public override void PostTransform(Branch branch, ref float curValue)
     {
-        curValue += branch.FacilityHandler.TotalFacilityLevel.Value / 8;
+        curValue += branch.FacilityHandler.TotalFacilityLevel / 8;
         curValue += Mathf.Min(branch.PopulationHandler.Population / 2000, 2);
         if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
@@ -18,7 +18,7 @@ public class BranchStatPart_BuildingCeiling : BranchStatPart
 
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)
     {
-        int offset = Mathf.FloorToInt(branch.FacilityHandler.TotalFacilityLevel.Value / 8f);
+        int offset = Mathf.FloorToInt(branch.FacilityHandler.TotalFacilityLevel / 8f);
         if (offset > 0)
         {
             explanation.Append("    ");

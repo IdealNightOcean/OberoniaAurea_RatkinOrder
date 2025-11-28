@@ -10,6 +10,10 @@ public class CertainDateLetterDef : SpecialLetterDefBase
 
     public int month;
     public int day;
+
+    /// <summary>
+    /// 可延迟时间（Day）
+    /// </summary>
     public int delayableDays;
 
     public DateTime EarliestDate => new DateTime(year: curYear, month: month, day: day).Date;
@@ -24,18 +28,18 @@ public class CertainDateLetterDef : SpecialLetterDefBase
         if (month <= 0 || month > 12)
         {
             month = Mathf.Clamp(month, 1, 12);
-            yield return "has an invalid month value. Month must be between 1 and 12.";
+            yield return $"has an invalid {nameof(month)} value. '{nameof(month)}' must be between 1 and 12.";
         }
 
         int maxDay = DateTime.DaysInMonth(curYear, month);
         if (day <= 0 || day > maxDay)
         {
-            yield return $"has an invalid day value. Day must be between 1 and {maxDay}.";
+            yield return $"has an invalid {nameof(day)} value. '{nameof(day)}' must be between 1 and {maxDay}.";
         }
 
         if (delayableDays < 0)
         {
-            yield return "has an invalid delayableDays value. DelayableDays must be greater than 0.";
+            yield return $"has an invalid {nameof(delayableDays)} value. '{nameof(delayableDays)}' must be greater than 0.";
             delayableDays = 0;
         }
     }

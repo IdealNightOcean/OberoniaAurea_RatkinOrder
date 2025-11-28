@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -131,27 +132,36 @@ public static class BranchSupportUtility
             return false;
         }
 
-        if (TryDeployCombatKnight(parms, sendStandardLetter))
+        if (!TryDeployCombatKnight(parms, sendStandardLetter))
         {
-            if (Rand.Chance(0.15f))
-            {
-                (bool added, BranchDemandDef demandDef) = BranchDemandUtility.TryAddRandomDemandToBranch(branch, BranchDemand.DemandType.Supplementary);
-                if (added)
-                {
-                    OrderLetter orderLetter = OrderLetterUtility.MakeOrderLetter(
-                        label: "OARO_BranchDemand_SupportTriggerLabel".Translate(),
-                        text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.label.Named("DEMAND")),
-                        def: OrderLetterDefOf.OARO_OfficialLetter,
-                        relatedOrder: branch.RatkinOrder,
-                        sender: branch.Name,
-                        relatedLetterType: OrderLetter.RelatedLetterType.Neutral);
-
-                    OrderLetterBox.Instance.ReceiveLetter(orderLetter);
-                }
-            }
-            return true;
+            return false;
         }
-        return false;
+
+        try
+        {
+            if (Rand.Chance(0.15f) && BranchDemandUtility.TryAddRandomDemandToBranch(out BranchDemandDef demandDef, branch, BranchDemand.DemandType.Supplementary))
+            {
+                OrderLetter orderLetter = OrderLetterUtility.MakeOrderLetter(
+                    label: "OARO_BranchDemand_SupportTriggerLabel".Translate(),
+                    text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.label.Named("DEMAND")),
+                    def: OrderLetterDefOf.OARO_OfficialLetter,
+                    relatedOrder: branch.RatkinOrder,
+                    sender: branch.Name,
+                    relatedLetterType: OrderLetter.RelatedLetterType.Neutral);
+
+                OrderLetterBox.Instance.ReceiveLetter(orderLetter);
+            }
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "triger supplementary branch demand",
+                typeName: nameof(BranchSupportUtility),
+                methodName: nameof(DoCombatKnightSupport),
+                needStackTrace: true);
+        }
+
+        return true;
     }
 
     /// <summary>

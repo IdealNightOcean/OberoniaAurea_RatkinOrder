@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructChecker
 {
     public override bool DoubleComfirm => true;
-    public override AcceptanceReport CanConstruct(BranchBuildingConstructParameter constructParam, bool resultOnly = false)
+    public override AcceptanceReport CanConstruct(BranchBuildingConstructParms constructParam, bool resultOnly = false)
     {
         BranchBuildingCompProperties_Memorial memorialComp = constructParam.BuildingDef.GetCompProperties<BranchBuildingCompProperties_Memorial>();
         if (memorialComp is null)
@@ -19,7 +19,7 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
         return true;
     }
 
-    public override void DoubleComfirmAction(BranchBuildingConstructParameter constructParam)
+    public override void DoubleComfirmAction(BranchBuildingConstructParms constructParam)
     {
         constructParam.ByPlayer = true;
         OberoniaAurea_Frame.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_ConstructionConfirm_Memorial".Translate(),

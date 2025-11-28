@@ -2,7 +2,7 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public struct BranchBuildingConstructParameter
+public struct BranchBuildingConstructParms
 {
     public Branch Branch;
     public BranchBuildingDef BuildingDef;
@@ -13,9 +13,9 @@ public struct BranchBuildingConstructParameter
     public readonly bool NeedDoubleConfirm => ByPlayer && BuildingDef.ConstructChecker.DoubleComfirm;
     public readonly void DoubleComfirm() => BuildingDef.ConstructChecker.DoubleComfirmAction(this);
 
-    public BranchBuildingConstructParameter() { }
+    public BranchBuildingConstructParms() { }
 
-    public BranchBuildingConstructParameter(Branch branch, BranchBuildingDef buildingDef)
+    public BranchBuildingConstructParms(Branch branch, BranchBuildingDef buildingDef)
     {
         Branch = branch;
         BuildingDef = buildingDef;

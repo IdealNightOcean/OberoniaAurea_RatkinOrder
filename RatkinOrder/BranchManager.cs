@@ -226,7 +226,7 @@ public class BranchManager : IExposable, ITickDay
                 bool successConstruct = false;
                 if (reserve.Target is BranchBuildingDef reserveBuilding)
                 {
-                    BranchBuildingConstructParameter constructParam = new(branch, reserveBuilding);
+                    BranchBuildingConstructParms constructParam = new(branch, reserveBuilding);
                     if (branch.BuildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
                     {
                         branch.BuildingHandler.StartBuildingConstruction(constructParam);

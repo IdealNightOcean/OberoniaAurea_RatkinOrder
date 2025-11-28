@@ -30,7 +30,8 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
     public bool IsValid => !knight.DestroyedOrNull() && !knight.Dead && knightRecord is not null;
     public bool ShouldRemove => knight is null || knightRecord is null;
 
-    public Branch Branch => KnightRecord.Branch;
+    public RatkinOrder RatkinOrder => knightRecord.RatkinOrder;
+    public Branch Branch => knightRecord.Branch;
 
     public Rank CurRank;
     public float MeditationPoints;

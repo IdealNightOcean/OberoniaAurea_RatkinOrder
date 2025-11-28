@@ -108,7 +108,7 @@ internal sealed class QuestPart_TownConstructionWatcher : QuestPart
                         BranchFacilityHandler facilityHandler = branch.FacilityHandler;
                         foreach (BranchFacilityDef facilityDef in DefDatabase<BranchFacilityDef>.AllDefs)
                         {
-                            facilityHandler.TryActiveNewStage(facilityDef, BranchFacilityLevel.Normal, addIfMiss: true);
+                            facilityHandler.TryAdjustFacilityStage(facilityDef, BranchFacilityLevel.Normal, addIfMiss: true);
                         }
                     }
                 }

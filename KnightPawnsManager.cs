@@ -10,6 +10,7 @@ public class KnightPawnsManager : IExposable
     public static KnightPawnsManager Instance { get; private set; }
 
     private Dictionary<Pawn, KnightRecord> knights = new(32);
+    public IReadOnlyDictionary<Pawn, KnightRecord> AllKnights => knights;
 
     private List<Pawn> knightKeys;
     private List<KnightRecord> knightValues;
