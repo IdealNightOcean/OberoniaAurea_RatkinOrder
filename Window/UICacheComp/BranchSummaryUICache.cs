@@ -15,12 +15,11 @@ public class BranchSummaryUICache
     public readonly float Distance = -1f;
     public readonly float AffectedRange = -1f;
     public bool IsInAffectedRange => AffectedRange >= Distance;
-    public readonly int CurAllCrewCount = -1;
+    public int AllCrewCount => Branch?.Squad.AllCrewCountInt ?? 0;
+
     public readonly int CrewCeiling = -1;
-    public readonly float Potency;
 
     public BranchSummaryUICache() { }
-
     public BranchSummaryUICache(Branch branch, Map map)
     {
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
@@ -38,7 +37,6 @@ public class BranchSummaryUICache
         }
 
         Distance = branch.DistanceTo(map.Tile);
-        CurAllCrewCount = branch.Squad.AllCrewCountInt;
         AffectedRange = branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
         CrewCeiling = (int)(branch.Squad.MemberCeiling + branch.Squad.CommanderCeiling);
     }

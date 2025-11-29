@@ -122,7 +122,7 @@ public static class OARO_WindowUtility
     /// 绘制分部简述
     /// inRect: (width: 392f, height: 90f)
     /// </summary>
-    /// <param name="inRect">width: 392f, height: 90f</param>
+    /// <param name="position">width: 392f, height: 90f</param>
     public static Rect DrawBranchSummary(Vector2 position, BranchSummaryUICache entry)
     {
         GameFont preFont = Text.Font;
@@ -230,7 +230,7 @@ public static class OARO_WindowUtility
         Rect rightRect = Rect.MinMaxRect(leftRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
         float textX = rightRect.xMin + 24f;
         reusedRect = new(textX, rightRect.y, rightRect.width, 29f);
-        Widgets.Label(reusedRect, "OARO_AllCrewCountShortInfo".Translate(entry.CurAllCrewCount));
+        Widgets.Label(reusedRect, "OARO_AllCrewCountShortInfo".Translate(entry.Branch.Squad.AllCrewCountInt));
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
         Widgets.Label(reusedRect, "OARO_BranchPotencyShortInfo".Translate() + ": ");
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);

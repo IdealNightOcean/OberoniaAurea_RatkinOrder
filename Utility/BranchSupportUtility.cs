@@ -143,10 +143,10 @@ public static class BranchSupportUtility
             {
                 OrderLetter orderLetter = OrderLetterUtility.MakeOrderLetter(
                     label: "OARO_BranchDemand_SupportTriggerLabel".Translate(),
-                    text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.label.Named("DEMAND")),
+                    text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), demandDef.label.Named("DEMAND")),
                     def: OrderLetterDefOf.OARO_OfficialLetter,
                     relatedOrder: branch.RatkinOrder,
-                    sender: branch.Name,
+                    sender: branch.NameColored,
                     relatedLetterType: OrderLetter.RelatedLetterType.Neutral);
 
                 OrderLetterBox.Instance.ReceiveLetter(orderLetter);

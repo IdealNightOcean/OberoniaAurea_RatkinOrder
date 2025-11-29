@@ -800,6 +800,11 @@ public class Window_RatkinOrder : MainTabWindow
 
         foreach (OrderInteractionDef def in DefDatabase<OrderInteractionDef>.AllDefsListForReading)
         {
+            if (!def.displayOnUI)
+            {
+                continue;
+            }
+
             AcceptanceReport acceptanceReport = false;
             try
             {

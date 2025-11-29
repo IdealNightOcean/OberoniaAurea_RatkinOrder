@@ -591,7 +591,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
 
     private void Assault(Caravan caravan, bool playerInitiated, bool branchJoin)
     {
-        MapParent_NobilityTerritory nobilityTerritory = (MapParent_NobilityTerritory)WorldObjectMaker.MakeWorldObject(OARO_ModDefOf.OARO_Map_NobilityTerritory);
+        MapParent_NobilityTerritory nobilityTerritory = (MapParent_NobilityTerritory)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_Map_NobilityTerritory);
         nobilityTerritory.SetFaction(Faction);
         nobilityTerritory.Tile = Tile;
         nobilityTerritory.InitRaidInfo(this, playerInitiated, branchJoin);

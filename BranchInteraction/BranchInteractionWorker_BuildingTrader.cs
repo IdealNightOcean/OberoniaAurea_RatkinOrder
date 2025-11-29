@@ -17,7 +17,7 @@ public class BranchInteractionWorker_BuildingTrader(BranchInteractionDef def) : 
     }
 
     /// <returns>
-    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="ApplyInteraction"/> 执行回调方法 <see cref="PostApplyInteraction"/></para>
+    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="BranchInteractionWorker.ApplyInteraction"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyInteraction"/></para>
     /// </returns>
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {

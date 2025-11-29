@@ -97,10 +97,11 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
     public void TickDay()
     {
-        DailyPopulationChange();
+        bool onMartialLaw = branch.EffectTags.HasTag(KeyLibrary_EffectTag.MartialLaw);
+        DailyPopulationChange(onMartialLaw);
+        DailyPublicSecurityCheck(onMartialLaw);
         DailyContractCheck();
-        DailyPublicSecurityCheck();
-
+       
         if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.ContractAddCheck))
         {
             ContractAddCheck();
@@ -111,13 +112,15 @@ public class BranchPopulationHandler : IExposable, ITickDay
     /// <summary>
     /// 每日人口变化
     /// </summary>
-    private void DailyPopulationChange()
+    private void DailyPopulationChange(bool onMartialLaw)
     {
-        float dailyGrowth = branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth);
+        if (!onMartialLaw)
+        {
+            float dailyGrowth = branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth);
+            dailyGrowth *= Rand.Range(0.75f, 1.25f);
+            population += Mathf.RoundToInt(dailyGrowth);
+        }
 
-        dailyGrowth *= Rand.Range(0.75f, 1.25f);
-
-        population += Mathf.RoundToInt(dailyGrowth);
         yesterdayPopChange = population - yesterdayPopulation;
         yesterdayPopulation = population;
     }
@@ -136,7 +139,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
         hasContractBuff = false;
     }
 
-    private void DailyPublicSecurityCheck()
+    private void DailyPublicSecurityCheck(bool onMartialLaw)
     {
         if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.PublicSecurityCheck))
         {
@@ -145,6 +148,10 @@ public class BranchPopulationHandler : IExposable, ITickDay
             {
                 PublicSecurity -= (publicSecurity * 0.05f) * Rand.Range(0.5f, 1.5f);
             }
+        }
+        if (onMartialLaw)
+        {
+            PublicSecurity += 0.02f;
         }
 
         yesterdayPublicSecChange = publicSecurity - yesterdayPopulation;

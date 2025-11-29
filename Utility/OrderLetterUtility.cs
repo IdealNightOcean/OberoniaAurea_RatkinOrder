@@ -16,7 +16,14 @@ public static class OrderLetterUtility
         Find.WindowStack.Add(new Window_OrderLetterBox());
     }
 
-    public static OrderLetter MakeOrderLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null, RelatedLetterType relatedLetterType = RelatedLetterType.Neutral)
+    public static OrderLetter MakeOrderLetter(
+        TaggedString label,
+        TaggedString text,
+        OrderLetterDef def,
+        RatkinOrder relatedOrder,
+        Branch relatedBranch = null,
+        string sender = null,
+        RelatedLetterType relatedLetterType = RelatedLetterType.Neutral)
     {
         OrderLetter orderLetter = (OrderLetter)Activator.CreateInstance(def.letterClass);
 
@@ -25,19 +32,29 @@ public static class OrderLetterUtility
         orderLetter.Text = text;
         orderLetter.Sender = sender ?? "OARO_Letter_UnkownSender".Translate();
         orderLetter.RelatedOrder = relatedOrder;
+        orderLetter.RelatedBranch = relatedBranch;
         orderLetter.RelatedFaction = relatedOrder.Faction;
         orderLetter.RelatedLetterTypeValue = relatedLetterType;
 
         return orderLetter;
     }
 
-    public static void ReceiveLetter(TaggedString label, TaggedString text, OrderLetterDef def, RatkinOrder relatedOrder, string sender = null, int delayDays = -1, RelatedLetterType relatedLetterType = RelatedLetterType.Neutral)
+    public static void ReceiveLetter(
+        TaggedString label,
+        TaggedString text,
+        OrderLetterDef def,
+        RatkinOrder relatedOrder,
+        Branch relatedBranch = null,
+        string sender = null,
+        int delayDays = -1,
+        RelatedLetterType relatedLetterType = RelatedLetterType.Neutral)
     {
         OrderLetter orderLetter = MakeOrderLetter(
             label: label,
             text: text,
             def: def,
             relatedOrder: relatedOrder,
+            relatedBranch: relatedBranch,
             sender: sender,
             relatedLetterType: relatedLetterType);
 

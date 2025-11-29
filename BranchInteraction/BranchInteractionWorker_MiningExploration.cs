@@ -61,10 +61,11 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
         Branch branch = parms.Branch;
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
             label: "OARO_MiningExploration_Label".Translate(),
-            text: "OARO_MiningExploration_Text".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
+            text: "OARO_MiningExploration_Text".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
             def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,
-            sender: branch.Name,
+            relatedBranch: branch,
+            sender: branch.NameColored,
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
 
         orderLetter.Attachments = [thing];

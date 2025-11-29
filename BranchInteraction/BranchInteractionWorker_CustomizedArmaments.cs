@@ -103,10 +103,11 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
 
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
             label: "OARO_CustomizedArmaments_CompletedLabel".Translate(),
-            text: "OARO_CustomizedArmaments_CompletedText".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
+            text: "OARO_CustomizedArmaments_CompletedText".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
             def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,
-            sender: branch.Name,
+            relatedBranch: branch,
+            sender: branch.NameColored,
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
 
         orderLetter.Attachments = [thing];
@@ -120,7 +121,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
     }
 
     /// <returns>
-    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="ApplyInteraction"/> 执行回调方法 <see cref="PostApplyInteraction"/></para>
+    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="BranchInteractionWorker.ApplyInteraction"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyInteraction"/></para>
     /// </returns>
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {

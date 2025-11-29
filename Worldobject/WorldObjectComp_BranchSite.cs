@@ -7,6 +7,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class WorldObjectCompProperties_BranchSite : WorldObjectCompProperties
 {
+    /// <summary>是否为独立站点</summary>
+    /// <remarks>- 若为<see langword="true"/> 当对应 <see cref="Branch"/> 被移除后，对应 <see cref="WorldObjectComp.parent"/> 也将同时被移除</remarks>
     public bool independent;
     public WorldObjectCompProperties_BranchSite()
     {
@@ -18,6 +20,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
 {
     private Branch branch;
     public Branch Branch => branch;
+    public RatkinOrder RatkinOrder => branch?.RatkinOrder;
 
     public WorldObjectCompProperties_BranchSite Props => (WorldObjectCompProperties_BranchSite)props;
 
@@ -31,7 +34,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
         {
             if (branch is null && Props.independent)
             {
-                parent.Destroy();
+                parent.SafeDestroy();
             }
         }
     }
@@ -106,7 +109,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
             this.branch = null;
             if (Props.independent)
             {
-                parent.Destroy();
+                parent.SafeDestroy();
             }
         }
     }
@@ -118,7 +121,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
             branch = null;
             if (Props.independent)
             {
-                parent.Destroy();
+                parent.SafeDestroy();
             }
         }
     }

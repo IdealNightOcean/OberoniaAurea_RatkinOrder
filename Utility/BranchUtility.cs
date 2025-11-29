@@ -12,6 +12,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchUtility
 {
+    /// <summary>
+    /// 地块是否在分部影响范围内
+    /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsInAffectedRange(this Branch branch, PlanetTile tile)
     {
@@ -33,7 +36,7 @@ public static class BranchUtility
     }
 
     /// <summary>
-    /// 该分部是否正在边境轮巡
+    /// 分部是否正在边境轮巡
     /// </summary>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsOnJointPatrol(this Branch branch)
@@ -42,7 +45,7 @@ public static class BranchUtility
     }
 
     /// <summary>
-    /// 该分部能否参与边境轮巡
+    /// 分部能否参与边境轮巡
     /// </summary>
     public static bool CanParticipateInJointPatrol(this Branch branch)
     {
@@ -172,9 +175,9 @@ public static class BranchUtility
         WorldObject curWO = allWorldObjects.Where(w => w.Tile == tile).FirstOrFallback(fallback: null);
         if (curWO is null)
         {
-            if (allWorldObjects.Any(w => w.Tile.Layer == tile.Layer && Find.WorldGrid.ApproxDistanceInTiles(w.Tile, tile) <= 4f))
+            if (allWorldObjects.Any(w => w.Tile.Layer == tile.Layer && Find.WorldGrid.ApproxDistanceInTiles(w.Tile, tile) <= 3f))
             {
-                return resultOnly ? false : "OARO_TooCloseToOtherWorldObjects".Translate(4.ToString());
+                return resultOnly ? false : "OARO_TooCloseToOtherWorldObjects".Translate(3.ToString());
             }
             return true;
         }
@@ -182,18 +185,22 @@ public static class BranchUtility
         return curWO.CanBeSiteForNewBranch(ratkinOrder);
     }
 
-    public static Branch GenerateBranchOnTile(RatkinOrder ratkinOrder, Map map, PlanetTile tile, WorldObject worldObject = null)
+    public static bool GenerateBranchOnTile(RatkinOrder ratkinOrder, PlanetTile tile, WorldObject worldObject = null)
     {
         if (worldObject is null)
         {
-
+            WorldObject_BranchUnderConstruction siteUnderConstruction = (WorldObject_BranchUnderConstruction)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_BranchUnderConstruction);
+            siteUnderConstruction.Tile = tile;
+            siteUnderConstruction.StartConstruction(ratkinOrder, 15 * 60000);
+            Find.WorldObjects.Add(siteUnderConstruction);
+            return true;
         }
-        else if (!worldObject.CanBeSiteForNewBranch(ratkinOrder))
+        else if (worldObject.CanBeSiteForNewBranch(ratkinOrder))
         {
-            return null;
+            return Branch.GenerateBranchFor(ratkinOrder, worldObject, addToManager: true) is not null;
         }
 
-        return Branch.GenerateBranchFor(ratkinOrder, worldObject, addToManager: true);
+        return false;
     }
 
     public static string GenerateBranchNameCore(RatkinOrder ratkinOrder)
@@ -230,7 +237,7 @@ public static class BranchUtility
     }
 
     /// <summary>
-    /// 重新获取该分部某个BranchStatDef的对应BranchStatTransformer
+    /// 重新获取该分部某个 <see cref="BranchStatDef"/> 的对应 <see cref="BranchStatTransformer"/>
     /// </summary>
     public static void RecacheBranchStat(this Branch branch, BranchStatDef statDef)
     {
@@ -257,6 +264,10 @@ public static class BranchUtility
         }
     }
 
+    /// <summary>
+    /// 通知 <see cref="QuestManager"/> 某个分部已被销毁
+    /// </summary>
+    /// <param name="branch">被销毁的分部</param>
     public static void OnBranchDestroyed(this QuestManager questManager, Branch branch)
     {
         ConcurrentBag<IOnBranchDestroyed> ratkinOrderRelateds = [];

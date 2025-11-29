@@ -15,11 +15,11 @@ public class OrderInteractionDef : InteractionDefBase
     /// </summary>
     public bool displayOnUI;
 
-    /// <summary>是否在骑士团主界面UI上特殊显式</summary>
+    /// <summary>是否在骑士团主界面UI上特殊显示</summary>
     /// <remarks>
     /// <para>- 只在 <see cref="displayOnUI"/> 为 <see langword="true"/> 时生效</para>
-    /// <para>- 若为 <see langword="true"/> 则在骑士团主界面相关部分手动指定显示</para>
-    /// <para>- 若为 <see langword="false"/> 则在骑士团主界面相关部分集中显示</para>
+    /// <para>- 若为 <see langword="true"/> 则需在骑士团主界面手动实现显示</para>
+    /// <para>- 若为 <see langword="false"/> 则自动在骑士团主界面相关部分集中显示</para>
     /// </remarks>
     public bool specialDisplayOnUI;
 

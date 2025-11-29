@@ -533,7 +533,7 @@ public class Window_BranchDemand : OrderWindowBase
 
             reusedRect.yMin = reusedRect.yMax;
             reusedRect.yMax += 28f;
-            Widgets.Label(reusedRect, $"{SummaryUICache.CurAllCrewCount}/{SummaryUICache.CrewCeiling}");
+            Widgets.Label(reusedRect, $"{SummaryUICache.AllCrewCount}/{SummaryUICache.CrewCeiling}");
 
             reusedRect = new(reusedRect.xMax + 2f, innerRect.y, 128f, 32f);
             Text.Font = GameFont.Medium;
@@ -569,7 +569,7 @@ public class Window_BranchDemand : OrderWindowBase
 
             reusedRectII.yMin = reusedRectII.yMax;
             reusedRectII.yMax = reusedRect.yMax;
-            Widgets.Label(reusedRectII, SummaryUICache.Potency.ToString());
+            Widgets.Label(reusedRectII, Branch.Potency.ToString());
 
             Rect normamDemandRect = new(innerRect.xMax - 352f, innerRect.y, 352f, 86f);
             DrawNormalDemand(normamDemandRect, Branch.DemandHandler.NormalDemand);

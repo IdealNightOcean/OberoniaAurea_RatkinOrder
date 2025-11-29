@@ -11,6 +11,8 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     private int loadID = -1;
     public int LoadID => loadID;
 
+    public bool HasRemoved { get; private set; }
+
     [Unsaved] public readonly int TickHashOffset;
     private int curYearPassed = -1;
 
@@ -120,6 +122,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
 
     public void OnRemoved()
     {
+        HasRemoved = true;
         branchManager.Notify_MyOrderRemoved();
         jointPatrolManager.Notify_MyOrderRemoved();
     }

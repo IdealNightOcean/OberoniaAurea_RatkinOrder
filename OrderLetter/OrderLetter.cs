@@ -19,6 +19,7 @@ public class OrderLetter : IExposable
 
     public Faction RelatedFaction;
     public RatkinOrder RelatedOrder;
+    public Branch RelatedBranch;
     public int ArrivalTick = -1;
     public RelatedLetterType RelatedLetterTypeValue;
 
@@ -110,6 +111,7 @@ public class OrderLetter : IExposable
         Scribe_Defs.Look(ref Def, "Def");
 
         Scribe_References.Look(ref RelatedFaction, "RelatedFaction");
+        Scribe_References.Look(ref RelatedBranch, "RelatedBranch");
         Scribe_References.Look(ref RelatedOrder, "RelatedOrder");
 
         Scribe_Values.Look(ref hasReaded, "hasReaded", defaultValue: false);

@@ -38,34 +38,34 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
             closeWorldTabWhenFinished: true,
             onUpdate: null,
             extraLabelGetter: null,
-            canSelectTarget: CanSelectTarget,
+            canSelectTarget: (t) => t.Tile.LayerDef == PlanetLayerDefOf.Surface,
             originForClosest: map.Tile,
             showCancelButton: true);
 
 
         bool SelectAction(GlobalTargetInfo t)
         {
+            AcceptanceReport acceptanceReport = BranchUtility.IsValidTileForInviteBranchCreation(ratkinOrder, map, t.Tile, resultOnly: false);
+            if (!acceptanceReport)
+            {
+                Messages.Message("OARO_CannotSelTileAsBranchSite".Translate(acceptanceReport.Reason), MessageTypeDefOf.RejectInput, historical: false);
+                return false;
+            }
+
             Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                 text: "OARO_InviteBranchCreationConfirm".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
                 ratkinOrder: ratkinOrder,
                 acceptAction: delegate
                 {
-                    if (!BranchUtility.IsValidTileForInviteBranchCreation(ratkinOrder, map, t.Tile, resultOnly: true))
+                    if (BranchUtility.GenerateBranchOnTile(ratkinOrder, t.Tile))
                     {
-                        return;
+                        base.ApplyInteraction(ratkinOrder, map);
                     }
-                    if (BranchUtility.GenerateBranchOnTile(ratkinOrder, map, t.Tile) is null)
-                    {
-                        return;
-                    }
-                    base.ApplyInteraction(ratkinOrder, map);
                 });
 
             Find.WindowStack.Add(nodeTree);
             return true;
         }
-
-        bool CanSelectTarget(GlobalTargetInfo t) => BranchUtility.IsValidTileForInviteBranchCreation(ratkinOrder, map, t.Tile, resultOnly: true);
     }
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)

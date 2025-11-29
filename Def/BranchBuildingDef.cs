@@ -16,9 +16,8 @@ public class BranchBuildingDef : BranchConstructionDef
     public Type buildingClass = defaultType;
     public Type constructCheckerClass = defaultConstructCheckerClass;
 
-    /// <summary>
-    /// 建筑检测类，负责检测<see cref="Branch"/>是否可以建设该建筑
-    /// </summary>
+    /// <summary>建筑检测类，负责检测<see cref="Branch"/>是否可以建设该建筑</summary>
+    /// <remarks>- 建设的二次确认</remarks>
     private BranchBuildingConstructChecker constructChecker;
     public BranchBuildingConstructChecker ConstructChecker => constructChecker ??= (constructCheckerClass == defaultConstructCheckerClass) ? defaultConstructChecker : (BranchBuildingConstructChecker)Activator.CreateInstance(constructCheckerClass);
 

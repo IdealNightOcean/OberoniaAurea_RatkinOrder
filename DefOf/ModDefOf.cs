@@ -32,9 +32,6 @@ public static class OARO_ModDefOf
 
     public static TraderKindDef OARO_TownConstruction_Trader; //建筑商商店
 
-    public static WorldObjectDef OARO_WO_ApprenticeHome;
-    public static WorldObjectDef OARO_Map_NobilityTerritory; //叛乱镇压 - 贵族领地 攻击时的地图
-
     public static ResidentKnightRoleDef OARO_Clerk; //驻地文书
     public static ResidentKnightRoleDef OARO_Orderly; //地区看护
 

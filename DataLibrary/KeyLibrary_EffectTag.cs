@@ -14,4 +14,6 @@ public static class KeyLibrary_EffectTag
     public const string BlockSupport = "BlockSupport";  //禁用一般支援
     public const string BlockBombard = "BlockBombard"; //禁用炮击支援
 
+    public const string MartialLaw = "MartialLaw"; //分部戒严
+
 }

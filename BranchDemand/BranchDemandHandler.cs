@@ -176,10 +176,11 @@ public class BranchDemandHandler : ITickDay, IExposable
                 branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.DemandFriendlyInform, cdTicks: 12 * 60000, removeWhenExpired: true);
 
                 OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
-                                                   text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.Named("DEMAND")),
+                                                   text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), demandDef.Named("DEMAND")),
                                                    def: OrderLetterDefOf.OARO_OfficialLetter,
                                                    relatedOrder: branch.RatkinOrder,
-                                                   sender: branch.Name,
+                                                   relatedBranch: branch,
+                                                   sender: branch.NameColored,
                                                    relatedLetterType: OrderLetter.RelatedLetterType.Positive);
             }
         }

@@ -8,6 +8,12 @@ public class BranchStatPart_DailyPopulationGrowth : BranchStatPart
 {
     public override void PostTransform(Branch branch, ref float curValue)
     {
+        if(branch.EffectTags.HasTag(KeyLibrary_EffectTag.MartialLaw))
+        {
+            curValue = 0f;
+            return;
+        }
+
         if (branch.RatkinOrder.Funds < 0.5f)
         {
             curValue *= Mathf.Max(0.01f, 1f - (0.5f - branch.RatkinOrder.Funds) * 2f);
@@ -26,6 +32,13 @@ public class BranchStatPart_DailyPopulationGrowth : BranchStatPart
 
     public override void ModifyExplanation(Branch branch, StringBuilder explanation)
     {
+        if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.MartialLaw))
+        {
+            explanation.Append("    ");
+            explanation.AppendLine("OARO_ChangeFactor_MartialLaw".Translate(0f.ToString("0.##")).Colorize(ColorLibrary.RedReadable));
+            return;
+        }
+
         float change;
         if (branch.RatkinOrder.Funds < 0.5f)
         {

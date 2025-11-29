@@ -30,6 +30,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -113,6 +115,7 @@
     <Compile Include="DefModExtension\CustomizableArmament_Extension.cs" />
     <Compile Include="DefOf\BranchResidentDefOf.cs" />
     <Compile Include="DefOf\BranchMedalDefOf.cs" />
+    <Compile Include="DefOf\WorldObjectDefOf.cs" />
     <Compile Include="DefOf\OrderInteractionDefOf.cs" />
     <Compile Include="DefOf\OrderLetterDefOf.cs" />
     <Compile Include="DefOf\PawnGroupKindDefOf.cs" />
@@ -369,6 +372,7 @@
     <Compile Include="Worldobject\Demand\GenStep_NobilityTerritoryPawns.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_NobilityTerritory.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_RefugeeInfluxCamp.cs" />
+    <Compile Include="Worldobject\WorldObject_BranchUnderConstruction.cs" />
     <Compile Include="Worldobject\WorldObjectComp_BranchSite.cs" />
     <Compile Include="Window\DevWindow\DevWindow_GlobalOrderInteractHandler.cs" />
     <Compile Include="Window\DevWindow\DevWindow_Branch.cs" />
@@ -458,6 +462,7 @@
     <Compile Include="Work\WorkGiver_RecieveOrderLetter.cs" />
     <Compile Include="Work\WorkGiver_TakeProductOutOfFermentingBarrel.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_PlagueVillage.cs" />
+    <Compile Include="Worldobject\WorldObject_BranchSite.cs" />
     <Compile Include="Worldobject\WorldObject_CriticalBranchDemand.cs" />
     <Compile Include="Worldobject\WorldObject_OrderRelationshipUpgrade.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_SupplyDepotConstruction.cs" />

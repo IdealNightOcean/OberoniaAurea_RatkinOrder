@@ -35,6 +35,18 @@ public class Branch : IExposable, ILoadReferenceable
 
     public string NameCore => nameCore;
     public string Name => name;
+    public Color Color
+    {
+        get
+        {
+            if (IsBranchOfType(BranchType.Friendly))
+            {
+                return Color.green;
+            }
+            return HonorDef?.color ?? RatkinOrder.Color;
+        }
+    }
+    public string NameColored => name.Colorize(Color);
 
     private WorldObject baseSite;
     public WorldObject BaseSite => baseSite;
