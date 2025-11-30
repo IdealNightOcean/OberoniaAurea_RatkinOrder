@@ -9,7 +9,7 @@ public abstract class WorldObject_InteractWithFixedCaravan_Nameable : WorldObjec
 {
     public override bool HasName => name is not null;
 
-    private string name;
+    protected string name;
     public string Name
     {
         get => name ?? def.label;
@@ -32,12 +32,12 @@ public abstract class WorldObject_InteractWithFixedCaravan_Nameable : WorldObjec
     {
         if (args is null)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "WorkResolved", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "WorkResolved", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else
         {
             NamedArgument[] extendedArgs = new NamedArgument[args.Length + 1];
-            extendedArgs[0] = this.Named("SUBJECT");
+            extendedArgs[0] = this.Named(KeyLibrary_FormatArgName.SUBJECT);
             Array.Copy(args, 0, extendedArgs, 1, args.Length);
             QuestUtility.SendQuestTargetSignals(questTags, "WorkResolved", extendedArgs);
         }

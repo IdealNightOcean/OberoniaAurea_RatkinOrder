@@ -8,7 +8,7 @@ public class BranchStatPart_DailyPopulationGrowth : BranchStatPart
 {
     public override void PostTransform(Branch branch, ref float curValue)
     {
-        if(branch.EffectTags.HasTag(KeyLibrary_EffectTag.MartialLaw))
+        if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.MartialLaw))
         {
             curValue = 0f;
             return;

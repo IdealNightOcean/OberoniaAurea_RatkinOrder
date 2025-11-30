@@ -54,7 +54,7 @@ internal class ChoiceLetter_Apprentice_QuizStayIntention : ChoiceLetter
     {
         action = delegate
         {
-            Find.SignalManager.SendSignal(new Signal(outSignalStay, apprentice.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(outSignalStay, apprentice.Named(KeyLibrary_FormatArgName.SUBJECT)));
             Find.LetterStack.RemoveLetter(this);
         },
         resolveTree = true
@@ -64,7 +64,7 @@ internal class ChoiceLetter_Apprentice_QuizStayIntention : ChoiceLetter
     {
         action = delegate
         {
-            Find.SignalManager.SendSignal(new Signal(outSignalLeave, apprentice.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(outSignalLeave, apprentice.Named(KeyLibrary_FormatArgName.SUBJECT)));
             Find.LetterStack.RemoveLetter(this);
         },
         resolveTree = true

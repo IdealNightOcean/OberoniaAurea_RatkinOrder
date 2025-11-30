@@ -84,7 +84,7 @@ public class CompDisappears : ThingComp
         base.PostDestroy(mode, previousMap);
         if (!string.IsNullOrEmpty(Props.messageOnDisappear))
         {
-            Messages.Message(Props.messageOnDisappear.Formatted(parent.Named("THING")), Props.disappearMessageType ?? MessageTypeDefOf.NeutralEvent);
+            Messages.Message(Props.messageOnDisappear.Formatted(parent.Named(KeyLibrary_FormatArgName.THING)), Props.disappearMessageType ?? MessageTypeDefOf.NeutralEvent);
         }
     }
 

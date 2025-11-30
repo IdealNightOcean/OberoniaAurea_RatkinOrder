@@ -28,7 +28,7 @@ public class ResidentKnightRoleWorker(ResidentKnightRoleDef def)
             rolePawn.health.AddHediff(Def.roleHediff);
         }
 
-        QuestUtility.SendQuestTargetSignals(rolePawn.questTags, "AssignedRole", rolePawn.Named("SUBJECT"), Def.Named("ROLE"));
+        QuestUtility.SendQuestTargetSignals(rolePawn.questTags, "AssignedRole", rolePawn.Named(KeyLibrary_FormatArgName.SUBJECT), Def.Named("ROLE"));
     }
 
     public virtual void PostDeactiveRole(Pawn rolePawn)
@@ -42,6 +42,6 @@ public class ResidentKnightRoleWorker(ResidentKnightRoleDef def)
             rolePawn.RemoveFirstHediffOfDef(Def.roleHediff);
         }
 
-        QuestUtility.SendQuestTargetSignals(rolePawn.questTags, "UnassignedRole", rolePawn.Named("SUBJECT"), Def.Named("ROLE"));
+        QuestUtility.SendQuestTargetSignals(rolePawn.questTags, "UnassignedRole", rolePawn.Named(KeyLibrary_FormatArgName.SUBJECT), Def.Named("ROLE"));
     }
 }

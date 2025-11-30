@@ -12,6 +12,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchUtility
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsValid(this Branch branch) => branch is not null && branch.RatkinOrder is not null && !branch.RatkinOrder.HasRemoved;
+
     /// <summary>
     /// 地块是否在分部影响范围内
     /// </summary>

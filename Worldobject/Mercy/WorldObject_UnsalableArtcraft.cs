@@ -145,15 +145,15 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         float percentage = purchasedCount / totalCount;
         if (percentage >= 0.99f)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else if (percentage >= 0.5f)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else if (percentage > 0f)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "BarelyRequestFulfilled", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "BarelyRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         base.Destroy();
     }

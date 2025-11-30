@@ -68,7 +68,7 @@ public class QuestPart_AnyPawnHasSpecialHediff : QuestPart
                 {
                     if (p.health.hediffSet.HasHediff(hediffDef))
                     {
-                        Find.SignalManager.SendSignal(new Signal(outSignalHas, p.Named("SUBJECT")));
+                        Find.SignalManager.SendSignal(new Signal(outSignalHas, p.Named(KeyLibrary_FormatArgName.SUBJECT)));
                         return;
                     }
                 }

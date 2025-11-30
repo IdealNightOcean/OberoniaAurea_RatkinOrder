@@ -51,7 +51,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MmercyQuestDef.Named("QUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -61,7 +61,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named("SUBJECT"), MmercyQuestDef.Named("QUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MmercyQuestDef.Named("QUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true

@@ -3,11 +3,11 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class JointPatrolIncidentPart_JointPatrolPotency : JointPatrolIncidentPart
+public class JointPatrolInteractionPart_JointPatrolPotency : JointPatrolInteractionPart
 {
     public float potencyFactorOffset;
     public float potencyOffsetOffset;
-    public override void ApplyPart(JointPatrolIncidentDef def, JointBranchRecord record, StringBuilder effectExplain)
+    public override void ApplyPart(JointPatrolInteractionDef def, JointBranchRecord record, StringBuilder effectExplain)
     {
         if (potencyFactorOffset != 0f)
         {

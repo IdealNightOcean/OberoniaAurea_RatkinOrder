@@ -8,7 +8,7 @@ public class WorldObject_Interactive_Nameable : WorldObject_InteractiveBase, INa
 {
     public override bool HasName => name is not null;
 
-    private string name;
+    protected string name;
     public string Name
     {
         get => name ?? def.label;

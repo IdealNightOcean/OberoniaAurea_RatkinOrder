@@ -81,7 +81,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         base.Notify_QuestSignalReceived(signal);
         if (signal.tag == InSignalOutPotency)
         {
-            Find.SignalManager.SendSignal(new Signal(OutSignalOutPotency, totalPotency.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(OutSignalOutPotency, totalPotency.Named(KeyLibrary_FormatArgName.SUBJECT)));
         }
     }
 
@@ -192,7 +192,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 TryActiveClique(clique, directly: true);
             }
-            Find.SignalManager.SendSignal(new Signal(SignalCliqueAdded(quest), clique.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(SignalCliqueAdded(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
             return true;
         }
 
@@ -203,7 +203,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false) && allCliques.Remove(cliqueKey))
         {
-            Find.SignalManager.SendSignal(new Signal(SignalCliqueRemoved(quest), clique.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(SignalCliqueRemoved(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
             if (clique.IsActive)
             {
                 DeactiveClique(clique);
@@ -311,7 +311,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             clique.IsActive = true;
             clique.TicksToActive = -1;
             totalPotency += clique.Potency;
-            Find.SignalManager.SendSignal(new Signal(SignalCliqueActived(quest), clique.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(SignalCliqueActived(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
         }
     }
 
@@ -330,7 +330,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         clique.IsActive = false;
         totalPotency -= clique.Potency;
-        Find.SignalManager.SendSignal(new Signal(SignalCliqueDeactived(quest), clique.Named("SUBJECT")));
+        Find.SignalManager.SendSignal(new Signal(SignalCliqueDeactived(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
     }
 
     public float GetCliquePotency(string cliqueKey, bool showErrorIfMiss = false)

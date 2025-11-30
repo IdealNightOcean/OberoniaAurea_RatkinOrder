@@ -100,11 +100,11 @@ public sealed class WorldObject_ArmsOrderSite : WorldObject_InteractiveBase, ITh
 
         if (perfectFulfill)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named("SUBJECT"), caravan.Named("CARAVAN"));
+            QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT), caravan.Named("CARAVAN"));
         }
         else
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named("SUBJECT"), caravan.Named("CARAVAN"));
+            QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT), caravan.Named("CARAVAN"));
         }
 
 

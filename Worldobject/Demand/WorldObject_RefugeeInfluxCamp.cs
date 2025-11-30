@@ -579,7 +579,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
     {
         if (!onMilitarySupervision)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "PopulationSettled", this.Named("SUBJECT"), population.Named("POPULATION"));
+            QuestUtility.SendQuestTargetSignals(questTags, "PopulationSettled", this.Named(KeyLibrary_FormatArgName.SUBJECT), population.Named("POPULATION"));
         }
         base.Destroy();
     }

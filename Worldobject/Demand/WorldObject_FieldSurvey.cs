@@ -365,15 +365,15 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
     {
         if (meteorologicalDataGained >= meteorologicalDataRequire)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "meteorologicalDataResolved", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "meteorologicalDataResolved", this.Named(KeyLibrary_FormatArgName.SUBJECT));
             if (infoCompleteness >= 5f)
             {
-                QuestUtility.SendQuestTargetSignals(questTags, "infoCompleted", this.Named("SUBJECT"));
+                QuestUtility.SendQuestTargetSignals(questTags, "infoCompleted", this.Named(KeyLibrary_FormatArgName.SUBJECT));
             }
         }
         else
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "meteorologicalDataNotResolved", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "meteorologicalDataNotResolved", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         base.Destroy();
     }

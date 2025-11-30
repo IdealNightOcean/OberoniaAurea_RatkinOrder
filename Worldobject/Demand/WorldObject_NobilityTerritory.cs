@@ -245,7 +245,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
                 textLetterDef: LetterDefOf.PositiveEvent,
                 lookTargets: this,
                 quest: quest);
-            QuestUtility.SendQuestTargetSignals(questTags, "AssaultFailed", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "AssaultFailed", this.Named(KeyLibrary_FormatArgName.SUBJECT));
             this.SafeDestroy();
         }
     }

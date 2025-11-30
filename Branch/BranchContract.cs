@@ -107,14 +107,17 @@ public class BranchContract : IExposable
             curState = ContractState.Finished;
         }
 
+        branch.PopulationHandler.Notify_ContractCompleted();
         GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchContractCompleted, 1f, addIfMiss: true);
+
+        return;
     }
 
     private string GetContractReason(Branch branch)
     {
         if (!string.IsNullOrEmpty(def.fixedRequestReasons))
         {
-            return def.fixedRequestReasons.Formatted(branch.Name.Named("BranchName"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+            return def.fixedRequestReasons.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
         }
         if (def.requestReasonsRulePack is not null)
         {
@@ -139,14 +142,14 @@ public class BranchContract : IExposable
 
             if (string.IsNullOrEmpty(reason))
             {
-                return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BranchName"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+                return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
             }
             else
             {
                 return reason;
             }
         }
-        return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named("BranchName"), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+        return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
 
     }
 }

@@ -31,17 +31,17 @@ internal sealed class WorldObject_WolfDisasterGossipPoint : WorldObject_Interact
         if (value < 0.25f)
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterGossipPoint_Discovered".Translate(maxAnimalsPawn)));
-            QuestUtility.SendQuestTargetSignals(questTags, "DiscoveredWolf", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "DiscoveredWolf", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else if (value < 0.75f)
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterGossipPoint_Succeess".Translate(maxAnimalsPawn)));
-            QuestUtility.SendQuestTargetSignals(questTags, "SucceessAdvancePoint", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "SucceessAdvancePoint", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterGossipPoint_Reduce".Translate(maxAnimalsPawn)));
-            QuestUtility.SendQuestTargetSignals(questTags, "ReducePoint", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "ReducePoint", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
 
         this.SafeDestroy();

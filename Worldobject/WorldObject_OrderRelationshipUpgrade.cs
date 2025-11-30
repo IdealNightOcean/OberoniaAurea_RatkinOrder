@@ -1,6 +1,6 @@
 ﻿namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixedCaravan_Nameable, ISingleRatkinOrderRelatedReferenceable
+public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixedCaravan_Nameable //, ISingleRatkinOrderRelatedReferenceable
 {
     private RatkinOrder ratkinOrder;
     public RatkinOrder RatkinOrder => ratkinOrder;

@@ -96,7 +96,7 @@ internal sealed class QuestPart_Apprentice_CheckSkill : QuestPart
         {
             if (Apprentice is null || Apprentice.skills is null)
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalFail, Apprentice.Named("SUBJECT")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalFail, Apprentice.Named(KeyLibrary_FormatArgName.SUBJECT)));
             }
             else
             {
@@ -106,19 +106,19 @@ internal sealed class QuestPart_Apprentice_CheckSkill : QuestPart
                   || CheckSkill(SkillDefOf.Artistic))
                 {
                     skillSuccess = true;
-                    Find.SignalManager.SendSignal(new Signal(OutSignalSuccess, Apprentice.Named("SUBJECT")));
+                    Find.SignalManager.SendSignal(new Signal(OutSignalSuccess, Apprentice.Named(KeyLibrary_FormatArgName.SUBJECT)));
                 }
                 else
                 {
                     skillSuccess = false;
-                    Find.SignalManager.SendSignal(new Signal(OutSignalFail, Apprentice.Named("SUBJECT")));
+                    Find.SignalManager.SendSignal(new Signal(OutSignalFail, Apprentice.Named(KeyLibrary_FormatArgName.SUBJECT)));
                 }
             }
         }
         finally
         {
             skillChecked = true;
-            Find.SignalManager.SendSignal(new Signal(OutSignalChecked, Apprentice.Named("SUBJECT")));
+            Find.SignalManager.SendSignal(new Signal(OutSignalChecked, Apprentice.Named(KeyLibrary_FormatArgName.SUBJECT)));
         }
     }
 

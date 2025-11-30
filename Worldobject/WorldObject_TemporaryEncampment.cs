@@ -73,7 +73,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         if (Rand.Chance(0.5f))
         {
             DisableRequest();
-            QuestUtility.SendQuestTargetSignals(questTags, "NoSupplyRequest", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "NoSupplyRequest", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else
         {
@@ -114,7 +114,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("CommandFulfillTradeOfferConfirm".Translate(GenLabel.ThingLabel(requestDef, null, requestCount)), delegate
         {
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, requestDef, requestCount);
-            QuestUtility.SendQuestTargetSignals(questTags, "TradeRequestFulfilled", this.Named("SUBJECT"), caravan.Named("CARAVAN"));
+            QuestUtility.SendQuestTargetSignals(questTags, "TradeRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT), caravan.Named("CARAVAN"));
             hasSupplyRequest = false;
         }));
     }
@@ -125,7 +125,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         if (requestThing is null)
         {
             DisableRequest();
-            QuestUtility.SendQuestTargetSignals(questTags, "NoSupplyRequest", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "NoSupplyRequest", this.Named(KeyLibrary_FormatArgName.SUBJECT));
             return;
         }
 
@@ -147,7 +147,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         if (hasSupplyRequest)
         {
             DisableRequest();
-            QuestUtility.SendQuestTargetSignals(questTags, "NoSupplyRequest", this.Named("SUBJECT"));
+            QuestUtility.SendQuestTargetSignals(questTags, "NoSupplyRequest", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
     }
 }

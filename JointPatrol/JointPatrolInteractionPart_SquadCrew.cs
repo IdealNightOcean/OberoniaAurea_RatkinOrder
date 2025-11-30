@@ -3,11 +3,11 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class JointPatrolIncidentPart_SquadCrew : JointPatrolIncidentPart
+public class JointPatrolInteractionPart_SquadCrew : JointPatrolInteractionPart
 {
     public int memberChange;
     public int commanderChange;
-    public override void ApplyPart(JointPatrolIncidentDef def, JointBranchRecord record, StringBuilder effectExplain)
+    public override void ApplyPart(JointPatrolInteractionDef def, JointBranchRecord record, StringBuilder effectExplain)
     {
         if (memberChange != 0)
         {

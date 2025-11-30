@@ -1,6 +1,4 @@
-﻿using Verse;
-
-namespace OberoniaAurea.RatkinOrder;
+﻿namespace OberoniaAurea.RatkinOrder;
 
 public interface IOnRatkinOrderRemoved
 {
@@ -13,4 +11,4 @@ public interface ISingleRatkinOrderRelated : IOnRatkinOrderRemoved
     void InitRatkinOrder(RatkinOrder ratkinOrder);
 }
 
-public interface ISingleRatkinOrderRelatedReferenceable : ISingleRatkinOrderRelated, ILoadReferenceable;
+//public interface ISingleRatkinOrderRelatedReferenceable : ISingleRatkinOrderRelated, ILoadReferenceable;

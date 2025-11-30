@@ -5,6 +5,7 @@ using RimWorld.QuestGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
@@ -27,6 +28,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     private PatrolState curState;
     public PatrolState CurState => curState;
 
+    public HelpPolicy CurHelpPolicy;
+
     private int tickToNextStage = JointPatrolDurationPrepDays * 60000;
     public int TickToNextStage => tickToNextStage;
 
@@ -47,14 +50,58 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     private Dictionary<PatrolInteractionType, int> patrolInteractionAcquired = [];
 
-    private List<JointIncidentRecord> incidentRecords = [];
-    public IReadOnlyList<JointIncidentRecord> IncidentRecords => incidentRecords;
+    private List<JointInteractionRecord> interactionRecords = [];
+    public IReadOnlyList<JointInteractionRecord> InteractionRecords => interactionRecords;
 
     [Unsaved] private readonly LazyMutable<IReadOnlyDictionary<BranchTaskType, float>> taskPotencys;
     [Unsaved] private readonly LazyMutable<IReadOnlyDictionary<IncidentType, List<JointPatrolIncidentDef>>> potentialIncidents;
 
     private int sacrificeCount;
     public int SacrificeCount => sacrificeCount;
+
+    private int curHelpCount;
+    private int nextHelpCheckTick = -1;
+    private int HelpCeiling
+    {
+        get
+        {
+            return ratkinOrder.Relationship switch
+            {
+                EsteemHandler.RelationshipKind.Soulmate => 8,
+                EsteemHandler.RelationshipKind.Trustworthy => 6,
+                EsteemHandler.RelationshipKind.Friendly => 4,
+                EsteemHandler.RelationshipKind.Acquaintance => 2,
+                _ => 0
+            };
+        }
+    }
+    private int HelpCheckInterval
+    {
+        get
+        {
+            return ratkinOrder.Relationship switch
+            {
+                EsteemHandler.RelationshipKind.Soulmate => 15000,
+                EsteemHandler.RelationshipKind.Trustworthy => 20000,
+                EsteemHandler.RelationshipKind.Friendly => 30000,
+                EsteemHandler.RelationshipKind.Acquaintance => 60000,
+                _ => 60000
+            };
+        }
+    }
+    private float HelpTriggerChance
+    {
+        get
+        {
+            return CurHelpPolicy switch
+            {
+                HelpPolicy.None => 0f,
+                HelpPolicy.OnlyFriendly => 0.125f,
+                HelpPolicy.All => 0.25f,
+                _ => 0f
+            };
+        }
+    }
 
     private string completionSummary = string.Empty;
     public string CompletionSummary => completionSummary;
@@ -106,18 +153,23 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public void ExposeData()
     {
         Scribe_Values.Look(ref curState, "curState", PatrolState.Invalid);
+
         Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
 
         Scribe_Values.Look(ref patrolLevel, "CurPatrolType", PatrolLevel.Popedom);
         Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
         Scribe_Values.Look(ref sacrificeCount, "sacrificeCount", 0);
 
+        Scribe_Values.Look(ref CurHelpPolicy, "CurHelpPolicy", HelpPolicy.None);
+        Scribe_Values.Look(ref curHelpCount, "curHelpCount", 0);
+        Scribe_Values.Look(ref nextHelpCheckTick, "nextHelpCheckTick", -1);
+
         Scribe_Values.Look(ref completionSummary, "completionSummary", string.Empty);
 
         Scribe_Collections.Look(ref participants, "participants", LookMode.Deep);
         Scribe_Collections.Look(ref patrolInteractionAcquired, "patrolInteractionAcquired", LookMode.Value, LookMode.Value);
         Scribe_Collections.Look(ref participatingResidentKnights, "participatingResidentKnights", LookMode.Reference);
-        Scribe_Collections.Look(ref incidentRecords, "incidentRecords", LookMode.Deep);
+        Scribe_Collections.Look(ref interactionRecords, "interactionRecords", LookMode.Deep);
 
         Scribe_Deep.Look(ref innerContainer, "innerContainer");
     }
@@ -161,7 +213,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         else if (curState == PatrolState.Ongoing)
         {
-            PeriodicPatrolIncidentChecker();
+            PeriodicPatrolInteractionChecker();
         }
     }
 
@@ -226,7 +278,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
     }
 
-    public void OnKnightSacrifice(int sacrificeCount) => this.sacrificeCount = Mathf.Max(this.sacrificeCount + sacrificeCount);
+    public void OnKnightSacrifice(int sacrificeCount) => this.sacrificeCount = Mathf.Max(0, this.sacrificeCount + sacrificeCount);
 
     public bool MarkResidentKnightBackTeam(ResidentKnightRecord record)
     {
@@ -243,11 +295,35 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         if (!participatingResidentKnights.Contains(record))
         {
             participatingResidentKnights.Add(record);
-            return true;
         }
-        return false;
+        return true;
     }
-    public void OnResidentKnightBackTeam(Pawn knight) => innerContainer.TryAddOrTransfer(knight);
+
+    public void OnResidentKnightBackTeam(Pawn knight)
+    {
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnightRecord record))
+        {
+            return;
+        }
+        if (innerContainer.TryAddOrTransfer(knight))
+        {
+            if (!participantsDict.TryGetValue(record.Branch, out JointBranchRecord pRecord))
+            {
+                pRecord.PotencyOffset += record.CurRank switch
+                {
+                    ResidentKnightRecord.Rank.Regular => 5,
+                    ResidentKnightRecord.Rank.Elite => 10,
+                    ResidentKnightRecord.Rank.Honor => 20,
+                    ResidentKnightRecord.Rank.Crown => 40,
+                    _ => 5
+                };
+            }
+        }
+        else
+        {
+            participatingResidentKnights.Remove(record);
+        }
+    }
 
     private void AddParticipant(Branch branch)
     {
@@ -309,6 +385,9 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         burdenSquadCount = 0;
 
+        curHelpCount = 0;
+        nextHelpCheckTick = -1;
+
         tickToNextStage = JointPatrolDurationPrepDays * 60000;
 
         participants.Clear();
@@ -329,7 +408,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             patrolLevel = default;
             sacrificeCount = 0;
             completionSummary = string.Empty;
-            incidentRecords.Clear();
+            interactionRecords.Clear();
         }
 
         curState = forState;
@@ -432,6 +511,23 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         return;
     }
 
+    public bool ApplyJointCaravanHelpEffect(JointPatrolCaravanHelpDef def, Branch branch)
+    {
+        if (curState != PatrolState.Ongoing)
+        {
+            Log.Error("[OARO] Trying to apply a joint-patrol-caravan-incident when joint patrol is not ongoing.");
+            return false;
+        }
+
+        if (!participantsDict.TryGetValue(branch, out JointBranchRecord record))
+        {
+            return false;
+        }
+
+        ApplyJointInteractionEffect(def, record);
+        return true;
+    }
+
     private void StartJointPatrol()
     {
         if (curState != PatrolState.Prepare)
@@ -441,6 +537,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
 
         tickToNextStage = JointPatrolDurationDays * 60000;
+        nextHelpCheckTick = Find.TickManager.TicksGame + HelpCheckInterval;
+
         curState = PatrolState.Ongoing;
 
         int overcap = participants.Count - burdenSquadCount;
@@ -712,7 +810,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         tickToNextStage = (int)(Rand.Range(55f, 65f) * 60000);
     }
 
-    private void PeriodicPatrolIncidentChecker()
+    private void PeriodicPatrolInteractionChecker()
     {
         int ticksGame = Find.TickManager.TicksGame;
         int triggerCount = 0;
@@ -729,7 +827,58 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 }
             }
         }
+
+        if (ticksGame > nextHelpCheckTick)
+        {
+            nextHelpCheckTick = ticksGame + HelpCheckInterval;
+            if (CurHelpPolicy != HelpPolicy.None && curHelpCount < HelpCeiling && Rand.Chance(HelpTriggerChance))
+            {
+                TryTriggerCaravanHelp();
+            }
+        }
+
         taskPotencys.MarkDirty();
+    }
+
+    private void TryTriggerCaravanHelp()
+    {
+        Branch targetBranch;
+        if (CurHelpPolicy == HelpPolicy.OnlyFriendly)
+        {
+            targetBranch = participantsDict.Keys.Where(b => b.IsBranchOfType(Branch.BranchType.Friendly)).RandomElementWithFallback(fallback: null);
+        }
+        else
+        {
+            targetBranch = participantsDict.Keys.RandomElementWithFallback(fallback: null);
+        }
+
+        if (targetBranch is null)
+        {
+            return;
+        }
+
+        JointPatrolCaravanHelpDef caravanHelpDef = DefDatabase<JointPatrolCaravanHelpDef>.AllDefsListForReading.Where(d => d.CanApplyOn(targetBranch, patrolLevel)).RandomElementWithFallback(fallback: null);
+        if (caravanHelpDef is null)
+        {
+            return;
+        }
+
+        Slate slate = new();
+        slate.Set("caravanHelpDef", caravanHelpDef);
+        slate.Set("caravanHelpSiteDef", caravanHelpDef.relatedWorldObject);
+        slate.Set("timeOutTicks", caravanHelpDef.timeOutTicks);
+        try
+        {
+            slate.SetBasicBranchSlateVar(targetBranch, alsoSetOrder: true);
+            slate.Set("helpDescription", caravanHelpDef.Worker.HelpDescription(targetBranch));
+            slate.Set("map", OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
+        }
+        catch { }
+
+        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_JointPatrolCaravanHelp, slate, forced: true))
+        {
+            curHelpCount++;
+        }
     }
 
     private void TryTriggerPatrolIncident(JointBranchRecord record)
@@ -743,16 +892,12 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
 
             Branch branch = record.Branch;
-            JointPatrolIncidentDef selIncident = potentialIncidentsOfType.Where(p => p.CanApply(branch)).RandomElementWithFallback(fallback: null);
+            JointPatrolIncidentDef selIncident = potentialIncidentsOfType.Where(p => p.CanApplyOn(branch, patrolLevel)).RandomElementWithFallback(fallback: null);
             if (selIncident is null)
             {
                 return;
             }
-            JointIncidentRecord incidentRecord = selIncident.ApplyIncident(record);
-            if (incidentRecord is not null)
-            {
-                incidentRecords.Add(incidentRecord);
-            }
+            ApplyJointInteractionEffect(selIncident, record);
         }
         catch (Exception ex)
         {
@@ -813,5 +958,41 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         {
             RemoveParticipant(branch);
         }
+    }
+
+    /// <summary>
+    /// 应用交互效果并写入联巡记录
+    /// </summary>
+    private void ApplyJointInteractionEffect(JointPatrolInteractionDef def, JointBranchRecord record)
+    {
+        if (record?.Branch is null)
+        {
+            return;
+        }
+
+        StringBuilder explainSB = new();
+        if (!def.customDescriptions.NullOrEmpty())
+        {
+            explainSB.AppendLine(def.customDescriptions.RandomElement().Formatted(record.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)));
+            explainSB.AppendLine();
+        }
+
+        if (!def.parts.NullOrEmpty())
+        {
+            for (int i = 0; i < def.parts.Count; i++)
+            {
+                def.parts[i].ApplyPart(def, record, explainSB);
+            }
+        }
+
+        JointInteractionRecord interactionRecord = new JointInteractionRecord()
+        {
+            Label = def.label,
+            RelatedBranch = record.Branch,
+            Description = explainSB.ToString(),
+            TriggerTick = Find.TickManager.TicksGame
+        };
+
+        interactionRecords.Add(interactionRecord);
     }
 }

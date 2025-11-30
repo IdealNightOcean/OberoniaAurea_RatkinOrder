@@ -20,7 +20,7 @@ public class SquadInfoUICache : BranchSummaryUICache
 
     public readonly AcceptanceReport BombardFeasibility = false;
 
-    public SquadInfoUICache() :base(){ }
+    public SquadInfoUICache() : base() { }
 
     public SquadInfoUICache(Branch branch, Map map) : base(branch, map)
     {

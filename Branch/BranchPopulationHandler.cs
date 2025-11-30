@@ -101,11 +101,16 @@ public class BranchPopulationHandler : IExposable, ITickDay
         DailyPopulationChange(onMartialLaw);
         DailyPublicSecurityCheck(onMartialLaw);
         DailyContractCheck();
-       
+
         if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.ContractAddCheck))
         {
             ContractAddCheck();
         }
+    }
+
+    public void Notify_ContractCompleted()
+    {
+        hasContractBuff = true;
     }
 
 

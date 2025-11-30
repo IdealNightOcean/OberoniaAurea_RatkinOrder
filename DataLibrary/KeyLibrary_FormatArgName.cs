@@ -4,8 +4,12 @@ public static class KeyLibrary_FormatArgName
 {
     public const string SUBJECT = "SUBJECT";
     public const string THING = "THING";
+    public const string SKILL = "SKILL";
     public const string STUFF = "STUFF";
     public const string PAWN = "PAWN";
+
+    public const string Count = "Count";
+    public const string Level = "Level";
 
     public const string ORDER = "ORDER";
     public const string BRANCNH = "BRANCNH";

@@ -1,12 +1,11 @@
 ﻿using System.Collections.Generic;
-using System.Text;
 using Verse;
 using static OberoniaAurea.RatkinOrder.JointBranchRecord;
 using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class JointPatrolIncidentDef : Def
+public class JointPatrolIncidentDef : JointPatrolInteractionDef
 {
     public enum IncidentType
     {
@@ -24,46 +23,16 @@ public class JointPatrolIncidentDef : Def
     public IncidentType incidentType;
 
     /// <summary>
-    /// 专注任务限制
-    /// </summary>
-    public BranchTaskType? restrictTaskType;
-
-    /// <summary>
-    /// 联巡等级限制
-    /// </summary>
-    public PatrolLevel? patrolLevelLimits;
-
-    /// <summary>
-    /// 分部类型限制
-    /// </summary>
-    public Branch.BranchType? restrictBranchType;
-
-    /// <summary>
     /// 分部建筑限制
     /// </summary>
     public BranchBuildingDef relatedBuilding;
 
     /// <summary>
-    /// 事件描述列表
-    /// </summary>
-    [MustTranslate]
-    public List<string> customDescriptions;
-
-    /// <summary>
-    /// 事件功能列表
-    /// </summary>
-    public List<JointPatrolIncidentPart> parts;
-
-    /// <summary>
     /// 能否触发小事件
     /// </summary>
-    public bool CanApply(Branch branch)
+    public override bool CanApplyOn(Branch branch, PatrolLevel patrolLevel)
     {
-        if (restrictTaskType.HasValue && branch.TaskHandler.FocusedTaskType != restrictTaskType.Value)
-        {
-            return false;
-        }
-        if (restrictBranchType.HasValue && !branch.IsBranchOfType(restrictBranchType.Value))
+        if (!base.CanApplyOn(branch, patrolLevel))
         {
             return false;
         }
@@ -72,40 +41,6 @@ public class JointPatrolIncidentDef : Def
             return true;
         }
         return true;
-    }
-
-    /// <summary>
-    /// 触发小事件
-    /// </summary>
-    public JointIncidentRecord ApplyIncident(JointBranchRecord record)
-    {
-        if (record?.Branch is null)
-        {
-            return null;
-        }
-
-        StringBuilder explainSB = new();
-        if (!customDescriptions.NullOrEmpty())
-        {
-            explainSB.AppendLine(customDescriptions.RandomElement().Formatted(record.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)));
-            explainSB.AppendLine();
-        }
-
-        if (!parts.NullOrEmpty())
-        {
-            for (int i = 0; i < parts.Count; i++)
-            {
-                parts[i].ApplyPart(this, record, explainSB);
-            }
-        }
-
-        return new JointIncidentRecord()
-        {
-            Def = this,
-            RelatedBranch = record.Branch,
-            Description = explainSB.ToString(),
-            TriggerTick = Find.TickManager.TicksGame
-        };
     }
 
     /// <summary>
