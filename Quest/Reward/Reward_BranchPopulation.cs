@@ -17,13 +17,13 @@ public class Reward_BranchPopulation : Reward
     {
         get
         {
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_BranchPopulation".Translate(Branch.Name),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_BranchPopulation".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
                                                                             GUI.DrawTexture(r, null);
                                                                             GUI.color = Color.white;
                                                                         },
-                                                                        tipGetter: () => "OARO_Reward_BranchPopulationTip".Translate(Branch.Name).Resolve());
+                                                                        tipGetter: () => "OARO_Reward_BranchPopulationTip".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)).Resolve());
         }
     }
 
@@ -43,7 +43,7 @@ public class Reward_BranchPopulation : Reward
         };
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_BranchPopulationDesc".Translate(Branch.Name).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_BranchPopulationDesc".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)).Resolve();
 
     public override string ToString() => $"{GetType().Name} (Branch={Branch.Name})";
 

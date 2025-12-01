@@ -32,6 +32,11 @@ public partial class JointPatrolManager
         public string Description;
         public Branch RelatedBranch;
 
+        public override string ToString()
+        {
+            return $"Label: {Label} - Desc: {Description}";
+        }
+
         public void ExposeData()
         {
             Scribe_Values.Look(ref TriggerTick, "TriggerTick", 0);

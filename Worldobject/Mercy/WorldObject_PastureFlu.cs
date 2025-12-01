@@ -38,12 +38,12 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
             }
             else if (maxMedicineSkill < 15)
             {
-                SendWorkResolvedSignal();
+                this.SendWorkResolvedSignal();
                 Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PastureFlu_Success".Translate(maxMedicinePawn)));
             }
             else
             {
-                SendWorkResolvedSignal();
+                this.SendWorkResolvedSignal();
                 EsteemUtility.AdjustAllOrdersEsteem(2, byPlayer: true, reason: "OARO_ResolvedFlu".Translate());
                 StringBuilder sb = new("OARO_PastureFlu_BigSuccess".Translate(maxMedicinePawn, 2));
 

@@ -83,11 +83,11 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (residentKnights.Remove(null) | (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0))
+            if (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
             {
                 Log.Error($"[OARO] Some resident knight records of {nameof(ResidentKnightsManager)} were null or invalid after loading and have been removed.");
             }
-            if (rolesToKnights.Remove(null) | (rolesToKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0))
+            if (rolesToKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
             {
                 Log.Error($"[OARO] Some resident knight roles of {nameof(ResidentKnightsManager)} were null or invalid after loading and have been removed.");
             }

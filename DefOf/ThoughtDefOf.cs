@@ -12,6 +12,8 @@ public static class OARO_ThoughtDefOf
 
     public static ThoughtDef OARO_Thought_ResidentKnight_SquadBeAttackedOnTask; //常驻骑士 - 自己骑士团有分部被袭击
 
+    public static ThoughtDef OARO_Thought_TouristAreaPatrol; //风景区巡逻
+
     static OARO_ThoughtDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ThoughtDefOf));

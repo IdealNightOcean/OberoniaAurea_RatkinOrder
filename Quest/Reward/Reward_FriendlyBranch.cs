@@ -18,13 +18,13 @@ public class Reward_FriendlyBranch : Reward
     {
         get
         {
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_FriendlyBranch".Translate(Branch.Name),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_FriendlyBranch".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
                                                                             GUI.DrawTexture(r, null);
                                                                             GUI.color = Color.white;
                                                                         },
-                                                                        tipGetter: () => "OARO_Reward_FriendlyBranchTip".Translate(Branch.Name, DurationDays).Resolve());
+                                                                        tipGetter: () => "OARO_Reward_FriendlyBranchTip".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), DurationDays.Named("DurationDays")).Resolve());
         }
     }
 
@@ -43,7 +43,7 @@ public class Reward_FriendlyBranch : Reward
         };
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_FriendlyBranchDesc".Translate(Branch.Name, DurationDays).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_FriendlyBranchDesc".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), DurationDays.Named("DurationDays")).Resolve();
 
     public override string ToString() => $"{GetType().Name} (Branch={Branch.Name}, DurationDays={DurationDays})";
 

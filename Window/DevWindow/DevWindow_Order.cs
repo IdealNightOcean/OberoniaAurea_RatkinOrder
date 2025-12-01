@@ -91,7 +91,7 @@ public class DevWindow_Order : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("联合巡逻:");
         Text.Font = GameFont.Small;
-        if (listing_Rect.ButtonText("Dev窗口 - 分部总览", null, 0.8f))
+        if (listing_Rect.ButtonText("Dev窗口 - 联巡总览", null, 0.8f))
         {
             Close();
             EndContents();

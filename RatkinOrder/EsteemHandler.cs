@@ -5,7 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay
+public class EsteemHandler : IExposable, ITickDay
 {
     public enum RelationshipKind : byte
     {
@@ -16,11 +16,8 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay
         Soulmate
     }
 
-    [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
+    [Unsaved] public readonly RatkinOrder RatkinOrder;
 
-    /*
-    认可度
-    */
     protected int esteem;
     public int Esteem => esteem;
     private int lastEsteemChange;
@@ -29,9 +26,8 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay
     public int LastEsteemChange => lastEsteemChange;
     public string LastEsteemChangeReason => lastEsteemChangeReason;
     public float CurEsteemSoftCap => EsteemUtility.GetEsteemSoftCap(relationship);
-    /*
-    关系
-    */
+
+
     private RelationshipKind relationship = RelationshipKind.Stranger; //当前关系
     private int lastRelationshipChangeTick = -1;
     private string lastRelationshipChangeReason = string.Empty;
@@ -46,6 +42,11 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay
     {
         get => totalRecommendation;
         set => totalRecommendation += Mathf.Max(0, value);
+    }
+
+    public EsteemHandler(RatkinOrder ratkinOrder)
+    {
+        RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
     }
 
     public void PostOrderGenerated()
@@ -70,15 +71,33 @@ public class EsteemHandler(RatkinOrder ratkinOrder) : IExposable, ITickDay
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"Esteem: {esteem}");
-        listing_Rect.Label($"LastEsteemChange(by player): {lastEsteemChange}");
-        listing_Rect.Label($"lastEsteemChangeReason(by player): {lastEsteemChangeReason}");
+        listing_Rect.Label($"认可度: {esteem}");
+        listing_Rect.Label($"最近变化 (by player): {lastEsteemChange}");
+        listing_Rect.Label($"最近变化的原因 (by player): {lastEsteemChangeReason}");
+        if (listing_Rect.ButtonText("+10 认可度", widthPct: 0.5f))
+        {
+            AdjustEsteem(10, byPlayer: true, showPlayerChangeMessage: false, reason: "Dev");
+        }
+        if (listing_Rect.ButtonText("-10 认可度", widthPct: 0.5f))
+        {
+            AdjustEsteem(10, byPlayer: true, showPlayerChangeMessage: false, reason: "Dev");
+        }
+
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"Relationship: {relationship}");
-        listing_Rect.Label($"LastRelationshipChangeTick: {lastRelationshipChangeTick}");
-        listing_Rect.Label($"LastRelationshipChangeReason: {lastRelationshipChangeReason}");
+        listing_Rect.Label($"关系: {relationship}");
+        listing_Rect.Label($"最近变化时刻 (Tick): {lastRelationshipChangeTick}");
+        listing_Rect.Label($"最近变化原因: {lastRelationshipChangeReason}");
+        if (listing_Rect.ButtonText("提升一级关系", widthPct: 0.5f))
+        {
+            SetRelationship(relationship.RelationshipKindOffsetBy(1), reason: "Dev", sendLetter: false);
+        }
+        if (listing_Rect.ButtonText("降低一级关系", widthPct: 0.5f))
+        {
+            SetRelationship(relationship.RelationshipKindOffsetBy(-1), reason: "Dev", sendLetter: false);
+        }
+
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"TotalRecommendation: {totalRecommendation}");
+        listing_Rect.Label($"获取过的推荐信总数: {totalRecommendation}");
     }
 
     public void TickDay()

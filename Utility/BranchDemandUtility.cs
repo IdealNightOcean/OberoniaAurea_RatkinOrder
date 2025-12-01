@@ -137,8 +137,6 @@ public static class BranchDemandUtility
             return resultOnly ? false : "OARO_ReachMax_ConcurrentAcceptedDemand".Translate();
         }
 
-        return true;
-
         EsteemHandler.RelationshipKind restrictedRelation = isCritical ? EsteemHandler.RelationshipKind.Trustworthy
                                                                        : EsteemHandler.RelationshipKind.Acquaintance;
 

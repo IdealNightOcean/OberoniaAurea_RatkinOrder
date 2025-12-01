@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class JointPatrolCaravanHelp_ThingHelpExtension : DefModExtension
 {
     [MustTranslate]
-    public string requireReason;
+    public string requestHelpReason;
 
     public ThingDef requireThing;
     public int requireCount;

@@ -31,7 +31,7 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
         }
         //ratkinOrder.RelationshipKindOffsetBy(1, sendLetter: true);
 
-        SendWorkResolvedSignal();
+        this.SendWorkResolvedSignal();
         this.SafeDestroy();
     }
 

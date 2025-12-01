@@ -128,6 +128,10 @@
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
     <Compile Include="Interface\IJointPatrolCaravanHelpSite.cs" />
+    <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_TouristAreaPatrol.cs" />
+    <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_JointHunting.cs" />
+    <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_MineralResourceExploration.cs" />
+    <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_SkillHelp_ThingReward.cs" />
     <Compile Include="JointPatrol\JointPatrolInteractionPart_ReformationProgress.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_ThingHelp.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker.cs" />

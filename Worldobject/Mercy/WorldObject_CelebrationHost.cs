@@ -46,7 +46,7 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
             string text = "OARO_CelebrationHost_Finish".Translate(maxSocialPawn, count) + "\n" + "OAFrame_PawnGainSkillXp".Translate(maxSocialPawn, SkillDefOf.Social.LabelCap, 6000);
         }
 
-        SendWorkResolvedSignal();
+        this.SendWorkResolvedSignal();
 
         this.SafeDestroy();
     }

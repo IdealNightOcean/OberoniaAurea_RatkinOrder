@@ -84,7 +84,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
         listing_Rect.Gap(6f);
         listing_Rect.Label($"治安度: {publicSecurity.ToStringPercent()}");
         listing_Rect.Label($"昨日治安度: {yesterdayPublicSecurity.ToStringPercent()}");
-        listing_Rect.Label($"昨日治安度变化: {yesterdayPublicSecChange.ToStringPercent()}");
+        listing_Rect.Label($"昨日治安度变化: {yesterdayPublicSecChange.ToStringPercentSigned()}");
 
         listing_Rect.Gap(6f);
         listing_Rect.Label($"有无平民需求（合约）完成Buff: {hasContractBuff}");
@@ -112,7 +112,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         hasContractBuff = true;
     }
-
 
     /// <summary>
     /// 每日人口变化

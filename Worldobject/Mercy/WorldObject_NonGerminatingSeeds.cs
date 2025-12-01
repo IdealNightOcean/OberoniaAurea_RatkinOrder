@@ -34,7 +34,7 @@ public sealed class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFi
             float successChance = successCurve.Evaluate(maxPlantsSkill);
             if (Rand.Chance(successChance))
             {
-                SendWorkResolvedSignal();
+                this.SendWorkResolvedSignal();
                 Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_NonGerminatingSeeds_Success".Translate(maxPlantsPawn)));
             }
             else

@@ -8,6 +8,7 @@ public abstract class JointPatrolCaravanHelpWorker_FixedCaravan : JointPatrolCar
 {
     public override bool Notify_CaravanArrived(Caravan caravan, Branch branch, WorldObject_InteractiveBase incidentSite)
     {
+        extraRewardText.Clear();
         if (incidentSite is not WorldObject_JointPatrolCaravanHelpSite_FixedCaravan fixedCaravanIncidentSite)
         {
             Log.Error($"[OARO] Failed to cast {nameof(incidentSite)} to {nameof(WorldObject_JointPatrolCaravanHelpSite_FixedCaravan)}.");

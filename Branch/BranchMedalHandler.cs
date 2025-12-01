@@ -116,7 +116,7 @@ public class BranchMedalHandler : IExposable
 
     internal void PostLoadInit()
     {
-        if (medalRecords.Remove(null) | (medalRecords.RemoveAll(kv => !kv.Value.Validate()) > 0))
+        if (medalRecords.RemoveAll(kv => kv.Value.Count <= 0) > 0)
         {
             Log.Error($"[OARO] Some Medal Records of were null or invalid after loading and have been removed.");
         }

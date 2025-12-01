@@ -265,42 +265,39 @@ public static class RelationshipUtility
 
         if (upgraded)
         {
-            sb.AppendInNewLine("OARO_UpgradedToNewRelation".Translate(ratkinOrder.NameColored, oldRelation.GetLabel(), newRelation.GetLabel()));
+            sb.AppendLine("OARO_UpgradedToNewRelation".Translate(ratkinOrder.NameColored, oldRelation.GetLabel(), newRelation.GetLabel()));
         }
         else
         {
-            sb.AppendInNewLine("OARO_DowngradedToNewRelation".Translate(ratkinOrder.NameColored, oldRelation.GetLabel(), newRelation.GetLabel()));
+            sb.AppendLine("OARO_DowngradedToNewRelation".Translate(ratkinOrder.NameColored, oldRelation.GetLabel(), newRelation.GetLabel()));
         }
 
-        sb.AppendLine();
         sb.AppendLine();
         if (!string.IsNullOrEmpty(ratkinOrder.EsteemHandler.LastRelationshipChangeReason))
         {
-            sb.AppendInNewLine("OARO_LastRelationshipChangeReason".Translate(ratkinOrder.EsteemHandler.LastRelationshipChangeReason));
-            sb.AppendLine();
+            sb.AppendLine("OARO_LastRelationshipChangeReason".Translate(ratkinOrder.EsteemHandler.LastRelationshipChangeReason));
             sb.AppendLine();
         }
 
-        sb.AppendInNewLine(GetDescription(ratkinOrder, newRelation));
-        sb.AppendLine();
+        sb.AppendLine(GetDescription(ratkinOrder, newRelation));
         sb.AppendLine();
 
         int oldIndex = (int)oldRelation;
         int newIndex = (int)newRelation;
         if (upgraded)
         {
-            sb.AppendInNewLine("OARO_Relationship_GainPermission".Translate(ratkinOrder.NameColored));
+            sb.AppendLine("OARO_Relationship_GainPermission".Translate(ratkinOrder.NameColored));
             for (int i = oldIndex + 1; i <= newIndex; i++)
             {
-                sb.AppendInNewLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
+                sb.AppendLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
             }
         }
         else
         {
-            sb.AppendInNewLine("OARO_Relationship_LossPermission".Translate(ratkinOrder.NameColored));
+            sb.AppendLine("OARO_Relationship_LossPermission".Translate(ratkinOrder.NameColored));
             for (int i = oldIndex; i > newIndex; i--)
             {
-                sb.AppendInNewLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
+                sb.AppendLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
             }
         }
     }

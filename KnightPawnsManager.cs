@@ -27,9 +27,9 @@ public class KnightPawnsManager : IExposable
         Scribe_Collections.Look(ref knights, "knights", LookMode.Reference, LookMode.Deep, ref knightKeys, ref knightValues);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (knights.Remove(null) | (knights.RemoveAll(kv => kv.Value is null || kv.Value.RatkinOrder is null) > 0))
+            if (knights.RemoveAll(kv => kv.Value is null || kv.Value.RatkinOrder is null) > 0)
             {
-                Log.Error($"[OARO] Some knight records of {nameof(KnightPawnsManager)} were null or invalid after loading and have been removed.");
+                Log.Error($"[OARO] Some knight records of {nameof(KnightPawnsManager)} were invalid after loading and have been removed.");
             }
         }
     }

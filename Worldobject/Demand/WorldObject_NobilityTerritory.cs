@@ -234,7 +234,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
                 textLetterDef: LetterDefOf.PositiveEvent,
                 lookTargets: this,
                 quest: quest);
-            SendWorkResolvedSignal([false.Named("YIELD")]);
+            this.SendWorkResolvedSignal([false.Named("YIELD")]);
             this.SafeDestroy();
         }
         else
@@ -668,7 +668,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             EndWork(interrupt: true);
         }
-        SendWorkResolvedSignal([true.Named("YIELD")]);
+        this.SendWorkResolvedSignal([true.Named("YIELD")]);
     }
 
     protected override void Reset()

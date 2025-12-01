@@ -42,6 +42,12 @@ public class OrderLetter_SimpleAttachments : OrderLetter
 
     private void SpawnAttachments(Building_OrderLetterBox letterBox)
     {
+        if (Attachments.NullOrEmpty())
+        {
+            Attachments = null;
+            return;
+        }
+
         Map map;
         IntVec3 pos = IntVec3.Invalid;
         bool lost = true;

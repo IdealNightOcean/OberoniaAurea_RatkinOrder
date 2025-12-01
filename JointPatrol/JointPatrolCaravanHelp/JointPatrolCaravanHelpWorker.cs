@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld.Planet;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -7,16 +8,27 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class JointPatrolCaravanHelpWorker
 {
     public JointPatrolCaravanHelpDef Def { get; set; }
+    protected Branch Branch { get; private set; }
+    protected Caravan Caravan { get; private set; }
+    protected WorldObject_InteractiveBase IncidentSite { get; private set; }
+    protected readonly StringBuilder extraRewardText = new(64);
+
     public abstract bool Notify_CaravanArrived(Caravan caravan, Branch branch, WorldObject_InteractiveBase incidentSite);
 
-    public virtual string HelpDescription(Branch branch)
+    public virtual string RequestHelpReason(Branch branch)
     {
-        return $"{Def.label} ({branch.Name})";
+        return Def.requestHelpReason?.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF)) ?? $"{Def.label} ({branch.Name})";
     }
 
-    public virtual string GetRewardText(Branch branch)
+    private string GetRewardText(Branch branch)
     {
-        return Def.rewardText.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named("CARAVANHELPDEF"));
+        string rewardText = Def.rewardText.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF));
+        if (extraRewardText.Length > 0)
+        {
+            rewardText += ("\n" + extraRewardText.ToString());
+        }
+        extraRewardText.Clear();
+        return rewardText;
     }
 
     public virtual void ApplyEffect(Branch branch)
@@ -33,7 +45,7 @@ public abstract class JointPatrolCaravanHelpWorker
 
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
             label: "OARO_JointPatrolCaravanIncident_ThankLabel".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
-            text: GetRewardText(branch),
+            text: TaggedString.Empty,
             def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,
             relatedBranch: branch,
@@ -42,11 +54,15 @@ public abstract class JointPatrolCaravanHelpWorker
 
         if (Rand.Chance(Def.recommendationChance))
         {
-            orderLetter.Text += ("\n\n" + "OARO_JointPatrolCaravanIncident_ThankWithRecommendation".Translate());
             OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
             recommendation.SetRatkinOrder(branch.RatkinOrder);
             orderLetter.Attachments = [recommendation];
+
+            extraRewardText.AppendLine();
+            extraRewardText.AppendLine("OARO_JointPatrolCaravanIncident_ThankWithRecommendation".Translate());
         }
+
+        orderLetter.Text = GetRewardText(branch);
         OrderLetterBox.Instance.ReceiveLetter(orderLetter);
     }
 

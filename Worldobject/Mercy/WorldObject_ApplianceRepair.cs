@@ -74,7 +74,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
             if (Rand.Chance(successChance))
             {
                 taggedString = "OARO_ApplianceRepair_RepairSuccess".Translate(maxPawn);
-                SendWorkResolvedSignal();
+                this.SendWorkResolvedSignal();
             }
             else
             {

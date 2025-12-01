@@ -11,7 +11,7 @@ public static class KeyLibrary_SlateStoreAs
     public const string OrderRelationship = "orderRelationship";
 
     public const string Branch = "branch";
-    public const string BranchName = "BranchName";
+    public const string BranchName = "branchName";
     public const string BranchSite = "branchSite";
 
     public const string Squad = "squad";

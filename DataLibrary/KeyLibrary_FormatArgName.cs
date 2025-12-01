@@ -7,6 +7,7 @@ public static class KeyLibrary_FormatArgName
     public const string SKILL = "SKILL";
     public const string STUFF = "STUFF";
     public const string PAWN = "PAWN";
+    public const string CARAVANHELPDEF = "CARAVANHELPDEF";
 
     public const string Count = "Count";
     public const string Level = "Level";

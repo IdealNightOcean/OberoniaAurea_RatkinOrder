@@ -28,9 +28,11 @@ public class Window_RatkinOrder : MainTabWindow
 
     private readonly Map map;
     private readonly LazyMutable<int> mapRecommendationCount;
+    private readonly LazyMutable<string> fundChangeDetail;
     private RatkinOrder selectedOrder;
 
-    private int totalKnightsCount;
+    private int TotalKnightsCount => selectedOrder.BranchManager.TotalKnightsCount.Value;
+
     private int totalPopulation;
     private float averageSupply;
     private int notIdleBranchCount;
@@ -49,20 +51,24 @@ public class Window_RatkinOrder : MainTabWindow
     public Window_RatkinOrder()
     {
         map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(map));
-        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(selectedOrder, map));
         selectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
                    ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
                                                           + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
 
+        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(selectedOrder, map));
+        fundChangeDetail = new(refreshFunc: () => selectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
 
     }
     public Window_RatkinOrder(Map map)
     {
         this.map = map ?? throw new ArgumentNullException(nameof(map));
-        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(selectedOrder, this.map));
+
         selectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
             ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
                                                    + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
+
+        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(selectedOrder, this.map));
+        fundChangeDetail = new(refreshFunc: () => selectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
 
         RefreshRatkinOrderCache();
     }
@@ -171,6 +177,14 @@ public class Window_RatkinOrder : MainTabWindow
         Text.Font = GameFont.Medium;
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 428f, 100f, 28f);
         Widgets.Label(reusedRect, selectedOrder.Relationship.GetLabel().Colorize(selectedOrder.Relationship.GetColor()));
+        if (Mouse.IsOver(reusedRect))
+        {
+            string relationChangeReason = selectedOrder.EsteemHandler.LastRelationshipChangeReason;
+            if (!string.IsNullOrEmpty(relationChangeReason))
+            {
+                TooltipHandler.TipRegion(reusedRect, relationChangeReason);
+            }
+        }
 
         Text.Font = GameFont.Small;
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 461f, 149f, 59f);
@@ -188,12 +202,22 @@ public class Window_RatkinOrder : MainTabWindow
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(inRectX + 86f, inRectY + 540f, 128f, 20f);
         Widgets.Label(reusedRect, "OARO_OrderWin_OrderFund".Translate());
-
         reusedRect = new(inRectX + 303f, inRectY + 540f, 128f, 20f);
         Widgets.Label(reusedRect, "OARO_OrderWin_CurRecommendationLetter".Translate());
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
+        reusedRect = new(inRectX + (220f - 100f), inRectY + 572f, 90f, 32f);
+        Widgets.Label(reusedRect, selectedOrder.Funds.ToStringPercent());
+        if (Mouse.IsOver(reusedRect))
+        {
+            string fundChangeDetailStr = fundChangeDetail.Value;
+            if (!string.IsNullOrEmpty(fundChangeDetailStr))
+            {
+                TooltipHandler.TipRegion(reusedRect, () => fundChangeDetailStr, uniqueId: 19754361);
+            }
+        }
+
         reusedRect = new(inRectX + (420f - 100f), inRectY + 572f, 90f, 32f);
         Widgets.Label(reusedRect, $"× {mapRecommendationCount.Value}");
 
@@ -228,7 +252,7 @@ public class Window_RatkinOrder : MainTabWindow
         }
 
         reusedRect = new(inRectX + 270f, inRectY + 620f, 149f, 59f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_Open".Translate(), leftBigButton, leftBigButton_Down, doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_OrderWin_ExchangeWarehouse".Translate(), leftBigButton, leftBigButton_Down, doMouseoverSound: true))
         {
 
         }
@@ -241,6 +265,14 @@ public class Window_RatkinOrder : MainTabWindow
         Text.Anchor = TextAnchor.MiddleRight;
         reusedRect = new(inRectX + (420f - 110f), inRectY + 698f, 100f, 28f);
         Widgets.Label(reusedRect, selectedOrder.Esteem.ToString());
+        if (Mouse.IsOver(reusedRect))
+        {
+            if (string.IsNullOrEmpty(selectedOrder.EsteemHandler.LastEsteemChangeReason))
+            {
+                string esteemChangeReason = $"{selectedOrder.EsteemHandler.LastEsteemChangeReason} ({selectedOrder.EsteemHandler.LastEsteemChange.ToStringWithSign()})";
+                TooltipHandler.TipRegion(reusedRect, esteemChangeReason);
+            }
+        }
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleLeft;
@@ -252,7 +284,7 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Anchor = TextAnchor.MiddleRight;
         reusedRect = new(inRectX + (420f - 110f), inRectY + 745f, 100f, 18f);
-        Widgets.Label(reusedRect, totalKnightsCount.ToString());
+        Widgets.Label(reusedRect, TotalKnightsCount.ToString());
 
         reusedRect = new(inRectX + (420f - 110f), inRectY + 770f, 100f, 18f);
         Widgets.Label(reusedRect, totalPopulation.ToString());
@@ -717,7 +749,6 @@ public class Window_RatkinOrder : MainTabWindow
         IReadOnlyList<Branch> allBranches = selectedOrder.BranchManager.AllBranches;
         foreach (Branch branch in allBranches)
         {
-            totalKnightsCount += branch.Squad.AllCrewCountInt;
             totalPopulation += branch.PopulationHandler.Population;
             averageSupply += branch.Supply;
             if (!branch.IsIdleNow)
@@ -850,9 +881,9 @@ public class Window_RatkinOrder : MainTabWindow
         }
 
         mapRecommendationCount.MarkDirty();
+        fundChangeDetail.MarkDirty();
         esteemTexture = new CachedTexture("UI/RatkinOrder/OARO_EsteemTexture_0");
 
-        totalKnightsCount = 0;
         totalPopulation = 0;
         averageSupply = 0f;
         notIdleBranchCount = 0;

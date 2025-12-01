@@ -1,8 +1,11 @@
 ﻿using RimWorld;
+using RimWorld.Planet;
 using RimWorld.QuestGen;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -44,5 +47,20 @@ public static class OARO_QuestUtility
         slate.Set(KeyLibrary_SlateStoreAs.Branch, branch);
         slate.Set(KeyLibrary_SlateStoreAs.BranchName, branch.Name);
         slate.Set(KeyLibrary_SlateStoreAs.BranchSite, branch.BaseSite);
+    }
+
+    public static void SendWorkResolvedSignal(this WorldObject worldObject, NamedArgument[] args = null)
+    {
+        if (args is null)
+        {
+            QuestUtility.SendQuestTargetSignals(worldObject.questTags, "WorkResolved", worldObject.Named(KeyLibrary_FormatArgName.SUBJECT));
+        }
+        else
+        {
+            NamedArgument[] extendedArgs = new NamedArgument[args.Length + 1];
+            extendedArgs[0] = worldObject.Named(KeyLibrary_FormatArgName.SUBJECT);
+            Array.Copy(args, 0, extendedArgs, 1, args.Length);
+            QuestUtility.SendQuestTargetSignals(worldObject.questTags, "WorkResolved", extendedArgs);
+        }
     }
 }

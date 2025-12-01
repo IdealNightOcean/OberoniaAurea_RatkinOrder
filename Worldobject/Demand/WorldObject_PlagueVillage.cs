@@ -503,7 +503,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
 
     private void PlagueResolved()
     {
-        SendWorkResolvedSignal([population.Named("POPULATION")]);
+        this.SendWorkResolvedSignal([population.Named("POPULATION")]);
         this.SafeDestroy();
     }
 }

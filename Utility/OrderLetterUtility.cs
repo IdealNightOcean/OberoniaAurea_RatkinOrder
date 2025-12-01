@@ -65,7 +65,13 @@ public static class OrderLetterUtility
     {
         if (!forceSlience && IsTransToRimLetter(letter.Def))
         {
-            ChoiceLetter rimLetter = LetterMaker.MakeLetter(letter.Label, letter.Text, letter.RelatedLetterDef, lookTargets: null, letter.RelatedFaction);
+            ChoiceLetter rimLetter = LetterMaker.MakeLetter(
+                label: letter.Label,
+                text: letter.Text,
+                def: letter.RelatedLetterDef,
+                lookTargets: null,
+                relatedFaction: letter.RelatedFaction);
+
             if (rimLetter is ChoiceLetter_RatkinOrder rimOrderLetter)
             {
                 rimOrderLetter.relatedOrder = letter.RelatedOrder;

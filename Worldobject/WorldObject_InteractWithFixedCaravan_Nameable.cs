@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -26,20 +25,5 @@ public abstract class WorldObject_InteractWithFixedCaravan_Nameable : WorldObjec
     {
         base.ExposeData();
         Scribe_Values.Look(ref name, "name", null);
-    }
-
-    protected void SendWorkResolvedSignal(NamedArgument[] args = null)
-    {
-        if (args is null)
-        {
-            QuestUtility.SendQuestTargetSignals(questTags, "WorkResolved", this.Named(KeyLibrary_FormatArgName.SUBJECT));
-        }
-        else
-        {
-            NamedArgument[] extendedArgs = new NamedArgument[args.Length + 1];
-            extendedArgs[0] = this.Named(KeyLibrary_FormatArgName.SUBJECT);
-            Array.Copy(args, 0, extendedArgs, 1, args.Length);
-            QuestUtility.SendQuestTargetSignals(questTags, "WorkResolved", extendedArgs);
-        }
     }
 }

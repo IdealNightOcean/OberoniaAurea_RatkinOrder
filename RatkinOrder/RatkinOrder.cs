@@ -137,6 +137,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     internal void PostLoadInit()
     {
         branchManager.PostLoadInit();
+        jointPatrolManager.PostLoadInit();
     }
 
     public string GetUniqueLoadID() => $"{nameof(RatkinOrder)}_{loadID}";

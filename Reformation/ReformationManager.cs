@@ -18,7 +18,7 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
     public float ReformProgress
     {
         get { return reformProgress; }
-        set { reformProgress = value; }
+        set { reformProgress = value > 0f ? value : 0f; }
     }
 
     public float FixedReformProgressCost = -1f;
@@ -38,11 +38,19 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"ReformProgress: {reformProgress}");
-        listing_Rect.Label($"ReformationsCount: {ReformationsCount}");
-        listing_Rect.Label($"FixedReformProgressCost: {FixedReformProgressCost}");
+        listing_Rect.Label($"自新点数: {reformProgress}");
+        if (listing_Rect.ButtonText("自新点数 +10"))
+        {
+            ReformProgress += 10f;
+        }
+        if (listing_Rect.ButtonText("自新点数 -10"))
+        {
+            ReformProgress -= 10f;
+        }
+        listing_Rect.Label($"激活自新数量: {ReformationsCount}");
+        listing_Rect.Label($"下次自新固定花费: {FixedReformProgressCost}");
 
-        if (listing_Rect.ButtonText("Reformations", null, 0.8f))
+        if (listing_Rect.ButtonText("自新详细信息", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllActiveReformationString()));
         }

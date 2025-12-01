@@ -10,7 +10,6 @@ public struct BranchMedalRecord : IExposable
     /// <summary>
     /// None类型勋章和非正数勋章无效
     /// </summary>
-    public readonly bool Validate() => Count > 0;
 
     public override readonly string ToString() => $"Count: {Count}, FirstGotTick: {FirstGotTick}";
 

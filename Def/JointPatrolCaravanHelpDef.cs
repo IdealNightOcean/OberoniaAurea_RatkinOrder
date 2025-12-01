@@ -27,6 +27,8 @@ public class JointPatrolCaravanHelpDef : JointPatrolInteractionDef
     public int timeOutTicks = 60000;
 
     [MustTranslate]
+    public string requestHelpReason;
+    [MustTranslate]
     public string rewardText;
 
     public override IEnumerable<string> ConfigErrors()

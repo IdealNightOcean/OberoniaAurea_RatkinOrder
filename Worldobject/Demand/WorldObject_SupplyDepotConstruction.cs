@@ -24,7 +24,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
                 constricProgress = Mathf.Clamp(constricProgress + 10f, 0f, 800f);
                 if (constricProgress >= 800f && !isWorking)
                 {
-                    SendWorkResolvedSignal();
+                    this.SendWorkResolvedSignal();
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_FinallyAutoFinished".Translate(), Faction));
                     PlanetTile tile = Tile;
                     this.SafeDestroy();
@@ -50,7 +50,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
 
         if (constricProgress >= 800f)
         {
-            SendWorkResolvedSignal();
+            this.SendWorkResolvedSignal();
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_FinallyFinished".Translate(), Faction));
 
             PlanetTile tile = Tile;

@@ -177,20 +177,57 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_JointPatrolManager(ratkinOrder));
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"CurState: {curState}");
-        listing_Rect.Gap(6f);
-        listing_Rect.Label($"TickToNextStage: {tickToNextStage}");
+        listing_Rect.Label($"当前阶段: {curState}");
+        listing_Rect.Label($"距下一阶段 (Tick): {tickToNextStage}");
         listing_Rect.Gap(6f);
         listing_Rect.Label($"BurdenSquadCount: {burdenSquadCount}");
-        listing_Rect.Gap(6f);
-        listing_Rect.Label($"CurPatrolType: {patrolLevel}");
+        listing_Rect.Gap(12f);
+
         if (curState != PatrolState.Invalid)
         {
-            listing_Rect.Label($"ParticipantsCount: {participantsDict.Count}");
-            if (listing_Rect.ButtonText("next stage"))
+            listing_Rect.Label($"当前联巡等级: {patrolLevel}");
+            listing_Rect.Label($"参与分部数: {participantsDict.Count}");
+            listing_Rect.Label($"已归队常驻骑士数: {participatingResidentKnights.Count} | {innerContainer.Count}");
+            listing_Rect.SubLabel("左右两值应该相等，否则大概率是有问题的，可能导致某些常驻骑士无法返回", widthPct: 0.8f);
+            listing_Rect.Label($"骑士牺牲数量: {sacrificeCount}");
+        }
+        listing_Rect.Label($"当前求助接取策略: {CurHelpPolicy}");
+        if (listing_Rect.ButtonText("改变求助接取策略", widthPct: 0.5f))
+        {
+            CurHelpPolicy = (HelpPolicy)(((int)CurHelpPolicy + 1) % 3);
+        }
+        listing_Rect.Label($"可接取求助上限: {HelpCeiling}");
+        listing_Rect.Label($"求助生成检测间隔 (Tick): {HelpCeiling}");
+        listing_Rect.Label($"下一次求助生成检测时刻 (Tick): {nextHelpCheckTick}");
+        if (curState == PatrolState.Ongoing)
+        {
+            if (listing_Rect.ButtonText("触发联巡事件", widthPct: 0.5f))
             {
-                tickToNextStage = 0;
+                TryTriggerPatrolIncident(participants.RandomElement());
             }
+            if (listing_Rect.ButtonText("触发联巡求助", widthPct: 0.5f))
+            {
+                TryTriggerCaravanHelp();
+            }
+        }
+
+        listing_Rect.Gap(12f);
+        listing_Rect.Label("上一次联巡总结");
+        listing_Rect.SliderLabeled(completionSummary, 50f, 0f, 50f);
+        if (listing_Rect.ButtonText("查看联巡事件"))
+        {
+            StringBuilder sb = new(128);
+            int i = 0;
+            foreach (var record in interactionRecords)
+            {
+                sb.AppendLine($"{++i}. {record}");
+            }
+            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(sb.ToString(), ratkinOrder);
+            Find.WindowStack.Add(nodeTree);
+        }
+        if (listing_Rect.ButtonText("快速进入下一阶段", widthPct: 0.5f))
+        {
+            tickToNextStage = 0;
         }
     }
 
@@ -394,7 +431,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         participantsDict.Clear();
 
         participatingResidentKnights.Clear();
-        if (!forceClear || innerContainer.Count > 0)
+        if (!forceClear && innerContainer.Count > 0)
         {
             Log.Error("[OARO] Trying to clear joint patrol data when inner container is not empty.");
         }
@@ -870,7 +907,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         try
         {
             slate.SetBasicBranchSlateVar(targetBranch, alsoSetOrder: true);
-            slate.Set("helpDescription", caravanHelpDef.Worker.HelpDescription(targetBranch));
+            slate.Set("helpDescription", caravanHelpDef.Worker.RequestHelpReason(targetBranch));
             slate.Set("map", OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false));
         }
         catch { }

@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean.Collection;
+using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -55,19 +56,28 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"Funds: {funds:F2}");
-        listing_Rect.Label($"PreDayFunds: {preDayFunds:F2}");
-        listing_Rect.Label($"expectedChange: {expectedChange:F2}");
+        listing_Rect.Label($"当场资金: {funds.ToStringPercent("F2")}");
+        listing_Rect.Label($"昨日资金: {preDayFunds.ToStringPercent("F2")}");
+        listing_Rect.Label($"预期日结变化: {expectedChange.ToStringPercentSigned("F2")}");
+        if (listing_Rect.ButtonText("资金 +10%"))
+        {
+            AdjustFundsImmediately(0.1f, reason: "Dev +10%");
+        }
+        if (listing_Rect.ButtonText("资金 -10%"))
+        {
+            AdjustFundsImmediately(-0.1f, reason: "Dev -10%");
+        }
+
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"HasFortune: {hasFortune}");
-        listing_Rect.Label($"HasRestoration: {hasRestoration}");
+        listing_Rect.Label($"是否正在时运: {hasFortune}");
+        listing_Rect.Label($"是否正在归正: {hasRestoration}");
         listing_Rect.Gap(6f);
-        if (listing_Rect.ButtonText("Fund Events", null, 0.8f))
+        if (listing_Rect.ButtonText("资金事件", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetFundEventsDetailString()));
         }
         listing_Rect.Gap(6f);
-        if (listing_Rect.ButtonText("Fund Change Detail", null, 0.8f))
+        if (listing_Rect.ButtonText("资金变化细节", null, 0.8f))
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetFundChangeDetail()));
         }
@@ -157,7 +167,7 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
         return false;
     }
 
-    public void RemoveFirstFundEventsOfDef(OrderFundEventDef def)
+    public bool RemoveFirstFundEventsOfDef(OrderFundEventDef def)
     {
         int indexToRemove = -1;
         for (int i = 0; i < fundEvents.Count; i++)
@@ -172,13 +182,12 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
         if (indexToRemove > 0)
         {
             fundEvents.RemoveAt(indexToRemove);
+            return true;
         }
+        return false;
     }
 
-    public void RemoveAllFundEventsOfDef(OrderFundEventDef def)
-    {
-        fundEvents.RemoveAll(e => e.Def == def);
-    }
+    public int RemoveAllFundEventsOfDef(OrderFundEventDef def) => fundEvents.RemoveAll(e => e.Def == def);
 
     private void DailySpontaneousChange()
     {
@@ -224,24 +233,14 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
     {
         expectedChange = 0f;
         expectedChangeExplanation.Clear();
-        int newIndex = 0;
-        for (int i = 0; i < fundEvents.Count; i++)
+        fundEvents.RemoveAll(ShouldRemoveAfterProcessed);
+
+        bool ShouldRemoveAfterProcessed(OrderFundEvent fundEvent)
         {
-            OrderFundEvent fundEvent = fundEvents[i];
             fundEvent.DayPassed();
-            AdjustFundsExpected(fundEvent.TodayChange, fundEvent.Def?.label);
-
-            if (fundEvent.DaysLeft > 0)
-            {
-                if (i != newIndex)
-                {
-                    fundEvents[newIndex] = fundEvents[i];
-                }
-                newIndex++;
-            }
+            AdjustFundsExpected(fundEvent.TodayChange, fundEvent.Def?.label ?? "OARO_Fund_Misc".Translate());
+            return fundEvent.DaysLeft <= 0;
         }
-
-        fundEvents.RemoveRange(newIndex, fundEvents.Count - newIndex);
     }
 
     internal void PostLoadInit()
@@ -252,34 +251,33 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
     public string GetFundChangeDetail()
     {
         StringBuilder sb = new();
-        sb.AppendLine("OARO_Fund_ImmediatelyChange".Translate(immediatelyChange.ToStringWithSign("0.##")).Colorize(immediatelyChange < 0f ? ColorLibrary.RedReadable : Color.green));
+        sb.AppendLine("OARO_Fund_ImmediatelyChange".Translate(immediatelyChange.ToStringPercentSigned("0.##")).Colorize(immediatelyChange < 0f ? ColorLibrary.RedReadable : Color.green));
         sb.AppendLine("----");
         if (immediatelyChangeExplanation.Count > 0)
         {
             foreach (KeyValuePair<string, float> kv in immediatelyChangeExplanation)
             {
-                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringWithSign("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringPercentSigned("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
 
         sb.AppendLine();
-        sb.AppendLine("-*-*-*-*-*-");
         sb.AppendLine();
 
-        sb.AppendLine("OARO_Fund_ExpectedChange".Translate(expectedChange.ToStringWithSign("0.##")).Colorize(expectedChange < 0f ? ColorLibrary.RedReadable : Color.green));
+        sb.AppendLine("OARO_Fund_ExpectedChange".Translate(expectedChange.ToStringPercentSigned("0.##")).Colorize(expectedChange < 0f ? ColorLibrary.RedReadable : Color.green));
         sb.AppendLine("----");
         if (expectedChangeExplanation.Count > 0)
         {
             foreach (KeyValuePair<string, float> kv in expectedChangeExplanation)
             {
-                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringWithSign("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringPercentSigned("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
 
         return sb.ToString();
     }
 
-    public string GetFundEventsDetailString()
+    private string GetFundEventsDetailString()
     {
         if (fundEvents.NullOrEmpty())
         {

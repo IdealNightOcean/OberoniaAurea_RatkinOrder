@@ -21,7 +21,7 @@ public class WorldObject_JointPatrolCaravanHelpSite : WorldObject_Interactive_Na
     {
         SetOrderBranch(branch);
         caravanIncidentDef = def;
-        name = def.label + (branch?.Name);
+        name = $"{def.label} ({branch?.Name})";
     }
 
     public void SetOrderBranch(Branch branch)
@@ -32,10 +32,10 @@ public class WorldObject_JointPatrolCaravanHelpSite : WorldObject_Interactive_Na
     public override string GetInspectString()
     {
         StringBuilder sb = new(base.GetInspectString());
-        string caravanIncidentStr = caravanIncidentDef?.Worker?.HelpDescription(branch);
+        string caravanIncidentStr = caravanIncidentDef?.Worker?.RequestHelpReason(branch);
         if (!string.IsNullOrEmpty(caravanIncidentStr))
         {
-            sb.AppendLine(caravanIncidentStr);
+            sb.AppendInNewLine(caravanIncidentStr);
         }
         return sb.ToString();
     }

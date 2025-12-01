@@ -19,13 +19,13 @@ public class Reward_OrderRecommendation : Reward
     {
         get
         {
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_OrderRecommendation".Translate(RatkinOrder.Name) + " " + Count.ToStringWithSign(),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_OrderRecommendation".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)) + " " + Count.ToStringWithSign(),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
                                                                             GUI.DrawTexture(r, null); //OARO_ThingDefOf.OARO_OrderRecommendation.uiIcon
                                                                             GUI.color = Color.white;
                                                                         },
-                                                                        tipGetter: () => "OARO_Reward_OrderRecommendationTip".Translate(RatkinOrder.Name).Resolve());
+                                                                        tipGetter: () => "OARO_Reward_OrderRecommendationTip".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)).Resolve());
         }
     }
 
@@ -47,7 +47,7 @@ public class Reward_OrderRecommendation : Reward
         };
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_OrderRecommendationDesc".Translate(RatkinOrder.Name, Count).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_OrderRecommendationDesc".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName), Count.Named(KeyLibrary_FormatArgName.Count)).Resolve();
 
     public override string ToString() => $"{GetType().Name} (RatkinOrder={RatkinOrder.NameColored}, count={Count})";
 

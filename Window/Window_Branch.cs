@@ -183,7 +183,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, $"{branch.FacilityHandler.TotalFacilityLevel}/{allFacilityDefCount * 4}");
 
         reusedRect = new(mainInnerRectX + (755f - 192f), reusedRect.yMax + 10f, 192f, 32f);
-        Widgets.Label(reusedRect, "OARO_TotalFacilitiesLevel".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchWin_TotalFacilitiesLevel".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -234,7 +234,7 @@ public class Window_Branch : OrderWindowBase
 
         reusedRect = new(inRect.xMax - 110f, inRect.y + 10f, 110f, 22f);
         Text.Anchor = TextAnchor.MiddleRight;
-        Widgets.Label(reusedRect, "OARO_StoresReservesConstruction".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchWin_StoresReservesConstruction".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
         reusedRect = new(reusedRect.xMin - 13f, reusedRect.y, 13f, 22f);
         GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
@@ -244,17 +244,17 @@ public class Window_Branch : OrderWindowBase
     {
         float tabRectWidth = inRect.width / 3f;
         Rect constructionTabRect = new(inRect.x, inRect.y, tabRectWidth, 45f);
-        if (OARO_WindowUtility.TextButtonImage(constructionTabRect, "OARO_ConstructionTab".Translate(), middleTopButton, middleTopButton_Down))
+        if (OARO_WindowUtility.TextButtonImage(constructionTabRect, "OARO_BranchWin_ConstructionTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Construction);
         }
         Rect demandTabRect = new(constructionTabRect.xMax, inRect.y, tabRectWidth, 45f);
-        if (OARO_WindowUtility.TextButtonImage(demandTabRect, "OARO_DemandTab".Translate(), middleTopButton, middleTopButton_Down))
+        if (OARO_WindowUtility.TextButtonImage(demandTabRect, "OARO_BranchWin_DemandTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Contract);
         }
         Rect interactionTabRect = new(demandTabRect.xMax, inRect.y, tabRectWidth, 45f);
-        if (OARO_WindowUtility.TextButtonImage(interactionTabRect, "OARO_InteractionTab".Translate(), middleTopButton, middleTopButton_Down))
+        if (OARO_WindowUtility.TextButtonImage(interactionTabRect, "OARO_BranchWin_InteractionTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Interaction);
         }
@@ -287,7 +287,7 @@ public class Window_Branch : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, "OARO_BranchFacilities".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchWin_Facilities".Translate());
 
         Rect facilitiesRect = inRect;
         facilitiesRect.yMin = reusedRect.yMax + 3f;
@@ -300,12 +300,12 @@ public class Window_Branch : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, "OARO_BranchBuildings".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchWin_Buildings".Translate());
 
         reusedRect.xMax -= 12f;
         Text.Anchor = TextAnchor.MiddleRight;
         Text.Font = GameFont.Small;
-        Widgets.Label(reusedRect, "OARO_BranchBuildingCeiling".Translate() + ": " + $"{cachedBranchInfo.BuildingCeiling}/{BranchStatDefOf.OARO_BuildingCeiling.maxValue:F0}");
+        Widgets.Label(reusedRect, "OARO_BranchWin_BranchBuildingCeiling".Translate() + ": " + $"{cachedBranchInfo.BuildingCeiling}/{BranchStatDefOf.OARO_BuildingCeiling.maxValue:F0}");
 
         float yMin = reusedRect.yMax + 4f;
         reusedRect = inRect;
@@ -552,7 +552,7 @@ public class Window_Branch : OrderWindowBase
         }
         else
         {
-            string buttonLabel = isSpecialSlot ? "OARO_ClickToConstructBuilding_Special".Translate() : "OARO_ClickToConstructBuilding".Translate();
+            string buttonLabel = isSpecialSlot ? "OARO_BranchWin_ClickToConstructBuilding_Special".Translate() : "OARO_BranchWin_ClickToConstructBuilding".Translate();
             bool selected = ((curSelectType == SelectType.EmptyBuildingSlot) && (selEmptyBuildingSlotIsSpecial == isSpecialSlot));
             if (selected)
             {
@@ -586,7 +586,7 @@ public class Window_Branch : OrderWindowBase
 
         Rect reusedRect = new(inRect.x + 2f, inRect.y, inRect.width - 4f, Text.LineHeight);
         Text.Anchor = TextAnchor.MiddleLeft;
-        Widgets.Label(reusedRect, "OARO_Constructing".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchWin_Constructing".Translate());
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, underConstructionBuilding.DurationTicksLeft.ToStringTicksToPeriod());
 
@@ -660,7 +660,7 @@ public class Window_Branch : OrderWindowBase
                 entryY += (entryHeight - 2f);
                 entryRect = entryRect.ContractedBy(2f);
                 GUI.DrawTexture(entryRect, contractShade);
-                Widgets.Label(entryRect, "OARO_NoContractNow".Translate());
+                Widgets.Label(entryRect, "OARO_BranchWin_NoContractNow".Translate());
             }
         }
 
@@ -674,7 +674,7 @@ public class Window_Branch : OrderWindowBase
                 entryRect = entryRect.ContractedBy(2f);
                 int populationLimit = populationHandler.PopulationLimitByIndex(i);
                 GUI.DrawTexture(entryRect, contractShade, ScaleMode.ScaleAndCrop);
-                Widgets.Label(entryRect, "OARO_ContractUnlockPop".Translate(populationLimit));
+                Widgets.Label(entryRect, "OARO_BranchWin_ContractUnlockPop".Translate(populationLimit));
             }
         }
         Widgets.EndScrollView();
@@ -740,7 +740,7 @@ public class Window_Branch : OrderWindowBase
                         GUI.DrawTexture(inRect.ContractedBy(2f), contractShade, ScaleMode.StretchToFill);
                         Text.Font = GameFont.Medium;
                         Text.Anchor = TextAnchor.MiddleCenter;
-                        Widgets.Label(inRect, "OARO_ContractCooling".Translate(contract.TicksToExpire.TicksToDays().ToString("0.##"))
+                        Widgets.Label(inRect, "OARO_BranchWin_ContractCooling".Translate(contract.TicksToExpire.TicksToDays().ToString("0.##"))
                                                                     .Colorize(Color.green));
                     }
 
@@ -754,7 +754,7 @@ public class Window_Branch : OrderWindowBase
                     GUI.DrawTexture(inRect, contractShade);
                     Text.Font = GameFont.Medium;
                     Text.Anchor = TextAnchor.MiddleCenter;
-                    Widgets.Label(inRect, "OARO_ContractInvalid".Translate()
+                    Widgets.Label(inRect, "OARO_BranchWin_ContractInvalid".Translate()
                                                                 .Colorize(ColorLibrary.RedReadable));
                     return;
                 }
@@ -772,7 +772,7 @@ public class Window_Branch : OrderWindowBase
         float commonEntryHeight = 70f;
 
         reusedRect.height = commonRect.height - commonEntryHeight * 2f;
-        string label = "OARO_CommonBranchInteraction".Translate();
+        string label = "OARO_BranchWin_CommonInteraction".Translate();
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(reusedRect, label);
@@ -841,7 +841,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = buildingRect;
         reusedRect.height = 43f;
         Text.Anchor = TextAnchor.MiddleCenter;
-        label = "OARO_BuildingBranchInteraction".Translate();
+        label = "OARO_BranchWin_BuildingInteraction".Translate();
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
         Widgets.Label(reusedRect, label);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
@@ -880,7 +880,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = new(inRect.xMax - 72f, inRect.y, 72f, inRect.height);
         if (OARO_WindowUtility.TextButtonImageDisableable(
             butRect: reusedRect,
-            label: "OARO_Interaction".Translate(),
+            label: "OARO_BranchWin_Interaction".Translate(),
             acceptance: acceptance,
             baseTex: buildingInteractionButton,
             downTex: buildingInteractionButton_Down,
@@ -915,13 +915,13 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Small;
         reusedRect = new(inRect.x, textRect.yMax + 2f, 264f, 36f);
-        Widgets.Label(reusedRect, "OARO_BranchPopulation".Translate() + $"   {branch.PopulationHandler.Population}");
+        Widgets.Label(reusedRect, "OARO_BranchWin_Population".Translate() + $"   {branch.PopulationHandler.Population}");
         reusedRect = new(inRect.x, reusedRect.yMax + 2f, 264f, 36f);
-        Widgets.Label(reusedRect, "OARO_BranchPopulationCeiling".Translate() + $"   {cachedBranchInfo.PopulationCeiling}");
+        Widgets.Label(reusedRect, "OARO_BranchWin_PopulationCeiling".Translate() + $"   {cachedBranchInfo.PopulationCeiling}");
 
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(reusedRect.xMax + (2f + 10f), textRect.yMax + (2f + 10f), 90f, 24f);
-        Widgets.Label(reusedRect, "OARO_DailyChange".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchWin_DailyChange".Translate());
 
         Text.Anchor = TextAnchor.MiddleRight;
         Text.Font = GameFont.Medium;
@@ -984,7 +984,7 @@ public class Window_Branch : OrderWindowBase
         Rect descRect = new(inRectX, reusedRect.yMax + 36f, commonWidth, stageRectHeight);
         if (curFacilityStageCache is not null)
         {
-            TaggedString label = "OARO_CurFacilityStage".Translate();
+            TaggedString label = "OARO_BranchWin_CurFacilityStage".Translate();
             if (curFacilityStageCache.Level == BranchFacilityLevel.Excellent)
             {
                 label += " (Max)";
@@ -999,7 +999,7 @@ public class Window_Branch : OrderWindowBase
         descRect = new(inRectX, descRect.yMax + 48f, commonWidth, stageRectHeight);
         if (nextFacilityStageCache is not null)
         {
-            TaggedString label = "OARO_NextFacilityStage".Translate();
+            TaggedString label = "OARO_BranchWin_NextFacilityStage".Translate();
             reusedRect = descRect;
             reusedRect.height = 24f;
             Text.Anchor = TextAnchor.MiddleCenter;
@@ -1042,7 +1042,7 @@ public class Window_Branch : OrderWindowBase
             {
                 reusedRect = new(inRectX, inRect.y, inRect.width, 24f);
                 Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label(reusedRect, "OARO_Constructing".Translate());
+                Widgets.Label(reusedRect, "OARO_BranchWin_Constructing".Translate());
                 Text.Anchor = TextAnchor.MiddleRight;
                 Widgets.Label(reusedRect, underConstructionFacility.DurationTicksLeft.ToStringTicksToPeriod());
 
@@ -1051,10 +1051,10 @@ public class Window_Branch : OrderWindowBase
 
                 reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
                 Text.Anchor = TextAnchor.MiddleCenter;
-                if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
+                if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
                 {
                     Dialog_NodeTree dialog_Node = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
-                         text: "OARO_CancelConstructWarnning".Translate(),
+                         text: "OARO_BranchWin_CancelConstructWarnning".Translate(),
                          acceptAction: facilityHandler.CancelFacilityConstruction);
                     Find.WindowStack.Add(dialog_Node);
                 }
@@ -1073,7 +1073,7 @@ public class Window_Branch : OrderWindowBase
             Rect textRect = new(inRectX, inRect.y, inRectWidth, 24f);
             reusedRect = textRect;
             Text.Anchor = TextAnchor.MiddleLeft;
-            Widgets.Label(reusedRect, "OARO_ExpectedCost".Translate());
+            Widgets.Label(reusedRect, "OARO_BranchWin_ExpectedCost".Translate());
             reusedRect.xMin += 0.33f * inRectWidth;
             Widgets.Label(reusedRect, nextFacilityStageCache.TimeCost.TicksToDays().ToString() + "Day".Translate());
 
@@ -1087,7 +1087,7 @@ public class Window_Branch : OrderWindowBase
             Widgets.ThingIcon(reusedRect, ThingDefOf.Silver, graphicIndexOverride: 2);
 
             reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_StartConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
+            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_BranchWin_StartConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
             {
                 AcceptanceReport acceptance = facilityHandler.CanConstructFacility(selFacilityDef, byPlayer: true, caravan: caravan, resultOnly: false);
                 if (acceptance)
@@ -1147,15 +1147,15 @@ public class Window_Branch : OrderWindowBase
 
         float commonWidth = 298f;
 
-        Rect descRect = DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 32f), "OARO_BuildingBaseEffect".Translate(), selBuildingDefCache.BaseEffectDesc, ref scrollPosition_BuildingBaseEffect);
+        Rect descRect = DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 32f), "OARO_BranchWin_BuildingBaseEffect".Translate(), selBuildingDefCache.BaseEffectDesc, ref scrollPosition_BuildingBaseEffect);
 
         if (buildingDef.IsUpgradable)
         {
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(inRectX, descRect.yMax + 8f, commonWidth, 48f);
-            Widgets.Label(reusedRect, "OARO_BuildingUpgradePopGE".Translate(buildingDef.advancedProperties.advancedPopulation.ToString()));
+            Widgets.Label(reusedRect, "OARO_BranchWin_BuildingUpgradePopGE".Translate(buildingDef.advancedProperties.advancedPopulation.ToString()));
 
-            descRect = DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 8f), "OARO_BuildingAdvancedEffect".Translate(), selBuildingDefCache.AdvancedEffectDesc, ref scrollPosition_BuildingAdvancedEffect);
+            descRect = DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 8f), "OARO_BranchWin_BuildingAdvancedEffect".Translate(), selBuildingDefCache.AdvancedEffectDesc, ref scrollPosition_BuildingAdvancedEffect);
         }
 
         if (curSelectType == SelectType.ConstructingBuilding)
@@ -1183,7 +1183,7 @@ public class Window_Branch : OrderWindowBase
         Rect reusedRect = inRect;
         reusedRect.height = 24f;
         Text.Anchor = TextAnchor.MiddleLeft;
-        Widgets.Label(reusedRect, "OARO_Constructing".Translate());
+        Widgets.Label(reusedRect, "OARO_BranchWin_Constructing".Translate());
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, underConstructionBuilding.DurationTicksLeft.ToStringTicksToPeriod());
 
@@ -1191,10 +1191,10 @@ public class Window_Branch : OrderWindowBase
         Widgets.FillableBar(reusedRect, underConstructionBuilding.Progress, IconLibrary.BarTex_White, IconLibrary.BarTex_Black, doBorder: true);
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
         {
             Dialog_NodeTree dialog_Node = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
-                text: "OARO_CancelConstructWarnning".Translate(),
+                text: "OARO_BranchWin_CancelConstructWarnning".Translate(),
                 acceptAction: branch.BuildingHandler.CancelBuildingConstruction);
             Find.WindowStack.Add(dialog_Node);
         }
@@ -1277,7 +1277,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.TextArea(reusedRect, selBuildingDefCache.BuildingDef.description, readOnly: true);
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 2f, 88f, 29f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_StartConstruct".Translate(), constructButton, constructButton_Down))
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_BranchWin_StartConstruct".Translate(), constructButton, constructButton_Down))
         {
             BranchBuildingConstructParms constructParameter = new(branch, selBuildingDefCache.BuildingDef)
             {

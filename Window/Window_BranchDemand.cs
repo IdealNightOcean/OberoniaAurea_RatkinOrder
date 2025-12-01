@@ -210,7 +210,7 @@ public class Window_BranchDemand : OrderWindowBase
         Rect reusedRect = inRect;
         reusedRect.width /= 2;
         reusedRect.height /= 2;
-        Widgets.Label(reusedRect, "OARO_OrderEsteem".Translate() + ": " + ratkinOrder.Esteem.ToString());
+        Widgets.Label(reusedRect, "OARO_DemandWin_OrderEsteem".Translate() + ": " + ratkinOrder.Esteem.ToString());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = inRect.xMax;
@@ -276,7 +276,7 @@ public class Window_BranchDemand : OrderWindowBase
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleLeft;
         Rect reusedRect = new(inRect.x, inRect.y - 32f, inRect.width, 32f);
-        Widgets.Label(reusedRect, "OARO_AcceptedDemand".Translate());
+        Widgets.Label(reusedRect, "OARO_DemandWin_AcceptedDemand".Translate());
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, $"{AcceptedBranchDemandHandler.Instance.AcceptanceCount}/{RatkinOrderSettings.MaxConcurrentAcceptedDemand}");
         if (selDemand is null)
@@ -410,7 +410,7 @@ public class Window_BranchDemand : OrderWindowBase
             }
         }
         reusedRect = new(cliqueRect.x, cliqueRect.yMax - 25f, 92f, 25f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_CliqueDetail".Translate(), checkButton, checkButton_Down, doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_DemandWin_CliqueDetail".Translate(), checkButton, checkButton_Down, doMouseoverSound: true))
         {
 
         }
@@ -419,7 +419,7 @@ public class Window_BranchDemand : OrderWindowBase
         GUI.DrawTexture(potencyRect, criticalDemandPotencyFrame);
         reusedRect = OARO_WindowUtility.CenterRectOnX(potencyRect, potencyRect.y + 12f, potencyRect.width, 22f);
         Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(reusedRect, "OARO_DemandQuestPotency".Translate());
+        Widgets.Label(reusedRect, "OARO_DemandWin_QuestPotency".Translate());
 
         Text.Font = GameFont.Medium;
         reusedRect = OARO_WindowUtility.CenterRectOnX(potencyRect, reusedRect.yMax + 24f, potencyRect.width, 32f);
@@ -537,7 +537,7 @@ public class Window_BranchDemand : OrderWindowBase
 
             reusedRect = new(reusedRect.xMax + 2f, innerRect.y, 128f, 32f);
             Text.Font = GameFont.Medium;
-            Widgets.Label(reusedRect, "OARO_BranchSiteDistanceStr".Translate());
+            Widgets.Label(reusedRect, "OARO_DemandWin_BranchSiteDistance".Translate());
 
             reusedRect = new(reusedRect.x, reusedRect.yMax + 2f, reusedRect.width, 51f);
             Rect reusedRectII = reusedRect;
@@ -549,11 +549,11 @@ public class Window_BranchDemand : OrderWindowBase
             Text.Font = GameFont.Small;
             if (SummaryUICache.IsInAffectedRange)
             {
-                Widgets.Label(reusedRectII, "OARO_InAffectedRange".Translate().Colorize(Color.green));
+                Widgets.Label(reusedRectII, "OARO_DemandWin_InAffectedRange".Translate().Colorize(Color.green));
             }
             else
             {
-                Widgets.Label(reusedRectII, "OARO_OutOfAffectedRange".Translate());
+                Widgets.Label(reusedRectII, "OARO_DemandWin_OutOfAffectedRange".Translate());
             }
 
             reusedRect = new(reusedRect.xMax + 2f, innerRect.y, 150f, 86f);
@@ -565,7 +565,7 @@ public class Window_BranchDemand : OrderWindowBase
             reusedRectII = reusedRect;
             reusedRectII.height /= 2;
             Text.Font = GameFont.Medium;
-            Widgets.Label(reusedRectII, "OARO_BranchPotencyStr".Translate());
+            Widgets.Label(reusedRectII, "OARO_DemandWin_BranchPotency".Translate());
 
             reusedRectII.yMin = reusedRectII.yMax;
             reusedRectII.yMax = reusedRect.yMax;
@@ -625,7 +625,7 @@ public class Window_BranchDemand : OrderWindowBase
                 GUI.DrawTexture(inRect, IconLibrary.ShadeTexture);
                 Text.Font = GameFont.Medium;
                 Text.Anchor = TextAnchor.MiddleCenter;
-                Widgets.Label(inRect, "OARO_NoDemandOfTypeNow".Translate());
+                Widgets.Label(inRect, "OARO_DemandWin_NoDemandOfTypeNow".Translate());
                 return;
             }
 
@@ -699,7 +699,7 @@ public class Window_BranchDemand : OrderWindowBase
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.LowerCenter;
             reusedRect = new(tagRect.x + 8f, tagRect.y + 4f, 96f, 20f);
-            Widgets.Label(reusedRect, "OARO_BranchDemandTags".Translate());
+            Widgets.Label(reusedRect, "OARO_DemandWin_DemandTags".Translate());
 
             Rect tagOutRect = Rect.MinMaxRect(tagRect.xMin + 40f, tagRect.yMin + 30f, tagRect.xMax - 40f, tagRect.yMax - 30f);
 
