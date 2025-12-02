@@ -160,7 +160,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
         base.Notify_QuestSignalReceived(signal);
         if (InSignalsResolved?.Contains(signal.tag) ?? false)
         {
-            if (NobilityTerritories is not null && signal.args.TryGetArg("SUBJECT", out WorldObject_NobilityTerritory territory))
+            if (NobilityTerritories is not null && signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out WorldObject_NobilityTerritory territory))
             {
                 if (NobilityTerritories.Remove(territory))
                 {

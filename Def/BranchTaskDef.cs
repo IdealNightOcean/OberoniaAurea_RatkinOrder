@@ -48,6 +48,11 @@ public class BranchTaskDef : Def
     public bool isOutdoorTask;
 
     /// <summary>
+    /// 是否有分险
+    /// </summary>
+    public bool hasRisk;
+
+    /// <summary>
     /// 能否被打断
     /// </summary>
     public bool canInterrupted = true;

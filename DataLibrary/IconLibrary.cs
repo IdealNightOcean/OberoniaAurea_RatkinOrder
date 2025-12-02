@@ -33,7 +33,5 @@ public static class IconLibrary
     public static readonly Texture2D BigGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigGeneralBranchIcon");
 
 
-    public static readonly Texture2D BarTex_Green = SolidColorMaterials.NewSolidColorTexture(Color.green);
-    public static readonly Texture2D BarTex_White = SolidColorMaterials.NewSolidColorTexture(Color.white);
-    public static readonly Texture2D BarTex_Black = SolidColorMaterials.NewSolidColorTexture(Color.black);
+    public static readonly Texture2D GreenTex = SolidColorMaterials.NewSolidColorTexture(Color.green);
 }

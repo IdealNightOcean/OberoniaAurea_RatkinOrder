@@ -264,5 +264,4 @@ public class Window_OrderLetterBox : OrderWindowBase
     private static readonly Texture2D rightCoatOfArms = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightCoatOfArms");
     private static readonly Texture2D rightDownCuttingLine = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightDownCuttingLine");
     private static readonly Texture2D rightRibbon = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightRibbon");
-    private static readonly Texture2D rightMedal = ContentFinder<Texture2D>.Get("UI/LetterBox/OARO_RightMedal");
 }

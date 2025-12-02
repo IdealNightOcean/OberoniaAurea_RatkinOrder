@@ -10,7 +10,7 @@ public class BranchBuildingComp : IExposable
 
     /// <summary>
     /// 在实例化时使用；
-    /// 注意加载存档时会调用，此时BranchBuilding(parent)和对应Branch尚未绑定
+    /// 注意加载存档时会调用，此时BranchBuilding(Parent)和对应Branch尚未绑定
     /// </summary>
     public virtual void Initialize(BranchBuilding parent, BranchBuildingCompProperties props)
     {

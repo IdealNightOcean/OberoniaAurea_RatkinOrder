@@ -17,8 +17,32 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     [Unsaved] private readonly Branch branch;
 
-    public BranchTaskType FocusedTaskType;
-    public RadicalismDegree CurRadicalismDegree;
+    private BranchTaskType focusedTaskType;
+    public BranchTaskType FocusedTaskType
+    {
+        get { return focusedTaskType; }
+        set
+        {
+            if (value != focusedTaskType)
+            {
+                focusedTaskType = value;
+                branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.FocusedTaskTypeChanged, cdTicks: 5 * 60000, removeWhenExpired: true);
+            }
+        }
+    }
+    private RadicalismDegree curRadicalismDegree;
+    public RadicalismDegree CurRadicalismDegree
+    {
+        get { return curRadicalismDegree; }
+        set
+        {
+            if (value != curRadicalismDegree)
+            {
+                curRadicalismDegree = value;
+                branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RadicalismDegreeChanged, cdTicks: 5 * 60000, removeWhenExpired: true);
+            }
+        }
+    }
 
     private BranchTask curTask;
     public BranchTask CurTask => curTask;
@@ -40,8 +64,8 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref FocusedTaskType, "FocusedTaskType", BranchTaskType.General);
-        Scribe_Values.Look(ref CurRadicalismDegree, "CurRadicalismDegree", RadicalismDegree.Standard);
+        Scribe_Values.Look(ref focusedTaskType, "focusedTaskType", BranchTaskType.General);
+        Scribe_Values.Look(ref curRadicalismDegree, "curRadicalismDegree", RadicalismDegree.Standard);
 
         Scribe_Deep.Look(ref curTask, "curTask");
         Scribe_Values.Look(ref restEndTick, "squadRestEndTick", -1);
@@ -167,23 +191,6 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         return newTaskDef.StartChecker.CanStartNow(branch, resultOnly);
     }
 
-    public void FinishCurTask()
-    {
-        if (!HasTask)
-        {
-            return;
-        }
-
-        if (curTask.Def.nextTask is null)
-        {
-            EndCurTask(startRest: true);
-        }
-        else
-        {
-            TrySwitchToTask(curTask.Def.nextTask, endCurIfCantSwitch: true);
-        }
-    }
-
     public bool TrySwitchToTask(BranchTaskDef newTaskDef, bool forced = false, bool endCurIfCantSwitch = false)
     {
         if (forced || CanSwitchToTask(newTaskDef, resultOnly: true))
@@ -235,6 +242,23 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
         branch.MarkWorkStateDirty();
         return true;
+    }
+
+    private void FinishCurTask()
+    {
+        if (!HasTask)
+        {
+            return;
+        }
+
+        if (curTask.Def.nextTask is null)
+        {
+            EndCurTask(startRest: true);
+        }
+        else
+        {
+            TrySwitchToTask(curTask.Def.nextTask, endCurIfCantSwitch: true);
+        }
     }
 
     public void EndCurTask(bool startRest)

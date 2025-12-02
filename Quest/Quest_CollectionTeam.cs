@@ -201,7 +201,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         Scribe_Values.Look(ref hasFulfilled, "hasFulfilled", defaultValue: false);
 
 
-        Scribe_References.Look(ref talkWith, "talkWith");
+        Scribe_References.Look(ref talkWith, KeyLibrary_FormatArgName.TALKWITH);
         Scribe_Collections.Look(ref pawns, "pawns", LookMode.Reference);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
@@ -346,14 +346,14 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         {
             if (signal.tag == InSignalRemovePawn)
             {
-                if (signal.args.TryGetArg("SUBJECT", out Pawn p))
+                if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
                 {
                     pawns.Remove(p);
                 }
             }
             else if (signal.tag == InSignalLeftMap)
             {
-                if (signal.args.TryGetArg("SUBJECT", out Pawn p))
+                if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
                 {
                     if (pawns.Remove(p) && pawns.Count == 0)
                     {
@@ -587,9 +587,9 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     {
         if (string.IsNullOrEmpty(TalkText))
         {
-            return "OARO_CollectionTeam_DefaultTalkText".Translate(talker.Named("TALKER"), talkWith.Named("TALKWITH")) + "\n\n" + RequestThingsSummary();
+            return "OARO_CollectionTeam_DefaultTalkText".Translate(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)) + "\n\n" + RequestThingsSummary();
         }
-        return TalkText.Formatted(talker.Named("TALKER"), talkWith.Named("TALKWITH")) + "\n\n" + RequestThingsSummary();
+        return TalkText.Formatted(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)) + "\n\n" + RequestThingsSummary();
     }
 
     protected Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talker, Pawn talkWith, Map map)

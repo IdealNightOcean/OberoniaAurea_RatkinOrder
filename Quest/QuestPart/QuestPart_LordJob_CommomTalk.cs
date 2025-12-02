@@ -22,7 +22,7 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
         base.ExposeData();
         Scribe_Values.Look(ref DurationTicks, "DurationTicks", 0);
         Scribe_Values.Look(ref NearOrderHall, "NearOrderHall", defaultValue: false);
-        Scribe_References.Look(ref talkWith, "talkWith");
+        Scribe_References.Look(ref talkWith, KeyLibrary_FormatArgName.TALKWITH);
         if (Scribe.mode == LoadSaveMode.PostLoadInit && quest?.State == QuestState.Ongoing)
         {
             this.RegisterTalkAction();
@@ -60,7 +60,7 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
         base.Notify_QuestSignalReceived(signal);
         if (signal.tag == inSignalRemovePawn)
         {
-            signal.args.TryGetArg("SUBJECT", out Pawn p);
+            signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p);
             if (p == talkWith)
             {
                 this.DeregisterTalkAction();

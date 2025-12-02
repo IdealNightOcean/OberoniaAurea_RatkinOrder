@@ -35,7 +35,7 @@ public class ResidentKnightRoleDef : Def
 
     /// <summary>
     /// 根据职位【Def】提供不同的Stat修正
-    /// 修正是针对全体殖民者的，而非担任该职位的<see cref="Pawn"/>
+    /// 修正是针对全体殖民者的，而非担任该职位的<see cref=KeyLibrary_FormatArgName.PAWN/>
     /// </summary>
     public List<StatModifier> statOffsets;
     public List<StatModifier> statFactors;

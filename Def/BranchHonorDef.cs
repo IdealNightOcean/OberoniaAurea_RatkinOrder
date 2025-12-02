@@ -119,11 +119,11 @@ public class BranchHonorDef : Def
     }
 
 
-    protected Texture2D honorBarTexture;
+    protected Texture2D honorColorTex;
     /// <summary>
     /// 荣誉颜色标识图标，颜色使用<see cref="color"/>
     /// </summary>
-    public Texture2D HonorBarTexture => honorBarTexture ??= SolidColorMaterials.NewSolidColorTexture(color);
+    public Texture2D HonorColorTex => honorColorTex ??= SolidColorMaterials.NewSolidColorTexture(color);
 
     /// <summary>
     /// 荣誉背景图标路径

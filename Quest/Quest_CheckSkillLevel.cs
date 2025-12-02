@@ -55,7 +55,7 @@ public class QuestPart_CheckSkillLevel : QuestPart
 
         Scribe_Defs.Look(ref Skill, "Skill");
         Scribe_Values.Look(ref MinLevel, "MinLevel", 0);
-        Scribe_References.Look(ref Pawn, "Pawn");
+        Scribe_References.Look(ref Pawn, KeyLibrary_FormatArgName.PAWN);
     }
 
     public override void Cleanup()

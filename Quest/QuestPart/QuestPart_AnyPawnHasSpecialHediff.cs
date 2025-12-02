@@ -51,7 +51,7 @@ public class QuestPart_AnyPawnHasSpecialHediff : QuestPart
         base.Notify_QuestSignalReceived(signal);
         if (!pawns.NullOrEmpty() && signal.tag == inSignalRemovePawn)
         {
-            if (signal.args.TryGetArg("SUBJECT", out Pawn p))
+            if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
             {
                 pawns?.Remove(p);
             }

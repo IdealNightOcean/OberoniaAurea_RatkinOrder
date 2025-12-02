@@ -50,17 +50,29 @@ public static class BranchUtility
     /// <summary>
     /// 分部能否参与边境轮巡
     /// </summary>
-    public static bool CanParticipateInJointPatrol(this Branch branch)
+    public static AcceptanceReport CanParticipateInJointPatrol(this Branch branch, bool resultOnly)
     {
-        if (!branch.TaskHandler.HasTask)
+        JointPatrolManager jointPatrolManager = branch?.RatkinOrder.JointPatrolManager;
+        if (jointPatrolManager is null || jointPatrolManager.CurState != JointPatrolManager.PatrolState.Prepare)
         {
-            return true;
+            return resultOnly ? false : "OARO_JointPatrol_NotInPrepareStage".Translate();
         }
-        if (branch.TaskHandler.CurTask.Def.canInterruptedByJointPatrol)
+
+        if (branch.TaskHandler.CurTask?.Def.canInterruptedByJointPatrol ?? false)
         {
-            return true;
+            return resultOnly ? false : "OARO_JointPatrol_BusyWithTasks".Translate();
         }
-        return false;
+        if (jointPatrolManager.IsParticipant(branch))
+        {
+            return resultOnly ? false : "OARO_JointPatrol_AlreadyParticipantIn".Translate();
+        }
+        return true;
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool CanParticipateInJointPatrolFast(this Branch branch)
+    {
+        return branch.TaskHandler.CurTask?.Def.canInterruptedByJointPatrol ?? true;
     }
 
     public static AcceptanceReport CanUnlockSupportAuthority(Branch branch, Map map, bool resultOnly)
@@ -299,5 +311,56 @@ public static class BranchUtility
         int durationDays = 40;
         durationDays += branch.RatkinOrder.Esteem * 2;
         return durationDays;
+    }
+
+    public static AcceptanceReport CanChangeFocusedTaskType(Branch branch, bool resultOnly)
+    {
+        if (branch is null)
+        {
+            return false;
+        }
+        if (branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.FocusedTaskTypeChanged))
+        {
+            return resultOnly ? false : "OARO_Cooling_ChangeFocusedTaskType".Translate();
+        }
+
+        if (branch.RatkinOrder.Relationship < EsteemHandler.RelationshipKind.Soulmate)
+        {
+            if (branch.IsBranchOfType(Branch.BranchType.Friendly))
+            {
+                return true;
+            }
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(EsteemHandler.RelationshipKind.Soulmate.GetLabel());
+        }
+
+        return true;
+    }
+
+    public static AcceptanceReport CanChangeRadicalismDegree(Branch branch, bool resultOnly)
+    {
+        if (branch is null)
+        {
+            return false;
+        }
+
+        if (branch is null)
+        {
+            return false;
+        }
+        if (branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.FocusedTaskTypeChanged))
+        {
+            return resultOnly ? false : "OARO_Cooling_ChangeRadicalismDegree".Translate();
+        }
+
+        if (branch.RatkinOrder.Relationship < EsteemHandler.RelationshipKind.Soulmate)
+        {
+            if (branch.IsBranchOfType(Branch.BranchType.Friendly))
+            {
+                return true;
+            }
+            return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(EsteemHandler.RelationshipKind.Soulmate.GetLabel());
+        }
+
+        return true;
     }
 }

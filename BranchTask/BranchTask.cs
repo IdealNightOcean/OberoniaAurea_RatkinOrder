@@ -60,6 +60,8 @@ public class BranchTask : IExposable
 
     public virtual void TickHour(Branch branch) { }
 
+    public virtual float TaskRisk(Branch branch) => 0f;
+
     public static BranchTask GenerateTask(BranchTaskDef def)
     {
         return (BranchTask)Activator.CreateInstance(

@@ -8,6 +8,8 @@ public static class KeyLibrary_FormatArgName
     public const string STUFF = "STUFF";
     public const string PAWN = "PAWN";
     public const string CARAVANHELPDEF = "CARAVANHELPDEF";
+    public const string TALKER = "TALKER";
+    public const string TALKWITH = "TALKWITH";
 
     public const string Count = "Count";
     public const string Level = "Level";

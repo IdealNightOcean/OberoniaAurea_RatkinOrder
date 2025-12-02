@@ -381,6 +381,7 @@
     <Compile Include="Window\Window_BranchSquad.cs" />
     <Compile Include="Window\MainTabWindow_InteractionKnights.cs" />
     <Compile Include="Window\Window_Branch.cs" />
+    <Compile Include="Window\Window_BranchTask.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
     <Compile Include="Window\Window_RatkinOrder.cs" />
     <Compile Include="Worldobject\Demand\WorldObject_TownConstruction.cs" />

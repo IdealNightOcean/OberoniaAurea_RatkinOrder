@@ -22,26 +22,32 @@ public class Window_BranchSquad : OrderWindowBase
     private Vector2 scrollPosition_Squads;
     private Vector2 scrollPosition_Medals;
 
-    private readonly RatkinOrder ratkinOrder;
-    private readonly Map map;
-    private readonly LazyMutable<int> mapRecommendationCount;
+    private RatkinOrder RatkinOrder { get; }
+    private Map Map { get; }
+    private LazyMutable<int> MapRecommendationCount { get; }
 
-    private int selBranchIndex;
-    private SquadInfoUICache selSquadInfo;
-    private Branch SelBranch => selSquadInfo?.Branch;
-    private bool needRefreshSel;
+    private int SelBranchIndex { get; set; }
+    private SquadInfoUICache SelSquadInfo { get; set; }
+    private Branch SelBranch => SelSquadInfo?.Branch;
+    private bool NeedRefreshSel { get; set; }
 
-    private TabType curTab = TabType.All;
-    private readonly List<TabRecord> tabs = [];
+    private TabType CurTab { get; set; }
+    private List<TabRecord> Tabs { get; }
 
-    private readonly List<BranchSummaryUICache> branchSummaryCaches = [];
-    private readonly List<BranchSummaryUICache> tabSummaryCaches = [];
+    private List<BranchSummaryUICache> BranchSummaryCaches { get; }
+    private List<BranchSummaryUICache> TabSummaryCaches { get; }
 
     public Window_BranchSquad(RatkinOrder ratkinOrder, Map map) : base()
     {
-        this.ratkinOrder = ratkinOrder;
-        this.map = map;
-        mapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(this.ratkinOrder, this.map));
+        RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
+        Map = map ?? throw new ArgumentNullException(nameof(map));
+
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
+        BranchSummaryCaches = new(ratkinOrder.BranchManager.AllBranches.Count);
+        TabSummaryCaches = new(ratkinOrder.BranchManager.AllBranches.Count);
+
+        Tabs = [];
+        CurTab = TabType.All;
         RecacheBranchSummary();
     }
 
@@ -49,13 +55,13 @@ public class Window_BranchSquad : OrderWindowBase
     {
         base.PostClose();
         DeselectSquad();
-        branchSummaryCaches.Clear();
-        tabSummaryCaches.Clear();
+        BranchSummaryCaches.Clear();
+        TabSummaryCaches.Clear();
     }
 
     public override void DoWindowContents(Rect inRect)
     {
-        if (needRefreshSel)
+        if (NeedRefreshSel)
         {
             RefreshSelSquad();
         }
@@ -95,7 +101,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 150f, 322f, 48f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, selSquadInfo.SquadName);
+        Widgets.Label(reusedRect, SelSquadInfo.SquadName);
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -153,7 +159,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 12f, 88f, 48f);
         Text.Anchor = TextAnchor.MiddleLeft;
-        Widgets.Label(reusedRect, selSquadInfo.BaseSiteName);
+        Widgets.Label(reusedRect, SelSquadInfo.BaseSiteName);
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -172,8 +178,8 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRect.xMax - 192f, 192f, 32f);
         if (SelBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_BranchSiteDistance".Translate(selSquadInfo.Distance.ToString("F0"))
-                                                               .Colorize(selSquadInfo.IsInAffectedRange ? Color.green : Color.white));
+            Widgets.Label(reusedRect, "OARO_BranchSiteDistance".Translate(SelSquadInfo.Distance.ToString("F0"))
+                                                               .Colorize(SelSquadInfo.IsInAffectedRange ? Color.green : Color.white));
         }
         else
         {
@@ -193,7 +199,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(upInnerRect, upInnerRect.x, 6f, 144f);
         if (selIsHonor)
         {
-            GUI.DrawTexture(reusedRect, honorDef.HonorBarTexture);
+            GUI.DrawTexture(reusedRect, honorDef.HonorColorTex);
         }
 
         //上部左侧部分
@@ -245,8 +251,8 @@ public class Window_BranchSquad : OrderWindowBase
             GUI.DrawTexture(reusedRect, IconLibrary.BigFriendlyIcon, ScaleMode.ScaleToFit);
 
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
-            friendlyProcess = selSquadInfo.FriendlyProcess;
-            friendlyExpireDate = "OARO_UntilDate".Translate() + $"   {selSquadInfo.FriendlyExpireDateStr}";
+            friendlyProcess = SelSquadInfo.FriendlyProcess;
+            friendlyExpireDate = "OARO_UntilDate".Translate() + $"   {SelSquadInfo.FriendlyExpireDateStr}";
         }
         else
         {
@@ -263,7 +269,7 @@ public class Window_BranchSquad : OrderWindowBase
         Text.Font = GameFont.Small;
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
-        Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.BarTex_Green, IconLibrary.BarTex_Black, doBorder: true);
+        Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
 
         reusedRect = new(reusedRect.x, reusedRect.yMax + 8f, 120f, 24f);
         Widgets.Label(reusedRect, friendlyExpireDate);
@@ -353,11 +359,11 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 10f, 135f, 24f);
         if (SelBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_MemberCountInfo".Translate(SelBranch.Squad.AllCrewCountInt, selSquadInfo.CrewCeiling));
+            Widgets.Label(reusedRect, "OARO_MemberCountInfo".Translate(SelBranch.Squad.AllCrewCountInt, SelSquadInfo.CrewCeiling));
             reusedRect.yMin = reusedRect.yMax;
             reusedRect.yMax += 24f;
-            Widgets.Label(reusedRect, "OARO_PeoplePreDay".Translate(selSquadInfo.MemberRecoveryRate.ToStringWithSign("F1"))
-                                                         .Colorize(selSquadInfo.MemberRecoveryRate < 0 ? ColorLibrary.RedReadable : Color.green));
+            Widgets.Label(reusedRect, "OARO_PeoplePreDay".Translate(SelSquadInfo.MemberRecoveryRate.ToStringWithSign("F1"))
+                                                         .Colorize(SelSquadInfo.MemberRecoveryRate < 0 ? ColorLibrary.RedReadable : Color.green));
         }
         else
         {
@@ -397,7 +403,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.xMax - 54f, 50f, 24f);
         if (SelBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_FilledTotalFormatPeople".Translate(SelBranch.Squad.CommanderCountInt, selSquadInfo.CommanderCeiling));
+            Widgets.Label(reusedRect, "OARO_FilledTotalFormatPeople".Translate(SelBranch.Squad.CommanderCountInt, SelSquadInfo.CommanderCeiling));
         }
         else
         {
@@ -463,12 +469,12 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_RequestCombatReadiness".Translate());
 
         reusedRect = new(areaRect.x + 97f, areaRect.yMax - 37f, 98f, 37f);
-        if (hasSupportAuthority && selSquadInfo.CanRequestCombatReadiness)
+        if (hasSupportAuthority && SelSquadInfo.CanRequestCombatReadiness)
         {
             if (OARO_WindowUtility.ButtonImage(reusedRect, middleCombatReadinessButton, middleCombatReadinessButton_Down))
             {
                 SelBranch.TaskHandler.TrySwitchToTask(BranchTaskDefOf.OARO_CombatReadiness);
-                needRefreshSel = true;
+                NeedRefreshSel = true;
             }
         }
         else
@@ -476,7 +482,7 @@ public class Window_BranchSquad : OrderWindowBase
             GUI.DrawTexture(reusedRect, middleCombatReadinessButton_Down);
             if (hasSupportAuthority)
             {
-                string reason = selSquadInfo.CanRequestCombatReadiness.Reason;
+                string reason = SelSquadInfo.CanRequestCombatReadiness.Reason;
                 if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(reusedRect))
                 {
                     TooltipHandler.TipRegion(reusedRect, () => reason, 6484159);
@@ -530,7 +536,7 @@ public class Window_BranchSquad : OrderWindowBase
                                                           label: "OARO_BombardSupport".Translate(),
                                                           baseTex: middleSupportButton,
                                                           downTex: middleSupportButton_Down,
-                                                          acceptance: selSquadInfo.BombardFeasibility,
+                                                          acceptance: SelSquadInfo.BombardFeasibility,
                                                           doMouseoverSound: true))
         {
 
@@ -544,7 +550,7 @@ public class Window_BranchSquad : OrderWindowBase
                                                           label: "OARO_MilitarySupport".Translate(),
                                                           baseTex: middleSupportButton,
                                                           downTex: middleSupportButton_Down,
-                                                          acceptance: selSquadInfo.SupportFeasibility,
+                                                          acceptance: SelSquadInfo.SupportFeasibility,
                                                           doMouseoverSound: true))
         {
 
@@ -555,18 +561,18 @@ public class Window_BranchSquad : OrderWindowBase
             reusedRect = Rect.MinMaxRect(areaRect.xMin - 102f, supportOptRect.yMax, areaRect.xMax + 3f, areaRect.yMax + 5f);
             GUI.DrawTexture(reusedRect, middleLockShade, ScaleMode.StretchToFill, alphaBlend: true);
             reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
-            if (selSquadInfo.CanUnlockSupportAuthority)
+            if (SelSquadInfo.CanUnlockSupportAuthority)
             {
                 if (OARO_WindowUtility.ButtonImage(reusedRect, middleUnlockButton, middleUnlockButton_Down))
                 {
-                    BranchUtility.UnlockSupportAuthority(SelBranch, map);
-                    needRefreshSel = true;
+                    BranchUtility.UnlockSupportAuthority(SelBranch, Map);
+                    NeedRefreshSel = true;
                 }
             }
             else
             {
                 GUI.DrawTexture(reusedRect, middleUnlockButton_Down);
-                string reason = selSquadInfo.CanUnlockSupportAuthority.Reason;
+                string reason = SelSquadInfo.CanUnlockSupportAuthority.Reason;
                 if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(reusedRect))
                 {
                     TooltipHandler.TipRegion(reusedRect, () => reason, 56974814);
@@ -641,7 +647,7 @@ public class Window_BranchSquad : OrderWindowBase
     {
         Rect areaRect = inRect;
         areaRect.xMin = areaRect.xMax - 80f;
-        int bombardSupportCeiling = selSquadInfo.BombardSupportCeiling;
+        int bombardSupportCeiling = SelSquadInfo.BombardSupportCeiling;
         if (SelBranch is not null)
         {
             Widgets.Label(areaRect, $"× {bombardSupportCeiling}");
@@ -680,24 +686,24 @@ public class Window_BranchSquad : OrderWindowBase
         GUI.DrawTexture(inRect, leftBackground);
         Rect tabRect = new(inRect.x, inRect.y - 32f, inRect.width, 32f);
 
-        tabs.Clear();
-        tabs.Add(new TabRecord("OARO_BranchSquad_All".Translate().CapitalizeFirst(), delegate
+        Tabs.Clear();
+        Tabs.Add(new TabRecord("OARO_BranchSquad_All".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.All);
-        }, curTab == TabType.All));
-        tabs.Add(new TabRecord("OARO_BranchSquad_Near".Translate().CapitalizeFirst(), delegate
+        }, CurTab == TabType.All));
+        Tabs.Add(new TabRecord("OARO_BranchSquad_Near".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.Near);
-        }, curTab == TabType.Near));
-        tabs.Add(new TabRecord("OARO_BranchSquad_Friendly".Translate().CapitalizeFirst(), delegate
+        }, CurTab == TabType.Near));
+        Tabs.Add(new TabRecord("OARO_BranchSquad_Friendly".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.Friendly);
-        }, curTab == TabType.Friendly));
-        TabDrawer.DrawTabs(tabRect, tabs, maxTabWidth: 140f);
+        }, CurTab == TabType.Friendly));
+        TabDrawer.DrawTabs(tabRect, Tabs, maxTabWidth: 140f);
 
         inRect = inRect.ContractedBy(2f);
 
-        float viewHeight = tabSummaryCaches.Count * 91f;
+        float viewHeight = TabSummaryCaches.Count * 91f;
         Rect listRect = inRect;
         listRect.width = 393f;
         listRect.height = viewHeight;
@@ -708,7 +714,7 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.BeginScrollView(inRect, ref scrollPosition_Squads, listRect);
         float entryX = listRect.x;
         float entryY = listRect.y;
-        int squadCount = tabSummaryCaches.Count;
+        int squadCount = TabSummaryCaches.Count;
         int usedCount = Mathf.Max(7, squadCount);
         Rect entryRect;
 
@@ -718,7 +724,7 @@ public class Window_BranchSquad : OrderWindowBase
             entryRect = new(entryX, entryY, 393f, 91f);
             entryY += 89f;
 
-            DrawSquadEntry(entryRect, tabSummaryCaches[i], i);
+            DrawSquadEntry(entryRect, TabSummaryCaches[i], i);
         }
 
         if (usedCount > squadCount)
@@ -756,7 +762,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect = new(inRect.xMax - 64f, reusedRect.y, 58f, 24f);
         Text.Anchor = TextAnchor.LowerRight;
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, mapRecommendationCount.Value);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount.Value);
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
@@ -774,14 +780,14 @@ public class Window_BranchSquad : OrderWindowBase
         {
             Widgets.DrawHighlight(inRect);
         }
-        if (selBranchIndex == index)
+        if (SelBranchIndex == index)
         {
             Widgets.DrawHighlightSelected(inRect);
         }
         Rect summaryRect = inRect.ContractedBy(2f);
         if (Widgets.ButtonInvisible(summaryRect))
         {
-            if (selBranchIndex == index)
+            if (SelBranchIndex == index)
             {
                 DeselectSquad();
             }
@@ -796,19 +802,19 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void RefreshSelSquad()
     {
-        needRefreshSel = false;
-        if (selBranchIndex >= 0 && SelectSquad(selBranchIndex))
+        NeedRefreshSel = false;
+        if (SelBranchIndex >= 0 && SelectSquad(SelBranchIndex))
         {
             return;
         }
         Branch branch = SelBranch;
-        BranchSummaryUICache newCachedSummary = new(branch, map);
-        tabSummaryCaches[selBranchIndex] = newCachedSummary;
-        for (int i = 0; i < branchSummaryCaches.Count; i++)
+        BranchSummaryUICache newCachedSummary = new(branch, Map);
+        TabSummaryCaches[SelBranchIndex] = newCachedSummary;
+        for (int i = 0; i < BranchSummaryCaches.Count; i++)
         {
-            if (branchSummaryCaches[i].Branch == branch)
+            if (BranchSummaryCaches[i].Branch == branch)
             {
-                branchSummaryCaches[i] = newCachedSummary;
+                BranchSummaryCaches[i] = newCachedSummary;
                 break;
             }
         }
@@ -817,14 +823,14 @@ public class Window_BranchSquad : OrderWindowBase
     private void RecacheBranchSummary()
     {
         DeselectSquad();
-        mapRecommendationCount.MarkDirty();
-        branchSummaryCaches.Clear();
-        foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
+        MapRecommendationCount.MarkDirty();
+        BranchSummaryCaches.Clear();
+        foreach (Branch branch in RatkinOrder.BranchManager.AllBranches)
         {
             try
             {
-                BranchSummaryUICache summaryUICache = new(branch, map);
-                branchSummaryCaches.Add(new BranchSummaryUICache(branch, map));
+                BranchSummaryUICache summaryUICache = new(branch, Map);
+                BranchSummaryCaches.Add(new BranchSummaryUICache(branch, Map));
             }
             catch (Exception ex)
             {
@@ -835,61 +841,61 @@ public class Window_BranchSquad : OrderWindowBase
                     needStackTrace: true);
             }
         }
-        if (branchSummaryCaches.Count > 0)
+        if (BranchSummaryCaches.Count > 0)
         {
-            branchSummaryCaches.Sort(new BranchSummaryUICache.UIEntryComparer());
+            BranchSummaryCaches.Sort(new BranchSummaryUICache.UIEntryComparer());
             GetCurTapBranchSummary();
         }
     }
 
     private void SwitchTapBranchSummary(TabType tabType)
     {
-        if (curTab == tabType)
+        if (CurTab == tabType)
         {
             return;
         }
-        curTab = tabType;
+        CurTab = tabType;
         GetCurTapBranchSummary();
     }
 
     private void GetCurTapBranchSummary()
     {
         DeselectSquad();
-        tabSummaryCaches.Clear();
-        if (branchSummaryCaches.Count > 0)
+        TabSummaryCaches.Clear();
+        if (BranchSummaryCaches.Count > 0)
         {
-            switch (curTab)
+            switch (CurTab)
             {
                 case TabType.All:
                     {
-                        tabSummaryCaches.AddRange(branchSummaryCaches);
+                        TabSummaryCaches.AddRange(BranchSummaryCaches);
                         break;
                     }
                 case TabType.Near:
                     {
-                        for (int i = 0; i < branchSummaryCaches.Count; i++)
+                        for (int i = 0; i < BranchSummaryCaches.Count; i++)
                         {
-                            if (branchSummaryCaches[i].IsInAffectedRange)
+                            if (BranchSummaryCaches[i].IsInAffectedRange)
                             {
-                                tabSummaryCaches.Add(branchSummaryCaches[i]);
+                                TabSummaryCaches.Add(BranchSummaryCaches[i]);
                             }
                         }
                         break;
                     }
                 case TabType.Friendly:
                     {
-                        for (int i = 0; i < branchSummaryCaches.Count; i++)
+                        for (int i = 0; i < BranchSummaryCaches.Count; i++)
                         {
-                            if (branchSummaryCaches[i].Branch.IsBranchOfType(BranchType.Friendly))
+                            if (BranchSummaryCaches[i].Branch.IsBranchOfType(BranchType.Friendly))
                             {
-                                tabSummaryCaches.Add(branchSummaryCaches[i]);
+                                TabSummaryCaches.Add(BranchSummaryCaches[i]);
                             }
                         }
                         break;
                     }
             }
 
-            if (tabSummaryCaches.Count > 0)
+            if (TabSummaryCaches.Count > 0)
             {
                 SelectSquad(0);
             }
@@ -900,14 +906,14 @@ public class Window_BranchSquad : OrderWindowBase
     {
         try
         {
-            Branch branch = tabSummaryCaches[index].Branch;
+            Branch branch = TabSummaryCaches[index].Branch;
             if (branch is null)
             {
                 DeselectSquad();
                 return false;
             }
-            selBranchIndex = index;
-            selSquadInfo = new(branch, map);
+            SelBranchIndex = index;
+            SelSquadInfo = new(branch, Map);
             return true;
         }
         catch (Exception ex)
@@ -924,8 +930,8 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void DeselectSquad()
     {
-        selBranchIndex = -1;
-        selSquadInfo = new();
+        SelBranchIndex = -1;
+        SelSquadInfo = new();
     }
 
     protected override void SetInitialSizeAndPosition()

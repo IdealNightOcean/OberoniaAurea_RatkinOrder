@@ -255,6 +255,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     }
 
     public bool IsParticipant(Branch branch) => participantsDict.ContainsKey(branch);
+    public bool TryGetJointBranchRecord(Branch branch, out JointBranchRecord record) => participantsDict.TryGetValue(branch, out record);
+
     public void ChangeParticipant(IEnumerable<Branch> toAdd, IEnumerable<Branch> toRemove)
     {
         if (curState != PatrolState.Prepare)
@@ -298,7 +300,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     public void TryActiveParticipantInteraction(JointBranchRecord record, PatrolInteractionType interaction, Map map)
     {
-        if (curState != PatrolState.Ongoing)
+        if (curState != PatrolState.Ongoing || record is null)
         {
             return;
         }
@@ -493,7 +495,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             participantCount = 2;
         }
 
-        IEnumerable<Branch> tempEnumerables = BranchManager.AllBranches.Where(b => b.CanParticipateInJointPatrol())
+        IEnumerable<Branch> tempEnumerables = BranchManager.AllBranches.Where(b => b.CanParticipateInJointPatrolFast())
                                                                        .Take(participantCount);
 
         foreach (Branch branch in tempEnumerables)

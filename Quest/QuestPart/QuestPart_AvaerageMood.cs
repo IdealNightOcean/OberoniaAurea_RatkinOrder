@@ -178,7 +178,7 @@ public class QuestPart_AvaerageMood : QuestPartActivable
         base.Notify_QuestSignalReceived(signal);
         if (signal.tag == InSignalRemovePawn)
         {
-            if (signal.args.TryGetArg("SUBJECT", out Pawn p))
+            if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
             {
                 Pawns?.Remove(p);
             }

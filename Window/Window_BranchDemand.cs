@@ -1,5 +1,6 @@
 ﻿using NightOcean;
 using RimWorld;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -21,34 +22,34 @@ public class Window_BranchDemand : OrderWindowBase
 
     public override Vector2 InitialSize => new(1360f, 930f);
 
-    private readonly RatkinOrder ratkinOrder;
-    private readonly Map map;
-    private readonly LazyMutable<int> mapRecommendationLetterCount;
+    private RatkinOrder RatkinOrder { get; }
+    private Map Map { get; }
+    private LazyMutable<int> MapRecommendationLetterCount { get; }
 
-    private TabType curTab;
-    private readonly List<TabRecord> tabs = new(3);
-    private readonly List<TabRecord> acceptedTab = new(1);
+    private TabType CurTab { get; set; }
+    private List<TabRecord> Tabs { get; }
+    private List<TabRecord> AcceptedTab { get; }
 
-    private readonly List<BranchDemandEntryDrawer> branchWithDemandsCache = [];
-    private readonly List<BranchDemandEntryDrawer> tabDemandEntryCaches = [];
+    private List<BranchDemandEntryDrawer> BranchWithDemandsCache { get; }
+    private List<BranchDemandEntryDrawer> TabDemandEntryCaches { get; }
 
-    private Branch selBranch;
-    private bool selCritical;
-    private BranchDemand selDemand;
-    private string selFullDesc = string.Empty;
-    private AcceptanceReport selAcceptance;
+    private Branch SelBranch { get; set; }
+    private bool SelCritical { get; set; }
+    private BranchDemand SelDemand { get; set; }
+    private string SelFullDesc { get; set; }
+    private AcceptanceReport SelAcceptance { get; set; }
     private QuestPart_CliquesManager selDemandCliqueManager;
     private QuestPart_CliquesManager SelDemandCliqueManager
     {
         get
         {
-            if (selDemand is null || !selDemand.IsOngoing || selDemand is not BranchDemand_Critical)
+            if (SelDemand is null || !SelDemand.IsOngoing || SelDemand is not BranchDemand_Critical)
             {
                 return null;
             }
             if (selDemandCliqueManager is null)
             {
-                QuestPart_CliquesManager.TryGetCliquesManager(selDemand.RelatedQuest, addPartIfMiss: false, out selDemandCliqueManager);
+                QuestPart_CliquesManager.TryGetCliquesManager(SelDemand.RelatedQuest, addPartIfMiss: false, out selDemandCliqueManager);
             }
             return selDemandCliqueManager;
         }
@@ -58,62 +59,71 @@ public class Window_BranchDemand : OrderWindowBase
 
     public Window_BranchDemand(RatkinOrder ratkinOrder, Map map) : base()
     {
-        this.ratkinOrder = ratkinOrder;
-        this.map = map;
-        mapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(this.ratkinOrder, this.map));
+        RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
+        Map = map ?? throw new ArgumentNullException(nameof(map));
+
+        SelFullDesc = string.Empty;
+
+        MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
+        Tabs = new(3);
+        AcceptedTab = new(1);
+
+        CurTab = TabType.All;
+        BranchWithDemandsCache = [];
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
         for (int i = 0; i < allBranches.Count; i++)
         {
             if (allBranches[i].DemandHandler.HasDemand)
             {
-                branchWithDemandsCache.Add(new BranchDemandEntryDrawer(allBranches[i], map));
+                BranchWithDemandsCache.Add(new BranchDemandEntryDrawer(allBranches[i], map));
             }
         }
-        curTab = TabType.All;
+
+        TabDemandEntryCaches = new(BranchWithDemandsCache.Count);
         GetCurTapBranchSummary();
     }
 
     private void SwitchTapBranchSummary(TabType tabType)
     {
-        if (curTab == tabType)
+        if (CurTab == tabType)
         {
             return;
         }
-        curTab = tabType;
+        CurTab = tabType;
         GetCurTapBranchSummary();
     }
 
     private void GetCurTapBranchSummary()
     {
         //Deselect();
-        tabDemandEntryCaches.Clear();
-        if (branchWithDemandsCache.Count > 0)
+        TabDemandEntryCaches.Clear();
+        if (BranchWithDemandsCache.Count > 0)
         {
-            switch (curTab)
+            switch (CurTab)
             {
                 case TabType.All:
                     {
-                        tabDemandEntryCaches.AddRange(branchWithDemandsCache);
+                        TabDemandEntryCaches.AddRange(BranchWithDemandsCache);
                         break;
                     }
                 case TabType.Near:
                     {
-                        for (int i = 0; i < branchWithDemandsCache.Count; i++)
+                        for (int i = 0; i < BranchWithDemandsCache.Count; i++)
                         {
-                            if (branchWithDemandsCache[i].SummaryUICache.IsInAffectedRange)
+                            if (BranchWithDemandsCache[i].SummaryUICache.IsInAffectedRange)
                             {
-                                tabDemandEntryCaches.Add(branchWithDemandsCache[i]);
+                                TabDemandEntryCaches.Add(BranchWithDemandsCache[i]);
                             }
                         }
                         break;
                     }
                 case TabType.Friendly:
                     {
-                        for (int i = 0; i < branchWithDemandsCache.Count; i++)
+                        for (int i = 0; i < BranchWithDemandsCache.Count; i++)
                         {
-                            if (branchWithDemandsCache[i].Branch.IsBranchOfType(BranchType.Friendly))
+                            if (BranchWithDemandsCache[i].Branch.IsBranchOfType(BranchType.Friendly))
                             {
-                                tabDemandEntryCaches.Add(branchWithDemandsCache[i]);
+                                TabDemandEntryCaches.Add(BranchWithDemandsCache[i]);
                             }
                         }
                         break;
@@ -126,14 +136,14 @@ public class Window_BranchDemand : OrderWindowBase
                         {
                             if (branches.Add(acceptedRecords[i].Branch))
                             {
-                                tabDemandEntryCaches.Add(new(acceptedRecords[i].Branch, map));
+                                TabDemandEntryCaches.Add(new(acceptedRecords[i].Branch, Map));
                             }
                         }
                         break;
                     }
             }
 
-            if (tabDemandEntryCaches.Count > 0)
+            if (TabDemandEntryCaches.Count > 0)
             {
                 // SelectSquad(0);
             }
@@ -143,9 +153,9 @@ public class Window_BranchDemand : OrderWindowBase
     public override void PostClose()
     {
         base.PostClose();
-        branchWithDemandsCache.Clear();
-        tabDemandEntryCaches.Clear();
-        tabs.Clear();
+        BranchWithDemandsCache.Clear();
+        TabDemandEntryCaches.Clear();
+        Tabs.Clear();
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -164,29 +174,29 @@ public class Window_BranchDemand : OrderWindowBase
 
         reusedRect = demandListRect;
         reusedRect.width = 350f;
-        tabs.Clear();
-        tabs.Add(new TabRecord("OARO_BranchSquad_All".Translate().CapitalizeFirst(), delegate
+        Tabs.Clear();
+        Tabs.Add(new TabRecord("OARO_BranchSquad_All".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.All);
-        }, curTab == TabType.All));
-        tabs.Add(new TabRecord("OARO_BranchSquad_Near".Translate().CapitalizeFirst(), delegate
+        }, CurTab == TabType.All));
+        Tabs.Add(new TabRecord("OARO_BranchSquad_Near".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.Near);
-        }, curTab == TabType.Near));
-        tabs.Add(new TabRecord("OARO_BranchSquad_Friendly".Translate().CapitalizeFirst(), delegate
+        }, CurTab == TabType.Near));
+        Tabs.Add(new TabRecord("OARO_BranchSquad_Friendly".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.Friendly);
-        }, curTab == TabType.Friendly));
-        TabDrawer.DrawTabs(reusedRect, tabs);
+        }, CurTab == TabType.Friendly));
+        TabDrawer.DrawTabs(reusedRect, Tabs);
 
         reusedRect = demandListRect;
         reusedRect.xMin = reusedRect.xMax - 140f;
-        acceptedTab.Clear();
-        acceptedTab.Add(new TabRecord("OARO_HasAccepted".Translate().CapitalizeFirst(), delegate
+        AcceptedTab.Clear();
+        AcceptedTab.Add(new TabRecord("OARO_HasAccepted".Translate().CapitalizeFirst(), delegate
         {
             SwitchTapBranchSummary(TabType.Accepted);
-        }, curTab == TabType.Accepted));
-        TabDrawer.DrawTabs(reusedRect, acceptedTab, maxTabWidth: 140f);
+        }, CurTab == TabType.Accepted));
+        TabDrawer.DrawTabs(reusedRect, AcceptedTab, maxTabWidth: 140f);
 
         reusedRect = new(demandListRect.x, demandListRect.y - (32f + 48f), 450f, 48f);
         DrawLeftText(reusedRect);
@@ -210,7 +220,7 @@ public class Window_BranchDemand : OrderWindowBase
         Rect reusedRect = inRect;
         reusedRect.width /= 2;
         reusedRect.height /= 2;
-        Widgets.Label(reusedRect, "OARO_DemandWin_OrderEsteem".Translate() + ": " + ratkinOrder.Esteem.ToString());
+        Widgets.Label(reusedRect, "OARO_DemandWin_OrderEsteem".Translate() + ": " + RatkinOrder.Esteem.ToString());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = inRect.xMax;
@@ -222,16 +232,16 @@ public class Window_BranchDemand : OrderWindowBase
         Widgets.Label(reusedRectII, "OARO_RecommendationLetter".Translate());
 
         reusedRectII = Rect.MinMaxRect(reusedRectII.xMax + 6f, reusedRect.yMin, reusedRect.xMax, reusedRect.yMax);
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRectII, mapRecommendationLetterCount.Value);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRectII, MapRecommendationLetterCount.Value);
 
         reusedRect = inRect;
         reusedRect.width /= 2;
         reusedRect.yMin += reusedRect.height / 2;
-        Widgets.Label(reusedRect, "OARO_NormalDemandFulfillCount".Translate() + ": " + ratkinOrder.BranchManager.NormalDemandFulfillCount);
+        Widgets.Label(reusedRect, "OARO_NormalDemandFulfillCount".Translate() + ": " + RatkinOrder.BranchManager.NormalDemandFulfillCount);
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = inRect.xMax;
-        Widgets.Label(reusedRect, "OARO_CriticalDemandFulfillCount".Translate() + ": " + ratkinOrder.BranchManager.CriticalDemandFulfillCount);
+        Widgets.Label(reusedRect, "OARO_CriticalDemandFulfillCount".Translate() + ": " + RatkinOrder.BranchManager.CriticalDemandFulfillCount);
 
         OARO_WindowUtility.ResetText();
     }
@@ -247,23 +257,23 @@ public class Window_BranchDemand : OrderWindowBase
         float entryX = viewRect.x;
         float entryY = viewRect.y;
         float entryHeight = BranchDemandEntryDrawer.RectHeight;
-        viewRect.height = tabDemandEntryCaches.Count * entryHeight;
+        viewRect.height = TabDemandEntryCaches.Count * entryHeight;
 
         Vector2 entryPosition;
         Widgets.BeginScrollView(outRect, ref scrollPosition_Demands, viewRect);
-        for (int i = 0; i < tabDemandEntryCaches.Count; i++)
+        for (int i = 0; i < TabDemandEntryCaches.Count; i++)
         {
             entryPosition = new(entryX, entryY);
             entryY += (entryHeight - 2f);
 
-            BranchDemandEntryDrawer.ButtonResult buttonResult = tabDemandEntryCaches[i].DrawDemandEntry(entryPosition);
+            BranchDemandEntryDrawer.ButtonResult buttonResult = TabDemandEntryCaches[i].DrawDemandEntry(entryPosition);
             if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckNormal)
             {
-                SelDemand(tabDemandEntryCaches[i].Branch, isCritical: false);
+                SelctDemand(TabDemandEntryCaches[i].Branch, isCritical: false);
             }
             else if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckCritical)
             {
-                SelDemand(tabDemandEntryCaches[i].Branch, isCritical: true);
+                SelctDemand(TabDemandEntryCaches[i].Branch, isCritical: true);
             }
         }
         Widgets.EndScrollView();
@@ -279,7 +289,7 @@ public class Window_BranchDemand : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_DemandWin_AcceptedDemand".Translate());
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, $"{AcceptedBranchDemandHandler.Instance.AcceptanceCount}/{RatkinOrderSettings.MaxConcurrentAcceptedDemand}");
-        if (selDemand is null)
+        if (SelDemand is null)
         {
             return;
         }
@@ -287,23 +297,23 @@ public class Window_BranchDemand : OrderWindowBase
         reusedRect = new(inRect.x + 18f, inRect.y + 10f, inRect.width / 2 - 18f, 28f);
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.LowerLeft;
-        Widgets.Label(reusedRect, selDemand.Def.label);
+        Widgets.Label(reusedRect, SelDemand.Def.label);
 
         reusedRect.xMax = inRect.xMax - 18f;
         reusedRect.xMin = inRect.xMin + inRect.width / 2;
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.LowerRight;
-        string rightUpText = selDemand.HasAccepted ? "OARO_HasAccepted".Translate().Colorize(Color.green)
-                                                   : "OARO_ExpiredDate".Translate() + ": " + GenDate.SeasonDateStringAt(GenTicks.TicksAbs + selDemand.TicksToExpire, Find.WorldGrid.LongLatOf(map.Tile)).Colorize(Color.cyan);
+        string rightUpText = SelDemand.HasAccepted ? "OARO_HasAccepted".Translate().Colorize(Color.green)
+                                                   : "OARO_ExpiredDate".Translate() + ": " + GenDate.SeasonDateStringAt(GenTicks.TicksAbs + SelDemand.TicksToExpire, Find.WorldGrid.LongLatOf(Map.Tile)).Colorize(Color.cyan);
         Widgets.Label(reusedRect, rightUpText);
 
         reusedRect = Rect.MinMaxRect(inRect.xMin + 18f, reusedRect.yMax + 60f, inRect.xMax - 18f, reusedRect.yMax + (60f + 245f));
-        Widgets.TextArea(reusedRect, selFullDesc, readOnly: true);
+        Widgets.TextArea(reusedRect, SelFullDesc, readOnly: true);
 
-        if (selDemand.HasAccepted)
+        if (SelDemand.HasAccepted)
         {
             reusedRect = Rect.MinMaxRect(inRect.x, reusedRect.yMax + 16f, inRect.xMax, inRect.yMax);
-            if (selCritical && selDemand is BranchDemand_Critical)
+            if (SelCritical && SelDemand is BranchDemand_Critical)
             {
                 DrawRightRect_AcceptedCritical(reusedRect);
             }
@@ -315,31 +325,31 @@ public class Window_BranchDemand : OrderWindowBase
         else
         {
             reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 16f, 105f, 57f);
-            if (selAcceptance)
+            if (SelAcceptance)
             {
                 Text.Font = GameFont.Small;
                 Text.Anchor = TextAnchor.MiddleCenter;
                 if (OARO_WindowUtility.TextButtonImage(reusedRect, "Accept".Translate(), acceptButton, acceptButton_Down, doMouseoverSound: true))
                 {
-                    AcceptanceReport curAcceptance = BranchDemandUtility.CanAcceptDemand(selBranch, selCritical, resultOnly: false);
+                    AcceptanceReport curAcceptance = BranchDemandUtility.CanAcceptDemand(SelBranch, SelCritical, resultOnly: false);
                     if (curAcceptance)
                     {
-                        selBranch.DemandHandler.TryAcceptDemand(selCritical);
+                        SelBranch.DemandHandler.TryAcceptDemand(SelCritical);
                     }
                     else
                     {
                         Messages.Message("OARO_CanNotAcceptBrancDemand".Translate(curAcceptance.Reason), MessageTypeDefOf.RejectInput);
                     }
-                    SelDemand(selBranch, selCritical);
+                    SelctDemand(SelBranch, SelCritical);
                 }
             }
             else
             {
                 GUI.DrawTexture(reusedRect, acceptButton_Down);
                 Widgets.Label(reusedRect, "Accept".Translate());
-                if (!string.IsNullOrEmpty(selAcceptance.Reason) && Mouse.IsOver(reusedRect))
+                if (!string.IsNullOrEmpty(SelAcceptance.Reason) && Mouse.IsOver(reusedRect))
                 {
-                    string reason = selAcceptance.Reason;
+                    string reason = SelAcceptance.Reason;
                     TooltipHandler.TipRegion(reusedRect, () => reason, 7481051);
                 }
             }
@@ -352,11 +362,11 @@ public class Window_BranchDemand : OrderWindowBase
     private void DarwDemandBranchInfo(Rect inRect)
     {
         Rect reusedRect = new(inRect.x + 40f, inRect.y, 40f, 40f);
-        OARO_WindowUtility.DrawBranchIcon(reusedRect, selBranch, expand: false);
+        OARO_WindowUtility.DrawBranchIcon(reusedRect, SelBranch, expand: false);
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.LowerRight;
-        string linkText = "OARO_SuperLink".Translate() + ": " + selBranch.Name;
+        string linkText = "OARO_SuperLink".Translate() + ": " + SelBranch.Name;
         Vector2 linkTextSize = Text.CalcSize(linkText);
         reusedRect = new(inRect.xMax - (40f + linkTextSize.x), reusedRect.y, linkTextSize.x, 20f);
         Color color;
@@ -366,17 +376,17 @@ public class Window_BranchDemand : OrderWindowBase
         }
         else
         {
-            color = selBranch.HonorDef?.color ?? Color.white;
+            color = SelBranch.HonorDef?.color ?? Color.white;
         }
         Widgets.Label(reusedRect, linkText.Colorize(color));
         if (Widgets.ButtonInvisible(reusedRect))
         {
-            Window_Branch branchWinow = new(selBranch, caravan: null, map);
+            Window_Branch branchWinow = new(SelBranch, caravan: null, Map);
             Find.WindowStack.Add(branchWinow);
         }
 
         reusedRect = new(inRect.xMax - (40f + 96f), reusedRect.yMax, 96f, 20f);
-        if (selBranch.IsBranchOfType(BranchType.Friendly))
+        if (SelBranch.IsBranchOfType(BranchType.Friendly))
         {
             Widgets.Label(reusedRect, "OARO_Friendly".Translate().Colorize(Color.green));
         }
@@ -428,30 +438,30 @@ public class Window_BranchDemand : OrderWindowBase
         OARO_WindowUtility.ResetText();
     }
 
-    private void SelDemand(Branch branch, bool isCritical)
+    private void SelctDemand(Branch branch, bool isCritical)
     {
         Deselect();
-        selBranch = branch;
-        selCritical = isCritical;
-        selDemand = branch.DemandHandler.GetDemand(isCritical);
-        if (selDemand is null)
+        SelBranch = branch;
+        SelCritical = isCritical;
+        SelDemand = branch.DemandHandler.GetDemand(isCritical);
+        if (SelDemand is null)
         {
-            selFullDesc = string.Empty;
-            selAcceptance = false;
+            SelFullDesc = string.Empty;
+            SelAcceptance = false;
         }
         else
         {
-            selAcceptance = BranchDemandUtility.CanAcceptDemand(branch, isCritical, resultOnly: false);
-            selFullDesc = selDemand.GetFullDesc();
+            SelAcceptance = BranchDemandUtility.CanAcceptDemand(branch, isCritical, resultOnly: false);
+            SelFullDesc = SelDemand.GetFullDesc();
         }
     }
 
     private void Deselect()
     {
-        selBranch = null;
-        selCritical = false;
-        selDemand = null;
-        selFullDesc = string.Empty;
+        SelBranch = null;
+        SelCritical = false;
+        SelDemand = null;
+        SelFullDesc = string.Empty;
         selDemandCliqueManager = null;
     }
 
@@ -507,11 +517,11 @@ public class Window_BranchDemand : OrderWindowBase
             Rect reusedRect = new(inRect.x, inRect.y + 2f, 5f, innerRect.height);
             if (SummaryUICache.Branch.HonorDef is not null)
             {
-                GUI.DrawTexture(reusedRect, Branch.HonorDef.HonorBarTexture);
+                GUI.DrawTexture(reusedRect, Branch.HonorDef.HonorColorTex);
             }
             else
             {
-                GUI.DrawTexture(reusedRect, IconLibrary.BarTex_White);
+                GUI.DrawTexture(reusedRect, BaseContent.WhiteTex);
             }
             innerRect.xMin = reusedRect.xMax;
 

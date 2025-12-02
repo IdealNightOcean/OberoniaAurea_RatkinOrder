@@ -63,7 +63,7 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
         base.Notify_QuestSignalReceived(signal);
         if (Pawns is not null && signal.tag == InsignalRemovePawn)
         {
-            if (signal.args.TryGetArg("SUBJECT", out Pawn p))
+            if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
             {
                 Pawns.Remove(p);
             }

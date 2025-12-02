@@ -23,13 +23,29 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
 
     private float publicSecurity = 1f;
+    private float yesterdayPublicSecurity = 1f;
+    private float yesterdayPublicSecChange;
+
     public float PublicSecurity
     {
         get => publicSecurity;
         set => publicSecurity = Mathf.Clamp(value, 0.5f, 1.5f);
     }
-    private float yesterdayPublicSecurity = 1f;
-    private float yesterdayPublicSecChange;
+    public int PublicSecurityLevel
+    {
+        get
+        {
+            return publicSecurity switch
+            {
+                > 1.1f => 3,
+                > 0.9f => 2,
+                > 0.75f => 1,
+                _ => 0,
+            };
+        }
+    }
+    public string PublicSecurityLabel => $"OARO_Branch_PublicSecurityLevel_{PublicSecurityLevel}".Translate();
+
 
     private List<BranchContract> contracts = [];
     public IReadOnlyList<BranchContract> Contracts => contracts;
@@ -112,6 +128,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         hasContractBuff = true;
     }
+
 
     /// <summary>
     /// 每日人口变化

@@ -157,7 +157,7 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
         base.Notify_QuestSignalReceived(signal);
         if (!pawns.NullOrEmpty() && signal.tag == inSignalPawnSpawned)
         {
-            if (signal.args.TryGetArg("SUBJECT", out Pawn p) && pawns.Remove(p))
+            if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p) && pawns.Remove(p))
             {
                 string partResult = ResidentKnightAcademic(p);
                 if (!string.IsNullOrEmpty(partResult))

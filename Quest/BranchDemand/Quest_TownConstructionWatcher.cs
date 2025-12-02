@@ -129,7 +129,7 @@ internal sealed class QuestPart_TownConstructionWatcher : QuestPart
         base.Notify_QuestSignalReceived(signal);
         if (signal.tag == QuestPart_CliquesManager.SignalCliqueActived(quest))
         {
-            if (signal.args.TryGetArg("SUBJECT", out QuestClique clique))
+            if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out QuestClique clique))
             {
                 switch (clique.Key)
                 {

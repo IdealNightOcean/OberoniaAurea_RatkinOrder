@@ -230,7 +230,7 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
         }
         else if (signal.tag == InSignalFailAdvanced)
         {
-            WorldObject_WolfDisasterPoint disasterPoint = signal.args.GetArg<WorldObject_WolfDisasterPoint>("SUBJECT");
+            WorldObject_WolfDisasterPoint disasterPoint = signal.args.GetArg<WorldObject_WolfDisasterPoint>(KeyLibrary_FormatArgName.SUBJECT);
             ExtraPoint(disasterPoint);
         }
         else if (signal.tag == InSignalReduce)
@@ -239,12 +239,12 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
         }
         else if (DisasterPoints is not null && signal.tag == InSignalRemoveExtraPoint)
         {
-            WorldObject_WolfDisasterPoint point = signal.args.GetArg<WorldObject_WolfDisasterPoint>("SUBJECT");
+            WorldObject_WolfDisasterPoint point = signal.args.GetArg<WorldObject_WolfDisasterPoint>(KeyLibrary_FormatArgName.SUBJECT);
             DisasterPoints.Remove(point);
         }
         else if (gossipPoints is not null && signal.tag == InSignalRemoveGossipPoint)
         {
-            WorldObject_WolfDisasterGossipPoint gossipPoint = signal.args.GetArg<WorldObject_WolfDisasterGossipPoint>("SUBJECT");
+            WorldObject_WolfDisasterGossipPoint gossipPoint = signal.args.GetArg<WorldObject_WolfDisasterGossipPoint>(KeyLibrary_FormatArgName.SUBJECT);
             gossipPoints.Remove(gossipPoint);
         }
     }

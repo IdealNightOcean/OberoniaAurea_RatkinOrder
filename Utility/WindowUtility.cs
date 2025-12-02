@@ -138,7 +138,7 @@ public static class OARO_WindowUtility
         Rect reusedRect = CenterRectOnY(inRect, inRect.x, 5f, 86f);
         if (isHonorBranch)
         {
-            GUI.DrawTexture(reusedRect, honorDef.HonorBarTexture);
+            GUI.DrawTexture(reusedRect, honorDef.HonorColorTex);
         }
 
         Rect leftRect = new(inRect.x + 5f, inRect.y, 224f, inRect.height);
@@ -266,6 +266,42 @@ public static class OARO_WindowUtility
         else
         {
             GUI.DrawTexture(inRect, expand ? branch.HonorDef.ExpandingIconTexture : branch.HonorDef.IconTexture, ScaleMode.ScaleToFit);
+        }
+    }
+
+    public static void DrawBranchStateIcon(Rect inRect, Branch branch, bool expand)
+    {
+        if (branch.IsIdleNow)
+        {
+            GUI.DrawTexture(inRect, expand ? IconLibrary.BigIdleIcon : IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+        }
+        else if (branch.IsOutdoorNow)
+        {
+            GUI.DrawTexture(inRect, expand ? IconLibrary.BigOutdoorIcon : IconLibrary.SmallOutdoorIcon, ScaleMode.ScaleToFit);
+        }
+        else
+        {
+            GUI.DrawTexture(inRect, expand ? IconLibrary.BigIndoorIcon : IconLibrary.SmallIndoorIcon, ScaleMode.ScaleToFit);
+        }
+    }
+
+    public static void DrawBranchTaskTypeIcon(Rect inRect, BranchTaskType taskType, bool expand)
+    {
+        switch (taskType)
+        {
+            case BranchTaskType.CrimeFighting:
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Courage.ExpandingIconTexture : BranchMedalDefOf.OARO_Courage.IconTexture, ScaleMode.ScaleToFit);
+                return;
+            case BranchTaskType.StabilityMaintenance:
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Tenacity.ExpandingIconTexture : BranchMedalDefOf.OARO_Tenacity.IconTexture, ScaleMode.ScaleToFit);
+                return;
+            case BranchTaskType.Assistance:
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Rescue.ExpandingIconTexture : BranchMedalDefOf.OARO_Rescue.IconTexture, ScaleMode.ScaleToFit);
+                return;
+            case BranchTaskType.Supervision:
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Justice.ExpandingIconTexture : BranchMedalDefOf.OARO_Justice.IconTexture, ScaleMode.ScaleToFit);
+                return;
+            default: return;
         }
     }
 
