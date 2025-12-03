@@ -28,7 +28,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     private PatrolState curState;
     public PatrolState CurState => curState;
 
-    public HelpPolicy CurHelpPolicy;
+    private HelpPolicy curHelpPolicy;
+    public HelpPolicy CurHelpPolicy => curHelpPolicy;
 
     private int tickToNextStage = JointPatrolDurationPrepDays * 60000;
     public int TickToNextStage => tickToNextStage;
@@ -160,7 +161,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
         Scribe_Values.Look(ref sacrificeCount, "sacrificeCount", 0);
 
-        Scribe_Values.Look(ref CurHelpPolicy, "CurHelpPolicy", HelpPolicy.None);
+        Scribe_Values.Look(ref curHelpPolicy, "curHelpPolicy", HelpPolicy.None);
         Scribe_Values.Look(ref curHelpCount, "curHelpCount", 0);
         Scribe_Values.Look(ref nextHelpCheckTick, "nextHelpCheckTick", -1);
 
@@ -194,7 +195,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         listing_Rect.Label($"当前求助接取策略: {CurHelpPolicy}");
         if (listing_Rect.ButtonText("改变求助接取策略", widthPct: 0.5f))
         {
-            CurHelpPolicy = (HelpPolicy)(((int)CurHelpPolicy + 1) % 3);
+            ChangeHelpPolicy();
         }
         listing_Rect.Label($"可接取求助上限: {HelpCeiling}");
         listing_Rect.Label($"求助生成检测间隔 (Tick): {HelpCeiling}");
@@ -362,6 +363,11 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         {
             participatingResidentKnights.Remove(record);
         }
+    }
+
+    public void ChangeHelpPolicy()
+    {
+        curHelpPolicy = (HelpPolicy)(((int)curHelpPolicy + 1) % 3);
     }
 
     private void AddParticipant(Branch branch)

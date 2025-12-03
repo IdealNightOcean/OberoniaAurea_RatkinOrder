@@ -6,7 +6,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : BranchInteractionWorker(def)
+public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
     protected override void ApplyInteraction(BranchInteractionParms parms)
     {
@@ -19,9 +19,9 @@ public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : Bra
         Find.WindowStack.Add(nodeTree);
     }
 
-    protected override void DoInteractionCost(BranchInteractionParms parms)
+    protected override void DoBranchCost(BranchInteractionParms parms)
     {
-        base.DoInteractionCost(parms);
+        base.DoBranchCost(parms);
         parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: 5000, removeWhenExpired: true);
     }
 

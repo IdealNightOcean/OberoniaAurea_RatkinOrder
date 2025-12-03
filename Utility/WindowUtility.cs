@@ -1,4 +1,5 @@
 ﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -115,6 +116,30 @@ public static class OARO_WindowUtility
             Text.WordWrap = preWordWrap;
 
             return false;
+        }
+    }
+
+    public static void DrawBranchInteractionButton(Rect butRect, BranchInteractionDef def, BranchInteractionParms parms, AcceptanceReport? cachedAcceptance, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
+    {
+        if (!cachedAcceptance.HasValue)
+        {
+            cachedAcceptance = def.Worker.CanUseInteraction(parms, resultOnly: false);
+        }
+
+        if (TextButtonImageDisableable(butRect, def.label, cachedAcceptance.Value, baseTex, downTex, doMouseoverSound: doMouseoverSound, tooltip: tooltip))
+        {
+            AcceptanceReport acceptanceReport = def.Worker.CanUseInteraction(parms, resultOnly: false);
+            if (acceptanceReport)
+            {
+                def.Worker.TryApplyInteraction(parms);
+            }
+            else
+            {
+                Messages.Message(
+                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), def.Named("INTERACTION"), acceptanceReport.Reason.Named("Reason")),
+                    def: MessageTypeDefOf.RejectInput,
+                    historical: false);
+            }
         }
     }
 

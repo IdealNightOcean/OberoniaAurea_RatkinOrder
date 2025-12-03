@@ -5,12 +5,21 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionDef : InteractionDefBase
 {
+    public enum InteractionTarget
+    {
+        None,
+        Caravan,
+        Map
+    }
+
     /// <summary>
     /// 交互功能类
     /// </summary>
     public Type workerClass;
     private BranchInteractionWorker worker;
     public BranchInteractionWorker Worker => worker ??= (BranchInteractionWorker)Activator.CreateInstance(workerClass, args: this);
+
+    public InteractionTarget target = InteractionTarget.None;
 
     /// <summary>
     /// 是否仅作为建筑交互

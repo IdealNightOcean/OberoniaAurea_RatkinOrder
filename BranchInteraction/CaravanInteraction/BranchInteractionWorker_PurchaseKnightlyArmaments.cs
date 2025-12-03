@@ -5,7 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteractionDef def) : BranchInteractionWorker(def)
+public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
     protected override void ApplyInteraction(BranchInteractionParms parms)
     {
@@ -95,9 +95,9 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         base.ApplyInteraction(parms);
     }
 
-    protected override void DoInteractionCost(BranchInteractionParms parms)
+    protected override void DoBranchCost(BranchInteractionParms parms)
     {
-        base.DoInteractionCost(parms);
+        base.DoBranchCost(parms);
         if (!parms.Branch.EffectTags.HasTag("PurchaseKnightlyArmamentsNoCD"))
         {
             parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: Def.defaultCdDays * 60000, removeWhenExpired: true);

@@ -1,4 +1,6 @@
-﻿using RimWorld;
+﻿using NightOcean;
+using RimWorld;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -6,7 +8,7 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public class MainTabWindow_InteractionKnights : MainTabWindow
+public class Window_OrderHall : MainTabWindow
 {
     public override Vector2 InitialSize => new(1462f, 919f);
     public override Vector2 RequestedTabSize => new(1462f, 919f);
@@ -16,14 +18,14 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
     private Vector2 scrollPosition_Level;
     private Vector2 scrollPosition_AroundGroups;
 
-    private readonly int curOrderHallLevel;
-    private readonly Texture2D topShieldTexture;
+    private int CurOrderHallLevel { get; }
+    private Texture2D TopShieldTexture { get; }
 
-    private List<(AroundKnightGroup, float)> aroundKnightGroups = [];
-    private int aroundGroupTipIndex = -1;
-    private string aroundGroupTipCache = string.Empty;
+    private LazyMutable<List<KeyValuePair<AroundKnightGroup, float>>> AroundKnightGroups { get; }
+    private int AroundGroupTipIndex { get; set; }
+    private string AroundGroupTipCache { get; set; }
 
-    public MainTabWindow_InteractionKnights()
+    public Window_OrderHall()
     {
         forcePause = true;
         draggable = false;
@@ -40,16 +42,20 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
 
-        curOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
-        topShieldTexture = new CachedTexture($"UI/InteractionKnights/OARO_TopShield_{curOrderHallLevel}").Texture;
+        AroundGroupTipIndex = -1;
+        AroundGroupTipCache = string.Empty;
 
-        RecacheAroundKnightGroups();
+        CurOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
+        TopShieldTexture = new CachedTexture($"UI/InteractionKnights/OARO_TopShield_{CurOrderHallLevel}").Texture;
+
+        AroundKnightGroups = new(refreshFunc: RefreshAroundKnightGroups);
+        RefreshAroundKnightGroups();
     }
 
     public override void PreOpen()
     {
         base.PreOpen();
-        RecacheAroundKnightGroups();
+        RefreshAroundKnightGroups();
     }
 
     protected override void SetInitialSizeAndPosition()
@@ -102,7 +108,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, rightRect.y - (36f + 42f), 256f, 42f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, "OARO_AroundKnightGroup".Translate());
+        Widgets.Label(reusedRect, "OARO_HallWin_AroundKnightGroup".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -112,7 +118,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         //顶部盾徽
         reusedRect = OARO_WindowUtility.CenterRectOnX(mainRect, 0f, 215f, 211f);
         //盾徽绘制逻辑（未完成）
-        GUI.DrawTexture(reusedRect, topShieldTexture);
+        GUI.DrawTexture(reusedRect, TopShieldTexture);
 
         //左侧上部竖旗
         reusedRect = new(4f, 57f, 70f, 325f);
@@ -136,7 +142,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
 
         Rect reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.y + 7f, 256f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(reusedRect, "OARO_CurBuff".Translate());
+        Widgets.Label(reusedRect, "OARO_HallWin_CurBuff".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
 
         Rect buffRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 270f);
@@ -170,7 +176,7 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 256f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(reusedRect, "OARO_NextLevelNeed".Translate());
+        Widgets.Label(reusedRect, "OARO_HallWin_NextLevelNeed".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
 
         Rect levelRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 210f);
@@ -208,22 +214,23 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Rect reusedRect = new(innerRect.x, innerRect.y, 176f, 40f);
-        Widgets.Label(reusedRect, "OARO_GroupInfo".Translate());
+        Widgets.Label(reusedRect, "OARO_HallWin_GroupInfo".Translate());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = reusedRect.xMin + 72f;
-        Widgets.Label(reusedRect, "OARO_BusyLevel".Translate());
+        Widgets.Label(reusedRect, "OARO_HallWin_BusyLevel".Translate());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = reusedRect.xMin + 96f;
-        Widgets.Label(reusedRect, "OARO_Route".Translate());
+        Widgets.Label(reusedRect, "OARO_HallWin_Route".Translate());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = reusedRect.xMin + 64f;
-        Widgets.Label(reusedRect, "OARO_InvitationSuccessRate".Translate());
+        Widgets.Label(reusedRect, "OARO_SuccessRate".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
 
         Rect groupRect = new(innerRect.x, innerRect.yMax, 424f, 535f);
+        List<KeyValuePair<AroundKnightGroup, float>> aroundKnightGroups = AroundKnightGroups.Value;
         int groupCount = aroundKnightGroups.Count;
         int maxCount = Mathf.Max(10, groupCount);
         float viewHeight = maxCount * 107f;
@@ -238,12 +245,9 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
             reusedRect = new(entryX, entryY, 408f, 107f);
             entryY += 107f;
 
-            if (DrawAroundKnightGroup(reusedRect, aroundKnightGroups[i].Item1, aroundKnightGroups[i].Item2, i))
+            if (DrawAroundKnightGroup(reusedRect, aroundKnightGroups[i].Key, aroundKnightGroups[i].Value, i))
             {
-                RecacheAroundKnightGroups();
-                Widgets.EndScrollView();
-                Text.Anchor = TextAnchor.UpperLeft;
-                return;
+                AroundKnightGroups.MarkDirty();
             }
         }
 
@@ -295,18 +299,20 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
 
         if (Mouse.IsOver(reusedRect))
         {
-            if (index != aroundGroupTipIndex)
+            if (index != AroundGroupTipIndex)
             {
-                aroundGroupTipIndex = index;
+                AroundGroupTipIndex = index;
+                string aroundGroupTipCache = string.Empty;
                 GlobalInteractionUtility.InvitationAcceptanceChance(group, resultOnly: false, out aroundGroupTipCache);
+                AroundGroupTipCache = aroundGroupTipCache;
             }
-            if (!string.IsNullOrEmpty(aroundGroupTipCache))
+            if (!string.IsNullOrEmpty(AroundGroupTipCache))
             {
-                TooltipHandler.TipRegion(reusedRect, () => aroundGroupTipCache, 21345447);
+                TooltipHandler.TipRegion(reusedRect, () => AroundGroupTipCache, 21345447);
             }
         }
 
-        string buttonText = "OARO_Invite".Translate() + "\n";
+        string buttonText = "OAFrame_Invite".Translate() + "\n";
         if (OARO_WindowUtility.TextButtonImage(
             butRect: reusedRect,
             label: buttonText + successRate.ToStringPercent("F0"),
@@ -320,17 +326,32 @@ public class MainTabWindow_InteractionKnights : MainTabWindow
         return false;
     }
 
-    private void RecacheAroundKnightGroups()
+    private List<KeyValuePair<AroundKnightGroup, float>> RefreshAroundKnightGroups()
     {
-        aroundGroupTipIndex = -1;
-        aroundGroupTipCache = string.Empty;
-        aroundKnightGroups.Clear();
+        AroundGroupTipIndex = -1;
+        AroundGroupTipCache = string.Empty;
+
+        List<KeyValuePair<AroundKnightGroup, float>> pairs = new(AroundKnightGroupsManager.AroundKnightGroups.Count);
         IReadOnlyList<AroundKnightGroup> tempGroups = AroundKnightGroupsManager.AroundKnightGroups;
         for (int i = 0; i < tempGroups.Count; i++)
         {
-            float successRate = GlobalInteractionUtility.InvitationAcceptanceChance(tempGroups[i], resultOnly: true, out _);
-            aroundKnightGroups.Add((tempGroups[i], successRate));
+            float successRate = 0f;
+            try
+            {
+                successRate = GlobalInteractionUtility.InvitationAcceptanceChance(tempGroups[i], resultOnly: true, out _);
+            }
+            catch (Exception ex)
+            {
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"get invitation acceptance chance of {nameof(AroundKnightGroup)}",
+                    typeName: nameof(Window_OrderHall),
+                    methodName: nameof(RefreshAroundKnightGroups),
+                    needStackTrace: true);
+            }
+
+            pairs.Add(new KeyValuePair<AroundKnightGroup, float>(tempGroups[i], successRate));
         }
+        return pairs;
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/InteractionKnights/OARO_MainBackground");

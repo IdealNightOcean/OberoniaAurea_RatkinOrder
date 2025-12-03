@@ -13,15 +13,17 @@ public class Window_OrderLetterBox : OrderWindowBase
 
     private Vector2 scrollPosition_letterList;
 
-    private int selectedLetterIndex = -1;
-    private OrderLetter curLetter = null; // 当前选中的信件
-    private string curLetterDesc;
+    private int SelectedLetterIndex { get; set; }
+    /// <summary>
+    /// 当前选中的信件
+    /// </summary>
+    private OrderLetter CurLetter { get; set; }
+    private string CurLetterDesc { get; set; }
 
-    private readonly List<OrderLetter> archivedLetters = [];
-
+    private List<OrderLetter> ArchivedLetters { get; }
     public Window_OrderLetterBox() : base()
     {
-        archivedLetters = OrderLetterBox.Instance.ArchivedLetters;
+        ArchivedLetters = OrderLetterBox.Instance.ArchivedLetters;
         UnselectLetter();
     }
 
@@ -106,7 +108,7 @@ public class Window_OrderLetterBox : OrderWindowBase
         //右侧上部信件标题
         reusedRect = new(reusedRect.xMax + 16f, rightInnerRect.yMin + 48f, 383f, 32f);
         Text.Font = GameFont.Medium;
-        Widgets.LabelEllipses(reusedRect, curLetter?.Label ?? "OARO_Letter_NoSelected".Translate());
+        Widgets.LabelEllipses(reusedRect, CurLetter?.Label ?? "OARO_Letter_NoSelected".Translate());
         Text.Font = GameFont.Small;
 
         //右侧上部分割线
@@ -115,10 +117,10 @@ public class Window_OrderLetterBox : OrderWindowBase
 
         //右侧信件主要显示区
         Rect letterTextRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, rightInnerRect.yMin + 130f, 564f, 408f);
-        if (curLetter is not null)
+        if (CurLetter is not null)
         {
             Text.Font = GameFont.Medium;
-            Widgets.TextArea(letterTextRect, curLetter.Text, readOnly: true);
+            Widgets.TextArea(letterTextRect, CurLetter.Text, readOnly: true);
             Text.Font = GameFont.Small;
         }
 
@@ -136,7 +138,7 @@ public class Window_OrderLetterBox : OrderWindowBase
         //右侧下部信件信息显示
         reusedRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, reusedRect.yMin + 10f, 340f, 113f);
         Text.Font = GameFont.Medium;
-        Widgets.TextArea(reusedRect, curLetterDesc, readOnly: true);
+        Widgets.TextArea(reusedRect, CurLetterDesc, readOnly: true);
         Text.Font = GameFont.Small;
 
         /*
@@ -149,7 +151,7 @@ public class Window_OrderLetterBox : OrderWindowBase
     private void DrawLetterList(Rect inRect)
     {
         Rect viewRect = new(inRect.xMin, inRect.yMin, 374f, 68f);
-        int listCount = Mathf.Min(200, archivedLetters.Count);
+        int listCount = Mathf.Min(200, ArchivedLetters.Count);
         viewRect.height = listCount * (68f + 2f) - 2f;
 
         Widgets.BeginScrollView(inRect, ref scrollPosition_letterList, viewRect);
@@ -164,7 +166,7 @@ public class Window_OrderLetterBox : OrderWindowBase
             entryRect = new(entryXMin, curEntryYMin, 374f, 68f);
             if (DrawLetterEntry(entryRect, index: i))
             {
-                if (selectedLetterIndex == i)
+                if (SelectedLetterIndex == i)
                 {
                     UnselectLetter();
                 }
@@ -183,7 +185,7 @@ public class Window_OrderLetterBox : OrderWindowBase
     private bool DrawLetterEntry(Rect inRect, int index)
     {
         Rect reuseRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 2f, 49f, 49f);
-        if (index == selectedLetterIndex)
+        if (index == SelectedLetterIndex)
         {
             GUI.DrawTexture(inRect, leftLetterEntry_Sel);
             Widgets.DrawBox(inRect);
@@ -203,28 +205,28 @@ public class Window_OrderLetterBox : OrderWindowBase
         }
 
         reuseRect = Rect.MinMaxRect(reuseRect.xMax + 6f, inRect.yMin + 2f, inRect.xMax - 2f, inRect.yMax - 2f);
-        Widgets.LabelEllipses(reuseRect, archivedLetters[index].Label);
+        Widgets.LabelEllipses(reuseRect, ArchivedLetters[index].Label);
 
         return Widgets.ButtonInvisible(inRect);
     }
 
     private void SelectLetter(int selIndex)
     {
-        if (selIndex < 0 || selIndex > archivedLetters.Count)
+        if (selIndex < 0 || selIndex > ArchivedLetters.Count)
         {
             UnselectLetter();
             return;
         }
-        selectedLetterIndex = selIndex;
-        curLetter = archivedLetters[selectedLetterIndex];
-        curLetterDesc = curLetter.GetLetterDesc();
+        SelectedLetterIndex = selIndex;
+        CurLetter = ArchivedLetters[SelectedLetterIndex];
+        CurLetterDesc = CurLetter.GetLetterDesc();
     }
 
     private void UnselectLetter()
     {
-        selectedLetterIndex = -1;
-        curLetter = null;
-        curLetterDesc = GetEmptyLetterDesc();
+        SelectedLetterIndex = -1;
+        CurLetter = null;
+        CurLetterDesc = GetEmptyLetterDesc();
 
         static string GetEmptyLetterDesc()
         {

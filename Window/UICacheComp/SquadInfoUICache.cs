@@ -14,8 +14,6 @@ public class SquadInfoUICache : BranchSummaryUICache
     public readonly float MemberRecoveryRate = -1f;
     public readonly int BombardSupportCeiling = -1;
 
-    public readonly AcceptanceReport CanUnlockSupportAuthority = false;
-    public readonly AcceptanceReport CanRequestCombatReadiness = false;
     public readonly AcceptanceReport SupportFeasibility;
 
     public readonly AcceptanceReport BombardFeasibility = false;
@@ -30,8 +28,6 @@ public class SquadInfoUICache : BranchSummaryUICache
             FriendlyExpireDateStr = GenDate.SeasonDateStringAt(GenTicks.TicksAbs + branch.FriendlyDaysLeft, Find.WorldGrid.LongLatOf(map.Tile));
         }
 
-        CanUnlockSupportAuthority = BranchUtility.CanUnlockSupportAuthority(branch, map, resultOnly: false);
-        CanRequestCombatReadiness = branch.TaskHandler.CanSwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, resultOnly: false);
         BombardFeasibility = BranchSupportUtility.CanBombard(branch, map, resultOnly: false);
         SupportFeasibility = BranchSupportUtility.CanCombatKnightSupport(branch, map, BranchSupportUtility.DeploymentLevel.Quarter, resultOnly: false);
 

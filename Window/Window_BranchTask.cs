@@ -3,36 +3,65 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 using static OberoniaAurea.RatkinOrder.BranchTaskHandler;
+using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 namespace OberoniaAurea.RatkinOrder;
 
-internal class Window_BranchTask : OrderWindowBase
+[StaticConstructorOnStartup]
+public class Window_BranchTask : OrderWindowBase
 {
+    private Vector2 scrollPosition_Branches;
+
     public override Vector2 InitialSize => new(1339f, 909f);
 
     private RatkinOrder RatkinOrder { get; }
+    private JointPatrolManager JointPatrolManager { get; }
     private Map Map { get; }
     private List<BranchTaskEntryDrawer> BranchTaskEntryDrawers { get; }
     private BranchTaskEntryDrawer ShowDetailDrawer { get; set; }
+
+    private bool JointPatrolTab { get; set; }
+    private List<TabRecord> BranchTabs { get; }
+
+    private bool JointPatrolStaticTab { get; set; }
+    private List<TabRecord> JointPatrolTabs { get; }
+    private Lazy<string> JointPatrolRecordDetailStr { get; }
+    private int OrderResidentKnightCount { get; }
+    private LazyMutable<int> TotalJointPatrolKnightCount { get; }
 
     public Window_BranchTask(RatkinOrder ratkinOrder, Map map)
     {
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
+        JointPatrolManager = RatkinOrder.JointPatrolManager;
+        JointPatrolRecordDetailStr = new(valueFactory: JointPatrolRecordDetail);
+        TotalJointPatrolKnightCount = new(refreshFunc: () => JointPatrolManager?.ParticipantsDict.Keys.Sum(b => b.Squad.AllCrewCountInt) ?? 0);
+
+        BranchTabs = new(2);
+        JointPatrolTabs = new(2);
+
         BranchTaskEntryDrawers = new(RatkinOrder.BranchManager.AllBranches.Count);
+        OrderResidentKnightCount = ResidentKnightsManager.Instance.ResidentKnights.Where(kv => kv.Value.RatkinOrder == RatkinOrder).Count();
         foreach (Branch branch in RatkinOrder.BranchManager.AllBranches)
         {
-            BranchTaskEntryDrawers.Add(new BranchTaskEntryDrawer(this, branch, map));
+            BranchTaskEntryDrawers.Add(new BranchTaskEntryDrawer(this, branch, Map));
         }
     }
 
     public override void PostClose()
     {
         base.PostClose();
+
+        if (ShowDetailDrawer is not null)
+        {
+            ShowDetailDrawer.ShowDetail = false;
+            ShowDetailDrawer.ClearCache();
+        }
         BranchTaskEntryDrawers.Clear();
     }
 
@@ -46,24 +75,78 @@ internal class Window_BranchTask : OrderWindowBase
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
         Rect reusedRect = new(innerRectX, innerRectY + 36f, innerRect.width, 32f);
-        Widgets.Label(reusedRect, "");
+        Widgets.Label(reusedRect, "OARO_TaskWin_Title".Translate());
 
         reusedRect.yMax += 20f;
-        reusedRect.yMin += 20f;
+        reusedRect.yMin = reusedRect.yMax - 20f;
         reusedRect.height = 20f;
         Text.Font = GameFont.Small;
         Widgets.Label(reusedRect, RatkinOrder.NameColored);
 
         reusedRect = new(innerRectX + 65f, innerRectY + 180f, 655f, 647f);
         DrawLeftRect(reusedRect);
+
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 28f, 2f, 673f);
+        GUI.DrawTexture(reusedRect, verticalCuttingLine);
+
+        reusedRect = new(reusedRect.xMax + 28f, innerRectY + (210f - 40f), 510f, 555f + 40f);
+        DrawRightRect(reusedRect);
+
+        OARO_WindowUtility.ResetText();
     }
 
     private void DrawLeftRect(Rect inRect)
     {
+        BranchTabs.Clear();
+        BranchTabs.Add(new TabRecord("OARO_TaskWin_BranchTab_All".Translate().CapitalizeFirst(), delegate
+        {
+            ClearShowDetailDrawer();
+            JointPatrolTab = false;
+        }, !JointPatrolTab));
+        if (JointPatrolManager.CurState != PatrolState.Invalid)
+        {
+            BranchTabs.Add(new TabRecord("OARO_TaskWin_BranchTab_JointPatrol".Translate().CapitalizeFirst(), delegate
+            {
+                ClearShowDetailDrawer();
+                JointPatrolTab = true;
+            }, JointPatrolTab));
+        }
+        TabDrawer.DrawTabs(inRect, BranchTabs, maxTabWidth: 70f);
+
         GUI.DrawTexture(inRect, leftMainBackground);
         Rect innerRect = inRect.ContractedBy(2f);
+        float innerRectX = innerRect.xMin;
         Rect titleRect = innerRect;
         titleRect.height = 26f;
+
+        Rect reusedRect;
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleLeft;
+        reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 108f, 128f, 20f);
+        Widgets.Label(reusedRect, "OARO_TaskWin_BranchInfo".Translate());
+        if (JointPatrolTab)
+        {
+            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 340f, 100f, 20f);
+            Widgets.Label(reusedRect, "OARO_TaskWin_BranchJointPatrolPotency".Translate());
+
+            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 530f, 100f, 20f);
+            Widgets.Label(reusedRect, "OARO_TaskWin_BranchJointPatrolKnightInfo".Translate());
+        }
+        else
+        {
+            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 305f, 100f, 20f);
+            Widgets.Label(reusedRect, "OARO_BranchPotency".Translate());
+
+            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 415f, 50f, 20f);
+            Widgets.Label(reusedRect, "OARO_BranchWorkState".Translate());
+
+            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 525f, 50f, 20f);
+            Widgets.Label(reusedRect, "OARO_TaskWin_BranchTaskSummary".Translate());
+        }
+
+        reusedRect = innerRect;
+        reusedRect.xMin = innerRect.xMax - 16f;
+        GUI.DrawTexture(reusedRect, BaseContent.BlackTex);
 
         Rect outRect = innerRect;
         outRect.yMin = titleRect.yMax + 2f;
@@ -74,12 +157,171 @@ internal class Window_BranchTask : OrderWindowBase
         float entryX = viewRect.xMin - 2f;
         float entryY = viewRect.yMin - 2f;
         viewRect.height = BranchTaskEntryDrawers.Count * BranchTaskEntryDrawer.UpRectHeight + BranchTaskEntryDrawer.DetailRectHeight + 10f;
-        foreach (BranchTaskEntryDrawer drawer in BranchTaskEntryDrawers)
+
+        IEnumerable<BranchTaskEntryDrawer> showDrawers = JointPatrolTab ? BranchTaskEntryDrawers : BranchTaskEntryDrawers.Where(d => JointPatrolManager.IsParticipant(d.Branch));
+
+        foreach (BranchTaskEntryDrawer drawer in showDrawers)
         {
             Vector2 entryPos = new(entryX, entryY);
             entryY = drawer.DrawTaskEntry(entryPos);
         }
+    }
 
+    private void DrawRightRect(Rect inRect)
+    {
+        Rect reusedRect = new(inRect.x, inRect.y, inRect.width, 32f);
+        GUI.DrawTexture(reusedRect, horizontalDecorationLine);
+
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+
+        Rect mainRect = new(inRect.x, inRect.y + 40f, inRect.width, inRect.height - 40f);
+        if (JointPatrolManager.CurState == PatrolState.Invalid)
+        {
+            Widgets.Label(reusedRect, "OARO_TaskWin_PreJointPatrolDesc".Translate());
+            DrawRightRect_Normal(mainRect);
+        }
+        else
+        {
+            Widgets.Label(reusedRect, "OARO_TaskWin_JointPatrolDesc".Translate($"OARO_JointPatrolLevel_{JointPatrolManager.PatrolLevelValue}".Translate()));
+            DrawRightRect_JointPatrol(mainRect);
+        }
+
+        OARO_WindowUtility.ResetText();
+    }
+
+    private void DrawRightRect_Normal(Rect inRect)
+    {
+        GUI.DrawTexture(inRect, rightBrackground_Normal);
+        Rect innerRect = inRect.ContractedBy(2f);
+
+        OARO_WindowUtility.ResetText();
+    }
+
+    private void DrawRightRect_JointPatrol(Rect inRect)
+    {
+
+        Rect mainRect = inRect;
+        mainRect.xMin += 65f;
+
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        JointPatrolTabs.Clear();
+        JointPatrolTabs.Add(new TabRecord("OARO_TaskWin_JointPatrolTab_Target".Translate().CapitalizeFirst(), delegate
+        {
+            JointPatrolStaticTab = false;
+        }, !JointPatrolTab));
+
+        JointPatrolTabs.Add(new TabRecord("OARO_TaskWin_JointPatrolTab_Static".Translate().CapitalizeFirst(), delegate
+        {
+            JointPatrolStaticTab = true;
+        }, JointPatrolStaticTab));
+
+        TabDrawer.DrawTabs(mainRect, JointPatrolTabs, maxTabWidth: 70f);
+
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Rect stageTextRect = new(mainRect.xMax - 200f, mainRect.yMin - 24f, 200f, 20f);
+        if (JointPatrolManager.CurState == PatrolState.Prepare)
+        {
+            Widgets.Label(stageTextRect, $"OARO_TaskWin_JointPatrolStage_{PatrolState.Prepare}".Translate());
+        }
+        else
+        {
+            Widgets.Label(stageTextRect, $"OARO_TaskWin_JointPatrolStage_{PatrolState.Ongoing}".Translate());
+        }
+
+        Text.Anchor = TextAnchor.MiddleRight;
+        Widgets.Label(stageTextRect, "WaitTime".Translate(JointPatrolManager.TickToNextStage.ToStringTicksToPeriod()));
+
+        Rect mainInnerRect = mainRect.ContractedBy(2f);
+        if (JointPatrolStaticTab)
+        {
+            DrawJointPatrolStatic(mainInnerRect);
+        }
+        else
+        {
+
+        }
+
+        OARO_WindowUtility.ResetText();
+    }
+
+    private void DrawJointPatrolStatic(Rect inRect)
+    {
+        float inRectX = inRect.xMin;
+        float inRectY = inRect.yMin;
+
+        Rect textRect = new(inRectX + 12f, inRectY + 12f, inRect.width - 24f, 448f);
+        Rect reusedRect = new(textRect.x, textRect.y, textRect.width, 32f);
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Widgets.Label(reusedRect, "OARO_TaskWin_JointPatrolStatic".Translate());
+
+        Text.Font = GameFont.Small;
+        reusedRect = new(textRect.x, textRect.y + 55f, textRect.width, textRect.height - 55f);
+        Widgets.TextArea(reusedRect, JointPatrolRecordDetailStr.Value, readOnly: true);
+
+        Text.Anchor = TextAnchor.MiddleLeft;
+        reusedRect = new(inRectX + 10f, inRectY + 475f, 145f, 20f);
+        Widgets.Label(reusedRect, "OARO_TaskWin_NonBackKnights".Translate());
+        Text.Anchor = TextAnchor.MiddleRight;
+        int nonBackKnightsCount = OrderResidentKnightCount - JointPatrolManager.ParticipatingResidentKnights.Count;
+        Widgets.Label(reusedRect, nonBackKnightsCount.ToString());
+
+        Text.Anchor = TextAnchor.MiddleLeft;
+        reusedRect = new(inRectX + 10f, inRectY + 485f, 145f, 20f);
+        Widgets.Label(reusedRect, "OARO_TaskWin_BackKnights".Translate());
+        Text.Anchor = TextAnchor.MiddleRight;
+        Widgets.Label(reusedRect, JointPatrolManager.ParticipatingResidentKnights.Count.ToString());
+
+        Text.Anchor = TextAnchor.MiddleLeft;
+        reusedRect = new(inRectX + 10f, inRectY + 495f, 145f, 20f);
+        Widgets.Label(reusedRect, "OARO_TaskWin_TotalJoinKnights".Translate());
+        Text.Anchor = TextAnchor.MiddleRight;
+        Widgets.Label(reusedRect, TotalJointPatrolKnightCount.Value.ToString());
+
+        reusedRect = new(inRect.xMax - (150f + 10f), inRectY + 495f, 150f, 20f);
+        Widgets.Label(reusedRect, "OARO_TaskWin_JointPatroBranchBurden".Translate(JointPatrolManager.ParticipantsDict.Count, JointPatrolManager.BurdenSquadCount)
+                                                                       .Colorize(JointPatrolManager.ParticipantsDict.Count > JointPatrolManager.BurdenSquadCount ? ColorLibrary.RedReadable : Color.green));
+
+        reusedRect = new(inRectX + 240f, inRectY + 470f, 110f, 55f);
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OARO_TaskWin_KnightBackTeam".Translate(),
+            acceptance: JointPatrolManager.CurState != PatrolState.Prepare ? "OARO_JointPatrol_NotInPrepareStage".Translate() : true,
+            baseTex: jointPatrolButton,
+            downTex: jointPatrolButton_Down,
+            doMouseoverSound: true))
+        {
+
+        }
+
+        reusedRect = new(inRectX + 450f, inRectY + 470f, 110f, 55f);
+        string helpPolicyText = "OARO_TaskWin_HelpPolicyButton".Translate();
+        helpPolicyText += ("\n" + $"OARO_JointPatrol_HelpPolicy_{JointPatrolManager.CurHelpPolicy}".Translate());
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, helpPolicyText, jointPatrolButton, jointPatrolButton_Down, doMouseoverSound: true))
+        {
+            JointPatrolManager.ChangeHelpPolicy();
+        }
+    }
+
+    private string JointPatrolRecordDetail()
+    {
+        StringBuilder sb = new();
+        Vector2 location = Find.WorldGrid.LongLatOf(Map.Tile);
+        foreach (JointPatrolManager.JointInteractionRecord record in JointPatrolManager.InteractionRecords)
+        {
+            sb.AppendLine(GenDate.DateFullStringAt(GenDate.TickAbsToGame(record.TriggerTick), location) + " —— " + record.RelatedBranch.NameColored + " —— " + record.Label);
+            sb.AppendLine(record.Description);
+            sb.AppendLine();
+        }
+        return sb.ToString();
+    }
+
+    private void ClearShowDetailDrawer()
+    {
+        ShowDetailDrawer?.ClearCache();
+        ShowDetailDrawer = null;
     }
 
     private void OnShowDrawerDetailChanged(BranchTaskEntryDrawer drawer)
@@ -89,46 +331,49 @@ internal class Window_BranchTask : OrderWindowBase
             return;
         }
 
-        if (ShowDetailDrawer is not null)
-        {
-            ShowDetailDrawer.ShowDetail = false;
-            ShowDetailDrawer.ClearCache();
-        }
-
-        if (ShowDetailDrawer == drawer)
-        {
-            ShowDetailDrawer = null;
-        }
-        else
-        {
-            ShowDetailDrawer = drawer;
-            drawer.ShowDetail = true;
-        }
+        ClearShowDetailDrawer();
+        ShowDetailDrawer = drawer;
+        ShowDetailDrawer.ChangeShowDetail();
     }
-
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_MainBackground");
     private static readonly Texture2D leftMainBackground = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_LeftMainBackground");
 
+    private static readonly Texture2D horizontalDecorationLine = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_HorizontalDecorationLine");
+    private static readonly Texture2D rightBrackground_Normal = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_RightBrackground_Normal");
+
+    private static readonly Texture2D jointPatrolButton = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_JointPatrolButton");
+    private static readonly Texture2D jointPatrolButton_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_JointPatrolButton_Down");
+
+    private static readonly Texture2D verticalCuttingLine = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_VerticalCuttingLine");
+
+    [StaticConstructorOnStartup]
     private class BranchTaskEntryDrawer
     {
         private const float Width = 637f;
         public const float UpRectHeight = 82f;
         public const float DetailRectHeight = 301f;
+        private static readonly List<BranchInteractionDef> TaskNeedBranchInteractions =
+        [
+            BranchInteractionDefOf.OARO_RequestCombatReadiness,
+            BranchInteractionDefOf.OARO_MapRecommendationToKnight,
+            BranchInteractionDefOf.OARO_MapSilverToSupply,
+        ];
 
         private Vector2 scrollPosition_Medals;
 
         private Window_BranchTask Parent { get; }
-        private Branch Branch { get; }
+        public Branch Branch { get; }
         private Map Map { get; }
         private LazyMutable<JointBranchRecord> JointBranchRecord { get; }
+
         private JointPatrolManager JointPatrolManager => Branch.RatkinOrder.JointPatrolManager;
 
         public bool ShowDetail { get; set; }
 
         private LazyMutable<AcceptanceReport> ChangeRadicalismDegreeAcceptance { get; }
         private LazyMutable<AcceptanceReport> ChangeFocusedTaskTypeAcceptance { get; }
-        private LazyMutable<AcceptanceReport> CombatReadinessAcceptance { get; }
+        public LazyMutable<Dictionary<BranchInteractionDef, AcceptanceReport>> InteractionAcceptances { get; }
         private LazyMutable<List<KeyValuePair<JointBranchRecord.PatrolInteractionType, AcceptanceReport>>> PatrolInteractionAcceptances { get; }
         private LazyMutable<List<Pawn>> BackTeamKnights { get; }
         private Lazy<int> CrewCeiling { get; }
@@ -143,24 +388,39 @@ internal class Window_BranchTask : OrderWindowBase
             CrewCeiling = new(valueFactory: () => (int)(Branch.Squad.MemberCeiling + Branch.Squad.CommanderCeiling));
             ChangeRadicalismDegreeAcceptance = new(refreshFunc: () => BranchUtility.CanChangeRadicalismDegree(branch, resultOnly: false));
             ChangeFocusedTaskTypeAcceptance = new(refreshFunc: () => BranchUtility.CanChangeFocusedTaskType(branch, resultOnly: false));
-            CombatReadinessAcceptance = new(refreshFunc: () => Branch.TaskHandler.CanSwitchToTask(BranchTaskDefOf.OARO_CombatReadiness));
-            PatrolInteractionAcceptances = new(refreshFunc: RecachePatrolInteractionAcceptances);
+            PatrolInteractionAcceptances = new(refreshFunc: RefreshPatrolInteractionAcceptances);
             BackTeamKnights = new(refreshFunc: () => JointPatrolManager.ParticipatingResidentKnights.Where(r => r.Branch == Branch).Select(r => r.Knight).ToList());
         }
 
         public void ClearCache()
         {
             ShowDetail = false;
+            Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+
             JointBranchRecord.Reset();
             ChangeRadicalismDegreeAcceptance.Reset();
             ChangeFocusedTaskTypeAcceptance.Reset();
-            CombatReadinessAcceptance.Reset();
+            InteractionAcceptances.Reset();
             PatrolInteractionAcceptances.Reset();
+        }
+
+        public void ChangeShowDetail()
+        {
+            ShowDetail = !ShowDetail;
+            if (ShowDetail)
+            {
+                Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+                Branch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+            }
+            else
+            {
+                ClearCache();
+            }
         }
 
         private JointBranchRecord RefreshJointBranchRecord()
         {
-            if (JointPatrolManager.CurState == JointPatrolManager.PatrolState.Invalid)
+            if (JointPatrolManager.CurState == PatrolState.Invalid)
             {
                 return null;
             }
@@ -265,7 +525,7 @@ internal class Window_BranchTask : OrderWindowBase
 
             Text.Anchor = TextAnchor.MiddleRight;
             reusedRect = new(inRect.xMax - (10f + 100f), inRectY + 4f, 100f, 20f);
-            Widgets.Label(reusedRect, "OARO_TaskWin_AutoTaskChance".Translate());
+            Widgets.Label(reusedRect, "OARO_AutoStartTaskChance".Translate());
 
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect.yMax += 20f;
@@ -285,7 +545,6 @@ internal class Window_BranchTask : OrderWindowBase
 
         private void DrawJointPatrol(Rect inRect)
         {
-
             float inRectX = inRect.xMin;
 
             Rect reusedRect = new(inRectX + 285f, inRect.y - 2f, 348f, 52f);
@@ -348,7 +607,7 @@ internal class Window_BranchTask : OrderWindowBase
             reusedRect = new(innerRectX + 30f, reusedRect.yMax + 10f, 300f, 20f);
             Widgets.Label(reusedRect, Branch.CurWorkState);
 
-            float entryX = innerRectX + 210f;
+            float entryX = innerRectX + 360f;
             float entryY = innerRectY;
             float entryWidth = 137f;
             float entryHeight = 32f;
@@ -363,6 +622,7 @@ internal class Window_BranchTask : OrderWindowBase
                 {
                     entryX = innerRectX + 210f;
                     entryY += entryHeight;
+                    column = 0;
                 }
                 else
                 {
@@ -371,7 +631,7 @@ internal class Window_BranchTask : OrderWindowBase
 
                 if (OARO_WindowUtility.TextButtonImageDisableable(
                     butRect: entryRect,
-                    label: $"OARO_TaskType_{taskType}".Translate(),
+                    label: $"OARO_JointPatrolTaskType_{taskType}".Translate(),
                     acceptance: focusedTaskType == taskType ? false : ChangeFocusedTaskTypeAcceptance.Value,
                     baseTex: GetTaskTypeButtonTex(taskType, downed: false, disable: taskType != focusedTaskType),
                     downTex: GetTaskTypeButtonTex(taskType, downed: true, disable: taskType != focusedTaskType),
@@ -419,42 +679,40 @@ internal class Window_BranchTask : OrderWindowBase
             Widgets.Label(reusedRect, "OARO_TaskWin_Interaction".Translate());
 
             reusedRect = new(innerRectX + 360f, innerRectY + 148f, 137f, 24f);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            OARO_WindowUtility.DrawBranchInteractionButton(
                 butRect: reusedRect,
-                label: "OARO_TaskWin_RequireCombatReadiness".Translate(),
-                acceptance: CombatReadinessAcceptance.Value,
+                def: BranchInteractionDefOf.OARO_RequestCombatReadiness,
+                parms: new BranchInteractionParms(Branch, Map),
+                cachedAcceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_RequestCombatReadiness, fallback: false),
                 baseTex: combatReadinessButton,
                 downTex: combatReadinessButton_Down,
-                doMouseoverSound: true))
-            {
-                AcceptanceReport acceptanceReport = Branch.TaskHandler.CanSwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, resultOnly: false);
-                if (acceptanceReport)
-                {
-                    Branch.TaskHandler.TrySwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, endCurIfCantSwitch: false);
-                }
-                else
-                {
-                    Messages.Message(
-                        text: "OARO_CanNotSwithToBranchTaskWithReason".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), BranchTaskDefOf.OARO_CombatReadiness.Named("TASK"), acceptanceReport.Reason.Named("Reason")),
-                        def: MessageTypeDefOf.RejectInput,
-                        historical: false);
-                }
-                CombatReadinessAcceptance.MarkDirty();
-            }
-            reusedRect.yMax += 24f;
-            reusedRect.yMin += 24f;
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_TaskWin_SupplementPersonnel".Translate(), supplementPersonnelButton, supplementPersonnelButton_Down, doMouseoverSound: true))
-            {
+                doMouseoverSound: true);
 
-            }
             reusedRect.yMax += 24f;
-            reusedRect.yMin += 24f;
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_TaskWin_SupplementPersonnel".Translate(), supplementButton, supplementButton_Down, doMouseoverSound: true))
-            {
+            reusedRect.yMin = reusedRect.yMax - 24f;
+            OARO_WindowUtility.DrawBranchInteractionButton(
+                butRect: reusedRect,
+                def: BranchInteractionDefOf.OARO_MapRecommendationToKnight,
+                parms: new BranchInteractionParms(Branch, Map),
+                cachedAcceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapRecommendationToKnight, fallback: false),
+                baseTex: combatReadinessButton,
+                downTex: combatReadinessButton_Down,
+                doMouseoverSound: true);
 
-            }
             reusedRect.yMax += 24f;
-            reusedRect.yMin += 24f;
+            reusedRect.yMin = reusedRect.yMax - 24f;
+            OARO_WindowUtility.DrawBranchInteractionButton(
+                butRect: reusedRect,
+                def: BranchInteractionDefOf.OARO_MapSilverToSupply,
+                parms: new BranchInteractionParms(Branch, Map),
+                cachedAcceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapSilverToSupply, fallback: false),
+                baseTex: combatReadinessButton,
+                downTex: combatReadinessButton_Down,
+
+                doMouseoverSound: true);
+
+            reusedRect.yMax += 24f;
+            reusedRect.yMin = reusedRect.yMax - 24f;
             if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_TaskWin_OpenBranchWin".Translate(), patrolInteractionButton, patrolInteractionButton_Down, doMouseoverSound: true))
             {
                 Window_Branch branchWin = new(Branch, caravan: null, Map);
@@ -463,7 +721,7 @@ internal class Window_BranchTask : OrderWindowBase
                 return inRect.yMax;
             }
 
-            entryX = reusedRect.xMax + 377f;
+            entryX = reusedRect.xMax;
             entryY = innerRectY + 148f;
             entryWidth = 137f;
             entryHeight = 24f;
@@ -493,6 +751,7 @@ internal class Window_BranchTask : OrderWindowBase
                 doMouseoverSound: true))
             {
                 JointPatrolManager.ChangeParticipant(toAdd: [Branch], toRemove: null);
+                Parent.TotalJointPatrolKnightCount.MarkDirty();
             }
 
             reusedRect = new(innerRectX, innerRectY + 211f, 357f, 87f);
@@ -540,6 +799,7 @@ internal class Window_BranchTask : OrderWindowBase
                 {
                     entryX = medalsOutRect.xMin;
                     entryY += entryHeight;
+                    column = 0;
                 }
                 else
                 {
@@ -551,8 +811,33 @@ internal class Window_BranchTask : OrderWindowBase
             OARO_WindowUtility.ResetText();
         }
 
+        private Dictionary<BranchInteractionDef, AcceptanceReport> RefreshInteractionAcceptances()
+        {
+            Dictionary<BranchInteractionDef, AcceptanceReport> pairs = [];
+            foreach (BranchInteractionDef def in TaskNeedBranchInteractions)
+            {
+                AcceptanceReport acceptance = false;
+                try
+                {
+                    BranchInteractionParms parms = new(Branch, Map);
+                    acceptance = def.Worker.CanUseInteraction(parms, resultOnly: false);
+                }
+                catch (Exception ex)
+                {
+                    acceptance = false;
+                    ModUtility.LogExceptionError(ex,
+                        errorDesc: $"get {nameof(AcceptanceReport)} of {nameof(BranchInteractionDef)}",
+                        typeName: nameof(BranchTaskEntryDrawer),
+                        methodName: nameof(RefreshInteractionAcceptances),
+                        needStackTrace: true);
+                }
 
-        private List<KeyValuePair<JointBranchRecord.PatrolInteractionType, AcceptanceReport>> RecachePatrolInteractionAcceptances()
+                pairs.Add(def, acceptance);
+            }
+            return pairs;
+        }
+
+        private List<KeyValuePair<JointBranchRecord.PatrolInteractionType, AcceptanceReport>> RefreshPatrolInteractionAcceptances()
         {
             List<KeyValuePair<JointBranchRecord.PatrolInteractionType, AcceptanceReport>> acceptances = [];
 
@@ -578,15 +863,17 @@ internal class Window_BranchTask : OrderWindowBase
                 {
                     acceptance = false;
                     ModUtility.LogExceptionError(ex,
-                        errorDesc: $"get AcceptanceReport of {interactionType}",
+                        errorDesc: $"get {nameof(AcceptanceReport)} of {interactionType}",
                         typeName: nameof(BranchTaskEntryDrawer),
-                        methodName: nameof(RecachePatrolInteractionAcceptances),
+                        methodName: nameof(RefreshPatrolInteractionAcceptances),
                         needStackTrace: true);
                 }
                 acceptances.Add(new KeyValuePair<JointBranchRecord.PatrolInteractionType, AcceptanceReport>(interactionType, acceptance));
             }
             return acceptances;
         }
+
+        private void PostApplyBranchInteraction(BranchInteractionDef def, BranchInteractionParms parms, bool succeeded) => InteractionAcceptances.MarkDirty();
 
         private static readonly Texture2D taskEntryUpBackground = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskEntryUpBackground");
         private static readonly Texture2D taskEntryBottomBackground = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskEntryBottomBackground");

@@ -7,16 +7,15 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def) : BranchInteractionWorker(def)
+public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
-    public override AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly = false)
+    protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
     {
         if (OARO_ModDefOf.Rakinia_RockRatkin is null || OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_RockRatkin, FactionValidationParams.NonHostileNormalFaction) is null)
         {
             return resultOnly ? false : "OARO_NoNonHostileRockRatkin".Translate();
         }
-
-        return base.CanUseInteraction(parms, resultOnly);
+        return base.TargetValidate(parms, resultOnly);
     }
 
     protected override void ApplyInteraction(BranchInteractionParms parms)

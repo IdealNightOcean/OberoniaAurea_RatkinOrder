@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class Window_LetterBoxSetting : Window
 {
     public override Vector2 InitialSize => new(450f, 300f); // inRect大小
-    private readonly OrderLetterBox LetterBox;
+    private OrderLetterBox LetterBox { get; }
     public Window_LetterBoxSetting()
     {
         doCloseX = true; // 是否显示关闭按钮

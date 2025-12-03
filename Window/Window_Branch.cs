@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -35,9 +36,10 @@ public class Window_Branch : OrderWindowBase
     private Caravan Caravan { get; }
     private Map Map { get; }
 
-    private TabType curTab = TabType.Construction;
-    private SelectType curSelectType = SelectType.None;
-    private readonly int allFacilityDefCount;
+    private TabType CurTab { get; set; }
+
+    private SelectType CurSelectType { get; set; }
+    private int AllFacilityDefCount { get; }
 
     /*
         建设部分缓存
@@ -78,19 +80,7 @@ public class Window_Branch : OrderWindowBase
     /*
         需求部分缓存
     */
-    private List<(BranchContract, AcceptanceReport)> contractAcceptances = [];
-    private IReadOnlyList<(BranchContract, AcceptanceReport)> ContractAcceptances
-    {
-        get
-        {
-            if (contractAcceptanceDirty)
-            {
-                RecacheContractAcceptance();
-            }
-            return contractAcceptances;
-        }
-    }
-    private bool contractAcceptanceDirty = true;
+    private LazyMutable<List<KeyValuePair<BranchContract, AcceptanceReport>>> ContractAcceptances { get; }
     private Vector2 scrollPosition_Contract;
 
     /*
@@ -134,9 +124,11 @@ public class Window_Branch : OrderWindowBase
         Caravan = caravan;
         CachedBranchInfo = new(Branch, Map);
 
-        allFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
+        AllFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
+        CurTab = TabType.Construction;
+        CurSelectType = SelectType.None;
 
-
+        ContractAcceptances = new(refreshFunc: RecacheContractAcceptance);
     }
 
     public override void PreOpen()
@@ -152,9 +144,9 @@ public class Window_Branch : OrderWindowBase
         Branch.BuildingHandler.PostConstructionChanged -= PostConstructionChanged_Building;
         Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
         ClearConstructCache();
-        ClearContractCache();
+        ContractAcceptances.Reset();
         ClearInteractionCache();
-        curTab = TabType.Construction;
+        CurTab = TabType.Construction;
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -176,12 +168,12 @@ public class Window_Branch : OrderWindowBase
         float offsetMainInnerMidX = mainInnerRectX + 824f;
 
         reusedRect = new(mainInnerRectX + 546f, mainInnerRectY + 171f, 562f, 9f);
-        Widgets.FillableBar(reusedRect, Mathf.Clamp01(Branch.FacilityHandler.TotalFacilityLevel / (allFacilityDefCount * 4f)), IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: false);
+        Widgets.FillableBar(reusedRect, Mathf.Clamp01(Branch.FacilityHandler.TotalFacilityLevel / (AllFacilityDefCount * 4f)), IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: false);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
         reusedRect = new(mainInnerRectX + (755f - 128f), mainInnerRectY + 65f, 128f, 32f);
-        Widgets.Label(reusedRect, $"{Branch.FacilityHandler.TotalFacilityLevel}/{allFacilityDefCount * 4}");
+        Widgets.Label(reusedRect, $"{Branch.FacilityHandler.TotalFacilityLevel}/{AllFacilityDefCount * 4}");
 
         reusedRect = new(mainInnerRectX + (755f - 192f), reusedRect.yMax + 10f, 192f, 32f);
         Widgets.Label(reusedRect, "OARO_BranchWin_TotalFacilitiesLevel".Translate());
@@ -262,7 +254,7 @@ public class Window_Branch : OrderWindowBase
 
         Rect mainRect = inRect;
         mainRect.yMin += 45f;
-        switch (curTab)
+        switch (CurTab)
         {
             case TabType.Construction:
                 Widgets.DrawBox(constructionTabRect);
@@ -389,10 +381,10 @@ public class Window_Branch : OrderWindowBase
             Widgets.FillableBar(reusedRect, UnderConstructionFacility.Progress, BaseContent.WhiteTex, BaseContent.BlackTex, doBorder: true);
         }
 
-        bool selected = ((curSelectType == SelectType.Facility) && (SelFacilityDef == facilityDef));
+        bool selected = ((CurSelectType == SelectType.Facility) && (SelFacilityDef == facilityDef));
         if (Widgets.ButtonInvisible(inRect))
         {
-            curSelectType = SelectType.Facility;
+            CurSelectType = SelectType.Facility;
             if (selected)
             {
                 DeselectConstruct();
@@ -519,7 +511,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, building.Label);
         Text.Anchor = TextAnchor.UpperLeft;
 
-        bool selected = ((curSelectType == SelectType.Building) && (SelBuildingDef == building.Def));
+        bool selected = ((CurSelectType == SelectType.Building) && (SelBuildingDef == building.Def));
         if (Widgets.ButtonInvisible(inRect))
         {
             if (selected)
@@ -533,7 +525,7 @@ public class Window_Branch : OrderWindowBase
                     SelBuilding = building;
                     SelBuildingDefCache = new(building.Def, Branch);
                 }
-                curSelectType = SelectType.Building;
+                CurSelectType = SelectType.Building;
             }
         }
         if (selected)
@@ -554,7 +546,7 @@ public class Window_Branch : OrderWindowBase
         else
         {
             string buttonLabel = isSpecialSlot ? "OARO_BranchWin_ClickToConstructBuilding_Special".Translate() : "OARO_BranchWin_ClickToConstructBuilding".Translate();
-            bool selected = ((curSelectType == SelectType.EmptyBuildingSlot) && (SelEmptyBuildingSlotIsSpecial == isSpecialSlot));
+            bool selected = ((CurSelectType == SelectType.EmptyBuildingSlot) && (SelEmptyBuildingSlotIsSpecial == isSpecialSlot));
             if (selected)
             {
                 GUI.DrawTexture(inRect, buildingConstructButton_Down, ScaleMode.ScaleToFit);
@@ -563,7 +555,7 @@ public class Window_Branch : OrderWindowBase
                 Widgets.DrawBox(inRect);
                 if (Widgets.ButtonInvisible(inRect, doMouseoverSound: true))
                 {
-                    curSelectType = SelectType.EmptyBuildingSlot;
+                    CurSelectType = SelectType.EmptyBuildingSlot;
                     DeselectConstruct();
                 }
             }
@@ -572,7 +564,7 @@ public class Window_Branch : OrderWindowBase
                 SelBuilding = null;
                 SelBuildingDefCache = null;
                 SelEmptyBuildingSlotIsSpecial = isSpecialSlot;
-                curSelectType = SelectType.EmptyBuildingSlot;
+                CurSelectType = SelectType.EmptyBuildingSlot;
             }
         }
     }
@@ -604,7 +596,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = new(inRect.x + 2f, inRect.yMax - 12f, inRect.width - 4f, 12f);
         Widgets.FillableBar(reusedRect, underConstructionBuilding.Progress, BaseContent.WhiteTex, BaseContent.BlackTex, doBorder: true);
 
-        bool selected = curSelectType == SelectType.ConstructingBuilding;
+        bool selected = CurSelectType == SelectType.ConstructingBuilding;
         if (Widgets.ButtonInvisible(inRect))
         {
             if (selected)
@@ -614,7 +606,7 @@ public class Window_Branch : OrderWindowBase
             else
             {
                 SelBuildingDefCache = new(buildingDef, Branch);
-                curSelectType = SelectType.ConstructingBuilding;
+                CurSelectType = SelectType.ConstructingBuilding;
             }
         }
         if (selected)
@@ -626,7 +618,7 @@ public class Window_Branch : OrderWindowBase
     private void DrawContractTab(Rect inRect)
     {
         BranchPopulationHandler populationHandler = Branch.PopulationHandler;
-        IReadOnlyList<(BranchContract, AcceptanceReport)> contractAcceptances = ContractAcceptances;
+        List<KeyValuePair<BranchContract, AcceptanceReport>> contractAcceptances = ContractAcceptances.Value;
         int contractCeilingByPop = populationHandler.ContractCeilingByPop;
 
         float entryX = inRect.xMin;
@@ -646,7 +638,7 @@ public class Window_Branch : OrderWindowBase
             GUI.DrawTexture(entryRect, contractBackground, ScaleMode.ScaleToFit);
             entryY += (entryHeight - 2f);
             entryRect.ContractedBy(2f);
-            DrawContractEntry(entryRect, contractAcceptances[i].Item1, contractAcceptances[i].Item2);
+            DrawContractEntry(entryRect, contractAcceptances[i].Key, contractAcceptances[i].Value);
         }
 
         Text.Font = GameFont.Medium;
@@ -711,7 +703,7 @@ public class Window_Branch : OrderWindowBase
                         if (OARO_WindowUtility.TextButtonImage(reusedRect, "Submit".Translate(), contractButton, contractButton_Down, doMouseoverSound: true))
                         {
                             contract.Fulfill(Caravan, Branch);
-                            contractAcceptanceDirty = true;
+                            ContractAcceptances.MarkDirty();
                         }
                     }
                     else
@@ -944,7 +936,7 @@ public class Window_Branch : OrderWindowBase
 
     private void DrawRightRect(Rect inRect)
     {
-        switch (curSelectType)
+        switch (CurSelectType)
         {
             case SelectType.None: return;
             case SelectType.Facility:
@@ -1107,7 +1099,7 @@ public class Window_Branch : OrderWindowBase
     {
         BranchBuildingDef buildingDef;
         string buildingLabel;
-        if (curSelectType == SelectType.Building)
+        if (CurSelectType == SelectType.Building)
         {
             if (SelBuilding is null)
             {
@@ -1159,7 +1151,7 @@ public class Window_Branch : OrderWindowBase
             descRect = DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 8f), "OARO_BranchWin_BuildingAdvancedEffect".Translate(), SelBuildingDefCache.AdvancedEffectDesc, ref scrollPosition_BuildingAdvancedEffect);
         }
 
-        if (curSelectType == SelectType.ConstructingBuilding)
+        if (CurSelectType == SelectType.ConstructingBuilding)
         {
             DrawRight_ConstructingBuildingBottom(new(inRectX, descRect.yMax + 16f));
         }
@@ -1428,7 +1420,7 @@ public class Window_Branch : OrderWindowBase
 
     private void SwitchTab(TabType tabType)
     {
-        if (curTab == tabType)
+        if (CurTab == tabType)
         {
             return;
         }
@@ -1443,13 +1435,13 @@ public class Window_Branch : OrderWindowBase
                 break;
             default: break;
         }
-        curTab = tabType;
+        CurTab = tabType;
     }
 
     private void DeselectConstruct()
     {
-        SelectType oldSelectType = curSelectType;
-        curSelectType = SelectType.None;
+        SelectType oldSelectType = CurSelectType;
+        CurSelectType = SelectType.None;
         switch (oldSelectType)
         {
             case SelectType.Facility:
@@ -1475,7 +1467,7 @@ public class Window_Branch : OrderWindowBase
 
     private void ClearConstructCache()
     {
-        curSelectType = SelectType.None;
+        CurSelectType = SelectType.None;
 
         SelBuilding = null;
         SelBuildingDefCache = null;
@@ -1486,12 +1478,6 @@ public class Window_Branch : OrderWindowBase
 
         SelEmptyBuildingSlotIsSpecial = null;
         optionalBuildingDefs = null;
-    }
-
-    private void ClearContractCache()
-    {
-        contractAcceptanceDirty = true;
-        contractAcceptances.Clear();
     }
 
     private void ClearInteractionCache()
@@ -1523,31 +1509,32 @@ public class Window_Branch : OrderWindowBase
         }
     }
 
-    private void RecacheContractAcceptance()
+    private List<KeyValuePair<BranchContract, AcceptanceReport>> RecacheContractAcceptance()
     {
-        contractAcceptanceDirty = false;
-        contractAcceptances.Clear();
+
         IReadOnlyList<BranchContract> contracts = Branch.PopulationHandler.Contracts;
+        List<KeyValuePair<BranchContract, AcceptanceReport>> pairs = [];
         foreach (BranchContract contract in contracts)
         {
-            AcceptanceReport acceptanceReport;
+            AcceptanceReport acceptance;
             try
             {
-                acceptanceReport = contract.CanFulfill(Caravan);
+                acceptance = contract.CanFulfill(Caravan);
             }
             catch
             {
-                acceptanceReport = false;
+                acceptance = false;
             }
-            contractAcceptances.Add((contract, acceptanceReport));
+            pairs.Add(new KeyValuePair<BranchContract, AcceptanceReport>(contract, acceptance));
         }
+        return pairs;
     }
 
     private void RecacheInteractionAcceptance()
     {
         interactionAcceptanceDirty = false;
         commonInteractionAcceptances.Clear();
-        foreach (BranchInteractionDef interactionDef in DefDatabase<BranchInteractionDef>.AllDefs.Where(d => !d.onlyBuildingInteraction))
+        foreach (BranchInteractionDef interactionDef in DefDatabase<BranchInteractionDef>.AllDefs.Where(d => !d.onlyBuildingInteraction && d.target == BranchInteractionDef.InteractionTarget.Caravan))
         {
             AcceptanceReport acceptanceReport;
             try
@@ -1562,7 +1549,7 @@ public class Window_Branch : OrderWindowBase
         }
 
         buildingInteractionAcceptances.Clear();
-        foreach (BranchBuildingComp_Interaction interactionComp in Branch.BuildingHandler.InteractionComps)
+        foreach (BranchBuildingComp_Interaction interactionComp in Branch.BuildingHandler.InteractionComps.Where(c => c.Def.target == BranchInteractionDef.InteractionTarget.Caravan))
         {
             AcceptanceReport acceptanceReport;
             try
@@ -1579,17 +1566,17 @@ public class Window_Branch : OrderWindowBase
 
     private void PostConstructionChanged_Building(BranchBuildingDef buildingDef, bool added)
     {
-        if (curSelectType == SelectType.ConstructingBuilding)
+        if (CurSelectType == SelectType.ConstructingBuilding)
         {
             DeselectConstruct();
         }
-        if (curSelectType == SelectType.EmptyBuildingSlot)
+        if (CurSelectType == SelectType.EmptyBuildingSlot)
         {
             DeselectConstruct();
             if (UnderConstructionBuilding?.TargetDef == buildingDef)
             {
                 SelBuildingDefCache = new BranchBuildingDefSummaryUICache(buildingDef, Branch);
-                curSelectType = SelectType.ConstructingBuilding;
+                CurSelectType = SelectType.ConstructingBuilding;
             }
         }
 

@@ -1,6 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
-using RimWorld.Planet;
+﻿using RimWorld;
 using System;
 using Verse;
 
@@ -14,16 +12,22 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 {
     public readonly BranchInteractionDef Def = def ?? throw new ArgumentNullException(nameof(def));
 
-    public virtual AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly = false)
+
+    protected virtual AcceptanceReport ParmsValidate(BranchInteractionParms parms, bool resultOnly)
     {
-        if (parms.Branch is null || parms.Caravan is null)
+        if (parms.Branch is null)
         {
             return false;
         }
         if (Def.onlyBuildingInteraction && parms.Building is null)
         {
-            return resultOnly ? false : "OARO_Require_TargetBranchBuilding".Translate();
+            return false;
         }
+        return true;
+    }
+
+    protected virtual AcceptanceReport BranchValidate(BranchInteractionParms parms, bool resultOnly)
+    {
         Branch branch = parms.Branch;
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         if (ratkinOrder.Relationship < Def.floorRelationship)
@@ -50,35 +54,54 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
                 return resultOnly ? false : "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
             }
         }
-        if (Def.needRecommendation > 0 && CaravanInventoryUtility.HasThings(parms.Caravan, OARO_ThingDefOf.OARO_OrderRecommendation, Def.needRecommendation, (t) => ((OrderRecommendation)t).RatkinOrder == ratkinOrder))
+        return true;
+    }
+
+    protected abstract AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly);
+
+    public AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly)
+    {
+        AcceptanceReport acceptance = ParmsValidate(parms, resultOnly);
+        if (!acceptance)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
+            return acceptance;
         }
-        if (Def.needSilver > 0 && !CaravanInventoryUtility.HasThings(parms.Caravan, ThingDefOf.Silver, Def.needSilver))
+
+        acceptance = BranchValidate(parms, resultOnly);
+        if (!acceptance)
         {
-            return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, Def.needSilver);
+            return acceptance;
         }
+
+        acceptance = TargetValidate(parms, resultOnly);
+        if (!acceptance)
+        {
+            return acceptance;
+        }
+
         return true;
     }
 
     public void TryApplyInteraction(BranchInteractionParms parms)
     {
-        if (parms.Branch is null || parms.Caravan is null)
+        if (!ParmsValidate(parms, resultOnly: true))
         {
+            Log.Error($"[OARO] Attempt to apply BranchInteraction with a invalid {nameof(BranchInteractionParms)}.");
             return;
         }
-        if (Def.onlyBuildingInteraction && parms.Building is null)
-        {
-            Log.Error("[OARO] Attempt to apply BranchInteraction with a null branch building.");
-            return;
-        }
+
         ApplyInteraction(parms);
     }
 
-    protected virtual void DoInteractionCost(BranchInteractionParms parms)
+    protected void DoInteractionCost(BranchInteractionParms parms)
+    {
+        DoBranchCost(parms);
+        DoTargetCost(parms);
+    }
+
+    protected virtual void DoBranchCost(BranchInteractionParms parms)
     {
         Branch branch = parms.Branch;
-
         if (Def.useDefaultCD && Def.defaultCdDays > 0)
         {
             branch.CooldownManager.RegisterRecord(def.defName, cdTicks: Def.defaultCdDays * 60000, removeWhenExpired: true);
@@ -87,15 +110,9 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             branch.Supply -= Def.needSupply;
         }
-        if (Def.needRecommendation > 0)
-        {
-            RecommendationUtility.UseRecommendationOfCaravan(branch.RatkinOrder, parms.Caravan, Def.needRecommendation);
-        }
-        if (Def.needSilver > 0)
-        {
-            parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, Def.needSilver);
-        }
     }
+
+    protected abstract void DoTargetCost(BranchInteractionParms parms);
 
     /// <returns>
     /// <para>- succeeded：是否成功执行交互逻辑</para>

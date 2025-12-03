@@ -5,15 +5,15 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchInteractionWorker_BuildingTrader(BranchInteractionDef def) : BranchInteractionWorker(def)
+public class BranchInteractionWorker_BuildingTrader(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
-    public override AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly = false)
+    protected override AcceptanceReport ParmsValidate(BranchInteractionParms parms, bool resultOnly)
     {
         if (parms.Building is not BranchBuilding_Trader)
         {
             return resultOnly ? false : "OARO_NotTraderContainerBranchBuilding".Translate();
         }
-        return base.CanUseInteraction(parms, resultOnly);
+        return base.ParmsValidate(parms, resultOnly);
     }
 
     /// <returns>

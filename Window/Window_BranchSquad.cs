@@ -17,6 +17,13 @@ public class Window_BranchSquad : OrderWindowBase
         Near,
         Friendly
     }
+    private static readonly List<BranchInteractionDef> SquadNeedBranchInteractions =
+    [
+        BranchInteractionDefOf.OARO_RequestCombatReadiness,
+        BranchInteractionDefOf.OARO_MapRecommendationToKnight,
+        BranchInteractionDefOf.OARO_MapSilverToSupply,
+        BranchInteractionDefOf.OARO_UnlockSupportAuthority
+    ];
     public override Vector2 InitialSize => new(1627f, 944f);
 
     private Vector2 scrollPosition_Squads;
@@ -29,13 +36,14 @@ public class Window_BranchSquad : OrderWindowBase
     private int SelBranchIndex { get; set; }
     private SquadInfoUICache SelSquadInfo { get; set; }
     private Branch SelBranch => SelSquadInfo?.Branch;
-    private bool NeedRefreshSel { get; set; }
 
     private TabType CurTab { get; set; }
     private List<TabRecord> Tabs { get; }
 
     private List<BranchSummaryUICache> BranchSummaryCaches { get; }
     private List<BranchSummaryUICache> TabSummaryCaches { get; }
+
+    private LazyMutable<Dictionary<BranchInteractionDef, AcceptanceReport>> InteractionAcceptanceCaches { get; }
 
     public Window_BranchSquad(RatkinOrder ratkinOrder, Map map) : base()
     {
@@ -45,6 +53,7 @@ public class Window_BranchSquad : OrderWindowBase
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
         BranchSummaryCaches = new(ratkinOrder.BranchManager.AllBranches.Count);
         TabSummaryCaches = new(ratkinOrder.BranchManager.AllBranches.Count);
+        InteractionAcceptanceCaches = new(refreshFunc: RefreshInteractionAcceptances);
 
         Tabs = [];
         CurTab = TabType.All;
@@ -61,11 +70,6 @@ public class Window_BranchSquad : OrderWindowBase
 
     public override void DoWindowContents(Rect inRect)
     {
-        if (NeedRefreshSel)
-        {
-            RefreshSelSquad();
-        }
-
         Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1544f, 901f);
         GUI.DrawTexture(mainRect, mainBackground);
 
@@ -93,7 +97,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 128f, 64f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, "OARO_BranchSquadWindow".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_SquadWindowTitle".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -129,7 +133,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, mainInnerRectY + 150f, 322f, 48f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, "OARO_SquadTech".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_SquadTech".Translate());
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -164,7 +168,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
         if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
-                                                          label: "OARO_CheckBranchSite".Translate(),
+                                                          label: "OAFrame_LookOver".Translate(),
                                                           baseTex: middleCheckButton,
                                                           downTex: middleCheckButton_Down,
                                                           acceptance: SelBranch is not null,
@@ -178,12 +182,12 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRect.xMax - 192f, 192f, 32f);
         if (SelBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_BranchSiteDistance".Translate(SelSquadInfo.Distance.ToString("F0"))
-                                                               .Colorize(SelSquadInfo.IsInAffectedRange ? Color.green : Color.white));
+            Widgets.Label(reusedRect, "OARO_SquadWin_SiteDistance".Translate(SelSquadInfo.Distance.ToString("F0"))
+                                                                  .Colorize(SelSquadInfo.IsInAffectedRange ? Color.green : Color.white));
         }
         else
         {
-            Widgets.Label(reusedRect, "OARO_BranchSiteDistanceN".Translate());
+            Widgets.Label(reusedRect, "OARO_SquadWin_SiteDistanceN".Translate());
         }
 
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -239,7 +243,7 @@ public class Window_BranchSquad : OrderWindowBase
         //中部左上区域
         areaRect = new(middleInnerRect.x, middleInnerRect.y, 260f, middleUpHeight);
         reusedRect = new(areaRect.x + 8f, areaRect.y + 6f, 72f, 24f);
-        Widgets.Label(reusedRect, "OARO_CurSquadRelation".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_Relation".Translate());
 
         TaggedString relation;
         float friendlyProcess;
@@ -252,7 +256,7 @@ public class Window_BranchSquad : OrderWindowBase
 
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
             friendlyProcess = SelSquadInfo.FriendlyProcess;
-            friendlyExpireDate = "OARO_UntilDate".Translate() + $"   {SelSquadInfo.FriendlyExpireDateStr}";
+            friendlyExpireDate = "OARO_SquadWin_UntilDate".Translate() + $"   {SelSquadInfo.FriendlyExpireDateStr}";
         }
         else
         {
@@ -260,7 +264,7 @@ public class Window_BranchSquad : OrderWindowBase
 
             relation = "OARO_Strange".Translate();
             friendlyProcess = 0f;
-            friendlyExpireDate = "OARO_UntilDate".Translate() + "   ---";
+            friendlyExpireDate = "OARO_SquadWin_UntilDate".Translate() + "   ---";
         }
 
         reusedRect = new(middleInnerRect.x + 136f, middleInnerRect.y + 4f, 54f, 32f);
@@ -278,12 +282,12 @@ public class Window_BranchSquad : OrderWindowBase
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 260f, middleBottomHeight);
         reusedRect = areaRect;
         reusedRect.xMax = areaRect.x + 100f;
-        Widgets.Label(reusedRect, "OARO_ColonistsMember".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_ColonistsMember".Translate());
 
         reusedRect.xMin = reusedRect.xMax + 8f;
         reusedRect.xMax = areaRect.xMax - 2f;
         if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
-                                                          label: "OARO_ClickToAdd".Translate(),
+                                                          label: "OARO_SquadWin_ClickToAdd".Translate(),
                                                           baseTex: middleClickToAddButton,
                                                           downTex: middleClickToAddButton_Down,
                                                           acceptance: SelBranch is not null,
@@ -333,22 +337,37 @@ public class Window_BranchSquad : OrderWindowBase
 
         //中部中下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 128f, middleBottomHeight);
-        if (SelBranch is not null)
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: areaRect,
+            label: string.Empty,
+            acceptance: InteractionAcceptanceCaches.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapSilverToSupply),
+            baseTex: middleCombatReadinessButton,
+            downTex: middleCombatReadinessButton_Down,
+            doMouseoverSound: true))
         {
-            if (OARO_WindowUtility.ButtonImage(areaRect, middleSilverButton, middleSilverButton_Down))
+            BranchInteractionParms parms = new(SelBranch, Map);
+            AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_MapSilverToSupply.Worker.CanUseInteraction(parms, resultOnly: false);
+            if (acceptanceReport)
             {
-
+                BranchInteractionDefOf.OARO_MapSilverToSupply.Worker.TryApplyInteraction(parms);
             }
-        }
-        else
-        {
-            GUI.DrawTexture(areaRect, middleClickToAddButton_Down);
+            else
+            {
+                Messages.Message(
+                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(
+                        parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                        BranchInteractionDefOf.OARO_MapSilverToSupply.Named("INTERACTION"),
+                        acceptanceReport.Reason.Named("Reason")),
+                    def: MessageTypeDefOf.RejectInput,
+                    historical: false);
+            }
+            InteractionAcceptanceCaches.MarkDirty();
         }
         reusedRect = new(areaRect.x + 16f, areaRect.y + 8f, 40f, 24f);
         Widgets.ThingIcon(reusedRect, ThingDefOf.Silver, graphicIndexOverride: 2);
 
         reusedRect = new(reusedRect.xMax + 8f, areaRect.y + 8f, 40f, 24f);
-        Widgets.Label(reusedRect, ThingDefOf.Silver.label);
+        Widgets.Label(reusedRect, BranchInteractionDefOf.OARO_MapSilverToSupply.label);
 
         //中部右上区域
         areaRect = new(areaRect.xMax + 2f, middleInnerRect.y, 185f, middleUpHeight);
@@ -359,7 +378,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 10f, 135f, 24f);
         if (SelBranch is not null)
         {
-            Widgets.Label(reusedRect, "OARO_MemberCountInfo".Translate(SelBranch.Squad.AllCrewCountInt, SelSquadInfo.CrewCeiling));
+            Widgets.Label(reusedRect, "OARO_SquadWin_MemberCountInfo".Translate(SelBranch.Squad.AllCrewCountInt, SelSquadInfo.CrewCeiling));
             reusedRect.yMin = reusedRect.yMax;
             reusedRect.yMax += 24f;
             Widgets.Label(reusedRect, "OARO_PeoplePreDay".Translate(SelSquadInfo.MemberRecoveryRate.ToStringWithSign("F1"))
@@ -367,7 +386,7 @@ public class Window_BranchSquad : OrderWindowBase
         }
         else
         {
-            Widgets.Label(reusedRect, "OARO_MemberCountInfoN".Translate());
+            Widgets.Label(reusedRect, "OARO_SquadWin_MemberCountInfoN".Translate());
             reusedRect.yMin = reusedRect.yMax;
             reusedRect.yMax += 24f;
             Widgets.Label(reusedRect, "OARO_PeoplePreDayN".Translate());
@@ -376,26 +395,41 @@ public class Window_BranchSquad : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(areaRect.x, areaRect.yMax - 39f, 186f, 39f);
 
-        if (SelBranch is not null)
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: string.Empty,
+            acceptance: InteractionAcceptanceCaches.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapRecommendationToKnight),
+            baseTex: middleCombatReadinessButton,
+            downTex: middleCombatReadinessButton_Down,
+            doMouseoverSound: true))
         {
-            if (OARO_WindowUtility.ButtonImage(reusedRect, middleSilverButton, middleSilverButton_Down))
+            BranchInteractionParms parms = new(SelBranch, Map);
+            AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_MapRecommendationToKnight.Worker.CanUseInteraction(parms, resultOnly: false);
+            if (acceptanceReport)
             {
-
+                BranchInteractionDefOf.OARO_MapRecommendationToKnight.Worker.TryApplyInteraction(parms);
             }
-        }
-        else
-        {
-            GUI.DrawTexture(reusedRect, middleCheckButton_Down);
+            else
+            {
+                Messages.Message(
+                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(
+                        parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                        BranchInteractionDefOf.OARO_MapRecommendationToKnight.Named("INTERACTION"),
+                        acceptanceReport.Reason.Named("Reason")),
+                    def: MessageTypeDefOf.RejectInput,
+                    historical: false);
+            }
+            InteractionAcceptanceCaches.MarkDirty();
         }
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 50f, 26f, 23f);
         GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 6f, 64f, 24f);
-        Widgets.Label(reusedRect, "OARO_RecommendationLetter".Translate());
+        Widgets.Label(reusedRect, BranchInteractionDefOf.OARO_MapRecommendationToKnight.label);
 
         //中部右下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 186f, middleBottomHeight);
         reusedRect = new(areaRect.x + 4f, areaRect.y + 8f, 70f, 24f);
-        Widgets.Label(reusedRect, "OARO_IncludeCommander".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_IncludeCommander".Translate());
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, reusedRect.xMax + 10f, 29f, 27f);
         GUI.DrawTexture(reusedRect, middleCommanderIcon);
@@ -466,28 +500,34 @@ public class Window_BranchSquad : OrderWindowBase
         }
 
         reusedRect = new(areaRect.x + 97f, areaRect.y + 85f, 98f, 20f);
-        Widgets.Label(reusedRect, "OARO_RequestCombatReadiness".Translate());
+        Widgets.Label(reusedRect, BranchInteractionDefOf.OARO_RequestCombatReadiness.label);
 
         reusedRect = new(areaRect.x + 97f, areaRect.yMax - 37f, 98f, 37f);
-        if (hasSupportAuthority && SelSquadInfo.CanRequestCombatReadiness)
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: string.Empty,
+            acceptance: InteractionAcceptanceCaches.Value.GetWithFallback(BranchInteractionDefOf.OARO_RequestCombatReadiness),
+            baseTex: middleCombatReadinessButton,
+            downTex: middleCombatReadinessButton_Down,
+            doMouseoverSound: true))
         {
-            if (OARO_WindowUtility.ButtonImage(reusedRect, middleCombatReadinessButton, middleCombatReadinessButton_Down))
+            BranchInteractionParms parms = new(SelBranch, Map);
+            AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_RequestCombatReadiness.Worker.CanUseInteraction(parms, resultOnly: false);
+            if (acceptanceReport)
             {
-                SelBranch.TaskHandler.TrySwitchToTask(BranchTaskDefOf.OARO_CombatReadiness);
-                NeedRefreshSel = true;
+                BranchInteractionDefOf.OARO_RequestCombatReadiness.Worker.TryApplyInteraction(parms);
             }
-        }
-        else
-        {
-            GUI.DrawTexture(reusedRect, middleCombatReadinessButton_Down);
-            if (hasSupportAuthority)
+            else
             {
-                string reason = SelSquadInfo.CanRequestCombatReadiness.Reason;
-                if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(reusedRect))
-                {
-                    TooltipHandler.TipRegion(reusedRect, () => reason, 6484159);
-                }
+                Messages.Message(
+                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(
+                        parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                        BranchInteractionDefOf.OARO_RequestCombatReadiness.Named("INTERACTION"),
+                        acceptanceReport.Reason.Named("Reason")),
+                    def: MessageTypeDefOf.RejectInput,
+                    historical: false);
             }
+            InteractionAcceptanceCaches.MarkDirty();
         }
 
         reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 29f, 29f);
@@ -497,26 +537,26 @@ public class Window_BranchSquad : OrderWindowBase
         Rect supportOptRect = areaRect;
         supportOptRect.yMax = areaRect.yMin + 40f;
         Text.Font = GameFont.Medium;
-        Widgets.Label(supportOptRect, "OARO_SupportOption".Translate());
+        Widgets.Label(supportOptRect, "OARO_SquadWin_SupportOption".Translate());
         Text.Font = GameFont.Small;
 
         reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
         GUI.DrawTexture(reusedRect, middleBottom_Light, ScaleMode.ScaleToFit);
 
         reusedRect.xMax = reusedRect.xMin + 100f;
-        Widgets.Label(reusedRect, "OARO_SupportAuthority".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_SupportAuthority".Translate());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = areaRect.xMax;
         if (hasSupportAuthority)
         {
-            Widgets.Label(reusedRect, "OARO_SupportAuthorityUnlocked".Translate());
+            Widgets.Label(reusedRect, "OARO_Unlocked".Translate());
             reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 227f, 11f);
             GUI.DrawTexture(reusedRect, middleSupportLockLine);
         }
 
         reusedRect = new(areaRect.x, areaRect.y + 78f, 100f, 38f);
-        Widgets.Label(reusedRect, "OARO_UsableBombardCount".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_UsableBombardCount".Translate());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax = areaRect.xMax;
@@ -526,18 +566,19 @@ public class Window_BranchSquad : OrderWindowBase
         GUI.DrawTexture(reusedRect, middleBottom_Light, ScaleMode.ScaleToFit);
 
         reusedRect.xMax = reusedRect.xMin + 100f;
-        Widgets.Label(reusedRect, "OARO_RequestSupport".Translate());
+        Widgets.Label(reusedRect, "OARO_SquadWin_RequestSupport".Translate());
 
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax += 140f;
 
         reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
-        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
-                                                          label: "OARO_BombardSupport".Translate(),
-                                                          baseTex: middleSupportButton,
-                                                          downTex: middleSupportButton_Down,
-                                                          acceptance: SelSquadInfo.BombardFeasibility,
-                                                          doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OARO_SquadWin_BombardSupport".Translate(),
+            baseTex: middleSupportButton,
+            downTex: middleSupportButton_Down,
+            acceptance: SelSquadInfo.BombardFeasibility,
+            doMouseoverSound: true))
         {
 
         }
@@ -546,43 +587,56 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect.xMin = areaRect.xMax - 140f;
         reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
 
-        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
-                                                          label: "OARO_MilitarySupport".Translate(),
-                                                          baseTex: middleSupportButton,
-                                                          downTex: middleSupportButton_Down,
-                                                          acceptance: SelSquadInfo.SupportFeasibility,
-                                                          doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OARO_SquadWin_MilitarySupport".Translate(),
+            baseTex: middleSupportButton,
+            downTex: middleSupportButton_Down,
+            acceptance: SelSquadInfo.SupportFeasibility,
+            doMouseoverSound: true))
         {
 
         }
 
         if (!hasSupportAuthority)
         {
-            reusedRect = Rect.MinMaxRect(areaRect.xMin - 102f, supportOptRect.yMax, areaRect.xMax + 3f, areaRect.yMax + 5f);
+            reusedRect = Rect.MinMaxRect(areaRect.xMin - 104f, supportOptRect.yMax, areaRect.xMax + 4f, areaRect.yMax + 8f);
             GUI.DrawTexture(reusedRect, middleLockShade, ScaleMode.StretchToFill, alphaBlend: true);
+
+
             reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
-            if (SelSquadInfo.CanUnlockSupportAuthority)
+            if (OARO_WindowUtility.TextButtonImageDisableable(
+                reusedRect,
+                string.Empty,
+                InteractionAcceptanceCaches.Value.GetWithFallback(BranchInteractionDefOf.OARO_UnlockSupportAuthority),
+                middleUnlockButton,
+                middleUnlockButton_Down,
+                doMouseoverSound: true))
             {
-                if (OARO_WindowUtility.ButtonImage(reusedRect, middleUnlockButton, middleUnlockButton_Down))
+                BranchInteractionParms parms = new(SelBranch, Map);
+                AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_UnlockSupportAuthority.Worker.CanUseInteraction(parms, resultOnly: false);
+                if (acceptanceReport)
                 {
-                    BranchUtility.UnlockSupportAuthority(SelBranch, Map);
-                    NeedRefreshSel = true;
+                    BranchInteractionDefOf.OARO_UnlockSupportAuthority.Worker.TryApplyInteraction(parms);
                 }
-            }
-            else
-            {
-                GUI.DrawTexture(reusedRect, middleUnlockButton_Down);
-                string reason = SelSquadInfo.CanUnlockSupportAuthority.Reason;
-                if (!string.IsNullOrEmpty(reason) && Mouse.IsOver(reusedRect))
+                else
                 {
-                    TooltipHandler.TipRegion(reusedRect, () => reason, 56974814);
+                    Messages.Message(
+                        text: "OARO_CanApplyBranchInteractionWithReason".Translate(
+                            parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                            BranchInteractionDefOf.OARO_UnlockSupportAuthority.Named("INTERACTION"),
+                            acceptanceReport.Reason.Named("Reason")),
+                        def: MessageTypeDefOf.RejectInput,
+                        historical: false);
                 }
+                InteractionAcceptanceCaches.MarkDirty();
             }
+
             reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
             GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon);
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(reusedRect.xMax + 8f, reusedRect.y, 80f, 24f);
-            Widgets.Label(reusedRect, "OARO_RequestUnlockSupport".Translate());
+            Widgets.Label(reusedRect, "OARO_SquadWin_RequestUnlockSupport".Translate());
         }
 
         return false;
@@ -629,6 +683,7 @@ public class Window_BranchSquad : OrderWindowBase
             {
                 entryX = medalOutRect.x;
                 entryY += entryHeight;
+                column = 0;
             }
             else
             {
@@ -758,7 +813,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect.xMin = reusedRect.xMax + 2f;
         reusedRect.xMax = inRect.xMin + 180f;
         Text.Anchor = TextAnchor.LowerLeft;
-        Widgets.Label(reusedRect, "OARO_SupportSquadNum".Translate() + $" /");
+        Widgets.Label(reusedRect, "OARO_SquadWin_SupportSquadNum".Translate() + $" /");
 
         reusedRect = new(inRect.xMax - 64f, reusedRect.y, 58f, 24f);
         Text.Anchor = TextAnchor.LowerRight;
@@ -769,7 +824,6 @@ public class Window_BranchSquad : OrderWindowBase
         Rect mainRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 45f, 352f, 597f);
         GUI.DrawTexture(mainRect, rightBackground);
         mainRect = mainRect.ContractedBy(2f);
-
 
 
     }
@@ -800,24 +854,35 @@ public class Window_BranchSquad : OrderWindowBase
         OARO_WindowUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
     }
 
-    private void RefreshSelSquad()
+    private Dictionary<BranchInteractionDef, AcceptanceReport> RefreshInteractionAcceptances()
     {
-        NeedRefreshSel = false;
-        if (SelBranchIndex >= 0 && SelectSquad(SelBranchIndex))
+        Branch selBranch = SelBranch;
+        Dictionary<BranchInteractionDef, AcceptanceReport> pairs = [];
+        foreach (BranchInteractionDef def in SquadNeedBranchInteractions)
         {
-            return;
-        }
-        Branch branch = SelBranch;
-        BranchSummaryUICache newCachedSummary = new(branch, Map);
-        TabSummaryCaches[SelBranchIndex] = newCachedSummary;
-        for (int i = 0; i < BranchSummaryCaches.Count; i++)
-        {
-            if (BranchSummaryCaches[i].Branch == branch)
+            AcceptanceReport acceptance = false;
+            try
             {
-                BranchSummaryCaches[i] = newCachedSummary;
-                break;
+                if (selBranch is null)
+                {
+                    BranchInteractionParms parms = new(selBranch, Map);
+                    acceptance = def.Worker.CanUseInteraction(parms, resultOnly: false);
+                }
+
             }
+            catch (Exception ex)
+            {
+                acceptance = false;
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: $"get {nameof(AcceptanceReport)} of {nameof(BranchInteractionDef)}",
+                    typeName: nameof(RefreshInteractionAcceptances),
+                    methodName: nameof(Window_BranchSquad),
+                    needStackTrace: true);
+            }
+
+            pairs.Add(def, acceptance);
         }
+        return pairs;
     }
 
     private void RecacheBranchSummary()
@@ -914,6 +979,11 @@ public class Window_BranchSquad : OrderWindowBase
             }
             SelBranchIndex = index;
             SelSquadInfo = new(branch, Map);
+            InteractionAcceptanceCaches.MarkDirty();
+
+            SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+            SelBranch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+
             return true;
         }
         catch (Exception ex)
@@ -930,10 +1000,15 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void DeselectSquad()
     {
+        if (SelBranch is not null)
+        {
+            SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+        }
         SelBranchIndex = -1;
         SelSquadInfo = new();
+        InteractionAcceptanceCaches.Reset();
     }
-
+    private void PostApplyBranchInteraction(BranchInteractionDef def, BranchInteractionParms parms, bool succeeded) => InteractionAcceptanceCaches.MarkDirty();
     protected override void SetInitialSizeAndPosition()
     {
         Vector2 initialSize = InitialSize;

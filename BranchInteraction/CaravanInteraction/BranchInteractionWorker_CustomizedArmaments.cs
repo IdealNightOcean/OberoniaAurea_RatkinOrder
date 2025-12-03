@@ -7,7 +7,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef def) : BranchInteractionWorker(def)
+public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
     private DiaNode WeaponNode(BranchInteractionParms parms)
     {

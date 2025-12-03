@@ -50,6 +50,7 @@ public class Window_RatkinOrder : MainTabWindow
 
     public Window_RatkinOrder()
     {
+        doWindowBackground = false; //绘制泰南的界面背景
         Map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(Map));
         SelectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
                    ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
@@ -64,6 +65,7 @@ public class Window_RatkinOrder : MainTabWindow
     }
     public Window_RatkinOrder(Map map)
     {
+        doWindowBackground = false; //绘制泰南的界面背景
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
         SelectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
