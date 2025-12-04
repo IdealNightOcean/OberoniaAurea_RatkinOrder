@@ -157,8 +157,9 @@ public static class OARO_WindowUtility
         GUI.DrawTexture(rect, IconLibrary.BranchSummaryBackground);
         Rect inRect = rect.ContractedBy(2f);
 
-        BranchHonorDef honorDef = entry.Branch.HonorDef;
-        bool isHonorBranch = entry.Branch.IsBranchOfType(BranchType.Honor) && honorDef is not null;
+        Branch branch = entry.Branch;
+        BranchHonorDef honorDef = branch.HonorDef;
+        bool isHonorBranch = branch.IsBranchOfType(BranchType.Honor) && honorDef is not null;
 
         Rect reusedRect = CenterRectOnY(inRect, inRect.x, 5f, 86f);
         if (isHonorBranch)
@@ -176,13 +177,13 @@ public static class OARO_WindowUtility
         if (isHonorBranch)
         {
             reusedRect = leftRect.ContractedBy(10f);
-            GUI.DrawTexture(reusedRect, honorDef.DecorationTexture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.decorationTexture.Texture, ScaleMode.ScaleToFit);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            GUI.DrawTexture(reusedRect, honorDef.BackgroundTexture);
+            GUI.DrawTexture(reusedRect, honorDef.backgroundTexture.Texture);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
-            GUI.DrawTexture(reusedRect, honorDef.IconTexture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
         }
         else
         {
@@ -194,7 +195,7 @@ public static class OARO_WindowUtility
         string squadName = entry.SquadName;
         if (Text.CalcSize(squadName).x < 100f)
         {
-            Widgets.Label(squadNameRect, squadName);
+            Widgets.Label(squadNameRect, squadName.Colorize(branch.Color));
         }
         else
         {
@@ -207,7 +208,7 @@ public static class OARO_WindowUtility
 
         reusedRect = new(squadNameRect.x + 16f, squadNameRect.yMax + 4f, 25f, 30f);
         string relation;
-        if (entry.Branch.IsBranchOfType(BranchType.Friendly))
+        if (branch.IsBranchOfType(BranchType.Friendly))
         {
             GUI.DrawTexture(reusedRect, IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
@@ -222,21 +223,10 @@ public static class OARO_WindowUtility
         Widgets.Label(reusedRect, relation);
 
         reusedRect = new(squadNameRect.xMax - 40f, squadNameRect.yMax + 4f, 30f, 30f);
-        if (entry.Branch.IsIdleNow)
-        {
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
-        }
-        else if (entry.Branch.IsOutdoorNow)
-        {
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallOutdoorIcon, ScaleMode.ScaleToFit);
-        }
-        else
-        {
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallIndoorIcon, ScaleMode.ScaleToFit);
-        }
+        DrawBranchStateIcon(reusedRect, branch, expand: false);
 
         reusedRect = CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 40f, 20f);
-        string workState = entry.Branch.CurWorkState;
+        string workState = branch.CurWorkState;
         if (Text.CalcSize(workState).x < 40f)
         {
             Widgets.Label(reusedRect, workState);
@@ -255,12 +245,12 @@ public static class OARO_WindowUtility
         Rect rightRect = Rect.MinMaxRect(leftRect.xMax, inRect.yMin, inRect.xMax, inRect.yMax);
         float textX = rightRect.xMin + 24f;
         reusedRect = new(textX, rightRect.y, rightRect.width, 29f);
-        Widgets.Label(reusedRect, "OARO_AllCrewCountShortInfo".Translate(entry.Branch.Squad.AllCrewCountInt));
+        Widgets.Label(reusedRect, "OARO_AllCrewCountShortInfo".Translate(branch.Squad.AllCrewCountInt));
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
-        Widgets.Label(reusedRect, "OARO_BranchPotencyShortInfo".Translate() + ": ");
+        Widgets.Label(reusedRect, "OARO_BranchPotencyShortInfo".Translate(branch.Potency.ToString("0.##")));
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
         string supplyState = "OARO_BranchSupplyState".Translate() + "  ";
-        supplyState += entry.Branch.Supply switch
+        supplyState += branch.Supply switch
         {
             < 0.2f => "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange),
             < 0.8f => "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow),
@@ -275,11 +265,16 @@ public static class OARO_WindowUtility
 
     public static void DrawRecommendationInfo(Rect inRect, int count, float textOffset = 0f)
     {
+        TextAnchor preAnchor = Text.Anchor;
+        Text.Anchor = TextAnchor.MiddleLeft;
+
         Rect reusedRect = new(inRect.x, inRect.y, inRect.height, inRect.height);
         GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
 
         reusedRect = Rect.MinMaxRect(reusedRect.xMax + textOffset, inRect.yMin, inRect.xMax, inRect.yMax);
         Widgets.Label(reusedRect, $"× {count}");
+
+        Text.Anchor = preAnchor;
     }
 
     public static void DrawBranchIcon(Rect inRect, Branch branch, bool expand)
@@ -290,7 +285,7 @@ public static class OARO_WindowUtility
         }
         else
         {
-            GUI.DrawTexture(inRect, expand ? branch.HonorDef.ExpandingIconTexture : branch.HonorDef.IconTexture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(inRect, expand ? branch.HonorDef.iconTexture.ExpandedTexture : branch.HonorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
         }
     }
 
@@ -315,16 +310,16 @@ public static class OARO_WindowUtility
         switch (taskType)
         {
             case BranchTaskType.CrimeFighting:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Courage.ExpandingIconTexture : BranchMedalDefOf.OARO_Courage.IconTexture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Courage.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Courage.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             case BranchTaskType.StabilityMaintenance:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Tenacity.ExpandingIconTexture : BranchMedalDefOf.OARO_Tenacity.IconTexture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Tenacity.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Tenacity.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             case BranchTaskType.Assistance:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Rescue.ExpandingIconTexture : BranchMedalDefOf.OARO_Rescue.IconTexture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Rescue.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Rescue.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             case BranchTaskType.Supervision:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Justice.ExpandingIconTexture : BranchMedalDefOf.OARO_Justice.IconTexture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Justice.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Justice.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             default: return;
         }

@@ -29,56 +29,22 @@ public class BranchMedalDef : Def
     /// 印记背景颜色
     /// </summary>
     public Color backgroundColor;
-    protected Texture2D backgroundTexture;
+    private Texture2D backgroundTexture;
     /// <summary>
     /// 印记背景图标，颜色使用 <see cref="backgroundColor"/>
     /// </summary>
     public Texture2D BackgroundTexture => backgroundTexture ??= SolidColorMaterials.NewSolidColorTexture(backgroundColor);
 
-    /// <summary>
-    /// 印记图标路径
-    /// </summary>
-    [NoTranslate]
-    protected string iconPath;
-    protected Texture2D iconTexture;
+
     /// <summary>
     /// 印记图标
     /// </summary>
-    public Texture2D IconTexture
-    {
-        get
-        {
-            if (iconTexture is null)
-            {
-                if (string.IsNullOrEmpty(iconPath))
-                {
-                    return null;
-                }
-                iconTexture = ContentFinder<Texture2D>.Get(iconPath);
-            }
-            return iconTexture;
-        }
-    }
+    public PathedTexture2DWithExpanded iconTexture;
 
-    protected Texture2D expandingIconTexture;
-    /// <summary>
-    /// 拓展的印记图标
-    /// </summary>
-    public Texture2D ExpandingIconTexture
-    {
-        get
-        {
-            if (expandingIconTexture is null)
-            {
-                if (string.IsNullOrEmpty(iconPath))
-                {
-                    return null;
-                }
-                expandingIconTexture = ContentFinder<Texture2D>.Get(iconPath + "_Expand");
-            }
-            return expandingIconTexture;
-        }
-    }
+    public PathedTexture2D jointPatrolEntryBackgroundTexture;
+
+    public PathedTexture2D jointPatrolEntryShadeTexture;
+
 }
 
 public class BranchMedalBuffWorker(BranchMedalDef def)

@@ -8,7 +8,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingDefSummaryUICache
 {
-    public readonly BranchBuildingDef BuildingDef;
+    public BranchBuildingDef BuildingDef { get; }
+    public int SilverCost { get; }
+    public int TimeCost { get; }
 
     private List<string> baseEffectDesc;
     private List<string> advancedEffectDesc;
@@ -21,9 +23,6 @@ public class BranchBuildingDefSummaryUICache
 
     private string advancedEffectDescJoint;
     public string AvancedEffectDescJoint => advancedEffectDescJoint ??= JointEffectDesc(AdvancedEffectDesc);
-
-    public int SilverCost;
-    public int TimeCost;
 
     public BranchBuildingDefSummaryUICache() { }
     public BranchBuildingDefSummaryUICache(BranchBuildingDef buildingDef, Branch branch)

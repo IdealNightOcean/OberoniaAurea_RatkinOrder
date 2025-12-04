@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using NightOcean;
+using RimWorld;
 using UnityEngine;
 using Verse;
 using static OberoniaAurea.RatkinOrder.Branch;
@@ -7,21 +8,28 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class SquadInfoUICache : BranchSummaryUICache
 {
-    public readonly string FriendlyExpireDateStr = string.Empty;
-    public readonly float FriendlyProcess = 0f;
+    public float FriendlyProcess { get; }
+    public string FriendlyExpireDateStr { get; } = string.Empty;
 
-    public readonly int CommanderCeiling = -1;
-    public readonly float MemberRecoveryRate = -1f;
-    public readonly int BombardSupportCeiling = -1;
 
-    public readonly AcceptanceReport SupportFeasibility;
+    public int CommanderCeiling { get; } = -1;
+    public float MemberRecoveryRate { get; } = -1f;
+    public int BombardSupportCeiling { get; } = -1;
 
-    public readonly AcceptanceReport BombardFeasibility = false;
+    public AcceptanceReport SupportFeasibility { get; } = false;
+    public AcceptanceReport BombardFeasibility { get; } = false;
 
-    public SquadInfoUICache() : base() { }
+    public LazyMutable<string> MemberRecoveryRateExplanation;
+
+    public SquadInfoUICache() : base()
+    {
+        MemberRecoveryRateExplanation = new(refreshFunc: () => string.Empty);
+    }
 
     public SquadInfoUICache(Branch branch, Map map) : base(branch, map)
     {
+        MemberRecoveryRateExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationSet(Branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate, showResultValue: true));
+
         if (branch.IsBranchOfType(BranchType.Friendly))
         {
             FriendlyProcess = Mathf.Clamp01(branch.FriendlyDaysLeft / (float)BranchUtility.GetDefaultFriendlyDurationDays(branch));
@@ -32,8 +40,12 @@ public class SquadInfoUICache : BranchSummaryUICache
         SupportFeasibility = BranchSupportUtility.CanCombatKnightSupport(branch, map, BranchSupportUtility.DeploymentLevel.Quarter, resultOnly: false);
 
         CommanderCeiling = (int)branch.Squad.CommanderCeiling;
-
         MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate);
         BombardSupportCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling);
+    }
+
+    public void ClearCache()
+    {
+        MemberRecoveryRateExplanation.Reset();
     }
 }

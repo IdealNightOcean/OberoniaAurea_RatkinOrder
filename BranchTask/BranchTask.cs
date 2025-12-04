@@ -60,7 +60,31 @@ public class BranchTask : IExposable
 
     public virtual void TickHour(Branch branch) { }
 
-    public virtual float TaskRisk(Branch branch) => 0f;
+    public float TaskRisk(Branch branch)
+    {
+        if (def.hasRisk)
+        {
+            return CalculateTaskRisk(branch);
+        }
+        return 0f;
+    }
+
+    protected virtual float CalculateTaskRisk(Branch branch)
+    {
+        float riskProb = Def.baseRiskProbability;
+        if (branch.PopulationHandler.PublicSecurity < 1f)
+        {
+            riskProb += (1f - branch.PopulationHandler.PublicSecurity);
+        }
+        riskProb *= branch.TaskHandler.CurRadicalismDegree switch
+        {
+            BranchTaskHandler.RadicalismDegree.StabilityFocused => 0.5f,
+            BranchTaskHandler.RadicalismDegree.Standard => 1f,
+            BranchTaskHandler.RadicalismDegree.Aggressive => 2f,
+            _ => 1f
+        };
+        return riskProb;
+    }
 
     public static BranchTask GenerateTask(BranchTaskDef def)
     {

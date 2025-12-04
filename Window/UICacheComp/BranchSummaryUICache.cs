@@ -8,23 +8,24 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchSummaryUICache
 {
-    public readonly Branch Branch;
+    public Branch Branch { get; }
 
-    public readonly string SquadName = "----";
-    public readonly string BaseSiteName = "----";
-    public readonly float Distance = -1f;
-    public readonly float AffectedRange = -1f;
+    public string SquadName { get; } = "----";
+    public string BaseSiteName { get; } = "----";
+    public float Distance { get; } = -1f;
+    public float AffectedRange { get; } = -1f;
+    public int CrewCeiling { get; } = -1;
+
     public bool IsInAffectedRange => AffectedRange >= Distance;
     public int AllCrewCount => Branch?.Squad.AllCrewCountInt ?? 0;
 
-    public readonly int CrewCeiling = -1;
-
     public BranchSummaryUICache() { }
+
     public BranchSummaryUICache(Branch branch, Map map)
     {
-        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         _ = map ?? throw new ArgumentNullException(nameof(map));
 
+        Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         SquadName = branch.Squad.Name;
 
         if (branch.BaseSite is INameableWorldObject nameSite)

@@ -117,6 +117,7 @@
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
+    <Compile Include="Components\PathedTexture2D.cs" />
     <Compile Include="DataLibrary\KeyLibrary_FormatArgName.cs" />
     <Compile Include="DefModExtension\BranchBuildingTrderSetter_Extension.cs" />
     <Compile Include="DefModExtension\CustomizableArmament_Extension.cs" />

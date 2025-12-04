@@ -252,25 +252,22 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
     {
         StringBuilder sb = new();
         sb.AppendLine("OARO_Fund_ImmediatelyChange".Translate(immediatelyChange.ToStringPercentSigned("0.##")).Colorize(immediatelyChange < 0f ? ColorLibrary.RedReadable : Color.green));
-        sb.AppendLine("----");
         if (immediatelyChangeExplanation.Count > 0)
         {
             foreach (KeyValuePair<string, float> kv in immediatelyChangeExplanation)
             {
-                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringPercentSigned("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendLine($"    {kv.Key}: {kv.Value.ToStringPercentSigned("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
 
-        sb.AppendLine();
-        sb.AppendLine();
+        sb.AppendLine("--------");
 
         sb.AppendLine("OARO_Fund_ExpectedChange".Translate(expectedChange.ToStringPercentSigned("0.##")).Colorize(expectedChange < 0f ? ColorLibrary.RedReadable : Color.green));
-        sb.AppendLine("----");
         if (expectedChangeExplanation.Count > 0)
         {
             foreach (KeyValuePair<string, float> kv in expectedChangeExplanation)
             {
-                sb.AppendLine($"{kv.Key}: {kv.Value.ToStringPercentSigned("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
+                sb.AppendLine($"    {kv.Key}: {kv.Value.ToStringPercentSigned("0.##")}".Colorize(kv.Value < 0f ? ColorLibrary.RedReadable : Color.green));
             }
         }
 

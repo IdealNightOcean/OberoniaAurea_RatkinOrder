@@ -26,7 +26,7 @@ public abstract class BranchInteractionWorker_MapOnly(BranchInteractionDef def) 
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
         }
-        if (Def.needSilver > 0 && !!parms.Map.HasEnoughThingsOfDef(ThingDefOf.Silver, Def.needSilver))
+        if (Def.needSilver > 0 && !parms.Map.HasEnoughThingsOfDef(ThingDefOf.Silver, Def.needSilver))
         {
             return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, Def.needSilver);
         }

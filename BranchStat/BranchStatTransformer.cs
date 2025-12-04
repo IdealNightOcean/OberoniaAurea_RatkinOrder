@@ -9,10 +9,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public struct BranchStatTransformer
 {
-    public float offset = 0f;
-    public float factor = 1f;
+    public float offset;
+    public float factor;
 
-    public BranchStatTransformer() { }
+    public BranchStatTransformer()
+    {
+        offset = 0f;
+        factor = 1f;
+    }
+
     public BranchStatTransformer(float offset, float factor, float fixedOffset)
     {
         this.offset = offset;
@@ -72,7 +77,7 @@ public struct BranchStatTransformer
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public readonly float DoTransform(BranchStatDef def, float? baseValueOverride = null)
     {
-        return (baseValueOverride ?? def.baseValue + offset) * factor;
+        return ((baseValueOverride ?? def.baseValue) + offset) * factor;
     }
 
     public readonly float DoTransformSafe(BranchStatDef def, float? baseValueOverride = null)
@@ -104,7 +109,7 @@ public struct BranchStatTransformer
         }
     }
 
-    public readonly void AppendTransExplanation(BranchStatDef statDef, StringBuilder explanation)
+    public readonly void AppendTransToExplanation(BranchStatDef statDef, StringBuilder explanation)
     {
         if (statDef.statType == BranchStatDef.StatType.Percent)
         {

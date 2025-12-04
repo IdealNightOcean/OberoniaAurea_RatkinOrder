@@ -97,7 +97,7 @@ public class BranchStatTransformerHandler
 
     public void MergeStatFactor(BranchStatModifier modifier, bool addIfMiss = true)
     {
-        UnmergeStatFactor(modifier.statDef, modifier.value, addIfMiss);
+        MergeStatFactor(modifier.statDef, modifier.value, addIfMiss);
     }
     public void MergeStatFactor(BranchStatDef statDef, float toAdd, bool addIfMiss = true)
     {
@@ -169,7 +169,6 @@ public class BranchStatTransformerHandler
                 DoZeroFactorUnmergedProcess();
             }
         }
-
     }
 
     public void UnmergeStatOffset(BranchStatModifier modifier)

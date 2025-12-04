@@ -26,17 +26,17 @@ public class Window_BranchDemand : OrderWindowBase
     private Map Map { get; }
     private LazyMutable<int> MapRecommendationLetterCount { get; }
 
-    private TabType CurTab { get; set; }
-    private List<TabRecord> Tabs { get; }
-    private List<TabRecord> AcceptedTab { get; }
+    private TabType CurTab { get; set; } = TabType.All;
+    private List<TabRecord> Tabs { get; } = new(3);
+    private List<TabRecord> AcceptedTab { get; } = new(1);
 
-    private List<BranchDemandEntryDrawer> BranchWithDemandsCache { get; }
+    private List<BranchDemandEntryDrawer> BranchWithDemandsCache { get; } = [];
     private List<BranchDemandEntryDrawer> TabDemandEntryCaches { get; }
 
     private Branch SelBranch { get; set; }
     private bool SelCritical { get; set; }
     private BranchDemand SelDemand { get; set; }
-    private string SelFullDesc { get; set; }
+    private string SelFullDesc { get; set; } = string.Empty;
     private AcceptanceReport SelAcceptance { get; set; }
     private QuestPart_CliquesManager selDemandCliqueManager;
     private QuestPart_CliquesManager SelDemandCliqueManager
@@ -62,14 +62,8 @@ public class Window_BranchDemand : OrderWindowBase
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
-        SelFullDesc = string.Empty;
-
         MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
-        Tabs = new(3);
-        AcceptedTab = new(1);
 
-        CurTab = TabType.All;
-        BranchWithDemandsCache = [];
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
         for (int i = 0; i < allBranches.Count; i++)
         {
@@ -700,7 +694,7 @@ public class Window_BranchDemand : OrderWindowBase
             {
                 entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryX += entryWidth;
-                GUI.DrawTexture(entryRect, potentialMedals[i].IconTexture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(entryRect, potentialMedals[i].iconTexture.Texture, ScaleMode.ScaleToFit);
             }
             Widgets.EndScrollView();
 

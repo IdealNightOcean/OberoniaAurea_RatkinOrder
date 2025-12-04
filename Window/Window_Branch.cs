@@ -36,9 +36,9 @@ public class Window_Branch : OrderWindowBase
     private Caravan Caravan { get; }
     private Map Map { get; }
 
-    private TabType CurTab { get; set; }
+    private TabType CurTab { get; set; } = TabType.Construction;
 
-    private SelectType CurSelectType { get; set; }
+    private SelectType CurSelectType { get; set; } = SelectType.None;
     private int AllFacilityDefCount { get; }
 
     /*
@@ -76,12 +76,12 @@ public class Window_Branch : OrderWindowBase
     private Vector2 scrollPosition_BuildingBaseEffect;
     private Vector2 scrollPosition_BuildingAdvancedEffect;
     private Vector2 scrollPosition_OptionalBuildings;
+    private Vector2 scrollPosition_Contract;
 
     /*
         需求部分缓存
     */
     private LazyMutable<List<KeyValuePair<BranchContract, AcceptanceReport>>> ContractAcceptances { get; }
-    private Vector2 scrollPosition_Contract;
 
     /*
         交互部分缓存
@@ -91,7 +91,7 @@ public class Window_Branch : OrderWindowBase
     {
         get
         {
-            if (interactionAcceptanceDirty)
+            if (InteractionAcceptanceDirty)
             {
                 RecacheInteractionAcceptance();
             }
@@ -103,7 +103,7 @@ public class Window_Branch : OrderWindowBase
     {
         get
         {
-            if (interactionAcceptanceDirty)
+            if (InteractionAcceptanceDirty)
             {
                 RecacheInteractionAcceptance();
             }
@@ -111,10 +111,13 @@ public class Window_Branch : OrderWindowBase
         }
     }
 
-    private bool interactionAcceptanceDirty = true;
+    private bool InteractionAcceptanceDirty { get; set; } = true;
 
     private Vector2 scrollPosition_CommonInteraction;
     private Vector2 scrollPosition_BuildingInteraction;
+
+    private Lazy<string> NaturalPopulationCeilingExplanation { get; }
+    private Lazy<string> BuildingCeilingExplanation { get; }
 
     public Window_Branch(Branch branch, Caravan caravan, Map map) : base()
     {
@@ -125,10 +128,10 @@ public class Window_Branch : OrderWindowBase
         CachedBranchInfo = new(Branch, Map);
 
         AllFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
-        CurTab = TabType.Construction;
-        CurSelectType = SelectType.None;
 
         ContractAcceptances = new(refreshFunc: RecacheContractAcceptance);
+        NaturalPopulationCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationSet(Branch, BranchStatDefOf.OARO_NaturalPopulationCeiling, showResultValue: true));
+        BuildingCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationSet(Branch, BranchStatDefOf.OARO_BuildingCeiling, showResultValue: true));
     }
 
     public override void PreOpen()
@@ -208,21 +211,21 @@ public class Window_Branch : OrderWindowBase
         {
             reusedRect = new(inRect.x + 2f, inRect.y + 28f, 82f, 82f);
             reusedRect = reusedRect.ContractedBy(10f);
-            GUI.DrawTexture(reusedRect, storesReserves[0].Target.IconTexture);
+            GUI.DrawTexture(reusedRect, storesReserves[0].Target.iconTexture.Texture);
         }
 
         if (storesReserves.Count > 1)
         {
             reusedRect = new(inRect.x + 102f, inRect.y + 55f, 55f, 55f);
             reusedRect = reusedRect.ContractedBy(6f);
-            GUI.DrawTexture(reusedRect, storesReserves[1].Target.IconTexture);
+            GUI.DrawTexture(reusedRect, storesReserves[1].Target.iconTexture.Texture);
         }
 
         if (storesReserves.Count > 2)
         {
             reusedRect = new(inRect.x + 175f, inRect.y + 56f, 55f, 55f);
             reusedRect = reusedRect.ContractedBy(6f);
-            GUI.DrawTexture(reusedRect, storesReserves[2].Target.IconTexture);
+            GUI.DrawTexture(reusedRect, storesReserves[2].Target.iconTexture.Texture);
         }
 
         reusedRect = new(inRect.xMax - 110f, inRect.y + 10f, 110f, 22f);
@@ -298,7 +301,8 @@ public class Window_Branch : OrderWindowBase
         reusedRect.xMax -= 12f;
         Text.Anchor = TextAnchor.MiddleRight;
         Text.Font = GameFont.Small;
-        Widgets.Label(reusedRect, "OARO_BranchWin_BranchBuildingCeiling".Translate() + ": " + $"{CachedBranchInfo.BuildingCeiling}/{BranchStatDefOf.OARO_BuildingCeiling.maxValue:F0}");
+        Widgets.Label(reusedRect, "OARO_BranchWin_BuildingCeiling".Translate() + ": " + $"{Branch.BuildingHandler.NormalBuildings.Count}/{CachedBranchInfo.BuildingCeiling}");
+        TooltipHandler.TipRegion(reusedRect, () => BuildingCeilingExplanation.Value, uniqueId: 86485309);
 
         float yMin = reusedRect.yMax + 4f;
         reusedRect = inRect;
@@ -354,7 +358,7 @@ public class Window_Branch : OrderWindowBase
 
         reusedRect = Rect.MinMaxRect(inRect.xMin, reusedRect.yMax, inRect.xMax, reusedRect.yMax + 108f);
         Rect textureRect = OARO_WindowUtility.CenterRect(reusedRect, 96f, 86f);
-        GUI.DrawTexture(textureRect, facilityDef.ExpandingIconTexture, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(textureRect, facilityDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
         reusedRect.yMax += 32f;
         reusedRect.yMin = reusedRect.yMax - 32f;
@@ -504,7 +508,7 @@ public class Window_Branch : OrderWindowBase
         }
 
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(innerRect, innerRect.x + 15f, 40f, 40f);
-        GUI.DrawTexture(reusedRect, building.Def.IconTexture, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, building.Def.iconTexture.Texture, ScaleMode.ScaleToFit);
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, 24f);
         Text.Anchor = TextAnchor.MiddleLeft;
@@ -586,7 +590,7 @@ public class Window_Branch : OrderWindowBase
         BranchBuildingDef buildingDef = underConstructionBuilding.TargetDef;
         reusedRect = inRect.ContractedBy(5f);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x + 15f, 40f, 40f);
-        GUI.DrawTexture(reusedRect, buildingDef.IconTexture, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, 24f);
         Text.Anchor = TextAnchor.MiddleLeft;
@@ -866,7 +870,7 @@ public class Window_Branch : OrderWindowBase
     private void DrawBuildingInteractionEntry(Rect inRect, BranchBuildingComp_Interaction interactionComp, AcceptanceReport acceptance)
     {
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x + 15f, 36f, 36f);
-        GUI.DrawTexture(reusedRect, interactionComp.Parent.Def.IconTexture, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, interactionComp.Parent.Def.iconTexture.Texture, ScaleMode.ScaleToFit);
 
         Widgets.Label(inRect, interactionComp.InteractionLabel);
 
@@ -911,6 +915,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_BranchWin_Population".Translate() + $"   {Branch.PopulationHandler.Population}");
         reusedRect = new(inRect.x, reusedRect.yMax + 2f, 264f, 36f);
         Widgets.Label(reusedRect, "OARO_BranchWin_PopulationCeiling".Translate() + $"   {CachedBranchInfo.PopulationCeiling}");
+        TooltipHandler.TipRegion(reusedRect, () => NaturalPopulationCeilingExplanation.Value, 48614123);
 
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(reusedRect.xMax + (2f + 10f), textRect.yMax + (2f + 10f), 90f, 24f);
@@ -960,7 +965,7 @@ public class Window_Branch : OrderWindowBase
         }
         float inRectX = inRect.xMin;
         Rect reusedRect = new(inRectX + 10f, inRect.y + 32f, 105f, 96f);
-        GUI.DrawTexture(reusedRect, SelFacilityDef.ExpandingIconTexture, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, SelFacilityDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
@@ -1020,7 +1025,7 @@ public class Window_Branch : OrderWindowBase
         {
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.MiddleCenter;
-            Widgets.Label(inRect, "OARO_FacilityAlreadyAtMaxLevel".Translate());
+            Widgets.Label(inRect, "OARO_ReachMax_FacilityLevel".Translate());
             Text.Anchor = TextAnchor.UpperLeft;
             Text.Font = GameFont.Small;
             return;
@@ -1126,7 +1131,7 @@ public class Window_Branch : OrderWindowBase
         float inRectX = inRect.x;
 
         Rect reusedRect = new(inRectX + 12f, inRect.y + 75f, 105f, 96f);
-        GUI.DrawTexture(reusedRect, buildingDef.ExpandingIconTexture, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, buildingDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
@@ -1296,7 +1301,7 @@ public class Window_Branch : OrderWindowBase
         Rect reusedRect = new(inRect.x + 8f, inRect.y, inRect.height, inRect.height);
         float textXMin = reusedRect.xMax;
         reusedRect = reusedRect.ContractedBy(12f);
-        GUI.DrawTexture(reusedRect, buildingDef.IconTexture, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
         float textHeight = inRect.height / 4f;
         float textWidth = inRect.xMax - textXMin;
@@ -1482,7 +1487,7 @@ public class Window_Branch : OrderWindowBase
 
     private void ClearInteractionCache()
     {
-        interactionAcceptanceDirty = true;
+        InteractionAcceptanceDirty = true;
         commonInteractionAcceptances.Clear();
         buildingInteractionAcceptances.Clear();
     }
@@ -1532,7 +1537,7 @@ public class Window_Branch : OrderWindowBase
 
     private void RecacheInteractionAcceptance()
     {
-        interactionAcceptanceDirty = false;
+        InteractionAcceptanceDirty = false;
         commonInteractionAcceptances.Clear();
         foreach (BranchInteractionDef interactionDef in DefDatabase<BranchInteractionDef>.AllDefs.Where(d => !d.onlyBuildingInteraction && d.target == BranchInteractionDef.InteractionTarget.Caravan))
         {
@@ -1594,7 +1599,7 @@ public class Window_Branch : OrderWindowBase
         }
     }
 
-    private void PostApplyBranchInteraction(BranchInteractionDef interactionDef, BranchInteractionParms parms, bool succeeded) => interactionAcceptanceDirty = true;
+    private void PostApplyBranchInteraction(BranchInteractionDef interactionDef, BranchInteractionParms parms, bool succeeded) => InteractionAcceptanceDirty = true;
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MainBackground");
 

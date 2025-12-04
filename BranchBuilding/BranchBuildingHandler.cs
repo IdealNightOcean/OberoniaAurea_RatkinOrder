@@ -39,7 +39,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     }
     public int AllBuldingsCount => noramlBuildings.Count + (specialBuilding is null ? 0 : 1);
 
-    [Unsaved] public readonly Lazy<HashSet<BranchBuildingDef>> AllBuildingDefsHash;
+    public Lazy<HashSet<BranchBuildingDef>> AllBuildingDefsHash { get; }
 
     [Unsaved] private List<ITickHour> tickHourHandlers;
     [Unsaved] private List<ITickDay> tickDayHandlers;
@@ -195,7 +195,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             if (constructParam.Caravan is null)
             {
-                return false;
+                return resultOnly ? false : "OARO_NeedACaravan".Translate();
             }
             int silverCost = branch.GetBuildingSilverCost(buildingDef);
             if (!CaravanInventoryUtility.HasThings(constructParam.Caravan, ThingDefOf.Silver, silverCost))

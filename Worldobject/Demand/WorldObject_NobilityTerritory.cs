@@ -69,7 +69,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     private float osmolity;
     public float Osmolity => osmolity;
 
-    [Unsaved] private bool beAssaultedAfterWork = false;
+    private bool BeAssaultedAfterWork { get; set; }
 
     public override void ExposeData()
     {
@@ -423,7 +423,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
 
     private void CommunicationResult()
     {
-        beAssaultedAfterWork = false;
+        BeAssaultedAfterWork = false;
         if (CliquesManager.GetCliqueWillingness(NobilityCliqueKey) < 0.3f)
         {
             CliquesManager.AdjustCliqueWillingness(NobilityCliqueKey, 0.1f);
@@ -435,7 +435,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             if (nobilityType == NobilityType.Tyrannical)
             {
-                beAssaultedAfterWork = true;
+                BeAssaultedAfterWork = true;
                 return;
             }
 
@@ -543,7 +543,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             case WorkType.Communication:
                 {
-                    if (beAssaultedAfterWork)
+                    if (BeAssaultedAfterWork)
                     {
                         Assault(caravan, playerInitiated: false, branchJoin: true);
                     }
@@ -674,7 +674,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     protected override void Reset()
     {
         base.Reset();
-        beAssaultedAfterWork = false;
+        BeAssaultedAfterWork = false;
     }
 
 }

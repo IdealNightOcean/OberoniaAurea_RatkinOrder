@@ -8,10 +8,12 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchFacilityStageSummaryUICache
 {
-    public readonly BranchFacilityDef Def;
-    public readonly BranchFacilityLevel Level;
+    public BranchFacilityDef Def { get; }
+    public BranchFacilityLevel Level { get; }
+    public BranchFacilityLevelStage Stage { get; }
+    public int SilverCost { get; }
+    public int TimeCost { get; }
 
-    public readonly BranchFacilityLevelStage Stage;
     private List<string> stageEffectDesc;
     private string stageEffectDescJoint;
     public List<string> StageEffectDesc => stageEffectDesc ??= (Stage?.GetEffectDescriptions().ToList() ?? []);
@@ -36,9 +38,6 @@ public class BranchFacilityStageSummaryUICache
         }
     }
 
-
-    public int SilverCost;
-    public int TimeCost;
 
     public BranchFacilityStageSummaryUICache() { }
     public BranchFacilityStageSummaryUICache(BranchFacilityDef def, BranchFacilityLevel level, Branch branch)

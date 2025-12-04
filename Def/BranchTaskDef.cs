@@ -53,6 +53,11 @@ public class BranchTaskDef : Def
     public bool hasRisk;
 
     /// <summary>
+    /// 基础风险
+    /// </summary>
+    public float baseRiskProbability;
+
+    /// <summary>
     /// 能否被打断
     /// </summary>
     public bool canInterrupted = true;

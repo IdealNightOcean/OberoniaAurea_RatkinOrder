@@ -10,9 +10,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
 {
-    [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-
-    [Unsaved] public readonly List<IPostCombatantGenerate> IPostCombatantGenerate = [];
+    public RatkinOrder RatkinOrder { get; } = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
+    public List<IPostCombatantGenerate> IPostCombatantGenerate { get; } = [];
 
     private float reformProgress;
     public float ReformProgress

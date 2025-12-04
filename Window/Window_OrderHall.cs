@@ -22,8 +22,8 @@ public class Window_OrderHall : MainTabWindow
     private Texture2D TopShieldTexture { get; }
 
     private LazyMutable<List<KeyValuePair<AroundKnightGroup, float>>> AroundKnightGroups { get; }
-    private int AroundGroupTipIndex { get; set; }
-    private string AroundGroupTipCache { get; set; }
+    private int AroundGroupTipIndex { get; set; } = -1;
+    private string AroundGroupTipCache { get; set; } = string.Empty;
 
     public Window_OrderHall()
     {
@@ -41,9 +41,6 @@ public class Window_OrderHall : MainTabWindow
         //注：用的通讯台声音
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
-
-        AroundGroupTipIndex = -1;
-        AroundGroupTipCache = string.Empty;
 
         CurOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
         TopShieldTexture = new CachedTexture($"UI/InteractionKnights/OARO_TopShield_{CurOrderHallLevel}").Texture;

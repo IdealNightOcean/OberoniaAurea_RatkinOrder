@@ -13,7 +13,7 @@ public class BranchInteractionWorker_RequestCombatReadiness(BranchInteractionDef
         }
         if (!parms.Branch.HasSupportAuthority)
         {
-
+            return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
         }
 
         return base.BranchValidate(parms, resultOnly);

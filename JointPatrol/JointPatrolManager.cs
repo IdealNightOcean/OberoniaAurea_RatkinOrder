@@ -20,7 +20,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 {
     private const int JointPatrolDurationPrepDays = 3;
     private const int JointPatrolDurationDays = 7;
-    public static readonly BranchTaskType[] PatrolTaskTypes = [BranchTaskType.CrimeFighting, BranchTaskType.StabilityMaintenance, BranchTaskType.Assistance, BranchTaskType.Supervision];
+    private static readonly FloatRange FirstJointPatrolInterval = new(20f, 40f);
+    private static readonly FloatRange JointPatrolInterval = new(40f, 60f);
 
     private readonly RatkinOrder ratkinOrder;
     private BranchManager BranchManager => ratkinOrder.BranchManager;
@@ -34,8 +35,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     private int tickToNextStage = JointPatrolDurationPrepDays * 60000;
     public int TickToNextStage => tickToNextStage;
 
-    private int burdenSquadCount;
-    public int BurdenSquadCount => burdenSquadCount;
+    private int burdenCount;
+    public int BurdenCount => burdenCount;
 
     private PatrolLevel patrolLevel;
     public PatrolLevel PatrolLevelValue => patrolLevel;
@@ -54,8 +55,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     private List<JointInteractionRecord> interactionRecords = [];
     public IReadOnlyList<JointInteractionRecord> InteractionRecords => interactionRecords;
 
-    [Unsaved] private readonly LazyMutable<IReadOnlyDictionary<BranchTaskType, float>> taskPotencys;
-    [Unsaved] private readonly LazyMutable<IReadOnlyDictionary<IncidentType, List<JointPatrolIncidentDef>>> potentialIncidents;
+    public LazyMutable<IReadOnlyDictionary<BranchTaskType, float>> TaskPotencys { get; }
+    private LazyMutable<IReadOnlyDictionary<IncidentType, List<JointPatrolIncidentDef>>> PotentialIncidents { get; }
 
     private int sacrificeCount;
     public int SacrificeCount => sacrificeCount;
@@ -124,7 +125,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public JointPatrolManager(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        taskPotencys = new(refreshFunc: delegate
+        TaskPotencys = new(refreshFunc: delegate
         {
             if (curState != PatrolState.Ongoing)
             {
@@ -133,7 +134,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             return participants.GroupBy(p => p.FocusedTaskType).ToDictionary(g => g.Key, g => g.Sum(gp => gp.TaskPotency.Value));
         });
 
-        potentialIncidents = new(refreshFunc: delegate
+        PotentialIncidents = new(refreshFunc: delegate
         {
             if (curState != PatrolState.Ongoing)
             {
@@ -158,7 +159,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
 
         Scribe_Values.Look(ref patrolLevel, "CurPatrolType", PatrolLevel.Popedom);
-        Scribe_Values.Look(ref burdenSquadCount, "burdenSquadCount", 0);
+        Scribe_Values.Look(ref burdenCount, "burdenSquadCount", 0);
         Scribe_Values.Look(ref sacrificeCount, "sacrificeCount", 0);
 
         Scribe_Values.Look(ref curHelpPolicy, "curHelpPolicy", HelpPolicy.None);
@@ -181,7 +182,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         listing_Rect.Label($"当前阶段: {curState}");
         listing_Rect.Label($"距下一阶段 (Tick): {tickToNextStage}");
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"BurdenSquadCount: {burdenSquadCount}");
+        listing_Rect.Label($"BurdenSquadCount: {burdenCount}");
         listing_Rect.Gap(12f);
 
         if (curState != PatrolState.Invalid)
@@ -234,22 +235,18 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     public void TickLong()
     {
-        if (curState == PatrolState.Invalid)
-        {
-            return;
-        }
-
         if ((tickToNextStage -= 1000) <= 0)
         {
             switch (curState)
             {
-                case PatrolState.Invalid: TryStartPatrolPrep(); break;
-                case PatrolState.Prepare: StartJointPatrol(); break;
-                case PatrolState.Ongoing: EndJointPatrol(); break;
-                default: tickToNextStage = 5 * 60000; break;
+                case PatrolState.Invalid: TryStartPatrolPrep(); return;
+                case PatrolState.Prepare: StartJointPatrol(); return;
+                case PatrolState.Ongoing: EndJointPatrol(); return;
+                default: tickToNextStage = 5 * 60000; return;
             }
         }
-        else if (curState == PatrolState.Ongoing)
+
+        if (curState == PatrolState.Ongoing)
         {
             PeriodicPatrolInteractionChecker();
         }
@@ -428,12 +425,17 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             return;
         }
 
-        burdenSquadCount = 0;
+        burdenCount = 0;
 
         curHelpCount = 0;
         nextHelpCheckTick = -1;
 
-        tickToNextStage = JointPatrolDurationPrepDays * 60000;
+        tickToNextStage = forState switch
+        {
+            PatrolState.Invalid => (int)(JointPatrolInterval.RandomInRange * 60000f),
+            PatrolState.Prepare => JointPatrolDurationPrepDays * 60000,
+            _ => 5 * 60000
+        };
 
         participants.Clear();
         participantsDict.Clear();
@@ -445,8 +447,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         innerContainer.Clear();
 
-        taskPotencys.Reset();
-        potentialIncidents.Reset();
+        TaskPotencys.Reset();
+        PotentialIncidents.Reset();
 
         if (forceClear || forState == PatrolState.Prepare)
         {
@@ -486,7 +488,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             ModUtility.LogExceptionError(ex, "set joint patrol level", nameof(JointPatrolManager), nameof(TryStartPatrolPrep), needStackTrace: true);
             patrolLevel = PatrolLevel.Popedom;
         }
-        potentialIncidents.MarkDirty();
+        PotentialIncidents.MarkDirty();
 
         /*
         * PatrolState选择联巡参与分队PatrolState
@@ -586,7 +588,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         curState = PatrolState.Ongoing;
 
-        int overcap = participants.Count - burdenSquadCount;
+        int overcap = participants.Count - burdenCount;
         if (overcap > 0)
         {
             ratkinOrder.FundHandler.AdjustFundsImmediately(overcap * 0.05f, "OARO_Fund_JointPatrolOvercap".Translate());
@@ -607,8 +609,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         BringResidentKnightBackTeam();
 
-        taskPotencys.MarkDirty();
-        potentialIncidents.MarkDirty();
+        TaskPotencys.MarkDirty();
+        PotentialIncidents.MarkDirty();
     }
 
     private void BringResidentKnightBackTeam()
@@ -659,7 +661,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 record.NextIncidentCheckTick = int.MaxValue;
                 record.TaskPotency.MarkDirty();
             }
-            taskPotencys.MarkDirty();
+            TaskPotencys.MarkDirty();
 
             float fundGain = 0f;
             float reformationGain = 0f;
@@ -668,7 +670,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             float participantPublicSecurityGain = 0f;
 
             float neededTaskPotency = NeededTaskPotency;
-            IReadOnlyDictionary<BranchTaskType, float> endTaskPotencys = taskPotencys.Value;
+            IReadOnlyDictionary<BranchTaskType, float> endTaskPotencys = TaskPotencys.Value;
             IReadOnlyDictionary<BranchTaskType, List<Branch>> taskTypeBranches = participants.GroupBy(p => p.FocusedTaskType)
                                                                                              .ToDictionary(g => g.Key, g => g.Select(p => p.Branch).ToList());
             List<Branch> taskBranches = [];
@@ -882,7 +884,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
         }
 
-        taskPotencys.MarkDirty();
+        TaskPotencys.MarkDirty();
     }
 
     private void TryTriggerCaravanHelp()
@@ -931,7 +933,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         try
         {
             IncidentType selIncidentType = JointPatrolIncidentDef.GetPotentialIncidentType(record);
-            if (!potentialIncidents.Value.TryGetValue(selIncidentType, out List<JointPatrolIncidentDef> potentialIncidentsOfType))
+            if (!PotentialIncidents.Value.TryGetValue(selIncidentType, out List<JointPatrolIncidentDef> potentialIncidentsOfType))
             {
                 return;
             }
@@ -989,7 +991,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     }
     internal void PostOrderGenerated()
     {
-        tickToNextStage = (int)(Rand.Range(20f, 60f) * 60000f);
+        tickToNextStage = (int)(FirstJointPatrolInterval.RandomInRange * 60000f);
     }
 
     public IThingHolder ParentHolder => null;

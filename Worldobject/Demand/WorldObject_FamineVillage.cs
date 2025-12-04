@@ -41,7 +41,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     private int gainTrustCount;
     private int validInfoCount;
 
-    [Unsaved] private bool hasFeastLater;
+    private bool HasFeastLater { get; set; }
 
     public override void ExposeData()
     {
@@ -256,7 +256,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
             case WorkType.Precise:
                 {
                     FulfillRequest(associatedFixedCaravan);
-                    if (!hasFeastLater && requestCountLeft <= 0)
+                    if (!HasFeastLater && requestCountLeft <= 0)
                     {
                         this.SafeDestroy();
                     }
@@ -290,7 +290,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                 QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT), caravan.Named("CARAVAN"));
                 return;
             case WorkType.Precise:
-                if (hasFeastLater)
+                if (HasFeastLater)
                 {
                     Dialog_NodeTreeWithFactionInfo nodeTree = OAFrame_DiaUtility.ConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_FamineVillage_FeastStart".Translate(),
@@ -359,7 +359,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         requestCountLeft -= fixedCaravan.RemoveThingsOfDef(requestDef, maxTakeCount);
         validInfoCount = 0;
         Log.Message($"requestCountLeft: {requestCountLeft}");
-        hasFeastLater = requestCountLeft <= 0 && curTrust >= 0.8f;
+        HasFeastLater = requestCountLeft <= 0 && curTrust >= 0.8f;
     }
 
     public void FulfillRequest(Caravan caravan)

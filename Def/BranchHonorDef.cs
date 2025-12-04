@@ -10,11 +10,6 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchHonorDef : Def
 {
     /// <summary>
-    /// 荣誉颜色
-    /// </summary>
-    public Color color;
-
-    /// <summary>
     /// 荣誉Buff（<see cref="HediffDef"/>）
     /// </summary>
     public HediffDef buffHediff;
@@ -30,95 +25,9 @@ public class BranchHonorDef : Def
     public List<PawnGroupOption> pawnGroupOptions;
 
     /// <summary>
-    /// 荣誉图标路径
+    /// 荣誉颜色
     /// </summary>
-    [NoTranslate]
-    protected string iconPath;
-    protected Texture2D iconTexture;
-    /// <summary>
-    /// 荣誉图标
-    /// </summary>
-    public Texture2D IconTexture
-    {
-        get
-        {
-            if (iconTexture is null)
-            {
-                if (string.IsNullOrEmpty(iconPath))
-                {
-                    return null;
-                }
-                iconTexture = ContentFinder<Texture2D>.Get(iconPath);
-            }
-            return iconTexture;
-        }
-    }
-
-    protected Texture2D expandingIconTexture;
-    /// <summary>
-    /// 拓展的荣誉图标路径
-    /// </summary>
-    public Texture2D ExpandingIconTexture
-    {
-        get
-        {
-            if (expandingIconTexture is null)
-            {
-                if (string.IsNullOrEmpty(iconPath))
-                {
-                    return null;
-                }
-                expandingIconTexture = ContentFinder<Texture2D>.Get(iconPath + "_Expand");
-            }
-            return expandingIconTexture;
-        }
-    }
-
-    /// <summary>
-    /// 荣誉装饰框图标路径
-    /// </summary>
-    [NoTranslate]
-    protected string decorationPath;
-    protected Texture2D decorationTexture;
-    /// <summary>
-    /// 荣誉装饰框图标路径
-    /// </summary>
-    public Texture2D DecorationTexture
-    {
-        get
-        {
-            if (decorationPath is null)
-            {
-                if (string.IsNullOrEmpty(decorationPath))
-                {
-                    return null;
-                }
-                decorationTexture = ContentFinder<Texture2D>.Get(decorationPath);
-            }
-            return decorationTexture;
-        }
-    }
-    protected Texture2D expandingDecorationTexture;
-    /// <summary>
-    /// 扩展的荣誉装饰框图标
-    /// </summary>
-    public Texture2D ExpandingDecorationTexture
-    {
-        get
-        {
-            if (decorationPath is null)
-            {
-                if (string.IsNullOrEmpty(decorationPath))
-                {
-                    return null;
-                }
-                expandingDecorationTexture = ContentFinder<Texture2D>.Get(decorationPath + "_Expand");
-            }
-            return expandingDecorationTexture;
-        }
-    }
-
-
+    public Color color;
     protected Texture2D honorColorTex;
     /// <summary>
     /// 荣誉颜色标识图标，颜色使用<see cref="color"/>
@@ -126,29 +35,19 @@ public class BranchHonorDef : Def
     public Texture2D HonorColorTex => honorColorTex ??= SolidColorMaterials.NewSolidColorTexture(color);
 
     /// <summary>
-    /// 荣誉背景图标路径
+    /// 荣誉图标
     /// </summary>
-    [NoTranslate]
-    protected string backgroundPath;
-    protected Texture2D backgroundTexture;
+    public PathedTexture2DWithExpanded iconTexture;
+
+    /// <summary>
+    /// 荣誉装饰框图标
+    /// </summary>
+    public PathedTexture2DWithExpanded decorationTexture;
+
     /// <summary>
     /// 荣誉背景图标
     /// </summary>
-    public Texture2D BackgroundTexture
-    {
-        get
-        {
-            if (backgroundTexture is null)
-            {
-                if (string.IsNullOrEmpty(backgroundPath))
-                {
-                    return null;
-                }
-                backgroundTexture = ContentFinder<Texture2D>.Get(backgroundPath);
-            }
-            return backgroundTexture;
-        }
-    }
+    public PathedTexture2D backgroundTexture;
 
     public bool TryGetRandomPawnGroupMaker(PawnGroupKindDef pawnGroupKindDef, out PawnGroupOption groupOption)
     {

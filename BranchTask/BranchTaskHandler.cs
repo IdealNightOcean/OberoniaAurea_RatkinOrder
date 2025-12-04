@@ -142,7 +142,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         if (beAttackedCooling > 0)
         {
             return resultOnly ? false : "OARO_Cooling_BeAttackedOnTask".Translate().Colorize(ColorLibrary.RedReadable)
-                                        + " "
+                                        + ", "
                                         + "WaitTime".Translate(beAttackedCooling.ToStringTicksToPeriod());
         }
 

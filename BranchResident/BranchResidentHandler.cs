@@ -16,7 +16,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
     private ThingOwner<Pawn> residentPawns;
     private Dictionary<BranchResidentDef, BranchResidentLoadBox> residentRecords;
 
-    [Unsaved] public readonly SimpleValueCache<float> DailyXpFactorCache;
+    public SimpleValueCache<float> DailyXpFactorCache { get; }
 
     public IThingHolder ParentHolder
     {

@@ -237,14 +237,14 @@ public static class BranchUtility
     /// 分部的名称序号生成器
     /// </summary>
     /// <returns>1~999的尽量不重复的随机数</returns>
-    public static int GetBranchOrdinal(int branchID, int orderID)
+    public static int GetBranchOrdinal(Branch branch)
     {
         int m = 999;
         int a = 445;
         int c = 700001;
         unchecked
         {
-            int ordinal = 31 * branchID + orderID;
+            int ordinal = 31 * branch.LoadID + branch.RatkinOrder.LoadID;
             ordinal ^= (ordinal >> 16);
             ordinal = (a * ordinal + c) % m + 1;
             return ordinal > 0 ? ordinal : ordinal + m;
@@ -319,9 +319,13 @@ public static class BranchUtility
         {
             return false;
         }
-        if (branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.FocusedTaskTypeChanged))
+
+        int cooldownTicksLeft = branch.CooldownManager.GetCooldownTicksLeft(KeyLibrary_CDRecord.FocusedTaskTypeChanged);
+        if (cooldownTicksLeft > 0)
         {
-            return resultOnly ? false : "OARO_Cooling_ChangeFocusedTaskType".Translate();
+            return resultOnly ? false : "OARO_Cooling_ChangeFocusedTaskType".Translate()
+                                        + ", "
+                                        + "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
         }
 
         if (branch.RatkinOrder.Relationship < EsteemHandler.RelationshipKind.Soulmate)
@@ -343,13 +347,12 @@ public static class BranchUtility
             return false;
         }
 
-        if (branch is null)
+        int cooldownTicksLeft = branch.CooldownManager.GetCooldownTicksLeft(KeyLibrary_CDRecord.RadicalismDegreeChanged);
+        if (cooldownTicksLeft > 0)
         {
-            return false;
-        }
-        if (branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.FocusedTaskTypeChanged))
-        {
-            return resultOnly ? false : "OARO_Cooling_ChangeRadicalismDegree".Translate();
+            return resultOnly ? false : "OARO_Cooling_ChangeRadicalismDegree".Translate()
+                                        + ", "
+                                        + "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
         }
 
         if (branch.RatkinOrder.Relationship < EsteemHandler.RelationshipKind.Soulmate)

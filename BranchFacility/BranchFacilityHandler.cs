@@ -92,7 +92,7 @@ public class BranchFacilityHandler : IExposable
         BranchFacilityLevel oldLevel = GetFacilityLevel(facilityDef);
         if (oldLevel == BranchFacilityLevel.Excellent)
         {
-            return resultOnly ? false : "OARO_FacilityAlreadyAtMaxLevel".Translate();
+            return resultOnly ? false : "OARO_ReachMax_FacilityLevel".Translate();
         }
         BranchFacilityLevel targetLevel = oldLevel.FacilityLevelOffSetBy(1);
 
@@ -100,7 +100,7 @@ public class BranchFacilityHandler : IExposable
         {
             if (caravan is null)
             {
-                return false;
+                return resultOnly ? false : "OARO_NeedACaravan".Translate();
             }
             int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
             if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))

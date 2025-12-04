@@ -21,7 +21,7 @@ public class Branch : IExposable, ILoadReferenceable
         Mobile = 4
     }
 
-    [Unsaved] public readonly RatkinOrder RatkinOrder;
+    public RatkinOrder RatkinOrder { get; }
     public BranchManager BranchManager => RatkinOrder.BranchManager;
 
     private int loadID = -1;
@@ -122,7 +122,7 @@ public class Branch : IExposable, ILoadReferenceable
 
     [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
     [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
-    [Unsaved] public readonly List<IPostCombatantGenerate> IPostCombatantGenerate = [];
+    public List<IPostCombatantGenerate> IPostCombatantGenerate { get; } = [];
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
 
@@ -153,6 +153,7 @@ public class Branch : IExposable, ILoadReferenceable
     private Branch(RatkinOrder ratkinOrder, bool initCtor)
     {
         RatkinOrder = ratkinOrder ?? throw new NullReferenceException(nameof(ratkinOrder));
+
         if (initCtor)
         {
             cooldownManager = new();
@@ -424,9 +425,11 @@ public class Branch : IExposable, ILoadReferenceable
 
     private void PostGenerated()
     {
-        int ordinal = BranchUtility.GetBranchOrdinal(loadID, RatkinOrder.LoadID);
+        int ordinal = BranchUtility.GetBranchOrdinal(this);
         nameCore = BranchUtility.GenerateBranchNameCore(RatkinOrder);
         Rename(ordinal, nameCore);
+
+
 
         medalHandler.PostBranchGenerated();
         facilityHandler.PostBranchGenerated();
@@ -438,6 +441,7 @@ public class Branch : IExposable, ILoadReferenceable
         residentHandler.PostBranchGenerated();
 
         taskHandler.FocusedTaskType = medalHandler.ProtogenicTaskType;
+        supply = Rand.Range(0.4f, 0.8f);
     }
 
     internal void PostLoadInit()

@@ -9,6 +9,11 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchStatUtility
 {
+    public static string GetStatModifyExplanationSet(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
+    {
+        return GetStatModifyExplanation(branch, statDef, baseValueOverride, showResultValue).ToString();
+    }
+
     public static StringBuilder GetStatModifyExplanation(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
     {
         StringBuilder explanation = new(256);
@@ -34,32 +39,28 @@ public static class BranchStatUtility
 
             if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
             {
-                explanation.AppendLine("OARO_StatExplain_BranchInfrastructure".Translate());
-                tempTransformer.AppendTransExplanation(statDef, explanation);
-
-                if (showResultValue)
-                {
-                    transformer.MergeWith(tempTransformer);
-                    hasTrans = true;
-                }
-            }
-            if (branch.TransformerHandler.TryGetStatTransformer(statDef, out transformer))
-            {
+                hasTrans = true;
                 explanation.AppendLine("OARO_StatExplain_OrderReformation".Translate());
-                tempTransformer.AppendTransExplanation(statDef, explanation);
+                tempTransformer.AppendTransToExplanation(statDef, explanation);
 
                 if (showResultValue)
                 {
                     transformer.MergeWith(tempTransformer);
-                    hasTrans = true;
+                }
+            }
+            if (branch.TransformerHandler.TryGetStatTransformer(statDef, out tempTransformer))
+            {
+                hasTrans = true;
+                explanation.AppendLine("OARO_StatExplain_BranchInfrastructure".Translate());
+                tempTransformer.AppendTransToExplanation(statDef, explanation);
+
+                if (showResultValue)
+                {
+                    transformer.MergeWith(tempTransformer);
                 }
             }
 
-            float result = baseValue;
-            if (showResultValue && hasTrans)
-            {
-                result = transformer.DoTransform(statDef, result);
-            }
+            float result = (showResultValue && hasTrans) ? transformer.DoTransform(statDef, baseValue) : baseValue;
 
             List<BranchStatPart> statParts = statDef.statParts;
             if (statParts is not null)
@@ -84,6 +85,11 @@ public static class BranchStatUtility
 
             if (showResultValue)
             {
+                result = Mathf.Clamp(result, statDef.minValue, statDef.maxValue);
+                if (statDef.statType == BranchStatDef.StatType.Int)
+                {
+                    result = Mathf.Round(result);
+                }
                 statDef.Worker.UpdateStatCache(branch, result);
                 AppendStatResultExplanation(explanation, statDef, result, baseValue);
             }
