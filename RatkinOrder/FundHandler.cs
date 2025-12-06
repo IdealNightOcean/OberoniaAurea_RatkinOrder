@@ -40,18 +40,18 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref funds, "funds", 0f);
-        Scribe_Values.Look(ref preDayFunds, "preDayFunds", 0f);
+        Scribe_Values.Look(ref funds, nameof(funds), 0f);
+        Scribe_Values.Look(ref preDayFunds, nameof(preDayFunds), 0f);
 
-        Scribe_Values.Look(ref hasFortune, "hasFortune", defaultValue: false);
-        Scribe_Values.Look(ref hasRestoration, "hasRestoration", defaultValue: false);
+        Scribe_Values.Look(ref hasFortune, nameof(hasFortune), defaultValue: false);
+        Scribe_Values.Look(ref hasRestoration, nameof(hasRestoration), defaultValue: false);
 
-        Scribe_Values.Look(ref immediatelyChange, "immediatelyChange", 0f);
-        Scribe_Values.Look(ref expectedChange, "expectedChange", 0f);
-        Scribe_Collections.Look(ref immediatelyChangeExplanation, "immediatelyChangeExplanation", LookMode.Value, LookMode.Value);
-        Scribe_Collections.Look(ref expectedChangeExplanation, "expectedChangeExplanation", LookMode.Value, LookMode.Value);
+        Scribe_Values.Look(ref immediatelyChange, nameof(immediatelyChange), 0f);
+        Scribe_Values.Look(ref expectedChange, nameof(expectedChange), 0f);
+        Scribe_Collections.Look(ref immediatelyChangeExplanation, nameof(immediatelyChangeExplanation), LookMode.Value, LookMode.Value);
+        Scribe_Collections.Look(ref expectedChangeExplanation, nameof(expectedChangeExplanation), LookMode.Value, LookMode.Value);
 
-        Scribe_Collections.Look(ref fundEvents, "fundEvents", LookMode.Deep);
+        Scribe_Collections.Look(ref fundEvents, nameof(fundEvents), LookMode.Deep);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

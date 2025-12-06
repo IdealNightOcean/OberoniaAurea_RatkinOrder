@@ -98,9 +98,9 @@ public class BranchTask : IExposable
 
     public virtual void ExposeData()
     {
-        Scribe_Defs.Look(ref def, "def");
-        Scribe_Values.Look(ref isOngoing, "isOngoing", defaultValue: false);
-        Scribe_Values.Look(ref startTick, "startTick", 0);
-        Scribe_Values.Look(ref durationTick, "durationTick", 0);
+        Scribe_Defs.Look(ref def, nameof(def));
+        Scribe_Values.Look(ref isOngoing, nameof(isOngoing), defaultValue: false);
+        Scribe_Values.Look(ref startTick, nameof(startTick), 0);
+        Scribe_Values.Look(ref durationTick, nameof(durationTick), 0);
     }
 }

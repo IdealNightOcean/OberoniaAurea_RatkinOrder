@@ -26,7 +26,7 @@ public static class RecommendationUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CurRecommendationOfMap(RatkinOrder order, Map map)
     {
-        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.OfType<OrderRecommendation>().Where(r => r.RatkinOrder == order).Count() ?? 0;
+        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.OfType<OrderRecommendation>().Where(r => r.RatkinOrder == order).Sum(t => t.stackCount) ?? 0;
     }
 
     public static void GiveRecommendationsToPlayer(RatkinOrder order, int count, Action<Thing> giveAction)
@@ -112,7 +112,7 @@ public static class RecommendationUtility
             return useCount;
         }
 
-        for (int i = recommendations.Count; i >= 0; i--)
+        for (int i = recommendations.Count - 1; i >= 0; i--)
         {
             recommendations[i].Destroy();
         }

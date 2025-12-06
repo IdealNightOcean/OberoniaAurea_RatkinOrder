@@ -319,7 +319,7 @@
     <Compile Include="Quest\QuestPart\QuestPart_ResidentKnightWatcher.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightsManager.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightRoleWorker.cs" />
-    <Compile Include="Thing\OrderCodePedestal.cs" />
+    <Compile Include="Thing\Building_OrderCodePedestal.cs" />
     <Compile Include="RatkinOrder\OrderFundEvent.cs" />
     <Compile Include="Def\OrderFundEventDef.cs" />
     <Compile Include="Interface\IBranchRelated.cs" />

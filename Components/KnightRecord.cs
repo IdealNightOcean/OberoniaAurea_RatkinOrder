@@ -48,7 +48,7 @@ public class KnightRecord : IExposable, ILoadReferenceable
         this.isCommander = isCommander;
         this.isCombatant = isCombatant && branch is not null;
 
-        loadID = UniqueIDManager.GetUniqueID("KnightRecord");
+        loadID = UniqueIDManager.GetUniqueID(nameof(KnightRecord));
     }
 
     public void ExposeData()

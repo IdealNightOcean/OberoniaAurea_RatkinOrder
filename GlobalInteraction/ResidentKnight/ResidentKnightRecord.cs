@@ -1,9 +1,10 @@
 ﻿using NightOcean;
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Verse.AI;
+using Verse.AI.Group;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -47,7 +48,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
     private int honorAcademicLevel;
     public int HonorAcademicLevel => honorAcademicLevel;
 
-    public readonly LazyMutable<int> TotalAcademicLevel;
+    public LazyMutable<int> TotalAcademicLevel { get; }
 
     private int residenceStartTick = -1;
     public int ResignationDaysLeft = -1;
@@ -55,19 +56,19 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref loadID, "loadID", -1);
-        Scribe_References.Look(ref knight, "knight");
-        Scribe_References.Look(ref knightRecord, "knightRecord");
+        Scribe_Values.Look(ref loadID, nameof(loadID), -1);
+        Scribe_References.Look(ref knight, nameof(knight));
+        Scribe_References.Look(ref knightRecord, nameof(knightRecord));
 
-        Scribe_Values.Look(ref CurRank, "CurRank", Rank.Regular);
-        Scribe_Values.Look(ref MeditationPoints, "MeditationPoints", 0f);
-        Scribe_Defs.Look(ref CurRole, "CurRole");
-        Scribe_Collections.Look(ref genealAcademicDefs, "genealAcademicDefs", LookMode.Def, LookMode.Value);
-        Scribe_Values.Look(ref honorAcademicLevel, "honorAcademicLevel", 0);
+        Scribe_Values.Look(ref CurRank, nameof(CurRank), Rank.Regular);
+        Scribe_Values.Look(ref MeditationPoints, nameof(MeditationPoints), 0f);
+        Scribe_Defs.Look(ref CurRole, nameof(CurRole));
+        Scribe_Collections.Look(ref genealAcademicDefs, nameof(genealAcademicDefs), LookMode.Def, LookMode.Value);
+        Scribe_Values.Look(ref honorAcademicLevel, nameof(honorAcademicLevel), 0);
 
-        Scribe_Values.Look(ref residenceStartTick, "residenceStartTick", -1);
-        Scribe_Values.Look(ref ResignationDaysLeft, "ResignationDaysLeft", -1);
-        Scribe_Values.Look(ref hasWarnedResignation, "hasWarnedResignation", defaultValue: false);
+        Scribe_Values.Look(ref residenceStartTick, nameof(residenceStartTick), -1);
+        Scribe_Values.Look(ref ResignationDaysLeft, nameof(ResignationDaysLeft), -1);
+        Scribe_Values.Look(ref hasWarnedResignation, nameof(hasWarnedResignation), defaultValue: false);
     }
 
     private ResidentKnightRecord()
@@ -75,16 +76,12 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         TotalAcademicLevel = new(refreshFunc: () => honorAcademicLevel + genealAcademicDefs.Values.Sum());
     }
 
-    public ResidentKnightRecord(Pawn knight, Branch branch) : base()
+    public ResidentKnightRecord(Pawn knight, KnightRecord knightRecord) : this()
     {
-        if (branch is null)
-        {
-            throw new ArgumentNullException(nameof(branch));
-        }
-
         this.knight = knight;
+        this.knightRecord = knightRecord;
         residenceStartTick = Find.TickManager.TicksGame;
-        if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
+        if (RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             ResignationDaysLeft = 4 * 60;
         }
@@ -93,7 +90,9 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
             ResignationDaysLeft = 2 * 60;
         }
 
-        loadID = UniqueIDManager.GetUniqueID("ResidentKnight");
+        ResidentKnightAcademicDef def = DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => !d.isHonorAcademic).RandomElement();
+
+        loadID = UniqueIDManager.GetUniqueID(nameof(ResidentKnightRecord));
     }
 
     public override string ToString()
@@ -101,8 +100,9 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         return $"Branch: {Branch.Name}, Rank: {CurRank}, MeditationPoints: {MeditationPoints}, Role: {CurRole} ";
     }
 
-    public void ResignationWarningCheck()
+    public void ResignationDailyCheck()
     {
+        ResignationDaysLeft--;
         if (!hasWarnedResignation && ResignationDaysLeft <= 15)
         {
             hasWarnedResignation = true;
@@ -115,15 +115,39 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         hasWarnedResignation = false;
     }
 
-    public int NoAdditionalCostAcademicCeiling()
+    public static int GetNoAdditionalCostAcademicCeiling(Rank rank)
     {
-        return CurRank switch
+        return rank switch
         {
             Rank.Regular => 5,
             Rank.Elite => 10,
             Rank.Honor => 20,
             Rank.Crown => 60,
             _ => 60
+        };
+    }
+
+    public static Color GetRankColor(Rank rank)
+    {
+        return rank switch
+        {
+            Rank.Regular => new Color(0.3f, 0.9f, 0.39f),
+            Rank.Elite => new Color(0.3f, 0.51f, 0.9f),
+            Rank.Honor => new Color(0.69f, 0.3f, 0.9f),
+            Rank.Crown => new Color(1f, 0.65f, 0f),
+            _ => Color.white
+        };
+    }
+
+    public static string GetRankLabel(Rank rank)
+    {
+        return rank switch
+        {
+            Rank.Regular => $"OARO_ResidentKnightRank_{Rank.Regular}".Translate().Colorize(new Color(0.3f, 0.9f, 0.39f)),
+            Rank.Elite => $"OARO_ResidentKnightRank_{Rank.Elite}".Translate().Colorize(new Color(0.3f, 0.51f, 0.9f)),
+            Rank.Honor => $"OARO_ResidentKnightRank_{Rank.Honor}".Translate().Colorize(new Color(0.69f, 0.3f, 0.9f)),
+            Rank.Crown => $"OARO_ResidentKnightRank_{Rank.Crown}".Translate().Colorize(new Color(1f, 0.65f, 0f)),
+            _ => "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable)
         };
     }
 
@@ -195,6 +219,16 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         }
 
         academicDef.GetStage(targetLevel)?.OnAcademicLevelUp(knight);
+    }
+
+    public void PostRemoved()
+    {
+        knight.SetFaction(RatkinOrder.Faction);
+        RatkinOrder.JointPatrolManager.OnResidentKnightRemoved(this);
+        if (knight.Spawned)
+        {
+            LordMaker.MakeNewLord(RatkinOrder.Faction, new LordJob_ExitMapBest(LocomotionUrgency.Walk, canDefendSelf: true), knight.Map, startingPawns: [knight]);
+        }
     }
 
     private float GetMeditationPointsNeeded(ResidentKnightAcademicDef academicDef, int targetLevel)

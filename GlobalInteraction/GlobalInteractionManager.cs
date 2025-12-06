@@ -135,14 +135,14 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
     public void ExposeData()
     {
-        Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
-        Scribe_Deep.Look(ref simpleInteractRecord, "simpleInteractRecord");
+        Scribe_Deep.Look(ref cooldownManager, nameof(cooldownManager));
+        Scribe_Deep.Look(ref simpleInteractRecord, nameof(simpleInteractRecord));
 
-        Scribe_Deep.Look(ref orderHallHandler, "orderHallHandler");
-        Scribe_Deep.Look(ref acceptedBranchDemandHandler, "acceptedBranchDemandHandler");
-        Scribe_Deep.Look(ref residentKnightsManager, "residentKnightsManager");
-        Scribe_Deep.Look(ref aroundKnightGroupsManager, "aroundKnightGroupsManager");
-        Scribe_Deep.Look(ref mercyQuestHandler, "mercyQuestHandler");
+        Scribe_Deep.Look(ref orderHallHandler, nameof(orderHallHandler));
+        Scribe_Deep.Look(ref acceptedBranchDemandHandler, nameof(acceptedBranchDemandHandler));
+        Scribe_Deep.Look(ref residentKnightsManager, nameof(residentKnightsManager));
+        Scribe_Deep.Look(ref aroundKnightGroupsManager, nameof(aroundKnightGroupsManager));
+        Scribe_Deep.Look(ref mercyQuestHandler, nameof(mercyQuestHandler));
     }
 
     public void TickDay()

@@ -73,6 +73,18 @@ public class Branch : IExposable, ILoadReferenceable
         get => supply;
         set => supply = Mathf.Clamp(value, 0f, supplyCeilingCache.GetCachedResult());
     }
+    public string SupplyState
+    {
+        get
+        {
+            return Supply switch
+            {
+                < 0.2f => "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange),
+                < 0.8f => "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow),
+                _ => "OARO_BranchSupply_Enough".Translate().Colorize(Color.green)
+            };
+        }
+    }
 
     [Unsaved] private SimpleValueCache<float> potencyCache;
     public float Potency => potencyCache.GetCachedResult();
@@ -175,7 +187,7 @@ public class Branch : IExposable, ILoadReferenceable
                                  checker: () => this.GetStatValue(BranchStatDefOf.OARO_SupplyCeiling));
 
         potencyCache = new(cacheInterval: 2500, defaultValue: 1f, GetCurPotency);
-        loadID = UniqueIDManager.GetUniqueID("Branch");
+        loadID = UniqueIDManager.GetUniqueID(nameof(Branch));
     }
 
     public static Branch GenerateBranchFor(RatkinOrder ratkinOrder, WorldObject worldObject, bool addToManager = true)
@@ -213,30 +225,30 @@ public class Branch : IExposable, ILoadReferenceable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref loadID, "loadID", -1);
-        Scribe_Values.Look(ref name, "name");
-        Scribe_References.Look(ref baseSite, "baseSite");
+        Scribe_Values.Look(ref loadID, nameof(loadID), -1);
 
-        Scribe_Values.Look(ref ordinal, "ordinal", 0);
-        Scribe_Values.Look(ref nameCore, "nameCore", string.Empty);
-        Scribe_Values.Look(ref name, "name", string.Empty);
+        Scribe_References.Look(ref baseSite, nameof(baseSite));
 
-        Scribe_Values.Look(ref HasSupportAuthority, "HasSupportAuthority", defaultValue: false);
-        Scribe_Values.Look(ref friendlyDaysLeft, "friendlyDaysLeft", 0);
-        Scribe_Values.Look(ref curType, "curType", BranchType.Normal);
+        Scribe_Values.Look(ref ordinal, nameof(ordinal), 0);
+        Scribe_Values.Look(ref nameCore, nameof(nameCore), string.Empty);
+        Scribe_Values.Look(ref name, nameof(name), string.Empty);
 
-        Scribe_Values.Look(ref supply, "supply", 0f);
+        Scribe_Values.Look(ref HasSupportAuthority, nameof(HasSupportAuthority), defaultValue: false);
+        Scribe_Values.Look(ref friendlyDaysLeft, nameof(friendlyDaysLeft), 0);
+        Scribe_Values.Look(ref curType, nameof(curType), BranchType.Normal);
 
-        Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
-        Scribe_Deep.Look(ref medalHandler, "medalHandler");
-        Scribe_Deep.Look(ref facilityHandler, "facilityHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref buildingHandler, "buildingHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref squad, "squad", ctorArgs: this);
-        Scribe_Deep.Look(ref populationHandler, "populationHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref taskHandler, "taskHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref demandHandler, "demandHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref residentHandler, "residentHandler", ctorArgs: [this, false]);
-        Scribe_Deep.Look(ref storesReserveHandler, "storesReserveHandler", ctorArgs: this);
+        Scribe_Values.Look(ref supply, nameof(supply), 0f);
+
+        Scribe_Deep.Look(ref cooldownManager, nameof(cooldownManager));
+        Scribe_Deep.Look(ref medalHandler, nameof(medalHandler));
+        Scribe_Deep.Look(ref facilityHandler, nameof(facilityHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref buildingHandler, nameof(buildingHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref squad, nameof(squad), ctorArgs: this);
+        Scribe_Deep.Look(ref populationHandler, nameof(populationHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref taskHandler, nameof(taskHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref demandHandler, nameof(demandHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref residentHandler, nameof(residentHandler), ctorArgs: [this, false]);
+        Scribe_Deep.Look(ref storesReserveHandler, nameof(storesReserveHandler), ctorArgs: this);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Branch(this));

@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class OrderCodePedestal : ThingWithComps
+public class Building_OrderCodePedestal : Building
 {
     public bool IsMainPedestal => this == OrderHallHandler.Instance.MainOrderCodePedestal;
 
@@ -45,6 +45,19 @@ public class OrderCodePedestal : ThingWithComps
 
         if (IsMainPedestal)
         {
+            Command_Action command_OpenOrderHallWin = new()
+            {
+                defaultLabel = "OARO_CodePedestal_OpenOrderHallWin".Translate(),
+                defaultDesc = "OARO_CodePedestal_OpenOrderHallWinDesc".Translate(),
+                action = delegate
+                {
+                    Find.Selector.Deselect(this);
+                    Window_OrderHall orderHallWin = new(Map);
+                    Find.WindowStack.Add(orderHallWin);
+                }
+            };
+            yield return command_OpenOrderHallWin;
+
             Command_Action command_UnsetAsMain = new()
             {
                 defaultLabel = "OARO_CodePedestal_Unset".Translate(),

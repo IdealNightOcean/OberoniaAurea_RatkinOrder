@@ -28,8 +28,8 @@ public class LordJob_ExitMapBestForDeployment : LordJob_ExitMapBest
     {
         base.ExposeData();
 
-        Scribe_References.Look(ref targetBranch, "targetBranch");
-        Scribe_Values.Look(ref totalDeployDays, "totalDeployDays", 1);
-        Scribe_Defs.Look(ref targetSkill, "targetSkill");
+        Scribe_References.Look(ref targetBranch, nameof(targetBranch));
+        Scribe_Values.Look(ref totalDeployDays, nameof(totalDeployDays), 1);
+        Scribe_Defs.Look(ref targetSkill, nameof(targetSkill));
     }
 }

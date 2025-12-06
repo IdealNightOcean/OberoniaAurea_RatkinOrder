@@ -34,7 +34,7 @@ public partial class BranchStoresReserveHandler
 
         public virtual void ExposeData()
         {
-            Scribe_Values.Look(ref CostRateReduce, "CostRateReduce", 0f);
+            Scribe_Values.Look(ref CostRateReduce, nameof(CostRateReduce), 0f);
         }
     }
 
@@ -52,7 +52,7 @@ public partial class BranchStoresReserveHandler
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Defs.Look(ref target, "target");
+            Scribe_Defs.Look(ref target, nameof(target));
         }
     }
 
@@ -70,7 +70,7 @@ public partial class BranchStoresReserveHandler
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Defs.Look(ref target, "target");
+            Scribe_Defs.Look(ref target, nameof(target));
         }
     }
 }

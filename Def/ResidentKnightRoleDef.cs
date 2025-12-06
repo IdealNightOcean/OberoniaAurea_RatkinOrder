@@ -15,6 +15,11 @@ public class ResidentKnightRoleDef : Def
     public ResidentKnightRoleWorker RoleWorker => roleWorker ??= (ResidentKnightRoleWorker)Activator.CreateInstance(roleWorkerClass, this);
 
     /// <summary>
+    /// UI图标
+    /// </summary>
+    public PathedTexture2D iconTexture;
+
+    /// <summary>
     /// 显示优先级
     /// </summary>
     public int displyPriority = 100;
@@ -34,10 +39,14 @@ public class ResidentKnightRoleDef : Def
     public HediffDef roleHediff;
 
     /// <summary>
-    /// 根据职位【Def】提供不同的Stat修正
-    /// 修正是针对全体殖民者的，而非担任该职位的<see cref=KeyLibrary_FormatArgName.PAWN/>
+    /// Stat偏移修正
+    /// 修正是针对全体殖民者的，而非担任该职位的<see cref="Pawn"/>
     /// </summary>
     public List<StatModifier> statOffsets;
+    /// <summary>
+    /// Stat系数修正
+    /// 修正是针对全体殖民者的，而非担任该职位的<see cref="Pawn"/>
+    /// </summary>
     public List<StatModifier> statFactors;
 
 }

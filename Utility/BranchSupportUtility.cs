@@ -18,9 +18,14 @@ public static class BranchSupportUtility
         Half,
         Entire
     }
+    private static readonly DeploymentLevel[] deploymentLevelArr = (DeploymentLevel[])Enum.GetValues(typeof(DeploymentLevel));
 
     public static AcceptanceReport CanBombard(Branch branch, Map map, bool resultOnly)
     {
+        if (branch is null || map is null)
+        {
+            return false;
+        }
         if (!branch.HasSupportAuthority)
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
@@ -46,10 +51,13 @@ public static class BranchSupportUtility
 
     public static AcceptanceReport CanCombatKnightSupport(Branch branch, Map map, DeploymentLevel level, bool resultOnly)
     {
+        if (branch is null || map is null)
+        {
+            return false;
+        }
         if (!branch.HasSupportAuthority)
         {
             return resultOnly ? false : "OARO_NoSupportAuthority".Translate();
-
         }
         if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.BlockSupport))
         {
@@ -164,8 +172,30 @@ public static class BranchSupportUtility
         return true;
     }
 
+    public static void CombatKnightSupportFloatMenu(Branch branch, Map map)
+    {
+        List<FloatMenuOption> options = [];
+        foreach (DeploymentLevel level in deploymentLevelArr)
+        {
+            AcceptanceReport acceptance = CanCombatKnightSupport(branch, map, level, resultOnly: false);
+            if (acceptance)
+            {
+                options.Add(new FloatMenuOption($"OARO_DeploymentLevel_{level}".Translate(), action: delegate
+                {
+                    DoCombatKnightSupport(branch, map, level, sendStandardLetter: true);
+                }));
+            }
+            else
+            {
+                string optText = $"OARO_DeploymentLevel_{level}".Translate() + $" ({acceptance.Reason})";
+                options.Add(new FloatMenuOption(optText, action: null));
+            }
+        }
+        Find.WindowStack.Add(new FloatMenu(options));
+    }
+
     /// <summary>
-    /// 根据部署等级创建战斗人员生成参数<paramref name="parms"/>（<see cref="CombatKnightGenerateParms"/>）
+    /// 根据部署等级创建战斗人员生成参数<paramref name="parms"/> (<see cref="CombatKnightGenerateParms"/> )
     /// </summary>
     public static bool GenerateCombatKnightGenerateParmsByDeploymentLevel(Branch branch, Map map, DeploymentLevel level, out CombatKnightGenerateParms parms)
     {

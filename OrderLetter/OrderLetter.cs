@@ -108,16 +108,16 @@ public class OrderLetter : IExposable
 
     public virtual void ExposeData()
     {
-        Scribe_Defs.Look(ref Def, "Def");
+        Scribe_Defs.Look(ref Def, nameof(Def));
 
-        Scribe_References.Look(ref RelatedFaction, "RelatedFaction");
-        Scribe_References.Look(ref RelatedBranch, "RelatedBranch");
-        Scribe_References.Look(ref RelatedOrder, "RelatedOrder");
+        Scribe_References.Look(ref RelatedFaction, nameof(RelatedFaction));
+        Scribe_References.Look(ref RelatedBranch, nameof(RelatedBranch));
+        Scribe_References.Look(ref RelatedOrder, nameof(RelatedOrder));
 
-        Scribe_Values.Look(ref hasReaded, "hasReaded", defaultValue: false);
-        Scribe_Values.Look(ref ArrivalTick, "ArrivalTick", -1);
-        Scribe_Values.Look(ref label, "label");
-        Scribe_Values.Look(ref text, "text");
-        Scribe_Values.Look(ref sender, "sender");
+        Scribe_Values.Look(ref hasReaded, nameof(hasReaded), defaultValue: false);
+        Scribe_Values.Look(ref ArrivalTick, nameof(ArrivalTick), -1);
+        Scribe_Values.Look(ref label, nameof(label));
+        Scribe_Values.Look(ref text, nameof(text));
+        Scribe_Values.Look(ref sender, nameof(sender));
     }
 }

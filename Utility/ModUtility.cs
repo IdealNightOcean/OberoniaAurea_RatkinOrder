@@ -59,7 +59,7 @@ public static class ModUtility
         return faction;
     }
 
-    public static bool TryMakePawnArrival(List<Pawn> pawns, IncidentParms arrivalParms, PawnsArrivalModeDef arrivalMode, bool sendStandardLetter = true)
+    public static bool TryMakePawnArrival(List<Pawn> pawns, IncidentParms arrivalParms, PawnsArrivalModeDef arrivalMode, bool joinPlayer = false, bool sendStandardLetter = true)
     {
         Map map = (Map)arrivalParms.target;
         PawnsArrivalModeDef pawnsArrivalModeDef = arrivalMode ?? PawnsArrivalModeDefOf.EdgeWalkIn;
@@ -82,6 +82,13 @@ public static class ModUtility
         }
 
         pawnsArrivalModeDef.Worker.TryResolveRaidSpawnCenter(arrivalParms);
+        if (joinPlayer)
+        {
+            foreach (Pawn p in pawns)
+            {
+                p.SetFaction(Faction.OfPlayer);
+            }
+        }
         pawnsArrivalModeDef.Worker.Arrive(pawns, arrivalParms);
         if (sendStandardLetter)
         {

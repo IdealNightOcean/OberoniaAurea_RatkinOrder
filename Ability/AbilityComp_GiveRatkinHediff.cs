@@ -12,22 +12,18 @@ public class AbilityComp_GiveKnightsOfMapHediff : CompAbilityEffect_WithDuration
     {
         IReadOnlyList<Pawn> pawns = parent.pawn.MapHeld.mapPawns.AllPawnsSpawned;
 
-        for (int i = 0; i < pawns.Count; i++)
+        foreach (Pawn p in parent.pawn.MapHeld.mapPawns.AllPawnsSpawned)
         {
-            if (KnightPawnsManager.Instance.IsKnight(pawns[i]))
+            if (p.CanBeKnight() && KnightPawnsManager.Instance.IsKnight(p))
             {
-                ApplyInner(pawns[i], parent.pawn);
+                ApplyInner(p, parent.pawn);
             }
         }
     }
 
     protected void ApplyInner(Pawn target, Pawn caster)
     {
-        if (target is null)
-        {
-            return;
-        }
-        if (TryResist(target))
+        if (target.HostileTo(Faction.OfPlayer))
         {
             MoteMaker.ThrowText(target.DrawPos, target.Map, "Resisted".Translate());
             return;
@@ -57,11 +53,6 @@ public class AbilityComp_GiveKnightsOfMapHediff : CompAbilityEffect_WithDuration
             hediffComp_Link.drawConnection = target == parent.pawn;
         }
         target.health.AddHediff(hediff);
-    }
-
-    protected bool TryResist(Pawn pawn)
-    {
-        return pawn.HostileTo(Faction.OfPlayer);
     }
 
     public override bool AICanTargetNow(LocalTargetInfo target)

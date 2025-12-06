@@ -42,7 +42,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref aroundKnightGroups, "aroundKnightGroups", LookMode.Deep);
+        Scribe_Collections.Look(ref aroundKnightGroups, nameof(aroundKnightGroups), LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             aroundKnightGroups.RemoveAll(g => !AroundKnightGroup.Validate(g));

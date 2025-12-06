@@ -6,20 +6,20 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Dialog_BranchTrade(Pawn playerNegotiator, ITrader trader, bool giftsOnly = false) : Dialog_Trade(playerNegotiator, trader, giftsOnly)
 {
-    protected BranchInteractionParms parms;
+    protected BranchInteractionParms Parms { get; set; }
 
     public Action<BranchInteractionParms, bool> PostApplyBranchInteraction { get; set; }
 
     public void InitForInteraction(BranchInteractionParms parms)
     {
-        this.parms = parms;
+        Parms = parms;
     }
 
     public override void PostClose()
     {
         try
         {
-            PostApplyBranchInteraction?.Invoke(parms, true);
+            PostApplyBranchInteraction?.Invoke(Parms, true);
         }
         catch (Exception ex)
         {

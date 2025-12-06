@@ -130,8 +130,8 @@ public class Window_Branch : OrderWindowBase
         AllFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
 
         ContractAcceptances = new(refreshFunc: RecacheContractAcceptance);
-        NaturalPopulationCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationSet(Branch, BranchStatDefOf.OARO_NaturalPopulationCeiling, showResultValue: true));
-        BuildingCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationSet(Branch, BranchStatDefOf.OARO_BuildingCeiling, showResultValue: true));
+        NaturalPopulationCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_NaturalPopulationCeiling, showResultValue: true));
+        BuildingCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_BuildingCeiling, showResultValue: true));
     }
 
     public override void PreOpen()
@@ -931,7 +931,7 @@ public class Window_Branch : OrderWindowBase
 
         if (Mouse.IsOver(reusedRect))
         {
-            string tipStr = CachedBranchInfo.DailyPopulationGrowthExplanation;
+            string tipStr = CachedBranchInfo.DailyPopulationGrowthExplanation.Value;
             if (!string.IsNullOrEmpty(tipStr))
             {
                 TooltipHandler.TipRegion(reusedRect, () => tipStr, 36746149);

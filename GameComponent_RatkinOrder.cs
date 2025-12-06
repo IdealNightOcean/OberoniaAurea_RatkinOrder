@@ -51,13 +51,13 @@ public class GameComponent_RatkinOrder : GameComponent
     {
         base.ExposeData();
 
-        Scribe_Values.Look(ref InitOrderRelationship, "InitOrderRelationship");
+        Scribe_Values.Look(ref InitOrderRelationship, nameof(InitOrderRelationship));
 
-        Scribe_Deep.Look(ref uniqueIDManager, "uniqueIDManager");
+        Scribe_Deep.Look(ref uniqueIDManager, nameof(uniqueIDManager));
 
-        Scribe_Deep.Look(ref ratkinOrderManager, "ratkinOrderManager");
-        Scribe_Deep.Look(ref orderLetterBox, "orderLetterBox");
-        Scribe_Deep.Look(ref globalInteractionManager, "globalInteractionManager");
+        Scribe_Deep.Look(ref ratkinOrderManager, nameof(ratkinOrderManager));
+        Scribe_Deep.Look(ref orderLetterBox, nameof(orderLetterBox));
+        Scribe_Deep.Look(ref globalInteractionManager, nameof(globalInteractionManager));
     }
 
     public override void StartedNewGame()

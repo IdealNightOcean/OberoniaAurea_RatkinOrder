@@ -1,6 +1,5 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
-using System.Linq;
 using Verse;
 using Verse.AI;
 
@@ -8,6 +7,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BombardSupportMaker : ThingWithComps
 {
+    private List<IntVec3> CachedAttackPositions { get; } = [];
+    private int NextReCacheAttackPositionsTick { get; set; } = -1;
+
     private int ticksToForceDestroy = 2500;
 
     private List<IntVec3> targetCells = [];
@@ -26,69 +28,36 @@ public class BombardSupportMaker : ThingWithComps
     {
         bombardCount = count;
         bombardCountRemaining = count;
+        ticksToForceDestroy = bombardCount * 15 + 5000;
     }
 
-    protected override void Tick()
+    protected override void TickInterval(int delta)
     {
-        base.Tick();
+        base.TickInterval(delta);
 
-        if (--ticksToForceDestroy < 0)
+        if ((ticksToForceDestroy -= delta) <= 0)
         {
             Destroy();
             return;
         }
 
-        if (bombStart)
+        if (!bombStart && (ticksToStart -= delta) <= 0)
         {
-            if (--bombInterval == 0)
-            {
-                bombInterval = 15;
-                if (curRound < targetCells.Count)
-                {
-                    DoBombard(Map, targetCells[curRound++], roundBombCount);
-                    bombardCountRemaining -= roundBombCount;
-                }
-                else if (bombardCountRemaining > 0)
-                {
-                    DoBombard(Map, targetCells.Last(), bombardCountRemaining);
-                    bombardCountRemaining = 0;
-                }
-                else
-                {
-                    Destroy();
-                }
-            }
+            ticksToStart = int.MaxValue;
+            bombStart = true;
+            return;
         }
-        else
+
+        if ((bombInterval -= delta) <= 0)
         {
-            if (--ticksToStart == 0)
+            bombInterval = 15;
+            DoBombard();
+            if (bombardCountRemaining <= 0)
             {
-                StartBomb();
+                Destroy();
             }
         }
     }
-
-    private void StartBomb()
-    {
-        Map map = Map;
-        if (map is null || bombardCount <= 0)
-        {
-            Destroy();
-            return;
-        }
-
-        HashSet<IAttackTarget> attackTargets = map.attackTargetsCache.TargetsHostileToFaction(Faction.OfPlayer);
-
-        if (attackTargets.NullOrEmpty())
-        {
-            Destroy();
-            return;
-        }
-        targetCells = attackTargets.Take(bombardCount).Where(at => at.Thing is not null).Select(at => at.Thing.PositionHeld).ToList();
-        roundBombCount = bombardCount / targetCells.Count;
-        bombStart = true;
-    }
-
 
     public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
     {
@@ -96,20 +65,44 @@ public class BombardSupportMaker : ThingWithComps
         base.Destroy(mode);
     }
 
-    private void DoBombard(Map map, IntVec3 cell, int bombCount)
+    private void DoBombard()
     {
-        if (!cell.IsValid)
+        if (CachedAttackPositions.Count == 0 || Find.TickManager.TicksGame > NextReCacheAttackPositionsTick)
+        {
+            RefreshHostileTargetCache();
+            if (CachedAttackPositions.Count == 0)
+            {
+                Destroy();
+                return;
+            }
+        }
+
+        IntVec3 targetCell = CachedAttackPositions.RandomElement();
+
+        IntVec3 bombSource = new(0, 30, 0);
+        ShootLine shootLine = new(bombSource, targetCell);
+        Projectile projectile = (Projectile)GenSpawn.Spawn(OARO_ThingDefOf.Bullet_Shell_HighExplosive, shootLine.Source, Map);
+        projectile.Launch(null, bombSource.ToVector3Shifted(), shootLine.Dest, targetCell, ProjectileHitFlags.NonTargetWorld, preventFriendlyFire: false, equipment: null);
+        bombardCountRemaining--;
+    }
+
+    private void RefreshHostileTargetCache()
+    {
+        NextReCacheAttackPositionsTick = Find.TickManager.TicksGame + 120;
+        CachedAttackPositions.Clear();
+        Map map = Map;
+        if (map is null)
         {
             return;
         }
 
-        IntVec3 bombSource = new IntVec3(0, 30, 0);
-        ShootLine shootLine = new(bombSource, cell);
-
-        for (int i = 0; i < bombardCount; i++)
+        foreach (IAttackTarget target in map.attackTargetsCache.TargetsHostileToFaction(Faction.OfPlayer))
         {
-            Projectile projectile = (Projectile)GenSpawn.Spawn(OARO_ThingDefOf.Bullet_Shell_HighExplosive, shootLine.Source, map);
-            projectile.Launch(null, bombSource.ToVector3Shifted(), shootLine.Dest, cell, ProjectileHitFlags.NonTargetWorld, preventFriendlyFire: false, equipment: null);
+            Thing thing = target.Thing;
+            if (thing is not null && thing.Spawned)
+            {
+                CachedAttackPositions.Add(thing.Position);
+            }
         }
     }
 

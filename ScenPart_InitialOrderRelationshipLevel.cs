@@ -55,6 +55,6 @@ public class ScenPart_InitialOrderRelationshipLevel : ScenPart
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref initRelation, "initRelation", RelationshipKind.Stranger);
+        Scribe_Values.Look(ref initRelation, nameof(initRelation), RelationshipKind.Stranger);
     }
 }

@@ -51,6 +51,16 @@ public class DevWindow_Branch : DevWindowBase
         listing_Rect.Label($"状态描述 WorkState: {branch.CurWorkState}");
         listing_Rect.Label($"是否空闲: {branch.IsIdleNow}");
         listing_Rect.Label($"是否外出: {branch.IsOutdoorNow}");
+        listing_Rect.Label($"效能: {branch.Potency}");
+        listing_Rect.Label($"补给: {branch.Supply.ToStringPercent("F2")}");
+        if (listing_Rect.ButtonText("补给 +10%", widthPct: 0.5f))
+        {
+            branch.Supply += 0.1f;
+        }
+        if (listing_Rect.ButtonText("补给 -10%", widthPct: 0.5f))
+        {
+            branch.Supply -= 0.1f;
+        }
 
         listing_Rect.Gap(6f);
         if (branch.BaseSite is not null)
@@ -68,6 +78,7 @@ public class DevWindow_Branch : DevWindowBase
         {
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(branch.TransformerHandler.GetDetailString()));
         }
+
 
         listing_Rect.Gap(12f);
         Text.Font = GameFont.Medium;

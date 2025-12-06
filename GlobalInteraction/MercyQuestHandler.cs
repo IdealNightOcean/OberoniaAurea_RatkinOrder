@@ -21,7 +21,7 @@ public class MercyQuestHandler : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref mercyQuestBaseChance, "mercyQuestBaseChance", 0f);
+        Scribe_Values.Look(ref mercyQuestBaseChance, nameof(mercyQuestBaseChance), 0f);
     }
 
     public void Notify_MercyQuestSucceed(Quest quest)

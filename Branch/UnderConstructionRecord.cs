@@ -22,8 +22,8 @@ public class UnderConstructionRecord<T> : IExposable where T : BranchConstructio
 
     public virtual void ExposeData()
     {
-        Scribe_Defs.Look(ref targetDef, "targetDef");
-        Scribe_Values.Look(ref durationTicks, "durationTicks", -1);
-        Scribe_Values.Look(ref CompletedTick, "CompletedTick", -1);
+        Scribe_Defs.Look(ref targetDef, nameof(targetDef));
+        Scribe_Values.Look(ref durationTicks, nameof(durationTicks), -1);
+        Scribe_Values.Look(ref CompletedTick, nameof(CompletedTick), -1);
     }
 }

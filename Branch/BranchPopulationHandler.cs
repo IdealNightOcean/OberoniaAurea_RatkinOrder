@@ -79,16 +79,16 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref population, "population", 0);
-        Scribe_Values.Look(ref yesterdayPopulation, "yesterdayPopulation", 0);
-        Scribe_Values.Look(ref yesterdayPopChange, "yesterdayChange", 0);
+        Scribe_Values.Look(ref population, nameof(population), 0);
+        Scribe_Values.Look(ref yesterdayPopulation, nameof(yesterdayPopulation), 0);
+        Scribe_Values.Look(ref yesterdayPopChange, nameof(yesterdayPopChange), 0);
 
-        Scribe_Values.Look(ref publicSecurity, "publicSecurity", 1f);
-        Scribe_Values.Look(ref yesterdayPublicSecurity, "yesterdayPublicSecurity", 1f);
-        Scribe_Values.Look(ref yesterdayPublicSecChange, "yesterdayPublicSecChange", 0f);
+        Scribe_Values.Look(ref publicSecurity, nameof(publicSecurity), 1f);
+        Scribe_Values.Look(ref yesterdayPublicSecurity, nameof(yesterdayPublicSecurity), 1f);
+        Scribe_Values.Look(ref yesterdayPublicSecChange, nameof(yesterdayPublicSecChange), 0f);
 
-        Scribe_Collections.Look(ref contracts, "contracts", LookMode.Deep);
-        Scribe_Values.Look(ref hasContractBuff, "hasContractBuff", defaultValue: false);
+        Scribe_Collections.Look(ref contracts, nameof(contracts), LookMode.Deep);
+        Scribe_Values.Look(ref hasContractBuff, nameof(hasContractBuff), defaultValue: false);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

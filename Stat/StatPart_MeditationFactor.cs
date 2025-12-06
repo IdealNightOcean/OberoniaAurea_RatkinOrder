@@ -15,6 +15,7 @@ public class StatPart_MeditationFactor : StatPart
         {
             return;
         }
+
         if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
         {
             return;
@@ -35,7 +36,6 @@ public class StatPart_MeditationFactor : StatPart
         {
             val += 0.25f;
         }
-
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             val += 0.25f;
@@ -44,6 +44,7 @@ public class StatPart_MeditationFactor : StatPart
         {
             val += 0.25f;
         }
+
         val += record.CurRank switch
         {
             ResidentKnightRecord.Rank.Elite => 0.1f,
@@ -54,9 +55,8 @@ public class StatPart_MeditationFactor : StatPart
 
         val += ((pawn.GetStatValue(StatDefOf.LearningRateFactor) - 1f) * 0.1f);
 
-        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.Instance.AllHasPersonalityTypes;
+        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.Instance.AllHasPersonalityTypes.Value;
         val += KnightPersonalityUtility.GetContainedPersonalities(resonatePersonality).Count() * 0.1f;
-
 
         if (OrderHallHandler.Instance.KnightJoyBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
         {
@@ -122,7 +122,7 @@ public class StatPart_MeditationFactor : StatPart
         stepChange = ((pawn.GetStatValue(StatDefOf.LearningRateFactor) - 1f) * 0.1f);
         sb.AppendLine(StatDefOf.LearningRateFactor.label + ": " + stepChange.ToStringPercentSigned("0.##"));
 
-        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.Instance.AllHasPersonalityTypes;
+        KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.Instance.AllHasPersonalityTypes.Value;
         foreach (KnightPersonality rp in KnightPersonalityUtility.GetContainedPersonalities(resonatePersonality))
         {
             sb.AppendLine("OARO_ChangeOffset_ResonatePersonality".Translate($"OARO_KnightPersonality_{rp}".Translate(), 0.1f.ToStringPercentSigned("0.##")));

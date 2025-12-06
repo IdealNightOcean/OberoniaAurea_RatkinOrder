@@ -50,8 +50,8 @@ public class BranchMedalHandler : IExposable
 
     public void ExposeData()
     {
-        Scribe_Defs.Look(ref primaryMedal, "primaryMedal");
-        Scribe_Collections.Look(ref medalRecords, "medalRecords", LookMode.Def, LookMode.Deep);
+        Scribe_Defs.Look(ref primaryMedal, nameof(primaryMedal));
+        Scribe_Collections.Look(ref medalRecords, nameof(medalRecords), LookMode.Def, LookMode.Deep);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

@@ -324,7 +324,76 @@ public static class DebugRatkinOrders
         }
     }
 
+    /// <summary>
+    /// 添加分部建筑
+    /// </summary>
+    [DebugAction(category: category,
+                 name: "添加分部建筑",
+                 displayPriority: 870,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
+    private static void AddBranchBuilding()
+    {
+        OrderBranchOptions(AddBuilding);
 
+
+        void AddBuilding(Branch branch)
+        {
+            BranchBuildingHandler buildingHandler = branch.BuildingHandler;
+            List<DebugMenuOption> buildngDefOptions = [];
+            foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefsListForReading)
+            {
+                DebugMenuOption levelOption;
+                if (buildingHandler.HasBuilding(buildingDef) || (buildingDef.isSpecial && buildingHandler.SpecialBuilding is not null))
+                {
+                    levelOption = new(label: buildingDef.label + "(No)",
+                                      mode: DebugMenuOptionMode.Action,
+                                      method: null);
+
+                }
+                else
+                {
+                    levelOption = new(label: buildingDef.label,
+                                      mode: DebugMenuOptionMode.Action,
+                                      method: () => buildingHandler.AddBuilding(buildingDef));
+                }
+                buildngDefOptions.Add(levelOption);
+            }
+            Find.WindowStack.Add(new Dialog_DebugOptionListLister(buildngDefOptions));
+        }
+    }
+
+    /// <summary>
+    /// 生成骑士团推荐信
+    /// </summary>
+    [DebugAction(category: category,
+                 name: "生成骑士团推荐信",
+                 displayPriority: 870,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
+    private static void SpawnOrderRecommendation()
+    {
+        RatkinOrderOptions(SpawnRecommendation);
+
+
+        void SpawnRecommendation(RatkinOrder ratkinOrder)
+        {
+            TargetingParameters parms = new()
+            {
+                canTargetLocations = true,
+                canTargetBuildings = false
+            };
+
+            Map map = Find.CurrentMap;
+            Find.Targeter.BeginTargeting(parms, action: delegate (LocalTargetInfo t)
+            {
+                OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
+                recommendation.SetRatkinOrder(ratkinOrder);
+                GenPlace.TryPlaceThing(recommendation, t.Cell, map, ThingPlaceMode.Near);
+                SpawnRecommendation(ratkinOrder);
+            });
+        }
+    }
 
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)
     {

@@ -15,7 +15,7 @@ public struct BranchMedalRecord : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref Count, "Count", 0);
-        Scribe_Values.Look(ref FirstGotTick, "FirstGotTick", 0);
+        Scribe_Values.Look(ref Count, nameof(Count), 0);
+        Scribe_Values.Look(ref FirstGotTick, nameof(FirstGotTick), 0);
     }
 }

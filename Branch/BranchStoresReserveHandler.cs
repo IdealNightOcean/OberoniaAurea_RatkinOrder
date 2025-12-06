@@ -27,7 +27,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref storesReserves, "storesReserves", LookMode.Deep);
+        Scribe_Collections.Look(ref storesReserves, nameof(storesReserves), LookMode.Deep);
     }
 
     internal void PostLoadInit()

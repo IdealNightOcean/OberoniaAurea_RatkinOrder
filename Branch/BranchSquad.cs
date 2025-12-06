@@ -65,10 +65,10 @@ public class BranchSquad : IExposable, ITickHourOfDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref name, "name");
+        Scribe_Values.Look(ref name, nameof(name));
 
-        Scribe_Values.Look(ref memberCount, "memberCount", 0f);
-        Scribe_Values.Look(ref commanderCount, "commanderCount", 0f);
+        Scribe_Values.Look(ref memberCount, nameof(memberCount), 0f);
+        Scribe_Values.Look(ref commanderCount, nameof(commanderCount), 0f);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

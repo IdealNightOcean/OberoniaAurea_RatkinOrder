@@ -8,10 +8,10 @@ public class UniqueIDManager : IExposable
 {
     private Dictionary<string, int> uniqueIDs = new(2)
         {
-            { "RatkinOrder", 0 },
-            { "Branch", 0 },
-            { "KnightRecord", 0 },
-            { "ResidentKnight", 0 }
+            { nameof(RatkinOrder), 0 },
+            { nameof(Branch), 0 },
+            { nameof(KnightRecord), 0 },
+            { nameof(ResidentKnightRecord), 0 }
         };
 
     private bool wasLoaded;
@@ -59,7 +59,7 @@ public class UniqueIDManager : IExposable
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref uniqueIDs, "uniqueIDs", LookMode.Value, LookMode.Value);
+        Scribe_Collections.Look(ref uniqueIDs, nameof(uniqueIDs), LookMode.Value, LookMode.Value);
         if (Scribe.mode == LoadSaveMode.LoadingVars)
         {
             wasLoaded = true;

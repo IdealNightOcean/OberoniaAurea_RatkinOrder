@@ -47,21 +47,23 @@ public static class GlobalInteractionUtility
 
     }
 
-    public static AcceptanceReport CanUpgradeResidentKnightRank(ResidentKnightRecord record, Map map, bool resultOnly = false)
+    /// <summary>
+    /// 能否提升常驻骑士阶位
+    /// </summary>
+    public static AcceptanceReport CanUpgradeResidentKnightRank(ResidentKnightRecord record, Map map, bool resultOnly)
     {
         if (record.CurRank == ResidentKnightRecord.Rank.Crown)
         {
             return resultOnly ? false : "OARO_ReachMax_ResidentKnightRank".Translate();
         }
 
-        int noAdditionalCostAcademicCeiling = record.NoAdditionalCostAcademicCeiling();
+        int noAdditionalCostAcademicCeiling = ResidentKnightRecord.GetNoAdditionalCostAcademicCeiling(record.CurRank);
         if (record.TotalAcademicLevel.Value < noAdditionalCostAcademicCeiling)
         {
             return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.ToString());
         }
-
         ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
-        RatkinOrder ratkinOrder = record.Branch.RatkinOrder;
+        RatkinOrder ratkinOrder = record.RatkinOrder;
         int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
         if (recommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < recommendationNeed)
         {
@@ -70,7 +72,7 @@ public static class GlobalInteractionUtility
         return true;
     }
 
-    public static void UpgradeResidentKnightRank(Pawn knight, ResidentKnightRecord record, Map map)
+    public static void UpgradeResidentKnightRank(ResidentKnightRecord record, Map map)
     {
         ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
         if (targetRank == record.CurRank)
@@ -85,6 +87,25 @@ public static class GlobalInteractionUtility
             RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
         }
         record.CurRank = targetRank;
+    }
+
+    public static AcceptanceReport CanPostponeResidentKnightkResignation(ResidentKnightRecord record, Map map, bool resultOnly)
+    {
+        if (record.ResignationDaysLeft >= 20)
+        {
+            return resultOnly ? false : "OARO_EnoughResignationDaysLeft".Translate(20.ToString());
+        }
+        if (RecommendationUtility.CurRecommendationOfMap(record.RatkinOrder, map) < 1)
+        {
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, record.RatkinOrder.Name);
+        }
+        return true;
+    }
+
+    public static void PostponeResidentKnightkResignation(ResidentKnightRecord record, Map map)
+    {
+        RecommendationUtility.UseRecommendationOfMap(record.RatkinOrder, map, 1);
+        record.PostponeResignation(120);
     }
 
 

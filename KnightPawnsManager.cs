@@ -24,7 +24,7 @@ public class KnightPawnsManager : IExposable
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref knights, "knights", LookMode.Reference, LookMode.Deep, ref knightKeys, ref knightValues);
+        Scribe_Collections.Look(ref knights, nameof(knights), LookMode.Reference, LookMode.Deep, ref knightKeys, ref knightValues);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             if (knights.RemoveAll(kv => kv.Value is null || kv.Value.RatkinOrder is null) > 0)

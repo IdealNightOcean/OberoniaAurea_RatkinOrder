@@ -30,9 +30,9 @@ public class BranchBuilding : IExposable
 
     public virtual void ExposeData()
     {
-        Scribe_Defs.Look(ref def, "def");
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref hasUpgraded, "hasUpgraded", defaultValue: false);
+        Scribe_Defs.Look(ref def, nameof(def));
+        Scribe_References.Look(ref branch, nameof(branch));
+        Scribe_Values.Look(ref hasUpgraded, nameof(hasUpgraded), defaultValue: false);
     }
 
     public static BranchBuilding GenerateBranchBuilding(BranchBuildingDef def, Branch branch)

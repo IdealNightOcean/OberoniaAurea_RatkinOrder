@@ -14,8 +14,8 @@ public class OrderHallHandler : IExposable
 
     public static OrderHallHandler Instance { get; private set; }
 
-    private OrderCodePedestal mainOrderCodePedestal;
-    public OrderCodePedestal MainOrderCodePedestal => mainOrderCodePedestal;
+    private Building_OrderCodePedestal mainOrderCodePedestal;
+    public Building_OrderCodePedestal MainOrderCodePedestal => mainOrderCodePedestal;
 
     [Unsaved] private Room orderHallRoom;
     [Unsaved] private int nextHallRoomCacheTick = -1;
@@ -84,10 +84,10 @@ public class OrderHallHandler : IExposable
 
     public void ExposeData()
     {
-        Scribe_References.Look(ref mainOrderCodePedestal, "mainOrderCodePedestal");
+        Scribe_References.Look(ref mainOrderCodePedestal, nameof(mainOrderCodePedestal));
     }
 
-    public bool TrySetMainPedestal(OrderCodePedestal pedestal, bool replaceCur)
+    public bool TrySetMainPedestal(Building_OrderCodePedestal pedestal, bool replaceCur)
     {
         if (pedestal is null)
         {
@@ -109,7 +109,7 @@ public class OrderHallHandler : IExposable
         return true;
     }
 
-    public bool TryUnsetMainPedestal(OrderCodePedestal pedestal)
+    public bool TryUnsetMainPedestal(Building_OrderCodePedestal pedestal)
     {
         if (pedestal is null || pedestal != mainOrderCodePedestal)
         {

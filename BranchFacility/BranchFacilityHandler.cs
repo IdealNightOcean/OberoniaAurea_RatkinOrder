@@ -46,9 +46,9 @@ public class BranchFacilityHandler : IExposable
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref facilities, "facilities", LookMode.Def, LookMode.Value);
+        Scribe_Collections.Look(ref facilities, nameof(facilities), LookMode.Def, LookMode.Value);
 
-        Scribe_Deep.Look(ref underConstructionFacility, "underConstructionFacility");
+        Scribe_Deep.Look(ref underConstructionFacility, nameof(underConstructionFacility));
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

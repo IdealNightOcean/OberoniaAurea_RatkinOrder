@@ -50,12 +50,12 @@ public class JointBranchRecord : IExposable
 
     public void ExposeData()
     {
-        Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Values.Look(ref CurInteractions, "CurInteractions", PatrolInteractionType.None);
-        Scribe_Values.Look(ref NextIncidentCheckTick, "NextIncidentCheckTick", -1);
+        Scribe_References.Look(ref Branch, nameof(Branch));
+        Scribe_Values.Look(ref CurInteractions, nameof(CurInteractions), PatrolInteractionType.None);
+        Scribe_Values.Look(ref NextIncidentCheckTick, nameof(NextIncidentCheckTick), -1);
 
-        Scribe_Values.Look(ref potencyFactor, "potencyFactor", 1f);
-        Scribe_Values.Look(ref potencyOffset, "potencyOffset", 0f);
+        Scribe_Values.Look(ref potencyFactor, nameof(potencyFactor), 1f);
+        Scribe_Values.Look(ref potencyOffset, nameof(potencyOffset), 0f);
     }
 
     public AcceptanceReport CanActiveInteraction(PatrolInteractionType interaction, Map map, bool resultOnly)

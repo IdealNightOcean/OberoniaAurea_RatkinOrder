@@ -96,13 +96,13 @@ public class BranchManager : IExposable, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref invitedBranchCreationsCount, "invitedBranchCreationsCount", 0);
+        Scribe_Values.Look(ref invitedBranchCreationsCount, nameof(invitedBranchCreationsCount), 0);
 
-        Scribe_Values.Look(ref normalDemandFulfillCount, "normalDemandFulfillCount", 0);
-        Scribe_Values.Look(ref criticalDemandFulfillCount, "criticalDemandFulfillCount", 0);
+        Scribe_Values.Look(ref normalDemandFulfillCount, nameof(normalDemandFulfillCount), 0);
+        Scribe_Values.Look(ref criticalDemandFulfillCount, nameof(criticalDemandFulfillCount), 0);
 
-        Scribe_Collections.Look(ref allBranches, "branches", LookMode.Deep, ctorArgs: [ratkinOrder, false]);
-        Scribe_Collections.Look(ref followedBranches, "followedBranches", LookMode.Reference);
+        Scribe_Collections.Look(ref allBranches, nameof(allBranches), LookMode.Deep, ctorArgs: [ratkinOrder, false]);
+        Scribe_Collections.Look(ref followedBranches, nameof(followedBranches), LookMode.Reference);
     }
 
     public void Tick()

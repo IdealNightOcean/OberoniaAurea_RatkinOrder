@@ -25,6 +25,6 @@ public class LordJob_ExitMapBestForJointPatrol : LordJob_ExitMapBest
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
+        Scribe_References.Look(ref ratkinOrder, nameof(ratkinOrder));
     }
 }

@@ -39,10 +39,10 @@ public partial class JointPatrolManager
 
         public void ExposeData()
         {
-            Scribe_Values.Look(ref TriggerTick, "TriggerTick", 0);
-            Scribe_Values.Look(ref Label, "Label");
-            Scribe_Values.Look(ref Description, "Description");
-            Scribe_References.Look(ref RelatedBranch, "RelatedBranch");
+            Scribe_Values.Look(ref TriggerTick, nameof(TriggerTick), 0);
+            Scribe_Values.Look(ref Label, nameof(Label));
+            Scribe_Values.Look(ref Description, nameof(Description));
+            Scribe_References.Look(ref RelatedBranch, nameof(RelatedBranch));
         }
     }
 }

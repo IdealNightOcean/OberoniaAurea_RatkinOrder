@@ -28,34 +28,63 @@ public class RatkinOrderSettings : ModSettings
     private Vector2 scrollPosition;
     private float viewRectHeight;
 
-    public static bool NoramlDemandShowMess = true; //普通需求刷出时显示信息
-    public static bool CriticalDemandShowMess = true; //关键需求刷出时显示信息
+    /// <summary>
+    /// 普通需求刷出时是否显示消息
+    /// </summary>
+    public static bool NoramlDemandShowMess = true;
+    /// <summary>
+    /// 关键需求刷出时显示信息
+    /// </summary>
+    public static bool CriticalDemandShowMess = true;
 
-    public static int MaxConcurrentAcceptedDemand = 2; //最多同时接取需求数
+    /// <summary>
+    /// 最多同时接取需求数
+    /// </summary>
+    public static int MaxConcurrentAcceptedDemand = 2;
 
-    public static int MaxConcurrentContractPerBranch = 5; //每个分部最多同时存在的合约
+    /// <summary>
+    /// 每个分部最多同时存在的合约
+    /// </summary>
+    public static int MaxConcurrentContractPerBranch = 5;
 
-    public static bool HasMaxLetterLimit = true; //是否启用信件上限
-    public static int MaxLetterCount = 100; //收件箱最多存在的信件数
+    /// <summary>
+    /// 是否启用信件上限
+    /// </summary>
+    public static bool HasMaxLetterLimit = true;
+    /// <summary>
+    /// 收件箱最多存储的信件数
+    /// </summary>
+    public static int MaxLetterCount = 100;
     [Unsaved] private static string maxLetterCountStr;
-    public static bool HasLetterRetentionLimit = true; //是否启用信件过期时间
-    public static int MaxLetterRetentionDays = 300; //信件最长保留时间（天）
+    /// <summary>
+    /// 是否启用信件过期时间
+    /// </summary>
+    public static bool HasLetterRetentionLimit = true;
+    /// <summary>
+    /// 信件最长保留时间（天）
+    /// </summary>
+    public static int MaxLetterRetentionDays = 300;
     [Unsaved] private static string maxLetterRetentionDaysStr;
 
-    public static int MaxAcquiredPatrolInteractionPreType = 3; //每种巡逻互动类型的最大累积次数
+    /// <summary>
+    /// 每种巡逻互动类型的最大累积次数
+    /// </summary>
+    public static int MaxAcquiredPatrolInteractionPreType = 3;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref NoramlDemandShowMess, "NoramlDemandShowMess", defaultValue: true);
-        Scribe_Values.Look(ref CriticalDemandShowMess, "CriticalDemandShowMess", defaultValue: true);
-        Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, "MaxConcurrentAcceptedDemand", 2);
-        Scribe_Values.Look(ref MaxConcurrentContractPerBranch, "MaxConcurrentContractPerBranch", 5);
+        Scribe_Values.Look(ref NoramlDemandShowMess, nameof(NoramlDemandShowMess), defaultValue: true);
+        Scribe_Values.Look(ref CriticalDemandShowMess, nameof(CriticalDemandShowMess), defaultValue: true);
+        Scribe_Values.Look(ref MaxConcurrentAcceptedDemand, nameof(MaxConcurrentAcceptedDemand), 2);
+        Scribe_Values.Look(ref MaxConcurrentContractPerBranch, nameof(MaxConcurrentContractPerBranch), 5);
 
-        Scribe_Values.Look(ref HasMaxLetterLimit, "HasMaxLetterLimit", defaultValue: true);
-        Scribe_Values.Look(ref MaxLetterCount, "MaxLetterCount", 100);
-        Scribe_Values.Look(ref HasLetterRetentionLimit, "HasLetterRetentionLimit", defaultValue: true);
-        Scribe_Values.Look(ref MaxLetterRetentionDays, "MaxLetterRetentionDays", 300);
+        Scribe_Values.Look(ref HasMaxLetterLimit, nameof(HasMaxLetterLimit), defaultValue: true);
+        Scribe_Values.Look(ref MaxLetterCount, nameof(MaxLetterCount), 100);
+        Scribe_Values.Look(ref HasLetterRetentionLimit, nameof(HasLetterRetentionLimit), defaultValue: true);
+        Scribe_Values.Look(ref MaxLetterRetentionDays, nameof(MaxLetterRetentionDays), 300);
+
+        Scribe_Values.Look(ref MaxAcquiredPatrolInteractionPreType, nameof(MaxAcquiredPatrolInteractionPreType), 3);
     }
 
     private static void Reset()
@@ -68,6 +97,8 @@ public class RatkinOrderSettings : ModSettings
         MaxLetterCount = 100;
         HasLetterRetentionLimit = true;
         MaxLetterRetentionDays = 300;
+
+        MaxAcquiredPatrolInteractionPreType = 3;
     }
 
     public void DoSettingsWindowContents(Rect inRect)
@@ -83,23 +114,25 @@ public class RatkinOrderSettings : ModSettings
         };
         listing_Rect.Begin(viewRect);
 
-        listing_Rect.CheckboxLabeled("OARO_Setting_NoramlDemandShowMess".Translate(), ref NoramlDemandShowMess);
-        listing_Rect.CheckboxLabeled("OARO_CriticalDemandShowMess".Translate(), ref CriticalDemandShowMess);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{NoramlDemandShowMess}".Translate(), ref NoramlDemandShowMess);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{CriticalDemandShowMess}".Translate(), ref CriticalDemandShowMess);
 
-        MaxConcurrentAcceptedDemand = (int)listing_Rect.SliderLabeled("OARO_MaxConcurrentAcceptedDemand".Translate(MaxConcurrentAcceptedDemand.ToString()), MaxConcurrentAcceptedDemand, 1f, 20f);
-        MaxConcurrentContractPerBranch = (int)listing_Rect.SliderLabeled("OARO_MaxConcurrentContractPerBranch".Translate(MaxConcurrentContractPerBranch.ToString()), MaxConcurrentContractPerBranch, 1f, 20f);
+        MaxConcurrentAcceptedDemand = (int)listing_Rect.SliderLabeled($"OARO_Setting_{MaxConcurrentAcceptedDemand}".Translate(MaxConcurrentAcceptedDemand.ToString()), MaxConcurrentAcceptedDemand, 1f, 20f);
+        MaxConcurrentContractPerBranch = (int)listing_Rect.SliderLabeled($"OARO_Setting_{MaxConcurrentContractPerBranch}".Translate(MaxConcurrentContractPerBranch.ToString()), MaxConcurrentContractPerBranch, 1f, 20f);
 
         listing_Rect.CheckboxLabeled("OARO_HasMaxLetterLimit".Translate(), ref HasMaxLetterLimit);
         if (HasMaxLetterLimit)
         {
-            listing_Rect.TextFieldNumericLabeled(label: "OARO_MaxLetterCount".Translate(), ref MaxLetterCount, ref maxLetterCountStr, 1f, 500f);
+            listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{MaxLetterCount}".Translate(), ref MaxLetterCount, ref maxLetterCountStr, 1f, 500f);
         }
 
         listing_Rect.CheckboxLabeled("OARO_HasLetterRetentionLimit".Translate(), ref HasLetterRetentionLimit);
         if (HasLetterRetentionLimit)
         {
-            listing_Rect.TextFieldNumericLabeled(label: "OARO_MaxLetterRetentionDays".Translate(), ref MaxLetterRetentionDays, ref maxLetterRetentionDaysStr, 1f, 600f);
+            listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{MaxLetterRetentionDays}".Translate(), ref MaxLetterRetentionDays, ref maxLetterRetentionDaysStr, 1f, 600f);
         }
+
+        MaxAcquiredPatrolInteractionPreType = (int)listing_Rect.SliderLabeled($"OARO_Setting_{MaxAcquiredPatrolInteractionPreType}".Translate(MaxAcquiredPatrolInteractionPreType.ToString()), MaxAcquiredPatrolInteractionPreType, 1f, 20f);
 
         if (listing_Rect.ButtonText("OAFrame_Reset".Translate()))
         {

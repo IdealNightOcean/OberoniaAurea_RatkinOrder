@@ -57,16 +57,16 @@ public class EsteemHandler : IExposable, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref esteem, "esteem", 0);
+        Scribe_Values.Look(ref esteem, nameof(esteem), 0);
 
-        Scribe_Values.Look(ref lastEsteemChange, "lastEsteemChange", 0);
-        Scribe_Values.Look(ref lastEsteemChangeReason, "lastEsteemChangeReason", string.Empty);
+        Scribe_Values.Look(ref lastEsteemChange, nameof(lastEsteemChange), 0);
+        Scribe_Values.Look(ref lastEsteemChangeReason, nameof(lastEsteemChangeReason), string.Empty);
 
-        Scribe_Values.Look(ref relationship, "relationship", RelationshipKind.Stranger);
-        Scribe_Values.Look(ref lastRelationshipChangeTick, "lastRelationshipChangeTick", -1);
-        Scribe_Values.Look(ref lastRelationshipChangeReason, "lastRelationshipChangeReason", string.Empty);
+        Scribe_Values.Look(ref relationship, nameof(relationship), RelationshipKind.Stranger);
+        Scribe_Values.Look(ref lastRelationshipChangeTick, nameof(lastRelationshipChangeTick), -1);
+        Scribe_Values.Look(ref lastRelationshipChangeReason, nameof(lastRelationshipChangeReason), string.Empty);
 
-        Scribe_Values.Look(ref totalRecommendation, "totalRecommendation", 0);
+        Scribe_Values.Look(ref totalRecommendation, nameof(totalRecommendation), 0);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

@@ -225,7 +225,7 @@ public static class OARO_WindowUtility
         reusedRect = new(squadNameRect.xMax - 40f, squadNameRect.yMax + 4f, 30f, 30f);
         DrawBranchStateIcon(reusedRect, branch, expand: false);
 
-        reusedRect = CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 40f, 20f);
+        reusedRect = CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 60f, 20f);
         string workState = branch.CurWorkState;
         if (Text.CalcSize(workState).x < 40f)
         {
@@ -249,13 +249,7 @@ public static class OARO_WindowUtility
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
         Widgets.Label(reusedRect, "OARO_BranchPotencyShortInfo".Translate(branch.Potency.ToString("0.##")));
         reusedRect = new(textX, reusedRect.yMax, rightRect.width, 29f);
-        string supplyState = "OARO_BranchSupplyState".Translate() + "  ";
-        supplyState += branch.Supply switch
-        {
-            < 0.2f => "OARO_BranchSupply_Lack".Translate().Colorize(ColorLibrary.Orange),
-            < 0.8f => "OARO_BranchSupply_Just".Translate().Colorize(Color.yellow),
-            _ => "OARO_BranchSupply_Enough".Translate().Colorize(Color.green),
-        };
+        string supplyState = "OARO_BranchSupplyState".Translate() + "  " + branch.SupplyState;
         Widgets.Label(reusedRect, supplyState);
 
         Text.Anchor = preAnchor;

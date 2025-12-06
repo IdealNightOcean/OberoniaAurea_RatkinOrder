@@ -51,11 +51,11 @@ public class BranchContract : IExposable
 
     public void ExposeData()
     {
-        Scribe_Defs.Look(ref def, "def");
-        Scribe_Values.Look(ref requestCount, "requestCount", 0);
-        Scribe_Values.Look(ref requestReason, "requestReason", string.Empty);
-        Scribe_Values.Look(ref curState, "curState", ContractState.Invalid);
-        Scribe_Values.Look(ref expirationTick, "expirationTick", -1);
+        Scribe_Defs.Look(ref def, nameof(def));
+        Scribe_Values.Look(ref requestCount, nameof(requestCount), 0);
+        Scribe_Values.Look(ref requestReason, nameof(requestReason), string.Empty);
+        Scribe_Values.Look(ref curState, nameof(curState), ContractState.Invalid);
+        Scribe_Values.Look(ref expirationTick, nameof(expirationTick), -1);
     }
 
     public void PostInit(Branch branch)

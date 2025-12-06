@@ -61,10 +61,10 @@ public class SpecialLetterManager : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref curYear, "curYear", 2025);
+        Scribe_Values.Look(ref curYear, nameof(curYear), 2025);
 
-        Scribe_Collections.Look(ref recievedSpecialLetters, "recievedSpecialLetters", LookMode.Def);
-        Scribe_Collections.Look(ref recievedCertainDateLetters, "recievedCertainDateLetters", LookMode.Def);
+        Scribe_Collections.Look(ref recievedSpecialLetters, nameof(recievedSpecialLetters), LookMode.Def);
+        Scribe_Collections.Look(ref recievedCertainDateLetters, nameof(recievedCertainDateLetters), LookMode.Def);
 
         if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
         {

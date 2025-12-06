@@ -6,8 +6,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestroyed
 {
-    [Unsaved] public List<Branch> BranchesInRadius;
-    [Unsaved] private int nextCacheTick = -1;
+    public List<Branch> BranchesInRadius { get; set; }
+    private int NextCacheTick { get; set; } = -1;
 
     public MapComponent_RatkinOrder(Map map) : base(map) { }
 
@@ -25,9 +25,9 @@ public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestroyed
 
     public override void MapComponentTick()
     {
-        if (Find.TickManager.TicksGame > nextCacheTick)
+        if (Find.TickManager.TicksGame > NextCacheTick)
         {
-            nextCacheTick = Find.TickManager.TicksGame + 60000;
+            NextCacheTick = Find.TickManager.TicksGame + 60000;
             if (map.IsPlayerHome)
             {
                 BranchesInRadius = BranchUtility.GetAllAffectedBranch(map.Tile).ToList();

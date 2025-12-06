@@ -60,10 +60,10 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref noramlBuildings, "noramlBuildings", LookMode.Deep);
-        Scribe_Deep.Look(ref specialBuilding, "specialBuilding");
+        Scribe_Collections.Look(ref noramlBuildings, nameof(noramlBuildings), LookMode.Deep);
+        Scribe_Deep.Look(ref specialBuilding, nameof(specialBuilding));
 
-        Scribe_Deep.Look(ref underConstructionBuilding, "underConstructionBuilding");
+        Scribe_Deep.Look(ref underConstructionBuilding, nameof(underConstructionBuilding));
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

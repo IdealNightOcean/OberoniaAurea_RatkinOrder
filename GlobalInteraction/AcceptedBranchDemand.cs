@@ -41,7 +41,7 @@ public class AcceptedBranchDemand : IExposable
 
     public void ExposeData()
     {
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref isCritical, "isCritical", defaultValue: false);
+        Scribe_References.Look(ref branch, nameof(branch));
+        Scribe_Values.Look(ref isCritical, nameof(isCritical), defaultValue: false);
     }
 }

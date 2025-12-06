@@ -33,7 +33,7 @@ public class OrderLetter_SimpleAttachments : OrderLetter
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Collections.Look(ref Attachments, "Attachments", LookMode.Deep);
+        Scribe_Collections.Look(ref Attachments, nameof(Attachments), LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             Attachments?.RemoveAll(t => t is null);

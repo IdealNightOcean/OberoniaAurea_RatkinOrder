@@ -13,6 +13,7 @@ public static class OrderDefDataBase
     private static readonly Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> knightAcademicByPersonality = [];
 
     private static readonly Dictionary<ThingDef, KnightPersonality> joyBuildingToKnightPersonality = [];
+    private static readonly Dictionary<KnightPersonality, List<ThingDef>> knightPersonalityToJoyBuilding = [];
 
 
     public static void ClearStaticCache()
@@ -20,11 +21,16 @@ public static class OrderDefDataBase
         mercyQuestsList.Clear();
         knightAcademicByPersonality.Clear();
         joyBuildingToKnightPersonality.Clear();
+        knightPersonalityToJoyBuilding.Clear();
     }
 
     public static bool GetKnightPersonalityForJoyBuilding(ThingDef thingDef, out KnightPersonality personality)
     {
         return joyBuildingToKnightPersonality.TryGetValue(thingDef, out personality);
+    }
+    public static bool GetJoyBuildingForKnightPersonality(KnightPersonality personality, out List<ThingDef> joyBuildings)
+    {
+        return knightPersonalityToJoyBuilding.TryGetValue(personality, out joyBuildings);
     }
 
     public static ResidentKnightAcademicDef GetRandomKnightAcademicOfPersonality(KnightPersonality personality)
@@ -57,7 +63,16 @@ public static class OrderDefDataBase
             Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
             return;
         }
+
         joyBuildingToKnightPersonality[buildingDef] = personality;
+        if (knightPersonalityToJoyBuilding.TryGetValue(personality, out List<ThingDef> buildings))
+        {
+            buildings.Add(buildingDef);
+        }
+        else
+        {
+            knightPersonalityToJoyBuilding.Add(personality, [buildingDef]);
+        }
     }
 
     public static void AddKnightAcademicByPersonality(KnightPersonality personality, ResidentKnightAcademicDef academicDef)

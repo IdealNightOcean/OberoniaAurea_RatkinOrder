@@ -61,10 +61,10 @@ public class BranchDemand : IExposable
 
     public virtual void ExposeData()
     {
-        Scribe_Defs.Look(ref def, "def");
-        Scribe_Values.Look(ref curState, "curState", DemandState.Invalid);
-        Scribe_References.Look(ref relatedQuest, "relatedQuest");
-        Scribe_Values.Look(ref expirationTick, "expirationTick", -1);
+        Scribe_Defs.Look(ref def, nameof(def));
+        Scribe_Values.Look(ref curState, nameof(curState), DemandState.Invalid);
+        Scribe_References.Look(ref relatedQuest, nameof(relatedQuest));
+        Scribe_Values.Look(ref expirationTick, nameof(expirationTick), -1);
     }
 
     public virtual void PostInit(Branch branch)

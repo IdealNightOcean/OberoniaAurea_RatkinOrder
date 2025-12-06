@@ -64,15 +64,15 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref focusedTaskType, "focusedTaskType", BranchTaskType.General);
-        Scribe_Values.Look(ref curRadicalismDegree, "curRadicalismDegree", RadicalismDegree.Standard);
+        Scribe_Values.Look(ref focusedTaskType, nameof(focusedTaskType), BranchTaskType.General);
+        Scribe_Values.Look(ref curRadicalismDegree, nameof(curRadicalismDegree), RadicalismDegree.Standard);
 
-        Scribe_Deep.Look(ref curTask, "curTask");
-        Scribe_Values.Look(ref restEndTick, "squadRestEndTick", -1);
+        Scribe_Deep.Look(ref curTask, nameof(curTask));
+        Scribe_Values.Look(ref restEndTick, nameof(restEndTick), -1);
 
-        Scribe_Defs.Look(ref autoTargetTask, "autoTargetTask");
-        Scribe_Values.Look(ref autoStartFailCount, "autoStartFailCount", 0);
-        Scribe_Values.Look(ref autoStartTaskChance, "autoStartTaskChance", 0f);
+        Scribe_Defs.Look(ref autoTargetTask, nameof(autoTargetTask));
+        Scribe_Values.Look(ref autoStartFailCount, nameof(autoStartFailCount), 0);
+        Scribe_Values.Look(ref autoStartTaskChance, nameof(autoStartTaskChance), 0f);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

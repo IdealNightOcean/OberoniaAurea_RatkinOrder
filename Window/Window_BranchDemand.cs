@@ -38,24 +38,20 @@ public class Window_BranchDemand : OrderWindowBase
     private BranchDemand SelDemand { get; set; }
     private string SelFullDesc { get; set; } = string.Empty;
     private AcceptanceReport SelAcceptance { get; set; }
-    private QuestPart_CliquesManager selDemandCliqueManager;
-    private QuestPart_CliquesManager SelDemandCliqueManager
-    {
-        get
-        {
-            if (SelDemand is null || !SelDemand.IsOngoing || SelDemand is not BranchDemand_Critical)
-            {
-                return null;
-            }
-            if (selDemandCliqueManager is null)
-            {
-                QuestPart_CliquesManager.TryGetCliquesManager(SelDemand.RelatedQuest, addPartIfMiss: false, out selDemandCliqueManager);
-            }
-            return selDemandCliqueManager;
-        }
-    }
+
+    private LazyMutable<QuestPart_CliquesManager> SelDemandCliqueManager { get; }
 
     private Vector2 scrollPosition_Demands;
+
+    private QuestPart_CliquesManager RefreshCliquesManager()
+    {
+        if (SelDemand is null || !SelDemand.IsOngoing || SelDemand is not BranchDemand_Critical)
+        {
+            return null;
+        }
+        QuestPart_CliquesManager.TryGetCliquesManager(SelDemand.RelatedQuest, addPartIfMiss: false, out QuestPart_CliquesManager cliqueManager);
+        return cliqueManager;
+    }
 
     public Window_BranchDemand(RatkinOrder ratkinOrder, Map map) : base()
     {
@@ -63,6 +59,7 @@ public class Window_BranchDemand : OrderWindowBase
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
         MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
+        SelDemandCliqueManager = new(refreshFunc: RefreshCliquesManager);
 
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
         for (int i = 0; i < allBranches.Count; i++)
@@ -397,7 +394,7 @@ public class Window_BranchDemand : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - (163f + 2f), 354f, 2f);
         GUI.DrawTexture(reusedRect, rightCuttingLine);
 
-        QuestPart_CliquesManager cliqueManager = SelDemandCliqueManager;
+        QuestPart_CliquesManager cliqueManager = SelDemandCliqueManager.Value;
         Rect cliqueRect = new(inRect.x + 50f, inRect.yMax - (32f + 114f), 146f, 146f);
         int column = 0;
         foreach (QuestClique clique in cliqueManager.AllCliques.Values)
@@ -456,7 +453,7 @@ public class Window_BranchDemand : OrderWindowBase
         SelCritical = false;
         SelDemand = null;
         SelFullDesc = string.Empty;
-        selDemandCliqueManager = null;
+        SelDemandCliqueManager.Reset();
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/BranchDemandWin/OARO_MainBackground");

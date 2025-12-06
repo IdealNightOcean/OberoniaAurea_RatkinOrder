@@ -1,5 +1,5 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld.QuestGen;
+﻿using RimWorld;
+using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -49,14 +49,41 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
     protected override void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
         int recommendationNeed = GetRecommendationNeedCount(ratkinOrder);
-        OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_InviteResidentKnight_Confirm".Translate(recommendationNeed.ToString()),
             ratkinOrder: ratkinOrder,
             acceptAction: () => base.ApplyInteraction(ratkinOrder, map));
+
+        Find.WindowStack.Add(nodeTree);
     }
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
+        Branch branch = ratkinOrder.BranchManager.AllBranches.Where(b => b.IsBranchOfType(Branch.BranchType.Friendly)).RandomElementWithFallback(null);
+        branch ??= ratkinOrder.BranchManager.AllBranches.Where(b => b.IsBranchOfType(Branch.BranchType.Honor)).RandomElementWithFallback(null);
+        branch ??= ratkinOrder.BranchManager.AllBranches.RandomElementWithFallback(null);
+
+        if (branch is null)
+        {
+            return (false, true);
+        }
+
+        KnightRecord knightRecord = new(ratkinOrder, branch, isCombatant: true, isCommander: false);
+        Pawn knight = KnightGenerateUtility.GenerateKnight(OARO_PawnKindDefOf.RatkinKnight, knightRecord, map.Tile);
+        IncidentParms parms = new()
+        {
+            target = map,
+            faction = ratkinOrder.Faction
+        };
+        if (!ModUtility.TryMakePawnArrival([knight], parms, PawnsArrivalModeDefOf.EdgeDrop, joinPlayer: true))
+        {
+            return (false, true);
+        }
+
+        ResidentKnightsManager.Instance.AddResidentKnight(knight, knightRecord);
+        return (true, true);
+
+        /*
         Slate slate = new();
         slate.SetBasicOrderSlateVar(ratkinOrder);
         slate.Set("map", map);
@@ -72,5 +99,6 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
             return (true, true);
         }
         return (false, true);
+        */
     }
 }

@@ -25,9 +25,9 @@ public class OrderFundEvent : IExposable
 
     public void ExposeData()
     {
-        Scribe_Defs.Look(ref Def, "Def");
-        Scribe_Values.Look(ref TodayChange, "TodayChange", 0f);
-        Scribe_Values.Look(ref DaysLeft, "DaysLeft", 1);
+        Scribe_Defs.Look(ref Def, nameof(Def));
+        Scribe_Values.Look(ref TodayChange, nameof(TodayChange), 0f);
+        Scribe_Values.Look(ref DaysLeft, nameof(DaysLeft), 1);
     }
 
     public void DayPassed()

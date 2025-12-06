@@ -33,11 +33,11 @@ public class AroundKnightGroup : IExposable
 
     public void ExposeData()
     {
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref MemberCount, "MemberCount", 0);
-        Scribe_Values.Look(ref TravelTicks, "TravelTicks", 0);
-        Scribe_Values.Look(ref DaysToExpired, "DaysToExpired", 0);
-        Scribe_Values.Look(ref CurBusyLevel, "CurBusyLevel", BusyLevel.Busy);
+        Scribe_References.Look(ref branch, nameof(branch));
+        Scribe_Values.Look(ref MemberCount, nameof(MemberCount), 0);
+        Scribe_Values.Look(ref TravelTicks, nameof(TravelTicks), 0);
+        Scribe_Values.Look(ref DaysToExpired, nameof(DaysToExpired), 0);
+        Scribe_Values.Look(ref CurBusyLevel, nameof(CurBusyLevel), BusyLevel.Busy);
     }
 
     public override string ToString()

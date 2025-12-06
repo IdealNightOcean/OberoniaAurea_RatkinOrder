@@ -62,7 +62,6 @@ public class Window_BranchTask : OrderWindowBase
 
         if (ShowDetailDrawer is not null)
         {
-            ShowDetailDrawer.ShowDetail = false;
             ShowDetailDrawer.ClearCache();
         }
     }
@@ -534,7 +533,7 @@ public class Window_BranchTask : OrderWindowBase
 
         private JointPatrolManager JointPatrolManager => Branch.RatkinOrder.JointPatrolManager;
 
-        public bool ShowDetail { get; set; }
+        private bool ShowDetail { get; set; }
 
         private LazyMutable<AcceptanceReport> ChangeRadicalismDegreeAcceptance { get; }
         private LazyMutable<AcceptanceReport> ChangeFocusedTaskTypeAcceptance { get; }

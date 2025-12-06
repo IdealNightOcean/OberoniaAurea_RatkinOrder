@@ -77,23 +77,23 @@ public class RatkinOrder : IExposable, ILoadReferenceable
         branchManager = new BranchManager(this);
         jointPatrolManager = new JointPatrolManager(this);
 
-        loadID = UniqueIDManager.GetUniqueID("RatkinOrder");
+        loadID = UniqueIDManager.GetUniqueID(nameof(RatkinOrder));
     }
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref loadID, "loadID", -1);
-        Scribe_Values.Look(ref curYearPassed, "curYearPassed", -1);
-        Scribe_Defs.Look(ref def, "def");
-        Scribe_References.Look(ref faction, "faction");
-        Scribe_Values.Look(ref name, "name");
+        Scribe_Values.Look(ref loadID, nameof(loadID), -1);
+        Scribe_Values.Look(ref curYearPassed, nameof(curYearPassed), -1);
+        Scribe_Defs.Look(ref def, nameof(def));
+        Scribe_References.Look(ref faction, nameof(faction));
+        Scribe_Values.Look(ref name, nameof(name));
 
-        Scribe_Deep.Look(ref cooldownManager, "cooldownManager");
-        Scribe_Deep.Look(ref esteemHandler, "esteemHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref fundHandler, "fundHandler", ctorArgs: this);
-        Scribe_Deep.Look(ref reformationManager, "reformationManager", ctorArgs: this);
-        Scribe_Deep.Look(ref branchManager, "branchManager", ctorArgs: this);
-        Scribe_Deep.Look(ref jointPatrolManager, "jointPatrolManager", ctorArgs: this);
+        Scribe_Deep.Look(ref cooldownManager, nameof(cooldownManager));
+        Scribe_Deep.Look(ref esteemHandler, nameof(esteemHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref fundHandler, nameof(fundHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref reformationManager, nameof(reformationManager), ctorArgs: this);
+        Scribe_Deep.Look(ref branchManager, nameof(branchManager), ctorArgs: this);
+        Scribe_Deep.Look(ref jointPatrolManager, nameof(jointPatrolManager), ctorArgs: this);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Order(this));

@@ -1,3 +1,4 @@
+using NightOcean;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -11,11 +12,13 @@ public class BranchInfoUICache : BranchSummaryUICache
 
     public int DailyPopulationGrowth_Bottom { get; set; }
     public int DailyPopulationGrowth_Ceiling { get; set; }
-    private string dailyPopulationGrowthExplanation;
-    public string DailyPopulationGrowthExplanation => dailyPopulationGrowthExplanation ??= GetDailyPopulationGrowthExplanation();
+
+    public LazyMutable<string> DailyPopulationGrowthExplanation { get; }
 
     public BranchInfoUICache(Branch branch, Map map) : base(branch, map)
     {
+        DailyPopulationGrowthExplanation = new(refreshFunc: GetDailyPopulationGrowthExplanation);
+
         PopulationCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
         BuildingCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling);
 

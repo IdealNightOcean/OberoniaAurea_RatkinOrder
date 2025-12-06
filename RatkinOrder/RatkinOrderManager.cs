@@ -21,7 +21,7 @@ public class RatkinOrderManager : IExposable
     public static void ClearStaticCache() => Instance = null;
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref allRatkinOrders, "allRatkinOrders", LookMode.Deep);
+        Scribe_Collections.Look(ref allRatkinOrders, nameof(allRatkinOrders), LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             PostLoadInit();

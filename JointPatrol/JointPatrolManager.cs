@@ -154,26 +154,26 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref curState, "curState", PatrolState.Invalid);
+        Scribe_Values.Look(ref curState, nameof(curState), PatrolState.Invalid);
 
-        Scribe_Values.Look(ref tickToNextStage, "tickToNextStage", 1800000);
+        Scribe_Values.Look(ref tickToNextStage, nameof(tickToNextStage), 1800000);
 
-        Scribe_Values.Look(ref patrolLevel, "CurPatrolType", PatrolLevel.Popedom);
-        Scribe_Values.Look(ref burdenCount, "burdenSquadCount", 0);
-        Scribe_Values.Look(ref sacrificeCount, "sacrificeCount", 0);
+        Scribe_Values.Look(ref patrolLevel, nameof(patrolLevel), PatrolLevel.Popedom);
+        Scribe_Values.Look(ref burdenCount, nameof(burdenCount), 0);
+        Scribe_Values.Look(ref sacrificeCount, nameof(sacrificeCount), 0);
 
-        Scribe_Values.Look(ref curHelpPolicy, "curHelpPolicy", HelpPolicy.None);
-        Scribe_Values.Look(ref curHelpCount, "curHelpCount", 0);
-        Scribe_Values.Look(ref nextHelpCheckTick, "nextHelpCheckTick", -1);
+        Scribe_Values.Look(ref curHelpPolicy, nameof(curHelpPolicy), HelpPolicy.None);
+        Scribe_Values.Look(ref curHelpCount, nameof(curHelpCount), 0);
+        Scribe_Values.Look(ref nextHelpCheckTick, nameof(nextHelpCheckTick), -1);
 
-        Scribe_Values.Look(ref completionSummary, "completionSummary", string.Empty);
+        Scribe_Values.Look(ref completionSummary, nameof(completionSummary), string.Empty);
 
-        Scribe_Collections.Look(ref participants, "participants", LookMode.Deep);
-        Scribe_Collections.Look(ref patrolInteractionAcquired, "patrolInteractionAcquired", LookMode.Value, LookMode.Value);
-        Scribe_Collections.Look(ref participatingResidentKnights, "participatingResidentKnights", LookMode.Reference);
-        Scribe_Collections.Look(ref interactionRecords, "interactionRecords", LookMode.Deep);
+        Scribe_Collections.Look(ref participants, nameof(participants), LookMode.Deep);
+        Scribe_Collections.Look(ref patrolInteractionAcquired, nameof(patrolInteractionAcquired), LookMode.Value, LookMode.Value);
+        Scribe_Collections.Look(ref participatingResidentKnights, nameof(participatingResidentKnights), LookMode.Reference);
+        Scribe_Collections.Look(ref interactionRecords, nameof(interactionRecords), LookMode.Deep);
 
-        Scribe_Deep.Look(ref innerContainer, "innerContainer");
+        Scribe_Deep.Look(ref innerContainer, nameof(innerContainer));
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_JointPatrolManager(ratkinOrder));
@@ -360,6 +360,12 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         {
             participatingResidentKnights.Remove(record);
         }
+    }
+
+    public void OnResidentKnightRemoved(ResidentKnightRecord record)
+    {
+        participatingResidentKnights?.Remove(record);
+        innerContainer?.Remove(record.Knight);
     }
 
     public void ChangeHelpPolicy()
@@ -622,6 +628,10 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
 
         participatingResidentKnights.RemoveAll(r => !r.IsValid && !r.Knight.Spawned);
+        foreach (ResidentKnightRecord record in participatingResidentKnights)
+        {
+            record.Knight.SetFaction(record.RatkinOrder.Faction);
+        }
         if (participatingResidentKnights.Count > 0)
         {
             Dictionary<Map, List<Pawn>> lordMapDict = participatingResidentKnights.Select(r => r.Knight).GroupBy(p => p.Map).ToDictionary(g => g.Key, g => g.ToList());

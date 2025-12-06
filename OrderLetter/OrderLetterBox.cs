@@ -181,15 +181,15 @@ public class OrderLetterBox : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref autoTransNormal, "autoTransNormal", defaultValue: false);
-        Scribe_Values.Look(ref autoTransOfficial, "autoTransOfficial", defaultValue: true);
-        Scribe_Values.Look(ref autoTransUrgent, "autoTransUrgent", defaultValue: true);
+        Scribe_Values.Look(ref autoTransNormal, nameof(autoTransNormal), defaultValue: false);
+        Scribe_Values.Look(ref autoTransOfficial, nameof(autoTransOfficial), defaultValue: true);
+        Scribe_Values.Look(ref autoTransUrgent, nameof(autoTransUrgent), defaultValue: true);
 
-        Scribe_Deep.Look(ref specialLetterManager, "specialLetterManager");
+        Scribe_Deep.Look(ref specialLetterManager, nameof(specialLetterManager));
 
-        Scribe_Collections.Look(ref delayLetters, "delayLetters", LookMode.Deep);
-        Scribe_Collections.Look(ref unreadLetters, "unreadLetters", LookMode.Deep);
-        Scribe_Collections.Look(ref archivedLetters, "archivedLetters", LookMode.Deep);
+        Scribe_Collections.Look(ref delayLetters, nameof(delayLetters), LookMode.Deep);
+        Scribe_Collections.Look(ref unreadLetters, nameof(unreadLetters), LookMode.Deep);
+        Scribe_Collections.Look(ref archivedLetters, nameof(archivedLetters), LookMode.Deep);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {

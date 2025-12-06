@@ -43,8 +43,8 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
 
     public void ExposeData()
     {
-        Scribe_Deep.Look(ref residentPawns, "residents");
-        Scribe_Collections.Look(ref residentRecords, "residentRecords", LookMode.Def, LookMode.Deep);
+        Scribe_Deep.Look(ref residentPawns, nameof(residentPawns));
+        Scribe_Collections.Look(ref residentRecords, nameof(residentRecords), LookMode.Def, LookMode.Deep);
     }
 
     internal void PostBranchGenerated() { }

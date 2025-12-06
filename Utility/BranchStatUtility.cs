@@ -9,13 +9,17 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class BranchStatUtility
 {
-    public static string GetStatModifyExplanationSet(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
+    public static string GetStatModifyExplanationStr(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
     {
         return GetStatModifyExplanation(branch, statDef, baseValueOverride, showResultValue).ToString();
     }
 
     public static StringBuilder GetStatModifyExplanation(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
     {
+        if (branch is null || statDef is null)
+        {
+            return new StringBuilder(string.Empty);
+        }
         StringBuilder explanation = new(256);
         try
         {

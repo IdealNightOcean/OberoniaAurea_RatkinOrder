@@ -36,11 +36,8 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
     public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnightRecord> RolesToKnights => RolesToKnights;
 
-    [Unsaved] private LazyMutable<KnightPersonality> allHasPersonalityTypes;
-    public KnightPersonality AllHasPersonalityTypes => allHasPersonalityTypes.Value;
-
-    [Unsaved] private LazyMutable<int> instructorKnightsCount;
-    public int InstructorKnightsCount => instructorKnightsCount.Value;
+    public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
+    public LazyMutable<int> InstructorKnightsCount { get; }
 
     [Unsaved] private readonly Dictionary<StatDef, float> statOffsets = [];
     [Unsaved] private readonly Dictionary<StatDef, float> statFactors = [];
@@ -71,15 +68,15 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         Instance = this;
 
         buffHediffStage = new HediffStage();
-        allHasPersonalityTypes = new(() => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
-        instructorKnightsCount = new(() => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
+        AllHasPersonalityTypes = new(() => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
+        InstructorKnightsCount = new(() => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
     }
     public static void ClearStaticCache() => Instance = null;
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref residentKnights, "residentKnights", LookMode.Reference, LookMode.Deep, ref residentKnightKeys, ref residentKnightValues);
-        Scribe_Collections.Look(ref rolesToKnights, "rolesToKnights", LookMode.Def, LookMode.Reference, ref rolesToKnightKeys, ref rolesToKnightValues);
+        Scribe_Collections.Look(ref residentKnights, nameof(residentKnights), LookMode.Reference, LookMode.Deep, ref residentKnightKeys, ref residentKnightValues);
+        Scribe_Collections.Look(ref rolesToKnights, nameof(rolesToKnights), LookMode.Def, LookMode.Reference, ref rolesToKnightKeys, ref rolesToKnightValues);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
@@ -137,14 +134,26 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public void TickDay()
     {
-        foreach (ResidentKnightRecord record in residentKnights.Values)
+        List<Pawn> toRemove = [];
+        foreach ((Pawn knight, ResidentKnightRecord record) in residentKnights)
         {
             if (record.IsValid)
             {
                 float gainPoints = record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationDailyGain);
                 record.MeditationPoints += gainPoints;
+                record.ResignationDailyCheck();
+            }
+            else
+            {
+                toRemove.Add(knight);
+            }
+
+            if (record.ResignationDaysLeft <= 0)
+            {
+                toRemove.Add(knight);
             }
         }
+
     }
 
     private void RemoveAllInvalidRecord(Predicate<ResidentKnightRecord> extraRemove = null)
@@ -157,7 +166,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
             {
                 (Pawn knight, ResidentKnightRecord record) = kv;
-                if (knight is null || record is null || record.Branch is null)
+                if (record is null || !record.Branch.IsValid())
                 {
                     pawnsToRemove.Add(knight);
                     if (record?.CurRole is not null)
@@ -172,7 +181,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
             {
                 (Pawn knight, ResidentKnightRecord record) = kv;
-                if (knight is null || record is null || record.Branch is null || extraRemove.Invoke(record))
+                if (record is null || !record.Branch.IsValid() || extraRemove.Invoke(record))
                 {
                     pawnsToRemove.Add(knight);
                     if (record?.CurRole is not null)
@@ -182,29 +191,10 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
                 }
             }
         }
-        if (rolesToKnights.RemoveAll(kv => kv.Key is null || kv.Value is null) > 0)
-        {
-            nextBuffStatRegainTick = -1;
-        }
 
-        if (pawnsToRemove.Count <= 0)
-        {
-            return;
-        }
         foreach (Pawn p in pawnsToRemove)
         {
-            residentKnights.Remove(p);
-        }
-        OnKnightChanged();
-
-        if (rolesToRemove.Count > 0)
-        {
-            foreach (ResidentKnightRoleDef role in rolesToRemove)
-            {
-                rolesToKnights.Remove(role);
-            }
-
-            nextBuffStatRegainTick = -1;
+            RemoveResidentKnight(p);
         }
     }
 
@@ -221,13 +211,12 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    public void AddResidentKnight(Pawn pawn, Branch branch)
+    public void AddResidentKnight(Pawn pawn, KnightRecord knightRecord)
     {
         if (!residentKnights.ContainsKey(pawn))
         {
-            residentKnights.Add(pawn, new ResidentKnightRecord(pawn, branch));
-            pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_ResidentKnight);
-            OnKnightChanged();
+            residentKnights.Add(pawn, new ResidentKnightRecord(pawn, knightRecord));
+            OnKnightsChanged();
         }
     }
 
@@ -238,13 +227,14 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             return;
         }
         residentKnights.Remove(pawn);
-        pawn.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_ResidentKnight);
         if (record.CurRole is not null)
         {
             rolesToKnights.Remove(record.CurRole);
             nextBuffStatRegainTick = -1;
         }
-        OnKnightChanged();
+
+        record.PostRemoved();
+        OnKnightsChanged();
     }
 
     public bool TrySetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
@@ -317,10 +307,10 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         return false;
     }
 
-    private void OnKnightChanged()
+    private void OnKnightsChanged()
     {
-        allHasPersonalityTypes.MarkDirty();
-        instructorKnightsCount.MarkDirty();
+        AllHasPersonalityTypes.MarkDirty();
+        InstructorKnightsCount.MarkDirty();
     }
 
     private void RegainRoleBuffStat()

@@ -22,8 +22,8 @@ public class BranchDemandHandler : ITickDay, IExposable
 
     public void ExposeData()
     {
-        Scribe_Deep.Look(ref normalDemand, "normalDemand");
-        Scribe_Deep.Look(ref criticalDemand, "criticalDemand");
+        Scribe_Deep.Look(ref normalDemand, nameof(normalDemand));
+        Scribe_Deep.Look(ref criticalDemand, nameof(criticalDemand));
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)

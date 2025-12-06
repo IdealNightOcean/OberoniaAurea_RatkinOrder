@@ -6,14 +6,14 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Dialog_NodeTreeWithRatkinOrderInfo : Dialog_NodeTree
 {
-    private readonly RatkinOrder ratkinOrder;
+    private RatkinOrder RatkinOrder { get; }
 
     private const float RelatedRatkinOrderInfoSize = 79f;
 
     public Dialog_NodeTreeWithRatkinOrderInfo(DiaNode nodeRoot, RatkinOrder ratkinOrder, bool delayInteractivity = false, bool radioMode = false, string title = null)
         : base(nodeRoot, delayInteractivity, radioMode, title)
     {
-        this.ratkinOrder = ratkinOrder;
+        RatkinOrder = ratkinOrder;
         if (ratkinOrder is not null)
         {
             minOptionsAreaHeight = 60f;
@@ -23,10 +23,10 @@ public class Dialog_NodeTreeWithRatkinOrderInfo : Dialog_NodeTree
     public override void DoWindowContents(Rect inRect)
     {
         base.DoWindowContents(inRect);
-        if (ratkinOrder is not null)
+        if (RatkinOrder is not null)
         {
             float curY = inRect.height - RelatedRatkinOrderInfoSize;
-            DrawRelatedOrderInfo(inRect, ratkinOrder, ref curY);
+            DrawRelatedOrderInfo(inRect, RatkinOrder, ref curY);
         }
     }
 
