@@ -19,10 +19,10 @@ public class BranchInfoUICache : BranchSummaryUICache
     {
         DailyPopulationGrowthExplanation = new(refreshFunc: GetDailyPopulationGrowthExplanation);
 
-        PopulationCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling);
-        BuildingCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling);
+        PopulationCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling, immediateUpdate: true);
+        BuildingCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling, immediateUpdate: true);
 
-        float dailyPopulationGrowth = Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth);
+        float dailyPopulationGrowth = Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth, immediateUpdate: true);
         DailyPopulationGrowth_Bottom = Mathf.CeilToInt(dailyPopulationGrowth * 0.5f);
         DailyPopulationGrowth_Ceiling = Mathf.FloorToInt(dailyPopulationGrowth * 1.5f);
         if (DailyPopulationGrowth_Bottom > DailyPopulationGrowth_Ceiling)

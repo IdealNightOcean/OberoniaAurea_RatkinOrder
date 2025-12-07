@@ -13,7 +13,7 @@ public class BranchBuilding : IExposable
     public Branch Branch => branch;
     public RatkinOrder RatkinOrder => branch.RatkinOrder;
 
-    private bool hasUpgraded;
+    protected bool hasUpgraded;
     public bool HasUpgraded
     {
         get => hasUpgraded;

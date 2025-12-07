@@ -86,7 +86,10 @@ public static class ModUtility
         {
             foreach (Pawn p in pawns)
             {
-                p.SetFaction(Faction.OfPlayer);
+                if (p.Faction != Faction.OfPlayer)
+                {
+                    p.SetFaction(Faction.OfPlayer);
+                }
             }
         }
         pawnsArrivalModeDef.Worker.Arrive(pawns, arrivalParms);

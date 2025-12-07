@@ -5,15 +5,39 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class KeyLibrary_EffectTag
 {
-    public const string Propaganda = "Propaganda"; //教堂宣讲
-    public const string AdvancedPropaganda = "AdvancedPropaganda"; //高级教堂宣讲
-    public const string IntensiveTrain = "IntensiveTrain"; //强化训练
+    /// <summary>
+    /// 教堂宣讲
+    /// </summary>
+    public const string Propaganda = "Propaganda";
+    /// <summary>
+    /// 高级教堂宣讲
+    /// </summary>
+    public const string AdvancedPropaganda = "AdvancedPropaganda";
+    /// <summary>
+    /// 强化训练
+    /// </summary>
+    public const string IntensiveTrain = "IntensiveTrain";
 
-    public const string BlockSquadRecover = "BlockSquadRecover";  //禁用分队恢复
+    /// <summary>
+    /// 禁用分队自然恢复
+    /// </summary>
+    public const string BlockSquadRecover = "BlockSquadRecover";
+    /// <summary>
+    /// 购买骑士军械无CD
+    /// </summary>
+    public const string PurchaseKnightlyArmamentsNoCD = "PurchaseKnightlyArmamentsNoCD";
+    /// <summary>
+    /// 禁用部署支援
+    /// </summary>
+    public const string BlockSupport = "BlockSupport";
+    /// <summary>
+    /// 禁用炮击支援
+    /// </summary>
+    public const string BlockBombard = "BlockBombard";
 
-    public const string BlockSupport = "BlockSupport";  //禁用一般支援
-    public const string BlockBombard = "BlockBombard"; //禁用炮击支援
-
-    public const string MartialLaw = "MartialLaw"; //分部戒严
+    /// <summary>
+    /// 分部戒严
+    /// </summary>
+    public const string MartialLaw = "MartialLaw";
 
 }

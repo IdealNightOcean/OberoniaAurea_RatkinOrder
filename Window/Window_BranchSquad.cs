@@ -57,7 +57,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
 
-        BombardSupportCeiling = new(refreshFunc: () => (int)(SelBranch?.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling) ?? -1f));
+        BombardSupportCeiling = new(refreshFunc: () => (int)(SelBranch?.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling, immediateUpdate: true) ?? -1f));
         BombardSupportCeilingExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationStr(SelBranch, BranchStatDefOf.OARO_BombardSupportCeiling, showResultValue: true));
 
         SupportAcceptance = new(refreshFunc: () => BranchSupportUtility.CanCombatKnightSupport(SelBranch, Map, BranchSupportUtility.DeploymentLevel.Quarter, resultOnly: false));

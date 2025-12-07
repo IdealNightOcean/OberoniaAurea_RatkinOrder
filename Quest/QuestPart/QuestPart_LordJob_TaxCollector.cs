@@ -135,12 +135,17 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         {
             action = delegate
             {
-                //临时占位，后续应改成其他方式
+                talkWith.MapHeld.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation).RandomElementWithFallback(fallback: null)?.SplitOff(1)?.Destroy();
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode("OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith), acceptText: "Confirm".Translate())
         };
+        if (!map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, 1))
+        {
+            briberyOpt.Disable("OAFrame_NeedCountOfThing".Translate(OARO_ThingDefOf.OARO_OrderRecommendation.LabelCap, 1));
+        }
+        rootNode.options.Add(threatOpt);
 
         DiaOption treatOpt = new("OARO_TalkWithTaxCollector_Treat".Translate())
         {

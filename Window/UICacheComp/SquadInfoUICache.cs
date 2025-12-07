@@ -32,7 +32,7 @@ public class SquadInfoUICache : BranchSummaryUICache
         }
 
         CommanderCeiling = (int)branch.Squad.CommanderCeiling;
-        MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate);
+        MemberRecoveryRate = branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate, immediateUpdate: true);
     }
 
     public void ClearCache()

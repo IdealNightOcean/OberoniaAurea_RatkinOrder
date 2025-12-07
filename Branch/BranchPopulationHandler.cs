@@ -46,7 +46,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
     }
     public string PublicSecurityLabel => $"OARO_Branch_PublicSecurityLevel_{PublicSecurityLevel}".Translate();
 
-
     private List<BranchContract> contracts = [];
     public IReadOnlyList<BranchContract> Contracts => contracts;
     private bool hasContractBuff;
@@ -184,10 +183,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
         branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.ContractAddCheck, cdTicks: 5 * 60000, removeWhenExpired: false);
         int startInex = contracts.Count;
         int endIndex = ContractCeilingByPop;
-        if (startInex >= endIndex)
-        {
-            return;
-        }
 
         for (int i = startInex; i < endIndex; i++)
         {

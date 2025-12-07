@@ -85,6 +85,7 @@
     <Compile Include="BranchBuilding\BranchBuilding_Trader.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
+    <Compile Include="BranchBuilding\BranchBuilding_OrderConferenceHall.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
     <Compile Include="BranchInteraction\BranchInteractionParms.cs" />
     <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_CaravanOnly.cs" />
@@ -120,7 +121,7 @@
     <Compile Include="Components\PathedTexture2D.cs" />
     <Compile Include="DataLibrary\KeyLibrary_FormatArgName.cs" />
     <Compile Include="DefModExtension\BranchBuildingTrderSetter_Extension.cs" />
-    <Compile Include="DefModExtension\CustomizableArmament_Extension.cs" />
+    <Compile Include="DefModExtension\ThingList_Extension.cs" />
     <Compile Include="DefModExtension\JointPatrolCaravanHelp_SkillHelpExtension.cs" />
     <Compile Include="DefOf\BranchInteractionDefOf.cs" />
     <Compile Include="DefOf\BranchResidentDefOf.cs" />
@@ -136,6 +137,7 @@
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
+    <Compile Include="GlobalInteraction\ResidentKnight\Alert_ResidentKnightWillResignation.cs" />
     <Compile Include="Interface\IJointPatrolCaravanHelpSite.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_TouristAreaPatrol.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_JointHunting.cs" />
@@ -173,7 +175,7 @@
     <Compile Include="Components\TrackedFloatValue.cs" />
     <Compile Include="Components\QuestEffectTag.cs" />
     <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
-    <Compile Include="DefModExtension\KnightJoyBuilding.cs" />
+    <Compile Include="DefModExtension\ResidentKnightPreferredBuildingExtension.cs" />
     <Compile Include="DefOf\OrderReformationDefOf.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />
     <Compile Include="DefModExtension\OrderInteraction_AssistanceQuestExtension.cs" />
@@ -184,7 +186,7 @@
     <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\ResidentKnightAcademicDef.cs" />
     <Compile Include="Def\SpecialLetterDef.cs" />
-    <Compile Include="GlobalInteraction\OrderHallHandler.cs" />
+    <Compile Include="OrderHall\OrderHallHandler.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightRecord.cs" />
     <Compile Include="HarmonyPatch\HotReloadDefs_Patch.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
@@ -425,8 +427,8 @@
     <Compile Include="OrderLetter\OrderLetterBox.cs" />
     <Compile Include="Utility\OrderLetterUtility.cs" />
     <Compile Include="Window\Window_LetterBoxSetting.cs" />
-    <Compile Include="Quest\BranchDemand\QuestNode_Root_TaxCollectorCome.cs" />
-    <Compile Include="Quest\BranchDemand\QuestNode_Root_TaxCollectorTreat.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_TaxCollectorCome.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_TaxCollectorTreat.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_LordJob_TaxCollector.cs" />
     <Compile Include="Quest\BranchDemand\QuestPart_Apprentice_CheckSkill.cs" />
     <Compile Include="Quest\BranchDemand\QuestPart_Apprentice_QuizStayIntention.cs" />

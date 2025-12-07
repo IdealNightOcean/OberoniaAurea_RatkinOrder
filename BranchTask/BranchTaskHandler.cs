@@ -10,9 +10,18 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 {
     public enum RadicalismDegree
     {
-        StabilityFocused, // 维稳
-        Standard,         // 常规
-        Aggressive        // 激进
+        /// <summary>
+        /// 常规
+        /// </summary>
+        Standard,
+        /// <summary>
+        /// 维稳
+        /// </summary>
+        StabilityFocused,
+        /// <summary>
+        /// 激进
+        /// </summary>
+        Aggressive
     }
 
     [Unsaved] private readonly Branch branch;
@@ -54,7 +63,13 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
     private BranchTaskDef autoTargetTask;
     private int autoStartFailCount;
     private float autoStartTaskChance;
-    public float AutoStartTaskChance => autoStartTaskChance;
+    public float AutoStartTaskChance => autoStartTaskChance * curRadicalismDegree switch
+    {
+        RadicalismDegree.Standard => 1f,
+        RadicalismDegree.StabilityFocused => 0.5f,
+        RadicalismDegree.Aggressive => 2f,
+        _ => 2f
+    };
 
     internal BranchTaskHandler(Branch branch)
     {

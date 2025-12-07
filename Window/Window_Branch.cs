@@ -121,7 +121,6 @@ public class Window_Branch : OrderWindowBase
 
     public Window_Branch(Branch branch, Caravan caravan, Map map) : base()
     {
-
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         Map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
         Caravan = caravan;

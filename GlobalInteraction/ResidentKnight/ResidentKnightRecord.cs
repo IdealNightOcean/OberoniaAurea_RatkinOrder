@@ -51,8 +51,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
     public LazyMutable<int> TotalAcademicLevel { get; }
 
     private int residenceStartTick = -1;
-    public int ResignationDaysLeft = -1;
-    private bool hasWarnedResignation;
+    public int ResignationTick = -1;
 
     public void ExposeData()
     {
@@ -67,8 +66,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref honorAcademicLevel, nameof(honorAcademicLevel), 0);
 
         Scribe_Values.Look(ref residenceStartTick, nameof(residenceStartTick), -1);
-        Scribe_Values.Look(ref ResignationDaysLeft, nameof(ResignationDaysLeft), -1);
-        Scribe_Values.Look(ref hasWarnedResignation, nameof(hasWarnedResignation), defaultValue: false);
+        Scribe_Values.Look(ref ResignationTick, nameof(ResignationTick), -1);
     }
 
     private ResidentKnightRecord()
@@ -83,11 +81,11 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         residenceStartTick = Find.TickManager.TicksGame;
         if (RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
-            ResignationDaysLeft = 4 * 60;
+            ResignationTick = Find.TickManager.TicksGame + 4 * 60 * 60000;
         }
         else
         {
-            ResignationDaysLeft = 2 * 60;
+            ResignationTick = Find.TickManager.TicksGame + 2 * 60;
         }
 
         ResidentKnightAcademicDef def = DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => !d.isHonorAcademic).RandomElement();
@@ -100,19 +98,10 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         return $"Branch: {Branch.Name}, Rank: {CurRank}, MeditationPoints: {MeditationPoints}, Role: {CurRole} ";
     }
 
-    public void ResignationDailyCheck()
-    {
-        ResignationDaysLeft--;
-        if (!hasWarnedResignation && ResignationDaysLeft <= 15)
-        {
-            hasWarnedResignation = true;
-        }
-    }
-
     public void PostponeResignation(int postponeDays)
     {
-        ResignationDaysLeft += postponeDays;
-        hasWarnedResignation = false;
+        ResignationTick += (postponeDays * 60000);
+        ResidentKnightsManager.Instance.ShowResignationAlert.MarkDirty();
     }
 
     public static int GetNoAdditionalCostAcademicCeiling(Rank rank)

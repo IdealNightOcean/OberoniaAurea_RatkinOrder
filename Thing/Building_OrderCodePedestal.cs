@@ -13,7 +13,7 @@ public class Building_OrderCodePedestal : Building
         {
             if (BeingTransportedOnGravship)
             {
-                OrderHallHandler.Instance.OnPedestalChange();
+                OrderHallHandler.Instance.RefreshCache();
             }
             else
             {
@@ -28,7 +28,7 @@ public class Building_OrderCodePedestal : Building
         base.PostSwapMap();
         if (Spawned && IsMainPedestal)
         {
-            OrderHallHandler.Instance.OnPedestalChange();
+            OrderHallHandler.Instance.RefreshCache();
         }
     }
 
@@ -70,7 +70,7 @@ public class Building_OrderCodePedestal : Building
             {
                 defaultLabel = "OARO_CodePedestal_RecheckHallLevel".Translate(),
                 defaultDesc = "OARO_CodePedestal_RecheckHallLevelDesc".Translate(),
-                action = OrderHallHandler.Instance.OnPedestalChange
+                action = OrderHallHandler.Instance.RefreshCache
             };
             yield return command_RecheckHallLevel;
         }

@@ -50,7 +50,7 @@ public class OrderHallHandler : IExposable
         }
     }
 
-    [Unsaved] private readonly Dictionary<KnightPersonality, HashSet<ThingDef>> knightJoyBuildingDefsByPersonality = new(EnumArraryLibrary.AvailablePersonalitiesCount);
+    [Unsaved] private readonly Dictionary<KnightPersonality, HashSet<ThingDef>> preferBuildingDefsByKnightPersonality = new(EnumArraryLibrary.AvailablePersonalitiesCount);
     public IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightJoyBuildingDefsByPersonality
     {
         get
@@ -59,7 +59,7 @@ public class OrderHallHandler : IExposable
             {
                 RecacheOrderHallBuildings();
             }
-            return knightJoyBuildingDefsByPersonality;
+            return preferBuildingDefsByKnightPersonality;
         }
     }
 
@@ -73,13 +73,13 @@ public class OrderHallHandler : IExposable
     }
     public static void ClearStaticCache() => Instance = null;
 
-    public void OnPedestalChange()
+    public void RefreshCache()
     {
         academicFurnituresCount = 0;
         nextHallRoomCacheTick = -1;
         nextHallBuildingCacheTick = -1;
         orderHallLevelCache.Reset();
-        knightJoyBuildingDefsByPersonality.Clear();
+        preferBuildingDefsByKnightPersonality.Clear();
     }
 
     public void ExposeData()
@@ -105,7 +105,7 @@ public class OrderHallHandler : IExposable
         }
 
         mainOrderCodePedestal = pedestal;
-        OnPedestalChange();
+        RefreshCache();
         return true;
     }
 
@@ -117,7 +117,7 @@ public class OrderHallHandler : IExposable
         }
         mainOrderCodePedestal = null;
         Messages.Message("OARO_MainOrderCodePedestal_Unset".Translate(), MessageTypeDefOf.NeutralEvent, historical: false);
-        OnPedestalChange();
+        RefreshCache();
         return true;
     }
 
@@ -126,7 +126,7 @@ public class OrderHallHandler : IExposable
         nextHallBuildingCacheTick = Find.TickManager.TicksGame + HallBuildingsRecacheInterval;
 
         academicFurnituresCount = 0;
-        knightJoyBuildingDefsByPersonality.Clear();
+        preferBuildingDefsByKnightPersonality.Clear();
         try
         {
             Room room = OrderHallRoom;
@@ -149,18 +149,18 @@ public class OrderHallHandler : IExposable
                         academicFurnituresCount++;
                     }
 
-                    if (buildingTags.Contains("OARO_KnightJoyFurniture"))
+                    if (buildingTags.Contains("OARO_ResidentKnightPrefer"))
                     {
                         ThingDef thingDef = allThings[i].def;
-                        if (OrderDefDataBase.GetKnightPersonalityForJoyBuilding(thingDef, out KnightPersonality personality))
+                        if (OrderDefDataBase.GetKnightPersonalityForPreferredBuilding(thingDef, out KnightPersonality personality))
                         {
-                            if (knightJoyBuildingDefsByPersonality.TryGetValue(personality, out HashSet<ThingDef> defsHash))
+                            if (preferBuildingDefsByKnightPersonality.TryGetValue(personality, out HashSet<ThingDef> defsHash))
                             {
                                 defsHash.Add(thingDef);
                             }
                             else
                             {
-                                knightJoyBuildingDefsByPersonality.Add(personality, [thingDef]);
+                                preferBuildingDefsByKnightPersonality.Add(personality, [thingDef]);
                             }
                         }
                     }

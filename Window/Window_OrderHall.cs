@@ -18,6 +18,7 @@ public class Window_OrderHall : OrderWindowBase
     private Vector2 scrollPosition_Level;
     private Vector2 scrollPosition_ResidentKnight;
     private Vector2 scrollPosition_AroundGroups;
+    private Vector2 scrollPosition_PreferredBuildingsStr;
 
     private Map Map { get; }
     private int CurOrderHallLevel { get; }
@@ -28,7 +29,8 @@ public class Window_OrderHall : OrderWindowBase
     private LazyMutable<List<KeyValuePair<AroundKnightGroup, float>>> AroundKnightGroups { get; }
     private int AroundGroupTipIndex { get; set; } = -1;
     private string AroundGroupTipCache { get; set; } = string.Empty;
-    private LazyMutable<List<ResidentKnightEntryDrawer>> ResidentKnightDrawers { get; }
+    private List<ResidentKnightEntryDrawer> ResidentKnightDrawers { get; }
+    private string PreferredBuildingsStr { get; } = string.Empty;
 
     public Window_OrderHall(Map map) : base()
     {
@@ -37,35 +39,32 @@ public class Window_OrderHall : OrderWindowBase
         TopShieldTexture = new CachedTexture($"UI/OrderHall/OARO_TopShield_{CurOrderHallLevel}").Texture;
 
         BuffHediffStageExplanation = new(refreshFunc: RefreshBuffHediffStageExplanation);
-        ResidentKnightDrawers = new(refreshFunc: RefreshResidentKnightDrawers);
         AroundKnightGroups = new(refreshFunc: RefreshAroundKnightGroups);
+        PreferredBuildingsStr = GetPreferredBuildingsStr();
 
+        OrderHallHandler.Instance.RefreshCache();
+        ResidentKnightDrawers = new(ResidentKnightsManager.Instance.ResidentKnights.Count + 1);
+        foreach (ResidentKnightRecord record in ResidentKnightsManager.Instance.ResidentKnights.Values)
+        {
+            ResidentKnightDrawers.Add(new ResidentKnightEntryDrawer(this, record, Map));
+        }
         RefreshAroundKnightGroups();
-    }
-
-
-
-    public override void PreOpen()
-    {
-        base.PreOpen();
-        RefreshAroundKnightGroups();
-    }
-
-    protected override void SetInitialSizeAndPosition()
-    {
-        Vector2 initialSize = InitialSize;
-        windowRect = new Rect((UI.screenWidth - initialSize.x) / 2f, (UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
-        windowRect = windowRect.Rounded();
     }
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect reusedRect = default;
         Rect mainRect = new(37f, 49f, 1385f, 860f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(4f);
         float mainInnerRectY = mainInnerRect.yMin;
+
+        Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRect.y + 1f, 20f, 20f);
+        if (Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true))
+        {
+            Close();
+            return;
+        }
 
         float infoRectY = mainInnerRectY + 184f;
         float infoRectHeight = 591f;
@@ -152,16 +151,29 @@ public class Window_OrderHall : OrderWindowBase
 
         Rect knightViewRect = knightRect;
         knightViewRect.width = entryWidth;
-        List<ResidentKnightEntryDrawer> residentKnightDrawers = ResidentKnightDrawers.Value;
-        knightViewRect.height = (residentKnightDrawers.Count + 1) * ResidentKnightEntryDrawer.SummaryHeight + ResidentKnightEntryDrawer.DetailHeight + 10f;
+        knightViewRect.height = (ResidentKnightDrawers.Count + 1) * ResidentKnightEntryDrawer.SummaryHeight + ResidentKnightEntryDrawer.DetailHeight + 10f;
 
         Widgets.BeginScrollView(knightRect, ref scrollPosition_ResidentKnight, knightViewRect);
-        foreach (ResidentKnightEntryDrawer drawer in residentKnightDrawers)
+        foreach (ResidentKnightEntryDrawer drawer in ResidentKnightDrawers)
         {
             Vector2 entryPos = new(entryX, entryY);
             entryY += drawer.Draw(entryPos);
         }
         Widgets.EndScrollView();
+
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+
+        reusedRect = new(innerRectX, innerRectY + 462f, 245f, 120f);
+        Widgets.Label(reusedRect, "OARO_HallWin_ResidentKnightCeiling".Translate(ResidentKnightsManager.ResidentKnightCeiling.ToString()));
+
+        Text.Font = GameFont.Small;
+        reusedRect = new(innerRect.xMax - 190f, innerRectY + 462f, 190f, 24f);
+        Widgets.Label(reusedRect, "OARO_HallWin_PreferredBuildingsLabel".Translate());
+
+        Text.Font = GameFont.Tiny;
+        reusedRect = new(innerRect.xMax - 190f, reusedRect.yMax + 2f, 190f, 95f);
+        Widgets.LabelScrollable(reusedRect, PreferredBuildingsStr, ref scrollPosition_PreferredBuildingsStr);
 
         OARO_WindowUtility.ResetText();
     }
@@ -410,15 +422,6 @@ public class Window_OrderHall : OrderWindowBase
 
         return result;
     }
-    private List<ResidentKnightEntryDrawer> RefreshResidentKnightDrawers()
-    {
-        List<ResidentKnightEntryDrawer> drawers = new(ResidentKnightsManager.Instance.ResidentKnights.Count);
-        foreach (ResidentKnightRecord record in ResidentKnightsManager.Instance.ResidentKnights.Values)
-        {
-            drawers.Add(new ResidentKnightEntryDrawer(this, record, Map));
-        }
-        return drawers;
-    }
     private List<KeyValuePair<AroundKnightGroup, float>> RefreshAroundKnightGroups()
     {
         AroundGroupTipIndex = -1;
@@ -471,6 +474,30 @@ public class Window_OrderHall : OrderWindowBase
         }
     }
 
+    private string GetPreferredBuildingsStr()
+    {
+        try
+        {
+            StringBuilder sb = new(string.Empty);
+            HashSet<ThingDef> allPreferredBuildings = OrderHallUtility.GetAllResidentKnightPreferredBuildingDefs(OrderHallHandler.Instance.OrderHallRoom);
+
+            foreach (ThingDef def in OrderDefDataBase.AllResidentPreferredBuildings)
+            {
+                sb.AppendLine(def.label.Colorize(allPreferredBuildings.Contains(def) ? Color.white : Color.gray));
+            }
+            return sb.ToString();
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "get preferred buildings description",
+                typeName: nameof(Window_OrderHall),
+                methodName: nameof(GetPreferredBuildingsStr),
+                needStackTrace: true);
+            return "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
+        }
+    }
+
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/OrderHall/OARO_MainBackground");
 
     private static readonly Texture2D topRibbon = ContentFinder<Texture2D>.Get("UI/OrderHall/OARO_TopRibbon");
@@ -493,13 +520,11 @@ public class Window_OrderHall : OrderWindowBase
 
     private static readonly Texture2D bigCuttingLine = ContentFinder<Texture2D>.Get("UI/OrderHall/OARO_BigCuttingLine");
 
-
-
     private class ResidentKnightEntryDrawer
     {
         public const float Width = 426f;
         public const float SummaryHeight = 63f;
-        public const float DetailHeight = 289f;
+        public const float DetailHeight = 288f;
 
         private Vector2 scrollPosition_GenealAcademic;
 
@@ -515,7 +540,6 @@ public class Window_OrderHall : OrderWindowBase
 
         public LazyMutable<(int, int)> PreferredFurnitureCount { get; }
         public LazyMutable<string> PreferredFurnitureExplanation { get; }
-
 
         public ResidentKnightEntryDrawer(Window_OrderHall parent, ResidentKnightRecord record, Map map)
         {
@@ -568,8 +592,7 @@ public class Window_OrderHall : OrderWindowBase
             Rect reusedRect = new(tileRect.xMax - 247f, summaryInnerRectY, 247f, titleRectHeight);
             DrawRankBackGround(reusedRect);
 
-
-            reusedRect = new(tileRect.x + 8f, tileRect.y + 2f, 24f, titleRectHeight - 4f);
+            reusedRect = new(tileRect.x + 4f, tileRect.y + 1f, 24f, titleRectHeight - 2f);
             GUI.DrawTexture(reusedRect, PortraitsCache.Get(Record.Knight, reusedRect.size, Rot4.South));
 
             Text.Font = GameFont.Small;
@@ -584,7 +607,7 @@ public class Window_OrderHall : OrderWindowBase
             }
 
             reusedRect = new(summaryInnerRectX + 150f, summaryInnerRectY, 85f, titleRectHeight);
-            Widgets.Label(reusedRect, MeditationFactor.ToStringPercent().Colorize(MeditationFactor > 1f ? Color.green : ColorLibrary.RedReadable));
+            Widgets.Label(reusedRect, MeditationFactor.ToStringPercent().Colorize(MeditationFactor < 1f ? ColorLibrary.RedReadable : Color.green));
 
             reusedRect = new(summaryInnerRectX + 235f, summaryInnerRectY, 85f, titleRectHeight);
             Widgets.Label(reusedRect, Record.MeditationPoints.ToString("F0"));
@@ -635,7 +658,7 @@ public class Window_OrderHall : OrderWindowBase
             Rect inRect = new(position.x, position.y, Width, DetailHeight);
             GUI.DrawTexture(inRect, residentKnightDetail);
 
-            inRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.y, 423f, DetailHeight);
+            inRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.y, 422f, DetailHeight);
             float inRectX = inRect.xMin;
             float inRectY = inRect.yMin;
 
@@ -674,12 +697,26 @@ public class Window_OrderHall : OrderWindowBase
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, "OARO_HallWin_PreferredFurniture".Translate());
 
-            reusedRect = new(inRectX + 32f, inRectY + 126f, 256f, 20f);
+            reusedRect = new(inRectX + 32f, inRectY + 140f, 256f, 20f);
 
             Widgets.Label(reusedRect, "OARO_HallWin_ResignationDay".Translate(
                 GenDate.DateFullStringAt(
-                    absTicks: GenDate.TickGameToAbs(Find.TickManager.TicksGame + Record.ResignationDaysLeft * 60000),
+                    absTicks: GenDate.TickGameToAbs(Record.ResignationTick),
                     location: Find.WorldGrid.LongLatOf(Map.Tile))));
+            buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 264f, 71f, 22f);
+            if (OARO_WindowUtility.TextButtonImage(buttonRect, "OARO_HallWin_DismissalKnight".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
+            {
+                Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                    text: "OARO_HallWin_DismissalKnightConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN)),
+                    ratkinOrder: Record.RatkinOrder,
+                    acceptAction: delegate
+                    {
+                        ResidentKnightsManager.Instance.RemoveResidentKnight(Record.Knight);
+                        Parent.OnShowDrawerDetailChanged(this);
+                        Parent.ResidentKnightDrawers.Remove(this);
+                    });
+                Find.WindowStack.Add(nodeTree);
+            }
             buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 335f, 71f, 22f);
             if (OARO_WindowUtility.TextButtonImageDisableable(buttonRect,
                 label: "OARO_HallWin_PostponeResignation".Translate(),
@@ -691,7 +728,14 @@ public class Window_OrderHall : OrderWindowBase
                 AcceptanceReport acceptance = GlobalInteractionUtility.CanPostponeResidentKnightkResignation(Record, Map, resultOnly: false);
                 if (acceptance)
                 {
-                    SecondWindow_UpgradeRank secondWin = new(this, Record, Map);
+                    SecondWindow_UpgradeRank secondWin = new(
+                       targetRank: ResidentKnightRecord.RankOffsetBy(Record.CurRank, offset: 1),
+                       acceptAction: delegate
+                        {
+                            GlobalInteractionUtility.PostponeResidentKnightkResignation(Record, Map);
+                            OnConditionChanged();
+                        }
+                    );
                     Find.WindowStack.Add(secondWin);
                 }
                 else
@@ -708,7 +752,7 @@ public class Window_OrderHall : OrderWindowBase
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, ResonatePersonalitiesStr.Value);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, $"OARO_HallWin_KnightRank_{Record.CurRank}".Translate().Colorize(ResidentKnightRecord.GetRankColor(Record.CurRank)));
+            Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{Record.CurRank}Knight".Translate().Colorize(ResidentKnightRecord.GetRankColor(Record.CurRank)));
 
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Rect starRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMin, 18f, 18f);
@@ -719,22 +763,22 @@ public class Window_OrderHall : OrderWindowBase
             {
                 starCount++;
                 starRect = new(starRectX, starRectY, 18f, 18f);
-                starRectY += 20f;
+                starRectX += 20f;
                 GUI.DrawTexture(starRect, starWhite, ScaleMode.ScaleToFit);
             }
             while (starCount < 6 && starCount < PreferredFurnitureCount.Value.Item2)
             {
                 starCount++;
                 starRect = new(starRectX, starRectY, 18f, 18f);
-                starRectY += 20f;
+                starRectX += 20f;
                 GUI.DrawTexture(starRect, starBlack, ScaleMode.ScaleToFit);
             }
             TooltipHandler.TipRegion(reusedRect, () => PreferredFurnitureExplanation.Value, uniqueId: 59748631);
 
             Text.Anchor = TextAnchor.MiddleCenter;
-            reusedRect = new(inRectX + 260, inRectY + 150f, 80f, 20f);
+            reusedRect = new(inRectX + 260f, inRectY + 164f, 80f, 20f);
             Widgets.Label(reusedRect, "OARO_HallWin_HonorAcademic".Translate());
-            reusedRect = new(inRectX + 260, reusedRect.yMax + 2f, 80f, 20f);
+            reusedRect = new(inRectX + 260f, reusedRect.yMax + 8f, 80f, 20f);
             if (Record.HonorAcademicDef is null)
             {
                 Widgets.Label(reusedRect, "None".Translate());
@@ -743,16 +787,16 @@ public class Window_OrderHall : OrderWindowBase
             {
                 BranchHonorDef honorDef = Record.Branch.HonorDef;
                 Widgets.Label(reusedRect, Record.HonorAcademicDef.label.Colorize(honorDef.color));
-                reusedRect = new(inRectX + 320f, inRectY + 150f, 90f, 55f);
+                reusedRect = new(inRectX + 320f, inRectY + 164f, 90f, 55f);
                 GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture);
 
-                reusedRect = new(inRectX + 260, inRectY + 210f, 128f, 22f);
+                reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
                 float honorAcademicProgress = Record.HonorAcademicLevel / (float)Record.HonorAcademicDef.MaxStageLevel;
                 Widgets.FillableBar(reusedRect, honorAcademicProgress, honorDef.HonorColorTex);
             }
 
             Text.Anchor = TextAnchor.MiddleCenter;
-            reusedRect = new(inRectX + 245f, inRectY + 238f, 80f, 20f);
+            reusedRect = new(inRectX + 255, inRectY + 238f, 142f, 43f);
             if (OARO_WindowUtility.TextButtonImage(
                 butRect: reusedRect,
                 label: "OARO_HallWin_ArrangeAcademic".Translate(),
@@ -764,9 +808,9 @@ public class Window_OrderHall : OrderWindowBase
             }
 
             Text.Anchor = TextAnchor.MiddleLeft;
-            reusedRect = new(inRectX + 32f, inRectY + 150f, 256f, 20f);
+            reusedRect = new(inRectX + 32f, inRectY + 164f, 256f, 20f);
             Widgets.Label(reusedRect, "OARO_HallWin_GenealAcademic".Translate());
-            Rect academicRect = new(inRectX + 32f, inRectY + 175f, 140f, 110f);
+            Rect academicRect = Rect.MinMaxRect(inRectX + 32f, reusedRect.yMax + 8f, inRectX + (32f + 140f), inRect.yMax - 2f);
             float entryX = academicRect.xMin;
             float entryY = academicRect.yMin;
             float entryHeight = 22f;
@@ -821,22 +865,22 @@ public class Window_OrderHall : OrderWindowBase
             {
                 case ResidentKnightRecord.Rank.Regular:
                     {
-                        GUI.DrawTexture(inRect, rankBackGround_RegularS, ScaleMode.ScaleToFit);
+                        GUI.DrawTexture(inRect, rankBackGround_RegularS, ScaleMode.StretchToFill);
                         return;
                     }
                 case ResidentKnightRecord.Rank.Elite:
                     {
-                        GUI.DrawTexture(inRect, rankBackGround_EliteS, ScaleMode.ScaleToFit);
+                        GUI.DrawTexture(inRect, rankBackGround_EliteS, ScaleMode.StretchToFill);
                         return;
                     }
                 case ResidentKnightRecord.Rank.Honor:
                     {
-                        GUI.DrawTexture(inRect, rankBackGround_HonorS, ScaleMode.ScaleToFit);
+                        GUI.DrawTexture(inRect, rankBackGround_HonorS, ScaleMode.StretchToFill);
                         return;
                     }
                 case ResidentKnightRecord.Rank.Crown:
                     {
-                        GUI.DrawTexture(inRect, rankBackGround_CrownS, ScaleMode.ScaleToFit);
+                        GUI.DrawTexture(inRect, rankBackGround_CrownS, ScaleMode.StretchToFill);
                         return;
                     }
                 default: return;
@@ -866,7 +910,7 @@ public class Window_OrderHall : OrderWindowBase
 
         private (int, int) RefreshPreferredFurnitureCount()
         {
-            if (!OrderDefDataBase.GetJoyBuildingForKnightPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
+            if (!OrderDefDataBase.GetPreferredBuildingForKnightPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
             {
                 return (0, 0);
             }
@@ -879,7 +923,7 @@ public class Window_OrderHall : OrderWindowBase
 
         private string RefreshFurnitureExplanation()
         {
-            if (!OrderDefDataBase.GetJoyBuildingForKnightPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
+            if (!OrderDefDataBase.GetPreferredBuildingForKnightPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
             {
                 return string.Empty;
             }
@@ -924,19 +968,16 @@ public class Window_OrderHall : OrderWindowBase
 
     private class SecondWindow_UpgradeRank : OrderWindowBase
     {
-        private ResidentKnightEntryDrawer Parent { get; }
-        private ResidentKnightRecord Record { get; }
-        private Map Map { get; }
         private ResidentKnightRecord.Rank TargetRank { get; }
+
+        public Action AcceptAction { get; }
 
         public override Vector2 InitialSize => new(593f, 480f);
 
-        public SecondWindow_UpgradeRank(ResidentKnightEntryDrawer parent, ResidentKnightRecord record, Map map) : base()
+        public SecondWindow_UpgradeRank(ResidentKnightRecord.Rank targetRank, Action acceptAction) : base()
         {
-            Parent = parent;
-            Record = record;
-            Map = map;
-            TargetRank = ResidentKnightRecord.RankOffsetBy(Record.CurRank, offset: 1);
+            TargetRank = targetRank;
+            AcceptAction = acceptAction;
         }
 
         public override void DoWindowContents(Rect inRect)
@@ -949,16 +990,16 @@ public class Window_OrderHall : OrderWindowBase
             Text.Anchor = TextAnchor.MiddleCenter;
 
             Rect reusedRect = new(innerRectX, innerRectY + 24f, innerRect.width, 32f);
-            Widgets.Label(reusedRect, $"OARO_HallWin_KnightRank_{TargetRank}".Translate());
+            Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}".Translate());
 
             Text.Font = GameFont.Small;
             reusedRect = new(innerRectX + 100f, innerRectY + 60f, innerRect.width - 200f, 64f);
-            Widgets.Label(reusedRect, $"OARO_HallWin_KnightRankDesc_{TargetRank}".Translate());
+            Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}Desc".Translate());
 
             Text.Font = GameFont.Medium;
             reusedRect = new(innerRectX, innerRectY + 137f, innerRect.width, 185f);
             DrawRankBackGround(reusedRect);
-            Widgets.Label(reusedRect, $"OARO_HallWin_KnightRank_{TargetRank}".Translate().Colorize(ResidentKnightRecord.GetRankColor(TargetRank)));
+            Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}Knight".Translate().Colorize(ResidentKnightRecord.GetRankColor(TargetRank)));
 
             Text.Font = GameFont.Small;
             reusedRect = new(innerRectX, innerRectY + 330f, innerRect.width, 20f);
@@ -978,8 +1019,7 @@ public class Window_OrderHall : OrderWindowBase
                 downTex: secondSmallButton_Down,
                 doMouseoverSound: true))
             {
-                GlobalInteractionUtility.PostponeResidentKnightkResignation(Record, Map);
-                Parent.OnConditionChanged();
+                AcceptAction?.Invoke();
                 Close();
             }
         }

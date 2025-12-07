@@ -44,10 +44,7 @@ public class BranchContract : IExposable
         }
     }
 
-    public static BranchContract MakeBranchContract(BranchContractDef def)
-    {
-        return new BranchContract { def = def };
-    }
+    public static BranchContract MakeBranchContract(BranchContractDef def) => new() { def = def };
 
     public void ExposeData()
     {
@@ -70,7 +67,7 @@ public class BranchContract : IExposable
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex, "getting contract reason", nameof(BranchContract), nameof(PostInit));
-            requestReason = "ERROR".Colorize(ColorLibrary.RedReadable);
+            requestReason = "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
         }
         curState = ContractState.Ongoing;
     }

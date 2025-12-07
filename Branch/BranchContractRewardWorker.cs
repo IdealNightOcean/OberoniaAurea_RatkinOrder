@@ -19,3 +19,11 @@ public class BranchContractRewardWorker
         branch.SetFriendly(active: true);
     }
 }
+
+public class BranchContractRewardWorker_SilverContract : BranchContractRewardWorker
+{
+    public override void Reward(BranchContract contract, Caravan caravan, Branch branch)
+    {
+        branch.SetFriendly(active: true);
+    }
+}

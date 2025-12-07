@@ -91,7 +91,7 @@ public static class GlobalInteractionUtility
 
     public static AcceptanceReport CanPostponeResidentKnightkResignation(ResidentKnightRecord record, Map map, bool resultOnly)
     {
-        if (record.ResignationDaysLeft >= 20)
+        if (record.ResignationTick >= Find.TickManager.TicksGame + 20 * 60000)
         {
             return resultOnly ? false : "OARO_EnoughResignationDaysLeft".Translate(20.ToString());
         }

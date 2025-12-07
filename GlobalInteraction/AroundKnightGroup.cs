@@ -1,4 +1,7 @@
-﻿using Verse;
+﻿using RimWorld.Planet;
+using System;
+using System.Linq;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -18,6 +21,9 @@ public class AroundKnightGroup : IExposable
     public int DaysToExpired;
     public BusyLevel CurBusyLevel;
 
+    public string Source;
+    public string Destination;
+
     public Branch Branch => branch;
     public RatkinOrder RatkinOrder => branch?.RatkinOrder;
 
@@ -29,6 +35,27 @@ public class AroundKnightGroup : IExposable
         TravelTicks = GenMath.RoundTo(Rand.RangeInclusive(15000, 2 * 60000), 2500);
         DaysToExpired = Rand.RangeInclusive(3, 7);
         CurBusyLevel = Gen.RandomEnumValue<BusyLevel>(disallowFirstValue: false);
+        InitRoute();
+    }
+
+    private void InitRoute()
+    {
+        try
+        {
+            Settlement[] route = Find.WorldObjects.Settlements.TakeRandom(2).ToArray();
+            Source = route[0].Name;
+            Destination = route[1].Name;
+        }
+        catch (Exception ex)
+        {
+            Source = "ERROR (；′⌒`)";
+            Destination = "ERROR (；′⌒`)";
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"initiate {nameof(AroundKnightGroup)}'s {Source} and {Destination}.",
+                typeName: nameof(AroundKnightGroup),
+                methodName: nameof(InitRoute),
+                needStackTrace: true);
+        }
     }
 
     public void ExposeData()

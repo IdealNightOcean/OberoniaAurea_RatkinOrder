@@ -176,6 +176,31 @@ public static class RatkinOrderGenerator
         }
 
         /*
+         * 保证至少一个荣誉分部
+         */
+        if (!branchManager.AllBranches.Any(b => b.IsBranchOfType(Branch.BranchType.Honor)))
+        {
+            Branch branch = branchManager.AllBranches.RandomElement();
+            if (branch is not null)
+            {
+                BranchBuildingDef honorBuildingDef = null;
+                try
+                {
+                    honorBuildingDef = honorBuildingDefs.RandomElement();
+                    branch.BuildingHandler.AddBuilding(honorBuildingDef);
+                }
+                catch (Exception ex2)
+                {
+                    ModUtility.LogExceptionError(ex2,
+                        errorDesc: $"Failed to add a honor building ({honorBuildingDef}) for {branch}",
+                        typeName: nameof(RatkinOrderGenerator),
+                        methodName: nameof(InitBranchForNewOrder),
+                        needStackTrace: true);
+                }
+            }
+        }
+
+        /*
          * 初始化骑士团关注分部
          */
         branchManager.ChangeFollowedBranches(branchManager.AllBranches.TakeRandomElements(3));

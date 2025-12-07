@@ -502,12 +502,13 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         short reformationTags = ratkinOrder.EffectTags.GetTagCount("");
 
         float rate = 0.2f + (reformationTags * 0.05f);
-        int participantCount = Mathf.FloorToInt(BranchManager.AllBranches.Count * rate);
+        int participantCount = Mathf.CeilToInt(BranchManager.AllBranches.Count * rate);
         //PatrolState至少应有两个分队参与联合巡逻PatrolState
-        if (participantCount <= 0)
+        if (participantCount <= 1)
         {
             participantCount = 2;
         }
+        burdenCount = participantCount;
 
         IEnumerable<Branch> tempEnumerables = BranchManager.AllBranches.Where(b => b.CanParticipateInJointPatrolFast())
                                                                        .Take(participantCount);
@@ -545,7 +546,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
         }
 
-        //PatrolState无任一分队参与联巡则返回falsePatrolState
+        //PatrolState无任一分队参与联巡则清理，并在5~10天后尝试重新开始
         if (participants.NullOrEmpty())
         {
             Log.Error($"[OARO] No branch can participate in the Joint Patrol of {ratkinOrder}.");

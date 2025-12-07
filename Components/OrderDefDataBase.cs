@@ -12,25 +12,26 @@ public static class OrderDefDataBase
 
     private static readonly Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> knightAcademicByPersonality = [];
 
-    private static readonly Dictionary<ThingDef, KnightPersonality> joyBuildingToKnightPersonality = [];
-    private static readonly Dictionary<KnightPersonality, List<ThingDef>> knightPersonalityToJoyBuilding = [];
+    private static readonly Dictionary<ThingDef, KnightPersonality> preferredBuildingToKnightPersonality = [];
+    private static readonly Dictionary<KnightPersonality, List<ThingDef>> knightPersonalityToPreferredBuilding = [];
+    public static IEnumerable<ThingDef> AllResidentPreferredBuildings => preferredBuildingToKnightPersonality.Keys;
 
 
     public static void ClearStaticCache()
     {
         mercyQuestsList.Clear();
         knightAcademicByPersonality.Clear();
-        joyBuildingToKnightPersonality.Clear();
-        knightPersonalityToJoyBuilding.Clear();
+        preferredBuildingToKnightPersonality.Clear();
+        knightPersonalityToPreferredBuilding.Clear();
     }
 
-    public static bool GetKnightPersonalityForJoyBuilding(ThingDef thingDef, out KnightPersonality personality)
+    public static bool GetKnightPersonalityForPreferredBuilding(ThingDef thingDef, out KnightPersonality personality)
     {
-        return joyBuildingToKnightPersonality.TryGetValue(thingDef, out personality);
+        return preferredBuildingToKnightPersonality.TryGetValue(thingDef, out personality);
     }
-    public static bool GetJoyBuildingForKnightPersonality(KnightPersonality personality, out List<ThingDef> joyBuildings)
+    public static bool GetPreferredBuildingForKnightPersonality(KnightPersonality personality, out List<ThingDef> joyBuildings)
     {
-        return knightPersonalityToJoyBuilding.TryGetValue(personality, out joyBuildings);
+        return knightPersonalityToPreferredBuilding.TryGetValue(personality, out joyBuildings);
     }
 
     public static ResidentKnightAcademicDef GetRandomKnightAcademicOfPersonality(KnightPersonality personality)
@@ -46,32 +47,32 @@ public static class OrderDefDataBase
     {
         if (scriptDef is null)
         {
-            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: scriptDef cannot be null.");
+            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: scriptDef cannot be null.");
             return;
         }
         mercyQuestsList.Add(scriptDef);
     }
-    public static void AddKnightJoyBuilding(ThingDef buildingDef, KnightPersonality personality)
+    public static void AddResidentKnightPreferBuilding(ThingDef buildingDef, KnightPersonality personality)
     {
         if (buildingDef is null)
         {
-            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: buildingDef cannot be null.");
+            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: buildingDef cannot be null.");
             return;
         }
         if (personality == KnightPersonality.None)
         {
-            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
             return;
         }
 
-        joyBuildingToKnightPersonality[buildingDef] = personality;
-        if (knightPersonalityToJoyBuilding.TryGetValue(personality, out List<ThingDef> buildings))
+        preferredBuildingToKnightPersonality[buildingDef] = personality;
+        if (knightPersonalityToPreferredBuilding.TryGetValue(personality, out List<ThingDef> buildings))
         {
             buildings.Add(buildingDef);
         }
         else
         {
-            knightPersonalityToJoyBuilding.Add(personality, [buildingDef]);
+            knightPersonalityToPreferredBuilding.Add(personality, [buildingDef]);
         }
     }
 
@@ -79,12 +80,12 @@ public static class OrderDefDataBase
     {
         if (personality == KnightPersonality.None)
         {
-            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
             return;
         }
         if (academicDef is null)
         {
-            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(joyBuildingToKnightPersonality)}: academicDef cannot be null.");
+            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: academicDef cannot be null.");
             return;
         }
 

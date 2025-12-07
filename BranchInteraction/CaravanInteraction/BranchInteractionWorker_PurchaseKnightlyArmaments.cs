@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -86,6 +87,20 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
 
     private void GiveKnightlyArmaments(BranchInteractionParms parms, QualityCategory quality, ThingDef stuffDef, int price)
     {
+        List<ThingDef> armaments = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
+        if (armaments.NullOrEmpty())
+        {
+            Log.Error($"[OARO] Null or Empty armaments list in {nameof(BranchInteractionWorker_PurchaseKnightlyArmaments)}.{nameof(GiveKnightlyArmaments)}");
+            return;
+        }
+
+        foreach (ThingDef def in armaments)
+        {
+            Thing armament = ThingMaker.MakeThing(def, stuffDef);
+            armament.TryGetComp<CompQuality>()?.SetQuality(quality, ArtGenerationContext.Outsider);
+            CaravanInventoryUtility.GiveThing(parms.Caravan, armament);
+        }
+
         parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, price);
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_PurchaseKnightlyArmamentsRoot_Purchased".Translate(quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality), stuffDef.label.Named(KeyLibrary_FormatArgName.STUFF), price.ToString().Named("Price")),
@@ -98,7 +113,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
     protected override void DoBranchCost(BranchInteractionParms parms)
     {
         base.DoBranchCost(parms);
-        if (!parms.Branch.EffectTags.HasTag("PurchaseKnightlyArmamentsNoCD"))
+        if (!parms.Branch.EffectTags.HasTag(KeyLibrary_EffectTag.PurchaseKnightlyArmamentsNoCD))
         {
             parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: Def.defaultCdDays * 60000, removeWhenExpired: true);
         }

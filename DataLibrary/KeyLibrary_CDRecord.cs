@@ -87,4 +87,9 @@ public static class KeyLibrary_CDRecord
     /// 任务执行激进度改变
     /// </summary>
     public const string RadicalismDegreeChanged = "RadicalismDegreeChanged";
+
+    /// <summary>
+    /// 金鸢尾兰洽谈
+    /// </summary>
+    public const string OrderConferenceNegotiate = "OrderConferenceNegotiate";
 }

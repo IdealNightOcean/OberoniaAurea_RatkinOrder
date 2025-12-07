@@ -147,7 +147,7 @@ public static class DebugRatkinOrders
     {
         RatkinOrderOptions(SelectRaidLevel);
 
-        void SelectRaidLevel(RatkinOrder ratkinOrder)
+        static void SelectRaidLevel(RatkinOrder ratkinOrder)
         {
             ratkinOrder.JointPatrolManager.TryStartPatrolPrep();
         }

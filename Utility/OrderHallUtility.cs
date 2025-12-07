@@ -54,6 +54,35 @@ public static class OrderHallUtility
         }
     }
 
+    public static HashSet<ThingDef> GetAllResidentKnightPreferredBuildingDefs(Room room)
+    {
+        HashSet<ThingDef> allBuildingDefs = [];
+        if (room is null)
+        {
+            return allBuildingDefs;
+        }
+
+        foreach (Region region in room.Regions)
+        {
+            List<Thing> allThings = region.ListerThings.AllThings;
+            for (int i = 0; i < allThings.Count; i++)
+            {
+                List<string> buildingTags = allThings[i].def.building?.buildingTags;
+                if (buildingTags is null)
+                {
+                    continue;
+                }
+
+                if (buildingTags.Contains("OARO_ResidentKnightPrefer"))
+                {
+                    allBuildingDefs.Add(allThings[i].def);
+                }
+            }
+        }
+
+        return allBuildingDefs;
+    }
+
     private static int TerrainRestrict(Room room, int maxPotentialLevel)
     {
         Map map = room.Map;

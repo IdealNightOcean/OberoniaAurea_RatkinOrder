@@ -98,7 +98,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
     public void ForceEndAllResidency()
     {
         residentRecords.Clear();
-        Caravan caravan = CaravanMaker.MakeCaravan(residentPawns.InnerListForReading, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
+        ResidentsToCaravan(residentPawns.InnerListForReading);
     }
 
     private void FinishResidency(IEnumerable<BranchResident> residentRecords, Caravan caravan = null)
@@ -136,6 +136,10 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         {
             foreach (Pawn pawn in pawns)
             {
+                if (pawn.Faction != Faction.OfPlayer)
+                {
+                    pawn.SetFaction(Faction.OfPlayer);
+                }
                 caravan.AddPawn(pawn, addCarriedPawnToWorldPawnsIfAny: true);
             }
             Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
@@ -145,25 +149,39 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         }
 
         Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
-        if (map is null)
-        {
-            Caravan residentCaravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
-            Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
-                                           text: "OARO_ResidencyFinishedText_NewCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
-                                           textLetterDef: LetterDefOf.PositiveEvent, lookTargets: residentCaravan);
-        }
-        else
+        if (map is not null)
         {
             IncidentParms arrivalParms = new()
             {
                 target = map,
             };
-            PawnsArrivalModeDefOf.EdgeWalkIn.Worker.TryResolveRaidSpawnCenter(arrivalParms);
-            PawnsArrivalModeDefOf.EdgeWalkIn.Worker.Arrive(pawns, arrivalParms);
-            Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
-                                           text: "OARO_ResidencyFinishedText_Map".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
-                                           textLetterDef: LetterDefOf.PositiveEvent, lookTargets: pawns);
+            if (ModUtility.TryMakePawnArrival(pawns, arrivalParms, PawnsArrivalModeDefOf.EdgeWalkIn, joinPlayer: true, sendStandardLetter: false))
+            {
+                Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
+                                               text: "OARO_ResidencyFinishedText_Map".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                                               textLetterDef: LetterDefOf.PositiveEvent,
+                                               lookTargets: pawns);
+                return;
+            }
         }
+
+        ResidentsToCaravan(pawns);
+    }
+
+    private void ResidentsToCaravan(IEnumerable<Pawn> pawns)
+    {
+        foreach (Pawn pawn in pawns)
+        {
+            if (pawn.Faction != Faction.OfPlayer)
+            {
+                pawn.SetFaction(Faction.OfPlayer);
+            }
+        }
+        Caravan residentCaravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
+        Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
+                                       text: "OARO_ResidencyFinishedText_NewCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                                       textLetterDef: LetterDefOf.PositiveEvent,
+                                       lookTargets: residentCaravan);
     }
 
     internal void PostLoadInit()

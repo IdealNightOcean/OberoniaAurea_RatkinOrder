@@ -41,8 +41,8 @@ public class GameComponent_RatkinOrder : GameComponent
     {
         UniqueIDManager.ClearStaticCache();
 
-        KnightPawnsManager.ClearStaticCache();
         RatkinOrderManager.ClearStaticCache();
+        KnightPawnsManager.ClearStaticCache();
         OrderLetterBox.ClearStaticCache();
         GlobalInteractionManager.ClearStaticCache();
     }
@@ -56,6 +56,7 @@ public class GameComponent_RatkinOrder : GameComponent
         Scribe_Deep.Look(ref uniqueIDManager, nameof(uniqueIDManager));
 
         Scribe_Deep.Look(ref ratkinOrderManager, nameof(ratkinOrderManager));
+        Scribe_Deep.Look(ref knightPawnsManager, nameof(knightPawnsManager));
         Scribe_Deep.Look(ref orderLetterBox, nameof(orderLetterBox));
         Scribe_Deep.Look(ref globalInteractionManager, nameof(globalInteractionManager));
     }

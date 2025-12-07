@@ -36,6 +36,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
     public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnightRecord> RolesToKnights => RolesToKnights;
 
+    public LazyMutable<bool> ShowResignationAlert { get; }
     public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
     public LazyMutable<int> InstructorKnightsCount { get; }
 
@@ -68,8 +69,9 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         Instance = this;
 
         buffHediffStage = new HediffStage();
-        AllHasPersonalityTypes = new(() => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
-        InstructorKnightsCount = new(() => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
+        ShowResignationAlert = new(refreshFunc: () => residentKnights.Count > 0 && residentKnights.Values.Any(r => r.ResignationTick <= Find.TickManager.TicksGame + 15 * 60000));
+        AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
+        InstructorKnightsCount = new(refreshFunc: () => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
     }
     public static void ClearStaticCache() => Instance = null;
 
@@ -135,25 +137,33 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public void TickDay()
     {
         List<Pawn> toRemove = [];
+        int ticksGame = Find.TickManager.TicksGame;
         foreach ((Pawn knight, ResidentKnightRecord record) in residentKnights)
         {
             if (record.IsValid)
             {
                 float gainPoints = record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationDailyGain);
                 record.MeditationPoints += gainPoints;
-                record.ResignationDailyCheck();
             }
             else
             {
                 toRemove.Add(knight);
             }
 
-            if (record.ResignationDaysLeft <= 0)
+            if (record.ResignationTick <= ticksGame)
             {
                 toRemove.Add(knight);
             }
         }
+        if (toRemove.Count > 0)
+        {
+            foreach (Pawn p in toRemove)
+            {
+                RemoveResidentKnight(p);
+            }
+        }
 
+        ShowResignationAlert.MarkDirty();
     }
 
     private void RemoveAllInvalidRecord(Predicate<ResidentKnightRecord> extraRemove = null)
@@ -201,16 +211,6 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder) => RemoveAllInvalidRecord((record) => record.Branch.RatkinOrder == ratkinOrder);
     public void Notify_BranchDestroyed(Branch branch) => RemoveAllInvalidRecord((record) => record.Branch == branch);
 
-    public void Notify_MercyQuestSucceed()
-    {
-        float gainPoints = 0f;
-        foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
-        {
-            gainPoints = 200f * kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
-            kv.Value.MeditationPoints += gainPoints;
-        }
-    }
-
     public void AddResidentKnight(Pawn pawn, KnightRecord knightRecord)
     {
         if (!residentKnights.ContainsKey(pawn))
@@ -245,6 +245,30 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             return true;
         }
         return false;
+    }
+
+    public void Notify_MercyQuestSucceed()
+    {
+        float gainPoints = 0f;
+        foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
+        {
+            gainPoints = 200f * kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
+            kv.Value.MeditationPoints += gainPoints;
+        }
+    }
+
+    public void Notify_SquadBeAttackedOnTask(RatkinOrder ratkinOrder, Branch branch)
+    {
+        foreach ((Pawn p, ResidentKnightRecord record) in ResidentKnights)
+        {
+            if (record.RatkinOrder != ratkinOrder || p.needs is null || p.needs.mood is null)
+            {
+                continue;
+            }
+            int forceStage = record.Branch == branch ? 1 : 0;
+            Thought_Memory memory = ThoughtMaker.MakeThought(OARO_ThoughtDefOf.OARO_Thought_ResidentKnight_SquadBeAttackedOnTask, forceStage);
+            p.needs.mood.thoughts.memories.TryGainMemory(memory);
+        }
     }
 
     private bool SetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
@@ -309,6 +333,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     private void OnKnightsChanged()
     {
+        ShowResignationAlert.MarkDirty();
         AllHasPersonalityTypes.MarkDirty();
         InstructorKnightsCount.MarkDirty();
     }
@@ -360,20 +385,6 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
                     target[modifier.stat] = modifier.value;
                 }
             }
-        }
-    }
-
-    public void OnSquadBeAttackedOnTask(RatkinOrder ratkinOrder, Branch branch)
-    {
-        foreach ((Pawn p, ResidentKnightRecord record) in ResidentKnights)
-        {
-            if (record.RatkinOrder != ratkinOrder || p.needs is null || p.needs.mood is null)
-            {
-                continue;
-            }
-            int forceStage = record.Branch == branch ? 1 : 0;
-            Thought_Memory memory = ThoughtMaker.MakeThought(OARO_ThoughtDefOf.OARO_Thought_ResidentKnight_SquadBeAttackedOnTask, forceStage);
-            p.needs.mood.thoughts.memories.TryGainMemory(memory);
         }
     }
 }

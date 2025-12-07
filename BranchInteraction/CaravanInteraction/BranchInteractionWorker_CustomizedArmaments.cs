@@ -11,7 +11,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
 {
     private DiaNode WeaponNode(BranchInteractionParms parms)
     {
-        List<ThingDef> customizableThings = Def.GetModExtension<CustomizableArmament_Extension>()?.customizableThings ?? [];
+        List<ThingDef> customizableThings = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
 
         DiaNode rootNode = new("OARO_CustomizedArmaments_Weapon".Translate());
 
