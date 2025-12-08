@@ -6,18 +6,54 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class OARO_HediffDefOf
 {
-    public static HediffDef OARO_Hediff_IntensiveTrain; //本能训练
-    public static HediffDef OARO_Hediff_WarDeepInjury; //战后创伤
-    public static HediffDef OARO_Hediff_ResidentKnight; //常驻骑士（隐藏）
+    /// <summary>
+    /// 本能训练
+    /// </summary>
+    public static HediffDef OARO_Hediff_IntensiveTrain;
+    /// <summary>
+    /// 战后创伤
+    /// </summary>
+    public static HediffDef OARO_Hediff_WarDeepInjury;
+    /// <summary>
+    /// 常驻骑士（隐藏）
+    /// </summary>
+    public static HediffDef OARO_Hediff_ResidentKnight;
 
-    public static HediffDef OARO_Hediff_BannerBullet; //旗弹标记
+    /// <summary>
+    /// 旗弹标记
+    /// </summary>
+    public static HediffDef OARO_Hediff_BannerBullet;
 
-    public static HediffDef OARO_Hediff_BranchMedal; //勋章buff
-    public static HediffDef OARO_Hediff_HonorHunting_Debuff; //影猎骑士增伤
-    public static HediffDef OARO_Hediff_HonorPaladin_Stimulate; //圣骑士鼓舞
+    /// <summary>
+    /// 印记Buff
+    /// </summary>
+    public static HediffDef OARO_Hediff_BranchMedal;
+    /// <summary>
+    /// 影猎骑士增伤
+    /// </summary>
+    public static HediffDef OARO_Hediff_HonorHunting_Debuff;
+    /// <summary>
+    /// 圣骑士鼓舞
+    /// </summary>
+    public static HediffDef OARO_Hediff_HonorPaladin_Stimulate;
 
-    public static HediffDef OARO_Hediff_NobilityTerritoryPounce; //叛乱贵族 - 贵族被突袭
-    public static HediffDef OARO_Hediff_NobilityTerritoryPouncePlayer; //叛乱贵族 - 玩家被突袭
+    /// <summary>
+    /// 骑士激励
+    /// </summary>
+    public static HediffDef OARO_Hediff_KnightlyTalk;
+
+    /// <summary>
+    /// 叛乱贵族 - 群情激愤下的叛乱
+    /// </summary>
+    public static HediffDef OARO_Hediff_NobilityTerritoryInHeat;
+    /// <summary>
+    /// 叛乱贵族 - 贵族被突袭
+    /// </summary>
+    public static HediffDef OARO_Hediff_NobilityTerritoryPounce;
+    /// <summary>
+    /// 叛乱贵族 - 玩家被突袭
+    /// </summary>
+    public static HediffDef OARO_Hediff_NobilityTerritoryPouncePlayer;
 
     static OARO_HediffDefOf()
     {

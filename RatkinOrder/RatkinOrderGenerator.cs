@@ -118,7 +118,7 @@ public static class RatkinOrderGenerator
 
     private static bool InitBranchForNewOrder(RatkinOrder ratkinOrder)
     {
-        if (ratkinOrder is null || ratkinOrder.Faction is null)
+        if (!ratkinOrder.IsValid() || ratkinOrder.Faction is null)
         {
             return false;
         }

@@ -22,7 +22,7 @@ public class QuestNode_SetRatkinOrderForObject : QuestNode
         }
 
         RatkinOrder ratkinOrder = this.ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
-        if (ratkinOrder is not null && target is ISingleRatkinOrderRelated orderRelated)
+        if (ratkinOrder.IsValid() && target is ISingleRatkinOrderRelated orderRelated)
         {
             orderRelated.InitRatkinOrder(ratkinOrder);
         }

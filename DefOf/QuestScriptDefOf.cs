@@ -18,9 +18,15 @@ public class OARO_QuestScriptDefOf
 
     public static QuestScriptDef OARO_Quest_OrderRelationshipUpgrade;
 
-    public static QuestScriptDef OARO_Quest_ResidentKnightBackPlayer; //常驻骑士回归玩家
+    /// <summary>
+    /// 常驻骑士回归玩家
+    /// </summary>
+    public static QuestScriptDef OARO_Quest_ResidentKnightBackPlayer;
 
-    public static QuestScriptDef OARO_Quest_JointPatrolCaravanHelp; //联合巡逻 - 分部求助
+    /// <summary>
+    /// 联合巡逻 - 分部求助
+    /// </summary>
+    public static QuestScriptDef OARO_Quest_JointPatrolCaravanHelp;
 
     static OARO_QuestScriptDefOf()
     {

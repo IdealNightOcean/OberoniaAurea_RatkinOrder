@@ -180,7 +180,7 @@ public class Window_BranchSquad : OrderWindowBase
                                                           label: "OAFrame_LookOver".Translate(),
                                                           baseTex: middleCheckButton,
                                                           downTex: middleCheckButton_Down,
-                                                          acceptance: SelBranch is not null,
+                                                          acceptance: SelBranch.IsValid(),
                                                           doMouseoverSound: true))
         {
             CameraJumper.TryJumpAndSelect(SelBranch.BaseSite);
@@ -189,7 +189,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleRight;
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRect.xMax - 192f, 192f, 32f);
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, "OARO_SquadWin_SiteDistance".Translate(SelSquadInfo.Distance.ToString("F0"))
                                                                   .Colorize(SelSquadInfo.IsInAffectedRange ? Color.green : Color.white));
@@ -299,7 +299,7 @@ public class Window_BranchSquad : OrderWindowBase
                                                           label: "OARO_SquadWin_ClickToAdd".Translate(),
                                                           baseTex: middleClickToAddButton,
                                                           downTex: middleClickToAddButton_Down,
-                                                          acceptance: SelBranch is not null,
+                                                          acceptance: SelBranch.IsValid(),
                                                           doMouseoverSound: true))
         {
 
@@ -311,7 +311,7 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_BranchSupplyState".Translate());
 
         TaggedString supplyState;
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             switch (SelBranch.Supply)
             {
@@ -383,7 +383,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleRight;
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 10f, 135f, 24f);
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, "OARO_SquadWin_MemberCountInfo".Translate(SelBranch.Squad.AllCrewCountInt, SelSquadInfo.CrewCeiling));
             reusedRect.yMin = reusedRect.yMax;
@@ -444,7 +444,7 @@ public class Window_BranchSquad : OrderWindowBase
         GUI.DrawTexture(reusedRect, middleCommanderIcon);
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.xMax - 54f, 50f, 24f);
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, "OARO_FilledTotalFormatPeople".Translate(SelBranch.Squad.CommanderCountInt, SelSquadInfo.CommanderCeiling));
         }
@@ -464,7 +464,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect = new(areaRect.x + 18f, areaRect.y + 14f, 60f, 65f);
         Color stateColor = Color.white;
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             if (SelBranch.IsIdleNow)
             {
@@ -486,7 +486,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 95f, 20f);
         Widgets.Label(reusedRect, "OARO_BranchWorkState".Translate());
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 16f, 95f, 20f);
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, SelBranch.CurWorkState.Colorize(stateColor));
         }
@@ -661,7 +661,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void DrawMedalRect(Rect inRect)
     {
-        if (SelBranch is null)
+        if (!SelBranch.IsValid())
         {
             return;
         }
@@ -720,7 +720,7 @@ public class Window_BranchSquad : OrderWindowBase
         Rect areaRect = inRect;
         areaRect.xMin = areaRect.xMax - 80f;
         int bombardSupportCeiling = BombardSupportCeiling.Value;
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             Widgets.Label(areaRect, $"× {bombardSupportCeiling}");
             TooltipHandler.TipRegion(areaRect, () => BombardSupportCeilingExplanation.Value, uniqueId: 9393957);
@@ -881,7 +881,7 @@ public class Window_BranchSquad : OrderWindowBase
             AcceptanceReport acceptance = false;
             try
             {
-                if (selBranch is not null)
+                if (selBranch.IsValid())
                 {
                     BranchInteractionParms parms = new(selBranch, Map);
                     acceptance = def.Worker.CanUseInteraction(parms, resultOnly: false);
@@ -996,7 +996,7 @@ public class Window_BranchSquad : OrderWindowBase
         try
         {
             Branch branch = TabSummaryCaches[index].Branch;
-            if (branch is null)
+            if (!branch.IsValid())
             {
                 DeselectSquad();
                 return;
@@ -1027,7 +1027,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void DeselectSquad()
     {
-        if (SelBranch is not null)
+        if (SelBranch.IsValid())
         {
             SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
         }

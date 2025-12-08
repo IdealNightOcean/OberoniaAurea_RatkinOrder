@@ -71,6 +71,8 @@ public class RatkinOrderSettings : ModSettings
     /// </summary>
     public static int MaxAcquiredPatrolInteractionPreType = 3;
 
+    public static bool ShowKnightlyTalkLetter = true;
+
     public override void ExposeData()
     {
         base.ExposeData();

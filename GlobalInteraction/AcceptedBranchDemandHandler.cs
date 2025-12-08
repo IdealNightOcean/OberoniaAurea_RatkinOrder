@@ -26,7 +26,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
     public void ExposeData()
     {
         Scribe_Collections.Look(ref records, nameof(records), LookMode.Deep);
-        if (records.RemoveAll(r => r is null || r.Branch is null) > 0)
+        if (records.RemoveAll(r => r is null || !r.Branch.IsValid()) > 0)
         {
             Log.Error($"[OARO] Some {nameof(AcceptedBranchDemand)} were null or invalided after loading and have been removed.");
         }
@@ -68,7 +68,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         }
     }
 
-    public void Notify_RatkinOrderRemoved(RatkinOrder order) => records.RemoveAll(r => r is null || r.Branch is null || r.Branch.RatkinOrder == order);
+    public void Notify_RatkinOrderRemoved(RatkinOrder order) => records.RemoveAll(r => r is null || !r.Branch.IsValid() || r.Branch.RatkinOrder == order);
 
-    public void Notify_BranchDestroyed(Branch branch) => records.RemoveAll(r => r is null || r.Branch is null || r.Branch == branch);
+    public void Notify_BranchDestroyed(Branch branch) => records.RemoveAll(r => r is null || !r.Branch.IsValid() || r.Branch == branch);
 }

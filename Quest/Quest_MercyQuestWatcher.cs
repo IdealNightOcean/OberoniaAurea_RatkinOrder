@@ -46,7 +46,7 @@ public class QuestPart_MercyQuestWatcher : QuestPart
             return;
         }
         RatkinOrder ratkinOrder = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(null);
-        if (ratkinOrder is null)
+        if (!ratkinOrder.IsValid())
         {
             return;
         }

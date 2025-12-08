@@ -102,7 +102,7 @@ public static class BranchDemandUtility
     {
         demandDef = null;
 
-        if (branch is null || !branch.DemandHandler.CanAddDemand(isCriticalDemand: demandType == DemandType.Critical, ignoreCD, replaceCur))
+        if (!branch.IsValid() || !branch.DemandHandler.CanAddDemand(isCriticalDemand: demandType == DemandType.Critical, ignoreCD, replaceCur))
         {
             return false;
         }
@@ -118,7 +118,7 @@ public static class BranchDemandUtility
 
     public static AcceptanceReport CanAcceptDemand(Branch branch, bool isCritical, bool resultOnly)
     {
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return false;
         }

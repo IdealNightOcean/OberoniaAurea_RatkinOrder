@@ -9,7 +9,7 @@ public class QuestNode_CheckGroupPatrolStart : QuestNode
     protected override bool TestRunInt(Slate slate)
     {
         RatkinOrder ratkinOrder = this.ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
-        return ratkinOrder is not null && ratkinOrder.JointPatrolManager.CurState == JointPatrolManager.PatrolState.Ongoing;
+        return ratkinOrder.IsValid() && ratkinOrder.JointPatrolManager.CurState == JointPatrolManager.PatrolState.Ongoing;
     }
 
     protected override void RunInt() { }

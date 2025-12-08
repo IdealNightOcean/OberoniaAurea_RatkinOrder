@@ -424,7 +424,7 @@ public class Window_BranchDemand : OrderWindowBase
 
         Text.Font = GameFont.Medium;
         reusedRect = OARO_WindowUtility.CenterRectOnX(potencyRect, reusedRect.yMax + 24f, potencyRect.width, 32f);
-        Widgets.Label(reusedRect, cliqueManager.TotalPotency.ToStringPercentSigned());
+        Widgets.Label(reusedRect, cliqueManager.TotalPotency.Value.ToStringPercentSigned());
 
         OARO_WindowUtility.ResetText();
     }

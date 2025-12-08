@@ -148,7 +148,7 @@ public class Window_RatkinOrder : MainTabWindow
     }
     private void OnOrderButtonDown(RatkinOrder ratkinOrder)
     {
-        if (ratkinOrder is null || SelectedOrder == ratkinOrder)
+        if (!ratkinOrder.IsValid() || SelectedOrder == ratkinOrder)
         {
             return;
         }
@@ -743,7 +743,7 @@ public class Window_RatkinOrder : MainTabWindow
     private void RefreshRatkinOrderCache()
     {
         ClearRatkinOrderCache();
-        if (SelectedOrder is null)
+        if (!SelectedOrder.IsValid())
         {
             return;
         }
@@ -827,7 +827,7 @@ public class Window_RatkinOrder : MainTabWindow
     {
         SpecialInteractionAcceptances.Clear();
         NormalInteractionAcceptances.Clear();
-        if (SelectedOrder is null)
+        if (!SelectedOrder.IsValid())
         {
             return;
         }

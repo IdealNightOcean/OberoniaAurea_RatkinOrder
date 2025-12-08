@@ -34,6 +34,7 @@ public static class KeyLibrary_SlateStoreAs
     public const string ContractReason = "contractReason";
 
     public const string PreSetQuestEffectTags = "PreSetQuestEffectTags";
+    public const string PreSetPotentialMedals = "PreSetPotentialMedals";
     public const string QuestEffectTags = "QuestEffectTags";
 
     public const string VisitingKnightsDelay = "visitingKnightsDelay";

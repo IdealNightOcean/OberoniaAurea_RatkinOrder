@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
@@ -43,14 +44,14 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     public string InSignalOutPotency;
     public string OutSignalOutPotency;
 
-    private float totalPotency;
-    public float TotalPotency
-    {
-        get => totalPotency;
-        private set => totalPotency = Mathf.Max(0f, value);
-    }
+    public LazyMutable<float> TotalPotency { get; }
 
     private int ticksToNextCheck = 1000;
+
+    public QuestPart_CliquesManager()
+    {
+        TotalPotency = new(refreshFunc: () => allCliques?.Values.Sum(c => c.Potency) ?? 0f);
+    }
 
     public override void ExposeData()
     {
@@ -60,7 +61,6 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         Scribe_Values.Look(ref InSignalOutPotency, "InSignalOutPotency");
         Scribe_Values.Look(ref OutSignalOutPotency, "OutSignalOutPotency");
 
-        Scribe_Values.Look(ref totalPotency, "totalPotency", 0f);
         Scribe_Values.Look(ref ticksToNextCheck, "ticksToNextCheck", 0);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
@@ -81,7 +81,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         base.Notify_QuestSignalReceived(signal);
         if (signal.tag == InSignalOutPotency)
         {
-            Find.SignalManager.SendSignal(new Signal(OutSignalOutPotency, totalPotency.Named(KeyLibrary_FormatArgName.SUBJECT)));
+            Find.SignalManager.SendSignal(new Signal(OutSignalOutPotency, TotalPotency.Value.Named(KeyLibrary_FormatArgName.SUBJECT)));
         }
     }
 
@@ -310,7 +310,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             clique.IsActive = true;
             clique.TicksToActive = -1;
-            totalPotency += clique.Potency;
+            TotalPotency.MarkDirty();
             Find.SignalManager.SendSignal(new Signal(SignalCliqueActived(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
         }
     }
@@ -329,7 +329,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     private void DeactiveClique(QuestClique clique)
     {
         clique.IsActive = false;
-        totalPotency -= clique.Potency;
+        TotalPotency.MarkDirty();
         Find.SignalManager.SendSignal(new Signal(SignalCliqueDeactived(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
     }
 
@@ -346,16 +346,8 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
         {
-            if (clique.IsActive)
-            {
-                TotalPotency -= clique.Potency;
-                clique.Potency += change;
-                TotalPotency += clique.Potency;
-            }
-            else
-            {
-                clique.Potency += change;
-            }
+            clique.Potency += change;
+            TotalPotency.MarkDirty();
         }
     }
 

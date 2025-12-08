@@ -99,7 +99,7 @@ internal sealed class QuestPart_TownConstructionWatcher : QuestPart
             if (Town.ConstructionScale >= 3)
             {
                 Branch branch = Branch.GenerateBranchFor(Town.Branch.RatkinOrder, settlement, addToManager: true);
-                if (branch is not null)
+                if (branch.IsValid())
                 {
                     branch.SetFriendly(active: true, showMessage: false);
 

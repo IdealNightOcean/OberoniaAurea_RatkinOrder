@@ -25,7 +25,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         if (initBranch)
         {
             branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-            if (branch is null)
+            if (!branch.IsValid())
             {
                 return false;
             }
@@ -40,7 +40,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             quest.AddPart(questPart_CriticalBranch);
         }
         ratkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder) ?? branch?.RatkinOrder;
-        if (ratkinOrder is null)
+        if (!ratkinOrder.IsValid())
         {
             return false;
         }

@@ -12,7 +12,7 @@ public class OrderRecommendation : ThingWithComps
     {
         get
         {
-            if (ratkinOrder is null)
+            if (!ratkinOrder.IsValid())
             {
                 return $"{base.LabelNoCount} ({"Invalid".Translate()})";
             }
@@ -36,7 +36,7 @@ public class OrderRecommendation : ThingWithComps
 
     public void OnGiveToPlayer()
     {
-        if (ratkinOrder is not null)
+        if (ratkinOrder.IsValid())
         {
             ratkinOrder.EsteemHandler.TotalRecommendation += stackCount;
         }

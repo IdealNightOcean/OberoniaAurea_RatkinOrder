@@ -19,7 +19,7 @@ public class QuestNode_BranchIsTypeOf : QuestNode
     {
         Slate slate = QuestGen.slate;
         Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        if (branch is null)
+        if (!branch.IsValid())
         {
             noMatchNode?.Run();
             return;

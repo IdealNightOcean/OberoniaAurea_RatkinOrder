@@ -5,7 +5,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class DemandPreSetQuestEffectTags : DefModExtension
+public class CriticalDemand_Extension : DefModExtension
 {
     public List<BranchMedalDef> potentialMedals = [];
     public List<QuestEffectTag> fixedTags;

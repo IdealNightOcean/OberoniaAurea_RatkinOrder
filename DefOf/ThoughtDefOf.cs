@@ -10,9 +10,15 @@ public static class OARO_ThoughtDefOf
     public static ThoughtDef OARO_Thought_FamineVillagetFeast;
     public static ThoughtDef OARO_Thought_VisitingKnight;
 
-    public static ThoughtDef OARO_Thought_ResidentKnight_SquadBeAttackedOnTask; //常驻骑士 - 自己骑士团有分部被袭击
+    /// <summary>
+    /// 常驻骑士 - 自己骑士团有分部被袭击
+    /// </summary>
+    public static ThoughtDef OARO_Thought_ResidentKnight_SquadBeAttackedOnTask;
 
-    public static ThoughtDef OARO_Thought_TouristAreaPatrol; //风景区巡逻
+    /// <summary>
+    /// 风景区巡逻
+    /// </summary>
+    public static ThoughtDef OARO_Thought_TouristAreaPatrol;
 
     static OARO_ThoughtDefOf()
     {

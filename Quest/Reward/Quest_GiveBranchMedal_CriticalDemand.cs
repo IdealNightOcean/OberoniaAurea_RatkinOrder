@@ -6,7 +6,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class QuestNode_GiveBranchMedal : QuestNode
+public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
 {
     public SlateRef<string> inSignal;
 
@@ -14,12 +14,16 @@ public class QuestNode_GiveBranchMedal : QuestNode
     public SlateRef<IEnumerable<BranchMedalDef>> potentialDefs;
     public SlateRef<int> count;
 
+    public SlateRef<int> baseRewardMedalTypeCount = 2;
+    public SlateRef<int> extraRewardMedalTypeCount = 1;
+    public SlateRef<float> extraMedalPotencyBoundary;
+
     public SlateRef<bool> isReward;
     public SlateRef<bool> isSingleReward;
 
     protected override bool TestRunInt(Slate slate)
     {
-        return potentialDefs.GetValue(slate) is not null;
+        return true;
     }
 
     protected override void RunInt()
@@ -29,36 +33,39 @@ public class QuestNode_GiveBranchMedal : QuestNode
         {
             return;
         }
-        QuestPart_GiveBranchMedal questPart_GiveBranchMedal = new()
+        QuestPart_GiveBranchMedal_CriticalDemand questPart_GiveBranchMedal_CriticalDemand = new()
         {
             InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
             Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
             Count = count.GetValue(slate),
+            BaseRewardMedalTypeCount = baseRewardMedalTypeCount.GetValue(slate),
+            ExtraRewardMedalTypeCount = extraRewardMedalTypeCount.GetValue(slate),
+            ExtraMedalPotencyBoundary = extraMedalPotencyBoundary.GetValue(slate),
             PotentialDefs = [],
         };
-        IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate);
+        IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<BranchMedalDef>>(KeyLibrary_SlateStoreAs.PreSetPotentialMedals);
         if (potentialDefs is not null)
         {
-            questPart_GiveBranchMedal.PotentialDefs.AddRangeUnique(potentialDefs);
+            questPart_GiveBranchMedal_CriticalDemand.PotentialDefs.AddRangeUnique(potentialDefs);
         }
 
-        QuestGen.quest.AddPart(questPart_GiveBranchMedal);
+        QuestGen.quest.AddPart(questPart_GiveBranchMedal_CriticalDemand);
 
         if (isReward.GetValue(slate))
         {
             QuestPart_Choice questPart_Choice;
             Reward_BranchMedals reward = new()
             {
-                Branch = questPart_GiveBranchMedal.Branch,
-                PotentialDefs = [.. questPart_GiveBranchMedal.PotentialDefs],
-                Amount = questPart_GiveBranchMedal.Count
+                Branch = questPart_GiveBranchMedal_CriticalDemand.Branch,
+                PotentialDefs = [.. questPart_GiveBranchMedal_CriticalDemand.PotentialDefs],
+                Amount = questPart_GiveBranchMedal_CriticalDemand.Count
             };
 
             if (isSingleReward.GetValue(slate))
             {
                 questPart_Choice = new QuestPart_Choice()
                 {
-                    inSignalChoiceUsed = questPart_GiveBranchMedal.InSignalTrigger,
+                    inSignalChoiceUsed = questPart_GiveBranchMedal_CriticalDemand.InSignalTrigger,
                 };
 
                 questPart_Choice.choices.Add(new QuestPart_Choice.Choice() { rewards = [reward] });
@@ -79,13 +86,17 @@ public class QuestNode_GiveBranchMedal : QuestNode
     }
 }
 
-
-public class QuestPart_GiveBranchMedal : QuestPart
+public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
 {
     public string InSignalTrigger;
     public Branch Branch;
     public List<BranchMedalDef> PotentialDefs;
     public int Count;
+
+    public int BaseRewardMedalTypeCount;
+    public int ExtraRewardMedalTypeCount;
+
+    public float ExtraMedalPotencyBoundary;
 
     public override void Cleanup()
     {
@@ -94,6 +105,9 @@ public class QuestPart_GiveBranchMedal : QuestPart
         Branch = null;
         PotentialDefs = null;
         Count = 0;
+        BaseRewardMedalTypeCount = 0;
+        ExtraRewardMedalTypeCount = 0;
+        ExtraMedalPotencyBoundary = 0f;
     }
 
     public override void ExposeData()
@@ -103,14 +117,23 @@ public class QuestPart_GiveBranchMedal : QuestPart
         Scribe_References.Look(ref Branch, nameof(Branch));
         Scribe_Collections.Look(ref PotentialDefs, nameof(PotentialDefs), LookMode.Def);
         Scribe_Values.Look(ref Count, nameof(Count), 0);
+        Scribe_Values.Look(ref BaseRewardMedalTypeCount, nameof(BaseRewardMedalTypeCount), 0);
+        Scribe_Values.Look(ref ExtraRewardMedalTypeCount, nameof(ExtraRewardMedalTypeCount), 0);
+        Scribe_Values.Look(ref ExtraMedalPotencyBoundary, nameof(ExtraMedalPotencyBoundary), 0f);
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
-        if (Count > 0 && Branch.IsValid() && signal.tag == InSignalTrigger)
+        if (Count > 0 && Branch.IsValid() && PotentialDefs is not null && signal.tag == InSignalTrigger)
         {
-            BranchMedalDef medalType = PotentialDefs?.RandomElementWithFallback(null);
-            if (medalType is not null)
+            QuestPart_CliquesManager.TryGetCliquesManager(quest, addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager);
+            int rewardMedalTypeCount = BaseRewardMedalTypeCount;
+            if (cliquesManager is not null && cliquesManager.TotalPotency.Value >= ExtraMedalPotencyBoundary)
+            {
+                rewardMedalTypeCount += ExtraRewardMedalTypeCount;
+            }
+            rewardMedalTypeCount = rewardMedalTypeCount > 0 ? rewardMedalTypeCount : 1;
+            foreach (BranchMedalDef medalType in PotentialDefs.TakeRandom(rewardMedalTypeCount))
             {
                 Branch.MedalHandler.AddMedal(medalType, Count);
             }

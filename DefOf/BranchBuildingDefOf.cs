@@ -5,9 +5,18 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class BranchBuildingDefOf
 {
-    public static BranchBuildingDef OARO_Church; //分部教堂（修女小屋）
-    public static BranchBuildingDef OARO_CommanderOffice; //骑士长办公室
-    public static BranchBuildingDef OARO_ArchitectOffice; //建筑师办公室
+    /// <summary>
+    /// 分部教堂（修女小屋）
+    /// </summary>
+    public static BranchBuildingDef OARO_Church;
+    /// <summary>
+    /// 骑士长办公室
+    /// </summary>
+    public static BranchBuildingDef OARO_CommanderOffice;
+    /// <summary>
+    /// 建筑师办公室
+    /// </summary>
+    public static BranchBuildingDef OARO_ArchitectOffice;
 
     static BranchBuildingDefOf()
     {

@@ -25,7 +25,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
         }
 
         Branch demandBranch = cliquesManager.Branch;
-        if (demandBranch is not null)
+        if (demandBranch.IsValid())
         {
             QuestClique demandBranchClique = new()
             {
@@ -64,7 +64,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
         RatkinOrder demandOrder = demandBranch?.RatkinOrder;
 
         // 需求骑士团附近派系
-        if (demandOrder is not null)
+        if (demandOrder.IsValid())
         {
             foreach (Branch branch in demandOrder.GetAllAffectedBranchForOrder(centerTile, ValidateBranch))
             {

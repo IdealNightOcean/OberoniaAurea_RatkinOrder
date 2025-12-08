@@ -11,7 +11,7 @@ internal sealed class QuestPart_CollectionTeam_MaterialSupply : QuestPart_Collec
     public override void Notify_PreCleanup()
     {
         base.Notify_PreCleanup();
-        if (Branch is not null && quest.State == QuestState.EndedSuccess)
+        if (Branch.IsValid() && quest.State == QuestState.EndedSuccess)
         {
             Branch.Supply += 0.5f;
         }

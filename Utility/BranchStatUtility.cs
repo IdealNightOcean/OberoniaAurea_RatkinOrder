@@ -16,7 +16,7 @@ public static class BranchStatUtility
 
     public static StringBuilder GetStatModifyExplanation(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
     {
-        if (branch is null || statDef is null)
+        if (!branch.IsValid() || statDef is null)
         {
             return new StringBuilder(string.Empty);
         }
@@ -75,14 +75,14 @@ public static class BranchStatUtility
                     for (int i = 0; i < statParts.Count; i++)
                     {
                         statParts[i].PostTransform(branch, ref result);
-                        statParts[i].ModifyExplanation(branch, explanation);
+                        statParts[i].ModifyExplanation(branch, statDef, explanation);
                     }
                 }
                 else
                 {
                     for (int i = 0; i < statParts.Count; i++)
                     {
-                        statParts[i].ModifyExplanation(branch, explanation);
+                        statParts[i].ModifyExplanation(branch, statDef, explanation);
                     }
                 }
             }

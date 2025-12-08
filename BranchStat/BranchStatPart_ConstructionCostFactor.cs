@@ -12,7 +12,7 @@ public class BranchStatPart_ConstructionCostFactor : BranchStatPart
         curValue = curValue < 0f ? 0f : curValue;
     }
 
-    public override void ModifyExplanation(Branch branch, StringBuilder explanation)
+    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
         float costRateReduce = -Mathf.Clamp(branch.PopulationHandler.Population / 100f * 0.01f, 0f, 0.9f);
         explanation.Append("    ");

@@ -4,10 +4,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public abstract class BranchStatPart
 {
-    private int priority = 100; //优先级，数值越大越优先
+    /// <summary>
+    /// 优先级，数值越大越先计算
+    /// </summary>
+    private int priority = 500;
     public int Priority => priority;
     public abstract void PostTransform(Branch branch, ref float curValue);
 
-    public abstract void ModifyExplanation(Branch branch, StringBuilder explanation);
+    public abstract void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation);
 
 }

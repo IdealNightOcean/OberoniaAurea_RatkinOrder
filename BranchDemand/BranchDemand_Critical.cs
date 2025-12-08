@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchDemand_Critical : BranchDemand
 {
     private IReadOnlyList<BranchMedalDef> potentialMedals;
-    public IReadOnlyList<BranchMedalDef> PotentialMedals => potentialMedals ??= (Def.GetModExtension<DemandPreSetQuestEffectTags>()?.potentialMedals ?? []);
+    public IReadOnlyList<BranchMedalDef> PotentialMedals => potentialMedals ??= (Def.GetModExtension<CriticalDemand_Extension>()?.potentialMedals ?? []);
 
     private List<QuestEffectTag> questEffectTags;
     public IReadOnlyList<QuestEffectTag> QuestEffectTags => questEffectTags;
@@ -15,7 +15,7 @@ public class BranchDemand_Critical : BranchDemand
     public override void PostInit(Branch branch)
     {
         base.PostInit(branch);
-        questEffectTags = Def.GetModExtension<DemandPreSetQuestEffectTags>()?.GetEffectTags();
+        questEffectTags = Def.GetModExtension<CriticalDemand_Extension>()?.GetEffectTags();
     }
 
     public override void ExposeData()
@@ -30,6 +30,10 @@ public class BranchDemand_Critical : BranchDemand
         if (questEffectTags is not null)
         {
             slate.Set(KeyLibrary_SlateStoreAs.PreSetQuestEffectTags, questEffectTags);
+        }
+        if (PotentialMedals is not null)
+        {
+            slate.Set(KeyLibrary_SlateStoreAs.PreSetPotentialMedals, PotentialMedals);
         }
         return slate;
     }

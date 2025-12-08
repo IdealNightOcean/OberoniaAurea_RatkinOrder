@@ -47,9 +47,9 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
 
     public void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
-        if (ratkinOrder is null)
+        if (!ratkinOrder.IsValid())
         {
-            Log.Error("[OARO] RatkinOrder is null, cannot apply interaction.");
+            Log.Error("[OARO] RatkinOrder is invalid, cannot apply interaction.");
             return;
         }
         if (map is null)

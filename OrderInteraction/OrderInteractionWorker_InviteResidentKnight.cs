@@ -63,7 +63,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
         branch ??= ratkinOrder.BranchManager.AllBranches.Where(b => b.IsBranchOfType(Branch.BranchType.Honor)).RandomElementWithFallback(null);
         branch ??= ratkinOrder.BranchManager.AllBranches.RandomElementWithFallback(null);
 
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return (false, true);
         }

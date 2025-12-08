@@ -17,6 +17,11 @@ public static class KeyLibrary_EffectTag
     /// 强化训练
     /// </summary>
     public const string IntensiveTrain = "IntensiveTrain";
+    /// <summary>
+    /// 阻止远行队被抢劫
+    /// </summary>
+    public const string CaravanPreventLoot = "CaravanPreventLoot";
+
 
     /// <summary>
     /// 禁用分队自然恢复

@@ -486,7 +486,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         }
 
         List<Pawn> pawns = [];
-        bool isKnight = Branch is not null;
+        bool isKnight = Branch.IsValid();
         PlanetTile mapTile = map.Tile;
         for (int i = 0; i < groupMaker.options.Count; i++)
         {

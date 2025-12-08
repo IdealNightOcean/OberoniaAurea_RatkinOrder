@@ -10,7 +10,7 @@ public class BranchStatPart_SquadMemberRecoveryRate : BranchStatPart
     {
         curValue += branch.PopulationHandler.Population / 100f * 0.005f;
     }
-    public override void ModifyExplanation(Branch branch, StringBuilder explanation)
+    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
         explanation.Append("    ");
         explanation.AppendLine("OARO_ChangeOffset_BranchPopulation".Translate((branch.PopulationHandler.Population / 100f * 0.005f).ToStringWithSign("0.##"))

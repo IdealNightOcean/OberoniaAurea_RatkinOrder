@@ -22,7 +22,7 @@ public class QuestNode_AddBranchClique : QuestNode_AddGeneralClique
     {
         Slate slate = QuestGen.slate;
         Branch branch = this.branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return null;
         }

@@ -13,6 +13,8 @@ namespace OberoniaAurea.RatkinOrder;
 public static class BranchUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool IsValid(this RatkinOrder ratkinOrder) => ratkinOrder is not null && !ratkinOrder.HasRemoved;
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsValid(this Branch branch) => branch is not null && branch.RatkinOrder is not null && !branch.RatkinOrder.HasRemoved;
 
     /// <summary>
@@ -156,7 +158,7 @@ public static class BranchUtility
 
     public static bool CanBeSiteForNewBranch(this WorldObject worldObject, RatkinOrder ratkinOrder)
     {
-        if (ratkinOrder is null || worldObject is null)
+        if (!ratkinOrder.IsValid() || worldObject is null)
         {
             return false;
         }
@@ -175,7 +177,7 @@ public static class BranchUtility
 
     public static AcceptanceReport IsValidTileForInviteBranchCreation(RatkinOrder ratkinOrder, Map map, PlanetTile tile, bool resultOnly)
     {
-        if (map is null || ratkinOrder is null || !tile.Valid)
+        if (map is null || !ratkinOrder.IsValid() || !tile.Valid)
         {
             return false;
         }
@@ -315,7 +317,7 @@ public static class BranchUtility
 
     public static AcceptanceReport CanChangeFocusedTaskType(Branch branch, bool resultOnly)
     {
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return false;
         }
@@ -342,7 +344,7 @@ public static class BranchUtility
 
     public static AcceptanceReport CanChangeRadicalismDegree(Branch branch, bool resultOnly)
     {
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return false;
         }

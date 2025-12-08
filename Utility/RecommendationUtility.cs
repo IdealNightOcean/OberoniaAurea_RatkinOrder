@@ -31,7 +31,7 @@ public static class RecommendationUtility
 
     public static void GiveRecommendationsToPlayer(RatkinOrder order, int count, Action<Thing> giveAction)
     {
-        if (order is null || count <= 0 || giveAction is null)
+        if (!order.IsValid() || count <= 0 || giveAction is null)
         {
             return;
         }

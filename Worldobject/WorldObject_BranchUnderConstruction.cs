@@ -18,7 +18,7 @@ public class WorldObject_BranchUnderConstruction : WorldObject
         base.ExposeData();
         Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
         Scribe_Values.Look(ref completedTick, "completedTick", 0);
-        if (Scribe.mode == LoadSaveMode.PostLoadInit && ratkinOrder is null)
+        if (Scribe.mode == LoadSaveMode.PostLoadInit && !ratkinOrder.IsValid())
         {
             this.SafeDestroy();
         }
@@ -53,7 +53,7 @@ public class WorldObject_BranchUnderConstruction : WorldObject
         PlanetTile tile = Tile;
         this.SafeDestroy();
 
-        if (ratkinOrder is null || ratkinOrder.HasRemoved)
+        if (!ratkinOrder.IsValid())
         {
             return;
         }
@@ -62,7 +62,7 @@ public class WorldObject_BranchUnderConstruction : WorldObject
         branchSite.Tile = tile;
         branchSite.SetFaction(ratkinOrder.Faction);
         Branch branch = Branch.GenerateBranchFor(ratkinOrder, branchSite, addToManager: true);
-        if (branch is not null)
+        if (branch.IsValid())
         {
             Find.WorldObjects.Add(branchSite);
             OrderLetterUtility.ReceiveLetter(

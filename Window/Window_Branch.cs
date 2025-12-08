@@ -56,18 +56,7 @@ public class Window_Branch : OrderWindowBase
     private BranchFacilityStageSummaryUICache CurFacilityStageCache { get; set; }
     private BranchFacilityStageSummaryUICache NextFacilityStageCache { get; set; }
 
-    private Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> optionalBuildingDefs;
-    private Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> OptionalBuildingDefs
-    {
-        get
-        {
-            if (optionalBuildingDefs is null)
-            {
-                RecacheOptionalBuildingDefs();
-            }
-            return optionalBuildingDefs;
-        }
-    }
+    private Lazy<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
 
     private Vector2 scrollPosition_Facilities;
     private Vector2 scrollPosition_CurFacilityStage;
@@ -128,6 +117,7 @@ public class Window_Branch : OrderWindowBase
 
         AllFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
 
+        OptionalBuildingDefs = new(valueFactory: GetOptionalBuildingDefs);
         ContractAcceptances = new(refreshFunc: RecacheContractAcceptance);
         NaturalPopulationCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_NaturalPopulationCeiling, showResultValue: true));
         BuildingCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_BuildingCeiling, showResultValue: true));
@@ -1233,7 +1223,7 @@ public class Window_Branch : OrderWindowBase
         float entryHeight = 96f;
         Rect entryRect;
 
-        Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> optionalBuildingDefs = OptionalBuildingDefs;
+        Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> optionalBuildingDefs = OptionalBuildingDefs.Value;
         optionalViewRect.height = entryHeight * optionalBuildingDefs.Count;
 
         Widgets.BeginScrollView(optionalOutRect, ref scrollPosition_OptionalBuildings, optionalViewRect);
@@ -1481,7 +1471,10 @@ public class Window_Branch : OrderWindowBase
         NextFacilityStageCache = null;
 
         SelEmptyBuildingSlotIsSpecial = null;
-        optionalBuildingDefs = null;
+        if (OptionalBuildingDefs.IsValueCreated)
+        {
+            OptionalBuildingDefs.Value.Clear();
+        }
     }
 
     private void ClearInteractionCache()
@@ -1491,26 +1484,20 @@ public class Window_Branch : OrderWindowBase
         buildingInteractionAcceptances.Clear();
     }
 
-    private void RecacheOptionalBuildingDefs()
+    private Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> GetOptionalBuildingDefs()
     {
-        optionalBuildingDefs = new(Mathf.RoundToInt(DefDatabase<BranchBuildingDef>.DefCount * 0.5f));
-        BranchBuildingHandler buildingHandler = Branch.BuildingHandler;
-        HashSet<BranchBuildingDef> existBuildingDefs = buildingHandler.NormalBuildings.Select(b => b.Def).ToHashSet();
-        if (buildingHandler.SpecialBuilding is not null)
-        {
-            existBuildingDefs.Add(buildingHandler.SpecialBuilding.Def);
-        }
-        if (buildingHandler.UnderConstructionBuilding is not null)
-        {
-            existBuildingDefs.Add(buildingHandler.UnderConstructionBuilding.TargetDef);
-        }
+        Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> options = new(DefDatabase<BranchBuildingDef>.DefCount - Branch.BuildingHandler.AllBuldingsCount);
+
+        HashSet<BranchBuildingDef> allBuildingDefsHash = Branch.BuildingHandler.AllBuildingDefsHash.Value;
         foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefs)
         {
-            if (!existBuildingDefs.Contains(buildingDef))
+            if (!allBuildingDefsHash.Contains(buildingDef))
             {
-                optionalBuildingDefs.Add(buildingDef, new BranchBuildingDefSummaryUICache(buildingDef, Branch));
+                options.Add(buildingDef, new BranchBuildingDefSummaryUICache(buildingDef, Branch));
             }
         }
+
+        return options;
     }
 
     private List<KeyValuePair<BranchContract, AcceptanceReport>> RecacheContractAcceptance()
@@ -1584,17 +1571,17 @@ public class Window_Branch : OrderWindowBase
             }
         }
 
-        if (optionalBuildingDefs is null)
+        if (!OptionalBuildingDefs.IsValueCreated)
         {
             return;
         }
         if (added)
         {
-            optionalBuildingDefs.Remove(buildingDef);
+            OptionalBuildingDefs.Value.Remove(buildingDef);
         }
         else
         {
-            optionalBuildingDefs[buildingDef] = new BranchBuildingDefSummaryUICache(buildingDef, Branch);
+            OptionalBuildingDefs.Value[buildingDef] = new BranchBuildingDefSummaryUICache(buildingDef, Branch);
         }
     }
 

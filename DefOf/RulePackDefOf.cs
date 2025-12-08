@@ -6,11 +6,23 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class OARO_RulePackDefOf
 {
-    public static RulePackDef OARO_NameBuilder_BranchName; //分部名称拼装 
-    public static RulePackDef OARO_NameBuilder_SquadName; //分队名称拼装
+    /// <summary>
+    /// 分部名称拼装 
+    /// </summary>
+    public static RulePackDef OARO_NameBuilder_BranchName;
+    /// <summary>
+    /// 分队名称拼装
+    /// </summary>
+    public static RulePackDef OARO_NameBuilder_SquadName;
     public static RulePackDef OARO_Dialog_AroundKnightGroupVisitInvalid;
-    public static RulePackDef OARO_Namer_Nobility; //贵族名称
-    public static RulePackDef OARO_JointPatrolCompletion; //联合巡逻完成
+    /// <summary>
+    /// 贵族名称
+    /// </summary>
+    public static RulePackDef OARO_Namer_Nobility;
+    /// <summary>
+    /// 联合巡逻完成
+    /// </summary>
+    public static RulePackDef OARO_JointPatrolCompletion;
     static OARO_RulePackDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_RulePackDefOf));

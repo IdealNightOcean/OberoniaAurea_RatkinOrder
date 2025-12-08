@@ -22,7 +22,7 @@ public static class BranchSupportUtility
 
     public static AcceptanceReport CanBombard(Branch branch, Map map, bool resultOnly)
     {
-        if (branch is null || map is null)
+        if (!branch.IsValid() || map is null)
         {
             return false;
         }
@@ -51,7 +51,7 @@ public static class BranchSupportUtility
 
     public static AcceptanceReport CanCombatKnightSupport(Branch branch, Map map, DeploymentLevel level, bool resultOnly)
     {
-        if (branch is null || map is null)
+        if (!branch.IsValid() || map is null)
         {
             return false;
         }

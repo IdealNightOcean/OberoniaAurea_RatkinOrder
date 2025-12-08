@@ -30,7 +30,7 @@ public class QuestNode_InitJointPatrolCaravanHelp : QuestNode
         }
 
         Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return;
         }

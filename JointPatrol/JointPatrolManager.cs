@@ -664,7 +664,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         try
         {
-            participants.RemoveAll(r => r is null || r.Branch is null);
+            participants.RemoveAll(r => r is null || !r.Branch.IsValid());
             participantsDict.RemoveAll(kv => kv.Key is null || kv.Value is null);
 
             foreach (JointBranchRecord record in participants)
@@ -910,7 +910,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             targetBranch = participantsDict.Keys.RandomElementWithFallback(fallback: null);
         }
 
-        if (targetBranch is null)
+        if (!targetBranch.IsValid())
         {
             return;
         }
@@ -993,7 +993,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         if (curState != PatrolState.Invalid)
         {
-            if (participants.RemoveAll(r => r is null || r.Branch is null) > 0)
+            if (participants.RemoveAll(r => r is null || !r.Branch.IsValid()) > 0)
             {
                 Log.Error($"[OARO] Some participant branches of {ratkinOrder} were null after loading and have been removed.");
             }
@@ -1023,7 +1023,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     /// </summary>
     private void ApplyJointInteractionEffect(JointPatrolInteractionDef def, JointBranchRecord record)
     {
-        if (record?.Branch is null)
+        if (record is null || !record.Branch.IsValid())
         {
             return;
         }

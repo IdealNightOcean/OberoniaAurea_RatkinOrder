@@ -24,7 +24,7 @@ public abstract class QuestNode_GetBranchBase : QuestNode
     protected override bool TestRunInt(Slate slate)
     {
         Branch branch = GetBranch(slate);
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return false;
         }
@@ -41,7 +41,7 @@ public abstract class QuestNode_GetBranchBase : QuestNode
 
         Branch branch = GetBranch(slate);
 
-        if (branch is null)
+        if (!branch.IsValid())
         {
             return;
         }

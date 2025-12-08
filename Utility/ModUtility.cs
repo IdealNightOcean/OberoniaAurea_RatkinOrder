@@ -114,7 +114,7 @@ public static class ModUtility
         {
             prefix += "_";
         }
-        if (ratkinOrder is null)
+        if (!ratkinOrder.IsValid())
         {
             yield return new Rule_String(prefix + "name", "OARO_RatkinOrderUnaffiliated".Translate());
             yield break;

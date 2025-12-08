@@ -36,15 +36,15 @@ public class BranchTask_JurisdictionDutyPrep : BranchTask
         {
             if (branch.IsBranchOfType(Branch.BranchType.Friendly))
             {
-                Messages.Message("OARO_Message_JurisdictionDutyStart".Translate(branch.Name), MessageTypeDefOf.NeutralEvent, historical: false);
+                Messages.Message("OARO_Message_JurisdictionDutyStart".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)), MessageTypeDefOf.NeutralEvent, historical: false);
             }
             else
             {
-                Find.LetterStack.ReceiveLetter("OARO_LetterLabel_JurisdictionDutyStart".Translate(),
-                                               "OARO_Letter_JurisdictionDutyStart".Translate(branch.Name),
-                                               LetterDefOf.NeutralEvent,
-                                               null,
-                                               branch.RatkinOrder.Faction);
+                Find.LetterStack.ReceiveLetter(label: "OARO_LetterLabel_JurisdictionDutyStart".Translate(),
+                                               text: "OARO_Letter_JurisdictionDutyStart".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                                               textLetterDef: LetterDefOf.NeutralEvent,
+                                               lookTargets: branch.BaseSite,
+                                               relatedFaction: branch.RatkinOrder.Faction);
             }
         }
     }

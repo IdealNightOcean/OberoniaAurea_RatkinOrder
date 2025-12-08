@@ -100,6 +100,10 @@
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_RecommendationToKnight.cs" />
     <Compile Include="BranchInteraction\TargetlessInteraction\BranchInteractionWorker_RequestCombatReadiness.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_UnlockSupportAuthority.cs" />
+    <Compile Include="BranchStat\BranchStatPart_BranchEffectTagFactor.cs" />
+    <Compile Include="BranchStat\BranchStatPart_BranchEffectTagOffset.cs" />
+    <Compile Include="BranchStat\BranchStatPart_OrderReformationFactor.cs" />
+    <Compile Include="BranchStat\BranchStatPart_OrderReformationOffset.cs" />
     <Compile Include="Branch\UnderConstructionRecord.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchResident\BranchResident_Deployment.cs" />
@@ -137,7 +141,9 @@
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
+    <Compile Include="InteractionWorker_KnightlyTalk.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\Alert_ResidentKnightWillResignation.cs" />
+    <Compile Include="HarmonyPatch\CaravanDemand_CanFireNowSub_Patch.cs" />
     <Compile Include="Interface\IJointPatrolCaravanHelpSite.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_TouristAreaPatrol.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_JointHunting.cs" />
@@ -164,6 +170,7 @@
     <Compile Include="OrderLetter\OrderLetter_SimpleAttachments.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_InitJointPatrolCaravanHelp.cs" />
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
+    <Compile Include="Quest\Reward\Quest_GiveBranchMedal_CriticalDemand.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
@@ -174,7 +181,7 @@
     <Compile Include="Components\TrackedIntValue.cs" />
     <Compile Include="Components\TrackedFloatValue.cs" />
     <Compile Include="Components\QuestEffectTag.cs" />
-    <Compile Include="DefModExtension\DemandPreSetQuestEffectTags.cs" />
+    <Compile Include="DefModExtension\CriticalDemand_Extension.cs" />
     <Compile Include="DefModExtension\ResidentKnightPreferredBuildingExtension.cs" />
     <Compile Include="DefOf\OrderReformationDefOf.cs" />
     <Compile Include="DefOf\LetterDefOf.cs" />

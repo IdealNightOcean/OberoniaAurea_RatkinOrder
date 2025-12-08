@@ -85,7 +85,7 @@ public class QuestPart_OrderEsteemChange : QuestPart, IOnRatkinOrderRemoved
     public string Reason;
     public override void Notify_QuestSignalReceived(Signal signal)
     {
-        if (RatkinOrder is not null && signal.tag == InSignalTrigger)
+        if (RatkinOrder.IsValid() && signal.tag == InSignalTrigger)
         {
             RatkinOrder.EsteemHandler.AdjustEsteem(Change, byPlayer: true, reason: Reason);
         }

@@ -30,7 +30,7 @@ public class QuestNode_OrderRecommendation : QuestNode
 
         RatkinOrder ratkinOrder = this.ratkinOrder.GetValue(slate);
         int recommendationCount = count.GetValue(slate);
-        if (ratkinOrder is null || recommendationCount <= 0)
+        if (!ratkinOrder.IsValid() || recommendationCount <= 0)
         {
             return;
         }
@@ -119,7 +119,7 @@ public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
     {
         if (signal.tag == InSignalTrigger)
         {
-            if (RatkinOrder is null)
+            if (!RatkinOrder.IsValid())
             {
                 return;
             }

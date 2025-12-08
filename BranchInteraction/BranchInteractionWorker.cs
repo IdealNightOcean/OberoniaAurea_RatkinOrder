@@ -15,7 +15,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 
     protected virtual AcceptanceReport ParmsValidate(BranchInteractionParms parms, bool resultOnly)
     {
-        if (parms.Branch is null)
+        if (!parms.Branch.IsValid())
         {
             return false;
         }

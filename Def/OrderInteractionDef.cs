@@ -39,7 +39,7 @@ public class OrderInteractionDef : InteractionDefBase
 
     public AcceptanceReport CanUseInteraction(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
-        if (ratkinOrder is null || Worker is null)
+        if (!ratkinOrder.IsValid() || Worker is null)
         {
             return false;
         }
@@ -48,7 +48,7 @@ public class OrderInteractionDef : InteractionDefBase
 
     public void TryApplyInteraction(RatkinOrder ratkinOrder, Map map)
     {
-        if (ratkinOrder is not null)
+        if (ratkinOrder.IsValid())
         {
             Worker?.TryApplyInteraction(ratkinOrder, map); ;
         }

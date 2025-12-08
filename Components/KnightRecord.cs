@@ -39,7 +39,7 @@ public class KnightRecord : IExposable, ILoadReferenceable
     public KnightRecord(RatkinOrder ratkinOrder, Branch branch = null, KnightPersonality personality = KnightPersonality.None, bool isCombatant = false, bool isCommander = false)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        if (branch is not null && branch.RatkinOrder != ratkinOrder)
+        if (branch.IsValid() && branch.RatkinOrder != ratkinOrder)
         {
             throw new ArgumentException();
         }

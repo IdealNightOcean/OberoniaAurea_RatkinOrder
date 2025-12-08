@@ -11,7 +11,7 @@ public class BranchStatPart_SquadMemberCeiling : BranchStatPart
         curValue += branch.RatkinOrder.FundHandler.Funds;
     }
 
-    public override void ModifyExplanation(Branch branch, StringBuilder explanation)
+    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
         explanation.AppendLine("OARO_ChangeOffset_Fund".Translate((branch.RatkinOrder.FundHandler.Funds / 0.08f).ToStringWithSign("0.##"))
                                                        .Colorize(Color.green));

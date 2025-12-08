@@ -9,7 +9,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Reward_BranchMedals : Reward
 {
-    public short Amount;
+    public int Amount;
     public Branch Branch;
     public List<BranchMedalDef> PotentialDefs;
 
@@ -52,8 +52,8 @@ public class Reward_BranchMedals : Reward
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref Amount, "Amount", (short)0);
-        Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Collections.Look(ref PotentialDefs, "PotentialDefs", LookMode.Def);
+        Scribe_Values.Look(ref Amount, nameof(Amount), 0);
+        Scribe_References.Look(ref Branch, nameof(Branch));
+        Scribe_Collections.Look(ref PotentialDefs, nameof(PotentialDefs), LookMode.Def);
     }
 }

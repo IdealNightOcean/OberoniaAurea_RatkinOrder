@@ -25,7 +25,7 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
 
     protected override void FinishWork()
     {
-        if (ratkinOrder is null)
+        if (!ratkinOrder.IsValid())
         {
             return;
         }

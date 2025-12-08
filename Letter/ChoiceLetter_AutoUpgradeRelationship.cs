@@ -9,7 +9,7 @@ public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
     {
         get
         {
-            if (ArchivedOnly || relatedOrder is null)
+            if (ArchivedOnly || !relatedOrder.IsValid())
             {
                 yield return Option_Close;
             }

@@ -10,34 +10,73 @@ public static class OARO_ModDefOf
     public static BackstoryDef Ratkin_Knight;
     public static BackstoryDef Ratkin_KnightCommander;
 
-    public static BranchFacilityDef OARO_SupportFacility; //支援设施
+    /// <summary>
+    /// 支援设施
+    /// </summary>
+    public static BranchFacilityDef OARO_SupportFacility;
 
     public static FactionDef Rakinia;
     public static FactionDef OARO_SubRakinia_Neutral;
 
+    /// <summary>
+    /// 旅鼠派系
+    /// </summary>
     [MayRequire("OARK.RatkinFaction.GeneExpand")]
-    public static FactionDef Rakinia_TravelRatkin; //旅鼠派系
+    public static FactionDef Rakinia_TravelRatkin;
+    /// <summary>
+    /// 岩鼠派系
+    /// </summary>
     [MayRequire("OARK.RatkinFaction.GeneExpand")]
-    public static FactionDef Rakinia_RockRatkin; //岩鼠派系
+    public static FactionDef Rakinia_RockRatkin;
 
+    /// <summary>
+    /// 骑士团交互 - 斡旋关系
+    /// </summary>
     public static HistoryEventDef OARO_OrderMediateFactionRelation;
 
-    public static BranchHonorDef OARO_Honor_Instructor; //荣誉分部 - 教导骑士
+    /// <summary>
+    /// 荣誉分部 - 教导骑士
+    /// </summary>
+    public static BranchHonorDef OARO_Honor_Instructor;
 
-    public static IncidentDef OARO_RaidNobilityTerritory; //叛乱镇压 - 贵族领地战斗
+    /// <summary>
+    /// 叛乱镇压 - 贵族领地战斗
+    /// </summary>
+    public static IncidentDef OARO_RaidNobilityTerritory;
 
-    public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader; //丢东西的旅行商人
+    /// <summary>
+    /// 丢东西的旅行商人
+    /// </summary>
+    public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader;
 
     public static RoomRoleDef OARO_RatkinOrderHall;
 
-    public static TraderKindDef OARO_TownConstruction_Trader; //建筑商商店
+    /// <summary>
+    /// 建筑商商店
+    /// </summary>
+    public static TraderKindDef OARO_TownConstruction_Trader;
 
-    public static ResidentKnightRoleDef OARO_Clerk; //驻地文书
-    public static ResidentKnightRoleDef OARO_Orderly; //地区看护
+    /// <summary>
+    /// 驻地文书
+    /// </summary>
+    public static ResidentKnightRoleDef OARO_Clerk;
+    /// <summary>
+    /// 地区看护
+    /// </summary>
+    public static ResidentKnightRoleDef OARO_Orderly;
 
-    public static StatDef OARO_Stat_MeditationDailyGain; //每日修行点获得
-    public static StatDef OARO_Stat_MeditationFactor; //每日修行点获得系数
-    public static StatDef OARO_Stat_MeditationBase; //每日修行点获得基础
+    /// <summary>
+    /// 每日修行点获得
+    /// </summary>
+    public static StatDef OARO_Stat_MeditationDailyGain;
+    /// <summary>
+    /// 每日修行点获得系数
+    /// </summary>
+    public static StatDef OARO_Stat_MeditationFactor;
+    /// <summary>
+    /// 每日修行点获得基础
+    /// </summary>
+    public static StatDef OARO_Stat_MeditationBase;
 
     public static TraitDef OARO_OrderKnight;
 

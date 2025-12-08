@@ -24,7 +24,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
 
     public WorldObjectCompProperties_BranchSite Props => (WorldObjectCompProperties_BranchSite)props;
 
-    public bool IsActive => branch is not null;
+    public bool IsActive => branch.IsValid();
 
     public override void PostExposeData()
     {
@@ -32,7 +32,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
         Scribe_References.Look(ref branch, "branch");
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (branch is null && Props.independent)
+            if (!branch.IsValid() && Props.independent)
             {
                 parent.SafeDestroy();
             }
@@ -67,7 +67,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
     {
         try
         {
-            if (branch is not null)
+            if (branch.IsValid())
             {
                 if (replaceCur)
                 {

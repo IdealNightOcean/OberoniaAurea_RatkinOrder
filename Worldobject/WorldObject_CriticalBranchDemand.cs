@@ -39,7 +39,7 @@ public abstract class WorldObject_CriticalBranchDemand : WorldObject_InteractWit
         }
     }
 
-    public float TotalPotency => CliquesManager?.TotalPotency ?? 0f;
+    public float TotalPotency => CliquesManager?.TotalPotency.Value ?? 0f;
 
     public override void ExposeData()
     {

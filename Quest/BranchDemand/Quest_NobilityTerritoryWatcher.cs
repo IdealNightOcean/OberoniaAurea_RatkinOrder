@@ -126,7 +126,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
     public override void Notify_PreCleanup()
     {
         base.Notify_PreCleanup();
-        if (quest.State == QuestState.EndedSuccess && extraRecommendation > 0 && Branch is not null)
+        if (quest.State == QuestState.EndedSuccess && extraRecommendation > 0 && Branch.IsValid())
         {
             Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
             if (map is not null)

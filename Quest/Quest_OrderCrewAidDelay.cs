@@ -105,7 +105,7 @@ public class QuestPart_OrderCrewAidDelay : QuestPart_Delay
 
     protected override void DelayFinished()
     {
-        if (RatkinOrder is null || persuadeCount >= MaxPersuadeCount)
+        if (!RatkinOrder.IsValid() || persuadeCount >= MaxPersuadeCount)
         {
             NotPersuadeToStay();
         }

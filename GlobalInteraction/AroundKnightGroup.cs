@@ -74,6 +74,6 @@ public class AroundKnightGroup : IExposable
 
     public static bool Validate(AroundKnightGroup aroundKnights)
     {
-        return aroundKnights is not null && aroundKnights.branch is not null;
+        return aroundKnights is not null && aroundKnights.branch.IsValid();
     }
 }

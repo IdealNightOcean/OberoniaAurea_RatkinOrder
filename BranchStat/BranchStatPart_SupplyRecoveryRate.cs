@@ -11,7 +11,7 @@ public class BranchStatPart_SupplyRecoveryRate : BranchStatPart
         curValue += branch.PopulationHandler.Population / 100f * 0.0005f;
     }
 
-    public override void ModifyExplanation(Branch branch, StringBuilder explanation)
+    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
         explanation.Append("    ");
         explanation.AppendLine("OARO_ChangeOffset_BranchPopulation".Translate((branch.PopulationHandler.Population / 100f * 0.0005f).ToStringPercent("0.##"))

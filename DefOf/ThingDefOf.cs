@@ -6,26 +6,62 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class OARO_ThingDefOf
 {
-    public static ThingDef Ratkin; //鼠族
-    public static ThingDef Ratkin_Su; //鼠族实验体
+    /// <summary>
+    /// 鼠族
+    /// </summary>
+    public static ThingDef Ratkin;
+    /// <summary>
+    /// 鼠族实验体
+    /// </summary>
+    public static ThingDef Ratkin_Su;
 
-    public static ThingDef OARO_OrderRecommendation; //推荐信
-    public static ThingDef OARO_OrderCodePedestal; // 骑士团团规台
+    /// <summary>
+    /// 推荐信
+    /// </summary>
+    public static ThingDef OARO_OrderRecommendation;
+    /// <summary>
+    /// 骑士团团规台
+    /// </summary>
+    public static ThingDef OARO_OrderCodePedestal;
 
     public static ThingDef OARO_BombardSupportMaker;
-    public static ThingDef RK_StrawberryBeer; //草莓精酿
+    /// <summary>
+    /// 草莓精酿
+    /// </summary>
+    public static ThingDef RK_StrawberryBeer;
 
-    public static ThingDef Bullet_Shell_HighExplosive; //高爆榴弹
-    public static ThingDef OARO_Turret_OrderSuperHeavyHowitzer; //超重型榴弹炮
+    /// <summary>
+    /// 高爆榴弹
+    /// </summary>
+    public static ThingDef Bullet_Shell_HighExplosive;
+    /// <summary>
+    /// 超重型榴弹炮
+    /// </summary>
+    public static ThingDef OARO_Turret_OrderSuperHeavyHowitzer;
 
-    public static ThingDef OARO_Bullet_BannerRifle; //旗弹（弹药）
+    /// <summary>
+    /// 旗弹（弹药）
+    /// </summary>
+    public static ThingDef OARO_Bullet_BannerRifle;
 
-    public static ThingDef OARO_OrderLetterBox; //骑士团信箱
-    public static ThingDef OARO_WineDisplayShelf; //骑士团酒架
+    /// <summary>
+    /// 骑士团信箱
+    /// </summary>
+    public static ThingDef OARO_OrderLetterBox;
+    /// <summary>
+    /// 骑士团酒架
+    /// </summary>
+    public static ThingDef OARO_WineDisplayShelf;
 
-    public static ThingDef OARO_PlagueSample; //瘟疫样本
+    /// <summary>
+    /// 瘟疫样本
+    /// </summary>
+    public static ThingDef OARO_PlagueSample;
 
-    public static ThingDef OARO_DesignDrawing; //设计规划图
+    /// <summary>
+    /// 设计规划图
+    /// </summary>
+    public static ThingDef OARO_DesignDrawing;
 
     static OARO_ThingDefOf()
     {

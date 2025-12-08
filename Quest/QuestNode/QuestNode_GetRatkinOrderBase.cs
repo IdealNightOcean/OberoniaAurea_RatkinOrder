@@ -16,7 +16,7 @@ public abstract class QuestNode_GetRatkinOrderBase : QuestNode
     protected override bool TestRunInt(Slate slate)
     {
         RatkinOrder order = GetRatkinOrder(slate);
-        if (order is null)
+        if (!order.IsValid())
         {
             return false;
         }
@@ -33,7 +33,7 @@ public abstract class QuestNode_GetRatkinOrderBase : QuestNode
 
         RatkinOrder ratkinOrder = GetRatkinOrder(slate);
 
-        if (ratkinOrder is null)
+        if (!ratkinOrder.IsValid())
         {
             return;
         }

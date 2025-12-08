@@ -17,7 +17,8 @@ internal sealed class IncidentWorker_RaidNobilityTerritory : IncidentWorker
         {
             return false;
         }
-        if (nobilityTerritory.Parent is null)
+        Branch branch = nobilityTerritory.Parent?.Branch;
+        if (!branch.IsValid())
         {
             return false;
         }
@@ -30,52 +31,78 @@ internal sealed class IncidentWorker_RaidNobilityTerritory : IncidentWorker
         {
             return false;
         }
-        if (nobilityTerritory.Parent is null)
+        Branch branch = nobilityTerritory.Parent?.Branch;
+        if (!branch.IsValid())
         {
             return false;
         }
         if (nobilityTerritory.BranchJoin)
         {
-            BranchSupportUtility.DoCombatKnightSupport(nobilityTerritory.Parent.Branch, map, BranchSupportUtility.DeploymentLevel.Entire, sendStandardLetter: true);
-        }
-
-        if (nobilityTerritory.AssaultTypeValue == MapParent_NobilityTerritory.AssaultType.BePounced)
-        {
-            Faction playerFaction = Faction.OfPlayer;
-            Faction branchFaction = nobilityTerritory.Parent.Branch.RatkinOrder.Faction;
-
-            IEnumerable<Pawn> friendlyPawns = map.mapPawns.AllHumanlikeSpawned.Where(p => p.Faction == playerFaction || p.Faction == branchFaction);
-            foreach (Pawn p in friendlyPawns)
-            {
-                p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPouncePlayer);
-            }
+            BranchSupportUtility.DoCombatKnightSupport(branch, map, BranchSupportUtility.DeploymentLevel.Entire, sendStandardLetter: true);
         }
 
         Faction enemyFaction = nobilityTerritory.Faction;
         IEnumerable<Pawn> hostilePawns = map.mapPawns.AllHumanlikeSpawned.Where(p => p.Faction == enemyFaction);
-        if (nobilityTerritory.AssaultTypeValue == MapParent_NobilityTerritory.AssaultType.Pounce)
+        switch (nobilityTerritory.AssaultTypeValue)
         {
-            foreach (Pawn p in hostilePawns)
-            {
-                p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPounce);
-            }
-        }
-
-        if (nobilityTerritory.AssaultTypeValue == MapParent_NobilityTerritory.AssaultType.DeadlyPounce)
-        {
-            foreach (Pawn p in hostilePawns)
-            {
-                Hediff hediff = p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPounce);
-                hediff.Severity = 2f;
-
-                if (Rand.Chance(0.2f))
+            case MapParent_NobilityTerritory.AssaultType.BePounced:
                 {
-                    //  p.mindState.mentalBreaker.TryDoMentalBreak("OARO_NobilityTerritory_DeadlyPounceScare".Translate());
+                    foreach (Pawn p in hostilePawns)
+                    {
+                        p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryInHeat);
+                    }
+
+                    Faction playerFaction = Faction.OfPlayer;
+                    Faction branchFaction = branch.RatkinOrder.Faction;
+
+                    IEnumerable<Pawn> friendlyPawns = map.mapPawns.AllHumanlikeSpawned.Where(p => p.Faction == playerFaction || p.Faction == branchFaction);
+                    foreach (Pawn p in friendlyPawns)
+                    {
+                        p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPouncePlayer);
+                    }
+
+                    break;
                 }
-            }
+            case MapParent_NobilityTerritory.AssaultType.Normal:
+                {
+                    foreach (Pawn p in hostilePawns)
+                    {
+                        p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryInHeat);
+                    }
+
+                    break;
+                }
+            case MapParent_NobilityTerritory.AssaultType.Pounce:
+                {
+                    foreach (Pawn p in hostilePawns)
+                    {
+                        p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPounce);
+                    }
+                    break;
+                }
+            case MapParent_NobilityTerritory.AssaultType.DeadlyPounce:
+                {
+                    foreach (Pawn p in hostilePawns)
+                    {
+                        Hediff hediff = p.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPounce);
+                        hediff.Severity = 2f;
+
+                        if (Rand.Chance(0.2f))
+                        {
+                            p.mindState.mentalStateHandler.TryStartMentalState(
+                                stateDef: MentalStateDefOf.PanicFlee,
+                                reason: "OARO_NobilityTerritory_DeadlyPounceScare".Translate(),
+                                forced: true,
+                                forceWake: true);
+                        }
+                    }
+                    break;
+                }
+            default: break;
         }
 
-        if (nobilityTerritory.AssaultTypeValue != MapParent_NobilityTerritory.AssaultType.BePounced && nobilityTerritory.Parent.CliquesManager.IsCliqueActive(nobilityTerritory.Parent.NobilityCivilianCliqueKey))
+        if (nobilityTerritory.AssaultTypeValue != MapParent_NobilityTerritory.AssaultType.BePounced
+            && (nobilityTerritory.Parent.CliquesManager?.IsCliqueActive(nobilityTerritory.Parent.NobilityCivilianCliqueKey) ?? false))
         {
             IncidentParms civilianRaidParms = new()
             {

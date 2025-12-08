@@ -5,9 +5,18 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class OrderLetterDefOf
 {
-    public static OrderLetterDef OARO_OfficialLetter; //公务信件
-    public static OrderLetterDef OARO_OfficialLetter_SimpleAttachments; //公务信件 + 简单附件
-    public static OrderLetterDef OARO_UrgentLetter; //紧急信件
+    /// <summary>
+    /// 公务信件
+    /// </summary>
+    public static OrderLetterDef OARO_OfficialLetter;
+    /// <summary>
+    /// 公务信件 + 简单附件
+    /// </summary>
+    public static OrderLetterDef OARO_OfficialLetter_SimpleAttachments;
+    /// <summary>
+    /// 紧急信件
+    /// </summary>
+    public static OrderLetterDef OARO_UrgentLetter;
 
     static OrderLetterDefOf()
     {

@@ -15,9 +15,21 @@ public class Branch : IExposable, ILoadReferenceable
     [Flags]
     public enum BranchType : byte
     {
+        /// <summary>
+        /// 普通
+        /// </summary>
         Normal = 0,
+        /// <summary>
+        /// 友好
+        /// </summary>
         Friendly = 1,
+        /// <summary>
+        /// 荣誉
+        /// </summary>
         Honor = 2,
+        /// <summary>
+        /// 机动
+        /// </summary>
         Mobile = 4
     }
 
@@ -296,7 +308,10 @@ public class Branch : IExposable, ILoadReferenceable
             friendlyDaysLeft = durationDays > friendlyDaysLeft ? durationDays : friendlyDaysLeft;
             if (showMessage)
             {
-                Messages.Message("OARO_Mess_BranchBeFriendly".Translate(name, friendlyDaysLeft), baseSite, MessageTypeDefOf.PositiveEvent);
+                Messages.Message(
+                    text: "OARO_Mess_BranchBeFriendly".Translate(name.Named(KeyLibrary_FormatArgName.BranchName), friendlyDaysLeft.Named(KeyLibrary_FormatArgName.Count)),
+                    lookTargets: baseSite,
+                    def: MessageTypeDefOf.PositiveEvent);
             }
         }
         else if (activeNow)

@@ -6,10 +6,22 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class OARO_JobDefOf
 {
-    public static JobDef OARO_Job_CommonTalkWith; //与...交谈
-    public static JobDef OARO_FillFermentingBarrel; //填充酒窖原料
-    public static JobDef OARO_TakeProductOutOfFermentingBarrel; //从酒窖中取出产物
-    public static JobDef OARO_RecieveLetterFromBox; // 从信息收取信件
+    /// <summary>
+    /// 与...交谈
+    /// </summary>
+    public static JobDef OARO_Job_CommonTalkWith;
+    /// <summary>
+    /// 填充酒窖原料
+    /// </summary>
+    public static JobDef OARO_FillFermentingBarrel;
+    /// <summary>
+    /// 从酒窖中取出产物
+    /// </summary>
+    public static JobDef OARO_TakeProductOutOfFermentingBarrel;
+    /// <summary>
+    /// 从信息收取信件
+    /// </summary>
+    public static JobDef OARO_RecieveLetterFromBox;
 
     static OARO_JobDefOf()
     {
