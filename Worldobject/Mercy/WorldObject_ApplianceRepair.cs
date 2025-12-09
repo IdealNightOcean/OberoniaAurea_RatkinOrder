@@ -2,8 +2,8 @@
 using RimWorld;
 using RimWorld.Planet;
 using System.Text;
-using UnityEngine;
 using Verse;
+using Verse.Utility;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -12,14 +12,18 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedCaravan_Nameable
 {
-    private static readonly string[] faultName = ["OARO_ApplianceFault_line", "OARO_ApplianceFault_Component", "OARO_ApplianceFault_Linkage"];
-    private static readonly string[] repairName = ["OARO_ApplianceRepair_line", "OARO_ApplianceRepair_Component", "OARO_ApplianceRepair_Linkage"];
+    private enum FaultType
+    {
+        Line,
+        Component,
+        Linkage
+    }
+
     public override string FixedCaravanName => "OARO_FixedCaravan_ApplianceRepair".Translate();
 
-    private int faultType;
-
-    private int repairType;
-    public int RepairType { get { return repairType; } set { repairType = Mathf.Clamp(value, 0, 2); } }
+    private FaultType faultType;
+    private FaultType repairType;
+    private string FaultLabel => $"OARO_ApplianceFault_{faultType}".Translate();
 
     private bool isReasonFound;
     private float successChance;
@@ -29,23 +33,23 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref faultType, "faultType", 0);
-        Scribe_Values.Look(ref repairType, "repairType", 0);
-        Scribe_Values.Look(ref successChance, "successChance", 0f);
-        Scribe_Values.Look(ref isReasonFound, "isReasonFound", defaultValue: false);
+        Scribe_Values.Look(ref faultType, nameof(faultType), FaultType.Line);
+        Scribe_Values.Look(ref repairType, nameof(repairType), FaultType.Line);
+        Scribe_Values.Look(ref successChance, nameof(successChance), 0f);
+        Scribe_Values.Look(ref isReasonFound, nameof(isReasonFound), defaultValue: false);
     }
 
     public override void PostMake()
     {
         base.PostMake();
-        faultType = Rand.RangeInclusive(0, 2);
+        faultType = EnumUtility.GetValues<FaultType>().RandomElement();
     }
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Construction) < 0)
+        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled))
         {
-            Messages.Message("OARO_NoOneCanDo".Translate(SkillDefOf.Construction.label), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Crafting.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         base.Notify_CaravanArrived(caravan);
@@ -66,7 +70,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
     protected override void FinishWork()
     {
-        (Pawn maxPawn, int maxLevel) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Construction);
+        (Pawn maxPawn, int _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Crafting);
         TaggedString taggedString;
 
         if (isReasonFound)
@@ -83,12 +87,10 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         }
         else
         {
-
             if (Rand.Chance(0.1f))
             {
                 isReasonFound = true;
-                string reason = faultName[faultType].Translate();
-                taggedString = "OARO_ApplianceRepair_FindReasonSuccess".Translate(maxPawn, reason);
+                taggedString = "OARO_ApplianceRepair_FindReasonSuccess".Translate(maxPawn, FaultLabel);
 
             }
             else
@@ -107,96 +109,51 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         StringBuilder sb = new("OARO_ApplianceRepair_RepairInfo".Translate());
         sb.AppendInNewLine("OARO_ApplianceRepair_CurFault");
         sb.Append(": ");
-        sb.Append(faultName[faultType].Translate());
+        sb.Append(FaultLabel);
 
         DiaNode repairNode = new(sb.ToString());
 
-        DiaOption Option_Line = new(repairName[0])
+        foreach (FaultType type in EnumUtility.GetValues<FaultType>())
         {
-            action = delegate
+            DiaOption option = new($"OARO_ApplianceRepair_{type}".Translate())
             {
-                RepairStart(0, caravan);
-            },
-            resolveTree = true
-        };
-
-        DiaOption Option_Component = new(repairName[1])
-        {
-            action = delegate
+                action = () => RepairStart(type, caravan),
+                resolveTree = true
+            };
+            if (type == FaultType.Component && !CaravanInventoryUtility.HasThings(caravan, ThingDefOf.ComponentIndustrial, 2))
             {
-                RepairStart(1, caravan);
-            },
-            resolveTree = true
-        };
-        if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.ComponentIndustrial, 2))
-        {
-            Option_Component.Disable(null);
+                option.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.ComponentIndustrial.label, 2.ToString()));
+            }
+            repairNode.options.Add(option);
         }
-
-        DiaOption Option_Linkage = new(repairName[2])
-        {
-            action = delegate
-            {
-                RepairStart(2, caravan);
-            },
-            resolveTree = true
-        };
-
-        repairNode.options.Add(Option_Line);
-        repairNode.options.Add(Option_Component);
-        repairNode.options.Add(Option_Linkage);
-
-        repairNode.options.Add(new DiaOption("Close".Translate())
-        {
-            resolveTree = true
-        });
+        repairNode.options.Add(OAFrame_DiaUtility.DefaultCloseOption);
 
         Find.WindowStack.Add(new Dialog_NodeTree(repairNode));
     }
 
-    private void RepairStart(int repairType, Caravan caravan)
+    private void RepairStart(FaultType repairType, Caravan caravan)
     {
-        RepairType = repairType;
-        successChance = 0f;
-
-
-        int maxConstructionSkill = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Construction);
-        if (RepairType == 0)
-        {
-            if (faultType == 0)
-            {
-                successChance *= 2f;
-            }
-            else if (faultType == 1)
-            {
-                successChance *= 0.5f;
-            }
-        }
-        else if (RepairType == 1)
+        this.repairType = repairType;
+        if (repairType == FaultType.Component)
         {
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.ComponentIndustrial, 2);
-            if (faultType == 1)
-            {
-                successChance = 1f;
-            }
-            else if (faultType == 2)
-            {
-                successChance *= 0.5f;
-            }
-        }
-        else
-        {
-            if (faultType == 0)
-            {
-                successChance *= 0.5f;
-            }
-            else if (faultType == 2)
-            {
-                successChance *= 2f;
-            }
         }
 
+        int maxConstructionSkill = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Crafting);
+        float successChance = maxConstructionSkill * 0.05f;
+        successChance *= faultType switch
+        {
+            FaultType.Line => 0.8f,
+            FaultType.Component => 1f,
+            FaultType.Linkage => 0.6f,
+            _ => 1f
+        };
+
+        if (repairType == faultType)
+        {
+            successChance *= 2f;
+        }
+        this.successChance = successChance;
         base.StartWork(caravan);
     }
-
 }

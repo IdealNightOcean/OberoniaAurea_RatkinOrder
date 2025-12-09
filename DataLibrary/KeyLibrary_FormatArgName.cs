@@ -3,6 +3,7 @@
 public static class KeyLibrary_FormatArgName
 {
     public const string SUBJECT = "SUBJECT";
+    public const string FACTION = "FACTION";
     public const string THING = "THING";
     public const string SKILL = "SKILL";
     public const string STUFF = "STUFF";

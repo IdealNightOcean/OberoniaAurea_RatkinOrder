@@ -31,9 +31,9 @@ public static class OARO_ThingDefOf
     public static ThingDef RK_StrawberryBeer;
 
     /// <summary>
-    /// 高爆榴弹
+    /// 鼠族高爆榴弹
     /// </summary>
-    public static ThingDef Bullet_Shell_HighExplosive;
+    public static ThingDef OARO_BulletShell_HeavyGrenade;
     /// <summary>
     /// 超重型榴弹炮
     /// </summary>

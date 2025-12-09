@@ -5,10 +5,11 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public class OARO_QuestScriptDefOf
 {
+    /// <summary>
+    /// 善行任务前置 - 寻求帮助
+    /// </summary>
     public static QuestScriptDef OARO_MercyPre_HelpSeeker;
 
-    public static QuestScriptDef OARO_Mercy_ApplianceRepair;
-    public static QuestScriptDef OARO_Mercy_PastureFlu;
     public static QuestScriptDef OARO_Mercy_TaxCollectorTreat;
 
     public static QuestScriptDef OARO_Quest_TemporaryEncampment;

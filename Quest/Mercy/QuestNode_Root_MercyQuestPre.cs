@@ -9,7 +9,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 {
     protected override bool TestRunInt(Slate slate)
     {
-        return slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuest, out QuestScriptDef _);
+        return slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuestDef, out MercyQuestDef _);
     }
 
     protected override void RunInt()
@@ -24,13 +24,12 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             return;
         }
         slate.Set("map", map);
-        slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuest, out QuestScriptDef mercyQuest);
+        slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuestDef, out MercyQuestDef mercyQuestDef);
 
         slate.TryGet(KeyLibrary_SlateStoreAs.SubFactionDef, out FactionDef subFactionDef);
         slate.TryGet(KeyLibrary_SlateStoreAs.ParentFactionDef, out FactionDef parentFactionDef);
         slate.TryGet(KeyLibrary_SlateStoreAs.ParentFaction, out Faction parentFaction);
 
-        subFactionDef ??= OARO_ModDefOf.OARO_SubRakinia_Neutral;
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
         if (subFaction is null)
         {
@@ -40,7 +39,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         slate.Set(KeyLibrary_SlateStoreAs.SubFaction, subFaction);
 
-        PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind) ?? OARO_PawnKindDefOf.RatkinColonist;
+        PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind);
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
         slate.Set(KeyLibrary_SlateStoreAs.HelpSeeker, helpSeeker);
         quest.PawnsArrive([helpSeeker], inSignal: rootInSignal, map.Parent, arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn);
@@ -71,7 +70,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             TalkWith = helpSeeker,
             DurationTicks = helpSeekerLeaveDelay,
 
-            MmercyQuestDef = mercyQuest,
+            MercyQuestDef = mercyQuestDef,
             SubFaction = subFaction,
             ParentFaction = parentFaction
         };
@@ -125,7 +124,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             InSignalAccept = acceptSignal,
             InSignalReject = rejectSignal,
 
-            MmercyQuestDef = QuestGen.slate.Get<QuestScriptDef>(KeyLibrary_SlateStoreAs.MercyQuest),
+            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.MercyQuestDef),
 
             SubFaction = subFaction,
             ParentFaction = parentFaction,

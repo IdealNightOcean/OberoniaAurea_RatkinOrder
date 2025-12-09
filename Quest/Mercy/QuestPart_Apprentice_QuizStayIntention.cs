@@ -80,12 +80,12 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
                 if (skillSuccess)
                 {
                     label = "OARO_Apprentice_QuizStayIntentionLabel_NS".Translate();
-                    text = "OARO_Apprentice_QuizStayIntention_NS".Translate(Apprentice);
+                    text = "OARO_Apprentice_QuizStayIntention_NS".Translate(Apprentice.Named(KeyLibrary_FormatArgName.PAWN));
                 }
                 else
                 {
                     label = "OARO_Apprentice_QuizStayIntentionLabel_NF".Translate();
-                    text = "OARO_Apprentice_QuizStayIntention_NF".Translate(Apprentice);
+                    text = "OARO_Apprentice_QuizStayIntention_NF".Translate(Apprentice.Named(KeyLibrary_FormatArgName.PAWN));
                 }
             }
             else
@@ -95,12 +95,12 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
                     if (skillSuccess)
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SRS".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SRS".Translate(Apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SRS".Translate(Apprentice.Named(KeyLibrary_FormatArgName.PAWN));
                     }
                     else
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SRF".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SRF".Translate(Apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SRF".Translate(Apprentice.Named(KeyLibrary_FormatArgName.PAWN));
                     }
                 }
                 else
@@ -108,12 +108,12 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
                     if (skillSuccess)
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SS".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SS".Translate(Apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SS".Translate(Apprentice.Named(KeyLibrary_FormatArgName.PAWN));
                     }
                     else
                     {
                         label = "OARO_Apprentice_QuizStayIntentionLabel_SF".Translate();
-                        text = "OARO_Apprentice_QuizStayIntention_SF".Translate(Apprentice);
+                        text = "OARO_Apprentice_QuizStayIntention_SF".Translate(Apprentice.Named(KeyLibrary_FormatArgName.PAWN));
                     }
                 }
             }

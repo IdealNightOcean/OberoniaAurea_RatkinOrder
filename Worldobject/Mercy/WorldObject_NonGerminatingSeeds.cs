@@ -17,9 +17,9 @@ public sealed class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFi
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Plants) < 0)
+        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Plants).TotallyDisabled))
         {
-            Messages.Message("OARO_NoOneCanDo".Translate(SkillDefOf.Plants.label), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Plants.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         base.Notify_CaravanArrived(caravan);

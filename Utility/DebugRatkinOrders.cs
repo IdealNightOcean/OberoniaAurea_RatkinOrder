@@ -336,7 +336,6 @@ public static class DebugRatkinOrders
     {
         OrderBranchOptions(AddBuilding);
 
-
         void AddBuilding(Branch branch)
         {
             BranchBuildingHandler buildingHandler = branch.BuildingHandler;
@@ -393,6 +392,31 @@ public static class DebugRatkinOrders
                 SpawnRecommendation(ratkinOrder);
             });
         }
+    }
+
+    /// <summary>
+    /// 触发善行任务
+    /// </summary>
+    [DebugAction(category: category,
+                 name: "触发善行任务 ",
+                 displayPriority: 860,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
+    private static void TriggerMercyQuest()
+    {
+        List<DebugMenuOption> mercyQuestOptions = [];
+
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+        map ??= Find.CurrentMap;
+        foreach (MercyQuestDef mercyQuestDef in DefDatabase<MercyQuestDef>.AllDefs)
+        {
+            DebugMenuOption orderOption = new(label: mercyQuestDef.label,
+                                              mode: DebugMenuOptionMode.Action,
+                                              method: () => MercyQuestHandler.TryTriggerMercyQuest(mercyQuestDef, map));
+
+            mercyQuestOptions.Add(orderOption);
+        }
+        Find.WindowStack.Add(new Dialog_DebugOptionListLister(mercyQuestOptions));
     }
 
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)

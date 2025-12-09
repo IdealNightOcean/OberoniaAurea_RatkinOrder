@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -114,19 +113,10 @@ public static class BranchSupportUtility
 
     public static void DoBombard(Branch branch, Map map)
     {
-        int bombCount = Mathf.FloorToInt(BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_BombardSupportCeiling));
-        if (bombCount <= 0)
-        {
-            return;
-        }
-
-        if (map.ThreatsCountOfPlayer() <= 0)
-        {
-            return;
-        }
+        IntVec3 placeCell = CellFinder.RandomEdgeCell(map);
         BombardSupportMaker bombMaker = (BombardSupportMaker)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_BombardSupportMaker);
-        bombMaker.SetBombardCount(bombCount);
-        GenPlace.TryPlaceThing(bombMaker, IntVec3.Zero, map, ThingPlaceMode.Near);
+        bombMaker.SetBombardCount(branch);
+        GenPlace.TryPlaceThing(bombMaker, placeCell, map, ThingPlaceMode.Near);
         branch.Supply -= 0.25f;
     }
 

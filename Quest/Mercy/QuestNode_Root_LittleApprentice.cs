@@ -96,10 +96,11 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         else
         {
             OAFrame_TileFinderUtility.TryFindNewAvaliableTile(out PlanetTile tile, questParameter.map.Parent.Tile, 4, 15);
-            WorldObject apprenticeHome = WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_ApprenticeHome);
+            WorldObject_ApprenticeHome apprenticeHome = (WorldObject_ApprenticeHome)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_ApprenticeHome);
             apprenticeHome.Tile = tile;
+            apprenticeHome.SetAssociatedQuest(quest);
             apprenticeHome.SetFaction(questParameter.faction);
-            (apprenticeHome as IQuestAssociate)?.SetAssociatedQuest(quest);
+            apprenticeHome.Name = "OARO_ApprenticeHomeName".Translate(questParameter.faction.Name.Named(KeyLibrary_FormatArgName.FACTION), questParameter.pawns[0].Named(KeyLibrary_FormatArgName.PAWN));
             QuestGen.slate.Set("apprenticeHome", apprenticeHome);
 
             quest.SpawnWorldObject(apprenticeHome, inSignal: durationEndSignal);

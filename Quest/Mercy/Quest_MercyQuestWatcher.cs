@@ -38,31 +38,6 @@ public class QuestPart_MercyQuestWatcher : QuestPart
         Scribe_References.Look(ref ParentFaction, "ParentFaction");
     }
 
-    public override void Notify_PreCleanup()
-    {
-        base.Notify_PreCleanup();
-        if (quest.State != QuestState.EndedSuccess)
-        {
-            return;
-        }
-        RatkinOrder ratkinOrder = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(null);
-        if (!ratkinOrder.IsValid())
-        {
-            return;
-        }
-        OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-              label: "OARO_Offical_MercyQuestSuccessLabel".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
-              text: "OARO_Offical_MercyQuestSuccessText".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), quest.name.Named("QuestName")),
-              def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
-              relatedOrder: ratkinOrder,
-              sender: ratkinOrder.NameColored,
-              relatedLetterType: OrderLetter.RelatedLetterType.Positive);
-        OrderRecommendation orderRecommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
-        orderRecommendation.SetRatkinOrder(ratkinOrder);
-        orderLetter.Attachments = [orderRecommendation];
-        OrderLetterBox.Instance.ReceiveLetter(orderLetter);
-    }
-
     public override void Cleanup()
     {
         base.Cleanup();

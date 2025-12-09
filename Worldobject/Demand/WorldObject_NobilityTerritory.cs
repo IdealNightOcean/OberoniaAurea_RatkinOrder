@@ -1,7 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
-using System;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -19,19 +18,46 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     public enum NobilityType : byte
     {
         None,
-        Deceitful, //狡诈
-        Stubborn, //刚愎
-        Justice, //正义
-        Tyrannical, //暴虐
-        Kindness, //仁慈
-        Greediness //贪婪
+        /// <summary>
+        /// 狡诈
+        /// </summary>
+        Deceitful,
+        /// <summary>
+        /// 刚愎
+        /// </summary>
+        Stubborn,
+        /// <summary>
+        /// 正义
+        /// </summary>
+        Justice,
+        /// <summary>
+        /// 暴虐
+        /// </summary>
+        Tyrannical,
+        /// <summary>
+        /// 仁慈
+        /// </summary>
+        Kindness,
+        /// <summary>
+        /// 贪婪
+        /// </summary>
+        Greediness
     }
 
     private enum WorkType : byte
     {
-        Infiltrate, //尝试渗透
-        Communication, //与贵族交流
-        Negotiate //与贵族谈判
+        /// <summary>
+        /// 尝试渗透
+        /// </summary>
+        Infiltrate,
+        /// <summary>
+        /// 与贵族交流
+        /// </summary>
+        Communication,
+        /// <summary>
+        /// 与贵族谈判
+        /// </summary>
+        Negotiate
     }
 
     public override int TicksNeeded => curWork switch
@@ -677,105 +703,4 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         BeAssaultedAfterWork = false;
     }
 
-}
-
-/// <summary>
-/// 叛乱镇压 - 贵族领地 攻击时的地图
-/// </summary>
-public sealed class MapParent_NobilityTerritory : MapParent_Enterable
-{
-    public enum AssaultType
-    {
-        BePounced,
-        Normal,
-        Pounce,
-        DeadlyPounce
-    }
-
-    public WorldObject_NobilityTerritory Parent;
-    public AssaultType AssaultTypeValue;
-    public bool BranchJoin;
-
-    private bool succeeded;
-
-    public void InitRaidInfo(WorldObject_NobilityTerritory parent, bool playerInitiated, bool branchJoin)
-    {
-        Parent = parent;
-        BranchJoin = branchJoin;
-        if (playerInitiated)
-        {
-            AssaultTypeValue = parent.Osmolity > 0.999f ? AssaultType.DeadlyPounce : Rand.Chance(parent.Osmolity) ? AssaultType.Pounce : AssaultType.Normal;
-        }
-        else
-        {
-            AssaultTypeValue = AssaultType.BePounced;
-        }
-    }
-
-    public override void PostMapGenerate()
-    {
-        base.PostMapGenerate();
-        try
-        {
-            LetterDef letterDef = AssaultTypeValue switch
-            {
-                AssaultType.BePounced => LetterDefOf.ThreatBig,
-                AssaultType.Normal => LetterDefOf.NeutralEvent,
-                _ => LetterDefOf.PositiveEvent
-            };
-
-            Find.LetterStack.ReceiveLetter(
-                label: $"OARO_NobilityTerritory_AssaultLabel_{AssaultTypeValue}".Translate(),
-                text: $"OARO_NobilityTerritory_AssaultText_{AssaultTypeValue}".Translate(Parent.NobilityName),
-                textLetterDef: letterDef,
-                lookTargets: this,
-                quest: Parent.AssociatedQuest);
-
-            IncidentParms parms = new()
-            {
-                target = Map,
-                faction = Faction,
-                forced = true
-            };
-            OAFrame_MiscUtility.AddNewQueuedIncident(OARO_ModDefOf.OARO_RaidNobilityTerritory, delayTicks: 60, parms);
-        }
-        catch (Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: "generating Nobility Territory assault map.",
-                typeName: nameof(MapParent_NobilityTerritory),
-                methodName: nameof(PostMapGenerate),
-                needStackTrace: true);
-        }
-    }
-
-    public override void ExposeData()
-    {
-        base.ExposeData();
-        Scribe_References.Look(ref Parent, "Parent");
-        Scribe_Values.Look(ref AssaultTypeValue, "AssaultTypeValue");
-        Scribe_Values.Look(ref BranchJoin, "BranchJoin");
-
-        Scribe_Values.Look(ref succeeded, "succeeded", defaultValue: false);
-    }
-
-    protected override void TickInterval(int delta)
-    {
-        base.TickInterval(delta);
-        if (!succeeded && HasMap && !GenHostility.AnyHostileActiveThreatToPlayer(Map, countDormantPawnsAsHostile: true))
-        {
-            succeeded = true;
-            forceRemoveWorldObjectWhenMapRemoved = true;
-            Parent?.Notify_AssaultEnd(true);
-        }
-    }
-
-    public override void Destroy()
-    {
-        if (!succeeded)
-        {
-            Parent?.Notify_AssaultEnd(false);
-        }
-        base.Destroy();
-    }
 }

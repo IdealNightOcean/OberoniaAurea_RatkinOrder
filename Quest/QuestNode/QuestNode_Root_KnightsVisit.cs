@@ -53,6 +53,17 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
         return InitRatkinOrder(initBranch: true);
     }
 
+    protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
+    {
+        base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
+
+        pawn.workSettings.DisableAll();
+        pawn.workSettings.SetPriority(WorkTypeDefOf.Firefighter, 3);
+        pawn.workSettings.SetPriority(WorkTypeDefOf.Cleaning, 3);
+        pawn.workSettings.SetPriority(WorkTypeDefOf.Handling, 3);
+        pawn.workSettings.SetPriority(OARO_RimWorldDefOf.Patient, 2);
+    }
+
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_Negative");

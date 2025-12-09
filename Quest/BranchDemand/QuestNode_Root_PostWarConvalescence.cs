@@ -84,6 +84,12 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         }
 
         pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_WarDeepInjury);
+
+        pawn.workSettings.DisableAll();
+        pawn.workSettings.SetPriority(WorkTypeDefOf.Firefighter, 3);
+        pawn.workSettings.SetPriority(WorkTypeDefOf.Cleaning, 3);
+        pawn.workSettings.SetPriority(WorkTypeDefOf.Handling, 3);
+        pawn.workSettings.SetPriority(OARO_RimWorldDefOf.Patient, 2);
     }
 
     protected override void AddQuestAward(QuestPart_Choice.Choice choice)

@@ -21,7 +21,8 @@ public static class KeyLibrary_SlateStoreAs
     public const string ParentFaction = "parentFaction";
     public const string ParentFactionDef = "parentFactionDef";
 
-    public const string MercyQuest = "mercyQuest";
+    public const string MercyQuestDef = "mercyQuestDef";
+    // public const string MercyQuest = "mercyQuest";
     public const string HelpSeeker = "helpSeeker";
     public const string HelpSeekerPawnKind = "helpSeekerPawnKind";
 

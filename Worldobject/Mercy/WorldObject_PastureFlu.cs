@@ -18,9 +18,9 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Medicine) < 0)
+        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Medicine).TotallyDisabled))
         {
-            Messages.Message("OARO_NoOneCanDo".Translate(SkillDefOf.Medicine.label), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Medicine.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         base.Notify_CaravanArrived(caravan);

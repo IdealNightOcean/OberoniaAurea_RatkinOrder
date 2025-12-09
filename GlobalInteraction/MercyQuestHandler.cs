@@ -26,6 +26,8 @@ public class MercyQuestHandler : IExposable
 
     public void Notify_MercyQuestSucceed(Quest quest)
     {
+        ResidentKnightsManager.Instance.Notify_MercyQuestSucceed();
+
         GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
         float letterChance = 0.2f;
 
@@ -35,10 +37,23 @@ public class MercyQuestHandler : IExposable
         }
         if (Rand.Chance(letterChance))
         {
-
+            RatkinOrder ratkinOrder = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(null);
+            if (!ratkinOrder.IsValid())
+            {
+                return;
+            }
+            OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
+                  label: "OARO_Offical_MercyQuestSuccessLabel".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
+                  text: "OARO_Offical_MercyQuestSuccessText".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), quest.name.Named("QuestName")),
+                  def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
+                  relatedOrder: ratkinOrder,
+                  sender: ratkinOrder.NameColored,
+                  relatedLetterType: OrderLetter.RelatedLetterType.Positive);
+            OrderRecommendation orderRecommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
+            orderRecommendation.SetRatkinOrder(ratkinOrder);
+            orderLetter.Attachments = [orderRecommendation];
+            OrderLetterBox.Instance.ReceiveLetter(orderLetter);
         }
-
-        ResidentKnightsManager.Instance.Notify_MercyQuestSucceed();
     }
 
     public void PeriodicTriggerMercyQuest()
@@ -57,14 +72,9 @@ public class MercyQuestHandler : IExposable
             return;
         }
 
-        foreach (QuestScriptDef scriptDef in OrderDefDataBase.MercyQuestsList.TakeRandomElements(3).InRandomOrder())
+        foreach (MercyQuestDef mercyQuestDef in DefDatabase<MercyQuestDef>.AllDefsListForReading.TakeRandomElements(5))
         {
-            Slate slate = new();
-            slate.Set("map", map);
-            slate.Set(KeyLibrary_SlateStoreAs.MercyQuest, scriptDef);
-
-            // 善行任务的派系Test时未生成，只好强制触发了
-            if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_MercyPre_HelpSeeker, slate, forced: true, target: map))
+            if (TryTriggerMercyQuest(mercyQuestDef, map))
             {
                 mercyQuestBaseChance = 0f;
                 return;
@@ -72,6 +82,23 @@ public class MercyQuestHandler : IExposable
         }
 
         mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.1f, 0.8f);
+    }
+
+    public static bool TryTriggerMercyQuest(MercyQuestDef mercyQuestDef, Map map)
+    {
+        Slate slate = new();
+        slate.Set("map", map);
+        if (!mercyQuestDef.TrySetQuestSlateValue(slate))
+        {
+            return false;
+        }
+        // 善行任务的派系Test时未生成，只好强制触发了
+        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(
+            quest: out _,
+            scriptDef: mercyQuestDef.needPreQuest ? mercyQuestDef.preQuestDef : mercyQuestDef.mainQuestDef,
+            slate: slate,
+            forced: true,
+            target: map);
     }
 
     private static float GetMercyQuestChance(float baseChance)

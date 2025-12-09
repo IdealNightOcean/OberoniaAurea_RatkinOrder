@@ -43,6 +43,11 @@ public static class OARO_HediffDefOf
     public static HediffDef OARO_Hediff_KnightlyTalk;
 
     /// <summary>
+    /// 狼灾 - 灾狼
+    /// </summary>
+    public static HediffDef OARO_Hediff_WolfDisaster;
+
+    /// <summary>
     /// 叛乱贵族 - 群情激愤下的叛乱
     /// </summary>
     public static HediffDef OARO_Hediff_NobilityTerritoryInHeat;

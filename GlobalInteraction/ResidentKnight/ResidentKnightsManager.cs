@@ -249,7 +249,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public void Notify_MercyQuestSucceed()
     {
-        float gainPoints = 0f;
+        float gainPoints;
         foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
         {
             gainPoints = 200f * kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);

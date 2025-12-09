@@ -1,8 +1,76 @@
 ﻿using OberoniaAurea_Frame;
+using RimWorld;
+using System;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class MapParent_WolfDisaster : MapParent_Enterable
 {
+    private Pawn wolf;
+    private bool WolfDead { get; set; }
+    private int TicksToNextCheck { get; set; }
 
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_References.Look(ref wolf, nameof(wolf));
+    }
+
+    public override void PostMapGenerate()
+    {
+        try
+        {
+            IntVec3 spawnCell = CellFinder.RandomSpawnCellForPawnNear(Map.Center, Map);
+            PawnGenerationRequest request = new(OARO_RimWorldDefOf.Wolf_Timber, tile: Map.Tile, forceGenerateNewPawn: true);
+            wolf = PawnGenerator.GeneratePawn(request);
+            wolf.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_WolfDisaster);
+            GenSpawn.Spawn(wolf, spawnCell, Map);
+            wolf.mindState.mentalStateHandler.TryStartMentalState(MentalStateDefOf.Manhunter, forced: true, forceWake: true);
+            Find.LetterStack.ReceiveLetter(
+                label: "OARO_Enter_WolfDisasterLabel".Translate(),
+                text: "OARO_Enter_WolfDisasterText".Translate(),
+                textLetterDef: LetterDefOf.ThreatSmall,
+                lookTargets: wolf,
+                quest: AssociatedQuest);
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "spawn disaster wolf",
+                typeName: nameof(MapParent_WolfDisaster),
+                methodName: nameof(PostMapGenerate),
+                needStackTrace: true);
+        }
+    }
+
+    public override bool ShouldRemoveMapNow(out bool alsoRemoveWorldObject)
+    {
+        bool result = base.ShouldRemoveMapNow(out _);
+        alsoRemoveWorldObject = true;
+        return result;
+    }
+
+    protected override void TickInterval(int delta)
+    {
+        if (WolfDead)
+        {
+            return;
+        }
+
+        if ((TicksToNextCheck -= delta) <= 0)
+        {
+            TicksToNextCheck = 250;
+            if (!HasMap)
+            {
+                return;
+            }
+
+            if (wolf.DestroyedOrNull() || wolf.Dead)
+            {
+                QuestUtility.SendQuestTargetSignals(questTags, "WolfDead");
+                WolfDead = true;
+            }
+        }
+    }
 }

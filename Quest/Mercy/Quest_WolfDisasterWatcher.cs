@@ -223,10 +223,7 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
         base.ProcessQuestSignal(signal);
         if (signal.tag == InSignalAdvanced)
         {
-            if (++validCount >= TargetCount)
-            {
-                Find.SignalManager.SendSignal(new Signal(OutSignalDiscovered));
-            }
+            AddValidInfo();
         }
         else if (signal.tag == InSignalFailAdvanced)
         {
@@ -246,6 +243,14 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
         {
             WorldObject_WolfDisasterGossipPoint gossipPoint = signal.args.GetArg<WorldObject_WolfDisasterGossipPoint>(KeyLibrary_FormatArgName.SUBJECT);
             gossipPoints.Remove(gossipPoint);
+        }
+    }
+
+    private void AddValidInfo()
+    {
+        if ((++validCount) >= TargetCount)
+        {
+            Find.SignalManager.SendSignal(new Signal(OutSignalDiscovered));
         }
     }
 
@@ -312,5 +317,18 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
                                        lookTargets: gossipPoint,
                                        quest: quest,
                                        relatedFaction: Faction);
+    }
+
+    public override void DoDebugWindowContents(Rect innerRect, ref float curY)
+    {
+        if (State == QuestPartState.Enabled)
+        {
+            Rect rect = new(innerRect.x, curY, 500f, 25f);
+            if (Widgets.ButtonText(rect, "+1 valid info" + ToString()))
+            {
+                AddValidInfo();
+            }
+            curY += rect.height + 4f;
+        }
     }
 }

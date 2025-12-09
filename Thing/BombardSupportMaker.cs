@@ -1,34 +1,33 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BombardSupportMaker : ThingWithComps
+public class BombardSupportMaker : Thing
 {
+    private const int BombInterval = 15;
+
     private List<IntVec3> CachedAttackPositions { get; } = [];
     private int NextReCacheAttackPositionsTick { get; set; } = -1;
 
     private int ticksToForceDestroy = 2500;
 
-    private List<IntVec3> targetCells = [];
-
     private bool bombStart;
     private int ticksToStart = 120;
+    private int ticksToNextBomb = 15;
 
-    private int bombardCount = 20;
-    private int bombardCountRemaining = 20;
-    private int bombInterval = 15;
+    private int bombardCount;
+    private int bombardCountRemaining;
 
-    private int roundBombCount = 1;
-    private int curRound = 0;
-
-    public void SetBombardCount(int count)
+    public void SetBombardCount(Branch branch)
     {
-        bombardCount = count;
-        bombardCountRemaining = count;
-        ticksToForceDestroy = bombardCount * 15 + 5000;
+        bombardCount = Mathf.FloorToInt(BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_BombardSupportCeiling));
+        bombardCount = bombardCount > 0 ? bombardCount : 1;
+        bombardCountRemaining = bombardCount;
+        ticksToForceDestroy = bombardCount * BombInterval + 5000;
     }
 
     protected override void TickInterval(int delta)
@@ -48,9 +47,9 @@ public class BombardSupportMaker : ThingWithComps
             return;
         }
 
-        if ((bombInterval -= delta) <= 0)
+        if ((ticksToNextBomb -= delta) <= 0)
         {
-            bombInterval = 15;
+            ticksToNextBomb = BombInterval;
             DoBombard();
             if (bombardCountRemaining <= 0)
             {
@@ -61,7 +60,7 @@ public class BombardSupportMaker : ThingWithComps
 
     public override void Destroy(DestroyMode mode = DestroyMode.Vanish)
     {
-        targetCells.Clear();
+        CachedAttackPositions.Clear();
         base.Destroy(mode);
     }
 
@@ -79,10 +78,9 @@ public class BombardSupportMaker : ThingWithComps
 
         IntVec3 targetCell = CachedAttackPositions.RandomElement();
 
-        IntVec3 bombSource = new(0, 30, 0);
-        ShootLine shootLine = new(bombSource, targetCell);
-        Projectile projectile = (Projectile)GenSpawn.Spawn(OARO_ThingDefOf.Bullet_Shell_HighExplosive, shootLine.Source, Map);
-        projectile.Launch(null, bombSource.ToVector3Shifted(), shootLine.Dest, targetCell, ProjectileHitFlags.NonTargetWorld, preventFriendlyFire: false, equipment: null);
+        ShootLine shootLine = new(Position, targetCell);
+        Projectile projectile = (Projectile)GenSpawn.Spawn(OARO_ThingDefOf.OARO_BulletShell_HeavyGrenade, shootLine.Source, Map);
+        projectile.Launch(null, Position.ToVector3Shifted(), shootLine.Dest, targetCell, ProjectileHitFlags.NonTargetWorld, preventFriendlyFire: false, equipment: null);
         bombardCountRemaining--;
     }
 
@@ -109,18 +107,14 @@ public class BombardSupportMaker : ThingWithComps
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref ticksToForceDestroy, "ticksToForceDestroy", 0);
+        Scribe_Values.Look(ref ticksToForceDestroy, nameof(ticksToForceDestroy), 0);
 
-        Scribe_Values.Look(ref ticksToStart, "ticksToStart", -1);
-        Scribe_Values.Look(ref bombStart, "bombStart", defaultValue: false);
-        Scribe_Values.Look(ref bombInterval, "bombInterval", 0);
+        Scribe_Values.Look(ref ticksToStart, nameof(ticksToStart), -1);
+        Scribe_Values.Look(ref bombStart, nameof(bombStart), defaultValue: false);
+        Scribe_Values.Look(ref ticksToNextBomb, nameof(ticksToNextBomb), 0);
 
-        Scribe_Values.Look(ref bombardCount, "bombardCount", 0);
-        Scribe_Values.Look(ref bombardCountRemaining, "bombardCountRemaining", 0);
-        Scribe_Values.Look(ref roundBombCount, "roundBombCount", 0);
-        Scribe_Values.Look(ref curRound, "curRound", 0);
-
-        Scribe_Collections.Look(ref targetCells, "targetCells", LookMode.Value);
+        Scribe_Values.Look(ref bombardCount, nameof(bombardCount), 0);
+        Scribe_Values.Look(ref bombardCountRemaining, nameof(bombardCountRemaining), 0);
     }
 
 }

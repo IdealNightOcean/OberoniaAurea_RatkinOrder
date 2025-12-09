@@ -12,7 +12,7 @@ public class QuestPart_TriggerMercyQuest : QuestPart
 
     private bool canTriggered = true;
 
-    public QuestScriptDef MmercyQuestDef;
+    public MercyQuestDef MercyQuestDef;
 
     public Faction SubFaction;
     public Faction ParentFaction;
@@ -26,7 +26,7 @@ public class QuestPart_TriggerMercyQuest : QuestPart
 
         Scribe_Values.Look(ref canTriggered, "canTriggered", defaultValue: true);
 
-        Scribe_Defs.Look(ref MmercyQuestDef, "MmercyQuestDef");
+        Scribe_Defs.Look(ref MercyQuestDef, "MmercyQuestDef");
 
         Scribe_References.Look(ref SubFaction, "SubFaction");
         Scribe_References.Look(ref ParentFaction, "ParentFaction");
@@ -39,7 +39,7 @@ public class QuestPart_TriggerMercyQuest : QuestPart
         InSignalAccept = null;
         InSignalReject = null;
 
-        MmercyQuestDef = null;
+        MercyQuestDef = null;
 
         SubFaction = null;
         ParentFaction = null;
@@ -67,7 +67,7 @@ public class QuestPart_TriggerMercyQuest : QuestPart
     protected bool TryTriggerQuest()
     {
         Slate slate = GenerateQuestSlate();
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, MmercyQuestDef, slate, forced: true);
+        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, MercyQuestDef.mainQuestDef, slate, forced: true);
     }
 
     protected virtual Slate GenerateQuestSlate()

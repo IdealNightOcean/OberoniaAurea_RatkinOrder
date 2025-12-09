@@ -16,9 +16,9 @@ internal sealed class WorldObject_WolfDisasterGossipPoint : WorldObject_Interact
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) < 0)
+        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Animals).TotallyDisabled))
         {
-            Messages.Message("OARO_NoOneCanDo".Translate(SkillDefOf.Animals.label), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Animals.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         base.Notify_CaravanArrived(caravan);
@@ -26,7 +26,7 @@ internal sealed class WorldObject_WolfDisasterGossipPoint : WorldObject_Interact
 
     protected override void FinishWork()
     {
-        (Pawn maxAnimalsPawn, int maxAnimalsSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
+        (Pawn maxAnimalsPawn, _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
         float value = Rand.Value;
         if (value < 0.25f)
         {

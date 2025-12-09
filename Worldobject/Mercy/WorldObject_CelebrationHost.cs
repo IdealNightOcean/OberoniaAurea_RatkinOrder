@@ -17,9 +17,9 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Social) < 0)
+        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Social).TotallyDisabled))
         {
-            Messages.Message("OARO_NoOneCanDo".Translate(SkillDefOf.Social.label), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Social.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         base.Notify_CaravanArrived(caravan);

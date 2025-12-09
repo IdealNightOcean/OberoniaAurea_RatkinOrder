@@ -1,5 +1,4 @@
-﻿using RimWorld;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -7,19 +6,14 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class OrderDefDataBase
 {
-    private static readonly List<QuestScriptDef> mercyQuestsList = [];
-    public static IReadOnlyList<QuestScriptDef> MercyQuestsList => mercyQuestsList;
-
     private static readonly Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> knightAcademicByPersonality = [];
 
     private static readonly Dictionary<ThingDef, KnightPersonality> preferredBuildingToKnightPersonality = [];
     private static readonly Dictionary<KnightPersonality, List<ThingDef>> knightPersonalityToPreferredBuilding = [];
     public static IEnumerable<ThingDef> AllResidentPreferredBuildings => preferredBuildingToKnightPersonality.Keys;
 
-
     public static void ClearStaticCache()
     {
-        mercyQuestsList.Clear();
         knightAcademicByPersonality.Clear();
         preferredBuildingToKnightPersonality.Clear();
         knightPersonalityToPreferredBuilding.Clear();
@@ -43,15 +37,6 @@ public static class OrderDefDataBase
         return null;
     }
 
-    public static void AddMercyQuests(QuestScriptDef scriptDef)
-    {
-        if (scriptDef is null)
-        {
-            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: scriptDef cannot be null.");
-            return;
-        }
-        mercyQuestsList.Add(scriptDef);
-    }
     public static void AddResidentKnightPreferBuilding(ThingDef buildingDef, KnightPersonality personality)
     {
         if (buildingDef is null)

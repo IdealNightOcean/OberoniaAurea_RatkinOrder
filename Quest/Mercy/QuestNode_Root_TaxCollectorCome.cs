@@ -17,13 +17,14 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
     }
     private (Faction parentFaction, Faction subFaction) GetFactions()
     {
-        Faction parentFaction = Find.FactionManager.FirstFactionOfDef(OARO_ModDefOf.Rakinia);
+        Faction parentFaction = OAFrame_FactionUtility.FirstAvailableFactionOf(validationParams: FactionValidationParams.NonHostileNormalFaction,
+                                                                               predicater: f => f.IsRatkinKindomFaction());
         if (parentFaction is null)
         {
             return (null, null);
         }
-        Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef: OARO_ModDefOf.OARO_SubRakinia_Neutral,
-                                                                 parentFactionDef: parentFaction?.def,
+        Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef: QuestGen.slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.SubFactionDef) ?? OARO_ModDefOf.OARO_SubRakinia_Neutral,
+                                                                 parentFactionDef: parentFaction.def,
                                                                  parentFaction: parentFaction);
         return (parentFaction, subFaction);
     }

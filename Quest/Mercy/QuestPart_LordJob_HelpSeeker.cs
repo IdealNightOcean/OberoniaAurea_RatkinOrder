@@ -13,20 +13,20 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
     public string OutSignalAccept;
     public string OutSignalReject;
 
-    public QuestScriptDef MmercyQuestDef;
+    public MercyQuestDef MercyQuestDef;
     public Faction SubFaction;
     public Faction ParentFaction;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref OutSignalAccept, "OutSignalAccept");
-        Scribe_Values.Look(ref OutSignalReject, "OutSignalReject");
+        Scribe_Values.Look(ref OutSignalAccept, nameof(OutSignalAccept));
+        Scribe_Values.Look(ref OutSignalReject, nameof(OutSignalReject));
 
-        Scribe_Defs.Look(ref MmercyQuestDef, "MmercyQuestDef");
+        Scribe_Defs.Look(ref MercyQuestDef, nameof(MercyQuestDef));
 
-        Scribe_References.Look(ref SubFaction, "SubFaction");
-        Scribe_References.Look(ref ParentFaction, "ParentFaction");
+        Scribe_References.Look(ref SubFaction, nameof(SubFaction));
+        Scribe_References.Look(ref ParentFaction, nameof(ParentFaction));
     }
 
     public override void Cleanup()
@@ -34,7 +34,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         base.Cleanup();
         OutSignalAccept = null;
         OutSignalReject = null;
-        MmercyQuestDef = null;
+        MercyQuestDef = null;
         SubFaction = null;
         ParentFaction = null;
     }
@@ -46,12 +46,12 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 
     private Dialog_NodeTree HelpQuizNodeTree(Pawn talkWith)
     {
-        DiaNode rootNode = new(GetTalkText(MmercyQuestDef));
+        DiaNode rootNode = new(GetTalkText());
         DiaOption acceptOpt = new("OARO_TalkWithHelpSeeker_Accept".Translate())
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MmercyQuestDef.Named("QUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -61,7 +61,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MmercyQuestDef.Named("QUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -78,23 +78,22 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         return new Dialog_NodeTreeWithFactionInfo(rootNode, talkWith.Faction);
     }
 
-    private TaggedString GetTalkText(QuestScriptDef mercyQuest)
+    private TaggedString GetTalkText()
     {
-        MercyQuestExtension mercyQuestExtension = mercyQuest.GetModExtension<MercyQuestExtension>();
-        if (mercyQuestExtension is null)
+        if (MercyQuestDef is null)
         {
             return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
         }
         else
         {
-            if (!string.IsNullOrEmpty(mercyQuestExtension.fixedQuestDesc))
+            if (!string.IsNullOrEmpty(MercyQuestDef.fixedHelpDesc))
             {
-                return mercyQuestExtension.fixedQuestDesc.Formatted(TextNamedArguments());
+                return MercyQuestDef.fixedHelpDesc.Formatted(TextNamedArguments());
             }
-            if (mercyQuestExtension.questDescMaker is not null)
+            if (MercyQuestDef.helpDescRulePack is not null)
             {
                 GrammarRequest grammarRequest = new();
-                grammarRequest.Includes.Add(mercyQuestExtension.questDescMaker);
+                grammarRequest.Includes.Add(MercyQuestDef.helpDescRulePack);
                 grammarRequest.Rules.AddRange(GrammarUtility.RulesForPawn("HELPSEEKER", TalkWith));
                 grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("SUBFACTION", SubFaction));
                 if (ParentFaction is not null)
