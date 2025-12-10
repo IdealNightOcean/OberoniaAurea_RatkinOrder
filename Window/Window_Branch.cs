@@ -194,28 +194,15 @@ public class Window_Branch : OrderWindowBase
     private void DrawStoresReserves(Rect inRect)
     {
         IReadOnlyList<BranchStoresReserveHandler.ReserveRecord> storesReserves = Branch.StoresReserveHandler.StoresReserves;
-        Rect reusedRect;
 
-        if (storesReserves.Count > 0)
-        {
-            reusedRect = new(inRect.x + 2f, inRect.y + 28f, 82f, 82f);
-            reusedRect = reusedRect.ContractedBy(10f);
-            GUI.DrawTexture(reusedRect, storesReserves[0].Target.iconTexture.Texture);
-        }
+        Rect reusedRect = new(inRect.x + 2f, inRect.y + 28f, 82f, 82f);
+        DrawEntry(reusedRect, 10f, 0);
 
-        if (storesReserves.Count > 1)
-        {
-            reusedRect = new(inRect.x + 102f, inRect.y + 55f, 55f, 55f);
-            reusedRect = reusedRect.ContractedBy(6f);
-            GUI.DrawTexture(reusedRect, storesReserves[1].Target.iconTexture.Texture);
-        }
+        reusedRect = new(inRect.x + 102f, inRect.y + 55f, 55f, 55f);
+        DrawEntry(reusedRect, 6f, 1);
 
-        if (storesReserves.Count > 2)
-        {
-            reusedRect = new(inRect.x + 175f, inRect.y + 56f, 55f, 55f);
-            reusedRect = reusedRect.ContractedBy(6f);
-            GUI.DrawTexture(reusedRect, storesReserves[2].Target.iconTexture.Texture);
-        }
+        reusedRect = new(inRect.x + 175f, inRect.y + 56f, 55f, 55f);
+        DrawEntry(reusedRect, 6f, 2);
 
         reusedRect = new(inRect.xMax - 110f, inRect.y + 10f, 110f, 22f);
         Text.Anchor = TextAnchor.MiddleRight;
@@ -223,6 +210,56 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
         reusedRect = new(reusedRect.xMin - 13f, reusedRect.y, 13f, 22f);
         GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
+
+        void DrawEntry(Rect entryRect, float iconMargin, int index)
+        {
+            if (index < storesReserves.Count)
+            {
+                GUI.DrawTexture(entryRect.ContractedBy(iconMargin), storesReserves[index].Target.iconTexture.Texture);
+            }
+            AcceptanceReport acceptance = BranchUtility.CanAssignStoreReserveByPlayer(Branch, resultOnly: false);
+            if (acceptance)
+            {
+                if (Mouse.IsOver(entryRect))
+                {
+                    Widgets.DrawHighlight(entryRect);
+                }
+
+                if (Widgets.ButtonInvisible(entryRect))
+                {
+                    StoresReservesFloatMenu(Branch, index);
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(acceptance.Reason))
+                {
+                    TooltipHandler.TipRegion(entryRect, () => acceptance.Reason, uniqueId: 24500513);
+                }
+            }
+        }
+    }
+
+    private void StoresReservesFloatMenu(Branch branch, int index)
+    {
+        List<FloatMenuOption> options = new(32);
+        foreach (BranchConstructionDef constructionDef in BranchUtility.GetAllStorableConstructionDefs(branch))
+        {
+            options.Add(new FloatMenuOption(constructionDef.label, () => StoreAction(constructionDef)));
+        }
+        Find.WindowStack.Add(new FloatMenu(options));
+
+        void StoreAction(BranchConstructionDef def)
+        {
+            if (index < branch.StoresReserveHandler.StoresReserves.Count)
+            {
+                branch.StoresReserveHandler.SetReserves(def, index);
+            }
+            else
+            {
+                branch.StoresReserveHandler.AddNewReserve(def);
+            }
+        }
     }
 
     private void DrawMiddleRect(Rect inRect)
@@ -398,7 +435,7 @@ public class Window_Branch : OrderWindowBase
         }
         if (selected)
         {
-            Widgets.DrawHighlight(inRect);
+            Widgets.DrawHighlightSelected(inRect);
         }
     }
 

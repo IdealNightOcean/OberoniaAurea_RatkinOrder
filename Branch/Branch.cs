@@ -3,6 +3,7 @@ using RimWorld;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
@@ -452,8 +453,8 @@ public class Branch : IExposable, ILoadReferenceable
 
     private void PostGenerated()
     {
-        int ordinal = BranchUtility.GetBranchOrdinal(this);
-        nameCore = BranchUtility.GenerateBranchNameCore(RatkinOrder);
+        int ordinal = GetBranchOrdinal(this);
+        nameCore = GenerateBranchNameCore(RatkinOrder);
         Rename(ordinal, nameCore);
 
 
@@ -485,4 +486,37 @@ public class Branch : IExposable, ILoadReferenceable
 
     public string GetUniqueLoadID() => $"{nameof(Branch)}_{loadID}";
     public override string ToString() => $"{nameof(Branch)}_{loadID}";
+
+    /// <summary>
+    /// 分部的名称序号生成器
+    /// </summary>
+    /// <returns>1~999的尽量不重复的随机数</returns>
+    private static int GetBranchOrdinal(Branch branch)
+    {
+        int m = 999;
+        int a = 445;
+        int c = 700001;
+        unchecked
+        {
+            int ordinal = 31 * branch.LoadID + branch.RatkinOrder.LoadID;
+            ordinal ^= (ordinal >> 16);
+            ordinal = (a * ordinal + c) % m + 1;
+            return ordinal > 0 ? ordinal : ordinal + m;
+        }
+    }
+
+    private static string GenerateBranchNameCore(RatkinOrder ratkinOrder)
+    {
+        GrammarRequest grammarRequest = new()
+        {
+            Includes = { ratkinOrder.Def.branchNameCoreSelecter }
+        };
+
+        return NameGenerator.GenerateName(grammarRequest, IsUniqueName, false, rootKeyword: "r_name");
+
+        bool IsUniqueName(string name)
+        {
+            return !ratkinOrder.BranchManager.AllBranches.Select(b => b.NameCore).Contains(name);
+        }
+    }
 }

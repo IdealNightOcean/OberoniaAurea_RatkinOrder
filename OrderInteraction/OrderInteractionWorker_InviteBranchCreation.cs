@@ -1,6 +1,8 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
+using System.Collections.Generic;
+using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -45,7 +47,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
 
         bool SelectAction(GlobalTargetInfo t)
         {
-            AcceptanceReport acceptanceReport = BranchUtility.IsValidTileForInviteBranchCreation(ratkinOrder, map, t.Tile, resultOnly: false);
+            AcceptanceReport acceptanceReport = IsValidTileForInviteBranchCreation(ratkinOrder, map, t.Tile, resultOnly: false);
             if (!acceptanceReport)
             {
                 Messages.Message("OARO_CannotSelTileAsBranchSite".Translate(acceptanceReport.Reason), MessageTypeDefOf.RejectInput, historical: false);
@@ -78,5 +80,32 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
     {
         base.DoInteractionCost(ratkinOrder, map);
         map.DestoryThingsOfDef(ThingDefOf.Silver, ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
+    }
+
+    private static AcceptanceReport IsValidTileForInviteBranchCreation(RatkinOrder ratkinOrder, Map map, PlanetTile tile, bool resultOnly)
+    {
+        if (map is null || !ratkinOrder.IsValid() || !tile.Valid)
+        {
+            return false;
+        }
+
+        if (tile.LayerDef != PlanetLayerDefOf.Surface)
+        {
+            return resultOnly ? false : "OARO_SurfaceOnly".Translate();
+        }
+
+        List<WorldObject> allWorldObjects = Find.WorldObjects.AllWorldObjects;
+
+        WorldObject curWO = allWorldObjects.Where(w => w.Tile == tile).FirstOrFallback(fallback: null);
+        if (curWO is null)
+        {
+            if (allWorldObjects.Any(w => w.Tile.Layer == tile.Layer && Find.WorldGrid.ApproxDistanceInTiles(w.Tile, tile) <= 3f))
+            {
+                return resultOnly ? false : "OARO_TooCloseToOtherWorldObjects".Translate(3.ToString());
+            }
+            return true;
+        }
+
+        return curWO.CanBeSiteForNewBranch(ratkinOrder);
     }
 }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Threading.Tasks;
@@ -54,46 +55,59 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
     }
 
-    public void SetPrimaryReserves(BranchConstructionDef def)
+    public bool HasReservesOf(BranchConstructionDef def)
     {
-        if (storesReserves.Count == 0)
-        {
-            storesReserves.Add(ReserveRecord.GenrateNewRecord(def));
-        }
-
-        if (storesReserves[0].Target == def)
-        {
-            return;
-        }
-
-        for (int i = 1; i < storesReserves.Count; i++)
-        {
-            if (storesReserves[i].Target == def)
-            {
-                storesReserves.Swap(0, i);
-                return;
-            }
-        }
-
-        storesReserves.Insert(0, ReserveRecord.GenrateNewRecord(def));
-    }
-
-    public void AddNewReserve(BranchConstructionDef def)
-    {
-        if (def is null)
-        {
-            return;
-        }
-
         for (int i = 0; i < storesReserves.Count; i++)
         {
             if (storesReserves[i].Target == def)
             {
-                return;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void RemoveReserves(int index) => storesReserves.RemoveAt(index);
+    public int RemoveReserves(BranchConstructionDef def) => storesReserves.RemoveAll(r => r.Target == def);
+
+    public void SetReserves(BranchConstructionDef def, int index)
+    {
+        if (index < 0 || index >= storesReserves.Count)
+        {
+            throw new ArgumentOutOfRangeException(nameof(index));
+        }
+
+        if (def == storesReserves[index].Target)
+        {
+            return;
+        }
+
+        int existDefIndex = -1;
+        for (int i = 0; i < storesReserves.Count; i++)
+        {
+            if (storesReserves[i].Target == def)
+            {
+                existDefIndex = i;
+                break;
             }
         }
 
-        storesReserves.Add(ReserveRecord.GenrateNewRecord(def));
+        if (existDefIndex >= 0)
+        {
+            storesReserves.Swap(existDefIndex, index);
+        }
+        else
+        {
+            storesReserves[index] = ReserveRecord.GenrateNewRecord(def);
+        }
+    }
+
+    public void AddNewReserve(BranchConstructionDef def)
+    {
+        if (!HasReservesOf(def))
+        {
+            storesReserves.Add(ReserveRecord.GenrateNewRecord(def));
+        }
     }
 
     /// <summary>
@@ -103,8 +117,8 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     {
         if (hourOfDay == 5)
         {
-            float maxReduce = 0.3f;// ThoroughPreparation ? 0.4f : 0.3f;
-            float reduceMulti = 1f;// ThoroughPreparation ? 2f : 1f;
+            float maxReduce = branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder) ? 0.4f : 0.3f;
+            float reduceMulti = branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder) ? 2f : 1f;
             for (int i = 0; i < storesReserves.Count; i++)
             {
                 float costRateReduce = storesReserves[i].CostRateReduce - (CostRateReduceArr[Mathf.Min(i, 3)] * reduceMulti);
@@ -115,7 +129,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         {
             if (storesReserves.Count < StoresReserveCeiling && Rand.Chance(0.1f))
             {
-                TryCreateNewReserves();
+                TryCreateAutoStartReserves();
             }
         }
     }
@@ -149,40 +163,36 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         return 0f;
     }
 
-    private void TryCreateNewReserves()
+    private void TryCreateAutoStartReserves()
     {
-        BranchBuildingHandler buildingHandler = branch.BuildingHandler;
+        if (!branch.FacilityHandler.IsFacilityFullyCompleted)
+        {
+            List<BranchFacilityDef> potentialFacilities = [];
+            foreach (BranchFacilityDef facilityDef in DefDatabase<BranchFacilityDef>.AllDefsListForReading)
+            {
+                if (BranchUtility.CanStoreReserve(branch, facilityDef))
+                {
+                    potentialFacilities.Add(facilityDef);
+                }
+            }
 
+            if (potentialFacilities.Count > 0)
+            {
+                BranchFacilityDef facilityDef = potentialFacilities.RandomElement();
+                AddNewReserve(facilityDef);
+                return;
+            }
+        }
+
+
+        BranchBuildingHandler buildingHandler = branch.BuildingHandler;
         if (!buildingHandler.IsNormalBuildingFullyCompleted && buildingHandler.HasUnusedNormalSlots)
         {
-            if (TryAddBuildingReserve(isSpecial: false))
-            {
-                return;
-            }
-        }
-
-        BranchFacilityHandler facilityHandler = branch.FacilityHandler;
-        if (!facilityHandler.IsFacilityFullyCompleted)
-        {
-            (BranchFacilityDef fDef, BranchFacilityLevel fLevel) = facilityHandler.Facilities.MinBy(kv => kv.Value);
-            if (fDef is not null && fLevel < BranchFacilityLevel.Excellent)
-            {
-                AddNewReserve(fDef);
-                return;
-            }
-        }
-
-        if (buildingHandler.SpecialBuilding is null)
-        {
-            TryAddBuildingReserve(isSpecial: true);
-        }
-
-        bool TryAddBuildingReserve(bool isSpecial)
-        {
-            List<BranchBuildingDef> allDefs = DefDatabase<BranchBuildingDef>.AllDefsListForReading;
             ConcurrentBag<BranchBuildingDef> potentialBuildings = [];
+
+            List<BranchBuildingDef> allBuildingDefs = DefDatabase<BranchBuildingDef>.AllDefsListForReading;
             ParallelOptions options = new() { MaxDegreeOfParallelism = 8 }; // 最多使用8个线程
-            Parallel.For(0, allDefs.Count, options, (i, state) =>
+            Parallel.For(0, allBuildingDefs.Count, options, (i, state) =>
             {
                 if (potentialBuildings.Count >= 10)
                 {
@@ -190,19 +200,9 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
                     return;
                 }
 
-                if (allDefs[i].isSpecial != isSpecial)
+                if (BranchUtility.CanStoreReserve(branch, allBuildingDefs[i]))
                 {
-                    return;
-                }
-
-                BranchBuildingConstructParms constructParam = new()
-                {
-                    Branch = branch,
-                    BuildingDef = allDefs[i],
-                };
-                if (buildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
-                {
-                    potentialBuildings.Add(allDefs[i]);
+                    potentialBuildings.Add(allBuildingDefs[i]);
                     if (potentialBuildings.Count >= 10)
                     {
                         state.Stop();
@@ -214,10 +214,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
             {
                 BranchBuildingDef targetDef = potentialBuildings.RandomElement();
                 AddNewReserve(targetDef);
-                potentialBuildings = null;
-                return true;
             }
-            return false;
         }
     }
 }

@@ -43,9 +43,9 @@ public class Window_BranchSquad : OrderWindowBase
     private List<BranchSummaryUICache> BranchSummaryCaches { get; }
     private List<BranchSummaryUICache> TabSummaryCaches { get; }
 
+    private LazyMutable<string> SupplyRecoveryRateExplanation { get; }
     private LazyMutable<int> BombardSupportCeiling { get; }
     private LazyMutable<string> BombardSupportCeilingExplanation { get; }
-
     public LazyMutable<AcceptanceReport> SupportAcceptance { get; }
     public LazyMutable<AcceptanceReport> BombardAcceptance { get; }
     private LazyMutable<Dictionary<BranchInteractionDef, AcceptanceReport>> InteractionAcceptances { get; }
@@ -57,6 +57,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
 
+        SupplyRecoveryRateExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationStr(SelBranch, BranchStatDefOf.OARO_SupplyRecoveryRate, showResultValue: true));
         BombardSupportCeiling = new(refreshFunc: () => (int)(SelBranch?.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling, immediateUpdate: true) ?? -1f));
         BombardSupportCeilingExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationStr(SelBranch, BranchStatDefOf.OARO_BombardSupportCeiling, showResultValue: true));
 
@@ -310,7 +311,6 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = new(areaRect.x, areaRect.y + 4f, 128f, 24f);
         Widgets.Label(reusedRect, "OARO_BranchSupplyState".Translate());
 
-        TaggedString supplyState;
         if (SelBranch.IsValid())
         {
             switch (SelBranch.Supply)
@@ -330,16 +330,15 @@ public class Window_BranchSquad : OrderWindowBase
                     GUI.DrawTexture(reusedRect, branchSupplyEnough);
                     break;
             }
-            supplyState = (SelBranch.SupplyState + "   " + SelBranch.Supply.ToStringPercent("F0"));
+            reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
+            Widgets.Label(reusedRect, (SelBranch.SupplyState + "   " + SelBranch.Supply.ToStringPercent("F0")));
+            TooltipHandler.TipRegion(reusedRect, () => SupplyRecoveryRateExplanation.Value, uniqueId: 61486431);
         }
         else
         {
-            supplyState = "--   --%";
+            reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
+            Widgets.Label(reusedRect, "--   --%");
         }
-
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
-        Widgets.Label(reusedRect, supplyState);
-
 
         //中部中下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 128f, middleBottomHeight);
@@ -598,7 +597,7 @@ public class Window_BranchSquad : OrderWindowBase
             {
                 Messages.Message("OARO_CanNotDoBombardWithReason".Translate(SelBranch.Name.Named(KeyLibrary_FormatArgName.BranchName), acceptance.Reason.Named("Reason")), MessageTypeDefOf.RejectInput, historical: false);
             }
-            OnMapOrBranchConditionChanged();
+            RefreshBranchAcceptance();
         }
 
         reusedRect.xMax = areaRect.xMax;
@@ -848,14 +847,6 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void DrawSquadEntry(Rect inRect, BranchSummaryUICache entry, int index)
     {
-        if (Mouse.IsOver(inRect))
-        {
-            Widgets.DrawHighlight(inRect);
-        }
-        if (SelBranchIndex == index)
-        {
-            Widgets.DrawHighlightSelected(inRect);
-        }
         Rect summaryRect = inRect.ContractedBy(2f);
         if (Widgets.ButtonInvisible(summaryRect))
         {
@@ -870,6 +861,14 @@ public class Window_BranchSquad : OrderWindowBase
         }
 
         OARO_WindowUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
+        if (Mouse.IsOver(inRect))
+        {
+            Widgets.DrawHighlight(inRect);
+        }
+        if (SelBranchIndex == index)
+        {
+            Widgets.DrawHighlightSelected(inRect);
+        }
     }
 
     private Dictionary<BranchInteractionDef, AcceptanceReport> RefreshInteractionAcceptances()
@@ -1004,9 +1003,8 @@ public class Window_BranchSquad : OrderWindowBase
             SelBranchIndex = index;
             SelSquadInfo = new(branch, Map);
 
-            BombardSupportCeiling.Reset();
-            BombardSupportCeilingExplanation.Reset();
-            OnMapOrBranchConditionChanged();
+            RefreshBranchStatCache();
+            RefreshBranchAcceptance();
 
             SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
             SelBranch.PostApplyBranchInteraction += PostApplyBranchInteraction;
@@ -1032,16 +1030,22 @@ public class Window_BranchSquad : OrderWindowBase
             SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
         }
 
-        BombardSupportCeiling.Reset();
-        BombardSupportCeilingExplanation.Reset();
-        SelSquadInfo?.ClearCache();
+        RefreshBranchStatCache();
+        RefreshBranchAcceptance();
 
-        OnMapOrBranchConditionChanged();
+        SelSquadInfo?.ClearCache();
         SelBranchIndex = -1;
         SelSquadInfo = new();
     }
 
-    private void OnMapOrBranchConditionChanged()
+    private void RefreshBranchStatCache()
+    {
+        SupplyRecoveryRateExplanation.Reset();
+        BombardSupportCeiling.Reset();
+        BombardSupportCeilingExplanation.Reset();
+    }
+
+    private void RefreshBranchAcceptance()
     {
         SupportAcceptance.Reset();
         BombardAcceptance.Reset();
@@ -1050,7 +1054,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void PostApplyBranchInteraction(BranchInteractionDef def, BranchInteractionParms parms, bool succeeded)
     {
-        OnMapOrBranchConditionChanged();
+        RefreshBranchAcceptance();
         MapRecommendationCount.MarkDirty();
     }
 

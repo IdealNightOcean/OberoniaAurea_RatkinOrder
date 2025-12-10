@@ -6,7 +6,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Verse;
-using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -75,32 +74,6 @@ public static class BranchUtility
     public static bool CanParticipateInJointPatrolFast(this Branch branch)
     {
         return branch.TaskHandler.CurTask?.Def.canInterruptedByJointPatrol ?? true;
-    }
-
-    public static AcceptanceReport CanUnlockSupportAuthority(Branch branch, Map map, bool resultOnly)
-    {
-        if (branch.HasSupportAuthority)
-        {
-            return resultOnly ? false : "OARO_AlreadyHasSupportAuthority".Translate();
-        }
-
-        RatkinOrder ratkinOrder = branch.RatkinOrder;
-        if (ratkinOrder.Faction.HostileTo(Faction.OfPlayer))
-        {
-            return resultOnly ? false : "OARO_OrderFaction_Hostile".Translate();
-        }
-        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < 1)
-        {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, ratkinOrder.Name);
-        }
-
-        return true;
-    }
-
-    public static void UnlockSupportAuthority(Branch branch, Map map)
-    {
-        RecommendationUtility.UseRecommendationOfMap(branch.RatkinOrder, map, 1);
-        branch.HasSupportAuthority = true;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -173,84 +146,6 @@ public static class BranchUtility
             return false;
         }
         return true;
-    }
-
-    public static AcceptanceReport IsValidTileForInviteBranchCreation(RatkinOrder ratkinOrder, Map map, PlanetTile tile, bool resultOnly)
-    {
-        if (map is null || !ratkinOrder.IsValid() || !tile.Valid)
-        {
-            return false;
-        }
-
-        if (tile.LayerDef != PlanetLayerDefOf.Surface)
-        {
-            return resultOnly ? false : "OARO_SurfaceOnly".Translate();
-        }
-
-        List<WorldObject> allWorldObjects = Find.WorldObjects.AllWorldObjects;
-
-        WorldObject curWO = allWorldObjects.Where(w => w.Tile == tile).FirstOrFallback(fallback: null);
-        if (curWO is null)
-        {
-            if (allWorldObjects.Any(w => w.Tile.Layer == tile.Layer && Find.WorldGrid.ApproxDistanceInTiles(w.Tile, tile) <= 3f))
-            {
-                return resultOnly ? false : "OARO_TooCloseToOtherWorldObjects".Translate(3.ToString());
-            }
-            return true;
-        }
-
-        return curWO.CanBeSiteForNewBranch(ratkinOrder);
-    }
-
-    public static bool GenerateBranchOnTile(RatkinOrder ratkinOrder, PlanetTile tile, WorldObject worldObject = null)
-    {
-        if (worldObject is null)
-        {
-            WorldObject_BranchUnderConstruction siteUnderConstruction = (WorldObject_BranchUnderConstruction)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_BranchUnderConstruction);
-            siteUnderConstruction.Tile = tile;
-            siteUnderConstruction.StartConstruction(ratkinOrder, 15 * 60000);
-            Find.WorldObjects.Add(siteUnderConstruction);
-            return true;
-        }
-        else if (worldObject.CanBeSiteForNewBranch(ratkinOrder))
-        {
-            return Branch.GenerateBranchFor(ratkinOrder, worldObject, addToManager: true) is not null;
-        }
-
-        return false;
-    }
-
-    public static string GenerateBranchNameCore(RatkinOrder ratkinOrder)
-    {
-        GrammarRequest grammarRequest = new()
-        {
-            Includes = { ratkinOrder.Def.branchNameCoreSelecter }
-        };
-
-        return NameGenerator.GenerateName(grammarRequest, IsUniqueName, false, rootKeyword: "r_name");
-
-        bool IsUniqueName(string name)
-        {
-            return !ratkinOrder.BranchManager.AllBranches.Select(b => b.NameCore).Contains(name);
-        }
-    }
-
-    /// <summary>
-    /// 分部的名称序号生成器
-    /// </summary>
-    /// <returns>1~999的尽量不重复的随机数</returns>
-    public static int GetBranchOrdinal(Branch branch)
-    {
-        int m = 999;
-        int a = 445;
-        int c = 700001;
-        unchecked
-        {
-            int ordinal = 31 * branch.LoadID + branch.RatkinOrder.LoadID;
-            ordinal ^= (ordinal >> 16);
-            ordinal = (a * ordinal + c) % m + 1;
-            return ordinal > 0 ? ordinal : ordinal + m;
-        }
     }
 
     /// <summary>
@@ -367,5 +262,102 @@ public static class BranchUtility
         }
 
         return true;
+    }
+
+    public static bool GenerateBranchOnTile(RatkinOrder ratkinOrder, PlanetTile tile, WorldObject worldObject = null)
+    {
+        if (worldObject is null)
+        {
+            WorldObject_BranchUnderConstruction siteUnderConstruction = (WorldObject_BranchUnderConstruction)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_BranchUnderConstruction);
+            siteUnderConstruction.Tile = tile;
+            siteUnderConstruction.StartConstruction(ratkinOrder, 15 * 60000);
+            Find.WorldObjects.Add(siteUnderConstruction);
+            return true;
+        }
+        else if (worldObject.CanBeSiteForNewBranch(ratkinOrder))
+        {
+            return Branch.GenerateBranchFor(ratkinOrder, worldObject, addToManager: true) is not null;
+        }
+
+        return false;
+    }
+
+    public static AcceptanceReport CanAssignStoreReserveByPlayer(Branch branch, bool resultOnly)
+    {
+        if (branch is null)
+        {
+            return false;
+        }
+        /*
+        if(!branch.IsBranchOfType(Branch.BranchType.Friendly))
+        {
+            return false;
+        }
+        */
+
+        return true;
+    }
+
+    public static bool CanStoreReserve(Branch branch, BranchConstructionDef def)
+    {
+        if (branch.StoresReserveHandler.HasReservesOf(def))
+        {
+            return false;
+        }
+
+        if (def is BranchFacilityDef facilityDef)
+        {
+            BranchFacilityHandler facilityHandler = branch.FacilityHandler;
+            if (facilityHandler.UnderConstructionFacility?.TargetDef == facilityDef)
+            {
+                return false;
+            }
+            return facilityHandler.GetFacilityLevel(facilityDef) < BranchFacilityLevel.Excellent;
+
+        }
+        else if (def is BranchBuildingDef buildingDef)
+        {
+            BranchBuildingHandler buildingHandler = branch.BuildingHandler;
+            if (buildingDef.isSpecial && buildingHandler.SpecialBuilding is not null)
+            {
+                return false;
+            }
+            if (buildingHandler.UnderConstructionBuilding?.TargetDef == buildingDef)
+            {
+                return false;
+            }
+
+            return !buildingHandler.HasBuilding(buildingDef);
+        }
+        else
+        {
+            return false;
+        }
+    }
+
+    public static IEnumerable<BranchConstructionDef> GetAllStorableConstructionDefs(Branch branch)
+    {
+        if (!branch.FacilityHandler.IsFacilityFullyCompleted)
+        {
+            foreach (BranchFacilityDef facilityDef in DefDatabase<BranchFacilityDef>.AllDefsListForReading)
+            {
+                if (CanStoreReserve(branch, facilityDef))
+                {
+                    yield return facilityDef;
+                }
+            }
+        }
+
+        BranchBuildingHandler buildingHandler = branch.BuildingHandler;
+        if (!buildingHandler.IsNormalBuildingFullyCompleted && buildingHandler.HasUnusedNormalSlots)
+        {
+            foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefsListForReading)
+            {
+                if (CanStoreReserve(branch, buildingDef))
+                {
+                    yield return buildingDef;
+                }
+            }
+        }
     }
 }
