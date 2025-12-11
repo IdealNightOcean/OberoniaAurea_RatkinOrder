@@ -30,8 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>
-    </DocumentationFile>
+    <DocumentationFile>OberoniaAurea_RatkinOrder.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -86,9 +85,11 @@
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
     <Compile Include="BranchBuilding\BranchBuilding_OrderConferenceHall.cs" />
+    <Compile Include="BranchBuilding\BranchBuilding_CommanderOffice.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
     <Compile Include="BranchInteraction\BranchInteractionParms.cs" />
     <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_CaravanOnly.cs" />
+    <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_VisitKnightCommander.cs" />
     <Compile Include="BranchInteraction\TargetlessInteraction\BranchInteractionWorker_Targetless.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_MapOnly.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_MapSilverToSupply.cs" />

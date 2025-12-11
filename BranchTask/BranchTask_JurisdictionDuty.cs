@@ -101,17 +101,28 @@ public class BranchTask_JurisdictionDuty : BranchTask
         }
 
         float securityGain = Rand.Range(0.08f, 0.16f);
-        branch.PopulationHandler.PublicSecurity += securityGain;
+        if (branch.BuildingHandler.HasBuilding(BranchBuildingDefOf.OARO_LargeWarningTower))
+        {
+            securityGain *= 1.5f;
+        }
+        branch.PopulationHandler.AdjustPublicSecurity(securityGain);
+
         endSB.AppendLine();
         endSB.AppendLine("OARO_Jurisdiction_PublicSecGain".Translate(securityGain.ToStringPercentSigned("0.##")));
 
         List<Branch> nearbyBranches = BranchUtility.GetAllAffectedBranch(branch.Tile);
         if (!nearbyBranches.NullOrEmpty())
         {
-            endSB.AppendLine("OARO_Jurisdiction_OtherPublicSecGain".Translate(0.02f.ToStringPercentSigned("0.##")));
+            BranchBuilding largeWarningTower = branch.BuildingHandler.GetBuilding(BranchBuildingDefOf.OARO_LargeWarningTower);
+            float otherSecurityGain = 0.02f;
+            if (largeWarningTower is not null && largeWarningTower.HasUpgraded)
+            {
+                securityGain *= 5f;
+            }
+            endSB.AppendLine("OARO_Jurisdiction_OtherPublicSecGain".Translate(otherSecurityGain.ToStringPercentSigned("0.##")));
             for (int i = 0; i < nearbyBranches.Count; i++)
             {
-                nearbyBranches[i].PopulationHandler.PublicSecurity += 0.02f;
+                nearbyBranches[i].PopulationHandler.AdjustPublicSecurity(otherSecurityGain);
                 endSB.AppendWithSeparator(nearbyBranches[i].Name, ", ");
             }
         }

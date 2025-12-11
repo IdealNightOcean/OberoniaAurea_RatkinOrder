@@ -226,7 +226,7 @@ public static class OARO_WindowUtility
         DrawBranchStateIcon(reusedRect, branch, expand: false);
 
         reusedRect = CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 60f, 20f);
-        string workState = branch.CurWorkState;
+        string workState = branch.CurWorkStateDesc;
         if (Text.CalcSize(workState).x < 40f)
         {
             Widgets.Label(reusedRect, workState);
@@ -285,17 +285,24 @@ public static class OARO_WindowUtility
 
     public static void DrawBranchStateIcon(Rect inRect, Branch branch, bool expand)
     {
-        if (branch.IsIdleNow)
+        switch (branch.CurWorkState)
         {
-            GUI.DrawTexture(inRect, expand ? IconLibrary.BigIdleIcon : IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
-        }
-        else if (branch.IsOutdoorNow)
-        {
-            GUI.DrawTexture(inRect, expand ? IconLibrary.BigOutdoorIcon : IconLibrary.SmallOutdoorIcon, ScaleMode.ScaleToFit);
-        }
-        else
-        {
-            GUI.DrawTexture(inRect, expand ? IconLibrary.BigIndoorIcon : IconLibrary.SmallIndoorIcon, ScaleMode.ScaleToFit);
+            case WorkStateType.Idle:
+                {
+                    GUI.DrawTexture(inRect, expand ? IconLibrary.BigIdleIcon : IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+                    return;
+                }
+            case WorkStateType.OnBaseTask:
+                {
+                    GUI.DrawTexture(inRect, expand ? IconLibrary.BigOnBaseIcon : IconLibrary.SmallOnBaseIcon, ScaleMode.ScaleToFit);
+                    return;
+                }
+            case WorkStateType.AbroadTask:
+                {
+                    GUI.DrawTexture(inRect, expand ? IconLibrary.BigAbroadIcon : IconLibrary.SmallAbroadIcon, ScaleMode.ScaleToFit);
+                    return;
+                }
+            default: return;
         }
     }
 

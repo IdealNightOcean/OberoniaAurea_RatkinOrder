@@ -34,7 +34,7 @@ public static class BranchUtility
     {
         if (tile.Layer != branch.BaseSite.Tile.Layer)
         {
-            return 999999f;
+            return float.MaxValue;
         }
         return Find.WorldGrid.ApproxDistanceInTiles(branch.BaseSite.Tile, tile);
     }

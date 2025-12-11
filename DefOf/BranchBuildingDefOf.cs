@@ -17,6 +17,10 @@ public static class BranchBuildingDefOf
     /// 建筑师办公室
     /// </summary>
     public static BranchBuildingDef OARO_ArchitectOffice;
+    /// <summary>
+    /// 大型预警塔
+    /// </summary>
+    public static BranchBuildingDef OARO_LargeWarningTower;
 
     static BranchBuildingDefOf()
     {

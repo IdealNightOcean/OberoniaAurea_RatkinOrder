@@ -14,7 +14,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
     public IReadOnlyList<AcceptedBranchDemand> Records => records;
     public int AcceptanceCount => records.Count;
 
-    [Unsaved] public Action<Branch, bool> PostDemandAccepted;
+    public Action<Branch, bool> PostDemandAccepted { get; set; }
 
     public AcceptedBranchDemandHandler()
     {

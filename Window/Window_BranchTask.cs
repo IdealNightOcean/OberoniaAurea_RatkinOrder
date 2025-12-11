@@ -687,13 +687,13 @@ public class Window_BranchTask : OrderWindowBase
             reusedRect = new(inRectX + 525f, inRectY + 4f, 100f, 48f);
             Widgets.Label(reusedRect.TopHalf(), "OARO_AutoStartTaskChance".Translate());
 
-            if (Branch.IsIdleNow)
+            if (Branch.CurWorkState == Branch.WorkStateType.Idle)
             {
                 Widgets.Label(reusedRect.BottomHalf(), Branch.TaskHandler.AutoStartTaskChance.ToStringPercent());
             }
             else
             {
-                Widgets.Label(reusedRect.BottomHalf(), Branch.CurWorkState);
+                Widgets.Label(reusedRect.BottomHalf(), Branch.CurWorkStateDesc);
             }
 
             reusedRect = new(inRectX + 495f, inRectY + 24f, 25f, 20f);
@@ -771,7 +771,7 @@ public class Window_BranchTask : OrderWindowBase
             Widgets.Label(reusedRect, "");
 
             reusedRect = new(innerRectX + 30f, reusedRect.yMax + 10f, 300f, 20f);
-            Widgets.Label(reusedRect, Branch.CurWorkState);
+            Widgets.Label(reusedRect, Branch.CurWorkStateDesc);
 
             reusedRect = new(innerRectX, innerRectY + 211f, 357f, 87f);
             DrawMedals(reusedRect);

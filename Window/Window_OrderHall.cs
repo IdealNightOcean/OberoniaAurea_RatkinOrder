@@ -910,7 +910,7 @@ public class Window_OrderHall : OrderWindowBase
 
         private (int, int) RefreshPreferredFurnitureCount()
         {
-            if (!OrderDefDataBase.GetPreferredBuildingForKnightPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
+            if (!OrderDefDataBase.TryGetAllPreferredBuildingsByPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
             {
                 return (0, 0);
             }
@@ -923,7 +923,7 @@ public class Window_OrderHall : OrderWindowBase
 
         private string RefreshFurnitureExplanation()
         {
-            if (!OrderDefDataBase.GetPreferredBuildingForKnightPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
+            if (!OrderDefDataBase.TryGetAllPreferredBuildingsByPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
             {
                 return string.Empty;
             }

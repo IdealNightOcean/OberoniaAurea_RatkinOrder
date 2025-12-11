@@ -8,6 +8,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 自新管理
+/// </summary>
 public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
 {
     public RatkinOrder RatkinOrder { get; } = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));

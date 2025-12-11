@@ -22,29 +22,29 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     private Faction faction;
     public Faction Faction => faction;
 
+    [Unsaved] private Color? color;
+    public Color Color => color ??= (def.color ?? faction.color ?? Color.white);
+
     private string name;
     public string Name
     {
         get => name ?? def.label;
         set => name = value;
     }
-
-    [Unsaved] private Color? color;
-    public Color Color => color ??= (def.color ?? faction.color ?? Color.white);
     public string NameColored => Name.Colorize(Color);
-
 
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
-    [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
-    [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
+    public TagStrToBoolCountable EffectTags { get; } = new();
+    public BranchStatTransformerHandler TransformerHandler { get; } = new();
+    public Action<OrderInteractionDef, RatkinOrder, Map, bool> PostApplyOrderInteraction { get; set; }
 
 
-    private EsteemHandler esteemHandler; // 认可度 | 关系 | 推荐信
-    private FundHandler fundHandler; //资金
-    private ReformationManager reformationManager; //自新
-    private BranchManager branchManager; //分部管理
-    private JointPatrolManager jointPatrolManager; //联巡管理
+    private EsteemHandler esteemHandler;
+    private FundHandler fundHandler;
+    private ReformationManager reformationManager;
+    private BranchManager branchManager;
+    private JointPatrolManager jointPatrolManager;
 
     public EsteemHandler EsteemHandler => esteemHandler;
     public FundHandler FundHandler => fundHandler;
@@ -56,8 +56,6 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     public EsteemHandler.RelationshipKind Relationship => esteemHandler.Relationship;
     public float Funds => fundHandler.Funds;
     public float ReformProgress => reformationManager.ReformProgress;
-
-    public Action<OrderInteractionDef, RatkinOrder, Map, bool> PostApplyOrderInteraction { get; set; }
 
     private RatkinOrder()
     {

@@ -34,6 +34,22 @@ public class Branch : IExposable, ILoadReferenceable
         Mobile = 4
     }
 
+    public enum WorkStateType : byte
+    {
+        /// <summary>
+        /// 空闲
+        /// </summary>
+        Idle,
+        /// <summary>
+        /// 驻地任务
+        /// </summary>
+        OnBaseTask,
+        /// <summary>
+        /// 外出任务
+        /// </summary>
+        AbroadTask
+    }
+
     public RatkinOrder RatkinOrder { get; }
     public BranchManager BranchManager => RatkinOrder.BranchManager;
 
@@ -71,15 +87,23 @@ public class Branch : IExposable, ILoadReferenceable
     protected int friendlyDaysLeft = -1;
     public int FriendlyDaysLeft => friendlyDaysLeft;
 
-    public bool HasSupportAuthority;
-
-    [Unsaved] private BranchHonorDef honorDef;
-    public BranchHonorDef HonorDef
+    private bool hasSupportAuthority;
+    public bool HasSupportAuthority
     {
-        get => IsBranchOfType(BranchType.Honor) ? honorDef : null;
-        set => honorDef = value;
+        get => hasSupportAuthority;
+        set => hasSupportAuthority = value;
     }
-    private SimpleValueCache<float> supplyCeilingCache;
+
+    private bool commanderVisitable;
+    public bool CommanderVisitable
+    {
+        get => commanderVisitable;
+        set => commanderVisitable = value;
+    }
+
+    public BranchHonorDef HonorDef { get; protected set; }
+
+    [Unsaved] private SimpleValueCache<float> supplyCeilingCache;
     private float supply;
     public float Supply
     {
@@ -102,52 +126,41 @@ public class Branch : IExposable, ILoadReferenceable
     [Unsaved] private SimpleValueCache<float> potencyCache;
     public float Potency => potencyCache.GetCachedResult();
 
-    [Unsaved] private bool isIdleNow = true;
-    [Unsaved] private bool isOutdoorNow = true;
-    [Unsaved] private string curWorkState = string.Empty;
-    [Unsaved] private bool workStateDirty = true;
-    public bool IsIdleNow
-    {
-        get
-        {
-            if (workStateDirty)
-            {
-                UpdateWorkState();
-                workStateDirty = false;
-            }
-            return isIdleNow;
-        }
-    }
+    [Unsaved] private WorkStateType curWorkState = WorkStateType.Idle;
+    [Unsaved] private string curWorkStateDesc = string.Empty;
+    private bool WorkStateDirty { get; set; }
 
-    public bool IsOutdoorNow
+    public WorkStateType CurWorkState
     {
         get
         {
-            if (workStateDirty)
+            if (WorkStateDirty)
             {
                 UpdateWorkState();
-                workStateDirty = false;
-            }
-            return isOutdoorNow;
-        }
-    }
-
-    public string CurWorkState
-    {
-        get
-        {
-            if (workStateDirty)
-            {
-                UpdateWorkState();
-                workStateDirty = false;
+                WorkStateDirty = false;
             }
             return curWorkState;
         }
     }
+    public string CurWorkStateDesc
+    {
+        get
+        {
+            if (WorkStateDirty)
+            {
+                UpdateWorkState();
+                WorkStateDirty = false;
+            }
+            return curWorkStateDesc;
+        }
+    }
 
-    [Unsaved] public readonly TagStrToBoolCountable EffectTags = new();
-    [Unsaved] public readonly BranchStatTransformerHandler TransformerHandler = new();
+    public TagStrToBoolCountable EffectTags { get; } = new();
+    public BranchStatTransformerHandler TransformerHandler { get; } = new();
     public List<IPostCombatantGenerate> IPostCombatantGenerate { get; } = [];
+    public Action<BranchInteractionDef, BranchInteractionParms, bool> PostApplyBranchInteraction { get; set; }
+
+
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
 
@@ -172,8 +185,6 @@ public class Branch : IExposable, ILoadReferenceable
     public BranchStoresReserveHandler StoresReserveHandler => storesReserveHandler;
 
     public bool IsConstructionBusy => facilityHandler.IsBusy || buildingHandler.IsBusy;
-
-    public Action<BranchInteractionDef, BranchInteractionParms, bool> PostApplyBranchInteraction { get; set; }
 
     private Branch(RatkinOrder ratkinOrder, bool initCtor)
     {
@@ -246,7 +257,8 @@ public class Branch : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref nameCore, nameof(nameCore), string.Empty);
         Scribe_Values.Look(ref name, nameof(name), string.Empty);
 
-        Scribe_Values.Look(ref HasSupportAuthority, nameof(HasSupportAuthority), defaultValue: false);
+        Scribe_Values.Look(ref commanderVisitable, nameof(commanderVisitable), defaultValue: false);
+        Scribe_Values.Look(ref hasSupportAuthority, nameof(hasSupportAuthority), defaultValue: false);
         Scribe_Values.Look(ref friendlyDaysLeft, nameof(friendlyDaysLeft), 0);
         Scribe_Values.Look(ref curType, nameof(curType), BranchType.Normal);
 
@@ -279,7 +291,7 @@ public class Branch : IExposable, ILoadReferenceable
         }
     }
 
-    public void MarkWorkStateDirty() => workStateDirty = true;
+    public void MarkWorkStateDirty() => WorkStateDirty = true;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsBranchOfType(BranchType type) => (curType & type) != 0;
@@ -325,6 +337,17 @@ public class Branch : IExposable, ILoadReferenceable
                 Messages.Message("OARO_Mess_BranchBeNonFriendly".Translate(name), baseSite, MessageTypeDefOf.NegativeEvent);
             }
         }
+    }
+
+    public void SetHonorDef(BranchHonorDef honorDef, bool replaceCur = false)
+    {
+        if (!replaceCur && HonorDef is not null)
+        {
+            Log.Error($"[OARO] Failed to set {nameof(BranchHonorDef)}: {nameof(HonorDef)} already exists and {nameof(replaceCur)} is false. ");
+            return;
+        }
+        SetBranchType(BranchType.Honor, active: true);
+        HonorDef = honorDef;
     }
 
     public void Rename(int ordinal, string nameCore)
@@ -414,32 +437,30 @@ public class Branch : IExposable, ILoadReferenceable
 
         if (taskHandler.HasTask)
         {
-            isIdleNow = false;
-            isOutdoorNow = taskHandler.CurTask.Def.isOutdoorTask;
-            curWorkState = taskHandler.CurTask.Label;
+            curWorkState = taskHandler.CurTask.Def.isAbroadTask ? WorkStateType.AbroadTask : WorkStateType.OnBaseTask;
+            curWorkStateDesc = taskHandler.CurTask.Label;
             return;
         }
 
         if (this.IsOnJointPatrol())
         {
-            isIdleNow = false;
-            isOutdoorNow = true;
-            curWorkState = "OARO_BranchWorkState_JointPatrol".Translate();
+            curWorkState = WorkStateType.AbroadTask;
+            curWorkStateDesc = "OARO_BranchWorkState_JointPatrol".Translate();
             return;
         }
 
-        isIdleNow = true;
-        isOutdoorNow = false;
+        curWorkState = WorkStateType.Idle;
         int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
         if (hourOfDay <= 5 || hourOfDay >= 21)
         {
-            curWorkState = "OARO_BranchWorkState_Rest".Translate();
-            return;
+            curWorkStateDesc = "OARO_BranchWorkState_Rest".Translate();
+        }
+        else
+        {
+            curWorkStateDesc = "OARO_BranchWorkState_Idle".Translate();
         }
 
-        curWorkState = "OARO_BranchWorkState_Idle".Translate();
-
-        workStateDirty = false;
+        WorkStateDirty = false;
     }
 
     private float GetCurPotency()
@@ -456,8 +477,6 @@ public class Branch : IExposable, ILoadReferenceable
         int ordinal = GetBranchOrdinal(this);
         nameCore = GenerateBranchNameCore(RatkinOrder);
         Rename(ordinal, nameCore);
-
-
 
         medalHandler.PostBranchGenerated();
         facilityHandler.PostBranchGenerated();

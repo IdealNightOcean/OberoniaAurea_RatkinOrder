@@ -9,7 +9,7 @@ public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
     {
         get
         {
-            if (ArchivedOnly || !relatedOrder.IsValid())
+            if (ArchivedOnly || !RelatedOrder.IsValid())
             {
                 yield return Option_Close;
             }
@@ -38,13 +38,13 @@ public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
     {
         Find.LetterStack.RemoveLetter(this);
         Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-        if (map is not null && RelationshipUtility.TryTriggerRelationshipQuest(relatedOrder, map))
+        if (map is not null && RelationshipUtility.TryTriggerRelationshipQuest(RelatedOrder, map))
         {
-            OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_Triggered".Translate(relatedOrder.Name), relatedOrder);
+            OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_Triggered".Translate(RelatedOrder.Name), RelatedOrder);
         }
         else
         {
-            OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_TriggerFailed".Translate(relatedOrder.Name), relatedOrder);
+            OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_AutoUpgradeRelationship_TriggerFailed".Translate(RelatedOrder.Name), RelatedOrder);
         }
     }
 }

@@ -9,7 +9,7 @@ public class ResidentKnightPreferredBuildingExtension : DefModExtension
     {
         if (personality != KnightPersonality.None && parentDef is ThingDef thingDef && thingDef.building is not null)
         {
-            OrderDefDataBase.AddResidentKnightPreferBuilding(thingDef, personality);
+            OrderDefDataBase.AddKnightPreferBuilding(thingDef, personality);
         }
     }
 }

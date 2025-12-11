@@ -212,7 +212,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
             def: OARO_LetterDefOf.OARO_KnightGroupProactiveVisitLetter,
             relatedFaction: knightGroup.RatkinOrder.Faction);
 
-        letter.relatedOrder = knightGroup.RatkinOrder;
+        letter.RelatedOrder = knightGroup.RatkinOrder;
         letter.StartTimeout(30000);
         Find.LetterStack.ReceiveLetter(letter);
     }

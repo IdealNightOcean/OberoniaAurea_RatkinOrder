@@ -237,7 +237,7 @@ public static class RelationshipUtility
             text: "OARO_Letter_AutoUpgradeRelationship".Translate(ratkinOrder.Name),
             def: OARO_LetterDefOf.OARO_AutoUpgradeRelationshipQuizLetter,
             relatedFaction: ratkinOrder.Faction);
-        letter.relatedOrder = ratkinOrder;
+        letter.RelatedOrder = ratkinOrder;
         letter.StartTimeout(30000);
         Find.LetterStack.ReceiveLetter(letter);
     }

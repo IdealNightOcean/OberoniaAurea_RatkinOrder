@@ -48,9 +48,8 @@ public class DevWindow_Branch : DevWindowBase
 
         listing_Rect.Gap(12f);
         listing_Rect.Label("————————————————");
-        listing_Rect.Label($"状态描述 WorkState: {branch.CurWorkState}");
-        listing_Rect.Label($"是否空闲: {branch.IsIdleNow}");
-        listing_Rect.Label($"是否外出: {branch.IsOutdoorNow}");
+        listing_Rect.Label($"状态 WorkStateDesc: {branch.CurWorkState}");
+        listing_Rect.Label($"状态描述: {branch.CurWorkStateDesc}");
         listing_Rect.Label($"效能: {branch.Potency}");
         listing_Rect.Label($"补给: {branch.Supply.ToStringPercent("F2")}");
         if (listing_Rect.ButtonText("补给 +10%", widthPct: 0.5f))

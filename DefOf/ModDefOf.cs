@@ -11,6 +11,10 @@ public static class OARO_ModDefOf
     public static BackstoryDef Ratkin_KnightCommander;
 
     /// <summary>
+    /// 防卫设施
+    /// </summary>
+    public static BranchFacilityDef OARO_DefensiveFacility;
+    /// <summary>
     /// 支援设施
     /// </summary>
     public static BranchFacilityDef OARO_SupportFacility;

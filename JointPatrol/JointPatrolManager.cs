@@ -16,6 +16,9 @@ namespace OberoniaAurea.RatkinOrder;
 using IncidentType = JointPatrolIncidentDef.IncidentType;
 using PatrolInteractionType = JointBranchRecord.PatrolInteractionType;
 
+/// <summary>
+/// 联合巡逻管理
+/// </summary>
 public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetentionHolder
 {
     private const int JointPatrolDurationPrepDays = 3;
@@ -56,7 +59,6 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public IReadOnlyList<JointInteractionRecord> InteractionRecords => interactionRecords;
 
     public LazyMutable<IReadOnlyDictionary<BranchTaskType, float>> TaskPotencys { get; }
-    private LazyMutable<IReadOnlyDictionary<IncidentType, List<JointPatrolIncidentDef>>> PotentialIncidents { get; }
 
     private int sacrificeCount;
     public int SacrificeCount => sacrificeCount;
@@ -132,17 +134,6 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 return new Dictionary<BranchTaskType, float>();
             }
             return participants.GroupBy(p => p.FocusedTaskType).ToDictionary(g => g.Key, g => g.Sum(gp => gp.TaskPotency.Value));
-        });
-
-        PotentialIncidents = new(refreshFunc: delegate
-        {
-            if (curState != PatrolState.Ongoing)
-            {
-                return new Dictionary<IncidentType, List<JointPatrolIncidentDef>>();
-            }
-            return DefDatabase<JointPatrolIncidentDef>.AllDefsListForReading.Where(d => !d.patrolLevelLimits.HasValue || d.patrolLevelLimits.Value == patrolLevel)
-                                                                            .GroupBy(d => d.incidentType)
-                                                                            .ToDictionary(g => g.Key, g => g.ToList());
         });
 
         innerContainer = new ThingOwner<Pawn>(this)
@@ -454,7 +445,6 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         innerContainer.Clear();
 
         TaskPotencys.Reset();
-        PotentialIncidents.Reset();
 
         if (forceClear || forState == PatrolState.Prepare)
         {
@@ -494,7 +484,6 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             ModUtility.LogExceptionError(ex, "set joint patrol level", nameof(JointPatrolManager), nameof(TryStartPatrolPrep), needStackTrace: true);
             patrolLevel = PatrolLevel.Popedom;
         }
-        PotentialIncidents.MarkDirty();
 
         /*
         * PatrolState选择联巡参与分队PatrolState
@@ -595,10 +584,9 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         curState = PatrolState.Ongoing;
 
-        int overcap = participants.Count - burdenCount;
-        if (overcap > 0)
+        if (participants.Count > burdenCount)
         {
-            ratkinOrder.FundHandler.AdjustFundsImmediately(overcap * 0.05f, "OARO_Fund_JointPatrolOvercap".Translate());
+            ratkinOrder.FundHandler.AdjustFundsImmediately((burdenCount - participants.Count) * 0.05f, "OARO_Fund_JointPatrolOvercap".Translate());
         }
 
         int ticksGame = Find.TickManager.TicksGame;
@@ -616,8 +604,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         BringResidentKnightBackTeam();
 
-        TaskPotencys.MarkDirty();
-        PotentialIncidents.MarkDirty();
+        TaskPotencys.Reset();
     }
 
     private void BringResidentKnightBackTeam()
@@ -762,7 +749,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
                 {
                     float publicSecurityChange = participantsDict.ContainsKey(branch) ? participantPublicSecurityGain + publicSecurityGain : publicSecurityGain;
-                    branch.PopulationHandler.PublicSecurity += publicSecurityChange;
+                    branch.PopulationHandler.AdjustPublicSecurity(publicSecurityChange);
                     if (publicSecurityChange > 0f)
                     {
                         publicSecurityUpCount++;
@@ -944,7 +931,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         try
         {
             IncidentType selIncidentType = JointPatrolIncidentDef.GetPotentialIncidentType(record);
-            if (!PotentialIncidents.Value.TryGetValue(selIncidentType, out List<JointPatrolIncidentDef> potentialIncidentsOfType))
+            if (!OrderDefDataBase.TryGetAllJointPatrolIncidentsByType(selIncidentType, out List<JointPatrolIncidentDef> potentialIncidentsOfType))
             {
                 return;
             }

@@ -465,21 +465,15 @@ public class Window_BranchSquad : OrderWindowBase
         Color stateColor = Color.white;
         if (SelBranch.IsValid())
         {
-            if (SelBranch.IsIdleNow)
+            OARO_WindowUtility.DrawBranchStateIcon(reusedRect, SelBranch, expand: true);
+            stateColor = SelBranch.CurWorkState switch
             {
-                GUI.DrawTexture(reusedRect, IconLibrary.BigIdleIcon, ScaleMode.ScaleToFit);
-                stateColor = Color.cyan;
-            }
-            else if (SelBranch.IsOutdoorNow)
-            {
-                GUI.DrawTexture(reusedRect, IconLibrary.BigOutdoorIcon, ScaleMode.ScaleToFit);
-                stateColor = ColorLibrary.Orange;
-            }
-            else
-            {
-                GUI.DrawTexture(reusedRect, IconLibrary.BigIndoorIcon, ScaleMode.ScaleToFit);
-                stateColor = Color.yellow;
-            }
+                WorkStateType.Idle => Color.cyan,
+                WorkStateType.OnBaseTask => Color.yellow,
+                WorkStateType.AbroadTask => ColorLibrary.Orange,
+                _ => Color.white
+
+            };
         }
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 95f, 20f);
@@ -487,7 +481,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 16f, 95f, 20f);
         if (SelBranch.IsValid())
         {
-            Widgets.Label(reusedRect, SelBranch.CurWorkState.Colorize(stateColor));
+            Widgets.Label(reusedRect, SelBranch.CurWorkStateDesc.Colorize(stateColor));
         }
         else
         {
@@ -498,7 +492,7 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_AutoStartTaskChance".Translate());
 
         reusedRect = new(areaRect.x + 97f, reusedRect.yMax + 10f, 98f, 20f);
-        if (SelBranch?.IsIdleNow ?? false)
+        if (SelBranch.IsValid() && SelBranch.CurWorkState == WorkStateType.Idle)
         {
             Widgets.Label(reusedRect, SelBranch.TaskHandler.AutoStartTaskChance.ToStringPercent("F0"));
         }

@@ -433,8 +433,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             if (building.Def.IsHonorSymbol)
             {
-                branch.SetBranchType(Branch.BranchType.Honor, active: true);
-                branch.HonorDef = building.Def.honorDef;
+                branch.SetHonorDef(building.Def.honorDef);
             }
         }
 

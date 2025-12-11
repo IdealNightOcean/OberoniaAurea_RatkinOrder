@@ -63,18 +63,37 @@ public class BranchStatDef : Def
     /// </summary>
     public List<BranchStatPart> statParts;
 
-    public override void PostLoad()
+
+    public override IEnumerable<string> ConfigErrors()
     {
+        foreach (string error in base.ConfigErrors())
+        {
+            yield return error;
+        }
         if (nonNegative)
         {
-            minValue = minValue > 0f ? minValue : 0f;
-            maxValue = maxValue > 0f ? maxValue : 0f;
+            if (minValue < 0f)
+            {
+                minValue = 0f;
+                yield return $"{nonNegative} setting but {minValue} is negative";
+            }
+            if (maxValue < 0f)
+            {
+                maxValue = 0f;
+                yield return $"{nonNegative} setting but {maxValue} is negative";
+            }
         }
 
+        // 最小值大于最大值校验
         if (minValue > maxValue)
         {
             (minValue, maxValue) = (maxValue, minValue);
+            yield return $"{minValue} is greater than {maxValue}";
         }
+    }
+
+    public override void PostLoad()
+    {
 
         if (statType == StatType.Int)
         {

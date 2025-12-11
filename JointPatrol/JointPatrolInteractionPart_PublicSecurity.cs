@@ -9,7 +9,7 @@ public class JointPatrolInteractionPart_PublicSecurity : JointPatrolInteractionP
 
     public override void ApplyPart(JointPatrolInteractionDef def, JointBranchRecord record, StringBuilder effectExplain)
     {
-        record.Branch.PopulationHandler.PublicSecurity += change;
+        record.Branch.PopulationHandler.AdjustPublicSecurity(change);
         effectExplain.AppendLine("OARO_ChangeOffset_PublicSecurity".Translate(change.ToStringPercentSigned("0.##")));
     }
 }

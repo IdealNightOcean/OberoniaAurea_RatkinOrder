@@ -5,6 +5,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 认可度 | 关系 | 推荐信
+/// </summary>
 public class EsteemHandler : IExposable, ITickDay
 {
     public enum RelationshipKind : byte
@@ -16,7 +19,7 @@ public class EsteemHandler : IExposable, ITickDay
         Soulmate
     }
 
-    [Unsaved] public readonly RatkinOrder RatkinOrder;
+    public RatkinOrder RatkinOrder { get; }
 
     protected int esteem;
     public int Esteem => esteem;

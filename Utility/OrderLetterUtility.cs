@@ -74,7 +74,7 @@ public static class OrderLetterUtility
 
             if (rimLetter is ChoiceLetter_RatkinOrder rimOrderLetter)
             {
-                rimOrderLetter.relatedOrder = letter.RelatedOrder;
+                rimOrderLetter.RelatedOrder = letter.RelatedOrder;
             }
             Find.LetterStack.ReceiveLetter(rimLetter);
         }

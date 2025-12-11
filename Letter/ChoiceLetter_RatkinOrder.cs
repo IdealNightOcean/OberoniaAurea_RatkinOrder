@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ChoiceLetter_RatkinOrder : ChoiceLetter
 {
-    public RatkinOrder relatedOrder;
+    public RatkinOrder RelatedOrder;
 
     public override IEnumerable<DiaOption> Choices
     {
@@ -18,14 +18,14 @@ public class ChoiceLetter_RatkinOrder : ChoiceLetter
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref relatedOrder, "relatedOrder");
+        Scribe_References.Look(ref RelatedOrder, nameof(RelatedOrder));
     }
 
     public override void OpenLetter()
     {
         DiaNode diaNode = new(Text);
         diaNode.options.AddRange(Choices);
-        Dialog_NodeTreeWithRatkinOrderInfo window = new(diaNode, relatedOrder, delayInteractivity: false, radioMode, title);
+        Dialog_NodeTreeWithRatkinOrderInfo window = new(diaNode, RelatedOrder, delayInteractivity: false, radioMode, title);
         Find.WindowStack.Add(window);
     }
 }

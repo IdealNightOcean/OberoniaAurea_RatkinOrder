@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace OberoniaAurea.RatkinOrder;
 using static OberoniaAurea.RatkinOrder.Branch;
 using static OberoniaAurea.RatkinOrder.BranchDemand;
 
+/// <summary>
+/// 分部管理
+/// </summary>
 public class BranchManager : IExposable, ITickDay
 {
     [Unsaved] private readonly RatkinOrder ratkinOrder;
@@ -16,7 +20,7 @@ public class BranchManager : IExposable, ITickDay
     private List<Branch> allBranches = [];
     public IReadOnlyList<Branch> AllBranches => allBranches;
 
-    [Unsaved] public readonly LazyMutable<int> TotalKnightsCount;
+    public LazyMutable<int> TotalKnightsCount { get; }
 
     public IEnumerable<Branch> HonorBranches
     {
@@ -45,7 +49,7 @@ public class BranchManager : IExposable, ITickDay
         }
     }
 
-    [Unsaved] public readonly LazyMutable<int> FriendlyBranchesCount;
+    public LazyMutable<int> FriendlyBranchesCount { get; }
 
     private Branch honorMobileBranch;
     private Branch normalMobileBranch;
@@ -215,45 +219,76 @@ public class BranchManager : IExposable, ITickDay
             return;
         }
 
-        List<KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord>> potentialReserve = AllPrimaryReserves.Where(pr => pr.Value.CostRateReduce >= 0.3f).ToList();
+        List<KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord>> potentialReserves = AllPrimaryReserves.Where(pr => pr.Value.CostRateReduce >= 0.3f).ToList();
 
-        for (int i = potentialReserve.Count - 1; i >= 0; i--)
+        for (int i = potentialReserves.Count - 1; i >= 0; i--)
         {
-            (Branch branch, BranchStoresReserveHandler.ReserveRecord reserve) = potentialReserve[i];
-
-            if (Rand.Chance(0.05f))
+            if (Rand.Chance(0.95f))
             {
-                bool successConstruct = false;
-                if (reserve.Target is BranchBuildingDef reserveBuilding)
-                {
-                    BranchBuildingConstructParms constructParam = new(branch, reserveBuilding);
-                    if (branch.BuildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
-                    {
-                        branch.BuildingHandler.StartBuildingConstruction(constructParam);
-                        successConstruct = true;
-                    }
-                }
-                else if (reserve.Target is BranchFacilityDef reserveFacility)
-                {
-                    if (branch.FacilityHandler.CanConstructFacility(reserveFacility, byPlayer: false))
-                    {
-                        branch.FacilityHandler.StartFacilityConstruction(reserveFacility, byPlayer: false);
-                        successConstruct = true;
-                    }
-                }
+                continue;
+            }
 
-                if (successConstruct)
+            (Branch branch, BranchStoresReserveHandler.ReserveRecord reserve) = potentialReserves[i];
+
+            bool successConstruct = false;
+            if (reserve.Target is BranchBuildingDef reserveBuilding)
+            {
+                BranchBuildingConstructParms constructParam = new(branch, reserveBuilding);
+                if (branch.BuildingHandler.CanConstructBuilding(constructParam, resultOnly: true))
                 {
-                    ratkinOrder.FundHandler.AdjustFundsImmediately(-0.002f, "OARO_Fund_BranchConstruct".Translate());
+                    branch.BuildingHandler.StartBuildingConstruction(constructParam);
+                    successConstruct = true;
+                }
+            }
+            else if (reserve.Target is BranchFacilityDef reserveFacility)
+            {
+                if (branch.FacilityHandler.CanConstructFacility(reserveFacility, byPlayer: false, resultOnly: true))
+                {
+                    branch.FacilityHandler.StartFacilityConstruction(reserveFacility, byPlayer: false);
+                    successConstruct = true;
                 }
             }
 
-            if (ratkinOrder.Funds < 0.2f)
+            if (successConstruct)
             {
-                break;
+                ratkinOrder.FundHandler.AdjustFundsImmediately(-0.002f, "OARO_Fund_BranchConstruct".Translate());
+                if (ratkinOrder.Funds < 0.2f)
+                {
+                    break;
+                }
             }
         }
+    }
 
+    private void DailyRandomUnlockKnightCommanderVisit()
+    {
+        if (Rand.Chance(0.99f))
+        {
+            return;
+        }
+
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: false);
+        if (map is null)
+        {
+            return;
+        }
+
+        PlanetTile tile = map.Tile;
+        Branch targetBranch = ratkinOrder.GetAllAvailableBranchForOrder(b => b.DistanceTo(tile) <= 20f).RandomElementWithFallback(fallback: null);
+        if (targetBranch is null)
+        {
+            return;
+        }
+
+        targetBranch.CommanderVisitable = true;
+        ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+            label: "OARO_AutoUnlockCommanderVisitLabel".Translate(),
+            text: "OARO_AutoUnlockCommanderVisitText".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), targetBranch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
+            def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
+            lookTargets: targetBranch.BaseSite,
+            relatedFaction: ratkinOrder.Faction);
+        letter.RelatedOrder = ratkinOrder;
+        Find.LetterStack.ReceiveLetter(letter);
     }
 
     /// <summary>
@@ -269,15 +304,17 @@ public class BranchManager : IExposable, ITickDay
         ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.CriticalDemandPeriodic, cdTicks: 5 * 60000);
         foreach (Branch branch in allBranches)
         {
-            if (branch.DemandHandler.CanAddDemand(isCriticalDemand: true, ignoreCD: false, replaceCur: false))
+            if (!branch.DemandHandler.CanAddDemand(isCriticalDemand: true, ignoreCD: false, replaceCur: false))
             {
-                if (Rand.Chance(BranchDemandUtility.GetCriticalDemandTriggerChance(branch, resultOnly: true, out _)))
+                continue;
+            }
+
+            if (Rand.Chance(BranchDemandUtility.GetCriticalDemandTriggerChance(branch, resultOnly: true, out _)))
+            {
+                BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(branch, DemandType.Critical);
+                if (demandDef is not null)
                 {
-                    BranchDemandDef demandDef = BranchDemandUtility.GetRandomBranchDemandOfType(branch, DemandType.Critical);
-                    if (demandDef is not null)
-                    {
-                        branch.DemandHandler.AddNewDemand(demandDef);
-                    }
+                    branch.DemandHandler.AddNewDemand(demandDef);
                 }
             }
         }

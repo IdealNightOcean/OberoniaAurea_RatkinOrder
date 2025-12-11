@@ -11,9 +11,21 @@ public class BranchContract : IExposable
 {
     public enum ContractState : byte
     {
+        /// <summary>
+        /// 无效
+        /// </summary>
         Invalid,
+        /// <summary>
+        /// 冷却中
+        /// </summary>
         Cooling,
+        /// <summary>
+        /// 进行中
+        /// </summary>
         Ongoing,
+        /// <summary>
+        /// 已完成
+        /// </summary>
         Finished
     }
 
@@ -114,7 +126,7 @@ public class BranchContract : IExposable
     {
         if (!string.IsNullOrEmpty(def.fixedRequestReasons))
         {
-            return def.fixedRequestReasons.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+            return def.fixedRequestReasons.Formatted(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
         }
         if (def.requestReasonsRulePack is not null)
         {
@@ -139,14 +151,14 @@ public class BranchContract : IExposable
 
             if (string.IsNullOrEmpty(reason))
             {
-                return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+                return "OARO_BranchContract_DefaultReason".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
             }
             else
             {
                 return reason;
             }
         }
-        return "OARO_BranchContract_DefaultReason".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+        return "OARO_BranchContract_DefaultReason".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
 
     }
 }

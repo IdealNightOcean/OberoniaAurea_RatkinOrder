@@ -1,4 +1,5 @@
 ﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,16 +22,11 @@ public class BranchPopulationHandler : IExposable, ITickDay
     private readonly SimpleValueCache<float> naturalPopulationCeilingCache;
     public float PopulationRatio => population / naturalPopulationCeilingCache.GetCachedResult();
 
-
     private float publicSecurity = 1f;
     private float yesterdayPublicSecurity = 1f;
     private float yesterdayPublicSecChange;
 
-    public float PublicSecurity
-    {
-        get => publicSecurity;
-        set => publicSecurity = Mathf.Clamp(value, 0.5f, 1.5f);
-    }
+    public float PublicSecurity => publicSecurity;
     public int PublicSecurityLevel
     {
         get
@@ -128,6 +124,21 @@ public class BranchPopulationHandler : IExposable, ITickDay
         hasContractBuff = true;
     }
 
+    public void AdjustPublicSecurity(float change, bool directly = false)
+    {
+        if (!directly)
+        {
+            if (change < 0f)
+            {
+                if (branch.FacilityHandler.GetFacilityLevel(OARO_ModDefOf.OARO_DefensiveFacility) >= BranchFacilityLevel.Good)
+                {
+                    change *= 0.8f;
+                }
+            }
+        }
+
+        publicSecurity = Mathf.Clamp(publicSecurity + change, 0.5f, 1.5f);
+    }
 
     /// <summary>
     /// 每日人口变化
@@ -166,12 +177,12 @@ public class BranchPopulationHandler : IExposable, ITickDay
             branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.PublicSecurityCheck, cdTicks: 3 * 60000, removeWhenExpired: false);
             if (Rand.Chance(0.2f))
             {
-                PublicSecurity -= (publicSecurity * 0.05f) * Rand.Range(0.5f, 1.5f);
+                AdjustPublicSecurity(-(publicSecurity * 0.05f) * Rand.Range(0.5f, 1.5f));
             }
         }
         if (onMartialLaw)
         {
-            PublicSecurity += 0.02f;
+            AdjustPublicSecurity(0.02f);
         }
 
         yesterdayPublicSecChange = publicSecurity - yesterdayPopulation;

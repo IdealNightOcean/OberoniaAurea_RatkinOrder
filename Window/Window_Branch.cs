@@ -32,7 +32,6 @@ public class Window_Branch : OrderWindowBase
 
     private Branch Branch { get; }
     private BranchInfoUICache CachedBranchInfo { get; set; }
-
     private Caravan Caravan { get; }
     private Map Map { get; }
 
@@ -215,8 +214,19 @@ public class Window_Branch : OrderWindowBase
         {
             if (index < storesReserves.Count)
             {
-                GUI.DrawTexture(entryRect.ContractedBy(iconMargin), storesReserves[index].Target.iconTexture.Texture);
+                Rect iconRect = entryRect.ContractedBy(iconMargin);
+                BranchStoresReserveHandler.ReserveRecord reserves = storesReserves[index];
+                GUI.DrawTexture(iconRect, reserves.Target.iconTexture.Texture);
+                string reservesDesc = "OARO_StoresReserve_EffectDesc".Translate(
+                    Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                    reserves.Target.Named("TARGET"),
+                    reserves.CostRateReduce.ToStringPercent("0.##").Named("Reduce"));
+                if (!string.IsNullOrEmpty(reservesDesc))
+                {
+                    TooltipHandler.TipRegion(iconRect, () => reservesDesc, uniqueId: 8310234);
+                }
             }
+
             AcceptanceReport acceptance = BranchUtility.CanAssignStoreReserveByPlayer(Branch, resultOnly: false);
             if (acceptance)
             {
@@ -253,7 +263,7 @@ public class Window_Branch : OrderWindowBase
         {
             if (index < branch.StoresReserveHandler.StoresReserves.Count)
             {
-                branch.StoresReserveHandler.SetReserves(def, index);
+                branch.StoresReserveHandler.SetReserve(def, index);
             }
             else
             {

@@ -6,81 +6,108 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class OrderDefDataBase
 {
-    private static readonly Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> knightAcademicByPersonality = [];
+    private static readonly Dictionary<JointPatrolIncidentDef.IncidentType, List<JointPatrolIncidentDef>> jointPatrolIncidentGruopByType = [];
+
+
+    private static readonly Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> residentKnightAcademicGroupByPersonality = [];
 
     private static readonly Dictionary<ThingDef, KnightPersonality> preferredBuildingToKnightPersonality = [];
-    private static readonly Dictionary<KnightPersonality, List<ThingDef>> knightPersonalityToPreferredBuilding = [];
+    private static readonly Dictionary<KnightPersonality, List<ThingDef>> preferredBuildingGroupByPersonality = [];
     public static IEnumerable<ThingDef> AllResidentPreferredBuildings => preferredBuildingToKnightPersonality.Keys;
 
     public static void ClearStaticCache()
     {
-        knightAcademicByPersonality.Clear();
+        jointPatrolIncidentGruopByType.Clear();
+
+        residentKnightAcademicGroupByPersonality.Clear();
         preferredBuildingToKnightPersonality.Clear();
-        knightPersonalityToPreferredBuilding.Clear();
+        preferredBuildingGroupByPersonality.Clear();
     }
 
-    public static bool GetKnightPersonalityForPreferredBuilding(ThingDef thingDef, out KnightPersonality personality)
+    public static bool TryGetAllJointPatrolIncidentsByType(JointPatrolIncidentDef.IncidentType incidentType, out List<JointPatrolIncidentDef> incidents)
+    {
+        return jointPatrolIncidentGruopByType.TryGetValue(incidentType, out incidents);
+    }
+    public static bool TryGetKnightPersonalityByBuilding(ThingDef thingDef, out KnightPersonality personality)
     {
         return preferredBuildingToKnightPersonality.TryGetValue(thingDef, out personality);
     }
-    public static bool GetPreferredBuildingForKnightPersonality(KnightPersonality personality, out List<ThingDef> joyBuildings)
+    public static bool TryGetAllPreferredBuildingsByPersonality(KnightPersonality personality, out List<ThingDef> joyBuildings)
     {
-        return knightPersonalityToPreferredBuilding.TryGetValue(personality, out joyBuildings);
+        return preferredBuildingGroupByPersonality.TryGetValue(personality, out joyBuildings);
     }
 
     public static ResidentKnightAcademicDef GetRandomKnightAcademicOfPersonality(KnightPersonality personality)
     {
-        if (knightAcademicByPersonality.TryGetValue(personality, out List<ResidentKnightAcademicDef> defsList))
+        if (residentKnightAcademicGroupByPersonality.TryGetValue(personality, out List<ResidentKnightAcademicDef> defsList))
         {
             return defsList.RandomElementWithFallback(null);
         }
         return null;
     }
 
-    public static void AddResidentKnightPreferBuilding(ThingDef buildingDef, KnightPersonality personality)
+    public static void AddJointPatrolIncident(JointPatrolIncidentDef incidentDef)
+    {
+        if (incidentDef is null)
+        {
+            Log.Error($"[OARO] Failed to add {nameof(JointPatrolIncidentDef)} to to {nameof(OrderDefDataBase)}: {nameof(incidentDef)} cannot be null.");
+            return;
+        }
+
+        if (jointPatrolIncidentGruopByType.TryGetValue(incidentDef.incidentType, out List<JointPatrolIncidentDef> incidents))
+        {
+            incidents.Add(incidentDef);
+        }
+        else
+        {
+            jointPatrolIncidentGruopByType.Add(incidentDef.incidentType, [incidentDef]);
+        }
+    }
+
+    public static void AddKnightPreferBuilding(ThingDef buildingDef, KnightPersonality personality)
     {
         if (buildingDef is null)
         {
-            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: buildingDef cannot be null.");
+            Log.Error($"[OARO] Failed to add {nameof(ThingDef)} to to {nameof(OrderDefDataBase)}: {nameof(buildingDef)} cannot be null.");
             return;
         }
         if (personality == KnightPersonality.None)
         {
-            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            Log.Error($"[OARO] Failed to add {nameof(ThingDef)} to {nameof(OrderDefDataBase)}: {nameof(personality)} cannot be {nameof(KnightPersonality.None)}.");
             return;
         }
 
         preferredBuildingToKnightPersonality[buildingDef] = personality;
-        if (knightPersonalityToPreferredBuilding.TryGetValue(personality, out List<ThingDef> buildings))
+        if (preferredBuildingGroupByPersonality.TryGetValue(personality, out List<ThingDef> buildings))
         {
             buildings.Add(buildingDef);
         }
         else
         {
-            knightPersonalityToPreferredBuilding.Add(personality, [buildingDef]);
+            preferredBuildingGroupByPersonality.Add(personality, [buildingDef]);
         }
     }
 
-    public static void AddKnightAcademicByPersonality(KnightPersonality personality, ResidentKnightAcademicDef academicDef)
+    public static void AddKnightAcademic(ResidentKnightAcademicDef academicDef, KnightPersonality personality)
     {
         if (personality == KnightPersonality.None)
         {
-            Log.Error($"[OARO] Failed to add building to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: KnightPersonality cannot be None.");
+            Log.Error($"[OARO] Failed to add {nameof(ResidentKnightAcademicDef)} to {nameof(OrderDefDataBase)}: {nameof(personality)} cannot be {nameof(KnightPersonality.None)}.");
             return;
         }
         if (academicDef is null)
         {
-            Log.Error($"[OARO] Failed to add building to to {nameof(OrderDefDataBase)}.{nameof(preferredBuildingToKnightPersonality)}: academicDef cannot be null.");
+            Log.Error($"[OARO] Failed to add {nameof(ResidentKnightAcademicDef)} to to {nameof(OrderDefDataBase)}: {nameof(academicDef)}  cannot be null.");
             return;
         }
 
-        if (knightAcademicByPersonality.TryGetValue(personality, out List<ResidentKnightAcademicDef> academicList))
+        if (residentKnightAcademicGroupByPersonality.TryGetValue(personality, out List<ResidentKnightAcademicDef> academicList))
         {
             academicList.Add(academicDef);
         }
         else
         {
-            knightAcademicByPersonality.Add(personality, [academicDef]);
+            residentKnightAcademicGroupByPersonality.Add(personality, [academicDef]);
         }
     }
 }

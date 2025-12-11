@@ -95,4 +95,9 @@ public class JointPatrolIncidentDef : JointPatrolInteractionDef
             yield return $"'{nameof(relatedBuilding)}' is specified, but incident type is not '{nameof(IncidentType.Building)}'. Type has been set to '{nameof(IncidentType.Building)}'.";
         }
     }
+
+    public override void PostLoad()
+    {
+        OrderDefDataBase.AddJointPatrolIncident(this);
+    }
 }

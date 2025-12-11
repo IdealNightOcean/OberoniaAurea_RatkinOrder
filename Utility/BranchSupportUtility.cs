@@ -311,7 +311,7 @@ public static class BranchSupportUtility
                 def: isFriendly ? OARO_LetterDefOf.OARO_Order_PositiveLetter : OARO_LetterDefOf.OARO_Order_ThreatBigLetter,
                 relatedFaction: faction,
                 lookTargets: combatPanws);
-            letter.relatedOrder = parms.RatkinOrder;
+            letter.RelatedOrder = parms.RatkinOrder;
             Find.LetterStack.ReceiveLetter(letter);
         }
 
@@ -328,11 +328,11 @@ public static class BranchSupportUtility
             textSB.AppendLine();
             if (parms.Branch is null)
             {
-                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(parms.RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), parms.CommanderCount));
             }
             else
             {
-                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), parms.CommanderCount));
             }
             textSB.AppendLine();
             textSB.AppendLine(parms.RaidStrategy.arrivalTextFriendly);
@@ -349,11 +349,11 @@ public static class BranchSupportUtility
             textSB.AppendLine();
             if (parms.Branch is null)
             {
-                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(parms.RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), parms.CommanderCount));
             }
             else
             {
-                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), parms.CommanderCount));
             }
             textSB.AppendLine();
             textSB.AppendLine(parms.RaidStrategy.arrivalTextEnemy);

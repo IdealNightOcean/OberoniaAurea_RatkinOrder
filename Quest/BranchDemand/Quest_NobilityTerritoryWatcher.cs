@@ -140,7 +140,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
                     lookTargets: new LookTargets(spawnCell, map),
                     relatedFaction: Branch?.RatkinOrder.Faction,
                     quest: quest);
-                letter.relatedOrder = Branch?.RatkinOrder;
+                letter.RelatedOrder = Branch?.RatkinOrder;
                 Find.LetterStack.ReceiveLetter(letter);
             }
         }

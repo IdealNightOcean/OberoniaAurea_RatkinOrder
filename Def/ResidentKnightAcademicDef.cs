@@ -47,7 +47,7 @@ public class ResidentKnightAcademicDef : Def
         base.PostLoad();
         if (knightPersonality != KnightPersonality.None)
         {
-            OrderDefDataBase.AddKnightAcademicByPersonality(knightPersonality, this);
+            OrderDefDataBase.AddKnightAcademic(this, knightPersonality);
         }
     }
 }

@@ -23,11 +23,11 @@ public static class IconLibrary
     public static readonly Texture2D BigIdleIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigIdleIcon");
     public static readonly Texture2D SmallIdleIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallIdleIcon");
 
-    public static readonly Texture2D BigOutdoorIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigOutdoorIcon");
-    public static readonly Texture2D SmallOutdoorIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallOutdoorIcon");
+    public static readonly Texture2D BigAbroadIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigAbroadIcon");
+    public static readonly Texture2D SmallAbroadIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallAbroadIcon");
 
-    public static readonly Texture2D BigIndoorIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigIndoorIcon");
-    public static readonly Texture2D SmallIndoorIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallIndoorIcon");
+    public static readonly Texture2D BigOnBaseIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigOnBaseIcon");
+    public static readonly Texture2D SmallOnBaseIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallOnBaseIcon");
 
     public static readonly Texture2D SmallGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallGeneralBranchIcon");
     public static readonly Texture2D BigGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigGeneralBranchIcon");

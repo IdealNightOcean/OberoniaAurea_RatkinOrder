@@ -21,7 +21,7 @@ public class GameComponent_RatkinOrder : GameComponent
     /// 全局对话行为管理
     /// 因不保存，应注意重新注册
     /// </summary>
-    [Unsaved] public Dictionary<Pawn, ITalkAction> TalkActionHandler = [];
+    public Dictionary<Pawn, ITalkAction> TalkActionHandler { get; } = [];
 
     /// <summary>
     /// GameComp比较特殊，没有找到合适的时机清理GameComp实例，所以不再检测直接替换实例

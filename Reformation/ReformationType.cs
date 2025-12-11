@@ -1,9 +1,21 @@
 ﻿namespace OberoniaAurea.RatkinOrder;
 
-public enum ReformationType
+public enum ReformationType : byte
 {
-    Armament, //军备
-    Branch, //分部
-    Management, //经营
-    Regulation //规章
+    /// <summary>
+    /// 军备
+    /// </summary>
+    Armament,
+    /// <summary>
+    /// 分部
+    /// </summary>
+    Branch,
+    /// <summary>
+    /// 经营
+    /// </summary>
+    Management,
+    /// <summary>
+    /// 规章
+    /// </summary>
+    Regulation
 }

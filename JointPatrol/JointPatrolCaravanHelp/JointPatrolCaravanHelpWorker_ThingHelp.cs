@@ -37,7 +37,7 @@ public class JointPatrolCaravanHelpWorker_ThingHelp : JointPatrolCaravanHelpWork
     {
         JointPatrolCaravanHelp_ThingHelpExtension modEx_ThingHelp = Def.GetModExtension<JointPatrolCaravanHelp_ThingHelpExtension>();
         DiaNode rootNode = new(modEx_ThingHelp.requestHelpReason.Formatted(
-            branch.Named(KeyLibrary_FormatArgName.BranchName),
+            branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
             modEx_ThingHelp.requireThing.Named(KeyLibrary_FormatArgName.THING),
             modEx_ThingHelp.requireCount.Named(KeyLibrary_FormatArgName.Count),
             Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF)));

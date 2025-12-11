@@ -583,7 +583,7 @@ public class Window_RatkinOrder : MainTabWindow
             Widgets.LabelEllipses(reusedRect, "OARO_Honor".Translate().Colorize(Color.yellow));
         }
 
-        if (branch.IsIdleNow)
+        if (branch.CurWorkState == Branch.WorkStateType.Idle)
         {
             reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 12f, inRect.height - 2f, inRect.height - 2f);
             GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
@@ -754,7 +754,7 @@ public class Window_RatkinOrder : MainTabWindow
         {
             TotalPopulation += branch.PopulationHandler.Population;
             AverageSupply += branch.Supply;
-            if (!branch.IsIdleNow)
+            if (branch.CurWorkState != Branch.WorkStateType.Idle)
             {
                 NotIdleBranchCount++;
             }

@@ -65,7 +65,7 @@ public static class RecommendationUtility
                         def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
                         lookTargets: new LookTargets(spawnCell.Value, map),
                         relatedFaction: ratkinOrder.Faction);
-                    letter.relatedOrder = ratkinOrder;
+                    letter.RelatedOrder = ratkinOrder;
                     Find.LetterStack.ReceiveLetter(letter);
                 }
             }
@@ -85,7 +85,7 @@ public static class RecommendationUtility
                         def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
                         lookTargets: new LookTargets(spawnCell.Value, map),
                         relatedFaction: ratkinOrder.Faction);
-                    letter.relatedOrder = ratkinOrder;
+                    letter.RelatedOrder = ratkinOrder;
                     Find.LetterStack.ReceiveLetter(letter);
                 }
             }

@@ -152,7 +152,7 @@ public class OrderHallHandler : IExposable
                     if (buildingTags.Contains("OARO_ResidentKnightPrefer"))
                     {
                         ThingDef thingDef = allThings[i].def;
-                        if (OrderDefDataBase.GetKnightPersonalityForPreferredBuilding(thingDef, out KnightPersonality personality))
+                        if (OrderDefDataBase.TryGetKnightPersonalityByBuilding(thingDef, out KnightPersonality personality))
                         {
                             if (preferBuildingDefsByKnightPersonality.TryGetValue(personality, out HashSet<ThingDef> defsHash))
                             {

@@ -36,7 +36,7 @@ public class BranchBuildingComp_Memorial : BranchBuildingComp
         {
             OrderLetterUtility.ReceiveLetter(
                 label: "OARO_MemorialInitActiveLabel".Translate(parent.Label.Named("BuildingLabel")),
-                text: "OARO_MemorialInitActiveLabel".Translate(parent.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                text: "OARO_MemorialInitActiveLabel".Translate(parent.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
                                                          parent.Label.Named("BuildingLabel"),
                                                          parent.Def.honorDef.Named("HONORDEF")),
                 def: OrderLetterDefOf.OARO_OfficialLetter,

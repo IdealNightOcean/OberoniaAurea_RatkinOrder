@@ -45,7 +45,7 @@ public class BranchTaskDef : Def
     /// <summary>
     /// 是否为户外任务
     /// </summary>
-    public bool isOutdoorTask;
+    public bool isAbroadTask;
 
     /// <summary>
     /// 是否有分险

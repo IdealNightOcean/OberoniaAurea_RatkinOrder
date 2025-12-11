@@ -12,14 +12,22 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
 {
     [Unsaved] private readonly Branch branch;
 
+    /// <summary>自动准备新建设的概率</summary>
+    /// <remarks> - 只在可自动准备新建设时起效</remarks>
+    private const float AutoStartReserveChacne = 0.1f;
     private static readonly float[] CostRateReduceArr = [0.02f, 0.01f, 0.005f, 0.0025f];
+    private static readonly int CostRateReduceArrLen = CostRateReduceArr.Length;
+
+    /// <summary>
+    /// 建设储备项目上限
+    /// </summary>
     private const int StoresReserveCeiling = 3;
 
     private List<ReserveRecord> storesReserves = new(StoresReserveCeiling);
     public IReadOnlyList<ReserveRecord> StoresReserves => storesReserves;
 
-    public ReserveRecord PrimaryReserves => storesReserves.FirstOrFallback(null);
-    public float PrimaryCostRateReduce => PrimaryReserves?.CostRateReduce ?? 0f;
+    public ReserveRecord PrimaryReserves => storesReserves.Count > 0 ? storesReserves[0] : null;
+    public float PrimaryCostRateReduce => storesReserves.Count > 0 ? storesReserves[0].CostRateReduce : 0f;
 
     internal BranchStoresReserveHandler(Branch branch)
     {
@@ -67,10 +75,21 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         return false;
     }
 
-    public void RemoveReserves(int index) => storesReserves.RemoveAt(index);
-    public int RemoveReserves(BranchConstructionDef def) => storesReserves.RemoveAll(r => r.Target == def);
+    public void RemoveReserve(int index) => storesReserves.RemoveAt(index);
+    public bool RemoveReserve(BranchConstructionDef def)
+    {
+        for (int i = 0; i < storesReserves.Count; i++)
+        {
+            if (storesReserves[i].Target == def)
+            {
+                storesReserves.RemoveAt(i);
+                return true;
+            }
+        }
+        return false;
+    }
 
-    public void SetReserves(BranchConstructionDef def, int index)
+    public void SetReserve(BranchConstructionDef def, int index)
     {
         if (index < 0 || index >= storesReserves.Count)
         {
@@ -117,34 +136,30 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     {
         if (hourOfDay == 5)
         {
-            float maxReduce = branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder) ? 0.4f : 0.3f;
-            float reduceMulti = branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder) ? 2f : 1f;
+            float maxReduce = 0.3f;
+            float reduceMulti = 1f;
+            if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
+            {
+                maxReduce = 0.4f;
+                reduceMulti *= 2f;
+            }
+
             for (int i = 0; i < storesReserves.Count; i++)
             {
-                float costRateReduce = storesReserves[i].CostRateReduce - (CostRateReduceArr[Mathf.Min(i, 3)] * reduceMulti);
+                float costRateReduce = storesReserves[i].CostRateReduce - (CostRateReduceArr[Mathf.Min(i, CostRateReduceArrLen - 1)] * reduceMulti);
                 storesReserves[i].CostRateReduce = Mathf.Min(costRateReduce, maxReduce);
             }
         }
         else if (hourOfDay == 17)
         {
-            if (storesReserves.Count < StoresReserveCeiling && Rand.Chance(0.1f))
+            if (storesReserves.Count < StoresReserveCeiling && Rand.Chance(AutoStartReserveChacne))
             {
-                TryCreateAutoStartReserves();
+                TryCreateAutoStartReserve();
             }
         }
     }
 
-    public void RemoveReserve(BranchConstructionDef def)
-    {
-        for (int i = 0; i < storesReserves.Count; i++)
-        {
-            if (storesReserves[i].Target == def)
-            {
-                storesReserves.RemoveAt(i);
-                break;
-            }
-        }
-    }
+
 
     public void Notify_BranchConstructStarted(BranchConstructionDef def)
     {
@@ -163,7 +178,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         return 0f;
     }
 
-    private void TryCreateAutoStartReserves()
+    private void TryCreateAutoStartReserve()
     {
         if (!branch.FacilityHandler.IsFacilityFullyCompleted)
         {

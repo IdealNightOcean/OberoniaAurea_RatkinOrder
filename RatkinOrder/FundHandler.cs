@@ -9,9 +9,12 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 资金管理
+/// </summary>
 public class FundHandler(RatkinOrder ratkinOrder) : IExposable
 {
-    [Unsaved] public readonly RatkinOrder RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
+    public RatkinOrder RatkinOrder { get; } = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
 
     private float funds;
     public float Funds => funds;

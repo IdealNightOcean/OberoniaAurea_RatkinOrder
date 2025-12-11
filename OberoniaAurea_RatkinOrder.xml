@@ -1,0 +1,2361 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>OberoniaAurea_RatkinOrder</name>
+    </assembly>
+    <members>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuildingComp.Initialize(OberoniaAurea.RatkinOrder.BranchBuilding,OberoniaAurea.RatkinOrder.BranchBuildingCompProperties)">
+            <summary>
+            在实例化时使用；
+            注意加载存档时会调用，此时BranchBuilding(Parent)和对应Branch尚未绑定
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BuildingAdvancedProperties.label">
+            <summary>
+            升级后的建筑名称
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BuildingAdvancedProperties.extraDescription">
+            <summary>
+            升级后的建筑描述
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BuildingAdvancedProperties.advancedPopulation">
+            <summary>升级人口</summary>
+            <remarks>- <see cref="P:OberoniaAurea.RatkinOrder.BranchPopulationHandler.Population"/>大于等于该值时，<see cref="T:OberoniaAurea.RatkinOrder.BranchBuilding"/> 会自动升级</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BuildingAdvancedProperties.effectFlags">
+            <summary>
+            效果标志列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BuildingAdvancedProperties.branchStatOffsets">
+            <summary>
+            属性修正列表（Offset）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BuildingAdvancedProperties.branchStatFactors">
+            <summary>
+            属性修正列表（Factor）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BuildingAdvancedProperties.customEffectDescriptions">
+            <summary>额外自定义的效果描述</summary>
+            <remarks>- 显示在修正效果之后</remarks>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker_CustomizedArmaments.InteractionEffect(OberoniaAurea.RatkinOrder.BranchInteractionParms)">
+            <returns>
+            <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.ApplyInteraction(OberoniaAurea.RatkinOrder.BranchInteractionParms)"/> 执行回调方法 <see cref="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.PostApplyInteraction(OberoniaAurea.RatkinOrder.BranchInteractionParms,System.Boolean)"/></para>
+            </returns>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker_BuildingTrader.InteractionEffect(OberoniaAurea.RatkinOrder.BranchInteractionParms)">
+            <returns>
+            <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.ApplyInteraction(OberoniaAurea.RatkinOrder.BranchInteractionParms)"/> 执行回调方法 <see cref="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.PostApplyInteraction(OberoniaAurea.RatkinOrder.BranchInteractionParms,System.Boolean)"/></para>
+            </returns>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker_RandomTrade.InteractionEffect(OberoniaAurea.RatkinOrder.BranchInteractionParms)">
+            <returns>
+            <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker_RandomTrade.ApplyInteraction(OberoniaAurea.RatkinOrder.BranchInteractionParms)"/> 执行回调方法 <see cref="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.PostApplyInteraction(OberoniaAurea.RatkinOrder.BranchInteractionParms,System.Boolean)"/></para>
+            </returns>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.BranchInteractionWorker">
+            <summary>
+            分部交互的功能类，必须实现一个只接受BranchInteractionDef参数的构造函数
+            分部交互以远行队Caravan为交互载体
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.#ctor(OberoniaAurea.RatkinOrder.BranchInteractionDef)">
+            <summary>
+            分部交互的功能类，必须实现一个只接受BranchInteractionDef参数的构造函数
+            分部交互以远行队Caravan为交互载体
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.InteractionEffect(OberoniaAurea.RatkinOrder.BranchInteractionParms)">
+            <returns>
+            <para>- succeeded：是否成功执行交互逻辑</para>
+            <para>- doPostApply：是否需要执行后续回调 <see cref="M:OberoniaAurea.RatkinOrder.BranchInteractionWorker.PostApplyInteraction(OberoniaAurea.RatkinOrder.BranchInteractionParms,System.Boolean)"/></para>
+            </returns>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchTask.#ctor(OberoniaAurea.RatkinOrder.BranchTaskDef)">
+            <summary>
+            常用于反射构造，注意子类同参数构造函数需要非公开
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContract.ContractState.Invalid">
+            <summary>
+            无效
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContract.ContractState.Cooling">
+            <summary>
+            冷却中
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContract.ContractState.Ongoing">
+            <summary>
+            进行中
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContract.ContractState.Finished">
+            <summary>
+            已完成
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchMedalRecord.ToString">
+            <summary>
+            None类型勋章和非正数勋章无效
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchMedalHandler.PostBranchGenerated">
+            <summary>
+            初始化主要勋章
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchPopulationHandler.DailyPopulationChange(System.Boolean)">
+            <summary>
+            每日人口变化
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStoresReserveHandler.AutoStartReserveChacne">
+            <summary>自动准备新建设的概率</summary>
+            <remarks> - 只在可自动准备新建设时起效</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStoresReserveHandler.StoresReserveCeiling">
+            <summary>
+            建设储备项目上限
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchStoresReserveHandler.TickHour(System.Int32)">
+            <summary>
+            应该只在分部无任何建设时执行
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDefOf.OARO_RequestCombatReadiness">
+            <summary>
+            要求战备
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDefOf.OARO_MapRecommendationToKnight">
+            <summary>
+            人员补充
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDefOf.OARO_MapSilverToSupply">
+            <summary>
+            补充物资
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDefOf.OARO_UnlockSupportAuthority">
+            <summary>
+            解锁支援权限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDefOf.OARO_Courage">
+            <summary>
+            勇气印记
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDefOf.OARO_Tenacity">
+            <summary>
+            简易印记
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDefOf.OARO_Rescue">
+            <summary>
+            援护印记
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDefOf.OARO_Justice">
+            <summary>
+            公义印记
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_WorldObjectDefOf.OARO_WO_BranchUnderConstruction">
+            <summary>
+            建设中的分部
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_WorldObjectDefOf.OARO_WO_BranchSite">
+            <summary>
+            分部（单独设施）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_WorldObjectDefOf.OARO_WO_ApprenticeHome">
+            <summary>
+            小学徒的家乡
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_WorldObjectDefOf.OARO_Map_NobilityTerritory">
+            <summary>
+            叛乱镇压 - 贵族领地 攻击时的地图
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDefOf.OARO_OfficialLetter">
+            <summary>
+            公务信件
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments">
+            <summary>
+            公务信件 + 简单附件
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDefOf.OARO_UrgentLetter">
+            <summary>
+            紧急信件
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_RulePackDefOf.OARO_NameBuilder_BranchName">
+            <summary>
+            分部名称拼装 
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_RulePackDefOf.OARO_NameBuilder_SquadName">
+            <summary>
+            分队名称拼装
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_RulePackDefOf.OARO_Namer_Nobility">
+            <summary>
+            贵族名称
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_RulePackDefOf.OARO_JointPatrolCompletion">
+            <summary>
+            联合巡逻完成
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDef.focusedTaskType">
+            <summary>印记专注任务类型</summary>
+            <remarks>- 会在 <see cref="T:OberoniaAurea.RatkinOrder.Branch"/> 初始化时设置 <see cref="P:OberoniaAurea.RatkinOrder.BranchTaskHandler.FocusedTaskType"/></remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDef.color">
+            <summary>
+            印记颜色
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDef.buffWorkerClass">
+            <summary>
+            印记Buff功能类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDef.backgroundColor">
+            <summary>
+            印记背景颜色
+            </summary>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.BranchMedalDef.BackgroundTexture">
+            <summary>
+            印记背景图标，颜色使用 <see cref="F:OberoniaAurea.RatkinOrder.BranchMedalDef.backgroundColor"/>
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchMedalDef.iconTexture">
+            <summary>
+            印记图标
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchResidentDef.residentClass">
+            <summary>
+            部署功能类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchResidentDef.defaultDeployDays">
+            <summary>
+            默认部署天数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.JointPatrolIncidentDef.incidentType">
+            <summary>
+            事件类型
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.JointPatrolIncidentDef.relatedBuilding">
+            <summary>
+            分部建筑限制
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.JointPatrolIncidentDef.CanApplyOn(OberoniaAurea.RatkinOrder.Branch,OberoniaAurea.RatkinOrder.JointPatrolManager.PatrolLevel)">
+            <summary>
+            能否触发小事件
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.JointPatrolIncidentDef.GetPotentialIncidentType(OberoniaAurea.RatkinOrder.JointBranchRecord)">
+            <summary>
+            根据联巡参与者获取随机的联巡小事件类型（<see cref="T:OberoniaAurea.RatkinOrder.JointPatrolIncidentDef.IncidentType"/>）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.JointPatrolInteractionDef.restrictTaskType">
+            <summary>
+            专注任务限制
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.JointPatrolInteractionDef.restrictBranchType">
+            <summary>
+            分部类型限制
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.JointPatrolInteractionDef.patrolLevelLimits">
+            <summary>
+            联巡等级限制
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.JointPatrolInteractionDef.customDescriptions">
+            <summary>
+            事件描述列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.JointPatrolInteractionDef.parts">
+            <summary>
+            事件功能列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDef.letterClass">
+            <summary>
+            信件功能类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDef.letterType">
+            <summary>
+            信件类型
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDef.canShowAsRimLetter">
+            <summary>
+            能否被转化为原版信件
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDef.forceShowAsRimLetter">
+            <summary>强制转化为原版信件</summary>
+            <remarks>- 只在 <see cref="F:OberoniaAurea.RatkinOrder.OrderLetterDef.canShowAsRimLetter"/> 为 <see langword="true"/> 时生效</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderLetterDef.relatedLetterDef">
+            <summary>相关原版信件Def</summary>
+            <remarks>- 只在 <see cref="F:OberoniaAurea.RatkinOrder.OrderLetterDef.canShowAsRimLetter"/> 为 <see langword="true"/> 时生效</remarks>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.JointPatrolManager">
+            <summary>
+            联合巡逻管理
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.JointPatrolManager.ApplyJointInteractionEffect(OberoniaAurea.RatkinOrder.JointPatrolInteractionDef,OberoniaAurea.RatkinOrder.JointBranchRecord)">
+            <summary>
+            应用交互效果并写入联巡记录
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OrderInteractionWorker_InviteResidentKnight.GetRecommendationNeedCount(OberoniaAurea.RatkinOrder.RatkinOrder)">
+            <summary>
+            招募常驻骑士所需推荐信数量
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.Window_BranchDemand.DrawDemandBranchInfo(UnityEngine.Rect)">
+            <summary>
+            宽40f
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDefOf.OARO_ComprehensiveJointPatrolPreparation">
+            <summary>
+            全面联巡战备
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDefOf.OARO_ExplorationTraining">
+            <summary>
+            勘探训练
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDefOf.OARO_ReformationPlaceholder">
+            <summary>
+            未实现Def自新占位
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchConstructionDef.iconTexture">
+            <summary>
+            图标（小+大）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContractDef.rewardWorkerClass">
+            <summary>
+            需求奖励方法类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContractDef.requestThingDef">
+            <summary>
+            需求的<see cref="T:Verse.ThingDef"/>
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContractDef.requestCountRange">
+            <summary>
+            需求的数量范围（<see cref="T:Verse.IntRange"/>）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContractDef.fixedRequestReasons">
+            <summary>
+            固定的需求原因
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContractDef.requestReasonsRulePack">
+            <summary>需求原因构建使用的<see cref="T:Verse.RulePackDef"/></summary>
+            <remarks>- 只在<see cref="F:OberoniaAurea.RatkinOrder.BranchContractDef.fixedRequestReasons"/>为<see langword="null"/>或<see cref="F:System.String.Empty"/>时起效</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContractDef.durationDays">
+            <summary>
+            需求在[接取前]的持续时间（Day）
+            </summary>
+            <remarks>超过该时间仍未接取则会被移除</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchContractDef.coolingDaysAfterFulfilled">
+            <summary>
+            需求[完成后]的冷却时间（Day）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchHonorDef.buffHediff">
+            <summary>
+            荣誉Buff（<see cref="T:Verse.HediffDef"/>）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchHonorDef.academicDef">
+            <summary>
+            荣誉课业（<see cref="T:OberoniaAurea.RatkinOrder.ResidentKnightAcademicDef"/>）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchHonorDef.pawnGroupOptions">
+            <summary>
+            荣誉分部特殊的人物生成组
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchHonorDef.color">
+            <summary>
+            荣誉颜色
+            </summary>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.BranchHonorDef.HonorColorTex">
+            <summary>
+            荣誉颜色标识图标，颜色使用<see cref="F:OberoniaAurea.RatkinOrder.BranchHonorDef.color"/>
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchHonorDef.iconTexture">
+            <summary>
+            荣誉图标
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchHonorDef.decorationTexture">
+            <summary>
+            荣誉装饰框图标
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchHonorDef.backgroundTexture">
+            <summary>
+            荣誉背景图标
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDef.workerClass">
+            <summary>
+            交互功能类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDef.onlyBuildingInteraction">
+            <summary>
+            是否仅作为建筑交互
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDef.needSupply">
+            <summary>
+            分部补给下限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchInteractionDef.floorPopulation">
+            <summary>
+            分部人口下限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.InteractionDefBase.hasCoolDown">
+            <summary>
+            是否有冷却
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.InteractionDefBase.useDefaultCD">
+            <summary>
+            是否使用默认冷却
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.InteractionDefBase.defaultCdDays">
+            <summary>
+            默认冷却时间
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.InteractionDefBase.floorRelationship">
+            <summary>
+            最低骑士团关系
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.InteractionDefBase.floorEsteem">
+            <summary>
+            最低骑士团认可度
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.InteractionDefBase.needRecommendation">
+            <summary>
+            需求推荐信数量
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.InteractionDefBase.needSilver">
+            <summary>
+            需求白银数量
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightAcademicDef.knightPersonality">
+             <summary>对应骑士个性</summary>
+            <remarks>- 不要使用组合枚举！！！</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightAcademicDef.academicStages">
+            <summary>
+            课业阶段
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightAcademicDef.isHonorAcademic">
+            <summary>
+            是否为荣誉课业
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ResidentKnightAcademicStage.OnAcademicLevelUp(Verse.Pawn)">
+            <summary>
+            只执行一次，在升级时执行
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.SpecialLetterDefBase.sender">
+            <summary>
+            发信人
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.SpecialLetterDefBase.text">
+            <summary>
+            信件内容
+            </summary>
+            <remarks>- 信件标题使用<see cref="F:Verse.Def.label"/>字段</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.SpecialLetterDefBase.relatedOrderLetterDef">
+            <summary>
+            相关骑士团信件Def
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.SpecialLetterDefBase.relatedLetterType">
+            <summary>
+            相关骑士团信件类型
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.SpecialLetterDefBase.absolutelyUnique">
+            <summary>
+            是否全局唯一
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.Propaganda">
+            <summary>
+            教堂宣讲
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.AdvancedPropaganda">
+            <summary>
+            高级教堂宣讲
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.IntensiveTrain">
+            <summary>
+            强化训练
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.CaravanPreventLoot">
+            <summary>
+            阻止远行队被抢劫
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.BlockSquadRecover">
+            <summary>
+            禁用分队自然恢复
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.PurchaseKnightlyArmamentsNoCD">
+            <summary>
+            购买骑士军械无CD
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.BlockSupport">
+            <summary>
+            禁用部署支援
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.BlockBombard">
+            <summary>
+            禁用炮击支援
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_EffectTag.MartialLaw">
+            <summary>
+            分部戒严
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_NobilityTerritoryWatcher">
+            <summary>
+            一个特化的用于叛乱镇压 - 贵族领地管理的（特化类）
+            应该在QuestEffectTag后使用，否则强制贵族类型不会生效
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_Root_LostItemsOfTrader">
+            <summary>
+            旅行商的失物
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.QuestNode_SetPresetEffectTags.addToTestList">
+            <summary>
+            这是用于TestRun的tagKey列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.QuestNode_HasQuestEffectTag.tagsListForTestRun">
+            <summary>
+            这是用于TestRun的tag列表
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.QuestClique.GetBranchPotency(OberoniaAurea.RatkinOrder.Branch)">
+            <summary>
+            获取分队效能
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.QuestClique.BranchPotencyToCliquePotency(System.Single)">
+            <summary>
+            将分队效能转换为任务派别效能，最大值50%
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.QuestNode_AddEffectTags.addToTestList">
+            <summary>
+            这是用于TestRun的tag列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ReformationType.Armament">
+            <summary>
+            军备
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ReformationType.Branch">
+            <summary>
+            分部
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ReformationType.Management">
+            <summary>
+            经营
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ReformationType.Regulation">
+            <summary>
+            规章
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatPart.priority">
+            <summary>
+            优先级，数值越大越先计算
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_IntensiveTrain">
+            <summary>
+            本能训练
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_WarDeepInjury">
+            <summary>
+            战后创伤
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_ResidentKnight">
+            <summary>
+            常驻骑士（隐藏）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_BannerBullet">
+            <summary>
+            旗弹标记
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_BranchMedal">
+            <summary>
+            印记Buff
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_HonorHunting_Debuff">
+            <summary>
+            影猎骑士增伤
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate">
+            <summary>
+            圣骑士鼓舞
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_KnightlyTalk">
+            <summary>
+            骑士激励
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_WolfDisaster">
+            <summary>
+            狼灾 - 灾狼
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryInHeat">
+            <summary>
+            叛乱贵族 - 群情激愤下的叛乱
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPounce">
+            <summary>
+            叛乱贵族 - 贵族被突袭
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_HediffDefOf.OARO_Hediff_NobilityTerritoryPouncePlayer">
+            <summary>
+            叛乱贵族 - 玩家被突袭
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_JobDefOf.OARO_Job_CommonTalkWith">
+            <summary>
+            与...交谈
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_JobDefOf.OARO_FillFermentingBarrel">
+            <summary>
+            填充酒窖原料
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_JobDefOf.OARO_TakeProductOutOfFermentingBarrel">
+            <summary>
+            从酒窖中取出产物
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_JobDefOf.OARO_RecieveLetterFromBox">
+            <summary>
+            从信息收取信件
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThoughtDefOf.OARO_Thought_ResidentKnight_SquadBeAttackedOnTask">
+            <summary>
+            常驻骑士 - 自己骑士团有分部被袭击
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThoughtDefOf.OARO_Thought_TouristAreaPatrol">
+            <summary>
+            风景区巡逻
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.CertainDateLetterDef.delayableDays">
+            <summary>
+            可延迟时间（Day）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_FundDailyChange">
+            <summary>
+            每日随机
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_NewOrderSubsidy">
+            <summary>
+            新骑士团补助
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_FundFortune_Positive">
+            <summary>
+            时运 - 正
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_FundFortune_Negative">
+            <summary>
+            时运 - 负
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_FundRestoration_Positive">
+            <summary>
+            归正 - 正
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_FundRestoration_Negative">
+            <summary>
+            归正 - 负
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_PlayerSponsor_Immediate">
+            <summary>
+            赞助 - 立刻
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_PlayerSponsor_ShortTerm">
+            <summary>
+            赞助 - 短期
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDefOf.OARO_PlayerSponsor_LongTerm">
+            <summary>
+            赞助 - 长期
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchDemandDef.demandType">
+            <summary>
+            需求类型
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchDemandDef.durationDays">
+            <summary>
+            需求在[接取前]的持续时间（Day）
+            </summary>
+            <remarks>超过该时间仍未接取则会被移除</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchDemandDef.relatedQuestDef">
+            <summary>
+            需求相关的<see cref="T:RimWorld.QuestScriptDef"/>
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchDemandDef.baseSelectWeight">
+            <summary>
+            需求随机权重
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchDemandDef.targetDesc">
+            <summary>
+            目标描述
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchDemandDef.rewardDesc">
+            <summary>
+            奖励描述
+            </summary>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.BranchDemandDef.IsCritical">
+            <summary>
+            是否为关键需求（<see cref="F:OberoniaAurea.RatkinOrder.BranchDemand.DemandType.Critical"/>）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchDemandDef.backgroundPath">
+            <summary>
+            关键需求背景图标
+            </summary>
+            <remarks>- 目前仅在 <see cref="F:OberoniaAurea.RatkinOrder.BranchDemandDef.demandType"/> 为 <see cref="F:OberoniaAurea.RatkinOrder.BranchDemand.DemandType.Critical"/> 时使用</remarks>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchDemandHandler.CheckDemand">
+            <summary>
+            检查需求有效性，移除无效需求
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_AffectRadius">
+            <summary>
+            分部影响范围
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_BuildingCeiling">
+            <summary>
+            分部普通建筑上限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_SupplyCeiling">
+            <summary>
+            分部补给容量上限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_SupplyRecoveryRate">
+            <summary>
+            分部补给恢复速率
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_DailyPopulationGrowth">
+            <summary>
+            每日人口增长
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_NaturalPopulationCeiling">
+            <summary>
+            自然人口上限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_ConstructionCostFactor">
+            <summary>
+            建设白银花费系数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_ConstructionSpeedFactor">
+            <summary>
+            建设速度系数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_BombardSupportCeiling">
+            <summary>
+            每轮炮击支援数量
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_SquadMemberCeiling">
+            <summary>
+            分队普通成员上限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_SquadCommanderCeiling">
+            <summary>
+            分队骑士长上限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDefOf.OARO_SquadMemberRecoveryRate">
+            <summary>
+            分队成员恢复率
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_QuestScriptDefOf.OARO_MercyPre_HelpSeeker">
+            <summary>
+            善行任务前置 - 寻求帮助
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_QuestScriptDefOf.OARO_Quest_ResidentKnightBackPlayer">
+            <summary>
+            常驻骑士回归玩家
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_QuestScriptDefOf.OARO_Quest_JointPatrolCaravanHelp">
+            <summary>
+            联合巡逻 - 分部求助
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.Ratkin">
+            <summary>
+            鼠族
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.Ratkin_Su">
+            <summary>
+            鼠族实验体
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_OrderRecommendation">
+            <summary>
+            推荐信
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_OrderCodePedestal">
+            <summary>
+            骑士团团规台
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.RK_StrawberryBeer">
+            <summary>
+            草莓精酿
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_BulletShell_HeavyGrenade">
+            <summary>
+            鼠族高爆榴弹
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_Turret_OrderSuperHeavyHowitzer">
+            <summary>
+            超重型榴弹炮
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_Bullet_BannerRifle">
+            <summary>
+            旗弹（弹药）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_OrderLetterBox">
+            <summary>
+            骑士团信箱
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_WineDisplayShelf">
+            <summary>
+            骑士团酒架
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_PlagueSample">
+            <summary>
+            瘟疫样本
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ThingDefOf.OARO_DesignDrawing">
+            <summary>
+            设计规划图
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_RimWorldDefOf.Wolf_Timber">
+            <summary>
+            森林狼
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_RimWorldDefOf.SculptureSmall">
+            <summary>
+            小雕塑
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_RimWorldDefOf.Patient">
+            <summary>
+            工作类型 - 修养
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDefOf.OARO_CombatReadiness">
+            <summary>
+            战备
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderInteractionDef.displayOnUI">
+            <summary>
+            是否在骑士团主界面UI上显式
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderInteractionDef.specialDisplayOnUI">
+            <summary>是否在骑士团主界面UI上特殊显示</summary>
+            <remarks>
+            <para>- 只在 <see cref="F:OberoniaAurea.RatkinOrder.OrderInteractionDef.displayOnUI"/> 为 <see langword="true"/> 时生效</para>
+            <para>- 若为 <see langword="true"/> 则需在骑士团主界面手动实现显示</para>
+            <para>- 若为 <see langword="false"/> 则自动在骑士团主界面相关部分集中显示</para>
+            </remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderInteractionDef.needFund">
+            <summary>
+            需求骑士团资金数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderInteractionDef.fundEventDef">
+            <summary>事件触发的资金事件</summary>
+            <remarks>- 只在 <see cref="F:OberoniaAurea.RatkinOrder.OrderInteractionDef.needFund"/>><see langword="0f"/> 时生效</remarks>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.OrderInteractionDef.MinFundNeeded">
+            <summary>
+            最低骑士团资金需求
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightRoleDef.iconTexture">
+            <summary>
+            UI图标
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightRoleDef.displyPriority">
+            <summary>
+            显示优先级
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightRoleDef.positionChangeCDDays">
+            <summary>
+            职位变更冷却时间（Day）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightRoleDef.roleAbility">
+            <summary>
+            给予担任该职位的Pawn的Ability
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightRoleDef.roleHediff">
+            <summary>
+            给予担任该职位的Pawn的Hediff
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightRoleDef.statOffsets">
+            <summary>
+            Stat偏移修正
+            修正是针对全体殖民者的，而非担任该职位的<see cref="T:Verse.Pawn"/>
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.ResidentKnightRoleDef.statFactors">
+            <summary>
+            Stat系数修正
+            修正是针对全体殖民者的，而非担任该职位的<see cref="T:Verse.Pawn"/>
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.KnightPersonalityUtility.IsResonatePersonality(OberoniaAurea.RatkinOrder.KnightPersonality,OberoniaAurea.RatkinOrder.KnightPersonality)">
+            <summary>
+            是否为相互共鸣个性
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.KnightPersonalityUtility.GetResonatePersonality(OberoniaAurea.RatkinOrder.KnightPersonality)">
+            <summary>
+            获取共鸣个性
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OARO_WindowUtility.CenterMinCoords(System.Single,System.Single,System.Single)">
+            <summary>
+            Rect居中对应最小坐标
+            </summary>
+            <param name="outerMinCoords">做标准Rect对应最小坐标</param>
+            <param name="outerSize">做标准Rect尺寸</param>
+            <param name="innerSize">被居中Rect尺寸</param>
+            <returns>Rect居中对应最小坐标</returns>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OARO_WindowUtility.DrawBranchSummary(UnityEngine.Vector2,OberoniaAurea.RatkinOrder.BranchSummaryUICache)">
+            <summary>
+            绘制分部简述
+            inRect: (width: 392f, height: 90f)
+            </summary>
+            <param name="position">width: 392f, height: 90f</param>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RelationshipUtility.CanUpgradeRelationship(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map,System.Boolean,System.Boolean)">
+            <summary>
+            能否提升关系类型等级
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RelationshipUtility.UpgradeRelationshipByPlayer(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map)">
+            <summary>
+            提升骑士团关系（玩家）
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RelationshipUtility.GetChanceOfAutoUpgradeRelationship(OberoniaAurea.RatkinOrder.RatkinOrder,System.Boolean,System.String@)">
+            <summary>
+            骑士团主动提升关系概率
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RelationshipUtility.AutoUpgradeRelationship(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map)">
+            <summary>
+            骑士团主动提升关系
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RelationshipUtility.TryTriggerRelationshipQuest(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map)">
+            <summary>
+            触发关系提升任务
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RelationshipUtility.SendNewRelationshipLetter(OberoniaAurea.RatkinOrder.RatkinOrder,OberoniaAurea.RatkinOrder.EsteemHandler.RelationshipKind,OberoniaAurea.RatkinOrder.EsteemHandler.RelationshipKind)">
+            <summary>
+            骑士团关系变化邮件
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ResidentKnightRoleWorker.RoleStatOffsets(Verse.Pawn)">
+            <summary>
+            根据该职位的【Pawn】提供不同的Stat修正
+            修正是针对殖民者的，而非担任该职位的<see cref="T:Verse.Pawn"/>
+            </summary>
+            <param name="rolePawn">担任该职位的Pawn</param>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDef.changeRange">
+            <summary>
+            资金变化量，(-1f~1f)范围外的数值会被归正
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDef.immediately">
+            <summary>
+            是否为一次性事件
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderFundEventDef.durationDays">
+            <summary>
+            持续时间（Day）
+            </summary>
+            <remarks>- 若 <see cref="F:OberoniaAurea.RatkinOrder.OrderFundEventDef.immediately"/> 为 <see langword="true"/>，该字段无效</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.NoramlDemandShowMess">
+            <summary>
+            普通需求刷出时是否显示消息
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.CriticalDemandShowMess">
+            <summary>
+            关键需求刷出时显示信息
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.MaxConcurrentAcceptedDemand">
+            <summary>
+            最多同时接取需求数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.MaxConcurrentContractPerBranch">
+            <summary>
+            每个分部最多同时存在的合约
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.HasMaxLetterLimit">
+            <summary>
+            是否启用信件上限
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.MaxLetterCount">
+            <summary>
+            收件箱最多存储的信件数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.HasLetterRetentionLimit">
+            <summary>
+            是否启用信件过期时间
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.MaxLetterRetentionDays">
+            <summary>
+            信件最长保留时间（天）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderSettings.MaxAcquiredPatrolInteractionPreType">
+            <summary>
+            每种巡逻互动类型的最大累积次数
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.OrderInteractionWorker">
+            <summary>
+            骑士团团级交互的功能类，必须实现一个只接受OrderInteractionDef参数的构造函数
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OrderInteractionWorker.#ctor(OberoniaAurea.RatkinOrder.OrderInteractionDef)">
+            <summary>
+            骑士团团级交互的功能类，必须实现一个只接受OrderInteractionDef参数的构造函数
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OrderInteractionWorker.InteractionEffect(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map)">
+            <returns>
+            <para>- succeeded：是否成功执行交互逻辑</para>
+            <para>- doPostApply：是否需要执行后续回调 <see cref="M:OberoniaAurea.RatkinOrder.OrderInteractionWorker.PostApplyInteraction(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map,System.Boolean)"/></para>
+            </returns>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.IncidentWorker_RaidNobilityTerritory">
+            <summary>
+            叛乱镇压 - 攻击贵族时触发的特定事件（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_CollectionTeam_SuperHeavyHowitzer">
+            <summary>
+            需求-榴弹炮维护收集队伍 QuestPart | TalkAction（内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_CollectionTeam_MaterialSupply">
+            <summary>
+            需求-物资补给任务监控 QuestPart | TalkAction（内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_Root_PostWarConvalescence">
+            <summary>
+            任务实现：战后疗养（内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_CollectionTeam">
+            <summary>
+            物资收集补给队 QuestNode（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_CollectionTeam">
+            <summary>
+            物资收集补给队 QuestPart（可继承）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_LordJob_HelpSeeker">
+            <summary>
+            善行求助者的 LordJob | TalkAction
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.Branch.BranchType.Normal">
+            <summary>
+            普通
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.Branch.BranchType.Friendly">
+            <summary>
+            友好
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.Branch.BranchType.Honor">
+            <summary>
+            荣誉
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.Branch.BranchType.Mobile">
+            <summary>
+            机动
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.Branch.WorkStateType.Idle">
+            <summary>
+            空闲
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.Branch.WorkStateType.OnBaseTask">
+            <summary>
+            驻地任务
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.Branch.WorkStateType.AbroadTask">
+            <summary>
+            外出任务
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.Branch.GetBranchOrdinal(OberoniaAurea.RatkinOrder.Branch)">
+            <summary>
+            分部的名称序号生成器
+            </summary>
+            <returns>1~999的尽量不重复的随机数</returns>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchFacilityLevelStage.silverCost">
+            <summary>
+            建设白银花费（基础）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchFacilityLevelStage.constructionDays">
+            <summary> 
+            建设所需天数（基础）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchFacilityLevelStage.effectFlags">
+            <summary>
+            效果标志列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchFacilityLevelStage.branchStatOffsets">
+            <summary>
+            属性修正列表（Offset）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchFacilityLevelStage.branchStatFactors">
+            <summary>
+            属性修正列表（Factor）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchFacilityLevelStage.customEffectDescriptions">
+            <summary>额外自定义的效果描述</summary>
+            <remarks>- 显示在修正效果之后</remarks>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.BranchManager">
+            <summary>
+            分部管理
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchManager.DestoryBranch(OberoniaAurea.RatkinOrder.Branch)">
+            <summary>
+            只有单个分部销毁的时候使用
+            骑士团移除（所有分部销毁）时应由骑士团进行骑士团移除通知 （Notify_RatkinOrderRemoved | OnRatkinOrderRemoved）
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchManager.PeriodicCriticalDemandTrigger">
+            <summary>
+            每5日统一更新骑士团所有分部的关键需求
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchManager.ReselectMobileBranch">
+            <summary>
+            重选机动分队
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchUtility.IsInAffectedRange(OberoniaAurea.RatkinOrder.Branch,RimWorld.Planet.PlanetTile)">
+            <summary>
+            地块是否在分部影响范围内
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchUtility.IsOnJointPatrol(OberoniaAurea.RatkinOrder.Branch)">
+            <summary>
+            分部是否正在边境轮巡
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchUtility.CanParticipateInJointPatrol(OberoniaAurea.RatkinOrder.Branch,System.Boolean)">
+            <summary>
+            分部能否参与边境轮巡
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchUtility.RecacheBranchStat(OberoniaAurea.RatkinOrder.Branch,OberoniaAurea.RatkinOrder.BranchStatDef)">
+            <summary>
+            重新获取该分部某个 <see cref="T:OberoniaAurea.RatkinOrder.BranchStatDef"/> 的对应 <see cref="T:OberoniaAurea.RatkinOrder.BranchStatTransformer"/>
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchUtility.OnBranchDestroyed(RimWorld.QuestManager,OberoniaAurea.RatkinOrder.Branch)">
+            <summary>
+            通知 <see cref="T:RimWorld.QuestManager"/> 某个分部已被销毁
+            </summary>
+            <param name="branch">被销毁的分部</param>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchUtility.GetDefaultFriendlyDurationDays(OberoniaAurea.RatkinOrder.Branch)">
+            <summary>
+            友好分部默认持续天数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.buildingClass">
+            <summary>
+            建筑功能类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.constructChecker">
+            <summary>建筑检测类，负责检测<see cref="T:OberoniaAurea.RatkinOrder.Branch"/>是否可以建设该建筑</summary>
+            <remarks>- 建设的二次确认</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.silverCost">
+            <summary>
+            建设白银花费（基础）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.constructionDays">
+            <summary> 
+            建设所需天数（基础）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.suggestedMinPopulation">
+            <summary>推荐建造人数</summary>
+            <remarks>分部人口（<see cref="P:OberoniaAurea.RatkinOrder.BranchPopulationHandler.Population"/>）低于该值会使建设成本增加</remarks>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.BranchBuildingDef.IsUpgradable">
+            <summary>
+            是否可升级
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.advancedProperties">
+            <summary>
+            升级参数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.isSpecial">
+            <summary>是否为特殊建筑</summary>
+            <remarks>
+            <para>- 特殊建筑不占用建筑上限</para>
+            <para>- 每个分部只能有一个特殊建筑</para>
+            </remarks>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.BranchBuildingDef.IsHonorSymbol">
+            <summary>是否为荣誉象征建筑</summary>
+            <remarks>
+            <para>- 建有该建筑的分部为荣誉分部</para>
+            <para>- 只在<see cref="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.isSpecial"/> 为 <see langword="true"/> 时生效</para>
+            </remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.honorDef">
+            <summary>
+            荣誉对应<see cref="T:OberoniaAurea.RatkinOrder.BranchHonorDef"/>
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.effectFlags">
+            <summary>
+            效果标志列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.branchStatOffsets">
+            <summary>
+            属性修正列表（Offset）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.branchStatFactors">
+            <summary>
+            属性修正列表（Factor）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.customEffectDescriptions">
+            <summary>额外自定义的效果描述</summary>
+            <remarks>- 显示在修正效果之后</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.comps">
+            <summary><see cref="T:OberoniaAurea.RatkinOrder.BranchBuildingCompProperties"/>列表，可为<see langword="null"/></summary>
+            <remarks>- 只在<see cref="F:OberoniaAurea.RatkinOrder.BranchBuildingDef.buildingClass"/>为<see cref="T:OberoniaAurea.RatkinOrder.BranchBuildingWithComps"/>或其子类时生效</remarks>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuildingDef.GetBaseEffectDescriptions">
+            <summary>
+            基础等级的修正描述
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuildingDef.GetAdvancedEffectDescriptions">
+            <summary>繁荣等级的修正描述</summary>
+            <remarks>- 不包含 <see cref="M:OberoniaAurea.RatkinOrder.BranchBuildingDef.GetBaseEffectDescriptions"/> 的内容</remarks>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.BranchResidentHandler.BranchResidentLoadBox">
+            <summary>
+            用于保存加载的中转类（RimWorld不能保存值为集合类型的字典）
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuilding.InitActive">
+            <summary>
+            仅在首次添加建筑时触发
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuilding.PostActive">
+            <summary>
+             添加建筑和加载存档时触发
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuilding.PostDeactive">
+            <summary>
+            移除建筑时触发
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuilding.InitUpgraded">
+            <summary>
+            仅在首次建筑升级时触发
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchBuilding.PostUpgraded">
+            <summary>
+             建筑升级时和已升级建筑加载存档时触发
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.Window_Branch.DrawRight_FacilityBottom(UnityEngine.Vector2)">
+            <summary>
+            长298f, 宽78f
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.Window_Branch.DrawRight_ConstructingBuildingBottom(UnityEngine.Vector2)">
+            <summary>
+            长：298f, 宽：xx
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.Window_Branch.DrawEffectDescriptions(UnityEngine.Vector2,System.String,System.Collections.Generic.List{System.String},UnityEngine.Vector2@)">
+            <summary>
+            长298f, 宽158f
+            </summary>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.Window_OrderLetterBox.CurLetter">
+            <summary>
+            当前选中的信件
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.MapParent_NobilityTerritory">
+            <summary>
+            叛乱镇压 - 贵族领地 攻击时的地图
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.MapParent_NobilityTerritory.AssaultType.BePounced">
+            <summary>
+            玩家被突袭
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.MapParent_NobilityTerritory.AssaultType.Normal">
+            <summary>
+            正常袭击
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.MapParent_NobilityTerritory.AssaultType.Pounce">
+            <summary>
+            敌人被突袭
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.MapParent_NobilityTerritory.AssaultType.DeadlyPounce">
+            <summary>
+            敌人被致命突袭
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_TownConstruction">
+            <summary>
+            城建规划 - 建设中的城镇
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.WorldObject_TownConstruction.GetWorkProgressChangeUsed(System.Int32,System.Boolean)">
+            <summary>
+            工程进度只能主动增加，倒退是设计触发的
+            </summary>
+            <param name="originalChange">原始变化（应>0）</param>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.GenStep_NobilityTerritoryPawns">
+            <summary>
+            叛乱镇压 - 贵族领地士兵生成（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory">
+            <summary>
+            叛乱镇压 - 贵族领地
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.NobilityType.Deceitful">
+            <summary>
+            狡诈
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.NobilityType.Stubborn">
+            <summary>
+            刚愎
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.NobilityType.Justice">
+            <summary>
+            正义
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.NobilityType.Tyrannical">
+            <summary>
+            暴虐
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.NobilityType.Kindness">
+            <summary>
+            仁慈
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.NobilityType.Greediness">
+            <summary>
+            贪婪
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.WorkType.Infiltrate">
+            <summary>
+            尝试渗透
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.WorkType.Communication">
+            <summary>
+            与贵族交流
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObject_NobilityTerritory.WorkType.Negotiate">
+            <summary>
+            与贵族谈判
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_RefugeeInfluxCamp">
+            <summary>
+            难民潮 - 难民营地
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.WorldObject_RefugeeInfluxCamp.PeriodicCheck">
+            <summary>
+            先检测饥荒削减人口，未导致失败再进行后继行为
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.WorldObject_RefugeeInfluxCamp.GrainArrival">
+            <summary>
+            运粮队到达
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.WorldObjectCompProperties_BranchSite.independent">
+            <summary>是否为独立站点</summary>
+            <remarks>- 若为<see langword="true"/> 当对应 <see cref="T:OberoniaAurea.RatkinOrder.Branch"/> 被移除后，对应 <see cref="F:RimWorld.Planet.WorldObjectComp.parent"/> 也将同时被移除</remarks>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.EsteemHandler">
+            <summary>
+            认可度 | 关系 | 推荐信
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.OpenOrderDevWindow">
+            <summary>
+            打开骑士团调试窗口
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.OpenBranchManagerWindow">
+            <summary>
+            打开BranchManager调试窗口
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.OpenJointPatrolDevWindow">
+            <summary>
+            打开JointPatrolManager调试窗口
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.OpenOrderInteractionDevWindow">
+            <summary>
+            全局交互管理器调试窗口
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.AddNewRatkinOrder">
+            <summary>
+            添加骑士团
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.RemoveRatkinOrder">
+            <summary>
+            移除骑士团
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.StartJointPatrol">
+            <summary>
+            开始分部联巡
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.TriggerOrderInteraction">
+            <summary>
+            触发骑士团交互
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.TriggerBranchCombatDeploy">
+            <summary>
+            触发分部袭击
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.GenerateBranchDemand">
+            <summary>
+            添加分部需求
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.AddBranchContract">
+            <summary>
+            添加分部人口需求（合约）
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.AddNewStoresReservee">
+            <summary>
+            添加新建筑材料储备
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.AddBranchBuilding">
+            <summary>
+            添加分部建筑
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.SpawnOrderRecommendation">
+            <summary>
+            生成骑士团推荐信
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.DebugRatkinOrders.TriggerMercyQuest">
+            <summary>
+            触发善行任务
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OARO_MapUtility.GetRationalPlayerHomeMap(System.Boolean,System.Boolean)">
+            <summary>
+            获取合适的玩家基地地图
+            优先级：当前地图 > 骑士大厅所在地图 > 其它地图
+            </summary>
+            <param name="forQuest">为任务获取</param>
+            <param name="canBeSpace">能否位于太空</param>
+            <returns>得到的地图，无符合条件则返回null</returns>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.RelationshipUpgraded">
+            <summary>
+            骑士团关系提升（Player）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.AutoRelationshipUpgraded">
+            <summary>
+            骑士团关系提升（骑士团）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.FundFortune">
+            <summary>
+            骑士团资金时运
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.AnnualFirstSponsor">
+            <summary>
+            每年的首次年度赞助
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.CriticalDemandPeriodic">
+            <summary>
+            关键需求周期检查
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.CriticalDemandAdd">
+            <summary>
+            关键需求添加
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.NormalDemandPeriodic">
+            <summary>
+            普通需求周期检查
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.NormalDemandAdd">
+            <summary>
+            普通需求添加
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.PublicSecurityCheck">
+            <summary>
+            分部治安度检测
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.ContractAddCheck">
+            <summary>
+            分部合约检测
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.DemandFriendlyInform">
+            <summary>
+            友好分部需求告知
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.BranchFriendly">
+            <summary>
+            分部友好状态
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.BranchWorkState">
+            <summary>
+            分部状态描述更新
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.KnightGroupProactiveVisit">
+            <summary>
+            骑士小组拜访
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.MercyQuestTryTriggered">
+            <summary>
+            善行任务触发
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.BeAttackedOnTask">
+            <summary>
+            在任务中被攻击
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.FocusedTaskTypeChanged">
+            <summary>
+            专注任务类型改变
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.RadicalismDegreeChanged">
+            <summary>
+            任务执行激进度改变
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.KeyLibrary_CDRecord.OrderConferenceNegotiate">
+            <summary>
+            金鸢尾兰洽谈
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RecommendationUtility.UseRecommendationOfMap(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map,System.Int32)">
+            <returns>实际使用数</returns>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RecommendationUtility.UseRecommendationOfCaravan(OberoniaAurea.RatkinOrder.RatkinOrder,RimWorld.Planet.Caravan,System.Int32)">
+            <returns>实际使用数</returns>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RecommendationUtility.UseRecommendationOfFixedCaravan(OberoniaAurea.RatkinOrder.RatkinOrder,OberoniaAurea_Frame.FixedCaravan,System.Int32)">
+            <returns>实际使用数</returns>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RecommendationUtility.RecommendationNeed_OrderRelationUpgrade(OberoniaAurea.RatkinOrder.EsteemHandler.RelationshipKind)">
+            <summary>
+            提升到新等级需要的推荐信数量
+            </summary>
+            <param name="targetRelation">目标关系等级</param>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RecommendationUtility.RecommendationNeed_RecruitmentKnight(OberoniaAurea.RatkinOrder.RatkinOrder)">
+            <summary>
+            招募骑士所需推荐信数量
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(OberoniaAurea.RatkinOrder.RatkinOrder,OberoniaAurea.RatkinOrder.ResidentKnightRecord.Rank)">
+            <summary>
+            提升常驻骑士阶位所需推荐信数量
+            </summary>
+            <param name="targetRank">目标阶位</param>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.CanRecruitKnight(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map,System.Boolean)">
+            <summary>
+            能否招募骑士
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.RecruitmentKnight(OberoniaAurea.RatkinOrder.RatkinOrder,Verse.Map,Verse.Pawn)">
+            <summary>
+            招募骑士
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.CanUpgradeResidentKnightRank(OberoniaAurea.RatkinOrder.ResidentKnightRecord,Verse.Map,System.Boolean)">
+            <summary>
+            能否提升常驻骑士阶位
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.CanInviteAroundKnightGroup(OberoniaAurea.RatkinOrder.AroundKnightGroup,Verse.Map,System.Boolean)">
+            <summary>
+            能否邀请附近骑士小组到访
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.InviteAroundKnightGroup(OberoniaAurea.RatkinOrder.AroundKnightGroup,Verse.Map)">
+            <summary>
+            玩家邀请附近骑士小组到访
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(OberoniaAurea.RatkinOrder.AroundKnightGroup,System.Boolean)">
+            <summary>
+            小组到访失败行为
+            包括邀请失败和任务触发失败
+            </summary>
+            <param name="isProactive">是否为骑士小组主动</param>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.InvitationAcceptanceChance(OberoniaAurea.RatkinOrder.AroundKnightGroup,System.Boolean,System.String@)">
+            <summary>
+            邀请附近骑士小组到访成功率
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GlobalInteractionUtility.SeasonInvitationLimit">
+            <summary>
+            当前季度无花费邀请骑士小组上限
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OrderLetterBox.OrderLetterComparerFunc(OberoniaAurea.RatkinOrder.OrderLetter,OberoniaAurea.RatkinOrder.OrderLetter)">
+            <summary>
+            降序比较方法
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_Root_TaxCollectorCome">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_Root_TaxCollectorTreat">
+            <summary>
+            招待征收官
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_LordJob_TaxCollector">
+            <summary>
+            征募队的 LordJob | TalkAction （内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_Apprentice_CheckSkill">
+            <summary>
+            小学徒技能判定（内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_Apprentice_QuizStayIntention">
+            <summary>
+            询问小学徒加入意愿（内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_Root_LittleApprentice">
+            <summary>
+            任务实现：小学徒（内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestNode_WolfDisasterWatcher">
+            <summary>
+            狼灾任务监控 QuestNode（内部特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.QuestPart_WolfDisasterWatcher">
+            <summary>
+            狼灾任务监控 QuestPartActivable（内部特化类）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.statType">
+            <summary>
+            属性类型，标记应该如何显示属性数值
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.reverse">
+            <summary>是否反转好坏</summary>
+            <remarks>
+            <para>- 一般的Stat越大越好（如影响距离）</para> 
+            <para>- 反转的Stat越小越好（如建设花费系数）</para> 
+            </remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.baseValue">
+            <summary>
+            基础值
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.cacheable">
+            <summary>
+            该Stat是否可以缓存
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.minValue">
+            <summary>
+            最小值
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.maxValue">
+            <summary>
+            最大值
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.nonNegative">
+            <summary>
+            是否为[非]负数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.cacheDuration">
+            <summary>
+            缓存持续时间（Tick）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchStatDef.statParts">
+            <summary>
+            额外Stat修正器列表（<see cref="T:OberoniaAurea.RatkinOrder.BranchStatPart"/>），可为 <see langword="null"/>
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDefOf.OARO_Church">
+            <summary>
+            分部教堂（修女小屋）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDefOf.OARO_CommanderOffice">
+            <summary>
+            骑士长办公室
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDefOf.OARO_ArchitectOffice">
+            <summary>
+            建筑师办公室
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchBuildingDefOf.OARO_LargeWarningTower">
+            <summary>
+            大型预警塔
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.OrderReformationDef">
+            <summary>
+            骑士团自新Def
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDef.workerClass">
+            <summary>
+            自新功能类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDef.reformationType">
+            <summary>
+            自新类型
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDef.reformProgressCost">
+            <summary>
+            自新值花费
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDef.prerequisites">
+            <summary>
+            前置自新
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDef.effectFlags">
+            <summary>
+            效果标志列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDef.branchStatOffsets">
+            <summary>
+            属性修正列表（Offset）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OrderReformationDef.branchStatFactors">
+            <summary>
+            属性修正列表（Factor）
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OrderReformationWorker.InitActive(OberoniaAurea.RatkinOrder.RatkinOrder)">
+            <summary>
+            仅在添加自新时触发
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.OrderReformationWorker.PostActive(OberoniaAurea.RatkinOrder.RatkinOrder)">
+            <summary>
+             添加自新和加载存档时触发
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_DefensiveFacility">
+            <summary>
+            防卫设施
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_SupportFacility">
+            <summary>
+            支援设施
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.Rakinia_TravelRatkin">
+            <summary>
+            旅鼠派系
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.Rakinia_RockRatkin">
+            <summary>
+            岩鼠派系
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_OrderMediateFactionRelation">
+            <summary>
+            骑士团交互 - 斡旋关系
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_Honor_Instructor">
+            <summary>
+            荣誉分部 - 教导骑士
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_RaidNobilityTerritory">
+            <summary>
+            叛乱镇压 - 贵族领地战斗
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_LostItemsOfTrader">
+            <summary>
+            丢东西的旅行商人
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_TownConstruction_Trader">
+            <summary>
+            建筑商商店
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_Clerk">
+            <summary>
+            驻地文书
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_Orderly">
+            <summary>
+            地区看护
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_Stat_MeditationDailyGain">
+            <summary>
+            每日修行点获得
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_Stat_MeditationFactor">
+            <summary>
+            每日修行点获得系数
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.OARO_ModDefOf.OARO_Stat_MeditationBase">
+            <summary>
+            每日修行点获得基础
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ITickHour.TickHour">
+            <summary>
+            每2500 tick调用一次
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ITickHourOfDay.TickHour(System.Int32)">
+            <summary>
+            每2500 tick调用一次
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ITickHour`1.TickHour(`0)">
+            <summary>
+            每2500 tick调用一次
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ITickDay.TickDay">
+            <summary>
+            每60000 tick调用一次
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ITickDay`1.TickDay(`0)">
+            <summary>
+            每60000 tick调用一次
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchSupportUtility.DoCombatKnightSupport(OberoniaAurea.RatkinOrder.Branch,Verse.Map,OberoniaAurea.RatkinOrder.BranchSupportUtility.DeploymentLevel,System.Boolean)">
+            <summary>
+            分部战斗骑士支援
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchSupportUtility.GenerateCombatKnightGenerateParmsByDeploymentLevel(OberoniaAurea.RatkinOrder.Branch,Verse.Map,OberoniaAurea.RatkinOrder.BranchSupportUtility.DeploymentLevel,OberoniaAurea.RatkinOrder.CombatKnightGenerateParms@)">
+            <summary>
+            根据部署等级创建战斗人员生成参数<paramref name="parms"/> (<see cref="T:OberoniaAurea.RatkinOrder.CombatKnightGenerateParms"/> )
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.BranchSupportUtility.TryDeployCombatKnight(OberoniaAurea.RatkinOrder.CombatKnightGenerateParms,System.Boolean)">
+            <summary>
+            部署战斗人员
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.taskClass">
+            <summary>
+            任务功能类
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.startCheckerClass">
+            <summary>任务开始检测类</summary>
+            <remarks>
+            <para>- 用于检测 <see cref="T:OberoniaAurea.RatkinOrder.Branch"/> 是否可以开始进行该任务</para>
+            <para>- 在<see cref="T:OberoniaAurea.RatkinOrder.BranchTaskHandler"/> 的检测之后</para>
+            <para>- 随机选择权重</para>
+            </remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.priority">
+            <summary>
+            任务优先级
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.taskType">
+            <summary>
+            任务对应专注类型
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.isAbroadTask">
+            <summary>
+            是否为户外任务
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.hasRisk">
+            <summary>
+            是否有分险
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.baseRiskProbability">
+            <summary>
+            基础风险
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.canInterrupted">
+            <summary>
+            能否被打断
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.canInterruptedByJointPatrol">
+            <summary>
+            能否被边境轮巡打断
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.ignoreRest">
+            <summary>
+            是否无视休息
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.canBeRandomlyChosen">
+            <summary>
+            是否可被随机选择
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.effectFlags">
+            <summary>
+            效果标志列表
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.durationDays">
+            <summary>
+            任务持续时间（Day）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.restDays">
+            <summary>
+            任务结束后休息时间（Day）
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskDef.nextTask">
+            <summary>
+            下一个任务，可为 <see langword="null"/>
+            </summary>
+            <remarks>
+            <para>- 当前任务结束后将会尝试开始</para>
+            </remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskHandler.RadicalismDegree.Standard">
+            <summary>
+            常规
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskHandler.RadicalismDegree.StabilityFocused">
+            <summary>
+            维稳
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.BranchTaskHandler.RadicalismDegree.Aggressive">
+            <summary>
+            激进
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.BranchTask_JurisdictionDutyPrep">
+            <summary>
+            辖区执勤（准备）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.ReformationManager">
+            <summary>
+            自新管理
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.ReformationManager.#ctor(OberoniaAurea.RatkinOrder.RatkinOrder)">
+            <summary>
+            自新管理
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.FundHandler">
+            <summary>
+            资金管理
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.FundHandler.#ctor(OberoniaAurea.RatkinOrder.RatkinOrder)">
+            <summary>
+            资金管理
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderDef.fixedName">
+            <summary>
+            骑士团固定名称
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderDef.nameMaker">
+            <summary>骑士团名称生成器</summary>
+            <remarks>- 只在<see cref="F:OberoniaAurea.RatkinOrder.RatkinOrderDef.fixedName"/>为<see langword="null"/>或<see cref="F:System.String.Empty"/>时起效</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderDef.branchNameCoreSelecter">
+            <summary>
+            骑士团分部名称生成器
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderDef.color">
+            <summary>骑士团颜色</summary>
+            <remarks>- 若为<see langword="null"/> 则使用 <see cref="T:RimWorld.Faction"/> 的颜色</remarks>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.RatkinOrderDef.pawnGroupOptions">
+            <summary>
+            相关人员生成组
+            </summary>
+        </member>
+        <member name="P:OberoniaAurea.RatkinOrder.GameComponent_RatkinOrder.TalkActionHandler">
+            <summary>
+            全局对话行为管理
+            因不保存，应注意重新注册
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GameComponent_RatkinOrder.#ctor(Verse.Game)">
+            <summary>
+            GameComp比较特殊，没有找到合适的时机清理GameComp实例，所以不再检测直接替换实例
+            </summary>
+            <param name="game"></param>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GameComponent_RatkinOrder.LoadedGame">
+            <summary>
+            会在PostLoadInit加载阶段之后调用
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.GameComponent_RatkinOrder.EnsureComponentsInit">
+            <summary>
+            初始化各个组件，因包含简单单例，要注意每个游戏仅能调用一次
+            新游戏：StartedNewGame调用
+            加载存档：LoadedGame调用
+            </summary>
+        </member>
+        <member name="M:OberoniaAurea.RatkinOrder.EsteemUtility.AdjustAllOrdersEsteem(System.Int32,System.Boolean,System.Boolean,System.String)">
+            <summary>
+            同时改变所有骑士团认可度
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.EsteemUtility.EsteemSoftCap">
+            <summary>
+            认可度软上限数组
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.EsteemUtility.EsteemTitles">
+            <summary>
+            认可度称号
+            </summary>
+        </member>
+        <member name="F:OberoniaAurea.RatkinOrder.EsteemUtility.EsteemDescs">
+            <summary>
+            认可度描述
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_ArmsOrderSite">
+            <summary>
+            军备订单交易点（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_FamineVillage">
+            <summary>
+            饥荒村庄（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_WolfDisasterGossipPoint">
+            <summary>
+            狼灾流言检查点（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_WolfDisasterPoint">
+            <summary>
+            狼灾检查点（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_CelebrationHost">
+            <summary>
+            庆典村庄（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_NonGerminatingSeeds">
+            <summary>
+            不发芽种子村庄（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_ApplianceRepair">
+            <summary>
+            机械故障村庄（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_PastureFlu">
+            <summary>
+            牧场流感种子村庄（特化类）
+            </summary>
+        </member>
+        <member name="T:OberoniaAurea.RatkinOrder.WorldObject_UnsalableArtcraft">
+            <summary>
+            滞销工艺品村庄（特化类）
+            </summary>
+        </member>
+    </members>
+</doc>
