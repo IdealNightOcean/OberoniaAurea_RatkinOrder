@@ -49,7 +49,7 @@ public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrder
         Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
         Scribe_Values.Look(ref Offset, "Offset", 0);
         Scribe_Values.Look(ref SendLetter, "SendLetter", defaultValue: true);
-        Scribe_Values.Look(ref Reason, "Reason");
+        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
     }
 
     public override void Cleanup()

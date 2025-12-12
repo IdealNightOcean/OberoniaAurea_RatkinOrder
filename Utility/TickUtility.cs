@@ -12,14 +12,8 @@ public static class TickUtility
     public static int DayPassed() => Find.TickManager.TicksGame / 60000;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsHashIntervalTick(this RatkinOrder order, int interval)
+    public static bool IsHashIntervalTick(int tickHashOffset, int interval)
     {
-        return (Find.TickManager.TicksGame + order.TickHashOffset) % interval == 0;
-    }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsHashIntervalTick(this Branch branch, int interval)
-    {
-        return (Find.TickManager.TicksGame + branch.TickHashOffset) % interval == 0;
+        return (Find.TickManager.TicksGame + tickHashOffset) % interval == 0;
     }
 }

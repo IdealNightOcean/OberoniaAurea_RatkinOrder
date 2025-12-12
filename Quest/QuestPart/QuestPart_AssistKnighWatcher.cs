@@ -18,12 +18,12 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref InsignalRemovePawn, "InsignalRemovePawn");
-        Scribe_Defs.Look(ref ThoughtToAdd, "ThoughtToAdd");
+        Scribe_Values.Look(ref InsignalRemovePawn, nameof(InsignalRemovePawn));
+        Scribe_Defs.Look(ref ThoughtToAdd, nameof(ThoughtToAdd));
 
-        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
-        Scribe_Values.Look(ref retainCount, "retainCount", 0);
-        Scribe_Collections.Look(ref Pawns, "Pawns", LookMode.Reference);
+        Scribe_References.Look(ref RatkinOrder, nameof(RatkinOrder));
+        Scribe_Values.Look(ref retainCount, nameof(retainCount), 0);
+        Scribe_Collections.Look(ref Pawns, nameof(Pawns), LookMode.Reference);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
@@ -46,15 +46,13 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
     {
         get
         {
-            int maxRetain = (RatkinOrder?.Esteem ?? 0) switch
+            return retainCount < (RatkinOrder?.Esteem ?? 0) switch
             {
                 < 30 => 0,
                 < 70 => 1,
                 < 99 => 2,
                 _ => 3
             };
-
-            return retainCount < maxRetain;
         }
     }
 
@@ -89,11 +87,11 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
         if (CanRetain)
         {
             Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.ConfirmDiaNodeTreeWithRatkinOrderInfo(
-                text: "OARO_AssistKnight_RetainInfo".Translate(RatkinOrder.Name),
+                text: "OARO_AssistKnight_RetainInfo".Translate(RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
                 ratkinOrder: RatkinOrder,
                 acceptText: "OARO_AssistKnight_Retain".Translate(),
                 acceptAction: DelayLeave,
-                rejectText: "OARO_AssistKnight_SeeOff ".Translate(),
+                rejectText: "OARO_AssistKnight_SeeOff".Translate(),
                 rejectAction: base.DelayFinished);
 
             Find.WindowStack.Add(nodeTree);
@@ -112,6 +110,7 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
             return;
         }
 
+        retainCount++;
         delayTicks = 120000;
         enableTick = Find.TickManager.TicksGame;
 
@@ -120,6 +119,7 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
             return;
         }
 
+        Pawns.RemoveAll(p => p.DestroyedOrNull());
         foreach (Pawn p in Pawns)
         {
             if (p.needs.mood is null)

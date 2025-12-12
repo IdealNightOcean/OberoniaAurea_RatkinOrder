@@ -289,7 +289,7 @@ public static class BranchUtility
             return false;
         }
         /*
-        if(!branch.IsBranchOfType(Branch.BranchType.Friendly))
+        if(!Branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             return false;
         }

@@ -56,7 +56,7 @@ public class Branch : IExposable, ILoadReferenceable
     private int loadID = -1;
     public int LoadID => loadID;
 
-    [Unsaved] public readonly int TickHashOffset;
+    [Unsaved] private readonly int tickHashOffset;
 
     private int ordinal;
     private string nameCore = string.Empty;
@@ -205,7 +205,7 @@ public class Branch : IExposable, ILoadReferenceable
             storesReserveHandler = new(this);
         }
 
-        TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
+        tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
         supplyCeilingCache = new(cacheInterval: 2500,
                                  defaultValue: BranchStatDefOf.OARO_SupplyCeiling.baseValue,
                                  checker: () => this.GetStatValue(BranchStatDefOf.OARO_SupplyCeiling));
@@ -280,11 +280,11 @@ public class Branch : IExposable, ILoadReferenceable
 
     public void Tick()
     {
-        if (this.IsHashIntervalTick(2500))
+        if (TickUtility.IsHashIntervalTick(tickHashOffset, 2500))
         {
             TickHour();
 
-            if (this.IsHashIntervalTick(60000))
+            if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
             {
                 TickDay();
             }

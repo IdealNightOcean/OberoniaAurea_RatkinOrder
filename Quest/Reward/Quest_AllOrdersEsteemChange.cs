@@ -113,6 +113,6 @@ public class QuestPart_AllOrdersEsteemChange : QuestPart
         Scribe_Values.Look(ref InSignalTrigger, "InSignalTrigger");
         Scribe_Values.Look(ref Change, "Change", 0);
         Scribe_Values.Look(ref ShowPlayerChangeMessage, "ShowPlayerChangeMessage", defaultValue: true);
-        Scribe_Values.Look(ref Reason, "Reason");
+        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
     }
 }

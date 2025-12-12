@@ -319,24 +319,16 @@ public class Window_BranchDemand : OrderWindowBase
         Rect textRect = new(inRectX + 18f, inRectY + 100f, inRectWidth - 36f, 245f);
         Widgets.LabelScrollable(textRect, SelFullDesc, ref scrollPosition_DemandDesc);
 
-        Rect buttonRect = OARO_WindowUtility.CenterRectOnX(inRect, textRect.yMax + 16f, 105f, 55f);
-        Rect branchInfoRect = new(inRectX, buttonRect.yMax + 4f, inRectWidth, 40f);
-        DrawDemandBranchInfo(branchInfoRect);
+        if (!SelDemand.HasAccepted)
+        {
+            reusedRect = new(inRectX, inRect.yMax - (4f + 40f), inRectWidth, 40f);
+            DrawDemandBranchInfo(reusedRect);
 
-        if (SelDemand.HasAccepted)
-        {
-            reusedRect = Rect.MinMaxRect(inRectX, branchInfoRect.yMax + 16f, inRect.xMax, inRect.yMax);
-            if (SelCritical && (SelDemand is BranchDemand_Critical))
-            {
-                DrawRightRect_AcceptedCritical(reusedRect);
-            }
-        }
-        else
-        {
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleCenter;
+            reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMin - 55f, 105f, 55f);
             if (OARO_WindowUtility.TextButtonImageDisableable(
-                butRect: buttonRect,
+                butRect: reusedRect,
                 label: "Accept".Translate(),
                 acceptance: SelAcceptance,
                 baseTex: acceptButton,
@@ -354,6 +346,17 @@ public class Window_BranchDemand : OrderWindowBase
                 }
                 SelctDemand(SelBranch, SelCritical);
             }
+        }
+        else if (SelCritical && (SelDemand is BranchDemand_Critical))
+        {
+            reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, textRect.yMax + 16f, 105f, 55f);
+            /////////////////////////////////////////////////////////////////////////////////////
+
+            reusedRect = new(inRectX, reusedRect.yMax + 4f, inRectWidth, 40f);
+            DrawDemandBranchInfo(reusedRect);
+
+            reusedRect = Rect.MinMaxRect(inRectX, reusedRect.yMax + 16f, inRect.xMax, inRect.yMax);
+            DrawRightRect_AcceptedCritical(reusedRect);
         }
 
         OARO_WindowUtility.ResetText();

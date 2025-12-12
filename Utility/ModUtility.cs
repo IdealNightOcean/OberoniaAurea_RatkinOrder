@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
@@ -86,10 +87,7 @@ public static class ModUtility
         {
             foreach (Pawn p in pawns)
             {
-                if (p.Faction != Faction.OfPlayer)
-                {
-                    p.SetFaction(Faction.OfPlayer);
-                }
+                OAFrame_PawnUtility.MakePawnJoinPlayer(p);
             }
         }
         pawnsArrivalModeDef.Worker.Arrive(pawns, arrivalParms);

@@ -85,15 +85,15 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
 
         /*
         Slate slate = new();
-        slate.SetBasicOrderSlateVar(ratkinOrder);
+        slate.SetBasicOrderSlateVar(RatkinOrder);
         slate.Set("map", map);
 
         if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnight, slate, forced: false))
         {
-            int recommendationNeed = GetRecommendationNeedCount(ratkinOrder);
+            int recommendationNeed = GetRecommendationNeedCount(RatkinOrder);
             if (recommendationNeed > 0)
             {
-                RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
+                RecommendationUtility.UseRecommendationOfMap(RatkinOrder, map, recommendationNeed);
             }
 
             return (true, true);

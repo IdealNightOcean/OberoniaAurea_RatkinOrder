@@ -16,50 +16,54 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
     protected virtual bool IsCombatant => false;
     protected virtual bool IsCommander => false;
 
-    protected RatkinOrder ratkinOrder;
-    protected Branch branch;
+    protected RatkinOrder RatkinOrder { get; set; }
+    protected virtual Branch Branch { get; set; }
 
-    protected bool InitRatkinOrder(bool initBranch)
+    protected virtual bool InitRatkinOrder(bool initBranch)
     {
         Quest quest = QuestGen.quest;
+        Slate slate = QuestGen.slate;
         if (initBranch)
         {
-            branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-            if (!branch.IsValid())
+            Branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+            if (!Branch.IsValid())
             {
                 return false;
             }
 
-            QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, ratkinOrder);
+            QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, RatkinOrder);
             QuestPart_CriticalBranch questPart_CriticalBranch = new()
             {
-                Branch = branch,
+                Branch = Branch,
                 EndQuest = true,
                 EndOutcome = QuestEndOutcome.Fail
             };
             quest.AddPart(questPart_CriticalBranch);
+
+            slate.SetBasicBranchSlateVar(Branch, alsoSetOrder: false);
         }
-        ratkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder) ?? branch?.RatkinOrder;
-        if (!ratkinOrder.IsValid())
+        RatkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder) ?? Branch?.RatkinOrder;
+        if (!RatkinOrder.IsValid())
         {
             return false;
         }
-        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, ratkinOrder);
+        QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, RatkinOrder);
         QuestPart_CriticalRatkinOrder questPart_CriticalRatkinOrder = new()
         {
-            RatkinOrder = ratkinOrder,
+            RatkinOrder = RatkinOrder,
             EndQuest = true,
             EndOutcome = QuestEndOutcome.Fail
         };
         quest.AddPart(questPart_CriticalRatkinOrder);
+        slate.SetBasicOrderSlateVar(RatkinOrder);
         return true;
     }
 
     protected override void ClearQuestParameter()
     {
         base.ClearQuestParameter();
-        ratkinOrder = null;
-        branch = null;
+        RatkinOrder = null;
+        Branch = null;
     }
 
     protected override Faction GetOrGenerateFaction()
@@ -78,10 +82,10 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         IReadOnlyList<PawnGenOption> pawnGenOptions = null;
         if (fixedPawnKind is null)
         {
-            KnightGenerateUtility.TryGetRandomPawnGroupMakerForOrder(ratkinOrder, branch, PawnGroupKind, out PawnGroupOption pawnGroupOption);
+            KnightGenerateUtility.TryGetRandomPawnGroupMakerForOrder(RatkinOrder, Branch, PawnGroupKind, out PawnGroupOption pawnGroupOption);
             if (pawnGroupOption is null)
             {
-                Log.Error($"[OARO] No usable {nameof(PawnGroupOption)} for {PawnGroupKind} found in {ratkinOrder}");
+                Log.Error($"[OARO] No usable {nameof(PawnGroupOption)} for {PawnGroupKind} found in {RatkinOrder}");
             }
             else
             {
@@ -106,7 +110,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             generationRequest.AllowedDevelopmentalStages = (i < adultCount ? DevelopmentalStage.Adult : DevelopmentalStage.Child);
 
             Pawn pawn = quest.GeneratePawn(generationRequest);
-            KnightGenerateUtility.PostKnightGenerate(pawn, new KnightRecord(ratkinOrder, branch, isCombatant: isCombatant, isCommander: isCommander));
+            KnightGenerateUtility.PostKnightGenerate(pawn, new KnightRecord(RatkinOrder, Branch, isCombatant: isCombatant, isCommander: isCommander));
 
             pawns.Add(pawn);
 

@@ -13,7 +13,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
 
     public bool HasRemoved { get; private set; }
 
-    [Unsaved] public readonly int TickHashOffset;
+    [Unsaved] private readonly int tickHashOffset;
     private int curYearPassed = -1;
 
     private RatkinOrderDef def;
@@ -59,7 +59,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
 
     private RatkinOrder()
     {
-        TickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
+        tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
     }
 
     public RatkinOrder(RatkinOrderDef def, Faction faction) : this()
@@ -100,11 +100,11 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     {
         branchManager.Tick();
 
-        if (this.IsHashIntervalTick(1000))
+        if (TickUtility.IsHashIntervalTick(tickHashOffset, 1000))
         {
             jointPatrolManager.TickLong();
 
-            if (this.IsHashIntervalTick(60000))
+            if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
             {
                 fundHandler.DailySettlement();
                 branchManager.TickDay();

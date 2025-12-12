@@ -31,7 +31,7 @@ public class QuestNode_Root_ResidentKnight : QuestNode_Root_RefugeeKnightBase
             return false;
         }
 
-        if (ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
+        if (RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             questParameter.questDurationTicks = 120 * 60000;
         }

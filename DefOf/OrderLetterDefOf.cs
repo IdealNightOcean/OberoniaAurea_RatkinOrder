@@ -14,6 +14,10 @@ public static class OrderLetterDefOf
     /// </summary>
     public static OrderLetterDef OARO_OfficialLetter_SimpleAttachments;
     /// <summary>
+    /// 落难骑士信件
+    /// </summary>
+    public static OrderLetterDef OARO_OfficialLetter_InDistressKnight;
+    /// <summary>
     /// 紧急信件
     /// </summary>
     public static OrderLetterDef OARO_UrgentLetter;

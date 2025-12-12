@@ -81,6 +81,7 @@ public class GameComponent_RatkinOrder : GameComponent
     public override void GameComponentTick()
     {
         ratkinOrderManager.Tick();
+        orderLetterBox.Tick();
     }
 
     /// <summary>

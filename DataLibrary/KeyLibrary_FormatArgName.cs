@@ -26,4 +26,6 @@ public static class KeyLibrary_FormatArgName
     public const string EffectTag = "EffectTag";
     public const string Offset = "Offset";
     public const string Factor = "Factor";
+
+    public const string Reason = "Reason";
 }

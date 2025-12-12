@@ -189,7 +189,7 @@ public class BranchDemandHandler : ITickDay, IExposable
     public bool TryAcceptDemand(bool isCritical)
     {
         BranchDemand demand = isCritical ? criticalDemand : normalDemand;
-        if (demand is null)
+        if (demand is null || demand.IsOngoing)
         {
             return false;
         }

@@ -78,7 +78,7 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
         QuestPart_OrderEsteemChange questPart_OrderEsteemChangePawnNegative = new()
         {
             InSignalTrigger = inSignalPawnNegative,
-            RatkinOrder = ratkinOrder,
+            RatkinOrder = RatkinOrder,
             Change = -10,
             Reason = "OARO_VisitingKnightKilled".Translate(),
         };

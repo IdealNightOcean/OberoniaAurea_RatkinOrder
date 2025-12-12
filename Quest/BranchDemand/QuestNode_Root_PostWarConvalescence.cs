@@ -55,7 +55,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         }
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
-            Branch = branch,
+            Branch = Branch,
             DemandType = demandType
         };
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
@@ -103,13 +103,13 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         Reward_OrderEsteem reward_OrderEsteem = new()
         {
-            RatkinOrder = branch?.RatkinOrder,
+            RatkinOrder = Branch?.RatkinOrder,
             Amount = 1,
         };
 
         Reward_FriendlyBranch reward_FriendlyBranch = new()
         {
-            Branch = branch
+            Branch = Branch
         };
 
         choice.rewards.Add(reward_Items);
@@ -120,7 +120,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         {
             Reward_OrderRecommendation reward_OrderRecommendation = new()
             {
-                RatkinOrder = branch?.RatkinOrder,
+                RatkinOrder = Branch?.RatkinOrder,
                 Count = 1
             };
             choice.rewards.Add(reward_OrderRecommendation);
@@ -193,7 +193,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange_Fail = new()
         {
             InSignalTrigger = inSignalFailAny,
-            RatkinOrder = branch.RatkinOrder,
+            RatkinOrder = Branch.RatkinOrder,
             Change = -6,
             Reason = "OARO_PostWarConvalescence_Fail".Translate()
         };
@@ -207,7 +207,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange_PerfectSuccess = new()
         {
             InSignalTrigger = inSignalPerfectSuccess,
-            RatkinOrder = branch.RatkinOrder,
+            RatkinOrder = Branch.RatkinOrder,
             Change = 4,
             Reason = "OARO_PostWarConvalescence_Success".Translate()
         };
@@ -215,14 +215,14 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         QuestPart_OrderRecommendation questPart_OrderRecommendation_PerfectSuccess = new()
         {
             InSignalTrigger = inSignalPerfectSuccess,
-            RatkinOrder = branch.RatkinOrder,
+            RatkinOrder = Branch.RatkinOrder,
             Count = 1
         };
         quest.AddPart(questPart_OrderRecommendation_PerfectSuccess);
         QuestPart_SetBranchToFriendly questPart_SetBranchToFriendly_PerfectSuccess = new()
         {
             InSignalTrigger = inSignalPerfectSuccess,
-            Branch = branch
+            Branch = Branch
         };
         quest.AddPart(questPart_SetBranchToFriendly_PerfectSuccess);
 
@@ -240,7 +240,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
                 QuestPart_OrderEsteemChange questPart_OrderEsteemChange_NormalSuccess = new()
                 {
                     InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-                    RatkinOrder = branch.RatkinOrder,
+                    RatkinOrder = Branch.RatkinOrder,
                     Change = 1,
                     Reason = "OARO_PostWarConvalescence_Success".Translate()
                 };
@@ -250,7 +250,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
                     QuestPart_OrderRecommendation questPart_OrderRecommendation_NormalSuccess = new()
                     {
                         InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-                        RatkinOrder = branch.RatkinOrder,
+                        RatkinOrder = Branch.RatkinOrder,
                         Count = 1
                     };
                     quest.AddPart(questPart_OrderRecommendation_NormalSuccess);

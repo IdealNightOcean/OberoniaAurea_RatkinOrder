@@ -47,6 +47,6 @@ public class Reward_AllOrdersEsteem : Reward
         base.ExposeData();
         Scribe_Values.Look(ref Amount, "Amount", 0);
         Scribe_Values.Look(ref ShowPlayerChangeMessage, "ShowPlayerChangeMessage", defaultValue: true);
-        Scribe_Values.Look(ref Reason, "Reason");
+        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
     }
 }

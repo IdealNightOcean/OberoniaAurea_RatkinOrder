@@ -30,7 +30,8 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>OberoniaAurea_RatkinOrder.xml</DocumentationFile>
+    <DocumentationFile>
+    </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="0Harmony">
@@ -168,7 +169,9 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_EnhanceRelationship.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_InviteResidentKnight.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_InviteBranchCreation.cs" />
+    <Compile Include="OrderLetter\OrderLetter_InDistressKnight.cs" />
     <Compile Include="OrderLetter\OrderLetter_SimpleAttachments.cs" />
+    <Compile Include="Quest\QuestNode\QuestNode_Root_InDistressKnight.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_InitJointPatrolCaravanHelp.cs" />
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Quest\Reward\Quest_GiveBranchMedal_CriticalDemand.cs" />

@@ -43,6 +43,11 @@ public static class OARO_HediffDefOf
     public static HediffDef OARO_Hediff_KnightlyTalk;
 
     /// <summary>
+    /// 落难骑士
+    /// </summary>
+    public static HediffDef OARO_Hediff_InDistressKnight;
+
+    /// <summary>
     /// 狼灾 - 灾狼
     /// </summary>
     public static HediffDef OARO_Hediff_WolfDisaster;

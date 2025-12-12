@@ -11,6 +11,8 @@ public class OrderLetterBox : IExposable
 {
     public static OrderLetterBox Instance { get; private set; }
 
+    private readonly int tickHashOffset;
+
     public bool autoTransNormal;
     public bool autoTransUrgent = true;
     public bool autoTransOfficial = true;
@@ -32,21 +34,38 @@ public class OrderLetterBox : IExposable
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
+        tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
         specialLetterManager = new SpecialLetterManager();
     }
     public static void ClearStaticCache() => Instance = null;
 
-    public void LetterBoxDay()
+    public void Tick()
     {
-        int ticksGame = Find.TickManager.TicksGame;
+        if (TickUtility.IsHashIntervalTick(tickHashOffset, 1000))
+        {
+            TickLong();
+
+            if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
+            {
+                TickDay();
+            }
+        }
+    }
+
+    private void TickLong()
+    {
         if (delayLetters.Count > 0)
         {
+            int ticksGame = Find.TickManager.TicksGame;
             foreach (OrderLetter letter in delayLetters.ExtractMatching(d => d.ArrivalTick <= ticksGame))
             {
                 ReceiveLetter(letter);
             }
         }
+    }
 
+    private void TickDay()
+    {
         // 优化：避免创建不必要的临时列表，直接在原列表上操作
         int validLetterCount = 0;
 
@@ -83,6 +102,7 @@ public class OrderLetterBox : IExposable
             int maxLetterRetentionDays = RatkinOrderSettings.MaxLetterRetentionDays;
             int retentionTicks = maxLetterRetentionDays * 60000;
 
+            int ticksGame = Find.TickManager.TicksGame;
             archivedLetters.RemoveAll(r => (ticksGame - r.ArrivalTick) >= retentionTicks);
         }
     }

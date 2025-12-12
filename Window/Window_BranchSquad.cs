@@ -363,7 +363,7 @@ public class Window_BranchSquad : OrderWindowBase
                     text: "OARO_CanApplyBranchInteractionWithReason".Translate(
                         parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
                         BranchInteractionDefOf.OARO_MapSilverToSupply.Named("INTERACTION"),
-                        acceptanceReport.Reason.Named("Reason")),
+                        acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
                     historical: false);
             }
@@ -424,7 +424,7 @@ public class Window_BranchSquad : OrderWindowBase
                     text: "OARO_CanApplyBranchInteractionWithReason".Translate(
                         parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
                         BranchInteractionDefOf.OARO_MapRecommendationToKnight.Named("INTERACTION"),
-                        acceptanceReport.Reason.Named("Reason")),
+                        acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
                     historical: false);
             }
@@ -526,7 +526,7 @@ public class Window_BranchSquad : OrderWindowBase
                     text: "OARO_CanApplyBranchInteractionWithReason".Translate(
                         parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
                         BranchInteractionDefOf.OARO_RequestCombatReadiness.Named("INTERACTION"),
-                        acceptanceReport.Reason.Named("Reason")),
+                        acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
                     historical: false);
             }
@@ -589,7 +589,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
             else
             {
-                Messages.Message("OARO_CanNotDoBombardWithReason".Translate(SelBranch.Name.Named(KeyLibrary_FormatArgName.BranchName), acceptance.Reason.Named("Reason")), MessageTypeDefOf.RejectInput, historical: false);
+                Messages.Message("OARO_CanNotDoBombardWithReason".Translate(SelBranch.Name.Named(KeyLibrary_FormatArgName.BranchName), acceptance.Reason.Named(KeyLibrary_FormatArgName.Reason)), MessageTypeDefOf.RejectInput, historical: false);
             }
             RefreshBranchAcceptance();
         }
@@ -636,7 +636,7 @@ public class Window_BranchSquad : OrderWindowBase
                         text: "OARO_CanApplyBranchInteractionWithReason".Translate(
                             parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
                             BranchInteractionDefOf.OARO_UnlockSupportAuthority.Named("INTERACTION"),
-                            acceptanceReport.Reason.Named("Reason")),
+                            acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                         def: MessageTypeDefOf.RejectInput,
                         historical: false);
                 }

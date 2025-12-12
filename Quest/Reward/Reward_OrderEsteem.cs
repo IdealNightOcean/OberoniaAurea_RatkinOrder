@@ -54,6 +54,6 @@ public class Reward_OrderEsteem : Reward
         base.ExposeData();
         Scribe_Values.Look(ref Amount, "Amount", 0);
         Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
-        Scribe_Values.Look(ref Reason, "Reason");
+        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
     }
 }

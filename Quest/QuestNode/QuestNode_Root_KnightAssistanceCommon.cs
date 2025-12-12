@@ -13,6 +13,8 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
     protected override PawnKindDef FixedPawnKind => _fixedPawnKind;
     protected override ThoughtDef ThoughtToAdd => _thoughtToAdd;
 
+    protected override Branch Branch { get => RatkinOrder.BranchManager.AllBranches.RandomElement(); }
+
     protected override bool InitQuestParameter()
     {
         questParameter = new()
@@ -29,7 +31,6 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
             goodwillSuccess = 0,
             goodwillFailure = -25,
         };
-
         Slate slate = QuestGen.slate;
         questParameter.LodgerCount = slate.Get("assistantCount", defaultValue: 1);
         _fixedPawnKind = slate.Get<PawnKindDef>("assistantPawnkind", defaultValue: OARO_PawnKindDefOf.RatkinKnight);
@@ -38,7 +39,7 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
         slate.Set(UniqueQuestDescSlate, true);
         slate.Set(UniqueLeavingLetterSlate, true);
 
-        return InitRatkinOrder(initBranch: true);
+        return InitRatkinOrder(initBranch: false);
     }
 
     protected override void ClearQuestParameter()
@@ -61,13 +62,14 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
 
             InsignalRemovePawn = inSignalRemovePawn,
             ThoughtToAdd = ThoughtToAdd,
-            RatkinOrder = ratkinOrder,
+            RatkinOrder = RatkinOrder,
 
             expiryInfoPart = "GuestsDepartsIn".Translate(),
             expiryInfoPartTip = "GuestsDepartsOn".Translate(),
-            debugLabel = "QuestDelay"
+            debugLabel = "QuestDelay",
+
+            Pawns = []
         };
-        questPart_AssistKnighWatcher.Pawns ??= [];
         questPart_AssistKnighWatcher.Pawns.AddRange(questParameter.pawns);
         quest.AddPart(questPart_AssistKnighWatcher);
 
@@ -84,6 +86,7 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
         quest.Leave(
             pawns: questParameter.pawns,
             inSignal: outSignalMakePawnsLeave,
+            sendStandardLetter: false,
             leaveOnCleanup: true,
             inSignalRemovePawn: inSignalRemovePawn,
             wakeUp: true);
@@ -105,7 +108,7 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
         QuestPart_OrderEsteemChange questPart_OrderEsteemChangePawnNegative = new()
         {
             InSignalTrigger = inSignalPawnNegative,
-            RatkinOrder = ratkinOrder,
+            RatkinOrder = RatkinOrder,
             Change = -20,
             Reason = "OARO_Harming_AssisrKnight".Translate()
         };

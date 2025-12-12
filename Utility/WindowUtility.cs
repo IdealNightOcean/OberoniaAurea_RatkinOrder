@@ -136,7 +136,7 @@ public static class OARO_WindowUtility
             else
             {
                 Messages.Message(
-                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), def.Named("INTERACTION"), acceptanceReport.Reason.Named("Reason")),
+                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), def.Named("INTERACTION"), acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
                     historical: false);
             }

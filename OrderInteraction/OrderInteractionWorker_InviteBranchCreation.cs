@@ -50,7 +50,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
             AcceptanceReport acceptanceReport = IsValidTileForInviteBranchCreation(ratkinOrder, map, t.Tile, resultOnly: false);
             if (!acceptanceReport)
             {
-                Messages.Message("OARO_CannotSelTileAsBranchSite".Translate(acceptanceReport.Reason), MessageTypeDefOf.RejectInput, historical: false);
+                Messages.Message("OARO_CannotSelTileAsBranchSite".Translate(acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)), MessageTypeDefOf.RejectInput, historical: false);
                 return false;
             }
 

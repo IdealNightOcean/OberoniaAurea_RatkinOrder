@@ -136,10 +136,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         {
             foreach (Pawn pawn in pawns)
             {
-                if (pawn.Faction != Faction.OfPlayer)
-                {
-                    pawn.SetFaction(Faction.OfPlayer);
-                }
+                OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
                 caravan.AddPawn(pawn, addCarriedPawnToWorldPawnsIfAny: true);
             }
             Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
@@ -174,7 +171,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         {
             if (pawn.Faction != Faction.OfPlayer)
             {
-                pawn.SetFaction(Faction.OfPlayer);
+                OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
             }
         }
         Caravan residentCaravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);

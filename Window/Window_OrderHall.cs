@@ -689,7 +689,7 @@ public class Window_OrderHall : OrderWindowBase
                 }
                 else
                 {
-                    Messages.Message("OARO_CanNotUpgradeResidentKnightRankWithReason".Translate(acceptance.Reason.Named("Reason")), MessageTypeDefOf.RejectInput, historical: false);
+                    Messages.Message("OARO_CanNotUpgradeResidentKnightRankWithReason".Translate(acceptance.Reason.Named(KeyLibrary_FormatArgName.Reason)), MessageTypeDefOf.RejectInput, historical: false);
                 }
                 OnConditionChanged();
             }
@@ -740,7 +740,7 @@ public class Window_OrderHall : OrderWindowBase
                 }
                 else
                 {
-                    Messages.Message("OARO_CanNotPostponeResidentKnightkResignationWithReason".Translate(acceptance.Reason.Named("Reason")), MessageTypeDefOf.RejectInput, historical: false);
+                    Messages.Message("OARO_CanNotPostponeResidentKnightkResignationWithReason".Translate(acceptance.Reason.Named(KeyLibrary_FormatArgName.Reason)), MessageTypeDefOf.RejectInput, historical: false);
                     OnConditionChanged();
                 }
             }
