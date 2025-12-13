@@ -37,6 +37,8 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             return;
         }
 
+        quest.AddPart(new QuestPart_PreMercyQuestCleaner());
+
         slate.Set(KeyLibrary_SlateStoreAs.SubFaction, subFaction);
 
         PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind);

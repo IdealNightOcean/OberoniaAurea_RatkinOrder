@@ -101,8 +101,9 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 
         quest.Letter(letterDef: LetterDefOf.NegativeEvent,
                      inSignal: outSignalsUnhappy,
-                     text: "OARO_Letter_TaxCollector".Translate(),
-                     label: "OARO_LetterLabel_TaxCollector".Translate());
+                     text: "[taxCollectorLeaveUnhappyText]",
+                     label: "[taxCollectorLeaveUnhappyLabel]",
+                     relatedFaction: questParameter.faction);
 
         quest.End(QuestEndOutcome.Fail, questParameter.goodwillFailure, questParameter.faction, outSignalsUnhappy, sendStandardLetter: true);
 

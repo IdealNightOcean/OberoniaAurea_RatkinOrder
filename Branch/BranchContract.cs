@@ -3,7 +3,6 @@ using RimWorld;
 using RimWorld.Planet;
 using System;
 using Verse;
-using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -124,41 +123,19 @@ public class BranchContract : IExposable
 
     private string GetContractReason(Branch branch)
     {
-        if (!string.IsNullOrEmpty(def.fixedRequestReasons))
+        if (def.requestReasons.NullOrEmpty())
         {
-            return def.fixedRequestReasons.Formatted(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+            return "OARO_BranchContract_DefaultReason".Translate(branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                                                                 branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                                                                 RequestThingDef.Named("REQUESTDEF"),
+                                                                 requestCount.Named("RequestCount"));
         }
-        if (def.requestReasonsRulePack is not null)
-        {
-            string reason;
-            try
-            {
-                GrammarRequest grammarRequest = new();
-                grammarRequest.Includes.Add(def.requestReasonsRulePack);
-                grammarRequest.Constants.Add("requestDef", RequestThingDef.defName);
-                grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ORDER", branch.RatkinOrder));
-                grammarRequest.Rules.AddRange(ModUtility.RulesForBranch("BRNACH", branch, alsoAddOrderRule: false));
-                grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("ORDERFACTION", branch.RatkinOrder.Faction));
-                grammarRequest.Rules.AddRange(GrammarUtility.RulesForDef("REQUESTTHING", RequestThingDef));
-                grammarRequest.Rules.Add(new Rule_String("requestCount", requestCount.ToString()));
-                reason = GrammarResolver.Resolve("r_text", grammarRequest);
-            }
-            catch (Exception ex)
-            {
-                ModUtility.LogExceptionError(ex, nameof(GrammarResolver.Resolve), nameof(BranchContract), nameof(GetContractReason));
-                reason = null;
-            }
 
-            if (string.IsNullOrEmpty(reason))
-            {
-                return "OARO_BranchContract_DefaultReason".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
-            }
-            else
-            {
-                return reason;
-            }
-        }
-        return "OARO_BranchContract_DefaultReason".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), RequestThingDef.Named("REQUESTDEF"), requestCount.Named("RequestCount"));
+        return def.requestReasons.RandomElement().Formatted(
+            branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+            branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+            RequestThingDef.Named("REQUESTDEF"),
+            requestCount.Named("RequestCount"));
 
     }
 }

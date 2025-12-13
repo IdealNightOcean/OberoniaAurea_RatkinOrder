@@ -110,8 +110,8 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
                          inSignal: durationEndSignal,
                          relatedFaction: questParameter.faction,
                          lookTargets: [apprenticeHome],
-                         text: "OARO_Apprentice_NoOnePickUp".Translate(),
-                         label: "OARO_Apprentice_NoOnePickUpLabel".Translate());
+                         text: "[apprenticeNoOnePickUpText]",
+                         label: "[apprenticeNoOnePickUpLabel]");
 
             questPart_Apprentice_QuizStayIntention.InSiganl = QuestGenUtility.HardcodedSignalWithQuestID("apprenticeHome.Destroyed");
             questPart_Apprentice_QuizStayIntention.InSignalResolved = QuestGenUtility.HardcodedSignalWithQuestID("apprenticeHome.Resolved");

@@ -11,6 +11,15 @@ public static class OARO_LetterDefOf
     public static LetterDef OARO_Order_NegativeLetter;
     public static LetterDef OARO_Order_ThreatBigLetter;
 
+    /// <summary>
+    /// 坠马骑士 - 开始信件
+    /// </summary>
+    public static LetterDef OARO_Order_InDistressKnightStartLetter;
+    /// <summary>
+    /// 坠马骑士 - 结束信件
+    /// </summary>
+    public static LetterDef OARO_Order_InDistressKnightLeaveLetter;
+
     public static LetterDef OARO_AutoUpgradeRelationshipQuizLetter;
 
     public static LetterDef OARO_Apprentice_QuizStayIntentionLetter;

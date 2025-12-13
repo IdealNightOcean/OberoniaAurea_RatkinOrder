@@ -70,14 +70,15 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 
     private void NoFurtherAction()
     {
-        QuestGen.quest.Delay(
+        Quest quest = QuestGen.quest;
+        quest.Delay(
             delayTicks: Rand.RangeInclusive(4, 6) * 60000,
             inner: delegate
             {
-                QuestGen.quest.Letter(letterDef: LetterDefOf.PositiveEvent,
-                                      text: "OARO_LostItemsOfTrader_NoFurtherText".Translate(),
-                                      label: "OARO_LostItemsOfTrader_NoFurtherLabel".Translate());
-                QuestGen_End.End(QuestGen.quest, outcome: QuestEndOutcome.Success);
+                quest.Letter(letterDef: LetterDefOf.PositiveEvent,
+                             text: "OARO_LostItemsOfTrader_NoFurtherText".Translate(),
+                             label: "OARO_LostItemsOfTrader_NoFurtherLabel".Translate());
+                QuestGen_End.End(quest, outcome: QuestEndOutcome.Success);
             });
     }
 
@@ -87,7 +88,9 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         Quest quest = QuestGen.quest;
 
         string inSignalMakePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsArrival");
-        quest.Delay(delayTicks: GenMath.RoundTo(Rand.RangeInclusive(4 * 60000, 6 * 60000), 2500), inner: null, outSignalComplete: inSignalMakePawnsArrival);
+        quest.Delay(delayTicks: GenMath.RoundTo(Rand.RangeInclusive(4 * 60000, 6 * 60000), 2500),
+                    inner: null,
+                    outSignalComplete: inSignalMakePawnsArrival);
 
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Negative");
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()

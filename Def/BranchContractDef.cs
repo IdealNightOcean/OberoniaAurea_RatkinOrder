@@ -27,15 +27,10 @@ public class BranchContractDef : Def
     public IntRange requestCountRange;
 
     /// <summary>
-    /// 固定的需求原因
+    /// 需求原因
     /// </summary>
     [MustTranslate]
-    public string fixedRequestReasons;
-
-    /// <summary>需求原因构建使用的<see cref="RulePackDef"/></summary>
-    /// <remarks>- 只在<see cref="fixedRequestReasons"/>为<see langword="null"/>或<see cref="string.Empty"/>时起效</remarks>
-    [MustTranslate]
-    public RulePackDef requestReasonsRulePack;
+    public List<string> requestReasons;
 
     /// <summary>
     /// 需求在[接取前]的持续时间（Day）

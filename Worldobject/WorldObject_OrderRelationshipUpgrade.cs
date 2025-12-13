@@ -29,7 +29,7 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
         {
             return;
         }
-        //RatkinOrder.RelationshipKindOffsetBy(1, sendLetter: true);
+        //RelatedOrder.RelationshipKindOffsetBy(1, sendLetter: true);
 
         this.SendWorkResolvedSignal();
         this.SafeDestroy();
