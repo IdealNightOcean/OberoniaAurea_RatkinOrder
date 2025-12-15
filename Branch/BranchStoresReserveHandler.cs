@@ -201,7 +201,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
 
 
         BranchBuildingHandler buildingHandler = branch.BuildingHandler;
-        if (!buildingHandler.IsNormalBuildingFullyCompleted && buildingHandler.HasUnusedNormalSlots)
+        if (buildingHandler.HasUnusedSlots)
         {
             ConcurrentBag<BranchBuildingDef> potentialBuildings = [];
 

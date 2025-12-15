@@ -14,10 +14,6 @@ public static class OARO_HediffDefOf
     /// 战后创伤
     /// </summary>
     public static HediffDef OARO_Hediff_WarDeepInjury;
-    /// <summary>
-    /// 常驻骑士（隐藏）
-    /// </summary>
-    public static HediffDef OARO_Hediff_ResidentKnight;
 
     /// <summary>
     /// 旗弹标记
@@ -36,6 +32,11 @@ public static class OARO_HediffDefOf
     /// 圣骑士鼓舞
     /// </summary>
     public static HediffDef OARO_Hediff_HonorPaladin_Stimulate;
+
+    /// <summary>
+    /// 常驻骑士的Buff
+    /// </summary>
+    public static HediffDef OARO_Hediff_ByResidentKnightBuff;
 
     /// <summary>
     /// 骑士激励

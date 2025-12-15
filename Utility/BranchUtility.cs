@@ -308,7 +308,7 @@ public static class BranchUtility
         if (def is BranchFacilityDef facilityDef)
         {
             BranchFacilityHandler facilityHandler = branch.FacilityHandler;
-            if (facilityHandler.UnderConstructionFacility?.TargetDef == facilityDef)
+            if (facilityHandler.UnderConstructionFacilities.ContainsKey(facilityDef))
             {
                 return false;
             }
@@ -318,11 +318,11 @@ public static class BranchUtility
         else if (def is BranchBuildingDef buildingDef)
         {
             BranchBuildingHandler buildingHandler = branch.BuildingHandler;
-            if (buildingDef.isSpecial && buildingHandler.SpecialBuilding is not null)
+            if (buildingDef.isSpecial && buildingHandler.SpecialBuildingDef is not null)
             {
                 return false;
             }
-            if (buildingHandler.UnderConstructionBuilding?.TargetDef == buildingDef)
+            if (buildingHandler.UnderConstructionBuildingDefs.Contains(buildingDef))
             {
                 return false;
             }
@@ -349,7 +349,7 @@ public static class BranchUtility
         }
 
         BranchBuildingHandler buildingHandler = branch.BuildingHandler;
-        if (!buildingHandler.IsNormalBuildingFullyCompleted && buildingHandler.HasUnusedNormalSlots)
+        if (buildingHandler.HasUnusedSlots)
         {
             foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefsListForReading)
             {

@@ -63,7 +63,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
             {
                 ResolveParams pawnResolveParams = resolveParams;
                 pawnResolveParams.singlePawnToSpawn = p;
-                BaseGen.symbolStack.Push(KeyLibrary_FormatArgName.PAWN, pawnResolveParams);
+                BaseGen.symbolStack.Push("pawn", pawnResolveParams);
             }
         }
 

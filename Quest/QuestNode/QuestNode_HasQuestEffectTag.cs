@@ -38,7 +38,7 @@ public class QuestNode_HasQuestEffectTag : QuestNode
 
     protected override void RunInt()
     {
-        if (string.IsNullOrEmpty(tag.GetValue(QuestGen.slate)) || !QuestPart_EffectTags.TryGetEffectTagsPart(QuestGen.quest, addPartIfMiss: false, out QuestPart_EffectTags questPart_EffectTags))
+        if (string.IsNullOrEmpty(tag.GetValue(QuestGen.slate)) || !QuestGen.quest.TryGetEffectTagsPart(addPartIfMiss: false, out QuestPart_EffectTags questPart_EffectTags))
         {
             noMatchNode?.Run();
             return;

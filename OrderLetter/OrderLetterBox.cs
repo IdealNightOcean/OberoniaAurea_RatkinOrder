@@ -2,6 +2,7 @@ using NightOcean.Collection;
 using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -23,8 +24,6 @@ public class OrderLetterBox : IExposable
     protected List<OrderLetter> unreadLetters = []; // 未读邮件
     protected List<OrderLetter> archivedLetters = []; // 已读邮件
 
-    public SpecialLetterManager specialLetterManager;
-
     public List<OrderLetter> ArchivedLetters => archivedLetters;
 
     public bool HasUnreadLetters => unreadLetters.Count > 0;
@@ -35,8 +34,8 @@ public class OrderLetterBox : IExposable
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
-        specialLetterManager = new SpecialLetterManager();
     }
+
     public static void ClearStaticCache() => Instance = null;
 
     public void Tick()
@@ -112,7 +111,7 @@ public class OrderLetterBox : IExposable
         if (delayDays > 0)
         {
             letter.ArrivalTick = Find.TickManager.TicksGame + delayDays * 60000;
-            delayLetters.Add(letter);
+            delayLetters.BinaryInsert(letter, compareFunc: OrderLetterComparerFunc);
         }
         else
         {
@@ -205,8 +204,6 @@ public class OrderLetterBox : IExposable
         Scribe_Values.Look(ref autoTransOfficial, nameof(autoTransOfficial), defaultValue: true);
         Scribe_Values.Look(ref autoTransUrgent, nameof(autoTransUrgent), defaultValue: true);
 
-        Scribe_Deep.Look(ref specialLetterManager, nameof(specialLetterManager));
-
         Scribe_Collections.Look(ref delayLetters, nameof(delayLetters), LookMode.Deep);
         Scribe_Collections.Look(ref unreadLetters, nameof(unreadLetters), LookMode.Deep);
         Scribe_Collections.Look(ref archivedLetters, nameof(archivedLetters), LookMode.Deep);
@@ -217,8 +214,9 @@ public class OrderLetterBox : IExposable
             unreadLetters.RemoveAll(l => l is null);
             archivedLetters.RemoveAll(l => l is null);
 
-            unreadLetters.SortBy(r => -r.ArrivalTick);
-            archivedLetters.SortBy(r => -r.ArrivalTick);
+            delayLetters.OrderBy(r => -r.ArrivalTick);
+            unreadLetters.OrderBy(r => -r.ArrivalTick);
+            archivedLetters.OrderBy(r => -r.ArrivalTick);
         }
     }
 }

@@ -31,10 +31,16 @@ public static class KnightGenerateUtility
     public static void PostKnightGenerate(Pawn pawn, KnightRecord knightRecord)
     {
         KnightPawnsManager.Instance.RegisterKnight(pawn, knightRecord);
-        if (knightRecord.Branch.IsValid())
+        Branch branch = knightRecord.Branch;
+        if (branch.IsValid())
         {
             Hediff_BranchMedal medalHediff = (Hediff_BranchMedal)pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_BranchMedal);
-            medalHediff.SetOrderBranch(knightRecord.Branch);
+            medalHediff.SetOrderBranch(branch);
+
+            if (branch.HonorDef?.buffHediff is not null)
+            {
+                pawn.health.AddHediff(branch.HonorDef.buffHediff);
+            }
         }
         if (knightRecord.IsCombatant)
         {

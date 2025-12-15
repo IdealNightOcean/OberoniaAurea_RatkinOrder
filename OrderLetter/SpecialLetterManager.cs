@@ -11,6 +11,14 @@ public class SpecialLetterManager : IExposable
 
     private int curYear = 2025;
 
+    internal SpecialLetterManager(bool initCtor)
+    {
+        if (initCtor)
+        {
+            curYear = DateTime.Now.Year;
+        }
+    }
+
     public void Notify_GameStart()
     {
         foreach (SpecialLetterDef letterDef in DefDatabase<SpecialLetterDef>.AllDefs)
@@ -68,8 +76,8 @@ public class SpecialLetterManager : IExposable
 
         if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
         {
-            recievedSpecialLetters.RemoveWhere(l => l is null);
-            recievedCertainDateLetters.RemoveWhere(l => l is null);
+            recievedSpecialLetters.Remove(null);
+            recievedCertainDateLetters.Remove(null);
         }
     }
 }

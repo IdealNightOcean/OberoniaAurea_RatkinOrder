@@ -32,6 +32,27 @@ public class Building_OrderCodePedestal : Building
         }
     }
 
+    public override void TickLong()
+    {
+        base.TickLong();
+        if (!IsMainPedestal || !Spawned)
+        {
+            return;
+        }
+
+        _ = ResidentKnightsManager.Instance.BuffHediffStage;
+        foreach (Pawn p in Map.mapPawns.FreeColonistsSpawned)
+        {
+            Hediff hediff = p.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_ByResidentKnightBuff);
+            HediffComp_Disappears disappearsComp = hediff?.TryGetComp<HediffComp_Disappears>();
+            if (disappearsComp is not null)
+            {
+                disappearsComp.disappearsAfterTicks = 2000;
+                disappearsComp.ticksToDisappear = 2000;
+            }
+        }
+    }
+
     public override IEnumerable<Gizmo> GetGizmos()
     {
         foreach (Gizmo gizmo in base.GetGizmos())

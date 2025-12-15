@@ -14,8 +14,11 @@ public class GameComponent_RatkinOrder : GameComponent
 
     private KnightPawnsManager knightPawnsManager;
     private RatkinOrderManager ratkinOrderManager;
-    private OrderLetterBox orderLetterBox;
     private GlobalInteractionManager globalInteractionManager;
+
+    private OrderLetterBox orderLetterBox;
+    public SpecialLetterManager specialLetterManager;
+
 
     /// <summary>
     /// 全局对话行为管理
@@ -57,15 +60,19 @@ public class GameComponent_RatkinOrder : GameComponent
 
         Scribe_Deep.Look(ref ratkinOrderManager, nameof(ratkinOrderManager));
         Scribe_Deep.Look(ref knightPawnsManager, nameof(knightPawnsManager));
-        Scribe_Deep.Look(ref orderLetterBox, nameof(orderLetterBox));
         Scribe_Deep.Look(ref globalInteractionManager, nameof(globalInteractionManager));
+
+        Scribe_Deep.Look(ref orderLetterBox, nameof(orderLetterBox));
+        Scribe_Deep.Look(ref specialLetterManager, nameof(specialLetterManager), ctorArgs: false);
     }
 
     public override void StartedNewGame()
     {
         EnsureComponentsInit();
-        globalInteractionManager.StratNewGame();
+        globalInteractionManager.EnsureComponentsInit();
+
         RatkinOrderGenerator.StartNewGame();
+        specialLetterManager.Notify_GameStart();
     }
 
 
@@ -75,7 +82,9 @@ public class GameComponent_RatkinOrder : GameComponent
     public override void LoadedGame()
     {
         EnsureComponentsInit();
-        globalInteractionManager.LoadedGame();
+        globalInteractionManager.EnsureComponentsInit();
+
+        specialLetterManager.Notify_GameStart();
     }
 
     public override void GameComponentTick()
@@ -138,6 +147,21 @@ public class GameComponent_RatkinOrder : GameComponent
 
         try
         {
+            globalInteractionManager ??= new GlobalInteractionManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing GlobalInteractionManager",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            GlobalInteractionManager.ClearStaticCache();
+            globalInteractionManager = new GlobalInteractionManager();
+        }
+
+        try
+        {
             orderLetterBox ??= new OrderLetterBox();
         }
         catch (System.Exception ex)
@@ -151,19 +175,6 @@ public class GameComponent_RatkinOrder : GameComponent
             orderLetterBox = new OrderLetterBox();
         }
 
-        try
-        {
-            globalInteractionManager ??= new GlobalInteractionManager();
-        }
-        catch (System.Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: "initializing GlobalInteractionManager",
-                typeName: nameof(GameComponent_RatkinOrder),
-                methodName: nameof(EnsureComponentsInit),
-                needStackTrace: true);
-            GlobalInteractionManager.ClearStaticCache();
-            globalInteractionManager = new GlobalInteractionManager();
-        }
+        specialLetterManager ??= new(initCtor: true);
     }
 }

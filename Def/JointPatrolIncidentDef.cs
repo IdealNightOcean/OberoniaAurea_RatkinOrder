@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RimWorld;
+using System.Collections.Generic;
 using Verse;
 using static OberoniaAurea.RatkinOrder.JointBranchRecord;
 using static OberoniaAurea.RatkinOrder.JointPatrolManager;
@@ -26,6 +27,37 @@ public class JointPatrolIncidentDef : JointPatrolInteractionDef
     /// 分部建筑限制
     /// </summary>
     public BranchBuildingDef relatedBuilding;
+
+    /// <summary>
+    /// 是否为常驻骑士添加心情
+    /// </summary>
+    public bool addThought = true;
+
+    /// <summary> 为常驻骑士添加的心情Def </summary>
+    protected ThoughtDef thoughtToAdd;
+
+    /// <summary> 为常驻骑士添加的心情Def </summary>
+    /// <remarks> 
+    /// <para>- 若 <see cref="addThought"/> 为 <see langword="false"/>，永远返回 <see langword="null"/></para>
+    /// <para>- 若 <see cref="addThought"/> 为 <see langword="true"/>，且同时 <see cref="thoughtToAdd"/> 不为 <see langword="null"/>，返回 <see cref="thoughtToAdd"/></para>
+    /// <para>- 若 <see cref="addThought"/> 为 <see langword="true"/>，且同时 <see cref="thoughtToAdd"/> 为 <see langword="null"/>，根据 <see cref="incidentType"/> 返回默认值</para>
+    /// </remarks>
+    public ThoughtDef ThoughtToAdd
+    {
+        get
+        {
+            if (!addThought) return null;
+            if (thoughtToAdd is not null) return thoughtToAdd;
+
+            return incidentType switch
+            {
+                IncidentType.Positive => OARO_ThoughtDefOf.OARO_Thought_JointPatrolPositive,
+                IncidentType.Negative => OARO_ThoughtDefOf.OARO_Thought_JointPatrolNegative,
+                IncidentType.Disaster => OARO_ThoughtDefOf.OARO_Thought_JointPatrolDisaster,
+                _ => null
+            };
+        }
+    }
 
     /// <summary>
     /// 能否触发小事件

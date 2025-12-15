@@ -19,7 +19,7 @@ public abstract class WorldObject_CriticalBranchDemand : WorldObject_InteractWit
         {
             if (effectTags is null)
             {
-                QuestPart_EffectTags.TryGetEffectTagsPart(quest, addPartIfMiss: false, out effectTags);
+                quest.TryGetEffectTagsPart(addPartIfMiss: false, out effectTags);
             }
             return effectTags;
         }
@@ -33,7 +33,7 @@ public abstract class WorldObject_CriticalBranchDemand : WorldObject_InteractWit
         {
             if (cliquesManager is null)
             {
-                QuestPart_CliquesManager.TryGetCliquesManager(quest, addPartIfMiss: false, out cliquesManager);
+                quest.TryGetCliquesManager(addPartIfMiss: false, out cliquesManager);
             }
             return cliquesManager;
         }

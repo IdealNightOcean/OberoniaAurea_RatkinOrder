@@ -206,7 +206,8 @@ public class Window_OrderHall : OrderWindowBase
         Widgets.BeginScrollView(buffRect, ref scrollPosition_Buff, buffViewRect);
 
         Rect entryRect;
-
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleCenter;
         for (int i = 0; i < buffHediffStageExplanation.Count; i++)
         {
             entryRect = new(entryX, entryY, entryWidth, entryHeight);
@@ -401,13 +402,17 @@ public class Window_OrderHall : OrderWindowBase
     private List<string> RefreshBuffHediffStageExplanation()
     {
         HediffStage buffHediffStage = ResidentKnightsManager.Instance.BuffHediffStage;
+        if (buffHediffStage is null)
+        {
+            return [];
+        }
+
         List<string> result = new(buffHediffStage.statFactors.Count + buffHediffStage.statOffsets.Count + 1);
         foreach (StatDrawEntry item in buffHediffStage.SpecialDisplayStats())
         {
             try
             {
-                StatRequest statRequest = StatRequest.ForEmpty();
-                string explanation = item.GetExplanationText(statRequest);
+                string explanation = $"{item.LabelCap}  {item.ValueString}";
                 result.Add(explanation);
             }
             catch (Exception ex)
@@ -527,12 +532,12 @@ public class Window_OrderHall : OrderWindowBase
         public const float DetailHeight = 288f;
 
         private Vector2 scrollPosition_GenealAcademic;
-
         public Window_OrderHall Parent { get; }
         public ResidentKnightRecord Record { get; }
         public Map Map { get; }
         private float MeditationFactor { get; }
         public bool ShowDetail { get; set; }
+        public LazyMutable<string> RoleExplanationStr { get; }
         public LazyMutable<string> ResonatePersonalitiesStr { get; }
 
         public LazyMutable<AcceptanceReport> RankUpgradeAcceptance { get; }
@@ -547,6 +552,8 @@ public class Window_OrderHall : OrderWindowBase
             Record = record;
             Map = map;
             MeditationFactor = record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
+
+            RoleExplanationStr = new(refreshFunc: () => Record?.CurRole?.GetRoleDetailDesc() ?? string.Empty);
             ResonatePersonalitiesStr = new(refreshFunc: RefreshResonatePersonalitiesStr);
             RankUpgradeAcceptance = new(refreshFunc: () => GlobalInteractionUtility.CanUpgradeResidentKnightRank(Record, Map, resultOnly: false));
             PostponeResignationAcceptance = new(refreshFunc: () => GlobalInteractionUtility.CanPostponeResidentKnightkResignation(Record, Map, resultOnly: false));
@@ -562,12 +569,13 @@ public class Window_OrderHall : OrderWindowBase
         public void ClearCache()
         {
             ShowDetail = false;
+
+            RoleExplanationStr.Reset();
             ResonatePersonalitiesStr.Reset();
             RankUpgradeAcceptance.Reset();
             PostponeResignationAcceptance.Reset();
             PreferredFurnitureCount.Reset();
             PreferredFurnitureExplanation.Reset();
-
         }
 
         public void OnConditionChanged()
@@ -600,10 +608,23 @@ public class Window_OrderHall : OrderWindowBase
             reusedRect = new(summaryInnerRectX + 30f, summaryInnerRectY, 50f, titleRectHeight);
             Widgets.Label(reusedRect, Record.Knight.NameShortColored);
 
+            reusedRect = OARO_WindowUtility.CenterRectOnY(tileRect, summaryInnerRectX + 115f, 45f, titleRectHeight - 2f);
             if (Record.CurRole is not null)
             {
-                reusedRect = OARO_WindowUtility.CenterRectOnY(tileRect, summaryInnerRectX + 115f, 45f, titleRectHeight - 2f);
-                GUI.DrawTexture(reusedRect, Record.CurRole.iconTexture.Texture);
+                GUI.DrawTexture(reusedRect, Record.CurRole.iconTexture.Texture, ScaleMode.ScaleToFit);
+            }
+            else
+            {
+                GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+            }
+            if (Mouse.IsOver(reusedRect))
+            {
+                Widgets.DrawHighlight(reusedRect);
+                TooltipHandler.TipRegion(reusedRect, () => RoleExplanationStr.Value, uniqueId: 36431436);
+            }
+            if (Widgets.ButtonInvisible(reusedRect))
+            {
+                RoleFloatMenu();
             }
 
             reusedRect = new(summaryInnerRectX + 150f, summaryInnerRectY, 85f, titleRectHeight);
@@ -728,15 +749,15 @@ public class Window_OrderHall : OrderWindowBase
                 AcceptanceReport acceptance = GlobalInteractionUtility.CanPostponeResidentKnightkResignation(Record, Map, resultOnly: false);
                 if (acceptance)
                 {
-                    SecondWindow_UpgradeRank secondWin = new(
-                       targetRank: ResidentKnightRecord.RankOffsetBy(Record.CurRank, offset: 1),
-                       acceptAction: delegate
+                    Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                        text: "OARO_HallWin_PostponeResignationConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+                        ratkinOrder: Record.RatkinOrder,
+                        acceptAction: delegate
                         {
                             GlobalInteractionUtility.PostponeResidentKnightkResignation(Record, Map);
                             OnConditionChanged();
-                        }
-                    );
-                    Find.WindowStack.Add(secondWin);
+                        });
+                    Find.WindowStack.Add(nodeTree);
                 }
                 else
                 {
@@ -779,9 +800,14 @@ public class Window_OrderHall : OrderWindowBase
             reusedRect = new(inRectX + 260f, inRectY + 164f, 80f, 20f);
             Widgets.Label(reusedRect, "OARO_HallWin_HonorAcademic".Translate());
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 8f, 80f, 20f);
+
+
             if (Record.HonorAcademicDef is null)
             {
                 Widgets.Label(reusedRect, "None".Translate());
+
+                reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
+                GUI.DrawTexture(reusedRect, BaseContent.BlackTex);
             }
             else
             {
@@ -790,8 +816,8 @@ public class Window_OrderHall : OrderWindowBase
                 reusedRect = new(inRectX + 320f, inRectY + 164f, 90f, 55f);
                 GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture);
 
-                reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
                 float honorAcademicProgress = Record.HonorAcademicLevel / (float)Record.HonorAcademicDef.MaxStageLevel;
+                reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
                 Widgets.FillableBar(reusedRect, honorAcademicProgress, honorDef.HonorColorTex);
             }
 
@@ -945,6 +971,65 @@ public class Window_OrderHall : OrderWindowBase
             return sb.ToString();
         }
 
+        private void RoleFloatMenu()
+        {
+            List<FloatMenuOption> options = [];
+            int ticksGame = Find.TickManager.TicksGame;
+            if (Record.NextRoleChangeableTick > ticksGame)
+            {
+                int coolingTicksLeft = Record.NextRoleChangeableTick - ticksGame;
+                options.Add(new FloatMenuOption("WaitTime".Translate(coolingTicksLeft.ToStringTicksToPeriod()), action: null));
+            }
+            else
+            {
+                ResidentKnightsManager residentKnightsManager = ResidentKnightsManager.Instance;
+                foreach (ResidentKnightRoleDef roleDef in DefDatabase<ResidentKnightRoleDef>.AllDefsListForReading)
+                {
+                    if (residentKnightsManager.TryGetKnightOfRole(roleDef, out ResidentKnightRecord otherRecord))
+                    {
+                        if (otherRecord.NextRoleChangeableTick > ticksGame)
+                        {
+                            int coolingTicksLeft = Record.NextRoleChangeableTick - ticksGame;
+                            options.Add(new FloatMenuOption(
+                                label: $"{roleDef.label} ({otherRecord.Knight.NameShortColored}), " + "WaitTime".Translate(coolingTicksLeft.ToStringTicksToPeriod()),
+                                action: null));
+                        }
+                        else
+                        {
+                            options.Add(new FloatMenuOption(roleDef.label, action: () => RoleChangeConfirmDialog(roleDef, replaceCurRole: true)));
+                        }
+                    }
+                    else
+                    {
+                        options.Add(new FloatMenuOption(roleDef.label, action: () => RoleChangeConfirmDialog(roleDef, replaceCurRole: false)));
+                    }
+                }
+            }
+
+            Find.WindowStack.Add(new FloatMenu(options));
+        }
+
+        private void RoleChangeConfirmDialog(ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
+        {
+            StringBuilder sb = new("OARO_HallWin_RoleChangeConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.AppendLine(roleDef.GetRoleDetailDesc());
+            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                text: sb.ToTaggedString(),
+                Record.RatkinOrder,
+                acceptAction: delegate
+                {
+                    if (ResidentKnightsManager.Instance.TrySetResidentKnightRole(Record.Knight, roleDef, replaceCurRole: replaceCurRole))
+                    {
+                        RoleExplanationStr.MarkDirty();
+                        Parent.BuffHediffStageExplanation.MarkDirty();
+                    }
+                });
+            Find.WindowStack.Add(nodeTree);
+        }
+
+
         private static readonly Texture2D residentKnightSummary = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_KnightSummary");
         private static readonly Texture2D residentKnightDetail = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_KnightDetail");
 
@@ -966,6 +1051,7 @@ public class Window_OrderHall : OrderWindowBase
         private static readonly Texture2D rankBackGround_CrownS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_CrownS");
     }
 
+    [StaticConstructorOnStartup]
     private class SecondWindow_UpgradeRank : OrderWindowBase
     {
         private ResidentKnightRecord.Rank TargetRank { get; }

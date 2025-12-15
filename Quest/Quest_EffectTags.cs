@@ -2,7 +2,6 @@
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -70,17 +69,6 @@ public class QuestPart_EffectTags : QuestPart
     public void RemoveTag(string tagKey)
     {
         tags?.Remove(tagKey);
-    }
-
-    public static bool TryGetEffectTagsPart(Quest quest, bool addPartIfMiss, out QuestPart_EffectTags questPart_EffectTags)
-    {
-        questPart_EffectTags = quest.PartsListForReading.OfType<QuestPart_EffectTags>()?.FirstOrFallback(null);
-        if (addPartIfMiss && questPart_EffectTags is null)
-        {
-            questPart_EffectTags = new QuestPart_EffectTags();
-            quest.AddPart(questPart_EffectTags);
-        }
-        return questPart_EffectTags is not null;
     }
 
     public override void DoDebugWindowContents(Rect innerRect, ref float curY)

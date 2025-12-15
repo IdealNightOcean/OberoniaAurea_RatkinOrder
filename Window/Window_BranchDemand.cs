@@ -50,7 +50,7 @@ public class Window_BranchDemand : OrderWindowBase
         {
             return null;
         }
-        QuestPart_CliquesManager.TryGetCliquesManager(SelDemand.RelatedQuest, addPartIfMiss: false, out QuestPart_CliquesManager cliqueManager);
+        SelDemand.RelatedQuest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliqueManager);
         return cliqueManager;
     }
 

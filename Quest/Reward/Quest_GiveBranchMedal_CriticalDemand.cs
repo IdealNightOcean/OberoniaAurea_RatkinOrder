@@ -126,12 +126,13 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
     {
         if (Count > 0 && Branch.IsValid() && PotentialDefs is not null && signal.tag == InSignalTrigger)
         {
-            QuestPart_CliquesManager.TryGetCliquesManager(quest, addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager);
             int rewardMedalTypeCount = BaseRewardMedalTypeCount;
-            if (cliquesManager is not null && cliquesManager.TotalPotency.Value >= ExtraMedalPotencyBoundary)
+
+            if (quest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager) && cliquesManager.TotalPotency.Value >= ExtraMedalPotencyBoundary)
             {
                 rewardMedalTypeCount += ExtraRewardMedalTypeCount;
             }
+
             rewardMedalTypeCount = rewardMedalTypeCount > 0 ? rewardMedalTypeCount : 1;
             foreach (BranchMedalDef medalType in PotentialDefs.TakeRandom(rewardMedalTypeCount))
             {

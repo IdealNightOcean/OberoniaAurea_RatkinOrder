@@ -191,14 +191,14 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
         {
             float gainPoints = 1000f * record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
             record.MeditationPoints += gainPoints;
-            return "OARO_JointPatrol_OnlyMeditationPoints".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN), gainPoints.ToString("F0"));
+            return "OARO_JointPatrol_OnlyMeditationPoints".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN), gainPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count));
         }
         else
         {
             float gainPoints = 500f * record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
             record.MeditationPoints += gainPoints;
             record.UpgradeAcademicLevel(academicDef, usePoints: false);
-            return "OARO_JointPatrol_MeditationPointsAndAcademic".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN), gainPoints.ToString("F0"), academicDef.Named("ACADEMIC"));
+            return "OARO_JointPatrol_MeditationPointsAndAcademic".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN), gainPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count), academicDef.Named("ACADEMIC"));
         }
     }
 }

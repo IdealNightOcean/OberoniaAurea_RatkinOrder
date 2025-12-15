@@ -38,7 +38,27 @@ internal sealed class IncidentWorker_RaidNobilityTerritory : IncidentWorker
         }
         if (nobilityTerritory.BranchJoin)
         {
-            BranchSupportUtility.DoCombatKnightSupport(branch, map, BranchSupportUtility.DeploymentLevel.Entire, sendStandardLetter: true);
+            if (nobilityTerritory.AssociatedQuest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
+            {
+                foreach (var clique in cliquesManager.AllCliques.Values)
+                {
+                    if (clique.IsBranchClique && clique.IsActive)
+                    {
+                        if (clique.IsFriendlyBranchClique)
+                        {
+                            BranchSupportUtility.DoCombatKnightSupport(clique.RelatedBranch, map, BranchSupportUtility.DeploymentLevel.Entire, sendStandardLetter: true);
+                        }
+                        else
+                        {
+                            BranchSupportUtility.DoCombatKnightSupport(clique.RelatedBranch, map, BranchSupportUtility.DeploymentLevel.Half, sendStandardLetter: true);
+                        }
+                    }
+                }
+            }
+            else
+            {
+                BranchSupportUtility.DoCombatKnightSupport(branch, map, BranchSupportUtility.DeploymentLevel.Entire, sendStandardLetter: true);
+            }
         }
 
         Faction enemyFaction = nobilityTerritory.Faction;

@@ -330,7 +330,7 @@
     <Compile Include="Components\OrderDefDataBase.cs" />
     <Compile Include="Window\DevWindow\DevWindowBase.cs" />
     <Compile Include="Window\Dialog_NodeTreeWithRatkinOrderInfo.cs" />
-    <Compile Include="Hediff\Hediff_ByResidentKnight.cs" />
+    <Compile Include="Hediff\Hediff_ByResidentKnightBuff.cs" />
     <Compile Include="Letter\ChoiceLetter_RatkinOrder.cs" />
     <Compile Include="Letter\ChoiceLetter_KnightGroupProactiveVisit.cs" />
     <Compile Include="OrderHall\OrderHallBuildingRequirements.cs" />

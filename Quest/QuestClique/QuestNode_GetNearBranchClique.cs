@@ -18,7 +18,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
 
     protected override void RunInt()
     {
-        if (!QuestPart_CliquesManager.TryGetCliquesManager(QuestGen.quest, addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
+        if (!QuestGen.quest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
         {
             Log.Error($"[OARO] Failed to get QuestPart_CliquesManager from {QuestGen.quest}.");
             return;

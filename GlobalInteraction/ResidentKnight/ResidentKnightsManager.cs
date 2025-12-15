@@ -43,13 +43,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     [Unsaved] private readonly Dictionary<StatDef, float> statOffsets = [];
     [Unsaved] private readonly Dictionary<StatDef, float> statFactors = [];
     [Unsaved] private HediffStage buffHediffStage;
-    [Unsaved] private int nextBuffStatRegainTick = -1;
+    private int NextBuffStatRegainTick { get; set; } = -1;
 
     public HediffStage BuffHediffStage
     {
         get
         {
-            if (Find.TickManager.TicksGame > nextBuffStatRegainTick)
+            if (Find.TickManager.TicksGame > NextBuffStatRegainTick)
             {
                 RegainRoleBuffStat();
             }
@@ -91,7 +91,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
                 Log.Error($"[OARO] Some resident knight roles of {nameof(ResidentKnightsManager)} were null or invalid after loading and have been removed.");
             }
 
-            nextBuffStatRegainTick = -1;
+            NextBuffStatRegainTick = -1;
         }
     }
 
@@ -230,18 +230,18 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         if (record.CurRole is not null)
         {
             rolesToKnights.Remove(record.CurRole);
-            nextBuffStatRegainTick = -1;
+            NextBuffStatRegainTick = -1;
         }
 
         record.PostRemoved();
         OnKnightsChanged();
     }
 
-    public bool TrySetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
+    public bool TrySetResidentKnightRole(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
     {
-        if (SetResidentKnight(pawn, roleDef, replaceCurRole))
+        if (SetResidentKnightRole(pawn, roleDef, replaceCurRole))
         {
-            nextBuffStatRegainTick = -1;
+            NextBuffStatRegainTick = -1;
             return true;
         }
         return false;
@@ -271,7 +271,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    private bool SetResidentKnight(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
+    private bool SetResidentKnightRole(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
     {
         if (!residentKnights.TryGetValue(pawn, out ResidentKnightRecord pawnRecord))
         {
@@ -292,43 +292,44 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
         ResidentKnightRoleDef pOldRole = pawnRecord.CurRole;
 
-        //新增职位
-        if (curRolePawnRecord is null && pOldRole is null)
+        switch (curRolePawnRecord, pOldRole)
         {
-            pawnRecord.CurRole = roleDef;
-            rolesToKnights[roleDef] = pawnRecord;
-            return true;
+            //新增职位
+            case (null, null):
+                {
+                    pawnRecord.ChangeRole(roleDef);
+                    rolesToKnights[roleDef] = pawnRecord;
+                    break;
+                }
+            //两人交接职位
+            case (not null, null):
+                {
+                    curRolePawnRecord.ChangeRole(null);
+                    pawnRecord.ChangeRole(roleDef);
+                    rolesToKnights[roleDef] = pawnRecord;
+                    break;
+                }
+            //本人职位改变
+            case (null, not null):
+                {
+                    pawnRecord.ChangeRole(roleDef);
+                    rolesToKnights.Remove(pOldRole);
+                    rolesToKnights[roleDef] = pawnRecord;
+                    break;
+                }
+            //双方交换职位
+            case (not null, not null):
+                {
+                    curRolePawnRecord.ChangeRole(pOldRole);
+                    pawnRecord.ChangeRole(roleDef);
+
+                    rolesToKnights[pOldRole] = curRolePawnRecord;
+                    rolesToKnights[roleDef] = pawnRecord;
+                    break;
+                }
         }
 
-        //两人交接职位
-        if (curRolePawnRecord is not null && pOldRole is null)
-        {
-            curRolePawnRecord.CurRole = null;
-            pawnRecord.CurRole = roleDef;
-            rolesToKnights[roleDef] = pawnRecord;
-            return true;
-        }
-
-        //本人职位改变
-        if (curRolePawnRecord is null && pOldRole is not null)
-        {
-            pawnRecord.CurRole = roleDef;
-            rolesToKnights.Remove(pOldRole);
-            return true;
-        }
-
-        //双方交换职位
-        if (curRolePawnRecord is not null && pOldRole is not null)
-        {
-            curRolePawnRecord.CurRole = pOldRole;
-            rolesToKnights[pOldRole] = curRolePawnRecord;
-
-            pawnRecord.CurRole = roleDef;
-            rolesToKnights[roleDef] = pawnRecord;
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     private void OnKnightsChanged()
@@ -342,7 +343,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     {
         statOffsets.Clear();
         statFactors.Clear();
-        nextBuffStatRegainTick = Find.TickManager.TicksGame + 60000;
+        NextBuffStatRegainTick = Find.TickManager.TicksGame + 60000;
 
         foreach (KeyValuePair<ResidentKnightRoleDef, ResidentKnightRecord> kv in rolesToKnights)
         {
@@ -357,6 +358,9 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
         buffHediffStage.statOffsets = statOffsets.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
         buffHediffStage.statFactors = statFactors.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
+
+        statOffsets.Clear();
+        statFactors.Clear();
 
         void AddStatModifier(IEnumerable<StatModifier> modifiers, bool isFactor)
         {
@@ -378,7 +382,6 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
                     {
                         target[modifier.stat] = curValue + modifier.value;
                     }
-
                 }
                 else
                 {

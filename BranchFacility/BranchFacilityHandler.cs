@@ -33,11 +33,14 @@ public class BranchFacilityHandler : IExposable
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
-    private UnderConstructionRecord<BranchFacilityDef> underConstructionFacility;
-    public UnderConstructionRecord<BranchFacilityDef> UnderConstructionFacility => underConstructionFacility;
+
+    private Dictionary<BranchFacilityDef, UnderConstructionRecord<BranchFacilityDef>> underConstructionFacilities = [];
+    public IReadOnlyDictionary<BranchFacilityDef, UnderConstructionRecord<BranchFacilityDef>> UnderConstructionFacilities => underConstructionFacilities;
+    [Unsaved] private List<UnderConstructionRecord<BranchFacilityDef>> underConstructionFacilitiesList = [];
+
     public Action<BranchFacilityDef, bool> PostConstructionChanged { get; set; }
 
-    public bool IsBusy => underConstructionFacility is not null;
+    public bool IsBusy => underConstructionFacilities.Count > 0;
 
     internal BranchFacilityHandler(Branch branch)
     {
@@ -47,8 +50,7 @@ public class BranchFacilityHandler : IExposable
     public void ExposeData()
     {
         Scribe_Collections.Look(ref facilities, nameof(facilities), LookMode.Def, LookMode.Value);
-
-        Scribe_Deep.Look(ref underConstructionFacility, nameof(underConstructionFacility));
+        Scribe_Collections.Look(ref underConstructionFacilities, nameof(underConstructionFacilities), LookMode.Def, LookMode.Deep);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -62,13 +64,13 @@ public class BranchFacilityHandler : IExposable
 
         listing_Rect.Gap(6f);
 
-        if (underConstructionFacility is null)
+        if (underConstructionFacilities.Count == 0)
         {
             listing_Rect.Label("在建设施: 无");
         }
         else
         {
-            listing_Rect.Label($"在建设施: {underConstructionFacility.TargetDef.label} | {underConstructionFacility.DurationTicksLeft}");
+            // listing_Rect.Label($"在建设施: {underConstructionFacility.TargetDef.label} | {underConstructionFacility.DurationTicksLeft}");
         }
     }
 
@@ -77,15 +79,41 @@ public class BranchFacilityHandler : IExposable
 
     public void TickHour()
     {
-        if (underConstructionFacility is not null && Find.TickManager.TicksGame >= underConstructionFacility.CompletedTick)
+        if (underConstructionFacilitiesList.Count <= 0)
         {
-            CompleteFacilityConstruction();
+            return;
+        }
+
+        int ticksGame = Find.TickManager.TicksGame;
+        for (int i = underConstructionFacilitiesList.Count - 1; i >= 0; i--)
+        {
+            if (underConstructionFacilitiesList[i].CompletedTick <= ticksGame)
+            {
+                BranchFacilityDef facilityDef = underConstructionFacilitiesList[i].TargetDef;
+                try
+                {
+                    TryAdjustFacilityStage(facilityDef, GetFacilityLevel(facilityDef).FacilityLevelOffSetBy(1), addIfMiss: true);
+                }
+                catch (Exception ex)
+                {
+                    ModUtility.LogExceptionError(ex,
+                        errorDesc: "finish factity construction",
+                        typeName: nameof(BranchFacilityHandler),
+                        methodName: nameof(TickHour),
+                        needStackTrace: true);
+                }
+                finally
+                {
+                    underConstructionFacilitiesList.RemoveAt(i);
+                    underConstructionFacilities.Remove(facilityDef);
+                }
+            }
         }
     }
 
     public AcceptanceReport CanConstructFacility(BranchFacilityDef facilityDef, bool byPlayer, Caravan caravan = null, bool resultOnly = false)
     {
-        if (underConstructionFacility is not null)
+        if (underConstructionFacilities.Count > 0 && underConstructionFacilities.ContainsKey(facilityDef))
         {
             return resultOnly ? false : "OARO_OtherFacilityConstructing".Translate();
         }
@@ -114,15 +142,22 @@ public class BranchFacilityHandler : IExposable
 
     public void StartFacilityConstruction(BranchFacilityDef facilityDef, bool byPlayer, Caravan caravan = null)
     {
+
         BranchFacilityLevel oldLevel = GetFacilityLevel(facilityDef);
         if (oldLevel == BranchFacilityLevel.Excellent)
+        {
+            return;
+        }
+        if (underConstructionFacilities.ContainsKey(facilityDef))
         {
             return;
         }
 
         BranchFacilityLevel targetLevel = oldLevel.FacilityLevelOffSetBy(1);
         int buildingTicksCost = branch.GetFacilityTimeCost(facilityDef, targetLevel);
-        underConstructionFacility = new(facilityDef, buildingTicksCost);
+        UnderConstructionRecord<BranchFacilityDef> underConstructionFacility = new(facilityDef, buildingTicksCost);
+        underConstructionFacilities.Add(facilityDef, underConstructionFacility);
+        underConstructionFacilitiesList.Add(underConstructionFacility);
 
         if (byPlayer && caravan is not null)
         {
@@ -146,16 +181,20 @@ public class BranchFacilityHandler : IExposable
         }
     }
 
-    public void CancelFacilityConstruction()
+    public void CancelFacilityConstruction(BranchFacilityDef facilityDef)
     {
-        if (underConstructionFacility is null)
+        if (underConstructionFacilities.Count == 0)
         {
             return;
         }
 
         try
         {
-            PostConstructionChanged?.Invoke(underConstructionFacility.TargetDef, false);
+            if (underConstructionFacilities.TryGetValue(facilityDef, out UnderConstructionRecord<BranchFacilityDef> record))
+            {
+                underConstructionFacilitiesList.Remove(record);
+                PostConstructionChanged?.Invoke(facilityDef, false);
+            }
         }
         catch (Exception ex)
         {
@@ -165,22 +204,6 @@ public class BranchFacilityHandler : IExposable
                 methodName: nameof(CancelFacilityConstruction),
                 needStackTrace: true);
         }
-        finally
-        {
-            underConstructionFacility = null;
-        }
-    }
-
-    private void CompleteFacilityConstruction()
-    {
-        if (underConstructionFacility is null)
-        {
-            return;
-        }
-        BranchFacilityDef facilityDef = underConstructionFacility.TargetDef;
-        TryAdjustFacilityStage(facilityDef, GetFacilityLevel(facilityDef).FacilityLevelOffSetBy(1), addIfMiss: true);
-
-        underConstructionFacility = null;
     }
 
     public bool TryAdjustFacilityStage(BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel, bool addIfMiss = false)
@@ -294,10 +317,16 @@ public class BranchFacilityHandler : IExposable
 
     internal void PostLoadInit()
     {
-        if (facilities.RemoveAll(kv => kv.Key is null || kv.Value == BranchFacilityLevel.None) > 0)
+        if (facilities.RemoveAll(kv => kv.Value == BranchFacilityLevel.None) > 0)
         {
             Log.Error($"[OARO] {branch} has null or None facilities after loading, Removed.");
         }
+        if (underConstructionFacilities.RemoveAll(kv => kv.Value is null || kv.Value.TargetDef is null) > 0)
+        {
+            Log.Error($"[OARO] {branch} has null or Invalid under construction facilities after loading, Removed.");
+        }
+
+        underConstructionFacilitiesList = underConstructionFacilities.Values.ToList();
 
         int excellentFacilityCount = 0;
         foreach (KeyValuePair<BranchFacilityDef, BranchFacilityLevel> kv in facilities)

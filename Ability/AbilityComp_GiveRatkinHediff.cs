@@ -1,62 +1,72 @@
 ﻿using RimWorld;
-using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+public class CompProperties_AbilityGiveKnightsOfMapHediff : CompProperties_AbilityEffectWithDuration
+{
+    public HediffDef hediffDef;
+
+    public CompProperties_AbilityGiveKnightsOfMapHediff()
+    {
+        compClass = typeof(AbilityComp_GiveKnightsOfMapHediff);
+    }
+}
+
 public class AbilityComp_GiveKnightsOfMapHediff : CompAbilityEffect_WithDuration
 {
-    private new CompProperties_AbilityGiveHediff Props => (CompProperties_AbilityGiveHediff)props;
+    private new CompProperties_AbilityGiveKnightsOfMapHediff Props => (CompProperties_AbilityGiveKnightsOfMapHediff)props;
 
     public override void Apply(LocalTargetInfo target, LocalTargetInfo dest)
     {
-        IReadOnlyList<Pawn> pawns = parent.pawn.MapHeld.mapPawns.AllPawnsSpawned;
-
-        foreach (Pawn p in parent.pawn.MapHeld.mapPawns.AllPawnsSpawned)
+        Pawn caster = parent.pawn;
+        Faction casterFaction = caster.Faction;
+        int durationSecondsOverride = GetDurationSeconds(caster).SecondsToTicks();
+        Log.Message("000");
+        foreach (Pawn p in caster.MapHeld.mapPawns.AllHumanlikeSpawned)
         {
-            if (p.CanBeKnight() && KnightPawnsManager.Instance.IsKnight(p))
+            if (p.HostileTo(casterFaction))
             {
-                ApplyInner(p, parent.pawn);
+                continue;
             }
+
+            ApplyInner(p, caster, durationSecondsOverride);
         }
     }
 
-    protected void ApplyInner(Pawn target, Pawn caster)
+    protected void ApplyInner(Pawn target, Pawn caster, int durationSecondsOverride = -1)
     {
-        if (target.HostileTo(Faction.OfPlayer))
+        Hediff hediff = HediffMaker.MakeHediff(Props.hediffDef, target);
+        if (hediff is null)
         {
-            MoteMaker.ThrowText(target.DrawPos, target.Map, "Resisted".Translate());
             return;
         }
-        if (Props.replaceExisting)
+        if (target.CanBeKnight() && KnightPawnsManager.Instance.IsKnight(target))
         {
-            Hediff firstHediffOfDef = target.health.hediffSet.GetFirstHediffOfDef(Props.hediffDef);
-            if (firstHediffOfDef is not null)
-            {
-                target.health.RemoveHediff(firstHediffOfDef);
-            }
+            hediff.Severity = 2f;
         }
-        Hediff hediff = HediffMaker.MakeHediff(Props.hediffDef, target, Props.onlyBrain ? target.health.hediffSet.GetBrain() : null);
+        else
+        {
+            hediff.Severity = 1f;
+        }
+
         HediffComp_Disappears hediffComp_Disappears = hediff.TryGetComp<HediffComp_Disappears>();
-        if (hediffComp_Disappears is not null)
+        if (hediffComp_Disappears is not null && durationSecondsOverride > 0)
         {
-            hediffComp_Disappears.ticksToDisappear = GetDurationSeconds(target).SecondsToTicks();
+            hediffComp_Disappears.ticksToDisappear = durationSecondsOverride;
         }
-        if (Props.severity >= 0f)
-        {
-            hediff.Severity = Props.severity;
-        }
+
         HediffComp_Link hediffComp_Link = hediff.TryGetComp<HediffComp_Link>();
         if (hediffComp_Link is not null)
         {
             hediffComp_Link.other = caster;
-            hediffComp_Link.drawConnection = target == parent.pawn;
+            hediffComp_Link.drawConnection = (target != caster);
         }
         target.health.AddHediff(hediff);
     }
 
     public override bool AICanTargetNow(LocalTargetInfo target)
     {
-        return parent.pawn.Faction == Faction.OfPlayer;
+        return parent.pawn.Spawned;
     }
 }

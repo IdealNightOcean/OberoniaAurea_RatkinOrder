@@ -328,11 +328,16 @@ public static class BranchSupportUtility
             textSB.AppendLine();
             if (parms.Branch is null)
             {
-                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(
+                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                    parms.CommanderCount.Named("CommanderCount")));
             }
             else
             {
-                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(
+                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                    parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                    parms.CommanderCount.Named("CommanderCount")));
             }
             textSB.AppendLine();
             textSB.AppendLine(parms.RaidStrategy.arrivalTextFriendly);
@@ -349,11 +354,16 @@ public static class BranchSupportUtility
             textSB.AppendLine();
             if (parms.Branch is null)
             {
-                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(
+                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                    parms.CommanderCount.Named("CommanderCount")));
             }
             else
             {
-                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), parms.CommanderCount));
+                textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(
+                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                    parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                    parms.CommanderCount.Named("CommanderCount")));
             }
             textSB.AppendLine();
             textSB.AppendLine(parms.RaidStrategy.arrivalTextEnemy);

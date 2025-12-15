@@ -343,7 +343,7 @@ public static class DebugRatkinOrders
             foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefsListForReading)
             {
                 DebugMenuOption levelOption;
-                if (buildingHandler.HasBuilding(buildingDef) || (buildingDef.isSpecial && buildingHandler.SpecialBuilding is not null))
+                if (buildingHandler.HasBuilding(buildingDef) || (buildingDef.isSpecial && buildingHandler.SpecialBuildingDef is not null))
                 {
                     levelOption = new(label: buildingDef.label + "(No)",
                                       mode: DebugMenuOptionMode.Action,

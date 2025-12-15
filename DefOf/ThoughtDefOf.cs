@@ -20,6 +20,18 @@ public static class OARO_ThoughtDefOf
     /// </summary>
     public static ThoughtDef OARO_Thought_TouristAreaPatrol;
 
+    /// <summary>
+    /// 联巡正面事件心情
+    /// </summary>
+    public static ThoughtDef OARO_Thought_JointPatrolPositive;
+    /// <summary>
+    /// 联巡负面事件心情
+    /// </summary>
+    public static ThoughtDef OARO_Thought_JointPatrolNegative;
+    /// <summary>
+    ///联巡灾难事件心情
+    /// </summary>
+    public static ThoughtDef OARO_Thought_JointPatrolDisaster;
     static OARO_ThoughtDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ThoughtDefOf));

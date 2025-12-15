@@ -19,7 +19,7 @@ public class OberoniaAureaRatkinOrder : Mod
 
     public override string SettingsCategory()
     {
-        return "OberoniaAurea.RatkinOrder".Translate();
+        return "Mod.OberoniaAurea.RatkinOrder".Translate();
     }
 }
 
@@ -71,8 +71,6 @@ public class RatkinOrderSettings : ModSettings
     /// </summary>
     public static int MaxAcquiredPatrolInteractionPreType = 3;
 
-    public static bool ShowKnightlyTalkLetter = true;
-
     public override void ExposeData()
     {
         base.ExposeData();
@@ -94,11 +92,14 @@ public class RatkinOrderSettings : ModSettings
         NoramlDemandShowMess = true;
         CriticalDemandShowMess = true;
         MaxConcurrentAcceptedDemand = 2;
+        MaxConcurrentContractPerBranch = 5;
 
         HasMaxLetterLimit = true;
         MaxLetterCount = 100;
+        maxLetterCountStr = MaxLetterCount.ToString();
         HasLetterRetentionLimit = true;
         MaxLetterRetentionDays = 300;
+        maxLetterRetentionDaysStr = MaxLetterRetentionDays.ToString();
 
         MaxAcquiredPatrolInteractionPreType = 3;
     }
@@ -116,25 +117,25 @@ public class RatkinOrderSettings : ModSettings
         };
         listing_Rect.Begin(viewRect);
 
-        listing_Rect.CheckboxLabeled($"OARO_Setting_{NoramlDemandShowMess}".Translate(), ref NoramlDemandShowMess);
-        listing_Rect.CheckboxLabeled($"OARO_Setting_{CriticalDemandShowMess}".Translate(), ref CriticalDemandShowMess);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{nameof(NoramlDemandShowMess)}".Translate(), ref NoramlDemandShowMess);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{nameof(CriticalDemandShowMess)}".Translate(), ref CriticalDemandShowMess);
 
-        MaxConcurrentAcceptedDemand = (int)listing_Rect.SliderLabeled($"OARO_Setting_{MaxConcurrentAcceptedDemand}".Translate(MaxConcurrentAcceptedDemand.ToString()), MaxConcurrentAcceptedDemand, 1f, 20f);
-        MaxConcurrentContractPerBranch = (int)listing_Rect.SliderLabeled($"OARO_Setting_{MaxConcurrentContractPerBranch}".Translate(MaxConcurrentContractPerBranch.ToString()), MaxConcurrentContractPerBranch, 1f, 20f);
+        MaxConcurrentAcceptedDemand = (int)listing_Rect.SliderLabeled($"OARO_Setting_{nameof(MaxConcurrentAcceptedDemand)}".Translate(MaxConcurrentAcceptedDemand.ToString()), MaxConcurrentAcceptedDemand, 1f, 20f);
+        MaxConcurrentContractPerBranch = (int)listing_Rect.SliderLabeled($"OARO_Setting_{nameof(MaxConcurrentContractPerBranch)}".Translate(MaxConcurrentContractPerBranch.ToString()), MaxConcurrentContractPerBranch, 1f, 20f);
 
-        listing_Rect.CheckboxLabeled("OARO_HasMaxLetterLimit".Translate(), ref HasMaxLetterLimit);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{nameof(HasMaxLetterLimit)}".Translate(), ref HasMaxLetterLimit);
         if (HasMaxLetterLimit)
         {
-            listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{MaxLetterCount}".Translate(), ref MaxLetterCount, ref maxLetterCountStr, 1f, 500f);
+            listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{nameof(MaxLetterCount)}".Translate(), ref MaxLetterCount, ref maxLetterCountStr, 1f, 500f);
         }
 
-        listing_Rect.CheckboxLabeled("OARO_HasLetterRetentionLimit".Translate(), ref HasLetterRetentionLimit);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{nameof(HasLetterRetentionLimit)}".Translate(), ref HasLetterRetentionLimit);
         if (HasLetterRetentionLimit)
         {
-            listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{MaxLetterRetentionDays}".Translate(), ref MaxLetterRetentionDays, ref maxLetterRetentionDaysStr, 1f, 600f);
+            listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{nameof(MaxLetterRetentionDays)}".Translate(), ref MaxLetterRetentionDays, ref maxLetterRetentionDaysStr, 1f, 600f);
         }
 
-        MaxAcquiredPatrolInteractionPreType = (int)listing_Rect.SliderLabeled($"OARO_Setting_{MaxAcquiredPatrolInteractionPreType}".Translate(MaxAcquiredPatrolInteractionPreType.ToString()), MaxAcquiredPatrolInteractionPreType, 1f, 20f);
+        MaxAcquiredPatrolInteractionPreType = (int)listing_Rect.SliderLabeled($"OARO_Setting_{nameof(MaxAcquiredPatrolInteractionPreType)}".Translate(MaxAcquiredPatrolInteractionPreType.ToString()), MaxAcquiredPatrolInteractionPreType, 1f, 20f);
 
         if (listing_Rect.ButtonText("OAFrame_Reset".Translate()))
         {

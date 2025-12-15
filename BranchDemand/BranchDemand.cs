@@ -94,7 +94,7 @@ public class BranchDemand : IExposable
         slate.Set(KeyLibrary_SlateStoreAs.DemandDef, def);
         slate.Set(KeyLibrary_SlateStoreAs.DemandType, def.demandType);
 
-        Map map = QuestGen_Get.GetMap();
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
         slate.Set("map", map);
         float points = StorytellerUtility.DefaultThreatPointsNow(map);
         slate.Set("points", points);

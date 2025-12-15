@@ -30,21 +30,7 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         simpleInteractRecord = new();
     }
 
-    public void StratNewGame()
-    {
-        orderHallHandler = new();
-        acceptedBranchDemandHandler = new();
-        residentKnightsManager = new();
-        aroundKnightGroupsManager = new();
-        mercyQuestHandler = new();
-    }
-
-    public void LoadedGame()
-    {
-        EnsureComponentsInit();
-    }
-
-    private void EnsureComponentsInit()
+    internal void EnsureComponentsInit()
     {
         try
         {

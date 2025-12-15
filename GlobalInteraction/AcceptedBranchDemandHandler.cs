@@ -26,9 +26,13 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
     public void ExposeData()
     {
         Scribe_Collections.Look(ref records, nameof(records), LookMode.Deep);
-        if (records.RemoveAll(r => r is null || !r.Branch.IsValid()) > 0)
+
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            Log.Error($"[OARO] Some {nameof(AcceptedBranchDemand)} were null or invalided after loading and have been removed.");
+            if (records.RemoveAll(r => r is null || !r.Branch.IsValid()) > 0)
+            {
+                Log.Error($"[OARO] Some {nameof(AcceptedBranchDemand)} were null or invalided after loading and have been removed.");
+            }
         }
     }
 

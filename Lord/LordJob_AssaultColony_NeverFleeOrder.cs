@@ -15,15 +15,27 @@ public class LordJob_AssaultColony_NeverFleeOrder : LordJob_AssaultColony_NeverF
         : base(assaulterFaction, canKidnap, canTimeoutOrFlee, sappers, useAvoidGridSmart, canSteal, breachers, canPickUpOpportunisticWeapons)
     { }
 
+    public override void Cleanup()
+    {
+        base.Cleanup();
+        foreach (Pawn p in lord.ownedPawns)
+        {
+            if (!p.Spawned && !p.Dead)
+            {
+                KnightReturnToBranch(p);
+            }
+        }
+    }
+
     public override void Notify_PawnLost(Pawn p, PawnLostCondition condition)
     {
         if (condition == PawnLostCondition.ExitedMap)
         {
-            Notify_PawnLeftMap(p);
+            KnightReturnToBranch(p);
         }
     }
 
-    private static void Notify_PawnLeftMap(Pawn pawn)
+    private static void KnightReturnToBranch(Pawn pawn)
     {
         if (!pawn.CanBeKnight())
         {

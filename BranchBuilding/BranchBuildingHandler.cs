@@ -3,7 +3,6 @@ using RimWorld;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using Verse;
 
@@ -13,100 +12,104 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 {
     [Unsaved] private readonly Branch branch;
 
-    [Unsaved] private SimpleValueCache<int> buildingCeilingCache;
-    public int BuildingCeiling => buildingCeilingCache.GetCachedResult();
-    public bool HasUnusedNormalSlots => noramlBuildings.Count < BuildingCeiling;
-    public bool IsNormalBuildingFullyCompleted => noramlBuildings.Count >= BranchStatDefOf.OARO_BuildingCeiling.maxValue;
+    private SimpleValueCache<int> BuildingCeilingCache { get; }
+    public int BuildingCeiling => BuildingCeilingCache.GetCachedResult();
 
-    private List<BranchBuilding> noramlBuildings = [];
-    private BranchBuilding specialBuilding;
+    public int UnusedSlotsCount => BuildingCeiling - allBuildings.Count - underConstructionBuildings.Count;
+    public bool HasUnusedSlots => UnusedSlotsCount > 0;
 
-    public IReadOnlyList<BranchBuilding> NormalBuildings => noramlBuildings;
-    public BranchBuilding SpecialBuilding => specialBuilding;
-    public IEnumerable<BranchBuilding> AllBuldings
-    {
-        get
-        {
-            if (specialBuilding is not null)
-            {
-                yield return specialBuilding;
-            }
-            foreach (BranchBuilding building in noramlBuildings)
-            {
-                yield return building;
-            }
-        }
-    }
-    public int AllBuldingsCount => noramlBuildings.Count + (specialBuilding is null ? 0 : 1);
+    private List<BranchBuilding> allBuildings = [];
+    public IReadOnlyList<BranchBuilding> AllBuildings => allBuildings;
+    public int AllBuildingsCount => allBuildings.Count;
 
-    public Lazy<HashSet<BranchBuildingDef>> AllBuildingDefsHash { get; }
+    public BranchBuildingDef SpecialBuildingDef { get; private set; }
+    public HashSet<BranchBuildingDef> AllBuildingDefsHash { get; } = [];
 
     [Unsaved] private List<ITickHour> tickHourHandlers;
     [Unsaved] private List<ITickDay> tickDayHandlers;
     [Unsaved] private List<BranchBuildingComp_Interaction> interactionComps;
     public List<BranchBuildingComp_Interaction> InteractionComps => interactionComps ??= [];
 
-    private UnderConstructionRecord<BranchBuildingDef> underConstructionBuilding;
-    public UnderConstructionRecord<BranchBuildingDef> UnderConstructionBuilding => underConstructionBuilding;
+    private List<UnderConstructionRecord<BranchBuildingDef>> underConstructionBuildings = [];
+    public HashSet<BranchBuildingDef> UnderConstructionBuildingDefs { get; private set; } = [];
+    public IReadOnlyList<UnderConstructionRecord<BranchBuildingDef>> UnderConstructionBuildings => underConstructionBuildings;
+    public bool IsBusy => underConstructionBuildings.Count > 0;
+
     public Action<BranchBuildingDef, bool> PostConstructionChanged { get; set; }
-    public bool IsBusy => underConstructionBuilding is not null;
 
     internal BranchBuildingHandler(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
-        buildingCeilingCache = new SimpleValueCache<int>(cacheInterval: 60000, defaultValue: (int)BranchStatDefOf.OARO_BuildingCeiling.baseValue, () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
-        AllBuildingDefsHash = new Lazy<HashSet<BranchBuildingDef>>(valueFactory: () => AllBuldings.Select(b => b.Def).ToHashSet());
+        BuildingCeilingCache = new SimpleValueCache<int>(
+            cacheInterval: 2500,
+            defaultValue: (int)BranchStatDefOf.OARO_BuildingCeiling.baseValue,
+            checker: () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
     }
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref noramlBuildings, nameof(noramlBuildings), LookMode.Deep);
-        Scribe_Deep.Look(ref specialBuilding, nameof(specialBuilding));
-
-        Scribe_Deep.Look(ref underConstructionBuilding, nameof(underConstructionBuilding));
+        Scribe_Collections.Look(ref allBuildings, nameof(allBuildings), LookMode.Deep);
+        Scribe_Collections.Look(ref underConstructionBuildings, nameof(underConstructionBuildings), LookMode.Deep);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         listing_Rect.Label("特殊建筑:");
-        if (specialBuilding is null)
+        if (SpecialBuildingDef is null)
         {
             listing_Rect.SubLabel("None".Translate(), 0.8f);
         }
         else
         {
-            listing_Rect.SubLabel(specialBuilding.Def.label, 0.8f);
+            listing_Rect.SubLabel(SpecialBuildingDef.label, 0.8f);
         }
 
         listing_Rect.Gap(6f);
-        listing_Rect.Label($"普通建筑: {noramlBuildings.Count}");
-        foreach (BranchBuilding building in noramlBuildings)
+        listing_Rect.Label($"普通建筑: {allBuildings.Count}");
+        foreach (BranchBuilding building in allBuildings)
         {
             listing_Rect.SubLabel(building.Def.label, 0.8f);
         }
 
         listing_Rect.Gap(6f);
-        if (underConstructionBuilding is null)
+        if (underConstructionBuildings.Count == 0)
         {
             listing_Rect.Label("在建建筑: 无");
         }
         else
         {
-            listing_Rect.Label($"在建设施: {underConstructionBuilding.TargetDef.label} | {underConstructionBuilding.DurationTicksLeft}");
+            // listing_Rect.Label($"在建设施: {underConstructionBuilding.TargetDef.label} | {underConstructionBuilding.DurationTicksLeft}");
         }
     }
 
     public void TickHour()
     {
-        if (underConstructionBuilding is not null && Find.TickManager.TicksGame >= underConstructionBuilding.CompletedTick)
+        if (underConstructionBuildings.Count > 0)
         {
-            try
+            int ticksGame = Find.TickManager.TicksGame;
+            for (int i = underConstructionBuildings.Count - 1; i >= 0; i--)
             {
-                AddBuilding(underConstructionBuilding.TargetDef);
-            }
-            finally
-            {
-                underConstructionBuilding = null;
+                if (underConstructionBuildings[i].CompletedTick <= ticksGame)
+                {
+                    BranchBuildingDef buildingDef = underConstructionBuildings[i].TargetDef;
+                    try
+                    {
+                        AddBuilding(buildingDef);
+                    }
+                    catch (Exception ex)
+                    {
+                        ModUtility.LogExceptionError(ex,
+                            errorDesc: "finish branch-building construction",
+                            typeName: nameof(BranchBuildingHandler),
+                            methodName: nameof(TickHour),
+                            needStackTrace: true);
+                    }
+                    finally
+                    {
+                        underConstructionBuildings.RemoveAt(i);
+                        UnderConstructionBuildingDefs.Remove(buildingDef);
+                    }
+                }
             }
         }
 
@@ -121,18 +124,12 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public void TickDay()
     {
-        if (CanUpgradeBuilding(specialBuilding))
+        foreach (BranchBuilding building in allBuildings)
         {
-            specialBuilding.InitUpgraded();
-            UpgradeBuilding(specialBuilding);
-        }
-
-        for (int i = 0; i < noramlBuildings.Count; i++)
-        {
-            if (CanUpgradeBuilding(noramlBuildings[i]))
+            if (CanUpgradeBuilding(building))
             {
-                noramlBuildings[i].InitUpgraded();
-                UpgradeBuilding(noramlBuildings[i]);
+                building.InitUpgraded();
+                UpgradeBuilding(building);
             }
         }
 
@@ -146,27 +143,15 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasBuilding(BranchBuildingDef buildingDef) => AllBuildingDefsHash.Value.Contains(buildingDef);
+    public bool HasBuilding(BranchBuildingDef buildingDef) => AllBuildingDefsHash.Contains(buildingDef);
 
-    public BranchBuilding GetBuilding(BranchBuildingDef buildingDef, bool strictMatch = false)
+    public BranchBuilding GetBuilding(BranchBuildingDef buildingDef)
     {
-        if (buildingDef.isSpecial)
+        for (int i = 0; i < allBuildings.Count; i++)
         {
-            if (specialBuilding?.Def == buildingDef)
+            if (allBuildings[i].Def == buildingDef)
             {
-                return specialBuilding;
-            }
-            else if (!strictMatch)
-            {
-                return null;
-            }
-        }
-
-        for (int i = 0; i < noramlBuildings.Count; i++)
-        {
-            if (noramlBuildings[i].Def == buildingDef)
-            {
-                return noramlBuildings[i];
+                return allBuildings[i];
             }
         }
         return null;
@@ -174,14 +159,13 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public AcceptanceReport CanConstructBuilding(BranchBuildingConstructParms constructParam, bool resultOnly = false)
     {
-        if (constructParam.BuildingDef.isSpecial && specialBuilding is not null)
+        BranchBuildingDef buildingDef = constructParam.BuildingDef;
+        if (buildingDef.isSpecial && SpecialBuildingDef is not null)
         {
             return resultOnly ? false : "OARO_AlreadyHasSpecialBuilding".Translate();
         }
 
-        BranchBuildingDef buildingDef = constructParam.BuildingDef;
-
-        if (!HasUnusedNormalSlots)
+        if (!HasUnusedSlots)
         {
             return resultOnly ? false : "OARO_AlreadyReachedBuildingCeiling".Translate();
         }
@@ -189,6 +173,10 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         if (HasBuilding(buildingDef))
         {
             return resultOnly ? false : "OARO_HasSameBuilding".Translate();
+        }
+        if (UnderConstructionBuildingDefs.Contains(buildingDef))
+        {
+            return resultOnly ? false : "OARO_BuildingOnConstruction".Translate();
         }
 
         if (constructParam.ByPlayer)
@@ -219,33 +207,56 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         }
     }
 
-    public void CancelBuildingConstruction()
+    public void CancelBuildingConstruction(BranchBuildingDef buildingDef)
     {
-        if (underConstructionBuilding is null)
+        if (UnderConstructionBuildingDefs.Count == 0 || !UnderConstructionBuildingDefs.Contains(buildingDef))
         {
             return;
         }
 
         try
         {
-            PostConstructionChanged?.Invoke(underConstructionBuilding.TargetDef, false);
+            for (int i = 0; i < underConstructionBuildings.Count; i++)
+            {
+                if (underConstructionBuildings[i].TargetDef == buildingDef)
+                {
+                    underConstructionBuildings.RemoveAt(i);
+                    break;
+                }
+            }
+            UnderConstructionBuildingDefs.Remove(buildingDef);
+            if (buildingDef == SpecialBuildingDef)
+            {
+                SpecialBuildingDef = null;
+            }
+
+            PostConstructionChanged?.Invoke(buildingDef, false);
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex, nameof(PostConstructionChanged), nameof(BranchBuildingHandler), nameof(CancelBuildingConstruction), needStackTrace: true);
-        }
-        finally
-        {
-            underConstructionBuilding = null;
         }
     }
 
     public void StartBuildingConstructionDirectly(BranchBuildingConstructParms constructParam)
     {
         BranchBuildingDef buildingDef = constructParam.BuildingDef;
-        underConstructionBuilding = new(
+        if (buildingDef.isSpecial && SpecialBuildingDef is not null)
+        {
+            return;
+        }
+        if (AllBuildingDefsHash.Contains(buildingDef) || UnderConstructionBuildingDefs.Contains(buildingDef))
+        {
+            return;
+        }
+
+        UnderConstructionRecord<BranchBuildingDef> underConstructionBuilding = new(
             targetDef: buildingDef,
             durationTicks: branch.GetBuildingTimeCost(buildingDef));
+
+        underConstructionBuildings.Add(underConstructionBuilding);
+        UnderConstructionBuildingDefs.Add(buildingDef);
+
         if (constructParam.ByPlayer)
         {
             int silverCost = branch.GetBuildingSilverCost(buildingDef);
@@ -264,7 +275,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public void AddBuilding(BranchBuildingDef buildingDef)
     {
-        if (buildingDef.isSpecial && specialBuilding is not null)
+        if (buildingDef.isSpecial && SpecialBuildingDef is not null)
         {
             Log.Error($"[OARO] Attempted to add a new branch building to the special building slot of {branch}, but one already exists.");
             return;
@@ -289,15 +300,8 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
                 needStackTrace: true);
             return;
         }
-        if (buildingDef.isSpecial)
-        {
-            specialBuilding = newBuilding;
-        }
-        else
-        {
-            noramlBuildings.Add(newBuilding);
-        }
-        AllBuildingDefsHash.Value.Add(buildingDef);
+        allBuildings.Add(newBuilding);
+        AllBuildingDefsHash.Add(buildingDef);
 
         newBuilding.InitActive();
         ActiveBuilding(newBuilding);
@@ -311,21 +315,18 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public void RemoveBuilding(BranchBuildingDef buildingDef)
     {
-        BranchBuilding building = GetBuilding(buildingDef, strictMatch: true);
+        BranchBuilding building = GetBuilding(buildingDef);
         if (building is null)
         {
             return;
         }
 
-        if (buildingDef.isSpecial)
+        allBuildings.Remove(building);
+        if (buildingDef == SpecialBuildingDef)
         {
-            specialBuilding = null;
+            SpecialBuildingDef = null;
         }
-        else
-        {
-            noramlBuildings.Remove(building);
-        }
-        AllBuildingDefsHash.Value.Remove(buildingDef);
+        AllBuildingDefsHash.Remove(buildingDef);
 
         if (building is ITickHour ticksLong)
         {
@@ -377,15 +378,9 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         BranchStatTransformer tempTransformer;
         bool hasTransformer = false;
 
-        if (specialBuilding is not null && specialBuilding.TryGetStatTransformer(statDef, out tempTransformer))
+        for (int i = 0; i < allBuildings.Count; i++)
         {
-            hasTransformer = true;
-            transformer.MergeWith(tempTransformer);
-        }
-
-        for (int i = 0; i < noramlBuildings.Count; i++)
-        {
-            if (noramlBuildings[i].TryGetStatTransformer(statDef, out tempTransformer))
+            if (allBuildings[i].TryGetStatTransformer(statDef, out tempTransformer))
             {
                 hasTransformer = true;
                 transformer.MergeWith(tempTransformer);
@@ -397,25 +392,29 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     internal void PostLoadInit()
     {
-        if (specialBuilding is not null)
+        if (underConstructionBuildings.RemoveAll(r => r is null) > 0)
         {
-            ActiveBuilding(specialBuilding);
+            Log.Error($"[OARO] {branch} has null under construction buildings after loading, Removed.");
         }
 
-        if (noramlBuildings is null)
+        foreach (UnderConstructionRecord<BranchBuildingDef> constructionBuilding in underConstructionBuildings)
         {
-            noramlBuildings = [];
-            return;
+            if (constructionBuilding.TargetDef.isSpecial)
+            {
+                SpecialBuildingDef = constructionBuilding.TargetDef;
+            }
+            UnderConstructionBuildingDefs.Add(constructionBuilding.TargetDef);
         }
 
-        if (noramlBuildings.RemoveAll(b => b is null) > 0)
+        if (allBuildings.RemoveAll(b => b is null) > 0)
         {
             Log.Error($"[OARO] {branch} has null buildings after loading, Removed.");
         }
 
-        for (int i = 0; i < noramlBuildings.Count; i++)
+        foreach (BranchBuilding building in allBuildings)
         {
-            ActiveBuilding(noramlBuildings[i]);
+            AllBuildingDefsHash.Add(building.Def);
+            ActiveBuilding(building);
         }
     }
 
@@ -431,6 +430,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
         if (building.Def.isSpecial)
         {
+            SpecialBuildingDef = building.Def;
             if (building.Def.IsHonorSymbol)
             {
                 branch.SetHonorDef(building.Def.honorDef);

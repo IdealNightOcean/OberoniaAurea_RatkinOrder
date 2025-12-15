@@ -44,7 +44,7 @@ public class QuestNode_AddGeneralClique : QuestNode
             return;
         }
 
-        if (!QuestPart_CliquesManager.TryGetCliquesManager(QuestGen.quest, addPartIfMiss: true, out QuestPart_CliquesManager questPart_CliquesManager))
+        if (!QuestGen.quest.TryGetCliquesManager(addPartIfMiss: true, out QuestPart_CliquesManager questPart_CliquesManager))
         {
             return;
         }

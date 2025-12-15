@@ -11,15 +11,27 @@ public class LordJob_AssistColony_NeverFleeOrder : LordJob_AssistColony_NeverFle
     public LordJob_AssistColony_NeverFleeOrder(Faction faction, IntVec3 fallbackLocation) : base(faction, fallbackLocation)
     { }
 
+    public override void Cleanup()
+    {
+        base.Cleanup();
+        foreach (Pawn p in lord.ownedPawns)
+        {
+            if (!p.Spawned && !p.Dead)
+            {
+                KnightReturnToBranch(p);
+            }
+        }
+    }
+
     public override void Notify_PawnLost(Pawn p, PawnLostCondition condition)
     {
         if (condition == PawnLostCondition.ExitedMap)
         {
-            Notify_PawnLeftMap(p);
+            KnightReturnToBranch(p);
         }
     }
 
-    private static void Notify_PawnLeftMap(Pawn pawn)
+    private static void KnightReturnToBranch(Pawn pawn)
     {
         if (!pawn.CanBeKnight())
         {

@@ -472,20 +472,6 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
     }
 
-    public static bool TryGetCliquesManager(Quest quest, bool addPartIfMiss, out QuestPart_CliquesManager questPart_CliquesManager)
-    {
-        questPart_CliquesManager = quest?.PartsListForReading.OfType<QuestPart_CliquesManager>()?.FirstOrFallback(null);
-        if (addPartIfMiss && questPart_CliquesManager is null)
-        {
-            questPart_CliquesManager = new QuestPart_CliquesManager
-            {
-                inSignalEnable = quest.InitiateSignal
-            };
-            quest.AddPart(questPart_CliquesManager);
-        }
-        return questPart_CliquesManager is not null;
-    }
-
     public override void DoDebugWindowContents(Rect innerRect, ref float curY)
     {
         if (State == QuestPartState.Enabled)

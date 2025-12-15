@@ -211,6 +211,8 @@ public class Branch : IExposable, ILoadReferenceable
                                  checker: () => this.GetStatValue(BranchStatDefOf.OARO_SupplyCeiling));
 
         potencyCache = new(cacheInterval: 2500, defaultValue: 1f, GetCurPotency);
+        TransformerHandler.OnZeroFactorUnmerged += OnZeroFactorUnmerged;
+
         loadID = UniqueIDManager.GetUniqueID(nameof(Branch));
     }
 
@@ -470,6 +472,14 @@ public class Branch : IExposable, ILoadReferenceable
                          * (IsBranchOfType(BranchType.Honor) ? 1.25f : 1f);
 
         return curPotency * 0.01f;
+    }
+
+    private void OnZeroFactorUnmerged(IEnumerable<BranchStatDef> statDefs)
+    {
+        foreach (BranchStatDef stat in statDefs)
+        {
+            this.RecacheBranchStat(stat);
+        }
     }
 
     private void PostGenerated()

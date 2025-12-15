@@ -59,7 +59,7 @@ internal sealed class QuestNode_NobilityTerritoryWatcher : QuestNode
         int selCount = 4;
         Stack<(NobilityType, bool)> alternatives = new(4);
         List<NobilityType> allTypes = EnumUtility.GetValues<NobilityType>().Where(nt => nt != NobilityType.None).ToList();
-        if (QuestPart_EffectTags.TryGetEffectTagsPart(quest, addPartIfMiss: false, out QuestPart_EffectTags questPart_EffectTags))
+        if (quest.TryGetEffectTagsPart(addPartIfMiss: false, out QuestPart_EffectTags questPart_EffectTags))
         {
             if (questPart_EffectTags.HasTag("AKindnessLord"))
             {

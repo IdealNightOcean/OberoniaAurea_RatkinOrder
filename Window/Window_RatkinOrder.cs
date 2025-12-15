@@ -576,11 +576,11 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 3f, 40f, 20f);
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
-            Widgets.LabelEllipses(reusedRect, "OARO_Friendly".Translate().Colorize(Color.green));
+            Widgets.Label(reusedRect, "OARO_Friendly".Translate().Colorize(Color.green));
         }
         else if (branch.IsBranchOfType(Branch.BranchType.Honor))
         {
-            Widgets.LabelEllipses(reusedRect, "OARO_Honor".Translate().Colorize(Color.yellow));
+            Widgets.Label(reusedRect, "OARO_Honor".Translate().Colorize(Color.yellow));
         }
 
         if (branch.CurWorkState == Branch.WorkStateType.Idle)
@@ -627,11 +627,23 @@ public class Window_RatkinOrder : MainTabWindow
 
         float entryX = inRectX + 30f;
         float entryY = inRectY + 204f;
-        foreach (KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord> kv in ReserveRecordShow)
+        if (ReserveRecordShow.Count > 0)
+        {
+            foreach (KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord> kv in ReserveRecordShow)
+            {
+                Rect entryRect = new(entryX, entryY, 373f, 54f);
+                entryY += 54f;
+                DrawStoresReserveRect(entryRect, kv.Key, kv.Value);
+            }
+        }
+        else
         {
             Rect entryRect = new(entryX, entryY, 373f, 54f);
-            entryY += 54f;
-            DrawStoresReserveRect(entryRect, kv.Key, kv.Value);
+            GUI.DrawTexture(entryRect, rightUpFrame);
+            GUI.DrawTexture(entryRect, rightUpFrameShade);
+            Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(entryRect, "OARO_OrderWin_NoReserveRecordCanShow".Translate());
         }
 
         reusedRect = new(inRectX + 36f, inRectY + 337f, 134f, 52f);
@@ -723,7 +735,7 @@ public class Window_RatkinOrder : MainTabWindow
         Widgets.Label(reusedRect, "OARO_OrderWin_BranchPopulation".Translate(branch.PopulationHandler.Population.ToString()));
 
         Text.Anchor = TextAnchor.MiddleRight;
-        Widgets.Label(reusedRect, "OARO_OrderWin_BranchBuildingLimit".Translate(branch.BuildingHandler.AllBuldingsCount.ToString(), (branch.BuildingHandler.BuildingCeiling + 1).ToString()));
+        Widgets.Label(reusedRect, "OARO_OrderWin_BranchBuildingLimit".Translate(branch.BuildingHandler.AllBuildingsCount.ToString(), (branch.BuildingHandler.BuildingCeiling + 1).ToString()));
 
 
         Rect progressRect = new(innerRectX + 254f, innerRectY, 115f, innerRect.height);
@@ -813,8 +825,8 @@ public class Window_RatkinOrder : MainTabWindow
 
         AverageSupply /= allBranches.Count;
 
-        UnderConstructionFacility = allBranches.Where(b => b.FacilityHandler.IsBusy).Select(b => (b, b.FacilityHandler.UnderConstructionFacility)).FirstOrFallback();
-        UnderConstructionBuilding = allBranches.Where(b => b.BuildingHandler.IsBusy).Select(b => (b, b.BuildingHandler.UnderConstructionBuilding)).FirstOrFallback();
+        UnderConstructionFacility = allBranches.Where(b => b.FacilityHandler.IsBusy).Select(b => (b, b.FacilityHandler.UnderConstructionFacilities.Values.RandomElement())).FirstOrFallback();
+        UnderConstructionBuilding = allBranches.Where(b => b.BuildingHandler.IsBusy).Select(b => (b, b.BuildingHandler.UnderConstructionBuildings.RandomElement())).FirstOrFallback();
         ReserveRecordShow = SelectedOrder.BranchManager.AllPrimaryReserves.Take(2).ToList();
 
         RefreshRatkinInteractionCache(null, SelectedOrder, Map, succeeded: false);
@@ -921,6 +933,7 @@ public class Window_RatkinOrder : MainTabWindow
     private static readonly Texture2D changeFollowedBranchesButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_ChangeFollowedBranchesButton_Down");
 
     private static readonly Texture2D rightUpFrame = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_RightUpFrame");
+    private static readonly Texture2D rightUpFrameShade = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_RightUpFrameShade");
 
     private static readonly Texture2D windowButton = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_WindowButton");
     private static readonly Texture2D windowButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/OARO_WindowButton_Down");

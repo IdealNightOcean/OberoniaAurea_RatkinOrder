@@ -36,7 +36,11 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
     public Rank CurRank;
     public float MeditationPoints;
-    public ResidentKnightRoleDef CurRole;
+
+    private ResidentKnightRoleDef curRole;
+    private int nextRoleChangeableTick = -1;
+    public ResidentKnightRoleDef CurRole => curRole;
+    public int NextRoleChangeableTick => nextRoleChangeableTick;
 
     public KnightPersonality Personality => KnightRecord.Personality;
 
@@ -61,7 +65,10 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
         Scribe_Values.Look(ref CurRank, nameof(CurRank), Rank.Regular);
         Scribe_Values.Look(ref MeditationPoints, nameof(MeditationPoints), 0f);
-        Scribe_Defs.Look(ref CurRole, nameof(CurRole));
+
+        Scribe_Defs.Look(ref curRole, nameof(curRole));
+        Scribe_Values.Look(ref nextRoleChangeableTick, nameof(nextRoleChangeableTick), -1);
+
         Scribe_Collections.Look(ref genealAcademicDefs, nameof(genealAcademicDefs), LookMode.Def, LookMode.Value);
         Scribe_Values.Look(ref honorAcademicLevel, nameof(honorAcademicLevel), 0);
 
@@ -208,6 +215,28 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         }
 
         academicDef.GetStage(targetLevel)?.OnAcademicLevelUp(knight);
+    }
+
+    public void ChangeRole(ResidentKnightRoleDef newRole)
+    {
+        if (newRole == curRole)
+        {
+            return;
+        }
+        ResidentKnightRoleDef oldRole = curRole;
+        curRole = newRole;
+
+        oldRole?.RoleWorker.PostDeactiveRole(Knight);
+
+        if (newRole is null)
+        {
+            nextRoleChangeableTick = -1;
+        }
+        else
+        {
+            nextRoleChangeableTick = Find.TickManager.TicksGame + newRole.positionChangeCDDays * 60000;
+            newRole.RoleWorker.PostActiveRole(Knight);
+        }
     }
 
     public void PostRemoved()

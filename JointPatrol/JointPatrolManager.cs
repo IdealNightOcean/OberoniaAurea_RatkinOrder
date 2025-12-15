@@ -1030,7 +1030,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
         }
 
-        JointInteractionRecord interactionRecord = new JointInteractionRecord()
+        JointInteractionRecord interactionRecord = new()
         {
             Label = def.label,
             RelatedBranch = record.Branch,
@@ -1039,5 +1039,27 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         };
 
         interactionRecords.Add(interactionRecord);
+
+        try
+        {
+            if (def is not JointPatrolIncidentDef jDef || jDef.ThoughtToAdd is null)
+            {
+                return;
+            }
+
+            ThoughtDef thoughtToAdd = jDef.ThoughtToAdd;
+            foreach (ResidentKnightRecord kRecord in participatingResidentKnights)
+            {
+                kRecord.Knight.needs?.mood?.thoughts.memories.TryGainMemory(thoughtToAdd);
+            }
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "give memory to resident knight",
+                typeName: nameof(JointPatrolManager),
+                methodName: nameof(ApplyJointInteractionEffect),
+                needStackTrace: true);
+        }
     }
 }

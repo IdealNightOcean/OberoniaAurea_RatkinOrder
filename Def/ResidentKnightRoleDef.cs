@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -13,6 +14,9 @@ public class ResidentKnightRoleDef : Def
 
     private ResidentKnightRoleWorker roleWorker;
     public ResidentKnightRoleWorker RoleWorker => roleWorker ??= (ResidentKnightRoleWorker)Activator.CreateInstance(roleWorkerClass, this);
+
+    [MustTranslate]
+    public List<string> customDescriptions;
 
     /// <summary>
     /// UI图标
@@ -48,5 +52,23 @@ public class ResidentKnightRoleDef : Def
     /// 修正是针对全体殖民者的，而非担任该职位的<see cref="Pawn"/>
     /// </summary>
     public List<StatModifier> statFactors;
+
+    public string GetRoleDetailDesc()
+    {
+        StringBuilder sb = new(64);
+        sb.AppendLine(LabelCap);
+        sb.AppendLine();
+        sb.AppendLine(description);
+        if (!customDescriptions.NullOrEmpty())
+        {
+            sb.AppendLine();
+            foreach (string item in customDescriptions)
+            {
+                sb.AppendLine(item);
+            }
+        }
+
+        return sb.ToString();
+    }
 
 }

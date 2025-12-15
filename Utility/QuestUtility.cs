@@ -63,4 +63,30 @@ public static class OARO_QuestUtility
             QuestUtility.SendQuestTargetSignals(worldObject.questTags, "WorkResolved", extendedArgs);
         }
     }
+
+    public static bool TryGetCliquesManager(this Quest quest, bool addPartIfMiss, out QuestPart_CliquesManager questPart_CliquesManager)
+    {
+        questPart_CliquesManager = quest?.PartsListForReading.OfType<QuestPart_CliquesManager>()?.FirstOrFallback(null);
+        if (addPartIfMiss && questPart_CliquesManager is null)
+        {
+            questPart_CliquesManager = new QuestPart_CliquesManager
+            {
+                inSignalEnable = quest.InitiateSignal
+            };
+            quest.AddPart(questPart_CliquesManager);
+        }
+        return questPart_CliquesManager is not null;
+    }
+
+    public static bool TryGetEffectTagsPart(this Quest quest, bool addPartIfMiss, out QuestPart_EffectTags questPart_EffectTags)
+    {
+        questPart_EffectTags = quest.PartsListForReading.OfType<QuestPart_EffectTags>()?.FirstOrFallback(null);
+        if (addPartIfMiss && questPart_EffectTags is null)
+        {
+            questPart_EffectTags = new QuestPart_EffectTags();
+            quest.AddPart(questPart_EffectTags);
+        }
+        return questPart_EffectTags is not null;
+    }
+
 }

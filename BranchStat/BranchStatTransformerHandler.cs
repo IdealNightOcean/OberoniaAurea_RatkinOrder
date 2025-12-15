@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchStatTransformerHandler
 {
     public readonly Dictionary<BranchStatDef, BranchStatTransformer> branchStatTransformers = [];
-    public Action<HashSet<BranchStatDef>> OnZeroFactorUnmerged;
+    public Action<IEnumerable<BranchStatDef>> OnZeroFactorUnmerged;
     private HashSet<BranchStatDef> zeroFactorUnmergedStats;
 
     public bool TryGetStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
