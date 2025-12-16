@@ -168,6 +168,7 @@
     <Compile Include="Letter\ChoiceLetter_InDistressKnightLeave.cs" />
     <Compile Include="Letter\ChoiceLetter_InDistressKnightStart.cs" />
     <Compile Include="Lord\LordJob_ExitMapBestForJointPatrol.cs" />
+    <Compile Include="OrderInteraction\OrderInteractionWorker_ExchangeSupply.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_EnhanceRelationship.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_InviteResidentKnight.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_InviteBranchCreation.cs" />

@@ -250,9 +250,15 @@ public class Window_RatkinOrder : MainTabWindow
         }
 
         reusedRect = new(inRectX + 270f, inRectY + 620f, 149f, 59f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_OrderWin_ExchangeWarehouse".Translate(), leftBigButton, leftBigButton_Down, doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: OrderInteractionDefOf.OARO_ExchangeSupply.LabelCap,
+            acceptance: GetIndependentAcceptanceReport(OrderInteractionDefOf.OARO_ExchangeSupply),
+            baseTex: leftBigButton,
+            downTex: leftBigButton_Down,
+            doMouseoverSound: true))
         {
-
+            OrderInteractionDefOf.OARO_ExchangeSupply.TryApplyInteraction(SelectedOrder, Map);
         }
 
         Text.Font = GameFont.Medium;
