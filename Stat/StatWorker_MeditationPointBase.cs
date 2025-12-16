@@ -23,13 +23,7 @@ public class StatWorker_MeditationPointBase : StatWorker
         return false;
     }
 
-    public override bool ShouldShowFor(StatRequest req)
-    {
-        return CanApplyOn(req) && base.ShouldShowFor(req);
-    }
+    public override bool ShouldShowFor(StatRequest req) => CanApplyOn(req) && base.ShouldShowFor(req);
 
-    public override bool IsDisabledFor(Thing thing)
-    {
-        return CanApplyOn(thing) && base.IsDisabledFor(thing);
-    }
+    public override bool IsDisabledFor(Thing thing) => !CanApplyOn(thing) && base.IsDisabledFor(thing);
 }

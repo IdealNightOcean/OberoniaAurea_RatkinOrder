@@ -43,6 +43,14 @@ public static class OARO_WindowUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void DrawTextureOriginalSize(Vector2 position, Texture2D texture) => GUI.DrawTexture(new(position.x, position.y, texture.width, texture.height), texture);
 
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static bool DrawCloseX(Rect mainRect)
+    {
+        Rect reusedRect = new(mainRect.xMax - 22f, mainRect.y + 2f, 20f, 20f);
+        return Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true);
+    }
+
     public static bool ButtonImage(Rect butRect, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
     {
         if (Mouse.IsOver(butRect))

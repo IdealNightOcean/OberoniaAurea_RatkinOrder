@@ -59,11 +59,7 @@ public class Window_BranchTask : OrderWindowBase
     public override void PostClose()
     {
         base.PostClose();
-
-        if (ShowDetailDrawer is not null)
-        {
-            ShowDetailDrawer.ClearCache();
-        }
+        ShowDetailDrawer?.ClearCache();
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -73,8 +69,7 @@ public class Window_BranchTask : OrderWindowBase
         float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
-        Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRect.y + 1f, 20f, 20f);
-        if (Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true))
+        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
         {
             Close();
             return;
@@ -82,7 +77,7 @@ public class Window_BranchTask : OrderWindowBase
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = new(mainInnerRectX, mainInnerRectY + 36f, mainInnerRect.width, 32f);
+        Rect reusedRect = new(mainInnerRectX, mainInnerRectY + 36f, mainInnerRect.width, 32f);
         Widgets.Label(reusedRect, "OARO_TaskWin_Title".Translate());
 
         reusedRect.yMax += 20f;

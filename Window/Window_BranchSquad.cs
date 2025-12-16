@@ -89,15 +89,14 @@ public class Window_BranchSquad : OrderWindowBase
         float areaRectY = mainInnerRectY + 205f;
         float areaRectHeight = 657f;
 
-        Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRectY + 1f, 20f, 20f);
-        if (Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true))
+        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
         {
             Close();
             return;
         }
 
         //顶部缎带
-        reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1567f, 136f);
+        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1567f, 136f);
         GUI.DrawTexture(reusedRect, topRibbon);
 
         //顶部标题框

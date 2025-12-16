@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -7,7 +8,9 @@ public class ResidentKnightAcademicDef : Def
 {
     /// <summary>对应骑士个性</summary>
     ///<remarks>- 不要使用组合枚举！！！</remarks>
-    public KnightPersonality knightPersonality;
+    public KnightPersonality personality;
+
+    public HediffDef buffHediffDef;
 
     /// <summary>
     /// 课业阶段
@@ -36,7 +39,7 @@ public class ResidentKnightAcademicDef : Def
         {
             yield return error;
         }
-        if (knightPersonality == KnightPersonality.None)
+        if (personality == KnightPersonality.None)
         {
             yield return "";
         }
@@ -45,36 +48,42 @@ public class ResidentKnightAcademicDef : Def
     public override void PostLoad()
     {
         base.PostLoad();
-        if (knightPersonality != KnightPersonality.None)
+        if (personality != KnightPersonality.None)
         {
-            OrderDefDataBase.AddKnightAcademic(this, knightPersonality);
+            OrderDefDataBase.AddKnightAcademic(this, personality);
         }
+    }
+
+    /// <summary>
+    /// 只执行一次，在升级时执行
+    /// </summary>
+    public void OnAcademicLevelUpgrade(Pawn pawn, int targetStageIndex)
+    {
+        if (targetStageIndex < 0 || targetStageIndex > MaxStageLevel - 1)
+        {
+            throw new ArgumentOutOfRangeException(nameof(targetStageIndex));
+        }
+
+        if (buffHediffDef is null)
+        {
+            return;
+        }
+        Hediff_ResidentAcademicBuff hediff = pawn.health.GetOrAddHediff(buffHediffDef) as Hediff_ResidentAcademicBuff;
+        hediff.Notify_AcademicStageChanged(targetStageIndex);
+
+        academicStages[targetStageIndex].OnAcademicLevelUpgrade(pawn);
     }
 }
 
 
 public class ResidentKnightAcademicStage
 {
-    public HediffDef buffHediff;
-    public int buffHediffStage;
+    [MustTranslate]
+    public string label;
+    [MustTranslate]
+    public string shortDescription;
+    [MustTranslate]
+    public string description;
 
-    /// <summary>
-    /// 只执行一次，在升级时执行
-    /// </summary>
-    public virtual void OnAcademicLevelUp(Pawn pawn)
-    {
-        if (buffHediff is not null)
-        {
-            Hediff_ResidentKnightBuff hediff = pawn.health.hediffSet.GetFirstHediffOfDef(buffHediff) as Hediff_ResidentKnightBuff;
-            if (hediff is not null)
-            {
-
-            }
-            else
-            {
-                hediff = pawn.health.AddHediff(buffHediff) as Hediff_ResidentKnightBuff;
-                hediff?.SetBuffStage(buffHediffStage);
-            }
-        }
-    }
+    public virtual void OnAcademicLevelUpgrade(Pawn pawn) { }
 }

@@ -165,17 +165,17 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
                 academicLevel = 0;
             }
         }
-        if (academicLevel > academicDef.MaxStageLevel)
+        if (academicLevel >= academicDef.MaxStageLevel)
         {
             return resultOnly ? false : "OARO_ReachMax_AcademicLevel".Translate();
         }
 
         if (!ignorePoints)
         {
-            float neededPoints = GetMeditationPointsNeeded(academicDef, academicLevel + 1);
+            float neededPoints = GetMeditationPointsNeeded(academicDef, Personality, academicLevel + 1);
             if (MeditationPoints < neededPoints)
             {
-                return resultOnly ? false : "OARO_Insufficient_MeditationPoints".Translate(neededPoints.ToString("F0"));
+                return resultOnly ? false : "OARO_Insufficient_MeditationPoints".Translate(neededPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count));
             }
         }
 
@@ -210,11 +210,11 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         TotalAcademicLevel.MarkDirty();
         if (usePoints)
         {
-            float neededPoints = GetMeditationPointsNeeded(academicDef, targetLevel);
+            float neededPoints = GetMeditationPointsNeeded(academicDef, Personality, targetLevel);
             MeditationPoints = Mathf.Max(0f, MeditationPoints - neededPoints);
         }
 
-        academicDef.GetStage(targetLevel)?.OnAcademicLevelUp(knight);
+        academicDef.OnAcademicLevelUpgrade(knight, targetStageIndex: (targetLevel - 1));
     }
 
     public void ChangeRole(ResidentKnightRoleDef newRole)
@@ -249,7 +249,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         }
     }
 
-    private float GetMeditationPointsNeeded(ResidentKnightAcademicDef academicDef, int targetLevel)
+    public static float GetMeditationPointsNeeded(ResidentKnightAcademicDef academicDef, KnightPersonality personality, int targetLevel)
     {
         if (targetLevel < 1)
         {
@@ -258,7 +258,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
         float baseUnitCost = academicDef.isHonorAcademic ? 500f : 250f;
         float neededPoints = baseUnitCost + (targetLevel - 1) * baseUnitCost;
-        if ((academicDef.knightPersonality & Personality) != 0)
+        if ((academicDef.personality & personality) != 0)
         {
             neededPoints /= 2;
         }

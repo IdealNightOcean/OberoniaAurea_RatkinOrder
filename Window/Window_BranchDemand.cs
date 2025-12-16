@@ -152,8 +152,7 @@ public class Window_BranchDemand : OrderWindowBase
         Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1339f, 908f);
         GUI.DrawTexture(mainRect, mainBackground);
         Rect mainInnerRect = mainRect.ContractedBy(3f);
-        Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRect.y + 1f, 20f, 20f);
-        if (Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true))
+        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
         {
             Close();
             return;
@@ -161,7 +160,7 @@ public class Window_BranchDemand : OrderWindowBase
 
         Rect demandListRect = new(mainInnerRect.x + 60f, mainInnerRect.y + 210f, 801f, 624f);
 
-        reusedRect = demandListRect;
+        Rect reusedRect = demandListRect;
         reusedRect.width = 350f;
         Tabs.Clear();
         Tabs.Add(new TabRecord("OARO_BranchSquad_All".Translate().CapitalizeFirst(), delegate

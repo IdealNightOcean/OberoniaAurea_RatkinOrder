@@ -184,8 +184,8 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
             return null;
         }
         KnightPersonality personality = record.Personality;
-        ResidentKnightAcademicDef academicDef = record.GenealAcademicDefs.Where(kv => ((kv.Key.knightPersonality & personality) != 0) && (kv.Value < kv.Key.MaxStageLevel)).RandomElementWithFallback().Key;
-        academicDef ??= DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => (d.knightPersonality & personality) != 0).RandomElementWithFallback();
+        ResidentKnightAcademicDef academicDef = record.GenealAcademicDefs.Where(kv => ((kv.Key.personality & personality) != 0) && (kv.Value < kv.Key.MaxStageLevel)).RandomElementWithFallback().Key;
+        academicDef ??= DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => (d.personality & personality) != 0).RandomElementWithFallback();
 
         if (academicDef is null || !record.CanUpgradeAcademicLevel(academicDef, ignorePoints: true, resultOnly: true))
         {

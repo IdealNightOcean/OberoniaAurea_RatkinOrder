@@ -185,6 +185,7 @@
     <Compile Include="Quest\Reward\Quest_GiveBranchMedal_CriticalDemand.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
+    <Compile Include="Window\Window_ResidentKnight_AcademicArrange.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
     <Compile Include="Window\UICacheComp\SquadInfoUICache.cs" />
@@ -214,7 +215,7 @@
     <Compile Include="Hediff\Hediff_PainLevelAsStage.cs" />
     <Compile Include="Hediff\Hediff_HonorGlorious.cs" />
     <Compile Include="Hediff\Hediff_BranchMedal.cs" />
-    <Compile Include="Hediff\Hediff_ResidentKnightBuff.cs" />
+    <Compile Include="Hediff\Hediff_ResidentAcademicBuff.cs" />
     <Compile Include="Job\JobDriver_PlagueSample.cs" />
     <Compile Include="DataLibrary\KeyLibrary_EffectTag.cs" />
     <Compile Include="DataLibrary\KeyLibrary_QuestCliqueKey.cs" />
@@ -410,8 +411,11 @@
     <Compile Include="Window\Window_OrderHall.cs" />
     <Compile Include="Window\Window_Branch.cs" />
     <Compile Include="Window\Window_BranchTask.cs" />
+    <Compile Include="Window\ResidentKnightEntryDrawer.cs" />
     <Compile Include="Window\Window_OrderLetterBox.cs" />
     <Compile Include="Window\Window_RatkinOrder.cs" />
+    <Compile Include="Window\Window_ResidentKnight_RankUpgrade.cs" />
+    <Compile Include="Window\Window_OrderInteraction_ExchangeSupply.cs" />
     <Compile Include="WorldObject\Demand\MapParent_NobilityTerritory.cs" />
     <Compile Include="WorldObject\Demand\WorldObject_TownConstruction.cs" />
     <Compile Include="WorldObject\Demand\GenStep_NobilityTerritoryPawns.cs" />

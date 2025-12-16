@@ -99,15 +99,14 @@ public class Window_RatkinOrder : MainTabWindow
         float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
-        Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRectY + 1f, 20f, 20f);
-        if (Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true))
+        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
         {
             Close();
             return;
         }
 
         //左侧区域
-        reusedRect = new(mainInnerRectX, mainInnerRectY, 455f, mainInnerRect.height);
+        Rect reusedRect = new(mainInnerRectX, mainInnerRectY, 455f, mainInnerRect.height);
         DrawLeftRect(reusedRect);
 
         //中部区域
