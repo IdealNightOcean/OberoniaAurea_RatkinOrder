@@ -11,11 +11,11 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBase
 {
-    private bool normalLeave;
-    private string durationEndSignal;
-    private string staySignal;
-    private string skillSuccessSignal;
-    private string skillCheckedSignal;
+    private bool NormalLeave { get; set; }
+    private string DurationEndSignal { get; set; }
+    private string StaySignal { get; set; }
+    private string SkillSuccessSignal { get; set; }
+    private string SkillCheckedSignal { get; set; }
 
     protected override PawnKindDef FixedPawnKind => OARO_PawnKindDefOf.OARO_RatkinVillageChild;
     protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_ChildrenCare;
@@ -52,11 +52,11 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         QuestGen.slate.Set("uniqueQuestDesc", true);
         QuestGen.slate.Set("uniqueLeavingLetter", true);
 
-        normalLeave = false;
-        durationEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("durationEnd");
-        staySignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_Stay");
-        skillSuccessSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillSuccess");
-        skillCheckedSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillChecked");
+        NormalLeave = false;
+        DurationEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("durationEnd");
+        StaySignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_Stay");
+        SkillSuccessSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillSuccess");
+        SkillCheckedSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillChecked");
 
         return true;
     }
@@ -64,11 +64,11 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
     protected override void ClearQuestParameter()
     {
         base.ClearQuestParameter();
-        normalLeave = false;
-        durationEndSignal = null;
-        staySignal = null;
-        skillSuccessSignal = null;
-        skillCheckedSignal = null;
+        NormalLeave = false;
+        DurationEndSignal = null;
+        StaySignal = null;
+        SkillSuccessSignal = null;
+        SkillCheckedSignal = null;
     }
 
     protected override void SetPawnsLeaveComp(string lodgerArrivalSignal, string inSignalRemovePawn)
@@ -79,35 +79,36 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
 
         QuestPart_Apprentice_QuizStayIntention questPart_Apprentice_QuizStayIntention = new()
         {
-            IsNormalLeave = normalLeave,
-            InSignalSkillSuccess = skillSuccessSignal,
+            IsNormalLeave = NormalLeave,
+            InSignalSkillSuccess = SkillSuccessSignal,
 
             OutSignalLeave = leaveSignal,
-            OutSignalStay = staySignal,
+            OutSignalStay = StaySignal,
 
             Faction = questParameter.faction,
             Apprentice = questParameter.pawns[0]
         };
 
-        if (normalLeave)
+        if (NormalLeave)
         {
-            questPart_Apprentice_QuizStayIntention.InSiganl = skillCheckedSignal;
+            questPart_Apprentice_QuizStayIntention.InSiganl = SkillCheckedSignal;
         }
         else
         {
             OAFrame_TileFinderUtility.TryFindNewAvaliableTile(out PlanetTile tile, questParameter.map.Parent.Tile, 4, 15);
             WorldObject_ApprenticeHome apprenticeHome = (WorldObject_ApprenticeHome)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_ApprenticeHome);
             apprenticeHome.Tile = tile;
+            apprenticeHome.Apprentice = questParameter.pawns[0];
             apprenticeHome.SetAssociatedQuest(quest);
             apprenticeHome.SetFaction(questParameter.faction);
             apprenticeHome.Name = "OARO_ApprenticeHomeName".Translate(questParameter.faction.Name.Named(KeyLibrary_FormatArgName.FACTION), questParameter.pawns[0].Named(KeyLibrary_FormatArgName.PAWN));
             QuestGen.slate.Set("apprenticeHome", apprenticeHome);
 
-            quest.SpawnWorldObject(apprenticeHome, inSignal: durationEndSignal);
-            quest.WorldObjectTimeout(apprenticeHome, delayTicks: 7 * 60000, inSignalEnable: durationEndSignal, isQuestTimeout: true);
+            quest.SpawnWorldObject(apprenticeHome, inSignal: DurationEndSignal);
+            quest.WorldObjectTimeout(apprenticeHome, delayTicks: 20 * 60000, inSignalEnable: DurationEndSignal, isQuestTimeout: true);
 
             quest.Letter(letterDef: LetterDefOf.NeutralEvent,
-                         inSignal: durationEndSignal,
+                         inSignal: DurationEndSignal,
                          relatedFaction: questParameter.faction,
                          lookTargets: [apprenticeHome],
                          text: "[apprenticeNoOnePickUpText]",
@@ -119,26 +120,26 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         quest.AddPart(questPart_Apprentice_QuizStayIntention);
 
         string inSignalRemovePawnNew = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_Remove");
-        quest.SignalPassAny(action: null, [inSignalRemovePawn, staySignal], outSignal: inSignalRemovePawnNew);
+        quest.SignalPassAny(action: null, [inSignalRemovePawn, StaySignal], outSignal: inSignalRemovePawnNew);
         quest.Leave(questParameter.pawns, inSignal: leaveSignal, sendStandardLetter: true, leaveOnCleanup: false, inSignalRemovePawn: inSignalRemovePawnNew, wakeUp: true);
     }
 
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         Quest quest = QuestGen.quest;
-        quest.Delay(questParameter.questDurationTicks, inner: null, inSignalEnable: null, inSignalDisable: null, outSignalComplete: durationEndSignal, isQuestTimeout: false, expiryInfoPart: "GuestsDepartsIn".Translate(), expiryInfoPartTip: "GuestsDepartsOn".Translate(), debugLabel: "QuestDelay");
+        quest.Delay(questParameter.questDurationTicks, inner: null, inSignalEnable: null, inSignalDisable: null, outSignalComplete: DurationEndSignal, isQuestTimeout: false, expiryInfoPart: "GuestsDepartsIn".Translate(), expiryInfoPartTip: "GuestsDepartsOn".Translate(), debugLabel: "QuestDelay");
 
         string skillSuccessEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillSuccessEnd");
         string skillFailEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillFailEnd");
         QuestPart_Apprentice_CheckSkill questPart_Apprentice_CheckSkill = new()
         {
-            InSignalCheckSkill = durationEndSignal,
+            InSignalCheckSkill = DurationEndSignal,
             InSignalSuccessLeave = successSignal,
-            InSignalStay = staySignal,
+            InSignalStay = StaySignal,
 
             OutSignalFail = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillFail"),
-            OutSignalSuccess = skillSuccessSignal,
-            OutSignalChecked = skillCheckedSignal,
+            OutSignalSuccess = SkillSuccessSignal,
+            OutSignalChecked = SkillCheckedSignal,
 
             OutSignalSkillSuccessEnd = skillSuccessEndSignal,
             OutSignalSkillFailEnd = skillFailEndSignal,
@@ -156,9 +157,8 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
 
         quest.AddPart(questPart_AllOrdersEsteemChange_Success);
 
-        quest.End(QuestEndOutcome.Success, 0, null, skillSuccessEndSignal, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Fail, 0, null, skillFailEndSignal);
-
+        quest.End(outcome: QuestEndOutcome.Success, inSignal: skillSuccessEndSignal, sendStandardLetter: true);
+        quest.End(outcome: QuestEndOutcome.Fail, inSignal: skillFailEndSignal);
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_DelayFail = new()
         {

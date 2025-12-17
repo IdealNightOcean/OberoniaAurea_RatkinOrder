@@ -264,9 +264,10 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                 }
             case WorkType.Feast:
                 {
+                    ThoughtDef thoughtDef = DefDatabase<ThoughtDef>.GetNamedSilentFail("OARO_Thought_FamineVillagetFeast");
                     foreach (Pawn p in associatedFixedCaravan.PawnsListForReading)
                     {
-                        p.needs?.mood.thoughts.memories.TryGainMemory(OARO_ThoughtDefOf.OARO_Thought_FamineVillagetFeast);
+                        p.needs?.mood.thoughts.memories.TryGainMemory(thoughtDef);
                         if (p.needs?.food is not null)
                         {
                             p.needs.food.CurLevelPercentage += 1f;
@@ -336,9 +337,10 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         {
             if (associatedFixedCaravan is not null)
             {
+                ThoughtDef thoughtDef = DefDatabase<ThoughtDef>.GetNamedSilentFail("OARO_Thought_FamineVillagetFeast");
                 foreach (Pawn p in associatedFixedCaravan.PawnsListForReading)
                 {
-                    p.needs?.mood.thoughts.memories.TryGainMemory(OARO_ThoughtDefOf.OARO_Thought_FamineVillagetFeast);
+                    p.needs?.mood.thoughts.memories.TryGainMemory(thoughtDef);
                     if (p.needs?.food is not null)
                     {
                         p.needs.food.CurLevelPercentage += 1f;

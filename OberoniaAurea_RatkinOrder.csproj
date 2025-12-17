@@ -178,6 +178,7 @@
     <Compile Include="Quest\InDistressKnight\QuestPart_InDistressKnightLeaveLetter.cs" />
     <Compile Include="Quest\InDistressKnight\QuestNode_Root_InDistressKnight.cs" />
     <Compile Include="Quest\InDistressKnight\QuestPart_DistressKnightCanLeaveNow.cs" />
+    <Compile Include="Quest\Mercy\Quest_WolfDisasterWatcher.cs" />
     <Compile Include="Quest\Mercy\Quest_PreMercyQuestCleaner.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_InitJointPatrolCaravanHelp.cs" />
     <Compile Include="Quest\Quest_RimOrderLetter.cs" />
@@ -422,6 +423,8 @@
     <Compile Include="WorldObject\Demand\GenStep_NobilityTerritoryPawns.cs" />
     <Compile Include="WorldObject\Demand\WorldObject_NobilityTerritory.cs" />
     <Compile Include="WorldObject\Demand\WorldObject_RefugeeInfluxCamp.cs" />
+    <Compile Include="WorldObject\Mercy\WorldObject_WolfDisasterGossipPoint.cs" />
+    <Compile Include="WorldObject\Mercy\WorldObject_WolfDisasterPoint.cs" />
     <Compile Include="WorldObject\WorldObject_JointPatrolCaravanHelpSite_FixedCaravan.cs" />
     <Compile Include="WorldObject\WorldObject_BranchUnderConstruction.cs" />
     <Compile Include="WorldObject\WorldObjectComp_BranchSite.cs" />
@@ -456,7 +459,6 @@
     <Compile Include="Quest\Mercy\QuestPart_Apprentice_CheckSkill.cs" />
     <Compile Include="Quest\Mercy\QuestPart_Apprentice_QuizStayIntention.cs" />
     <Compile Include="Quest\Mercy\QuestNode_Root_LittleApprentice.cs" />
-    <Compile Include="Quest\Mercy\Quest_WolfDisasterWatcher.cs" />
     <Compile Include="Quest\Reward\Reward_AllOrdersEsteem.cs" />
     <Compile Include="Quest\Reward\Reward_OrderEsteem.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_CheckGroupPatrolStart.cs" />
@@ -524,9 +526,7 @@
     <Compile Include="WorldObject\WorldObject_Interactive_Nameable.cs" />
     <Compile Include="WorldObject\WorldObject_InteractWithFixedCaravan_Nameable.cs" />
     <Compile Include="WorldObject\Mercy\WorldObject_ApprenticeHome.cs" />
-    <Compile Include="WorldObject\Mercy\WorldObject_WolfDisasterGossipPoint.cs" />
     <Compile Include="WorldObject\Mercy\MapParent_WolfDisaster.cs" />
-    <Compile Include="WorldObject\Mercy\WorldObject_WolfDisasterPoint.cs" />
     <Compile Include="WorldObject\Mercy\WorldObject_CelebrationHost.cs" />
     <Compile Include="WorldObject\Mercy\WorldObject_NonGerminatingSeeds.cs" />
     <Compile Include="WorldObject\WorldObject_TemporaryEncampment.cs" />

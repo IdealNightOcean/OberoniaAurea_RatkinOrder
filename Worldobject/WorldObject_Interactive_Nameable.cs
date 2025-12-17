@@ -4,7 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_Interactive_Nameable : WorldObject_InteractiveBase, INameableWorldObject
+public abstract class WorldObject_Interactive_Nameable : WorldObject_InteractiveBase, INameableWorldObject
 {
     public override bool HasName => name is not null;
 

@@ -17,7 +17,7 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Social).TotallyDisabled))
+        if (!caravan.PawnsListForReading.Any(p => p.skills is not null && !p.skills.GetSkill(SkillDefOf.Social).TotallyDisabled))
         {
             Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Social.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;
@@ -29,9 +29,10 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
     {
         if (associatedFixedCaravan is not null)
         {
+            ThoughtDef thoughtDef = DefDatabase<ThoughtDef>.GetNamedSilentFail("OARO_Thought_CelebrationHost");
             foreach (Pawn pawn in associatedFixedCaravan.PawnsListForReading)
             {
-                pawn.needs.mood?.thoughts.memories.TryGainMemory(OARO_ThoughtDefOf.OARO_Thought_CelebrationHost);
+                pawn.needs.mood?.thoughts.memories.TryGainMemory(thoughtDef);
             }
 
             int count = associatedFixedCaravan.PawnsListForReading.Count * 10;

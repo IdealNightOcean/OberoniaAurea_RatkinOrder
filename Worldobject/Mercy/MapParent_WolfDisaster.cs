@@ -1,6 +1,8 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using RimWorld.Planet;
 using System;
+using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -46,13 +48,40 @@ public class MapParent_WolfDisaster : MapParent_Enterable
 
     public override bool ShouldRemoveMapNow(out bool alsoRemoveWorldObject)
     {
-        bool result = base.ShouldRemoveMapNow(out _);
         alsoRemoveWorldObject = true;
-        return result;
+        if (base.Map.mapPawns.AnyPawnBlockingMapRemoval)
+        {
+            Log.Message("111");
+            return false;
+        }
+
+        foreach (PocketMapParent item in Find.World.pocketMaps.ToList())
+        {
+            if (item.sourceMap == base.Map && item.Map.mapPawns.AnyPawnBlockingMapRemoval)
+            {
+                Log.Message("222");
+                return false;
+            }
+        }
+
+        if (ModsConfig.OdysseyActive && base.Map.listerThings.AnyThingWithDef(ThingDefOf.GravAnchor))
+        {
+            Log.Message("333");
+            return false;
+        }
+
+        if (TransporterUtility.IncomingTransporterPreventingMapRemoval(base.Map))
+        {
+            Log.Message("444");
+            return false;
+        }
+        Log.Message("555");
+        return true;
     }
 
     protected override void TickInterval(int delta)
     {
+        base.TickInterval(delta);
         if (WolfDead)
         {
             return;
@@ -68,8 +97,16 @@ public class MapParent_WolfDisaster : MapParent_Enterable
 
             if (wolf.DestroyedOrNull() || wolf.Dead)
             {
-                QuestUtility.SendQuestTargetSignals(questTags, "WolfDead");
                 WolfDead = true;
+                QuestUtility.SendQuestTargetSignals(questTags, "WolfDead");
+                ThoughtDef thoughtDef = DefDatabase<ThoughtDef>.GetNamedSilentFail("OARO_Thought_KillDisasterWolf");
+                if (thoughtDef is not null)
+                {
+                    foreach (Pawn p in Map.mapPawns.FreeColonistsSpawned)
+                    {
+                        p.needs.mood?.thoughts.memories.TryGainMemory(thoughtDef);
+                    }
+                }
             }
         }
     }

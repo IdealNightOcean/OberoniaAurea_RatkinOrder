@@ -47,7 +47,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled))
+        if (!caravan.PawnsListForReading.Any(p => p.skills is not null && !p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled))
         {
             Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Crafting.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;

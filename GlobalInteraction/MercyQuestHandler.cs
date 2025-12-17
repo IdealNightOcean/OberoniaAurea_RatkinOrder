@@ -26,7 +26,7 @@ public class MercyQuestHandler : IExposable
 
     public void Notify_MercyQuestSucceed(Quest quest)
     {
-        ResidentKnightsManager.Instance.Notify_MercyQuestSucceed();
+        ResidentKnightsManager.Instance.AllResidentKnightsGainMeditation(200f, directly: false);
 
         GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
         float letterChance = 0.2f;

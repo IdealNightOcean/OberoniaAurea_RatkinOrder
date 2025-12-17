@@ -17,7 +17,7 @@ public sealed class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFi
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Plants).TotallyDisabled))
+        if (!caravan.PawnsListForReading.Any(p => p.skills is not null && !p.skills.GetSkill(SkillDefOf.Plants).TotallyDisabled))
         {
             Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Plants.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;

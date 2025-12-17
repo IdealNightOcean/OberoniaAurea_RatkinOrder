@@ -10,65 +10,129 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFixedCaravan_Nameable
 {
-    private static readonly SimpleCurve successCurve = new([new CurvePoint(4, 0), new CurvePoint(15, 1)]);
-
-    public override int TicksNeeded => 7500;
-    public override string FixedCaravanName => "OARO_FixedCaravan_WolfDisasterPoint".Translate();
-    public override string FixedCaravanWorkDesc() => "OARO_WolfDisasterPoint_TimeLeft".Translate(ticksRemaining.ToStringTicksToPeriod());
-
-    public override void Notify_CaravanArrived(Caravan caravan)
+    private enum WorkType : byte
     {
-        if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) < 0)
+        EstablishObservation,
+        ObtainIntelligence
+    }
+
+    private bool observationEstablished;
+    private bool intelligenceObtained;
+    private int nextCanObtainSuppliesTick = -1;
+
+    private WorkType curWork;
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_Values.Look(ref curWork, nameof(curWork));
+
+        Scribe_Values.Look(ref observationEstablished, nameof(observationEstablished), defaultValue: false);
+        Scribe_Values.Look(ref intelligenceObtained, nameof(intelligenceObtained), defaultValue: false);
+        Scribe_Values.Look(ref nextCanObtainSuppliesTick, nameof(nextCanObtainSuppliesTick), -1);
+    }
+
+    public override int TicksNeeded => curWork switch
+    {
+        WorkType.EstablishObservation => 30000,
+        WorkType.ObtainIntelligence => 15000,
+        _ => 30000
+    };
+
+    public override bool StartWork(Caravan caravan)
+    {
+        WorkDialog(caravan);
+        return true;
+    }
+
+    private void WorkDialog(Caravan caravan)
+    {
+        DiaNode rootNode = new("OARO_WolfDisasterPoint_Root".Translate());
+        DiaOption obtainSuppliesOpt = new($"OARO_WolfDisasterPoint_ObtainSupplies".Translate())
         {
-            Messages.Message("OARO_NoOneCanDo".Translate(SkillDefOf.Animals.label), MessageTypeDefOf.RejectInput, historical: false);
-            return;
+            action = () => ObtainSupplies(caravan),
+            resolveTree = true,
+        };
+        int coolingTicksLeft = nextCanObtainSuppliesTick - Find.TickManager.TicksGame;
+        if (coolingTicksLeft > 0)
+        {
+            obtainSuppliesOpt.Disable("WaitTime".Translate(coolingTicksLeft.ToStringTicksToPeriod()));
         }
-        base.Notify_CaravanArrived(caravan);
+        rootNode.options.Add(obtainSuppliesOpt);
+
+        if (!observationEstablished)
+        {
+            DiaOption establishObservationOpt = new($"OARO_WolfDisasterPoint_{WorkType.EstablishObservation}".Translate())
+            {
+                action = delegate
+                {
+                    curWork = WorkType.EstablishObservation;
+                    base.StartWork(caravan);
+                },
+                resolveTree = true,
+            };
+            rootNode.options.Add(establishObservationOpt);
+        }
+
+
+        if (!intelligenceObtained)
+        {
+            DiaOption establishObservationOpt = new($"OARO_WolfDisasterPoint_{WorkType.ObtainIntelligence}".Translate())
+            {
+                action = delegate
+                {
+                    curWork = WorkType.ObtainIntelligence;
+                    base.StartWork(caravan);
+                },
+                resolveTree = true,
+            };
+            rootNode.options.Add(establishObservationOpt);
+        }
+
+        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+
+        Dialog_NodeTreeWithFactionInfo nodeTree = new(rootNode, Faction);
+        Find.WindowStack.Add(nodeTree);
+    }
+
+    private void ObtainSupplies(Caravan caravan)
+    {
+        nextCanObtainSuppliesTick = Find.TickManager.TicksGame + 30000;
+        Thing meal = ThingMaker.MakeThing(ThingDefOf.MealSimple);
+        int count = caravan.PawnsListForReading.Count * 4;
+        meal.stackCount = count;
+        CaravanInventoryUtility.GiveThing(caravan, meal);
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                       text: "OARO_WolfDisasterPoint_SuppliesObtained".Translate(count.Named(KeyLibrary_FormatArgName.Count)),
+                       faction: Faction));
     }
 
     protected override void FinishWork()
     {
-        (Pawn maxAnimalsPawn, int maxAnimalsSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
-        foreach (Pawn pawn in associatedFixedCaravan.PawnsListForReading)
+        switch (curWork)
         {
-            pawn.skills?.Learn(SkillDefOf.Animals, 1000f);
-        }
-
-        if (maxAnimalsSkill >= 15)
-        {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_Discovered".Translate(maxAnimalsPawn)));
-            QuestUtility.SendQuestTargetSignals(questTags, "DiscoveredWolf", this.Named(KeyLibrary_FormatArgName.SUBJECT));
-
-            this.SafeDestroy();
-        }
-        else
-        {
-            float successChance = successCurve.Evaluate(maxAnimalsSkill);
-            if (Rand.Chance(successChance))
-            {
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_Succeess".Translate(maxAnimalsPawn)));
-                QuestUtility.SendQuestTargetSignals(questTags, "SucceessAdvancePoint", this.Named(KeyLibrary_FormatArgName.SUBJECT));
-
-                this.SafeDestroy();
-            }
-            else
-            {
-                if (Rand.Bool)
+            case WorkType.EstablishObservation:
                 {
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_Fail".Translate()));
-                    QuestUtility.SendQuestTargetSignals(questTags, "FailAdvancePoint", this.Named(KeyLibrary_FormatArgName.SUBJECT));
-                    this.SafeDestroy();
+                    observationEstablished = true;
+                    QuestUtility.SendQuestTargetSignals(questTags, "ObservationEstablished");
+                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                        text: "OARO_WolfDisasterPoint_EstablishObservation_Finished".Translate(),
+                        faction: Faction));
+                    return;
                 }
-                else
+            case WorkType.ObtainIntelligence:
                 {
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_FailWithNew".Translate()));
+                    intelligenceObtained = true;
+                    QuestUtility.SendQuestTargetSignals(questTags, "IntelligenceObtained");
+                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                        text: "OARO_WolfDisasterPoint_ObtainIntelligence_Finished".Translate(),
+                        faction: Faction));
+                    return;
                 }
-            }
+
+            default: return;
         }
     }
 
-    protected override void InterruptWork()
-    {
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_WolfDisasterPoint_Interrupt".Translate()));
-    }
+    protected override void InterruptWork() { }
 }

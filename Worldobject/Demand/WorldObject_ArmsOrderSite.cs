@@ -29,6 +29,8 @@ public sealed class WorldObject_ArmsOrderSite : WorldObject_InteractiveBase, ITh
         Scribe_Values.Look(ref requestCountLeft, "requestCountLeft", -1);
     }
 
+    public override void Notify_CaravanArrived(Caravan caravan) { }
+
     public override IEnumerable<Gizmo> GetCaravanGizmos(Caravan caravan)
     {
         foreach (Gizmo gizmo in base.GetCaravanGizmos(caravan))

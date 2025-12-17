@@ -53,7 +53,7 @@ public sealed class MapParent_NobilityTerritory : MapParent_Enterable
     public override bool ShouldRemoveMapNow(out bool alsoRemoveWorldObject)
     {
         bool result = base.ShouldRemoveMapNow(out _);
-        alsoRemoveWorldObject = true;
+        alsoRemoveWorldObject = result;
         return result;
     }
 

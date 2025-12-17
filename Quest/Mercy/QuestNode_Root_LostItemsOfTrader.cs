@@ -64,6 +64,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         }
         else
         {
+            slate.Set("hasFollowUp", true);
             FollowUpAction(map, parentFaction, silverCount);
         }
     }
@@ -108,11 +109,12 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             PawnGroupMakerDef = OARO_ModDefOf.OARO_LostItemsOfTrader,
 
             DurationTicks = 60000,
-            TalkText = "OARO_Talk_LostItemsOfTrader".Translate()
         };
+
         questPart_CollectionTeam.InitWithDefaultSignal();
         questPart_CollectionTeam.inSignalEnable = inSignalMakePawnsArrival;
         questPart_CollectionTeam.InSignalMakePawnsLeave = inSignalPawnNegative;
+        questPart_CollectionTeam.InitTalkTextRequest("[lostItemsOfTraderTalkText]");
         questPart_CollectionTeam.AddRequestThingDefCount(new ThingDefCountClass(ThingDefOf.Silver, Mathf.FloorToInt(silverCount * 0.8f)));
         quest.AddPart(questPart_CollectionTeam);
 

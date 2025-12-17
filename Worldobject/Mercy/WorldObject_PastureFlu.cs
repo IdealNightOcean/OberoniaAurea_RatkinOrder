@@ -18,7 +18,7 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (caravan.PawnsListForReading.Any(p => !p.skills.GetSkill(SkillDefOf.Medicine).TotallyDisabled))
+        if (!caravan.PawnsListForReading.Any(p => p.skills is not null && !p.skills.GetSkill(SkillDefOf.Medicine).TotallyDisabled))
         {
             Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Medicine.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;

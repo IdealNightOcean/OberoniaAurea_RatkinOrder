@@ -8,6 +8,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
+using Verse.Grammar;
 
 
 namespace OberoniaAurea.RatkinOrder;
@@ -61,6 +62,8 @@ public sealed class QuestNode_CollectionTeam : QuestNode
     [MustTranslate]
     public SlateRef<string> talkText;
 
+    public SlateRef<RulePack> talkTextRulePack;
+
     public SlateRef<int> durationTicks = 30000;
 
     public SlateRef<MapParent> mapParent;
@@ -109,11 +112,11 @@ public sealed class QuestNode_CollectionTeam : QuestNode
         questPart_CollectionTeam.PawnsTag = QuestGenUtility.HardcodedTargetQuestTagWithQuestID(pawnsTag.GetValue(slate));
 
         questPart_CollectionTeam.DurationTicks = durationTicks.GetValue(slate);
-        questPart_CollectionTeam.TalkText = talkText.GetValue(slate);
 
         questPart_CollectionTeam.MapParent = mapParent.GetValue(slate) ?? slate.Get<Map>("map")?.Parent;
         questPart_CollectionTeam.PawnGroupMakerDef = isolatedPawnGroupMakerDef.GetValue(slate);
 
+        questPart_CollectionTeam.InitTalkTextRequest(talkText.GetValue(slate), talkTextRulePack.GetValue(slate));
         questPart_CollectionTeam.InitRequestThingDefCounts(requestThingDefCounts);
 
         QuestGen.quest.AddPart(questPart_CollectionTeam);
@@ -135,7 +138,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     public BranchDemand.DemandType? DemandType;
 
     public int DurationTicks = 30000;
-    public string TalkText;
+    protected string RawTalkText;
 
     public string InSignalDisablePawnsArrival;
     public string InSignalMakePawnsLeave;
@@ -170,39 +173,39 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Collections.Look(ref requestThingDefCounts, "requestThingDefCounts", LookMode.Deep);
+        Scribe_Collections.Look(ref requestThingDefCounts, nameof(requestThingDefCounts), LookMode.Deep);
 
-        Scribe_References.Look(ref Branch, "Branch");
-        Scribe_References.Look(ref Faction, "Faction");
-        Scribe_References.Look(ref MapParent, "MapParent");
-        Scribe_Defs.Look(ref PawnGroupMakerDef, "PawnGroupMakerDef");
-        Scribe_Values.Look(ref DemandType, "DemandType");
+        Scribe_References.Look(ref Branch, nameof(Branch));
+        Scribe_References.Look(ref Faction, nameof(Faction));
+        Scribe_References.Look(ref MapParent, nameof(MapParent));
+        Scribe_Defs.Look(ref PawnGroupMakerDef, nameof(PawnGroupMakerDef));
+        Scribe_Values.Look(ref DemandType, nameof(DemandType));
 
-        Scribe_Values.Look(ref DurationTicks, "DurationTicks", 30000);
-        Scribe_Values.Look(ref TalkText, "TalkText");
+        Scribe_Values.Look(ref DurationTicks, nameof(DurationTicks), 30000);
+        Scribe_Values.Look(ref RawTalkText, nameof(RawTalkText));
 
-        Scribe_Values.Look(ref InSignalDisablePawnsArrival, "InSignalDisablePawnsArrival");
-        Scribe_Values.Look(ref InSignalMakePawnsLeave, "InSignalMakePawnsLeave");
-        Scribe_Values.Look(ref InSignalRemovePawn, "InSignalRemovePawn");
-        Scribe_Values.Look(ref InSignalLeftMap, "InSignalLeftMap");
+        Scribe_Values.Look(ref InSignalDisablePawnsArrival, nameof(InSignalDisablePawnsArrival));
+        Scribe_Values.Look(ref InSignalMakePawnsLeave, nameof(InSignalMakePawnsLeave));
+        Scribe_Values.Look(ref InSignalRemovePawn, nameof(InSignalRemovePawn));
+        Scribe_Values.Look(ref InSignalLeftMap, nameof(InSignalLeftMap));
 
-        Scribe_Values.Look(ref OutSignalPawnsArrived, "OutSignalPawnsArrived");
-        Scribe_Values.Look(ref OutSignalGive, "OutSignalGive");
-        Scribe_Values.Look(ref OutSignalRejectGive, "OutSignalRejectGive");
-        Scribe_Values.Look(ref OutSignalDecided, "OutSignalDecided");
-        Scribe_Values.Look(ref OutSignalAllLeftMap, "OutSignalAllLeftMap");
-        Scribe_Values.Look(ref OutSignalAllLeftMapAndGive, "OutSignalAllLeftMapAndGive");
-        Scribe_Values.Look(ref OutSignalFailureToCollect, "OutSignalFailureToCollect");
+        Scribe_Values.Look(ref OutSignalPawnsArrived, nameof(OutSignalPawnsArrived));
+        Scribe_Values.Look(ref OutSignalGive, nameof(OutSignalGive));
+        Scribe_Values.Look(ref OutSignalRejectGive, nameof(OutSignalRejectGive));
+        Scribe_Values.Look(ref OutSignalDecided, nameof(OutSignalDecided));
+        Scribe_Values.Look(ref OutSignalAllLeftMap, nameof(OutSignalAllLeftMap));
+        Scribe_Values.Look(ref OutSignalAllLeftMapAndGive, nameof(OutSignalAllLeftMapAndGive));
+        Scribe_Values.Look(ref OutSignalFailureToCollect, nameof(OutSignalFailureToCollect));
 
-        Scribe_Values.Look(ref PawnsTag, "PawnsTag");
+        Scribe_Values.Look(ref PawnsTag, nameof(PawnsTag));
 
-        Scribe_Values.Look(ref canTryArrival, "canTryArrival", defaultValue: true);
-        Scribe_Values.Look(ref hasLeft, "hasLeft", defaultValue: false);
-        Scribe_Values.Look(ref hasFulfilled, "hasFulfilled", defaultValue: false);
+        Scribe_Values.Look(ref canTryArrival, nameof(canTryArrival), defaultValue: true);
+        Scribe_Values.Look(ref hasLeft, nameof(hasLeft), defaultValue: false);
+        Scribe_Values.Look(ref hasFulfilled, nameof(hasFulfilled), defaultValue: false);
 
 
-        Scribe_References.Look(ref talkWith, KeyLibrary_FormatArgName.TALKWITH);
-        Scribe_Collections.Look(ref pawns, "pawns", LookMode.Reference);
+        Scribe_References.Look(ref talkWith, nameof(talkWith));
+        Scribe_Collections.Look(ref pawns, nameof(pawns), LookMode.Reference);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
@@ -232,7 +235,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         DemandType = default;
 
         DurationTicks = 30000;
-        TalkText = null;
+        RawTalkText = null;
 
         InSignalDisablePawnsArrival = null;
         InSignalMakePawnsLeave = null;
@@ -268,6 +271,15 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         OutSignalFailureToCollect = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_FailureToCollect");
 
         PawnsTag = QuestGenUtility.HardcodedTargetQuestTagWithQuestID("collectionTeam");
+    }
+
+    public void InitTalkTextRequest(string talkText, RulePack talkTextRules = null)
+    {
+        Slate slate = QuestGen.slate;
+        QuestGen.AddTextRequest("root", delegate (string x)
+        {
+            RawTalkText = x;
+        }, QuestGenUtility.MergeRules(talkTextRules, talkText, "root"));
     }
 
     public virtual void InitRequestThingDefCounts(IEnumerable<ThingDefCountClass> thingDefCounts)
@@ -585,11 +597,11 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
     protected virtual TaggedString GetTalkNodeText(Pawn talker, Pawn talkWith)
     {
-        if (string.IsNullOrEmpty(TalkText))
+        if (string.IsNullOrEmpty(RawTalkText))
         {
             return "OARO_CollectionTeam_DefaultTalkText".Translate(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)) + "\n\n" + RequestThingsSummary();
         }
-        return TalkText.Formatted(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)) + "\n\n" + RequestThingsSummary();
+        return RawTalkText.Formatted(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)) + "\n\n" + RequestThingsSummary();
     }
 
     protected Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talker, Pawn talkWith, Map map)

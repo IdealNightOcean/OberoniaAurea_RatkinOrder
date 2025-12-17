@@ -247,13 +247,15 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         return false;
     }
 
-    public void Notify_MercyQuestSucceed()
+    public void AllResidentKnightsGainMeditation(float gain, RatkinOrder ratkinOrder = null, bool directly = false)
     {
-        float gainPoints;
-        foreach (KeyValuePair<Pawn, ResidentKnightRecord> kv in residentKnights)
+        foreach (ResidentKnightRecord record in residentKnights.Values)
         {
-            gainPoints = 200f * kv.Key.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
-            kv.Value.MeditationPoints += gainPoints;
+            if (ratkinOrder is null || record.RatkinOrder == ratkinOrder)
+            {
+                float finnalGain = gain * (directly ? 1f : record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor));
+                record.MeditationPoints += finnalGain;
+            }
         }
     }
 
