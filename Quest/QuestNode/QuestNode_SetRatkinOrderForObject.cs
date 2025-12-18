@@ -7,22 +7,19 @@ public class QuestNode_SetRatkinOrderForObject : QuestNode
     public SlateRef<RatkinOrder> ratkinOrder;
     public SlateRef<object> target;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return false;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
         object target = this.target.GetValue(slate);
-        if (target is null)
+        if (target is null || target is not ISingleRatkinOrderRelated orderRelated)
         {
             return;
         }
 
-        RatkinOrder ratkinOrder = this.ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
-        if (ratkinOrder.IsValid() && target is ISingleRatkinOrderRelated orderRelated)
+        RatkinOrder ratkinOrder = this.ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder);
+        if (ratkinOrder.IsValid())
         {
             orderRelated.InitRatkinOrder(ratkinOrder);
         }

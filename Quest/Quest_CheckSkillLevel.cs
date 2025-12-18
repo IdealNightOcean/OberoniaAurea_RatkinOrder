@@ -25,7 +25,7 @@ public class QuestNode_CheckSkillLevel : QuestNode
         {
             QuestPart_CheckSkillLevel questPart_CheckSkillLevel = new()
             {
-                InSignal = inSignal.GetValue(slate) ?? QuestGen.slate.Get<string>("inSignal"),
+                InSignal = inSignal.GetValue(slate) ?? QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
                 OutSignalSuccess = outSignalFail.GetValue(slate),
                 OutSignalFail = outSignalSuccess.GetValue(slate),
                 MinLevel = minLevel.GetValue(slate),

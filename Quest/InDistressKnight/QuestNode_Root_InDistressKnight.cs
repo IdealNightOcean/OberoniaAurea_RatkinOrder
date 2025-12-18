@@ -81,9 +81,9 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
         }
 
         Branch = targetBranch;
-        QuestGen.slate.Set(KeyLibrary_SlateStoreAs.Branch, Branch);
+        QuestGen.slate.Set(KeyLibrary_SlateStoreAs.branch, Branch);
         RatkinOrder = targetBranch.RatkinOrder;
-        QuestGen.slate.Set(KeyLibrary_SlateStoreAs.RatkinOrder, RatkinOrder);
+        QuestGen.slate.Set(KeyLibrary_SlateStoreAs.ratkinOrder, RatkinOrder);
 
         return base.InitRatkinOrder(initBranch);
     }
@@ -103,7 +103,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
         QuestPart_InDistressKnightStartLetter questPart_InDistressKnightStartLetter = new()
         {
-            InSignal = QuestGen.slate.Get<string>("inSignal"),
+            InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
             RelatedOrder = RatkinOrder,
             RelatedFaction = RatkinOrder.Faction,
             OutSignalAccepted = inSignalHelpAccepted,
@@ -136,7 +136,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
         {
             QuestPart_OrderLetter questPart_OrderLetter = new()
             {
-                InSignal = QuestGen.slate.Get<string>("inSignal"),
+                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -177,7 +177,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             {
                 QuestPart_InDistressKnightLeaveLetter questPart_InDistressKnightLeaveLetter = new()
                 {
-                    InSignal = QuestGen.slate.Get<string>("inSignal"),
+                    InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
                     InSignalRemovePawn = inSignalRemovePawn,
                     OutSignalMakeLeave = inSignalMakeLeaved,
                     OutSignalRecruit = InSignalRecruited,
@@ -201,7 +201,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             {
                 QuestPart_OrderLetter questPart_OrderLetter = new()
                 {
-                    InSignal = QuestGen.slate.Get<string>("inSignal"),
+                    InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
                     RelatedOrder = RatkinOrder,
                     RelatedBranch = Branch,
                     RelatedLetterType = OrderLetter.RelatedLetterType.Positive,

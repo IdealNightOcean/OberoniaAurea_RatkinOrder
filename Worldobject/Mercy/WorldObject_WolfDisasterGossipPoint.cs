@@ -23,7 +23,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
     {
         Fornt,
         Side,
-        Back,
+        Back
     }
 
     private GossipType gossipType;
@@ -70,9 +70,24 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
         base.Notify_CaravanArrived(caravan);
     }
 
+    public override bool StartWork(Caravan caravan)
+    {
+        float sucessChange = 0.2f + OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) * 0.05f;
+        Messages.Message(
+            text: "OARO_WolfDisasterGossipPoint_SearchStarted".Translate(
+                this.Named(KeyLibrary_FormatArgName.WORLDOBJECT),
+                sucessChange.ToStringPercent().Named(KeyLibrary_FormatArgName.Chance)),
+            lookTargets: this,
+            def: MessageTypeDefOf.NeutralEvent,
+            historical: false);
+
+        return base.StartWork(caravan);
+    }
+
     protected override void FinishWork()
     {
-        SearchSuccessful = true;
+        int maxSkillLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
+        SearchSuccessful = Rand.Chance(0.2f + maxSkillLevel * 0.05f);
     }
 
     protected override void InterruptWork() => SearchSuccessful = false;
@@ -81,6 +96,11 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
     {
         if (!SearchSuccessful)
         {
+            Messages.Message(
+                text: "OARO_WolfDisasterGossipPoint_SearchFailed".Translate(),
+                lookTargets: caravan,
+                def: MessageTypeDefOf.NegativeEvent,
+                historical: false);
             return;
         }
 

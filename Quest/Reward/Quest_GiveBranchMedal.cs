@@ -31,8 +31,8 @@ public class QuestNode_GiveBranchMedal : QuestNode
         }
         QuestPart_GiveBranchMedal questPart_GiveBranchMedal = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
-            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             Count = count.GetValue(slate),
             PotentialDefs = [],
         };

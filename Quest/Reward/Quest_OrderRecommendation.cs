@@ -37,8 +37,8 @@ public class QuestNode_OrderRecommendation : QuestNode
 
         QuestPart_OrderRecommendation questPart_OrderRecommendation = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
-            RatkinOrder = ratkinOrder ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = ratkinOrder ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
             Count = recommendationCount,
             MapParent = slate.Get<Map>("map")?.Parent,
             WorldObject = worldObject.GetValue(slate),
@@ -150,7 +150,6 @@ public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
         signal.args.TryGetArg("CARAVAN", out caravan);
         if (caravan is not null)
         {
-            Log.Message("get caravan");
             return true;
         }
 

@@ -18,7 +18,7 @@ public class QuestNode_BranchIsTypeOf : QuestNode
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
-        Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+        Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
         if (!branch.IsValid())
         {
             noMatchNode?.Run();

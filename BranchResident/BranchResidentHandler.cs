@@ -54,17 +54,22 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         listing_Rect.Label($"驻派人员总数: {residentPawns.Count}");
         listing_Rect.Label($"驻派记录总数: {residentRecords.Count}");
         listing_Rect.SubLabel("二者应该相等，否则大概率有问题。", 0.8f);
+        if (listing_Rect.ButtonText("结束所有驻派"))
+        {
+            ForceEndAllResidency();
+        }
     }
 
     public bool AddResident(BranchResident resident)
     {
-        if (resident is null || !resident.Validate())
+        if (resident is null || resident.Pawn is null)
         {
             return false;
         }
 
-        if (residentPawns.TryAddOrTransfer(resident.Resident))
+        if (residentPawns.TryAddOrTransfer(resident.Pawn))
         {
+            resident.Pawn.jobs.StopAll();
             resident.StartResidency(branch);
             if (residentRecords.TryGetValue(resident.Def, out BranchResidentLoadBox residentList))
             {
@@ -97,8 +102,17 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
 
     public void ForceEndAllResidency()
     {
+        List<BranchResident> expiredRecords = [];
+        foreach (BranchResidentLoadBox residentListLoadBox in residentRecords.Values)
+        {
+            expiredRecords.AddRange(residentListLoadBox.records);
+        }
+        if (expiredRecords.Count > 0)
+        {
+            FinishResidency(expiredRecords);
+        }
         residentRecords.Clear();
-        ResidentsToCaravan(residentPawns.InnerListForReading);
+        residentPawns.Clear();
     }
 
     private void FinishResidency(IEnumerable<BranchResident> residentRecords, Caravan caravan = null)
@@ -125,22 +139,34 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             }
             finally
             {
-                if (resident?.Resident is not null)
+                if (resident?.Pawn is not null)
                 {
-                    pawns.Add(resident.Resident);
+                    residentPawns.Remove(resident.Pawn);
+                    pawns.Add(resident.Pawn);
                 }
             }
+        }
+
+        if (pawns.NullOrEmpty())
+        {
+            return;
         }
 
         if (caravan is not null)
         {
             foreach (Pawn pawn in pawns)
             {
-                OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+                if (pawn.Faction != Faction.OfPlayer)
+                {
+                    OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+                }
+
                 caravan.AddPawn(pawn, addCarriedPawnToWorldPawnsIfAny: true);
             }
             Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
-                               text: "OARO_ResidencyFinishedText_JoinCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                               text: "OARO_ResidencyFinishedText_JoinCaravan".Translate(
+                                   caravan.Named(KeyLibrary_FormatArgName.Caravan),
+                                   GenLabel.ThingsLabel(pawns.Cast<Thing>()).Named(KeyLibrary_FormatArgName.PawnsInfo)),
                                textLetterDef: LetterDefOf.PositiveEvent, lookTargets: caravan);
             return;
         }
@@ -155,7 +181,9 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             if (ModUtility.TryMakePawnArrival(pawns, arrivalParms, PawnsArrivalModeDefOf.EdgeWalkIn, joinPlayer: true, sendStandardLetter: false))
             {
                 Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
-                                               text: "OARO_ResidencyFinishedText_Map".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                                               text: "OARO_ResidencyFinishedText_Map".Translate(
+                                                   map.Named("map"),
+                                                   GenLabel.ThingsLabel(pawns.Cast<Thing>()).Named(KeyLibrary_FormatArgName.PawnsInfo)),
                                                textLetterDef: LetterDefOf.PositiveEvent,
                                                lookTargets: pawns);
                 return;
@@ -176,7 +204,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         }
         Caravan residentCaravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);
         Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
-                                       text: "OARO_ResidencyFinishedText_NewCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>())),
+                                       text: "OARO_ResidencyFinishedText_NewCaravan".Translate(GenLabel.ThingsLabel(pawns.Cast<Thing>()).Named(KeyLibrary_FormatArgName.PawnsInfo)),
                                        textLetterDef: LetterDefOf.PositiveEvent,
                                        lookTargets: residentCaravan);
     }
@@ -202,7 +230,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             Scribe_Collections.Look(ref records, "records", LookMode.Deep);
             if (Scribe.mode == LoadSaveMode.PostLoadInit)
             {
-                records.RemoveAll(r => r is null || !r.Validate());
+                records.RemoveAll(r => r is null || r.Pawn is null);
             }
         }
     }

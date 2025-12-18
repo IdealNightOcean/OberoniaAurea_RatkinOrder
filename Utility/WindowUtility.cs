@@ -48,7 +48,7 @@ public static class OARO_WindowUtility
     public static bool DrawCloseX(Rect mainRect)
     {
         Rect reusedRect = new(mainRect.xMax - 22f, mainRect.y + 2f, 20f, 20f);
-        return Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true);
+        return Widgets.ButtonImage(reusedRect, IconLibrary.ColseX, doMouseoverSound: true);
     }
 
     public static bool ButtonImage(Rect butRect, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)

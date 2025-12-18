@@ -50,7 +50,7 @@ public class MercyQuestDef : Def
 
     public bool TrySetQuestSlateValue(Slate slate)
     {
-        slate.Set(KeyLibrary_SlateStoreAs.MercyQuestDef, this);
+        slate.Set(KeyLibrary_SlateStoreAs.mercyQuestDef, this);
 
         if (useFixedParentFaction)
         {
@@ -60,14 +60,14 @@ public class MercyQuestDef : Def
             }
             else
             {
-                slate.Set(KeyLibrary_SlateStoreAs.ParentFactionDef, fixedParentFactionDef);
+                slate.Set(KeyLibrary_SlateStoreAs.parentFactionDef, fixedParentFactionDef);
                 if (useFixedParentFaction)
                 {
                     Faction parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(fixedParentFactionDef, parentFactionValidationParams ?? FactionValidationParams.NonHostileNormalFaction);
                     if (parentFaction is null)
                         return false;
                     else
-                        slate.Set(KeyLibrary_SlateStoreAs.ParentFaction, parentFaction);
+                        slate.Set(KeyLibrary_SlateStoreAs.parentFaction, parentFaction);
                 }
             }
         }
@@ -75,12 +75,12 @@ public class MercyQuestDef : Def
         if (subFactionDef is null)
             return false;
         else
-            slate.Set(KeyLibrary_SlateStoreAs.SubFactionDef, subFactionDef);
+            slate.Set(KeyLibrary_SlateStoreAs.subFactionDef, subFactionDef);
 
         if (needPreQuest && helpSeekerPawnKind is null)
             return false;
         else
-            slate.Set(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind, helpSeekerPawnKind);
+            slate.Set(KeyLibrary_SlateStoreAs.helpSeekerPawnKind, helpSeekerPawnKind);
 
         return true;
     }

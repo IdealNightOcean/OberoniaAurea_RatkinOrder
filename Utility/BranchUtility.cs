@@ -70,6 +70,29 @@ public static class BranchUtility
         return true;
     }
 
+    /// <summary>
+    /// 分部能否退出边境轮巡
+    /// </summary>
+    public static AcceptanceReport CanQuitJointPatrol(this Branch branch, bool resultOnly)
+    {
+        JointPatrolManager jointPatrolManager = branch?.RatkinOrder.JointPatrolManager;
+        if (jointPatrolManager is null || jointPatrolManager.CurState != JointPatrolManager.PatrolState.Prepare)
+        {
+            return resultOnly ? false : "OARO_JointPatrol_NotInPrepareStage".Translate();
+        }
+        if (jointPatrolManager.ParticipantsDict.Count <= 2)
+        {
+            return resultOnly ? false : "OARO_JointPatrol_AtLeastTwoBranches".Translate();
+        }
+        if (!jointPatrolManager.IsParticipant(branch))
+        {
+            return resultOnly ? false : "OARO_JointPatrol_NotParticipantIn".Translate();
+        }
+
+        return true;
+    }
+
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CanParticipateInJointPatrolFast(this Branch branch)
     {
@@ -289,7 +312,7 @@ public static class BranchUtility
             return false;
         }
         /*
-        if(!Branch.IsBranchOfType(Branch.BranchType.Friendly))
+        if(!branch.IsBranchOfType(branch.BranchType.Friendly))
         {
             return false;
         }

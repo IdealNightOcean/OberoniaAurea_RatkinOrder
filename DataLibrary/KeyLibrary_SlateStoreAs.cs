@@ -5,40 +5,42 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class KeyLibrary_SlateStoreAs
 {
-    public const string RatkinOrder = "ratkinOrder";
-    public const string OrderFaction = "orderFaction";
-    public const string OrderName = "orderName";
-    public const string OrderRelationship = "orderRelationship";
+    public const string inSignal = "inSignal";
 
-    public const string Branch = "branch";
-    public const string BranchName = "branchName";
-    public const string BranchSite = "branchSite";
+    public const string ratkinOrder = "ratkinOrder";
+    public const string orderFaction = "orderFaction";
+    public const string orderName = "orderName";
+    public const string orderRelationship = "orderRelationship";
 
-    public const string Squad = "squad";
+    public const string branch = "branch";
+    public const string branchName = "branchName";
+    public const string branchSite = "branchSite";
 
-    public const string SubFaction = "subFaction";
-    public const string SubFactionDef = "subFactionDef";
-    public const string ParentFaction = "parentFaction";
-    public const string ParentFactionDef = "parentFactionDef";
+    public const string squad = "squad";
 
-    public const string MercyQuestDef = "mercyQuestDef";
+    public const string subFaction = "subFaction";
+    public const string subFactionDef = "subFactionDef";
+    public const string parentFaction = "parentFaction";
+    public const string parentFactionDef = "parentFactionDef";
+
+    public const string mercyQuestDef = "mercyQuestDef";
     // public const string MercyQuest = "mercyQuest";
-    public const string HelpSeeker = "helpSeeker";
-    public const string HelpSeekerPawnKind = "helpSeekerPawnKind";
+    public const string helpSeeker = "helpSeeker";
+    public const string helpSeekerPawnKind = "helpSeekerPawnKind";
 
-    public const string DemandType = "demandType";
-    public const string DemandDef = "demandDef";
+    public const string demandType = "demandType";
+    public const string demandDef = "demandDef";
 
-    public const string ContractDef = "contractDef";
-    public const string ContractThingDef = "contractThingDef";
-    public const string ContractThingCount = "contractThingCount";
-    public const string ContractReason = "contractReason";
+    public const string contractDef = "contractDef";
+    public const string contractThingDef = "contractThingDef";
+    public const string contractThingCount = "contractThingCount";
+    public const string contractReason = "contractReason";
 
-    public const string PreSetQuestEffectTags = "PreSetQuestEffectTags";
-    public const string PreSetPotentialMedals = "PreSetPotentialMedals";
-    public const string QuestEffectTags = "QuestEffectTags";
+    public const string preSetQuestEffectTags = "preSetQuestEffectTags";
+    public const string preSetPotentialMedals = "preSetPotentialMedals";
+    public const string questEffectTags = "questEffectTags";
 
-    public const string VisitingKnightsDelay = "visitingKnightsDelay";
-    public const string VisitingKnightsDuration = "visitingKnightsDuration";
-    public const string VisitingKnightsCount = "visitingKnightsCount";
+    public const string visitingKnightsDelay = "visitingKnightsDelay";
+    public const string visitingKnightsDuration = "visitingKnightsDuration";
+    public const string visitingKnightsCount = "visitingKnightsCount";
 }

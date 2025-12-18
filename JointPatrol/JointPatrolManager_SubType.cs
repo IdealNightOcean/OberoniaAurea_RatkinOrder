@@ -8,7 +8,8 @@ public partial class JointPatrolManager
     {
         Invalid,
         Prepare,
-        Ongoing
+        Ongoing,
+        Settlement
     }
 
     public enum PatrolLevel : byte

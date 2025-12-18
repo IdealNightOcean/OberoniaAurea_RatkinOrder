@@ -37,8 +37,8 @@ public class Reward_FriendlyBranch : Reward
     {
         yield return new QuestPart_SetBranchToFriendly()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             DurationDays = DurationDays
         };
     }

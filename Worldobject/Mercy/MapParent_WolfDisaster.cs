@@ -1,8 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.Planet;
 using System;
-using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -48,35 +46,9 @@ public class MapParent_WolfDisaster : MapParent_Enterable
 
     public override bool ShouldRemoveMapNow(out bool alsoRemoveWorldObject)
     {
-        alsoRemoveWorldObject = true;
-        if (base.Map.mapPawns.AnyPawnBlockingMapRemoval)
-        {
-            Log.Message("111");
-            return false;
-        }
-
-        foreach (PocketMapParent item in Find.World.pocketMaps.ToList())
-        {
-            if (item.sourceMap == base.Map && item.Map.mapPawns.AnyPawnBlockingMapRemoval)
-            {
-                Log.Message("222");
-                return false;
-            }
-        }
-
-        if (ModsConfig.OdysseyActive && base.Map.listerThings.AnyThingWithDef(ThingDefOf.GravAnchor))
-        {
-            Log.Message("333");
-            return false;
-        }
-
-        if (TransporterUtility.IncomingTransporterPreventingMapRemoval(base.Map))
-        {
-            Log.Message("444");
-            return false;
-        }
-        Log.Message("555");
-        return true;
+        bool result = base.ShouldRemoveMapNow(out _);
+        alsoRemoveWorldObject = result;
+        return result;
     }
 
     protected override void TickInterval(int delta)

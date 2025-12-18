@@ -135,9 +135,13 @@ public class Window_Branch : OrderWindowBase
         base.PostClose();
         BuildingHandler.PostConstructionChanged -= PostConstructionChanged_Building;
         Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
-        ClearConstructCache();
         ContractAcceptances.Reset();
         ClearInteractionCache();
+        ClearConstructCache();
+        if (OptionalBuildingDefs.IsValueCreated)
+        {
+            OptionalBuildingDefs.Value.Clear();
+        }
         CurTab = TabType.Construction;
     }
 
@@ -151,7 +155,7 @@ public class Window_Branch : OrderWindowBase
         float mainInnerRectY = mainInnerRect.yMin;
 
         Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRectY + 1f, 20f, 20f);
-        if (Widgets.ButtonImage(reusedRect, IconLibrary.colseX, doMouseoverSound: true))
+        if (Widgets.ButtonImage(reusedRect, IconLibrary.ColseX, doMouseoverSound: true))
         {
             Close();
             return;
@@ -209,7 +213,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_BranchWin_StoresReservesConstruction".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
         reusedRect = new(reusedRect.xMin - 13f, reusedRect.y, 13f, 22f);
-        GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
+        GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
 
         void DrawEntry(Rect entryRect, float iconMargin, int index)
         {
@@ -784,7 +788,7 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
-        GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
+        GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
 
         Rect commonOutRect = commonRect;
         commonOutRect.yMin = commonRect.yMax - commonEntryHeight * 2f;
@@ -850,7 +854,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
         Widgets.Label(reusedRect, label);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
-        GUI.DrawTexture(reusedRect, IconLibrary.smallExclamation);
+        GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
 
         Rect buildingOutRect = Rect.MinMaxRect(buildingRect.x, buildingRect.yMin + 45f, buildingRect.xMax, buildingRect.yMax);
 
@@ -1489,10 +1493,6 @@ public class Window_Branch : OrderWindowBase
         NextFacilityStageCache = null;
 
         SelUnderConstructionBuilding = null;
-        if (OptionalBuildingDefs.IsValueCreated)
-        {
-            OptionalBuildingDefs.Value.Clear();
-        }
     }
 
     private void ClearInteractionCache()

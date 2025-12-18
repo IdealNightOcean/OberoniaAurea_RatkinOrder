@@ -91,8 +91,8 @@ public class BranchDemand : IExposable
         Slate slate = new();
         slate.SetBasicBranchSlateVar(branch);
 
-        slate.Set(KeyLibrary_SlateStoreAs.DemandDef, def);
-        slate.Set(KeyLibrary_SlateStoreAs.DemandType, def.demandType);
+        slate.Set(KeyLibrary_SlateStoreAs.demandDef, def);
+        slate.Set(KeyLibrary_SlateStoreAs.demandType, def.demandType);
 
         Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
         slate.Set("map", map);

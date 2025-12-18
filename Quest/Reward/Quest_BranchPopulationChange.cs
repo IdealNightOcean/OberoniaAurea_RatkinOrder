@@ -31,9 +31,9 @@ public class QuestNode_BranchPopulationChange : QuestNode
         Slate slate = QuestGen.slate;
         QuestPart_BranchPopulationChange questPart_BranchPopulationChange = new()
         {
-            InSignalTrigger = inSignalTrigger.GetValue(slate) ?? slate.Get<string>("inSignal"),
+            InSignalTrigger = inSignalTrigger.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
 
-            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             Amount = defaultAmount.GetValue(slate),
             ChangeFactor = defaultChangeFactor.GetValue(slate)
         };

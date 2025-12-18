@@ -93,31 +93,19 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
 
     private void DrawRankBackGround(Rect inRect)
     {
-        switch (TargetRank)
+        Texture2D rankTex = TargetRank switch
         {
-            case ResidentKnightRecord.Rank.Regular:
-                {
-                    GUI.DrawTexture(inRect, rankBackground_Regular, ScaleMode.ScaleToFit);
-                    return;
-                }
-            case ResidentKnightRecord.Rank.Elite:
-                {
-                    GUI.DrawTexture(inRect, rankBackground_Elite, ScaleMode.ScaleToFit);
-                    return;
-                }
-            case ResidentKnightRecord.Rank.Honor:
-                {
-                    GUI.DrawTexture(inRect, rankBackground_Honor, ScaleMode.ScaleToFit);
-                    return;
-                }
-            case ResidentKnightRecord.Rank.Crown:
-                {
-                    GUI.DrawTexture(inRect, rankBackground_Crown, ScaleMode.ScaleToFit);
-                    return;
-                }
-            default: return;
-        }
+            ResidentKnightRecord.Rank.Regular => rankBackground_Regular,
+            ResidentKnightRecord.Rank.Elite => rankBackground_Elite,
+            ResidentKnightRecord.Rank.Honor => rankBackground_Honor,
+            ResidentKnightRecord.Rank.Crown => rankBackground_Crown,
+            _ => null,
+        };
 
+        if (rankTex is not null)
+        {
+            GUI.DrawTexture(inRect, rankTex, ScaleMode.ScaleToFit);
+        }
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/ResidentKnight/RankUpgrade/OARO_MainBackground");

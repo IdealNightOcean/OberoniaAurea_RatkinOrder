@@ -33,9 +33,9 @@ public static class OARO_QuestUtility
 
     public static void SetBasicOrderSlateVar(this Slate slate, RatkinOrder ratkinOrder)
     {
-        slate.Set(KeyLibrary_SlateStoreAs.RatkinOrder, ratkinOrder);
-        slate.Set(KeyLibrary_SlateStoreAs.OrderName, ratkinOrder.Name);
-        slate.Set(KeyLibrary_SlateStoreAs.OrderFaction, ratkinOrder.Faction);
+        slate.Set(KeyLibrary_SlateStoreAs.ratkinOrder, ratkinOrder);
+        slate.Set(KeyLibrary_SlateStoreAs.orderName, ratkinOrder.Name);
+        slate.Set(KeyLibrary_SlateStoreAs.orderFaction, ratkinOrder.Faction);
     }
 
     public static void SetBasicBranchSlateVar(this Slate slate, Branch branch, bool alsoSetOrder = true)
@@ -44,9 +44,9 @@ public static class OARO_QuestUtility
         {
             slate.SetBasicOrderSlateVar(branch.RatkinOrder);
         }
-        slate.Set(KeyLibrary_SlateStoreAs.Branch, branch);
-        slate.Set(KeyLibrary_SlateStoreAs.BranchName, branch.Name);
-        slate.Set(KeyLibrary_SlateStoreAs.BranchSite, branch.BaseSite);
+        slate.Set(KeyLibrary_SlateStoreAs.branch, branch);
+        slate.Set(KeyLibrary_SlateStoreAs.branchName, branch.Name);
+        slate.Set(KeyLibrary_SlateStoreAs.branchSite, branch.BaseSite);
     }
 
     public static void SendWorkResolvedSignal(this WorldObject worldObject, NamedArgument[] args = null)

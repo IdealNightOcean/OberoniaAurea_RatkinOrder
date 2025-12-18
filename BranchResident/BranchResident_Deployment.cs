@@ -17,16 +17,16 @@ public class BranchResident_Deployment : BranchResident
 
     public override void EndResidency(Branch branch)
     {
-        if (resident is null)
+        if (pawn is null)
         {
             return;
         }
         float deployDays = Mathf.Max(0f, (totalDeployDays - DeployDaysLeft));
 
-        if (Skill is not null && resident.skills is not null)
+        if (Skill is not null && pawn.skills is not null)
         {
             //  float xpGain = cachedDailyXp * deployDays;
-            //  resident.skills.GetSkill(Skill).Learn(xpGain, direct: true);
+            //  pawn.skills.GetSkill(Skill).Learn(xpGain, direct: true);
         }
 
         if (branch.EffectTags.HasTag(""))
@@ -36,7 +36,7 @@ public class BranchResident_Deployment : BranchResident
 
         if (branch.EffectTags.HasTag(KeyLibrary_EffectTag.IntensiveTrain))
         {
-            resident.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_IntensiveTrain);
+            pawn.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_IntensiveTrain);
         }
     }
 }

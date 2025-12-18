@@ -24,12 +24,12 @@ public class BranchTaskStartChecker_JurisdictionDutyPrep : BranchTaskStartChecke
 /// </summary>
 public class BranchTask_JurisdictionDutyPrep : BranchTask
 {
-    public override int BranchRestTick(Branch branch)
+    public override int BranchRestTick()
     {
-        return (int)(base.BranchRestTick(branch) * (branch.IsBranchOfType(Branch.BranchType.Mobile) ? 0.25f : 1f));
+        return (int)(base.BranchRestTick() * (branch.IsBranchOfType(Branch.BranchType.Mobile) ? 0.25f : 1f));
     }
 
-    protected override void PostTaskStart(Branch branch)
+    protected override void PostTaskStart()
     {
         Map map = Find.AnyPlayerHomeMap;
         if (branch.IsInAffectedRange(map.Tile))

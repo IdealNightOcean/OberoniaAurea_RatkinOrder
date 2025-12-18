@@ -10,10 +10,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_EffectTags : QuestNode
 {
-    protected override bool TestRunInt(Slate slate)
-    {
-        return true;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {

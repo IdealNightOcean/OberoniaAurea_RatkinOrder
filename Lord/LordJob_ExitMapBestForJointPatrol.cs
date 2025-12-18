@@ -17,7 +17,7 @@ public class LordJob_ExitMapBestForJointPatrol : LordJob_ExitMapBest
     {
         if (condition == PawnLostCondition.ExitedMap)
         {
-            Log.Message("join patrol");
+            p.DeSpawnOrDeselect();
             ratkinOrder.JointPatrolManager.OnResidentKnightBackTeam(p);
         }
     }

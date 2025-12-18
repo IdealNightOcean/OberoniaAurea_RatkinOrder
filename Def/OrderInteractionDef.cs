@@ -50,7 +50,7 @@ public class OrderInteractionDef : InteractionDefBase
     {
         if (ratkinOrder.IsValid())
         {
-            Worker?.TryApplyInteraction(ratkinOrder, map); ;
+            Worker?.TryApplyInteraction(ratkinOrder, map);
         }
     }
 

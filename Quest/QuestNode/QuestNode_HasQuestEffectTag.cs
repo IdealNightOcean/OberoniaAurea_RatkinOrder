@@ -12,7 +12,7 @@ public class QuestNode_HasQuestEffectTag : QuestNode
     /// 这是用于TestRun的tag列表
     /// </summary>
     [NoTranslate]
-    public SlateRef<string> tagsListForTestRun = KeyLibrary_SlateStoreAs.QuestEffectTags;
+    public SlateRef<string> tagsListForTestRun = KeyLibrary_SlateStoreAs.questEffectTags;
 
     public QuestNode matchNode;
     public QuestNode noMatchNode;

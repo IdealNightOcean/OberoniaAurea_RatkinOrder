@@ -10,7 +10,7 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
 {
     public bool IsNormalLeave;
 
-    public string InSiganl;
+    public string InSignal;
     public string InSignalSkillSuccess;
     public string InSignalResolved;
 
@@ -29,7 +29,7 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
         base.ExposeData();
         Scribe_Values.Look(ref IsNormalLeave, "IsNormalLeave", defaultValue: true);
 
-        Scribe_Values.Look(ref InSiganl, "InSiganl");
+        Scribe_Values.Look(ref InSignal, "InSignal");
         Scribe_Values.Look(ref InSignalSkillSuccess, "InSignalSkillSuccess");
         Scribe_Values.Look(ref InSignalResolved, "InSignalResolved");
 
@@ -47,7 +47,7 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
     public override void Cleanup()
     {
         base.Cleanup();
-        InSiganl = null;
+        InSignal = null;
         InSignalSkillSuccess = null;
         InSignalResolved = null;
 
@@ -70,7 +70,7 @@ internal class QuestPart_Apprentice_QuizStayIntention : QuestPart
         {
             resolved = true;
         }
-        else if (signal.tag == InSiganl)
+        else if (signal.tag == InSignal)
         {
             sentOnce = true;
             TaggedString label;

@@ -15,7 +15,7 @@ public class QuestNode_RimOrderLetter : QuestNode_ChoiceLetter
     {
         if (questPart_ChoiceLetter is QuestPart_RimOrderLetter rimOrderLetterPart)
         {
-            rimOrderLetterPart.RelatedOrder = ratkinOrder.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
+            rimOrderLetterPart.RelatedOrder = ratkinOrder.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder);
         }
     }
 }

@@ -263,21 +263,21 @@ public partial class Window_OrderHall
                 starCount++;
                 starRect = new(starRectX, starRectY, 18f, 18f);
                 starRectX += 20f;
-                GUI.DrawTexture(starRect, starWhite, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(starRect, IconLibrary.StarWhite, ScaleMode.ScaleToFit);
             }
             while (starCount < 6 && starCount < PreferredFurnitureCount.Value.Item2)
             {
                 starCount++;
                 starRect = new(starRectX, starRectY, 18f, 18f);
                 starRectX += 20f;
-                GUI.DrawTexture(starRect, starBlack, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(starRect, IconLibrary.StarBlack, ScaleMode.ScaleToFit);
             }
             TooltipHandler.TipRegion(reusedRect, () => PreferredFurnitureExplanation.Value, uniqueId: 59748631);
 
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(inRectX + 260f, inRectY + 164f, 80f, 20f);
             Widgets.Label(reusedRect, "OARO_HallWin_HonorAcademic".Translate());
-            reusedRect = new(inRectX + 260f, reusedRect.yMax + 8f, 80f, 20f);
+            reusedRect = new(inRectX + 240f, reusedRect.yMax + 8f, 100f, 20f);
 
 
             if (Record.HonorAcademicDef is null)
@@ -292,7 +292,7 @@ public partial class Window_OrderHall
                 BranchHonorDef honorDef = Record.Branch.HonorDef;
                 Widgets.Label(reusedRect, Record.HonorAcademicDef.label.Colorize(honorDef.color));
                 reusedRect = new(inRectX + 320f, inRectY + 164f, 90f, 55f);
-                GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture);
+                GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
                 float honorAcademicProgress = Record.HonorAcademicLevel / (float)Record.HonorAcademicDef.MaxStageLevel;
                 reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
@@ -521,14 +521,9 @@ public partial class Window_OrderHall
         private static readonly Texture2D academicButton = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_AcademicButton");
         private static readonly Texture2D academicButton_Down = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_AcademicButton_Down");
 
-        private static readonly Texture2D starWhite = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_StarWhite");
-        private static readonly Texture2D starBlack = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_StarBlack");
-
         private static readonly Texture2D rankBackGround_RegularS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_RegularS");
         private static readonly Texture2D rankBackGround_EliteS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_EliteS");
         private static readonly Texture2D rankBackGround_HonorS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_HonorS");
         private static readonly Texture2D rankBackGround_CrownS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_CrownS");
     }
-
-
 }

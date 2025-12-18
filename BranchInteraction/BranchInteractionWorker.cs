@@ -12,7 +12,6 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
 {
     public readonly BranchInteractionDef Def = def ?? throw new ArgumentNullException(nameof(def));
 
-
     protected virtual AcceptanceReport ParmsValidate(BranchInteractionParms parms, bool resultOnly)
     {
         if (!parms.Branch.IsValid())

@@ -22,11 +22,11 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
 
     protected override Faction GetOrGenerateFaction()
     {
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction);
+        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
             SubFaction = subFaction,
-            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentFaction)
+            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction)
         };
         QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
 
@@ -91,7 +91,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
 
         if (NormalLeave)
         {
-            questPart_Apprentice_QuizStayIntention.InSiganl = SkillCheckedSignal;
+            questPart_Apprentice_QuizStayIntention.InSignal = SkillCheckedSignal;
         }
         else
         {
@@ -114,8 +114,8 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
                          text: "[apprenticeNoOnePickUpText]",
                          label: "[apprenticeNoOnePickUpLabel]");
 
-            questPart_Apprentice_QuizStayIntention.InSiganl = QuestGenUtility.HardcodedSignalWithQuestID("apprenticeHome.Destroyed");
-            questPart_Apprentice_QuizStayIntention.InSignalResolved = QuestGenUtility.HardcodedSignalWithQuestID("apprenticeHome.Resolved");
+            questPart_Apprentice_QuizStayIntention.InSignal = QuestGenUtility.HardcodedSignalWithQuestID("apprenticeHome.Destroyed");
+            questPart_Apprentice_QuizStayIntention.InSignalResolved = QuestGenUtility.HardcodedSignalWithQuestID("apprenticeHome.WorkResolved");
         }
         quest.AddPart(questPart_Apprentice_QuizStayIntention);
 
@@ -127,7 +127,14 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         Quest quest = QuestGen.quest;
-        quest.Delay(questParameter.questDurationTicks, inner: null, inSignalEnable: null, inSignalDisable: null, outSignalComplete: DurationEndSignal, isQuestTimeout: false, expiryInfoPart: "GuestsDepartsIn".Translate(), expiryInfoPartTip: "GuestsDepartsOn".Translate(), debugLabel: "QuestDelay");
+        quest.Delay(
+            delayTicks: questParameter.questDurationTicks,
+            inner: null,
+            outSignalComplete: DurationEndSignal,
+            isQuestTimeout: false,
+            expiryInfoPart: "GuestsDepartsIn".Translate(),
+            expiryInfoPartTip: "GuestsDepartsOn".Translate(),
+            debugLabel: "QuestDelay");
 
         string skillSuccessEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillSuccessEnd");
         string skillFailEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillFailEnd");

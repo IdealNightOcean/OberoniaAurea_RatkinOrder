@@ -283,8 +283,6 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
 
     public override void PostConvertToCaravan(Caravan caravan)
     {
-        Log.Message($"curWorkType: {curWorkType}");
-        Log.Message($"requestCountLeft: {requestCountLeft}");
         switch (curWorkType)
         {
             case WorkType.Direct:
@@ -360,7 +358,6 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         int maxTakeCount = Mathf.Min(requestCountLeft, Mathf.CeilToInt(requestCount / 3 * validInfoCount));
         requestCountLeft -= fixedCaravan.RemoveThingsOfDef(requestDef, maxTakeCount);
         validInfoCount = 0;
-        Log.Message($"requestCountLeft: {requestCountLeft}");
         HasFeastLater = requestCountLeft <= 0 && curTrust >= 0.8f;
     }
 

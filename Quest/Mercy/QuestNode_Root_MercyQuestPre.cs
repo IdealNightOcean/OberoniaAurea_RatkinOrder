@@ -9,14 +9,14 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 {
     protected override bool TestRunInt(Slate slate)
     {
-        return slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuestDef, out MercyQuestDef _);
+        return slate.TryGet(KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef _);
     }
 
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
-        string rootInSignal = slate.Get<string>("inSignal");
+        string rootInSignal = slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
         Map map = slate.Get<Map>("map") ?? QuestGen_Get.GetMap();
         if (map is null)
         {
@@ -24,11 +24,11 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             return;
         }
         slate.Set("map", map);
-        slate.TryGet(KeyLibrary_SlateStoreAs.MercyQuestDef, out MercyQuestDef mercyQuestDef);
+        slate.TryGet(KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef mercyQuestDef);
 
-        slate.TryGet(KeyLibrary_SlateStoreAs.SubFactionDef, out FactionDef subFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.ParentFactionDef, out FactionDef parentFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.ParentFaction, out Faction parentFaction);
+        slate.TryGet(KeyLibrary_SlateStoreAs.subFactionDef, out FactionDef subFactionDef);
+        slate.TryGet(KeyLibrary_SlateStoreAs.parentFactionDef, out FactionDef parentFactionDef);
+        slate.TryGet(KeyLibrary_SlateStoreAs.parentFaction, out Faction parentFaction);
 
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
         if (subFaction is null)
@@ -39,11 +39,11 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         quest.AddPart(new QuestPart_PreMercyQuestCleaner());
 
-        slate.Set(KeyLibrary_SlateStoreAs.SubFaction, subFaction);
+        slate.Set(KeyLibrary_SlateStoreAs.subFaction, subFaction);
 
-        PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.HelpSeekerPawnKind);
+        PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.helpSeekerPawnKind);
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
-        slate.Set(KeyLibrary_SlateStoreAs.HelpSeeker, helpSeeker);
+        slate.Set(KeyLibrary_SlateStoreAs.helpSeeker, helpSeeker);
         quest.PawnsArrive([helpSeeker], inSignal: rootInSignal, map.Parent, arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn);
 
         string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("AcceptMercyQuest");
@@ -126,7 +126,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             InSignalAccept = acceptSignal,
             InSignalReject = rejectSignal,
 
-            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.MercyQuestDef),
+            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
 
             SubFaction = subFaction,
             ParentFaction = parentFaction,

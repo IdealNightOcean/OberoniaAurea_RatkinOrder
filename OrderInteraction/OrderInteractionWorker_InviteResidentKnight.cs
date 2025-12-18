@@ -28,7 +28,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
         int residentKnightCeiling = ResidentKnightsManager.ResidentKnightCeiling;
         if (ResidentKnightsManager.Instance.KnightsCount >= residentKnightCeiling)
         {
-            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(residentKnightCeiling);
+            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(ResidentKnightsManager.Instance.KnightsCount, residentKnightCeiling);
         }
 
         AcceptanceReport baseAcceptance = base.CanUseInteraction(ratkinOrder, map, resultOnly);
@@ -65,7 +65,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
 
         if (!branch.IsValid())
         {
-            return (false, true);
+            return (false, false);
         }
 
         KnightRecord knightRecord = new(ratkinOrder, branch, isCombatant: true, isCommander: false);
@@ -77,7 +77,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
         };
         if (!ModUtility.TryMakePawnArrival([knight], parms, PawnsArrivalModeDefOf.EdgeDrop, joinPlayer: true))
         {
-            return (false, true);
+            return (false, false);
         }
 
         ResidentKnightsManager.Instance.AddResidentKnight(knight, knightRecord);

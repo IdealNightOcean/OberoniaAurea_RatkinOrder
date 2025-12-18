@@ -11,7 +11,7 @@ public class QuestNode_AddEffectTags : QuestNode
     /// 这是用于TestRun的tag列表
     /// </summary>
     [NoTranslate]
-    public SlateRef<string> addToTestList = KeyLibrary_SlateStoreAs.QuestEffectTags;
+    public SlateRef<string> addToTestList = KeyLibrary_SlateStoreAs.questEffectTags;
 
     [NoTranslate]
     public SlateRef<IEnumerable<QuestEffectTag>> tagsToAdd;

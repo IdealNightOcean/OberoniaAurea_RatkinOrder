@@ -23,6 +23,7 @@ internal sealed class QuestNode_Root_ResidentKnightBackPlayer : QuestNode
 
         Map map = slate.Get<Map>("map") ?? QuestGen_Get.GetMap();
         MapParent mapParent = map?.Parent;
+        RatkinOrder ratkinOrder = slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder);
 
         string forceEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("ForceEnd_Quest");
 
@@ -41,7 +42,8 @@ internal sealed class QuestNode_Root_ResidentKnightBackPlayer : QuestNode
 
         QuestPart_ResidentKnightBackPlayer questPart_ResidentKnightBackPlayer = new()
         {
-            ratkinOrder = slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            inSignalEnable = slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            ratkinOrder = ratkinOrder,
             pawns = [],
             inSignalPawnSpawned = inSignalPawnSpawned,
             outSignalCanBack = outSignalCanBack,
@@ -57,7 +59,9 @@ internal sealed class QuestNode_Root_ResidentKnightBackPlayer : QuestNode
             arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn,
             joinPlayer: true,
             customLetterLabel: "OARO_LetterLabel_ResidentKnightReturnFromJointPatrol".Translate(),
-            customLetterText: "OARO_LetterText_ResidentKnightReturnFromJointPatrol".Translate()
+            customLetterText: "OARO_LetterText_ResidentKnightReturnFromJointPatrol".Translate(
+                GenLabel.ThingsLabel(pawns.Cast<Thing>()).Named("PawnsInfo"),
+                ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName))
             );
 
         quest.End(QuestEndOutcome.Unknown, inSignal: forceEndSignal);
@@ -128,11 +132,14 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
     public override void Notify_PreCleanup()
     {
         base.Notify_PreCleanup();
-        TaggedString label = "OARO_LetterLabel_ResidentKnightReturnFromJointPatrol".Translate();
-        TaggedString text = resultSummarySB.ToString();
-        OrderLetterUtility.MakeOrderLetter(
-            label: label,
-            text: text,
+        if (resultSummarySB is null)
+        {
+            return;
+        }
+
+        OrderLetterUtility.ReceiveLetter(
+            label: "OARO_LetterLabel_ResidentKnightReturnFromJointPatrol".Translate(),
+            text: resultSummarySB.ToString(),
             def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: ratkinOrder,
             sender: ratkinOrder?.NameColored,
@@ -141,7 +148,7 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
 
     public override void QuestPartTick()
     {
-        if (--ticksToNextMapCheck < 0)
+        if ((--ticksToNextMapCheck) <= 0)
         {
             ticksToNextMapCheck = 10000;
             mapParent = quest.GetAvailableMapParent(mapParent);
@@ -162,6 +169,7 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
                 string partResult = ResidentKnightAcademic(p);
                 if (!string.IsNullOrEmpty(partResult))
                 {
+                    resultSummarySB ??= new(64);
                     resultSummarySB.AppendLine(partResult);
                 }
                 if (pawns.Count == 0)

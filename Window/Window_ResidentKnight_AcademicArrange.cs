@@ -83,6 +83,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         float mainInnerX = mainInnerRect.xMin;
         float mainInnerY = mainInnerRect.yMin;
 
+        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        {
+            Close();
+            return;
+        }
+
         Rect pawnRect = new(mainRect.xMin, mainRect.yMin, 198f, 272f);
         DarwPawnInfo(pawnRect);
 
@@ -101,12 +107,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         float innerX = innerRect.xMin;
         float innerY = innerRect.yMin;
         float innerWidth = innerRect.width;
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 20f, 70f, 60f);
+        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 20f, 75f, 75f);
         GUI.DrawTexture(reusedRect, PortraitsCache.Get(Record.Knight, reusedRect.size, Rot4.South));
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, reusedRect.yMax + 20f, innerWidth, 20f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, reusedRect.yMax + 8f, innerWidth, 20f);
         Widgets.Label(reusedRect, Record.Knight.NameShortColored);
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 125f, 114f, 41f);
@@ -158,7 +164,6 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         Rect reusedRect = new(inRect.x, inRect.y + 14f, inRect.width, 20f);
         Widgets.Label(reusedRect, def.label);
 
-
         int academicLevel;
         if (def.isHonorAcademic)
         {
@@ -171,6 +176,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         reusedRect = new(inRect.x, reusedRect.yMax + 10f, inRect.width, 20f);
         Widgets.Label(reusedRect, "OARO_AcademicArrange_UnlockNum".Translate(academicLevel, def.MaxStageLevel));
 
+        if ((def.personality & Record.Personality) != 0)
+        {
+            reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 4f, 20f, 20f);
+            GUI.DrawTexture(reusedRect, IconLibrary.StarWhite);
+            TooltipHandler.TipRegion(inRect, () => "OARO_ResidentAcademic_ResonatePersonality".Translate(), uniqueId: 3256725);
+        }
         if (SelAcademicDef == def)
         {
             Widgets.DrawBox(inRect);
@@ -243,7 +254,10 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         if (CheckAcademicStageLevel == SelAcademicStageLevel + 1)
         {
             reusedRect = new(innerX + 660f, innerY + 430f, 160f, 64f);
-            Widgets.Label(reusedRect, "OARO_MeditationPointsSuffix".Translate(MeditationPointForSelAcademicUpgrade.ToString("F0").Named(KeyLibrary_FormatArgName.Count)));
+            Widgets.Label(
+                rect: reusedRect,
+                label: "OARO_MeditationPointsSuffix".Translate(MeditationPointForSelAcademicUpgrade.ToString("F0").Named(KeyLibrary_FormatArgName.Count))
+                                                    .Colorize(NoAdditionalCostAcademicCeiling < Record.TotalAcademicLevel.Value ? ColorLibrary.RedReadable : Color.white));
 
             reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 32f, 196f, 54f);
             if (OARO_WindowUtility.TextButtonImageDisableable(
@@ -286,7 +300,18 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         {
             reusedRect = new(innerX + 660f, innerY + 480f, 160f, 64f);
             GUI.DrawTexture(reusedRect, textLace, ScaleMode.ScaleToFit);
-            Widgets.Label(reusedRect, CheckAcademicStageLevel <= SelAcademicStageLevel ? "OARO_Unlocked".Translate() : "OARO_NeedPreAcademicLevel".Translate());
+            TaggedString stageUnlockLabel;
+            if (CheckAcademicStageLevel <= SelAcademicStageLevel)
+            {
+                stageUnlockLabel = SelAcademicStageLevel == SelAcademicDef.MaxStageLevel
+                    ? "OARO_AlreadyAtMaxAcademicLevel".Translate()
+                    : "OARO_Unlocked".Translate();
+            }
+            else
+            {
+                stageUnlockLabel = "OARO_NeedPreAcademicLevel".Translate();
+            }
+            Widgets.Label(reusedRect, stageUnlockLabel);
         }
 
         OARO_WindowUtility.ResetText();
@@ -308,7 +333,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         if (stageLevel < SelAcademicDef.MaxStageLevel)
         {
-            reusedRect = innerRect;
+            reusedRect = inRect;
             reusedRect.xMin = reusedRect.xMax - 2f;
             reusedRect.yMin += 4f;
             reusedRect.yMax -= 4f;
@@ -431,7 +456,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             SelAcademicStageLevel = 0;
         }
 
-        MeditationPointForSelAcademicUpgrade = ResidentKnightRecord.GetMeditationPointsNeeded(SelAcademicDef, Record.Personality, CheckAcademicStageLevel);
+        MeditationPointForSelAcademicUpgrade = ResidentKnightRecord.GetMeditationPointsNeeded(SelAcademicDef, Record.Personality, SelAcademicStageLevel + 1);
     }
 
     private void DrawRankBackGround(Rect inRect)

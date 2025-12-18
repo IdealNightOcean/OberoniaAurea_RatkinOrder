@@ -48,7 +48,7 @@ public class QuestNode_OrderLetter : QuestNode
         Slate slate = QuestGen.slate;
         QuestPart_OrderLetter questPart_OrderLetter = (QuestPart_OrderLetter)Activator.CreateInstance(PartClass);
 
-        questPart_OrderLetter.InSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>("inSignal");
+        questPart_OrderLetter.InSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
         questPart_OrderLetter.OrderLetterDef = orderLetterDef.GetValue(slate) ?? OrderLetterDefOf.OARO_UrgentLetter;
         questPart_OrderLetter.RelatedLetterType = relatedLetterType.GetValue(slate) ?? OrderLetter.RelatedLetterType.Neutral;
 
@@ -58,8 +58,8 @@ public class QuestNode_OrderLetter : QuestNode
 
         questPart_OrderLetter.DelayDays = delayDays.GetValue(slate);
 
-        questPart_OrderLetter.RelatedOrder = relatedOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder);
-        questPart_OrderLetter.RelatedBranch = relatedBranch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+        questPart_OrderLetter.RelatedOrder = relatedOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder);
+        questPart_OrderLetter.RelatedBranch = relatedBranch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
 
         questPart_OrderLetter.signalListenMode = signalListenMode.GetValue(slate).GetValueOrDefault();
         questPart_OrderLetter.InitLetterTextRequest(label.GetValue(slate), text.GetValue(slate), sender.GetValue(slate), labelRules.GetValue(slate), textRules.GetValue(slate));

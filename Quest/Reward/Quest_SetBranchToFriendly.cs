@@ -31,8 +31,8 @@ public class QuestNode_SetBranchToFriendly : QuestNode
 
         QuestPart_SetBranchToFriendly questPart_SetBranchToFriendly = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
-            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             DurationDays = durationDays.GetValue(slate),
             ShowMessage = showMessage.GetValue(slate),
         };

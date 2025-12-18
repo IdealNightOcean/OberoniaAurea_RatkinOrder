@@ -4,17 +4,17 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchResident_MedicalAssistance : BranchResident
+public class BranchResident_CaravanMedicalAssistance : BranchResident
 {
     public override void StartResidency(Branch branch)
     {
         base.StartResidency(branch);
-        List<Hediff> badHediffs = resident.health.hediffSet.hediffs.Where(h => h.def.isBad).ToList();
+        List<Hediff> badHediffs = pawn.health.hediffSet.hediffs.Where(h => h.def.isBad).ToList();
         if (badHediffs.Count > 0)
         {
             foreach (Hediff hediff in badHediffs)
             {
-                resident.health.RemoveHediff(hediff);
+                pawn.health.RemoveHediff(hediff);
             }
         }
     }

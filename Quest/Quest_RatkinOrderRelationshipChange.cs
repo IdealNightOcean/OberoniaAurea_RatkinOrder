@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestNode_RatkinOrderRelationshipChange : QuestNode
 {
     [NoTranslate]
-    public SlateRef<string> inSiganl;
+    public SlateRef<string> inSignal;
 
     public SlateRef<RatkinOrder> ratkinOrder;
     public SlateRef<int> offset;
@@ -15,18 +15,15 @@ public class QuestNode_RatkinOrderRelationshipChange : QuestNode
     [MustTranslate]
     public SlateRef<string> reason;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return true;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
         QuestPart_RatkinOrderRelationshipChange questPart_RatkinOrderRelationshipChange = new()
         {
-            InSiganl = QuestGenUtility.HardcodedSignalWithQuestID(inSiganl.GetValue(slate)) ?? slate.Get<string>("inSiganl"),
-            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            InSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
             Offset = offset.GetValue(slate),
             SendLetter = sendLetter.GetValue(slate)
         };
@@ -36,7 +33,7 @@ public class QuestNode_RatkinOrderRelationshipChange : QuestNode
 
 public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrderRemoved
 {
-    public string InSiganl;
+    public string InSignal;
     public RatkinOrder RatkinOrder;
     public int Offset;
     public bool SendLetter = true;
@@ -45,17 +42,17 @@ public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrder
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref InSiganl, "InSiganl");
-        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
-        Scribe_Values.Look(ref Offset, "Offset", 0);
-        Scribe_Values.Look(ref SendLetter, "SendLetter", defaultValue: true);
-        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
+        Scribe_Values.Look(ref InSignal, nameof(InSignal));
+        Scribe_References.Look(ref RatkinOrder, nameof(RatkinOrder));
+        Scribe_Values.Look(ref Offset, nameof(Offset), 0);
+        Scribe_Values.Look(ref SendLetter, nameof(SendLetter), defaultValue: true);
+        Scribe_Values.Look(ref Reason, nameof(Reason));
     }
 
     public override void Cleanup()
     {
         base.Cleanup();
-        InSiganl = null;
+        InSignal = null;
         RatkinOrder = null;
         Offset = 0;
         SendLetter = true;
@@ -73,7 +70,7 @@ public class QuestPart_RatkinOrderRelationshipChange : QuestPart, IOnRatkinOrder
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         base.Notify_QuestSignalReceived(signal);
-        if (signal.tag == InSiganl)
+        if (signal.tag == InSignal)
         {
             RatkinOrder?.RelationshipKindOffsetBy(Offset, Reason, SendLetter);
         }

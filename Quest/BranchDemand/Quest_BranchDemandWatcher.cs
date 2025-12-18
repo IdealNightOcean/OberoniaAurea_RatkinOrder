@@ -21,8 +21,8 @@ public class QuestNode_BranchDemandWatcher : QuestNode
     {
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
-            Branch = branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
-            DemandType = demandType.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType)
+            Branch = branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
+            DemandType = demandType.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType)
         };
 
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);

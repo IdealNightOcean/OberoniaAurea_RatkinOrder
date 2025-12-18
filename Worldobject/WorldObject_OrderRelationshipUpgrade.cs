@@ -1,6 +1,6 @@
 ﻿namespace OberoniaAurea.RatkinOrder;
 
-public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixedCaravan_Nameable //, ISingleRatkinOrderRelatedReferenceable
+public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixedCaravan_Nameable, ISingleRatkinOrderRelated
 {
     private RatkinOrder ratkinOrder;
     public RatkinOrder RatkinOrder => ratkinOrder;
@@ -25,13 +25,11 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
 
     protected override void FinishWork()
     {
-        if (!ratkinOrder.IsValid())
+        if (ratkinOrder.IsValid())
         {
-            return;
+            this.SendWorkResolvedSignal();
         }
-        //RelatedOrder.RelationshipKindOffsetBy(1, sendLetter: true);
 
-        this.SendWorkResolvedSignal();
         this.SafeDestroy();
     }
 

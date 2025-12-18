@@ -23,7 +23,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         {
             return (null, null);
         }
-        Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef: QuestGen.slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.SubFactionDef) ?? OARO_ModDefOf.OARO_SubRakinia_Neutral,
+        Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef: QuestGen.slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.subFactionDef) ?? OARO_ModDefOf.OARO_SubRakinia_Neutral,
                                                                  parentFactionDef: parentFaction.def,
                                                                  parentFaction: parentFaction);
         return (parentFaction, subFaction);
@@ -33,7 +33,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
     {
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
-        string rootInSignal = slate.Get<string>("inSignal");
+        string rootInSignal = slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
         Map map = QuestGen_Get.GetMap();
         if (map is null)
         {
@@ -56,7 +56,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         quest.ReserveFaction(subFaction);
 
         slate.Set("faction", parentFaction);
-        slate.Set(KeyLibrary_SlateStoreAs.SubFaction, subFaction);
+        slate.Set(KeyLibrary_SlateStoreAs.subFaction, subFaction);
         slate.Set("map", map);
 
         //人物生成;

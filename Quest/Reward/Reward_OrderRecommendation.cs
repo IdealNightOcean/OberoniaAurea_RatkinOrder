@@ -39,8 +39,8 @@ public class Reward_OrderRecommendation : Reward
     {
         yield return new QuestPart_OrderRecommendation()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
             Count = Count,
             MapParent = MapParent,
             GiveToCaravan = GiveToCaravan,

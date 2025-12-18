@@ -33,7 +33,7 @@ public class QuestNode_AllOrdersEsteemChange : QuestNode
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
             Change = change.GetValue(slate),
             ShowPlayerChangeMessage = showPlayerChangeMessage.GetValue(slate),
             Reason = reason.GetValue(slate)
@@ -110,9 +110,9 @@ public class QuestPart_AllOrdersEsteemChange : QuestPart
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref InSignalTrigger, "InSignalTrigger");
-        Scribe_Values.Look(ref Change, "Change", 0);
-        Scribe_Values.Look(ref ShowPlayerChangeMessage, "ShowPlayerChangeMessage", defaultValue: true);
-        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
+        Scribe_Values.Look(ref InSignalTrigger, nameof(InSignalTrigger));
+        Scribe_Values.Look(ref Change, nameof(Change), 0);
+        Scribe_Values.Look(ref ShowPlayerChangeMessage, nameof(ShowPlayerChangeMessage), defaultValue: true);
+        Scribe_Values.Look(ref Reason, nameof(Reason));
     }
 }

@@ -31,7 +31,7 @@ internal sealed class QuestNode_NobilityTerritoryWatcher : QuestNode
 
         QuestPart_NobilityTerritoryWatcher questPart_NobilityTerritoryWatcher = new()
         {
-            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             InSignalsResolved = [],
             OutSignalsAllResolved = QuestGenUtility.HardcodedSignalWithQuestID(outSignalsAllResolved.GetValue(slate))
         };

@@ -21,9 +21,9 @@ public class QuestNode_CliquesManager : QuestNode
     {
         QuestPart_CliquesManager questPart_CliquesManager = new()
         {
-            inSignalEnable = QuestGen.slate.Get<string>("inSignal"),
+            inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
         };
-        questPart_CliquesManager.SetOrderBranch(branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch));
+        questPart_CliquesManager.SetOrderBranch(branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch));
         QuestGen.quest.AddPart(questPart_CliquesManager);
     }
 }

@@ -90,12 +90,12 @@ public sealed class QuestNode_CollectionTeam : QuestNode
         }
         QuestPart_CollectionTeam questPart_CollectionTeam = (QuestPart_CollectionTeam)Activator.CreateInstance(questPartClass);
 
-        questPart_CollectionTeam.Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
-        questPart_CollectionTeam.DemandType = demandType.GetValue(slate) ?? slate.Get<BranchDemand.DemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        questPart_CollectionTeam.Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
+        questPart_CollectionTeam.DemandType = demandType.GetValue(slate) ?? slate.Get<BranchDemand.DemandType>(KeyLibrary_SlateStoreAs.demandType);
         questPart_CollectionTeam.Faction = faction.GetValue(slate) ?? questPart_CollectionTeam.Branch?.RatkinOrder.Faction;
 
-        questPart_CollectionTeam.inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? slate.Get<string>("inSignal");
-        questPart_CollectionTeam.inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisable.GetValue(slate)) ?? slate.Get<string>("inSignal");
+        questPart_CollectionTeam.inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
+        questPart_CollectionTeam.inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisable.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
         questPart_CollectionTeam.InSignalDisablePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisablePawnsArrival.GetValue(slate));
         questPart_CollectionTeam.InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID(inSignalPawnsLeave.GetValue(slate));
         questPart_CollectionTeam.InSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID(inSignalRemovePawn.GetValue(slate));
@@ -254,7 +254,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
     public void InitWithDefaultSignal()
     {
-        inSignalEnable = QuestGen.slate.Get<string>("inSignal");
+        inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
         inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Disable");
         InSignalDisablePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_DisableArrival");
         InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsLeave");

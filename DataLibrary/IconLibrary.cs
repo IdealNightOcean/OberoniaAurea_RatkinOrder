@@ -6,8 +6,11 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class IconLibrary
 {
-    public static readonly Texture2D colseX = ContentFinder<Texture2D>.Get("UI/Common/OARO_ColseX");
-    public static readonly Texture2D smallExclamation = ContentFinder<Texture2D>.Get("UI/Common/OARO_SmallExclamation");
+    public static readonly Texture2D ColseX = ContentFinder<Texture2D>.Get("UI/Common/OARO_ColseX");
+    public static readonly Texture2D SmallExclamation = ContentFinder<Texture2D>.Get("UI/Common/OARO_SmallExclamation");
+
+    public static readonly Texture2D StarWhite = ContentFinder<Texture2D>.Get("UI/Common/OARO_StarWhite");
+    public static readonly Texture2D StarBlack = ContentFinder<Texture2D>.Get("UI/Common/OARO_StarBlack");
 
     public static readonly Texture2D RecommendationIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_RecommendationIcon");
 

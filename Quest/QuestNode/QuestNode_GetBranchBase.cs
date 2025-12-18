@@ -7,11 +7,11 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class QuestNode_GetBranchBase : QuestNode
 {
     [NoTranslate]
-    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.Branch;
+    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.branch;
 
     public SlateRef<bool> storeRatkinOrder;
     [NoTranslate]
-    public SlateRef<string> storeRatkinOrderAs = KeyLibrary_SlateStoreAs.RatkinOrder;
+    public SlateRef<string> storeRatkinOrderAs = KeyLibrary_SlateStoreAs.ratkinOrder;
 
     public SlateRef<bool> addRatkinOrderToQuest;
 

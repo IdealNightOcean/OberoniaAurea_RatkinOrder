@@ -130,7 +130,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
     {
         if (HasTask)
         {
-            curTask.TickHour(branch);
+            curTask.TickHour();
             if (curTask.DurationLeft <= 0)
             {
                 FinishCurTask();
@@ -234,8 +234,8 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
     {
         try
         {
-            curTask = BranchTask.GenerateTask(newTaskDef);
-            curTask.StartTask(branch);
+            curTask = BranchTask.GenerateTask(newTaskDef, branch);
+            curTask.StartTask();
         }
         catch (Exception ex)
         {
@@ -284,10 +284,10 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         }
 
         branch.EffectTags.DecrementTagsValue(curTask.Def.effectFlags);
-        curTask.EndTask(branch);
+        curTask.EndTask();
         if (startRest)
         {
-            restEndTick = Find.TickManager.TicksGame + curTask.BranchRestTick(branch);
+            restEndTick = Find.TickManager.TicksGame + curTask.BranchRestTick();
         }
 
         curTask = null;

@@ -60,6 +60,7 @@ public static class GlobalInteractionUtility
         {
             return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.Named(KeyLibrary_FormatArgName.Count));
         }
+        /*
         ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
         RatkinOrder ratkinOrder = record.RatkinOrder;
         int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
@@ -67,6 +68,7 @@ public static class GlobalInteractionUtility
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed, ratkinOrder.Name);
         }
+        */
         return true;
     }
 
@@ -77,13 +79,16 @@ public static class GlobalInteractionUtility
         {
             return;
         }
+        /*
         RatkinOrder ratkinOrder = record.Branch.RatkinOrder;
 
+        
         int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
         if (recommendationNeed > 0)
         {
             RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
         }
+        */
         record.CurRank = targetRank;
     }
 

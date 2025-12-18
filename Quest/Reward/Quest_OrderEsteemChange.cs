@@ -32,8 +32,8 @@ public class QuestNode_OrderEsteemChange : QuestNode
 
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
-            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
             Change = change.GetValue(slate),
             ShowPlayerChangeMessage = showPlayerChangeMessage.GetValue(slate),
             Reason = reason.GetValue(slate)
@@ -104,11 +104,11 @@ public class QuestPart_OrderEsteemChange : QuestPart, IOnRatkinOrderRemoved
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref InSignalTrigger, "InSignalTrigger");
-        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
-        Scribe_Values.Look(ref Change, "Change", 0);
-        Scribe_Values.Look(ref ShowPlayerChangeMessage, "ShowPlayerChangeMessage", defaultValue: true);
-        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
+        Scribe_Values.Look(ref InSignalTrigger, nameof(InSignalTrigger));
+        Scribe_References.Look(ref RatkinOrder, nameof(RatkinOrder));
+        Scribe_Values.Look(ref Change, nameof(Change), 0);
+        Scribe_Values.Look(ref ShowPlayerChangeMessage, nameof(ShowPlayerChangeMessage), defaultValue: true);
+        Scribe_Values.Look(ref Reason, nameof(Reason));
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)

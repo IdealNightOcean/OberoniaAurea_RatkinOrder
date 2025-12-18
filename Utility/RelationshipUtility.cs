@@ -249,10 +249,10 @@ public static class RelationshipUtility
     {
         Slate slate = new();
         slate.SetBasicOrderSlateVar(ratkinOrder);
-        slate.Set(KeyLibrary_SlateStoreAs.OrderRelationship, ratkinOrder.Relationship);
+        slate.Set(KeyLibrary_SlateStoreAs.orderRelationship, ratkinOrder.Relationship);
         slate.Set("map", map);
 
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_OrderRelationshipUpgrade, slate, forced: false);
+        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_OrderRelationshipUpgrade, slate, forced: true);
     }
 
     /// <summary>
@@ -306,5 +306,13 @@ public static class RelationshipUtility
                 sb.AppendLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
             }
         }
+
+        OrderLetterUtility.ReceiveLetter(
+            label: upgraded ? "OARO_Order_Relationship_UpgradedLabel".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName))
+                            : "OARO_Order_Relationship_DowngradLabel".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
+            text: sb.ToTaggedString(),
+            def: OrderLetterDefOf.OARO_OfficialLetter,
+            relatedOrder: ratkinOrder,
+            relatedLetterType: upgraded ? OrderLetter.RelatedLetterType.Positive : OrderLetter.RelatedLetterType.Negative);
     }
 }

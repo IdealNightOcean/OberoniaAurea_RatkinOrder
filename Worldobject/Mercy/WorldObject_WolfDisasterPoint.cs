@@ -71,6 +71,13 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
                 },
                 resolveTree = true,
             };
+            if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) < 10)
+            {
+                establishObservationOpt.Disable("OAFrame_MissSkillSatisfiedPawn".Translate(
+                    SkillDefOf.Animals.Named(KeyLibrary_FormatArgName.SKILL),
+                    10.Named(KeyLibrary_FormatArgName.Level)));
+            }
+
             rootNode.options.Add(establishObservationOpt);
         }
 

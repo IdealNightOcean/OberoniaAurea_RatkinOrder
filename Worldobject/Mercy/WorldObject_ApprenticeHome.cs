@@ -53,7 +53,7 @@ public class WorldObject_ApprenticeHome : WorldObject_Interactive_Nameable
 
 
 
-        QuestUtility.SendQuestTargetSignals(questTags, "Resolved");
+        this.SendWorkResolvedSignal();
         this.SafeDestroy();
     }
 }

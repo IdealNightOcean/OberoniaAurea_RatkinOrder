@@ -10,11 +10,11 @@ public class QuestNode_SetPresetEffectTags : QuestNode
     /// <summary>
     /// 这是用于TestRun的tagKey列表
     /// </summary>
-    public SlateRef<string> addToTestList = KeyLibrary_SlateStoreAs.QuestEffectTags;
+    public SlateRef<string> addToTestList = KeyLibrary_SlateStoreAs.questEffectTags;
 
     protected override bool TestRunInt(Slate slate)
     {
-        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.PreSetQuestEffectTags, out List<QuestEffectTag> preSetQuestEffectTags))
+        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.preSetQuestEffectTags, out List<QuestEffectTag> preSetQuestEffectTags))
         {
             if (preSetQuestEffectTags.NullOrEmpty())
             {
@@ -35,7 +35,7 @@ public class QuestNode_SetPresetEffectTags : QuestNode
             return;
         }
 
-        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.PreSetQuestEffectTags, out List<QuestEffectTag> preSetQuestEffectTags))
+        if (QuestGen.slate.TryGet(KeyLibrary_SlateStoreAs.preSetQuestEffectTags, out List<QuestEffectTag> preSetQuestEffectTags))
         {
             questPart_EffectTags.AddTags(preSetQuestEffectTags);
         }

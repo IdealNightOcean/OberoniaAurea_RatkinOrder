@@ -14,14 +14,14 @@ public class QuestNode_AddBranchClique : QuestNode_AddGeneralClique
         {
             return cliqueKey;
         }
-        Branch branch = this.branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+        Branch branch = this.branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
         return branch is null ? string.Empty : QuestClique.GetBranchCliqueKey(branch);
     }
 
     protected override QuestClique GenerateClique(string cliqueKey)
     {
         Slate slate = QuestGen.slate;
-        Branch branch = this.branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+        Branch branch = this.branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
         if (!branch.IsValid())
         {
             return null;

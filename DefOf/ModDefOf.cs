@@ -39,6 +39,12 @@ public static class OARO_ModDefOf
     public static HistoryEventDef OARO_OrderMediateFactionRelation;
 
     /// <summary>
+    /// 分部建筑 - 金鸢尾兰洽谈所
+    /// </summary>
+    [MayRequire("OARK.RatkinFaction.OberoniaAurea")]
+    public static HistoryEventDef OARK_OrderConferenceHall;
+
+    /// <summary>
     /// 荣誉分部 - 教导骑士
     /// </summary>
     public static BranchHonorDef OARO_Honor_Instructor;

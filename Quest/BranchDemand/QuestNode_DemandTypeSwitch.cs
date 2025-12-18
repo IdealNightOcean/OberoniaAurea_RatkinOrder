@@ -16,7 +16,7 @@ public class QuestNode_DemandTypeSwitch : QuestNode
         {
             return true;
         }
-        DemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        DemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType);
         if (!demandType.HasValue)
         {
             return false;
@@ -35,7 +35,7 @@ public class QuestNode_DemandTypeSwitch : QuestNode
             return;
         }
         Slate slate = QuestGen.slate;
-        DemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        DemandType? demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType);
         if (!demandType.HasValue)
         {
             return;

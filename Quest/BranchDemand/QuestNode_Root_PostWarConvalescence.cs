@@ -44,7 +44,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
             return false;
         }
 
-        demandType = slate.Get<DemandType>(KeyLibrary_SlateStoreAs.DemandType);
+        demandType = slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType);
         if (demandType == DemandType.Supplementary)
         {
             questParameter.LodgerCount = 1;
@@ -145,7 +145,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         QuestPart_AvaerageMood questPart_AvaerageMood = new()
         {
-            inSignalEnable = QuestGen.slate.Get<string>("inSiganl"),
+            inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
             InSignal = inSigalTimeToLeave,
             InSignalRemovePawn = inSignalRemovePawn,
 
@@ -239,7 +239,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
             {
                 QuestPart_OrderEsteemChange questPart_OrderEsteemChange_NormalSuccess = new()
                 {
-                    InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
+                    InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
                     RatkinOrder = Branch.RatkinOrder,
                     Change = 1,
                     Reason = "OARO_PostWarConvalescence_Success".Translate()
@@ -249,7 +249,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
                 {
                     QuestPart_OrderRecommendation questPart_OrderRecommendation_NormalSuccess = new()
                     {
-                        InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
+                        InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
                         RatkinOrder = Branch.RatkinOrder,
                         Count = 1
                     };

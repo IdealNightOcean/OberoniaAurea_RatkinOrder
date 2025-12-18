@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchTask_JurisdictionDuty : BranchTask
 {
-    protected override void PostTaskEnd(Branch branch)
+    protected override void PostTaskEnd()
     {
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         BranchTaskHandler.RadicalismDegree curRadicalismDegree = branch.TaskHandler.CurRadicalismDegree;

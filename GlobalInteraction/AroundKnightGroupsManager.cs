@@ -127,8 +127,8 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         Slate slate = new();
         slate.SetBasicBranchSlateVar(knightGroup.Branch, alsoSetOrder: true);
         slate.Set("map", map);
-        slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsCount, knightGroup.MemberCount);
-        slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsDelay, knightGroup.TravelTicks);
+        slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsCount, knightGroup.MemberCount);
+        slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDelay, knightGroup.TravelTicks);
         int duration = knightGroup.CurBusyLevel switch
         {
             AroundKnightGroup.BusyLevel.Leisure => 3 * 60000,
@@ -136,7 +136,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
             AroundKnightGroup.BusyLevel.VeryBusy => 1 * 60000,
             _ => 2 * 60000
         };
-        slate.Set(KeyLibrary_SlateStoreAs.VisitingKnightsDuration, duration);
+        slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDuration, duration);
 
         return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
     }

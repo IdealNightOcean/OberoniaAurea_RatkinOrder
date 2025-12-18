@@ -259,7 +259,7 @@ public static class DebugRatkinOrders
                                                        }
                                                        else
                                                        {
-                                                           Log.Message($"Can add new demand for {branch.Name} now.");
+                                                           Messages.Message($"Can not add new demand for {branch.Name} now.", MessageTypeDefOf.RejectInput, historical: false);
                                                        }
                                                    });
                 demandOptions.Add(demandOption);

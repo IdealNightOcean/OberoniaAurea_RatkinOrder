@@ -15,8 +15,8 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
     {
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
-            SubFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction),
-            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentFaction),
+            SubFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction),
+            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction),
         };
         QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
 
@@ -26,7 +26,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 
     protected override bool InitQuestParameter()
     {
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction);
+        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
         questParameter = new()
         {
             allowAssaultColony = false,

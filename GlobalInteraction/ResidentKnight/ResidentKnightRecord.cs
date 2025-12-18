@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -92,10 +93,32 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         }
         else
         {
-            ResignationTick = Find.TickManager.TicksGame + 2 * 60;
+            ResignationTick = Find.TickManager.TicksGame + 2 * 60 * 60000;
         }
 
-        ResidentKnightAcademicDef def = DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => !d.isHonorAcademic).RandomElement();
+        try
+        {
+            ResidentKnightAcademicDef initAcademicDef;
+            if (Personality != KnightPersonality.None && OrderDefDataBase.ResidentKnightAcademicGroupByPersonality.TryGetValue(Personality, out var potentialAcademics))
+            {
+                initAcademicDef = potentialAcademics.RandomElement();
+            }
+            else
+            {
+                initAcademicDef = DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading
+                    .Where(d => !d.isHonorAcademic)
+                    .RandomElement();
+            }
+            UpgradeAcademicLevel(initAcademicDef, usePoints: false);
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                $"initialize {nameof(ResidentKnightAcademicDef)}.",
+                typeName: nameof(ResidentKnightRecord),
+                methodName: nameof(ResidentKnightRecord),
+                needStackTrace: true);
+        }
 
         loadID = UniqueIDManager.GetUniqueID(nameof(ResidentKnightRecord));
     }

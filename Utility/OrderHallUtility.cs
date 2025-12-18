@@ -33,12 +33,10 @@ public static class OrderHallUtility
 
             if (maxPotentialLevel <= 1) { return 1; }
 
-            Log.Message($"before terrain: {maxPotentialLevel}");
             maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
             // 最高可能索引为0，只能是1级
             if (maxPotentialLevel <= 1) { return 1; }
 
-            Log.Message($"before building: {maxPotentialLevel}");
             maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
 
             return Mathf.Clamp(maxPotentialLevel, 1, 7);

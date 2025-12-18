@@ -38,8 +38,8 @@ public class Reward_OrderEsteem : Reward
     {
         yield return new QuestPart_OrderEsteemChange()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.RatkinOrder),
+            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
             Change = Amount,
             Reason = Reason,
         };
@@ -52,8 +52,8 @@ public class Reward_OrderEsteem : Reward
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref Amount, "Amount", 0);
-        Scribe_References.Look(ref RatkinOrder, "RatkinOrder");
-        Scribe_Values.Look(ref Reason, KeyLibrary_FormatArgName.Reason);
+        Scribe_Values.Look(ref Amount, nameof(Amount), 0);
+        Scribe_References.Look(ref RatkinOrder, nameof(RatkinOrder));
+        Scribe_Values.Look(ref Reason, nameof(Reason));
     }
 }

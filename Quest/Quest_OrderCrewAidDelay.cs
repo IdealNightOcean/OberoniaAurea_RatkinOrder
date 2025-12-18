@@ -18,7 +18,7 @@ public class QuestNode_OrderCrewAidDelay : QuestNode_Delay
         {
             delayTicks = delayTicks.GetValue(slate),
 
-            inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? QuestGen.slate.Get<string>("inSignal"),
+            inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
             inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisable.GetValue(slate)),
             reactivatable = reactivatable.GetValue(slate),
             RatkinOrder = ratkinOrder.GetValue(slate)

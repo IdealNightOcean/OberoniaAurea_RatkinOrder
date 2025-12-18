@@ -35,15 +35,15 @@ public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
         }
         QuestPart_GiveBranchMedal_CriticalDemand questPart_GiveBranchMedal_CriticalDemand = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>("inSignal"),
-            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             Count = count.GetValue(slate),
             BaseRewardMedalTypeCount = baseRewardMedalTypeCount.GetValue(slate),
             ExtraRewardMedalTypeCount = extraRewardMedalTypeCount.GetValue(slate),
             ExtraMedalPotencyBoundary = extraMedalPotencyBoundary.GetValue(slate),
             PotentialDefs = [],
         };
-        IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<BranchMedalDef>>(KeyLibrary_SlateStoreAs.PreSetPotentialMedals);
+        IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<BranchMedalDef>>(KeyLibrary_SlateStoreAs.preSetPotentialMedals);
         if (potentialDefs is not null)
         {
             questPart_GiveBranchMedal_CriticalDemand.PotentialDefs.AddRangeUnique(potentialDefs);

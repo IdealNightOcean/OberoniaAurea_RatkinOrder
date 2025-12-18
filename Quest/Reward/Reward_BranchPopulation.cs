@@ -36,8 +36,8 @@ public class Reward_BranchPopulation : Reward
     {
         yield return new QuestPart_BranchPopulationChange()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             Amount = DefaultAmount,
             ChangeFactor = DefaultChangeFactor
         };

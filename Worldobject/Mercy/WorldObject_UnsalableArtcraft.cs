@@ -22,10 +22,10 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Deep.Look(ref sculptures, "sculptures");
-        Scribe_Values.Look(ref remainingMarkerValue, "remainingMarkerValue", 0f);
-        Scribe_Values.Look(ref purchasedCount, "purchasedCount", 0);
-        Scribe_Values.Look(ref totalCount, "totalCount", 0);
+        Scribe_Deep.Look(ref sculptures, nameof(sculptures));
+        Scribe_Values.Look(ref remainingMarkerValue, nameof(remainingMarkerValue), 0f);
+        Scribe_Values.Look(ref purchasedCount, nameof(purchasedCount), 0);
+        Scribe_Values.Look(ref totalCount, nameof(totalCount), 0);
     }
 
     public override void PostMake()

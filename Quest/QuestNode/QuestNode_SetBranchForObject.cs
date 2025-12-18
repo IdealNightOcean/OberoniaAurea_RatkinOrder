@@ -8,10 +8,7 @@ public class QuestNode_SetBranchForObject : QuestNode
     public SlateRef<bool> alsoSetRatkinOrder = true;
     public SlateRef<object> target;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return false;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
@@ -22,7 +19,7 @@ public class QuestNode_SetBranchForObject : QuestNode
             return;
         }
 
-        Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch);
+        Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
         if (branch.IsValid())
         {
             branchRelated.SetOrderBranch(branch);

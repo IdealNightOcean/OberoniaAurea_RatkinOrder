@@ -19,8 +19,8 @@ public class QuestNode_MercyQuestWatcher : QuestNode
         Slate slate = QuestGen.slate;
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
-            SubFaction = subFaction.GetValue(slate) ?? slate.Get<Faction>(KeyLibrary_SlateStoreAs.SubFaction),
-            ParentFaction = parentFaction.GetValue(slate) ?? slate.Get<Faction>(KeyLibrary_SlateStoreAs.ParentFaction),
+            SubFaction = subFaction.GetValue(slate) ?? slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction),
+            ParentFaction = parentFaction.GetValue(slate) ?? slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction),
         };
         QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
     }

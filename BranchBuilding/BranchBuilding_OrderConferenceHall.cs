@@ -38,7 +38,7 @@ public class BranchBuilding_OrderConferenceHall : BranchBuilding, ITickDay
             if (faction.HasGoodwill && !faction.IsPlayerSafe())
             {
                 int upgrade = hasUpgraded ? 12 : 7;
-                faction.TryAffectGoodwillWith(Faction.OfPlayer, upgrade, lookTarget: branch.BaseSite);
+                faction.TryAffectGoodwillWith(Faction.OfPlayer, upgrade, lookTarget: branch.BaseSite, reason: OARO_ModDefOf.OARK_OrderConferenceHall);
             }
         }
 

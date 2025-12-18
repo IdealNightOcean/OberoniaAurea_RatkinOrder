@@ -24,10 +24,26 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
         Isolation
     }
 
-    //多次使用的 QuestEffectTag
-    private const string ResponsibleDoctor = "ResponsibleDoctor"; //尽责医生
-    private const string MedicalInfusion = "MedicalInfusion"; //医疗充盈
-    private bool HasStrangePlagueTag => HasQuestEffectTag("StrangePlague");
+    /// <summary>
+    /// 尽责医生
+    /// </summary>
+    private const string ResponsibleDoctor = "ResponsibleDoctor";
+    /// <summary>
+    /// 医疗充盈
+    /// </summary>
+    private const string MedicalInfusion = "MedicalInfusion";
+    /// <summary>
+    /// 怪异瘟疫
+    /// </summary>
+    private const string StrangePlague = "StrangePlague";
+    /// <summary>
+    /// 传播性瘟疫
+    /// </summary>
+    private const string HighlyContagious = "HighlyContagious";
+    /// <summary>
+    /// 聚集的安全感
+    /// </summary>
+    private const string FalseSenseOfSafeGathering = "FalseSenseOfSafeGathering";
 
     public override int TicksNeeded => 30000;
     protected override int PeriodicCheckInterval => 15000;
@@ -221,7 +237,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                         int maxMedicineLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
                         int totalMedicineLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
                         float controlAdd = maxMedicineLevel + totalMedicineLevel * 0.2f;
-                        if (HasStrangePlagueTag)
+                        if (HasQuestEffectTag(StrangePlague))
                         {
                             controlAdd *= 0.5f;
                         }
@@ -233,6 +249,10 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                     {
                         int totalSocialLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
                         float spreadReduce = totalSocialLevel * 0.00025f;
+                        if (HasQuestEffectTag(FalseSenseOfSafeGathering))
+                        {
+                            spreadReduce *= 0.5f;
+                        }
                         PlagueSpread -= spreadReduce;
                         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(spreadReduce.ToStringPercent("0.##"))));
                         return;
@@ -392,10 +412,14 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             case PolicyType.OrderControl:
                 {
                     float plagueSpreadReduce = 0.002f + TotalPotency * 0.01f;
+                    if (HasQuestEffectTag(FalseSenseOfSafeGathering))
+                    {
+                        plagueSpreadReduce *= 0.75f;
+                    }
                     plagueSpread -= plagueSpreadReduce;
 
                     float controlAdd = 2 + TotalPotency * 6f;
-                    if (HasStrangePlagueTag)
+                    if (HasQuestEffectTag(StrangePlague))
                     {
                         controlAdd *= 0.5f;
                     }
@@ -411,7 +435,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                         if (map is not null)
                         {
                             Thing thing = ThingMaker.MakeThing(OARO_ThingDefOf.OARO_PlagueSample);
-                            thing.TryGetComp<CompPlagueSample>()?.InitSample(quest, this, HasStrangePlagueTag);
+                            thing.TryGetComp<CompPlagueSample>()?.InitSample(quest, this, HasQuestEffectTag(StrangePlague));
                             OAFrame_DropPodUtility.DefaultDropSingleThing(thing, map, branch?.RatkinOrder?.Faction, sendLetter: false);
 
                             Find.LetterStack.ReceiveLetter(
@@ -428,7 +452,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             case PolicyType.SurveyAssistance:
                 {
                     float controlAdd = 2 + TotalPotency * 12f;
-                    if (HasStrangePlagueTag)
+                    if (HasQuestEffectTag(StrangePlague))
                     {
                         controlAdd *= 0.5f;
                     }
@@ -449,13 +473,17 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
 
     private void DailySpreadPlague()
     {
-        float spreadCount = 15f + (population * PlagueSpread * 0.1f);
+        float deathsCount = 15f + (population * PlagueSpread * 0.1f);
         if (HasQuestEffectTag(MedicalInfusion))
         {
-            spreadCount *= 0.8f;
+            deathsCount *= 0.8f;
+        }
+        if (HasQuestEffectTag(HighlyContagious))
+        {
+            deathsCount *= 0.75f;
         }
 
-        AdjustPopulation(Mathf.FloorToInt(spreadCount));
+        AdjustPopulation(Mathf.FloorToInt(deathsCount));
 
         if (Destroyed)
         {
@@ -489,7 +517,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             }
         }
 
-        PlagueSpread += (0.02f + PlagueSpread * 0.05f);
+        PlagueSpread += ((HasQuestEffectTag(FalseSenseOfSafeGathering) ? 0.04f : 0.02f) + PlagueSpread * 0.05f);
     }
 
     private void AdjustPopulation(int change)

@@ -91,6 +91,7 @@
     <Compile Include="BranchInteraction\BranchInteractionParms.cs" />
     <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_CaravanOnly.cs" />
     <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_VisitKnightCommander.cs" />
+    <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_RequestCaravanMedicalAssistance.cs" />
     <Compile Include="BranchInteraction\TargetlessInteraction\BranchInteractionWorker_Targetless.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_MapOnly.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_MapSilverToSupply.cs" />
@@ -109,7 +110,7 @@
     <Compile Include="Branch\UnderConstructionRecord.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchResident\BranchResident_Deployment.cs" />
-    <Compile Include="BranchResident\BranchResident_MedicalAssistance.cs" />
+    <Compile Include="BranchResident\BranchResident_CaravanMedicalAssistance.cs" />
     <Compile Include="BranchStat\BranchStatPart_SupplyRecoveryRate.cs" />
     <Compile Include="BranchStat\BranchStatPart_SquadMemberRecoveryRate.cs" />
     <Compile Include="BranchStat\BranchStatPart_ConstructionCostFactor.cs" />
@@ -186,6 +187,7 @@
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Quest\Reward\Quest_GiveBranchMedal_CriticalDemand.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
+    <Compile Include="Window\BranchTaskEntryDrawer.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
     <Compile Include="Window\Window_ResidentKnight_AcademicArrange.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />

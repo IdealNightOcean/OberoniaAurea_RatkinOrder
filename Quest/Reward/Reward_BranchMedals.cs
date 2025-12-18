@@ -38,8 +38,8 @@ public class Reward_BranchMedals : Reward
     {
         yield return new QuestPart_GiveBranchMedal()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>("inSignal"),
-            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.Branch),
+            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
             Count = Amount,
             PotentialDefs = [.. PotentialDefs]
         };
