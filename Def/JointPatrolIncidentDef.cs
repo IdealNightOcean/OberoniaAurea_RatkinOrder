@@ -128,8 +128,4 @@ public class JointPatrolIncidentDef : JointPatrolInteractionDef
         }
     }
 
-    public override void PostLoad()
-    {
-        OrderDefDataBase.AddJointPatrolIncident(this);
-    }
 }

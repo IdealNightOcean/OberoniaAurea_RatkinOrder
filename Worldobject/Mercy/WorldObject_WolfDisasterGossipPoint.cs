@@ -31,6 +31,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
     private bool SearchSuccessful { get; set; }
 
     public override int TicksNeeded => 15000;
+    protected override string VisitLabel => "OARO_WolfDisasterGossipPoint_Search";
 
     public override void ExposeData()
     {

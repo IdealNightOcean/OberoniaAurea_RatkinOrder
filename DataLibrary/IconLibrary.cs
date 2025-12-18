@@ -32,6 +32,9 @@ public static class IconLibrary
     public static readonly Texture2D SmallGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallGeneralBranchIcon");
     public static readonly Texture2D BigGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigGeneralBranchIcon");
 
-
+    public static readonly Texture2D CyanTex = SolidColorMaterials.NewSolidColorTexture(Color.cyan);
     public static readonly Texture2D GreenTex = SolidColorMaterials.NewSolidColorTexture(Color.green);
+    public static readonly Texture2D OrangeTex = SolidColorMaterials.NewSolidColorTexture(ColorLibrary.Orange);
+    public static readonly Texture2D SilverTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.75f, 0.75f, 0.75f));
+
 }

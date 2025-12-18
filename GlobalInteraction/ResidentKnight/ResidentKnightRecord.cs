@@ -255,6 +255,10 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         {
             return 0f;
         }
+        if (targetLevel > academicDef.MaxStageLevel)
+        {
+            return float.MaxValue;
+        }
 
         float baseUnitCost = academicDef.isHonorAcademic ? 500f : 250f;
         float neededPoints = baseUnitCost + (targetLevel - 1) * baseUnitCost;

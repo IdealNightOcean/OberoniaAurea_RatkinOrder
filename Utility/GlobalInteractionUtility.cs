@@ -58,7 +58,7 @@ public static class GlobalInteractionUtility
         int noAdditionalCostAcademicCeiling = ResidentKnightRecord.GetNoAdditionalCostAcademicCeiling(record.CurRank);
         if (record.TotalAcademicLevel.Value < noAdditionalCostAcademicCeiling)
         {
-            return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.ToString());
+            return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.Named(KeyLibrary_FormatArgName.Count));
         }
         ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
         RatkinOrder ratkinOrder = record.RatkinOrder;

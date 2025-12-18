@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -56,6 +57,34 @@ public static class KnightPersonalityUtility
             KnightPersonality.Oath => KnightPersonality.Courage | KnightPersonality.Justice,
             KnightPersonality.Justice => KnightPersonality.Compassion | KnightPersonality.Oath,
             _ => KnightPersonality.None,
+        };
+    }
+
+    public static Color GetPersonalityColor(this KnightPersonality personality)
+    {
+        return personality switch
+        {
+            KnightPersonality.None => Color.white,
+            KnightPersonality.Courage => ColorLibrary.Orange,
+            KnightPersonality.Tenacity => Color.yellow,
+            KnightPersonality.Compassion => Color.cyan,
+            KnightPersonality.Oath => new Color(0.75f, 0.75f, 0.75f),
+            KnightPersonality.Justice => Color.green,
+            _ => Color.white,
+        };
+    }
+
+    public static Texture2D GetPersonalityColorTex(this KnightPersonality personality)
+    {
+        return personality switch
+        {
+            KnightPersonality.None => BaseContent.WhiteTex,
+            KnightPersonality.Courage => IconLibrary.OrangeTex,
+            KnightPersonality.Tenacity => BaseContent.YellowTex,
+            KnightPersonality.Compassion => IconLibrary.CyanTex,
+            KnightPersonality.Oath => IconLibrary.SilverTex,
+            KnightPersonality.Justice => IconLibrary.GreenTex,
+            _ => BaseContent.WhiteTex
         };
     }
 }

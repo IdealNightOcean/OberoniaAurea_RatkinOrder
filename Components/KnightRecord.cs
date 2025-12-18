@@ -15,7 +15,6 @@ public enum KnightPersonality : byte
     Justice = 16 //正义
 }
 
-
 public class KnightRecord : IExposable, ILoadReferenceable
 {
     private int loadID = -1;

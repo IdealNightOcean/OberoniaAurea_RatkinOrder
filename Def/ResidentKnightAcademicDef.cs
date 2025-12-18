@@ -45,15 +45,6 @@ public class ResidentKnightAcademicDef : Def
         }
     }
 
-    public override void PostLoad()
-    {
-        base.PostLoad();
-        if (personality != KnightPersonality.None)
-        {
-            OrderDefDataBase.AddKnightAcademic(this, personality);
-        }
-    }
-
     /// <summary>
     /// 只执行一次，在升级时执行
     /// </summary>

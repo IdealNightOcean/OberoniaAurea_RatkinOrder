@@ -12,6 +12,7 @@ public class Window_OrderLetterBox : OrderWindowBase
     public override Vector2 InitialSize => new(1316, 872);
 
     private Vector2 scrollPosition_letterList;
+    private Vector2 scrollPosition_letterText;
 
     private int SelectedLetterIndex { get; set; }
     /// <summary>
@@ -120,7 +121,7 @@ public class Window_OrderLetterBox : OrderWindowBase
         if (CurLetter is not null)
         {
             Text.Font = GameFont.Medium;
-            Widgets.TextArea(letterTextRect, CurLetter.Text, readOnly: true);
+            Widgets.LabelScrollable(letterTextRect, CurLetter.Text, ref scrollPosition_letterText);
             Text.Font = GameFont.Small;
         }
 
