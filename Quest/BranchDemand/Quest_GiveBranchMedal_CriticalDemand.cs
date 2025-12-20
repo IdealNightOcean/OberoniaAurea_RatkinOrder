@@ -2,6 +2,8 @@
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -21,10 +23,7 @@ public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
     public SlateRef<bool> isReward;
     public SlateRef<bool> isSingleReward;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return true;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
@@ -41,12 +40,12 @@ public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
             BaseRewardMedalTypeCount = baseRewardMedalTypeCount.GetValue(slate),
             ExtraRewardMedalTypeCount = extraRewardMedalTypeCount.GetValue(slate),
             ExtraMedalPotencyBoundary = extraMedalPotencyBoundary.GetValue(slate),
-            PotentialDefs = [],
+            PotentialMedalDefs = [],
         };
         IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<BranchMedalDef>>(KeyLibrary_SlateStoreAs.preSetPotentialMedals);
         if (potentialDefs is not null)
         {
-            questPart_GiveBranchMedal_CriticalDemand.PotentialDefs.AddRangeUnique(potentialDefs);
+            questPart_GiveBranchMedal_CriticalDemand.PotentialMedalDefs.AddRangeUnique(potentialDefs);
         }
 
         QuestGen.quest.AddPart(questPart_GiveBranchMedal_CriticalDemand);
@@ -57,7 +56,7 @@ public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
             Reward_BranchMedals reward = new()
             {
                 Branch = questPart_GiveBranchMedal_CriticalDemand.Branch,
-                PotentialDefs = [.. questPart_GiveBranchMedal_CriticalDemand.PotentialDefs],
+                PotentialDefs = [.. questPart_GiveBranchMedal_CriticalDemand.PotentialMedalDefs],
                 Amount = questPart_GiveBranchMedal_CriticalDemand.Count
             };
 
@@ -90,7 +89,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
 {
     public string InSignalTrigger;
     public Branch Branch;
-    public List<BranchMedalDef> PotentialDefs;
+    public List<BranchMedalDef> PotentialMedalDefs;
     public int Count;
 
     public int BaseRewardMedalTypeCount;
@@ -103,7 +102,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
         base.Cleanup();
         InSignalTrigger = null;
         Branch = null;
-        PotentialDefs = null;
+        PotentialMedalDefs = null;
         Count = 0;
         BaseRewardMedalTypeCount = 0;
         ExtraRewardMedalTypeCount = 0;
@@ -115,7 +114,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
         base.ExposeData();
         Scribe_Values.Look(ref InSignalTrigger, nameof(InSignalTrigger));
         Scribe_References.Look(ref Branch, nameof(Branch));
-        Scribe_Collections.Look(ref PotentialDefs, nameof(PotentialDefs), LookMode.Def);
+        Scribe_Collections.Look(ref PotentialMedalDefs, nameof(PotentialMedalDefs), LookMode.Def);
         Scribe_Values.Look(ref Count, nameof(Count), 0);
         Scribe_Values.Look(ref BaseRewardMedalTypeCount, nameof(BaseRewardMedalTypeCount), 0);
         Scribe_Values.Look(ref ExtraRewardMedalTypeCount, nameof(ExtraRewardMedalTypeCount), 0);
@@ -124,20 +123,94 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
-        if (Count > 0 && Branch.IsValid() && PotentialDefs is not null && signal.tag == InSignalTrigger)
+        if (!Branch.IsValid() || signal.tag != InSignalTrigger)
         {
-            int rewardMedalTypeCount = BaseRewardMedalTypeCount;
+            return;
+        }
 
-            if (quest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager) && cliquesManager.TotalPotency.Value >= ExtraMedalPotencyBoundary)
+        if (!quest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
+        {
+            return;
+        }
+
+        StringBuilder medalRewardSB = new("OARO_CriticalDemand_CliqueBranchMedalGainText".Translate(
+            Branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+            Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+            quest.name.Named("QuestName")
+            ));
+
+        medalRewardSB.AppendLine();
+        cliquesManager.TotalPotency.MarkDirty();
+        float totalPotency = cliquesManager.TotalPotency.Value;
+
+        Dictionary<BranchMedalDef, int> gainMedals = [];
+        foreach (QuestClique clique in cliquesManager.AllCliques.Values)
+        {
+            if (!clique.IsBranchClique)
             {
-                rewardMedalTypeCount += ExtraRewardMedalTypeCount;
+                continue;
             }
 
-            rewardMedalTypeCount = rewardMedalTypeCount > 0 ? rewardMedalTypeCount : 1;
-            foreach (BranchMedalDef medalType in PotentialDefs.TakeRandom(rewardMedalTypeCount))
+            Branch branch = clique.RelatedBranch;
+            BranchMedalHandler medalHandler = branch.MedalHandler;
+
+            BranchMedalDef medalDef;
+            int gainMedalCount;
+
+            if (clique.FocusedTaskType != BranchTaskType.General)
             {
-                Branch.MedalHandler.AddMedal(medalType, Count);
+                IReadOnlyList<BranchMedalDef> potentialMedalDefs = OrderDefDataBase.TryGetAllBranchMedalDefsByTaskType(clique.FocusedTaskType);
+                if (potentialMedalDefs is not null && potentialMedalDefs.Count > 0)
+                {
+                    medalDef = potentialMedalDefs.RandomElement();
+                    gainMedalCount = 1;
+                    medalHandler.AddMedal(medalDef, gainMedalCount);
+                    gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
+                }
+            }
+
+            if (!PotentialMedalDefs.NullOrEmpty())
+            {
+                if (branch == Branch)
+                {
+                    gainMedalCount = Mathf.CeilToInt(totalPotency / 0.5f);
+                    if (gainMedalCount > 0)
+                    {
+                        medalDef = PotentialMedalDefs.RandomElement();
+                        medalHandler.AddMedal(medalDef, gainMedalCount);
+                        gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
+                    }
+                }
+                else
+                {
+                    gainMedalCount = Mathf.CeilToInt(totalPotency / 1f);
+                    if (gainMedalCount > 0)
+                    {
+                        medalDef = PotentialMedalDefs.RandomElement();
+                        medalHandler.AddMedal(medalDef, gainMedalCount);
+                        gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
+                    }
+                }
+            }
+
+            if (gainMedals.Count > 0)
+            {
+                medalRewardSB.AppendLine(branch.NameColored);
+                foreach (KeyValuePair<BranchMedalDef, int> kv in gainMedals)
+                {
+                    medalRewardSB.AppendWithSeparator($"{kv.Key.LabelCap} × {kv.Value}".Colorize(kv.Key.color), ", ");
+                }
+                gainMedals.Clear();
             }
         }
+
+        OrderLetterUtility.ReceiveLetter(
+            label: "OARO_CriticalDemand_CliqueBranchMedalGainLabel".Translate(quest.name.Named("QuestName")).CapitalizeFirst(),
+            text: medalRewardSB.ToString(),
+            def: OrderLetterDefOf.OARO_OfficialLetter,
+            relatedOrder: Branch.RatkinOrder,
+            relatedBranch: Branch,
+            sender: Branch.NameColored,
+            relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 }

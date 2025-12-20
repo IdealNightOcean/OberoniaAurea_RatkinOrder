@@ -4,14 +4,31 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class OrderLetter_SimpleAttachments : OrderLetter
+public class OrderLetter_SimpleAttachments : OrderLetter, IAttachments
 {
-    public List<Thing> Attachments;
+    protected List<Thing> attachments;
+    public List<Thing> Attachments => attachments;
 
     public override void PostReaded(Building_OrderLetterBox letterBox = null)
     {
         base.PostReaded(letterBox);
         SpawnAttachments(letterBox);
+    }
+
+    public void AddAttachment(Thing attachment)
+    {
+        attachments ??= [];
+        attachments.Add(attachment);
+    }
+
+    public void AddAttachments(IEnumerable<Thing> newAttachments)
+    {
+        if (newAttachments is null)
+        {
+            return;
+        }
+        attachments ??= [];
+        attachments.AddRange(newAttachments);
     }
 
     protected override string AttachmentInfo()
@@ -20,9 +37,9 @@ public class OrderLetter_SimpleAttachments : OrderLetter
         {
             return "OARO_Attachments_Received".Translate();
         }
-        else if (!Attachments.NullOrEmpty())
+        else if (!attachments.NullOrEmpty())
         {
-            return GenLabel.ThingsLabel(Attachments);
+            return GenLabel.ThingsLabel(attachments);
         }
         else
         {
@@ -33,18 +50,18 @@ public class OrderLetter_SimpleAttachments : OrderLetter
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Collections.Look(ref Attachments, nameof(Attachments), LookMode.Deep);
+        Scribe_Collections.Look(ref attachments, nameof(attachments), LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            Attachments?.RemoveAll(t => t is null);
+            attachments?.RemoveAll(t => t is null);
         }
     }
 
     private void SpawnAttachments(Building_OrderLetterBox letterBox)
     {
-        if (Attachments.NullOrEmpty())
+        if (attachments.NullOrEmpty())
         {
-            Attachments = null;
+            attachments = null;
             return;
         }
 
@@ -74,12 +91,12 @@ public class OrderLetter_SimpleAttachments : OrderLetter
         }
         else
         {
-            foreach (Thing thing in Attachments)
+            foreach (Thing thing in attachments)
             {
                 GenPlace.TryPlaceThing(thing, pos, map, ThingPlaceMode.Near);
             }
         }
 
-        Attachments = null;
+        attachments = null;
     }
 }

@@ -19,7 +19,7 @@ public static class KeyLibrary_FormatArgName
     public const string Level = "Level";
 
     public const string ORDER = "ORDER";
-    public const string BRANCNH = "BRANCNH";
+    public const string BRANCH = "BRANCH";
 
     public const string OrderName = "OrderName";
     public const string BranchName = "BranchName";

@@ -190,10 +190,9 @@ public class QuestPart_OrderLetter : QuestPart
             sender: signal.args.GetFormattedText(RawSender),
             relatedLetterType: RelatedLetterType);
 
-        if (attachments is not null && orderLetter is OrderLetter_SimpleAttachments attachmentsLetter)
+        if (attachments is not null && orderLetter is IAttachments attachmentsLetter)
         {
-            attachmentsLetter.Attachments ??= [];
-            attachmentsLetter.Attachments.AddRange(attachments);
+            attachmentsLetter.AddAttachments(attachments);
             attachments = null;
         }
 

@@ -20,6 +20,11 @@ public class BranchHonorDef : Def
     public ResidentKnightAcademicDef academicDef;
 
     /// <summary>
+    /// 荣誉加成的专注任务类型
+    /// </summary>
+    public BranchTaskType focusedTaskType;
+
+    /// <summary>
     /// 荣誉分部特殊的人物生成组
     /// </summary>
     public List<PawnGroupOption> pawnGroupOptions;

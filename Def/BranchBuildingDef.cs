@@ -79,6 +79,11 @@ public class BranchBuildingDef : BranchConstructionDef
     /// </summary>
     public List<BranchStatModifier> branchStatFactors;
 
+    /// <summary>
+    /// 分部界面问候段落 - 建筑部分
+    /// </summary>
+    [MustTranslate]
+    public string greetingParagraph;
     /// <summary>额外自定义的效果描述</summary>
     /// <remarks>- 显示在修正效果之后</remarks>
     [MustTranslate]

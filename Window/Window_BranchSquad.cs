@@ -979,6 +979,23 @@ public class Window_BranchSquad : OrderWindowBase
         }
     }
 
+    public void SelectSquad(Branch branch)
+    {
+        if (TabSummaryCaches.NullOrEmpty())
+        {
+            return;
+        }
+
+        for (int i = 0; i < TabSummaryCaches.Count; i++)
+        {
+            if (TabSummaryCaches[i].Branch == branch)
+            {
+                SelectSquad(i);
+                return;
+            }
+        }
+    }
+
     private void SelectSquad(int index)
     {
         if (index == SelBranchIndex)

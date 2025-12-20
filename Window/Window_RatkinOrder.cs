@@ -61,6 +61,7 @@ public class Window_RatkinOrder : MainTabWindow
     }
     public Window_RatkinOrder(Map map)
     {
+
         doWindowBackground = false; //绘制泰南的界面背景
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
@@ -380,6 +381,9 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 385f, 346f, 25f);
         if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_OrderWin_OpenBranchWindow".Translate(), squadButton, squadButton_Down, doMouseoverSound: true))
         {
+            Window_BranchList branchListWin = new(SelectedOrder, Map, initWithConstructTab: false);
+            Find.WindowStack.Add(branchListWin);
+            Close();
             return;
         }
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 410f, 346f, 25f);
@@ -654,7 +658,9 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = new(inRectX + 36f, inRectY + 337f, 134f, 52f);
         if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_OrderWin_BranchConstructionButton".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
         {
-
+            Window_BranchList branchListWin = new(SelectedOrder, Map, initWithConstructTab: true);
+            Find.WindowStack.Add(branchListWin);
+            Close();
         }
 
         Text.Font = GameFont.Small;
@@ -741,7 +747,6 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, "OARO_OrderWin_BranchBuildingLimit".Translate(branch.BuildingHandler.AllBuildingsCount.ToString(), (branch.BuildingHandler.BuildingCeiling + 1).ToString()));
-
 
         Rect progressRect = new(innerRectX + 254f, innerRectY, 115f, innerRect.height);
 

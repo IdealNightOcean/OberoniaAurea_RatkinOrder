@@ -178,7 +178,7 @@ public static class GlobalInteractionUtility
             Includes = { OARO_RulePackDefOf.OARO_Dialog_AroundKnightGroupVisitInvalid }
         };
         grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, branch.RatkinOrder));
-        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(KeyLibrary_FormatArgName.BRANCNH, branch, alsoAddOrderRule: false));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(KeyLibrary_FormatArgName.BRANCH, branch, alsoAddOrderRule: false));
         grammarRequest.Constants.Add("isProactive", isProactive.ToString());
         TaggedString talkText = GrammarResolver.Resolve("r_text", grammarRequest);
 

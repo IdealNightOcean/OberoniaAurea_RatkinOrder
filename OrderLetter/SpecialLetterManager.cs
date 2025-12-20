@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class SpecialLetterManager : IExposable
 {
-    protected HashSet<SpecialLetterDef> recievedSpecialLetters = [];
+    protected HashSet<SpecialGameLetterDef> recievedSpecialLetters = [];
     protected HashSet<CertainDateLetterDef> recievedCertainDateLetters = [];
 
     private int curYear = 2025;
@@ -21,18 +21,12 @@ public class SpecialLetterManager : IExposable
 
     public void Notify_GameStart()
     {
-        foreach (SpecialLetterDef letterDef in DefDatabase<SpecialLetterDef>.AllDefs)
+        foreach (SpecialGameLetterDef letterDef in DefDatabase<SpecialGameLetterDef>.AllDefs)
         {
             if (!recievedSpecialLetters.Contains(letterDef))
             {
-                OrderLetter specialLetter = OrderLetterUtility.MakeOrderLetter(
-                    label: letterDef.label,
-                    text: letterDef.text,
-                    def: letterDef.relatedOrderLetterDef,
-                    relatedOrder: null,
-                    sender: letterDef.sender,
-                    relatedLetterType: letterDef.relatedLetterType);
-                OrderLetterBox.Instance.ReceiveLetter(specialLetter);
+                OrderLetter orderLetter = OrderLetterUtility.MakeSpecialLetter(letterDef);
+                OrderLetterBox.Instance.ReceiveLetter(orderLetter);
                 recievedSpecialLetters.Add(letterDef);
             }
         }
@@ -49,14 +43,8 @@ public class SpecialLetterManager : IExposable
         {
             if (!recievedCertainDateLetters.Contains(letterDef) && todayDate >= letterDef.EarliestDate && todayDate <= letterDef.LatestDate)
             {
-                OrderLetter certainDateLetter = OrderLetterUtility.MakeOrderLetter(
-                    label: letterDef.label,
-                    text: letterDef.text,
-                    def: letterDef.relatedOrderLetterDef,
-                    sender: letterDef.sender,
-                    relatedOrder: null,
-                    relatedLetterType: letterDef.relatedLetterType);
-                OrderLetterBox.Instance.ReceiveLetter(certainDateLetter);
+                OrderLetter orderLetter = OrderLetterUtility.MakeSpecialLetter(letterDef);
+                OrderLetterBox.Instance.ReceiveLetter(orderLetter);
                 recievedCertainDateLetters.Add(letterDef);
             }
         }

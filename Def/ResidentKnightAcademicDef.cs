@@ -33,18 +33,6 @@ public class ResidentKnightAcademicDef : Def
         return academicStages[level - 1];
     }
 
-    public override IEnumerable<string> ConfigErrors()
-    {
-        foreach (string error in base.ConfigErrors())
-        {
-            yield return error;
-        }
-        if (personality == KnightPersonality.None)
-        {
-            yield return "";
-        }
-    }
-
     /// <summary>
     /// 只执行一次，在升级时执行
     /// </summary>

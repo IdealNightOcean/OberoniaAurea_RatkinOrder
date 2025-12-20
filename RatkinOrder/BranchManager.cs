@@ -68,9 +68,9 @@ public class BranchManager : IExposable, ITickDay
         {
             foreach (Branch branch in allBranches)
             {
-                if (branch.StoresReserveHandler.PrimaryReserves is not null)
+                if (branch.StoresReserveHandler.PrimaryReserve is not null)
                 {
-                    yield return new(branch, branch.StoresReserveHandler.PrimaryReserves);
+                    yield return new(branch, branch.StoresReserveHandler.PrimaryReserve);
                 }
             }
         }

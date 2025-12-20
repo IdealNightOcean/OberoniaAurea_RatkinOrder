@@ -155,6 +155,20 @@ public class Branch : IExposable, ILoadReferenceable
         }
     }
 
+    private string greetingDescCache = string.Empty;
+    private int nextGreetingDescCacheTick = -1;
+    public string GreetingDesc
+    {
+        get
+        {
+            if (Find.TickManager.TicksGame > nextGreetingDescCacheTick)
+            {
+                UpdateGreetingDesc();
+            }
+            return greetingDescCache;
+        }
+    }
+
     public TagStrToBoolCountable EffectTags { get; } = new();
     public BranchStatTransformerHandler TransformerHandler { get; } = new();
     public List<IPostCombatantGenerate> IPostCombatantGenerate { get; } = [];
@@ -480,6 +494,42 @@ public class Branch : IExposable, ILoadReferenceable
         {
             this.RecacheBranchStat(stat);
         }
+    }
+
+    private void UpdateGreetingDesc()
+    {
+        nextGreetingDescCacheTick = Find.TickManager.TicksGame + 15000;
+
+        GrammarRequest grammarRequest = new()
+        {
+            Includes = { OARO_RulePackDefOf.OARO_Maker_BranchGreetingDesc }
+        };
+
+        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, RatkinOrder));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(KeyLibrary_FormatArgName.BRANCH, this, alsoAddOrderRule: false));
+        grammarRequest.Constants.Add("hourOfDay", GenLocalDate.HourOfDay(baseSite.Tile).ToString());
+        grammarRequest.Constants.Add("population", populationHandler.Population.ToString());
+        grammarRequest.Constants.Add("populationRatio", populationHandler.PopulationRatio.ToString("F2"));
+
+        string buildingParagraph = buildingHandler.AllBuildings.Where(b => b.HasGreetingParagraph).RandomElementWithFallback(fallback: null)?.GreetingParagraph ?? string.Empty;
+        grammarRequest.Rules.Add(new Rule_String(nameof(buildingParagraph), buildingParagraph));
+
+        if (Rand.Bool)
+        {
+            grammarRequest.Constants.Add("relationShip", "None");
+        }
+        else if (IsBranchOfType(BranchType.Friendly))
+
+        {
+            grammarRequest.Constants.Add("relationShip", "FriendlyBranch");
+        }
+        else
+        {
+            grammarRequest.Constants.Add("relationShip", RatkinOrder.Relationship.ToString());
+
+        }
+
+        greetingDescCache = GrammarResolver.Resolve("r_text", grammarRequest);
     }
 
     private void PostGenerated()

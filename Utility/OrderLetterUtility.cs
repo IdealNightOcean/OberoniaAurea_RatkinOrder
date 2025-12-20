@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -59,6 +60,77 @@ public static class OrderLetterUtility
             relatedLetterType: relatedLetterType);
 
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays);
+    }
+
+    public static OrderLetter MakeSpecialLetter(SpecialLetterDefBase letterDef)
+    {
+        OrderLetter specialLetter = MakeOrderLetter(
+            label: letterDef.labelOverride ?? letterDef.label,
+            text: letterDef.text,
+            def: letterDef.relatedOrderLetterDef,
+            sender: letterDef.sender,
+            relatedOrder: null,
+            relatedLetterType: letterDef.relatedLetterType);
+
+        if (!letterDef.attachments.NullOrEmpty())
+        {
+            if (specialLetter is IAttachments attachmentsLetter)
+            {
+                foreach (ThingDefCountClass tdcc in letterDef.attachments)
+                {
+                    Thing thing = ThingMaker.MakeThing(tdcc.thingDef);
+                    thing.stackCount = tdcc.count;
+                    attachmentsLetter.AddAttachment(thing);
+                }
+            }
+            else
+            {
+                Log.Error($"[OARO] {letterDef.defName} has attachments but its letter class {specialLetter.GetType().Name} does not implement {nameof(IAttachments)} interface.");
+            }
+        }
+
+        return specialLetter;
+    }
+
+    public static OrderLetter MakeDailyOrderLetter(DailyOrderLetterDef letterDef, RatkinOrder ratkinOrder, Branch branch = null)
+    {
+        List<NamedArgument> args =
+        [
+            ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+        ];
+        if (branch is not null)
+        {
+            args.Add(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
+        }
+        NamedArgument[] argsArr = args.ToArray();
+
+        OrderLetter dailyOrderLetter = MakeOrderLetter(
+            label: (letterDef.labelOverride ?? letterDef.label).Formatted(argsArr),
+            text: letterDef.text.Formatted(argsArr),
+            def: letterDef.relatedOrderLetterDef,
+            relatedOrder: ratkinOrder,
+            relatedBranch: branch,
+            sender: letterDef.sender ?? (branch is null ? ratkinOrder.Name : branch.Name),
+            relatedLetterType: letterDef.relatedLetterType);
+
+        if (!letterDef.attachments.NullOrEmpty())
+        {
+            if (dailyOrderLetter is IAttachments attachmentsLetter)
+            {
+                foreach (ThingDefCountClass tdcc in letterDef.attachments)
+                {
+                    Thing thing = ThingMaker.MakeThing(tdcc.thingDef);
+                    thing.stackCount = tdcc.count;
+                    attachmentsLetter.AddAttachment(thing);
+                }
+            }
+            else
+            {
+                Log.Error($"[OARO] {letterDef.defName} has attachments but its letter class {dailyOrderLetter.GetType().Name} does not implement {nameof(IAttachments)} interface.");
+            }
+        }
+
+        return dailyOrderLetter;
     }
 
     public static void ReadLetter(OrderLetter letter, Building_OrderLetterBox letterBox, bool forceSlience = false)

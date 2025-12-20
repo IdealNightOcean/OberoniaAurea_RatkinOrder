@@ -67,7 +67,7 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
             sender: branch.NameColored,
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
 
-        orderLetter.Attachments = [thing];
+        orderLetter.AddAttachment(thing);
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays: Rand.Range(8, 12));
 
         base.ApplyInteraction(parms);

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -132,13 +133,52 @@ public class BranchMedalHandler : IExposable
         };
 
         StringBuilder medalLabels = new(32);
+        Dictionary<StatDef, float> statOffsetValues = [];
+        Dictionary<StatDef, float> statFactorValues = [];
         foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> kv in medalRecords)
         {
+            if (kv.Value.Count <= 0)
+            {
+                continue;
+            }
             try
             {
                 BranchMedalDef medalDef = kv.Key;
                 bool isPrimaryMedal = primaryMedal == medalDef;
-                medalDef.BuffWorker.AdjuestHediffBuffStage(stage, isPrimaryMedal, kv.Value.Count);
+                if (!medalDef.statOffsetsByCount.NullOrEmpty())
+                {
+                    foreach (StatModifierBySeverity modifier in medalDef.statOffsetsByCount)
+                    {
+                        float value = modifier.valueBySeverity.Evaluate(kv.Value.Count);
+                        if (statOffsetValues.TryGetValue(modifier.stat, out float oldValue))
+                        {
+                            statOffsetValues[modifier.stat] = oldValue + value;
+
+                        }
+                        else
+                        {
+                            statOffsetValues[modifier.stat] = value;
+                        }
+                    }
+                }
+
+                if (!medalDef.statFactorsByCount.NullOrEmpty())
+                {
+                    foreach (StatModifierBySeverity modifier in medalDef.statFactorsByCount)
+                    {
+                        float value = modifier.valueBySeverity.Evaluate(kv.Value.Count);
+                        if (statFactorValues.TryGetValue(modifier.stat, out float oldValue))
+                        {
+                            statFactorValues[modifier.stat] = oldValue * value;
+
+                        }
+                        else
+                        {
+                            statFactorValues[modifier.stat] = value;
+                        }
+                    }
+                }
+
                 if (isPrimaryMedal)
                 {
                     medalLabels.AppendLine($"{medalDef.LabelCap} (★)".Colorize(medalDef.color));
@@ -158,6 +198,14 @@ public class BranchMedalHandler : IExposable
             }
         }
 
+        foreach (KeyValuePair<StatDef, float> kv in statOffsetValues)
+        {
+            stage.statOffsets.Add(new StatModifier() { stat = kv.Key, value = kv.Value });
+        }
+        foreach (KeyValuePair<StatDef, float> kv in statFactorValues)
+        {
+            stage.statFactors.Add(new StatModifier() { stat = kv.Key, value = kv.Value });
+        }
         if (medalLabels.Length > 0)
         {
             stage.extraTooltip = medalLabels.ToString();

@@ -21,6 +21,31 @@ public class BranchBuilding : IExposable
     }
 
     public string Label => hasUpgraded ? def.advancedProperties.label : def.label;
+    public string Description => (hasUpgraded && def.advancedProperties.extraDescription is not null)
+        ? $"{def.description}\n\n{def.advancedProperties.extraDescription}"
+        : def.description;
+
+    public bool HasGreetingParagraph => !def.greetingParagraph.NullOrEmpty() || (hasUpgraded && !def.advancedProperties.greetingParagraph.NullOrEmpty());
+    public string GreetingParagraph
+    {
+        get
+        {
+            if (hasUpgraded && !def.advancedProperties.greetingParagraph.NullOrEmpty())
+            {
+                return def.advancedProperties.greetingParagraph.Formatted(
+                    Label.Named("BuildingLabel"),
+                    branch.RatkinOrder.Named(KeyLibrary_FormatArgName.OrderName),
+                    branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
+            }
+            else
+            {
+                return def.greetingParagraph?.Formatted(
+                    Label.Named("BuildingLabel"),
+                    branch.RatkinOrder.Named(KeyLibrary_FormatArgName.OrderName),
+                    branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
+            }
+        }
+    }
 
     protected virtual void Initialize(BranchBuildingDef def, Branch branch)
     {

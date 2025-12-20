@@ -824,7 +824,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 {
                     Includes = { OARO_RulePackDefOf.OARO_JointPatrolCompletion }
                 };
-                grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder("ORDER", ratkinOrder));
+                grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, ratkinOrder));
                 grammarRequest.Rules.Add(new Rule_String("patrolLevel", $"OARO_JointPatrolLevel_{patrolLevel}".Translate()));
                 grammarRequest.Rules.Add(new Rule_String("participantsCount", participants.Count.ToString()));
 

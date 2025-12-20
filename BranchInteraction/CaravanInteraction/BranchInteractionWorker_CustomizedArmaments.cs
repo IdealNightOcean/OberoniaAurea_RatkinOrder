@@ -110,7 +110,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
             sender: branch.NameColored,
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
 
-        orderLetter.Attachments = [thing];
+        orderLetter.AddAttachment(thing);
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, coolingDays);
 
         parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, GetPrice(thingDef, stuffDef, quality));

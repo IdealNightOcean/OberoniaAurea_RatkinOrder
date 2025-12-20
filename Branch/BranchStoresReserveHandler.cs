@@ -26,7 +26,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     private List<ReserveRecord> storesReserves = new(StoresReserveCeiling);
     public IReadOnlyList<ReserveRecord> StoresReserves => storesReserves;
 
-    public ReserveRecord PrimaryReserves => storesReserves.Count > 0 ? storesReserves[0] : null;
+    public ReserveRecord PrimaryReserve => storesReserves.Count > 0 ? storesReserves[0] : null;
     public float PrimaryCostRateReduce => storesReserves.Count > 0 ? storesReserves[0].CostRateReduce : 0f;
 
     internal BranchStoresReserveHandler(Branch branch)

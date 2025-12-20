@@ -45,12 +45,12 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
             {
                 this.SendWorkResolvedSignal();
                 EsteemUtility.AdjustAllOrdersEsteem(2, byPlayer: true, reason: "OARO_ResolvedFlu".Translate());
-                StringBuilder sb = new("OARO_PastureFlu_BigSuccess".Translate(maxMedicinePawn, 2));
+                StringBuilder sb = new("OARO_PastureFlu_BigSuccess".Translate(maxMedicinePawn.Named(KeyLibrary_FormatArgName.PAWN), 2.Named(KeyLibrary_FormatArgName.Count)));
 
                 (Pawn maxIntellectualPawn, int maxIntellectualSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Intellectual);
                 if (maxIntellectualSkill >= 10)
                 {
-                    sb.AppendInNewLine("OARO_PastureFlu_Conspiracy".Translate(maxIntellectualPawn));
+                    sb.AppendInNewLine("OARO_PastureFlu_Conspiracy".Translate(maxIntellectualPawn.Named(KeyLibrary_FormatArgName.PAWN)));
                 }
 
                 (Pawn maxAnimalsPawn, int maxAnimalsSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
@@ -59,7 +59,7 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
                     int herbalCount = Rand.RangeInclusive(90, 150);
                     List<Thing> rewards = OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.MedicineHerbal, herbalCount);
                     OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
-                    sb.AppendInNewLine("OARO_PastureFlu_Herbal".Translate(maxAnimalsPawn, herbalCount));
+                    sb.AppendInNewLine("OARO_PastureFlu_Herbal".Translate(maxAnimalsPawn.Named(KeyLibrary_FormatArgName.PAWN), herbalCount.Named(KeyLibrary_FormatArgName.Count)));
                 }
                 Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(sb.ToString()));
             }

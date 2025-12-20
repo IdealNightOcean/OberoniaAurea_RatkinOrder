@@ -1,21 +1,23 @@
-﻿using Verse;
+﻿using System.Collections.Generic;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public abstract class SpecialLetterDefBase : Def
 {
-    /// <summary>
-    /// 发信人
-    /// </summary>
     [MustTranslate]
-    public string sender;
-
+    public string labelOverride;
     /// <summary>
     /// 信件内容
     /// </summary>
     /// <remarks>- 信件标题使用<see cref="Def.label"/>字段</remarks>
     [MustTranslate]
     public string text;
+    /// <summary>
+    /// 发信人
+    /// </summary>
+    [MustTranslate]
+    public string sender;
 
     /// <summary>
     /// 相关骑士团信件Def
@@ -31,7 +33,11 @@ public abstract class SpecialLetterDefBase : Def
     /// 是否全局唯一
     /// </summary>
     public bool absolutelyUnique;
+
+    public List<ThingDefCountClass> attachments;
 }
 
 
-public class SpecialLetterDef : SpecialLetterDefBase;
+public class DailyOrderLetterDef : SpecialLetterDefBase;
+
+public class SpecialGameLetterDef : SpecialLetterDefBase;

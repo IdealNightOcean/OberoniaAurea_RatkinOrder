@@ -12,10 +12,25 @@ public class EsteemHandler : IExposable, ITickDay
 {
     public enum RelationshipKind : byte
     {
+        /// <summary>
+        /// 陌生
+        /// </summary>
         Stranger,
+        /// <summary>
+        /// 熟识
+        /// </summary>
         Acquaintance,
+        /// <summary>
+        /// 友好
+        /// </summary>
         Friendly,
+        /// <summary>
+        /// 信赖
+        /// </summary>
         Trustworthy,
+        /// <summary>
+        /// 同途
+        /// </summary>
         Soulmate
     }
 

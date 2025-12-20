@@ -1,5 +1,4 @@
-﻿using RimWorld;
-using System;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -7,8 +6,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchMedalDef : Def
 {
-    private static readonly Type defaultBuffWorkerClass = typeof(BranchMedalBuffWorker);
-
     /// <summary>印记专注任务类型</summary>
     /// <remarks>- 会在 <see cref="Branch"/> 初始化时设置 <see cref="BranchTaskHandler.FocusedTaskType"/></remarks>
     public BranchTaskType focusedTaskType;
@@ -18,12 +15,11 @@ public class BranchMedalDef : Def
     /// </summary>
     public Color color;
 
-    /// <summary>
-    /// 印记Buff功能类
-    /// </summary>
-    protected Type buffWorkerClass = defaultBuffWorkerClass;
-    private BranchMedalBuffWorker buffWorker;
-    public BranchMedalBuffWorker BuffWorker => buffWorker ??= (BranchMedalBuffWorker)Activator.CreateInstance(buffWorkerClass, args: [this]);
+    [MustTranslate]
+    public string effectDescription;
+
+    public List<StatModifierBySeverity> statOffsetsByCount;
+    public List<StatModifierBySeverity> statFactorsByCount;
 
     /// <summary>
     /// 印记背景颜色
@@ -45,60 +41,4 @@ public class BranchMedalDef : Def
 
     public PathedTexture2D jointPatrolEntryShadeTexture;
 
-}
-
-public class BranchMedalBuffWorker(BranchMedalDef def)
-{
-    protected readonly BranchMedalDef def = def;
-
-    public virtual void AdjuestHediffBuffStage(HediffStage stage, bool isPrimary, int medalCount) { }
-}
-
-public class BranchMedalBuffWorker_Tenacity(BranchMedalDef def) : BranchMedalBuffWorker(def)
-{
-    public override void AdjuestHediffBuffStage(HediffStage stage, bool isPrimary, int medalCount)
-    {
-        stage.painFactor *= (isPrimary ? 0.85f : 0.95f);
-    }
-}
-
-public class BranchMedalBuffWorker_Courage(BranchMedalDef def) : BranchMedalBuffWorker(def)
-{
-    public override void AdjuestHediffBuffStage(HediffStage stage, bool isPrimary, int medalCount)
-    {
-        stage.statOffsets.Add(new StatModifier()
-        {
-            stat = StatDefOf.MeleeHitChance,
-            value = isPrimary ? 4f : 2f
-        });
-    }
-}
-
-public class BranchMedalBuffWorker_Rescue(BranchMedalDef def) : BranchMedalBuffWorker(def)
-{
-    public override void AdjuestHediffBuffStage(HediffStage stage, bool isPrimary, int medalCount)
-    {
-        stage.statOffsets.Add(new StatModifier()
-        {
-            stat = StatDefOf.MedicalTendSpeed,
-            value = isPrimary ? 0.12f : 0.06f
-        });
-    }
-}
-
-public class BranchMedalBuffWorker_Justice(BranchMedalDef def) : BranchMedalBuffWorker(def)
-{
-    public override void AdjuestHediffBuffStage(HediffStage stage, bool isPrimary, int medalCount)
-    {
-        stage.statOffsets.Add(new StatModifier()
-        {
-            stat = StatDefOf.MoveSpeed,
-            value = isPrimary ? 0.15f : 0.10f
-        });
-        stage.statOffsets.Add(new StatModifier()
-        {
-            stat = StatDefOf.WorkSpeedGlobal,
-            value = isPrimary ? 0.05f : 0.03f
-        });
-    }
 }

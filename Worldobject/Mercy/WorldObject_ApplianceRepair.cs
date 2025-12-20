@@ -25,10 +25,10 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
     private FaultType repairType;
     private string FaultLabel => $"OARO_ApplianceFault_{faultType}".Translate();
 
-    private bool isReasonFound;
+    private bool hasFoundReason;
     private float successChance;
 
-    public override int TicksNeeded => isReasonFound ? 30000 : 20000;
+    public override int TicksNeeded => hasFoundReason ? 30000 : 20000;
 
     public override void ExposeData()
     {
@@ -36,7 +36,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         Scribe_Values.Look(ref faultType, nameof(faultType), FaultType.Line);
         Scribe_Values.Look(ref repairType, nameof(repairType), FaultType.Line);
         Scribe_Values.Look(ref successChance, nameof(successChance), 0f);
-        Scribe_Values.Look(ref isReasonFound, nameof(isReasonFound), defaultValue: false);
+        Scribe_Values.Look(ref hasFoundReason, nameof(hasFoundReason), defaultValue: false);
     }
 
     public override void PostMake()
@@ -57,7 +57,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
     public override bool StartWork(Caravan caravan)
     {
-        if (isReasonFound)
+        if (hasFoundReason)
         {
             RepairDialog(caravan);
             return true;
@@ -73,11 +73,11 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         (Pawn maxPawn, int _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Crafting);
         TaggedString taggedString;
 
-        if (isReasonFound)
+        if (hasFoundReason)
         {
             if (Rand.Chance(successChance))
             {
-                taggedString = "OARO_ApplianceRepair_RepairSuccess".Translate(maxPawn);
+                taggedString = "OARO_ApplianceRepair_RepairSuccess".Translate(maxPawn.Named(KeyLibrary_FormatArgName.PAWN));
                 this.SendWorkResolvedSignal();
             }
             else
@@ -89,8 +89,8 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         {
             if (Rand.Chance(0.1f))
             {
-                isReasonFound = true;
-                taggedString = "OARO_ApplianceRepair_FindReasonSuccess".Translate(maxPawn, FaultLabel);
+                hasFoundReason = true;
+                taggedString = "OARO_ApplianceRepair_FindReasonSuccess".Translate(maxPawn.Named(KeyLibrary_FormatArgName.PAWN), FaultLabel.Named(KeyLibrary_FormatArgName.Reason));
 
             }
             else
@@ -99,10 +99,16 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
             }
         }
 
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(taggedString));
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(taggedString, Faction));
     }
 
-    protected override void InterruptWork() { }
+    protected override void InterruptWork()
+    {
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+            text: hasFoundReason ? "OARO_ApplianceRepair_Interrupt_HasFoundReason".Translate()
+                                 : "OARO_ApplianceRepair_Interrupt_NotFoundReason".Translate(),
+            faction: Faction));
+    }
 
     private void RepairDialog(Caravan caravan)
     {
@@ -126,9 +132,9 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
             }
             repairNode.options.Add(option);
         }
-        repairNode.options.Add(OAFrame_DiaUtility.DefaultCloseOption);
+        repairNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
 
-        Find.WindowStack.Add(new Dialog_NodeTree(repairNode));
+        Find.WindowStack.Add(new Dialog_NodeTreeWithFactionInfo(repairNode, Faction));
     }
 
     private void RepairStart(FaultType repairType, Caravan caravan)

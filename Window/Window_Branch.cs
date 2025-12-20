@@ -106,7 +106,7 @@ public class Window_Branch : OrderWindowBase
     private Lazy<string> NaturalPopulationCeilingExplanation { get; }
     private Lazy<string> BuildingCeilingExplanation { get; }
 
-    public Window_Branch(Branch branch, Caravan caravan, Map map) : base()
+    public Window_Branch(Branch branch, Caravan caravan = null, Map map = null) : base()
     {
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         FacilityHandler = Branch.FacilityHandler;

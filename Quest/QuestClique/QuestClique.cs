@@ -21,9 +21,27 @@ public class QuestClique : IExposable
 
     public float Potency
     {
-        get => potency;
+        get
+        {
+            if (!IsBranchClique || potency <= 0f)
+            {
+                return potency;
+            }
+
+            float finalPotency = potency;
+            if (focusedTaskType == relatedBranch.TaskHandler.FocusedTaskType)
+            {
+                finalPotency *= 1.1f;
+            }
+            if (focusedTaskType == relatedBranch.HonorDef?.focusedTaskType)
+            {
+                finalPotency *= 1.1f;
+            }
+            return Mathf.Clamp(finalPotency, -1f, 1f);
+        }
         set => potency = Mathf.Clamp(value, -1f, 1f);
     }
+
     public float Willingness
     {
         get => willingness;
@@ -43,6 +61,12 @@ public class QuestClique : IExposable
     public RatkinOrder RelatedRatkinOrder => relatedBranch?.RatkinOrder;
     public bool IsBranchClique => relatedBranch is not null;
     public bool IsFriendlyBranchClique => relatedBranch is not null && relatedBranch.IsBranchOfType(Branch.BranchType.Friendly);
+    private BranchTaskType focusedTaskType = BranchTaskType.General;
+    public BranchTaskType FocusedTaskType
+    {
+        get => IsBranchClique ? focusedTaskType : BranchTaskType.General;
+        set => focusedTaskType = IsBranchClique ? value : BranchTaskType.General;
+    }
 
     public QuestClique() { }
     public QuestClique(string key) { this.key = key; }
@@ -72,23 +96,24 @@ public class QuestClique : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref key, "key", "UNKNOWN");
+        Scribe_Values.Look(ref key, nameof(key), "UNKNOWN");
 
-        Scribe_Values.Look(ref Name, "Name", "UNKNOWN");
-        Scribe_Values.Look(ref ActiveDesc, "ActiveDesc", string.Empty);
-        Scribe_Values.Look(ref InactiveDesc, "InactiveDesc", string.Empty);
+        Scribe_Values.Look(ref Name, nameof(Name), "UNKNOWN");
+        Scribe_Values.Look(ref ActiveDesc, nameof(ActiveDesc), string.Empty);
+        Scribe_Values.Look(ref InactiveDesc, nameof(InactiveDesc), string.Empty);
 
-        Scribe_Values.Look(ref potency, "potency", 0f);
-        Scribe_Values.Look(ref willingness, "willingness", 0f);
-        Scribe_Values.Look(ref lastWillingnessChange, "lastWillingnessChange", 0f);
+        Scribe_Values.Look(ref potency, nameof(potency), 0f);
+        Scribe_Values.Look(ref willingness, nameof(willingness), 0f);
+        Scribe_Values.Look(ref lastWillingnessChange, nameof(lastWillingnessChange), 0f);
 
-        Scribe_Values.Look(ref IsActive, "IsActive", defaultValue: false);
-        Scribe_Values.Look(ref IsCommunicable, "IsCommunicable", defaultValue: false);
-        Scribe_Values.Look(ref IsBribable, "IsBribable", defaultValue: false);
-        Scribe_Values.Look(ref BriberyCost, "BriberyCost", -1);
-        Scribe_Values.Look(ref TicksToActive, "TicksToActive", -1);
+        Scribe_Values.Look(ref IsActive, nameof(IsActive), defaultValue: false);
+        Scribe_Values.Look(ref IsCommunicable, nameof(IsCommunicable), defaultValue: false);
+        Scribe_Values.Look(ref IsBribable, nameof(IsBribable), defaultValue: false);
+        Scribe_Values.Look(ref BriberyCost, nameof(BriberyCost), -1);
+        Scribe_Values.Look(ref TicksToActive, nameof(TicksToActive), -1);
 
-        Scribe_References.Look(ref relatedBranch, "relatedBranch");
+        Scribe_References.Look(ref relatedBranch, nameof(relatedBranch));
+        Scribe_Values.Look(ref focusedTaskType, nameof(focusedTaskType), BranchTaskType.General);
     }
 
     /// <summary>

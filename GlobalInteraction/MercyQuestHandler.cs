@@ -51,7 +51,7 @@ public class MercyQuestHandler : IExposable
                   relatedLetterType: OrderLetter.RelatedLetterType.Positive);
             OrderRecommendation orderRecommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
             orderRecommendation.SetRatkinOrder(ratkinOrder);
-            orderLetter.Attachments = [orderRecommendation];
+            orderLetter.AddAttachment(orderRecommendation);
             OrderLetterBox.Instance.ReceiveLetter(orderLetter);
         }
     }

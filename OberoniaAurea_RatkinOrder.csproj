@@ -147,6 +147,7 @@
     <Compile Include="InteractionWorker_KnightlyTalk.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\Alert_ResidentKnightWillResignation.cs" />
     <Compile Include="HarmonyPatch\CaravanDemand_CanFireNowSub_Patch.cs" />
+    <Compile Include="Interface\IAttachments.cs" />
     <Compile Include="Interface\IJointPatrolCaravanHelpSite.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_TouristAreaPatrol.cs" />
     <Compile Include="JointPatrol\JointPatrolCaravanHelp\JointPatrolCaravanHelpWorker_JointHunting.cs" />
@@ -185,7 +186,7 @@
     <Compile Include="Quest\Quest_RimOrderLetter.cs" />
     <Compile Include="Quest\Quest_OrderLetter.cs" />
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
-    <Compile Include="Quest\Reward\Quest_GiveBranchMedal_CriticalDemand.cs" />
+    <Compile Include="Quest\BranchDemand\Quest_GiveBranchMedal_CriticalDemand.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Window\BranchTaskEntryDrawer.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
@@ -209,7 +210,7 @@
     <Compile Include="Def\BranchInteractionDef.cs" />
     <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\ResidentKnightAcademicDef.cs" />
-    <Compile Include="Def\SpecialLetterDef.cs" />
+    <Compile Include="Def\SpecialGameLetterDef.cs" />
     <Compile Include="OrderHall\OrderHallHandler.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightRecord.cs" />
     <Compile Include="HarmonyPatch\HotReloadDefs_Patch.cs" />
@@ -427,6 +428,7 @@
     <Compile Include="WorldObject\Demand\WorldObject_RefugeeInfluxCamp.cs" />
     <Compile Include="WorldObject\Mercy\WorldObject_WolfDisasterGossipPoint.cs" />
     <Compile Include="WorldObject\Mercy\WorldObject_WolfDisasterPoint.cs" />
+    <Compile Include="Window\Window_BranchList.cs" />
     <Compile Include="WorldObject\WorldObject_JointPatrolCaravanHelpSite_FixedCaravan.cs" />
     <Compile Include="WorldObject\WorldObject_BranchUnderConstruction.cs" />
     <Compile Include="WorldObject\WorldObjectComp_BranchSite.cs" />

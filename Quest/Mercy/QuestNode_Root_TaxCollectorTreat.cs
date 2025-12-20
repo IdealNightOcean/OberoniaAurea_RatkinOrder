@@ -93,7 +93,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
         string outSignalsUnhappy = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_Unhappy");
         QuestPart_MoodBelow questPart_MoodBelow = new()
         {
-            threshold = 0.7f,
+            threshold = 0.4f,
         };
         questPart_MoodBelow.outSignalsCompleted.Add(outSignalsUnhappy);
         questPart_MoodBelow.pawns.AddRange(questParameter.pawns);

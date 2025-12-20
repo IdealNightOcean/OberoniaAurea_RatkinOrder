@@ -44,17 +44,19 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
 
             maxSocialPawn ??= associatedFixedCaravan.PawnsListForReading.RandomElement();
             maxSocialPawn.skills?.Learn(SkillDefOf.Social, 6000f);
-            string text = "OARO_CelebrationHost_Finish".Translate(maxSocialPawn, count) + "\n" + "OAFrame_PawnGainSkillXp".Translate(maxSocialPawn, SkillDefOf.Social.LabelCap, 6000);
+            TaggedString text = "OARO_CelebrationHost_Finish".Translate(maxSocialPawn.Named(KeyLibrary_FormatArgName.PAWN))
+                + "\n"
+                + "OAFrame_PawnGainSkillXp".Translate(maxSocialPawn, SkillDefOf.Social.LabelCap, 6000);
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(text, Faction));
         }
 
         this.SendWorkResolvedSignal();
-
         this.SafeDestroy();
     }
 
     protected override void InterruptWork()
     {
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_CelebrationHost_Interrupt".Translate()));
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_CelebrationHost_Interrupt".Translate(), Faction));
         this.SafeDestroy();
     }
 }

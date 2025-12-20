@@ -105,6 +105,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
     private static Dialog_NodeTree TalkDialog(Pawn talker, Pawn talkWith)
     {
         Map map = talkWith.MapHeld;
+        Faction faction = talkWith.Faction;
         List<Thing> silvers = map.listerThings.ThingsOfDef(ThingDefOf.Silver);
         int totalSilverCount = 0;
         for (int i = 0; i < silvers.Count; i++)
@@ -112,7 +113,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
             totalSilverCount += silvers[i].stackCount;
         }
 
-        DiaNode rootNode = new("OARO_TalkWithTaxCollectorInfo".Translate(talkWith));
+        DiaNode rootNode = new("OARO_TalkWithTaxCollectorInfo".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)));
 
         DiaOption briberyOpt = new("OARO_TalkWithTaxCollector_Bribery".Translate());
         if (totalSilverCount < 1000)
@@ -127,7 +128,9 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             };
-            briberyOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode("OARO_TalkWithTaxCollector_BriberyReply".Translate(talkWith), acceptText: "Confirm".Translate());
+            briberyOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+                text: "OARO_TalkWithTaxCollector_BriberyReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
+                acceptText: "Confirm".Translate());
         }
         rootNode.options.Add(briberyOpt);
 
@@ -139,7 +142,9 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
-            linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode("OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith), acceptText: "Confirm".Translate())
+            linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+                text: "OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
+                acceptText: "Confirm".Translate())
         };
         if (!map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, 1))
         {
@@ -149,13 +154,28 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
 
         DiaOption treatOpt = new("OARO_TalkWithTaxCollector_Treat".Translate())
         {
-            action = delegate
+            resolveTree = true
+        };
+        if (OrderHallHandler.Instance.OrderHallRoom is null)
+        {
+            treatOpt.action = delegate
+            {
+                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
+                TalkActionUtility.DisableLordJobTalk(talkWith);
+            };
+            treatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+                text: "OARO_TalkWithTaxCollector_NoOrderHallLeave".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
+                acceptText: "Confirm".Translate());
+        }
+        else
+        {
+            treatOpt.resolveTree = true;
+            treatOpt.action = delegate
             {
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "TreatByOpt");
                 TalkActionUtility.DisableLordJobTalk(talkWith);
-            },
-            resolveTree = true
-        };
+            };
+        }
         rootNode.options.Add(treatOpt);
 
         DiaOption ignoreOpt = new("OARO_TalkWithTaxCollector_Ignore".Translate())
@@ -164,6 +184,6 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         };
         rootNode.options.Add(ignoreOpt);
 
-        return new Dialog_NodeTree(rootNode);
+        return new Dialog_NodeTreeWithFactionInfo(rootNode, talkWith.Faction);
     }
 }

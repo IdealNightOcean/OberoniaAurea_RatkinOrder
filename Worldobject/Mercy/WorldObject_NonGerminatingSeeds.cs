@@ -35,11 +35,13 @@ public sealed class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFi
             if (Rand.Chance(successChance))
             {
                 this.SendWorkResolvedSignal();
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_NonGerminatingSeeds_Success".Translate(maxPlantsPawn)));
+                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    text: "OARO_NonGerminatingSeeds_Success".Translate(maxPlantsPawn.Named(KeyLibrary_FormatArgName.PAWN)),
+                    faction: Faction));
             }
             else
             {
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_NonGerminatingSeeds_Fail".Translate()));
+                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_NonGerminatingSeeds_Fail".Translate(), Faction));
             }
         }
 
@@ -48,7 +50,7 @@ public sealed class WorldObject_NonGerminatingSeeds : WorldObject_InteractWithFi
 
     protected override void InterruptWork()
     {
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_NonGerminatingSeeds_Interrupt".Translate()));
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_NonGerminatingSeeds_Interrupt".Translate(), Faction));
         this.SafeDestroy();
     }
 }

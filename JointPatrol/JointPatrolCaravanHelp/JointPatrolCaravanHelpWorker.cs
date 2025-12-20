@@ -56,7 +56,7 @@ public abstract class JointPatrolCaravanHelpWorker
         {
             OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
             recommendation.SetRatkinOrder(branch.RatkinOrder);
-            orderLetter.Attachments = [recommendation];
+            orderLetter.AddAttachment(recommendation);
 
             extraRewardText.AppendLine();
             extraRewardText.AppendLine("OARO_JointPatrolCaravanIncident_ThankWithRecommendation".Translate());

@@ -7,6 +7,11 @@ namespace OberoniaAurea.RatkinOrder;
 public static class OARO_RulePackDefOf
 {
     /// <summary>
+    /// 分部问候语
+    /// </summary>
+    public static RulePackDef OARO_Maker_BranchGreetingDesc;
+
+    /// <summary>
     /// 分部名称拼装 
     /// </summary>
     public static RulePackDef OARO_NameBuilder_BranchName;
