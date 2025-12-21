@@ -35,7 +35,12 @@ public class BranchMedalDef : Def
     /// <summary>
     /// 印记图标
     /// </summary>
-    public PathedTexture2DWithExpanded iconTexture;
+    public PathedTexture2D iconTexture;
+
+    /// <summary>
+    /// 主要印记图标
+    /// </summary>
+    public PathedTexture2D primaryIconTexture;
 
     public PathedTexture2D jointPatrolEntryBackgroundTexture;
 

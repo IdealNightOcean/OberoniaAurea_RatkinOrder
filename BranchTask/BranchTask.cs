@@ -73,7 +73,7 @@ public class BranchTask : IExposable
     protected virtual float CalculateTaskRisk()
     {
         float riskProb = Def.baseRiskProbability;
-        if (branch.PopulationHandler.PublicSecurity < 1f)
+        if (branch.PopulationHandler.PublicSecurity < 1f && !branch.EffectTags.HasTag(KeyLibrary_EffectTag.DangerWarning))
         {
             riskProb += (1f - branch.PopulationHandler.PublicSecurity);
         }

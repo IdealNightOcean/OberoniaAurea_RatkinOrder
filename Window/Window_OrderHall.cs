@@ -2,6 +2,7 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -22,6 +23,7 @@ public partial class Window_OrderHall : OrderWindowBase
 
     private Map Map { get; }
     private int CurOrderHallLevel { get; }
+    private IReadOnlyList<string> HallLevelRestrictionDescs { get; }
     private Texture2D TopShieldTexture { get; }
     private ResidentKnightEntryDrawer ShowDetailDrawer { get; set; }
 
@@ -35,14 +37,27 @@ public partial class Window_OrderHall : OrderWindowBase
     public Window_OrderHall(Map map) : base()
     {
         Map = map;
-        CurOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
-        TopShieldTexture = new CachedTexture($"UI/OrderHall/OARO_TopShield_{CurOrderHallLevel}").Texture;
 
         BuffHediffStageExplanation = new(refreshFunc: RefreshBuffHediffStageExplanation);
         AroundKnightGroups = new(refreshFunc: RefreshAroundKnightGroups);
         PreferredBuildingsStr = GetPreferredBuildingsStr();
 
         OrderHallHandler.Instance.RefreshCache();
+
+        CurOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
+        TopShieldTexture = new CachedTexture($"UI/OrderHall/OARO_TopShield_{CurOrderHallLevel}").Texture;
+        OrderHallRestrictionExtension hallRestriction = OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
+        List<string> restrictionDescs;
+        if (CurOrderHallLevel >= hallRestriction.MaxLevel)
+        {
+            restrictionDescs = ["OARO_ReachMax_OrderHallLevel".Translate()];
+        }
+        else
+        {
+            restrictionDescs = hallRestriction.GetRestrictionOfLevel(CurOrderHallLevel + 1)?.GetRestrictionDescs().ToList();
+        }
+        HallLevelRestrictionDescs = restrictionDescs ?? [];
+
         ResidentKnightDrawers = new(ResidentKnightsManager.Instance.ResidentKnights.Count + 1);
         foreach (ResidentKnightRecord record in ResidentKnightsManager.Instance.ResidentKnights.Values)
         {
@@ -109,7 +124,12 @@ public partial class Window_OrderHall : OrderWindowBase
         //顶部盾徽
         reusedRect = OARO_WindowUtility.CenterRectOnX(mainRect, 0f, 215f, 211f);
         //盾徽绘制逻辑（未完成）
-        GUI.DrawTexture(reusedRect, TopShieldTexture);
+        GUI.DrawTexture(reusedRect, TopShieldTexture, ScaleMode.ScaleToFit);
+
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        reusedRect = new(reusedRect.x + 30f, reusedRect.yMax - (20f + 42f), reusedRect.width - 60f, 42f);
+        Widgets.Label(reusedRect, $"OARO_OrderHall_LevelLabel_{CurOrderHallLevel}".Translate());
 
         //左侧上部竖旗
         reusedRect = new(4f, 57f, 70f, 325f);
@@ -118,6 +138,8 @@ public partial class Window_OrderHall : OrderWindowBase
         //左侧下部烛台
         reusedRect = new(14f, inRect.yMax - 284f, 50f, 284f);
         GUI.DrawTexture(reusedRect, leftCandlestick);
+
+        OARO_WindowUtility.ResetText();
     }
 
     private void DrawResidentKnights(Rect inRect)
@@ -144,21 +166,30 @@ public partial class Window_OrderHall : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_HallWin_KnightRank".Translate());
 
         Rect knightRect = new(innerRectX, titleRect.yMax + 2f, innerRect.width, 435f);
-        float entryX = knightRect.xMin - 2f;
-        float entryY = knightRect.yMin;
-        float entryWidth = ResidentKnightEntryDrawer.Width;
-
-        Rect knightViewRect = knightRect;
-        knightViewRect.width = entryWidth;
-        knightViewRect.height = (ResidentKnightDrawers.Count + 1) * ResidentKnightEntryDrawer.SummaryHeight + ResidentKnightEntryDrawer.DetailHeight + 10f;
-
-        Widgets.BeginScrollView(knightRect, ref scrollPosition_ResidentKnight, knightViewRect);
-        foreach (ResidentKnightEntryDrawer drawer in ResidentKnightDrawers)
+        if (ResidentKnightDrawers.Count <= 0)
         {
-            Vector2 entryPos = new(entryX, entryY);
-            entryY += drawer.Draw(entryPos);
+            Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(knightRect, "OARO_HallWin_NoResidentKnight".Translate().Colorize(Color.gray));
         }
-        Widgets.EndScrollView();
+        else
+        {
+            float entryX = knightRect.xMin - 2f;
+            float entryY = knightRect.yMin;
+            float entryWidth = ResidentKnightEntryDrawer.Width;
+
+            Rect knightViewRect = knightRect;
+            knightViewRect.width = entryWidth;
+            knightViewRect.height = (ResidentKnightDrawers.Count + 1) * ResidentKnightEntryDrawer.SummaryHeight + ResidentKnightEntryDrawer.DetailHeight + 10f;
+
+            Widgets.BeginScrollView(knightRect, ref scrollPosition_ResidentKnight, knightViewRect);
+            foreach (ResidentKnightEntryDrawer drawer in ResidentKnightDrawers)
+            {
+                Vector2 entryPos = new(entryX, entryY);
+                entryY += drawer.Draw(entryPos);
+            }
+            Widgets.EndScrollView();
+        }
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -183,9 +214,9 @@ public partial class Window_OrderHall : OrderWindowBase
         inRect = inRect.ContractedBy(3f);
 
         Rect reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.y + 7f, 256f, 32f);
+        Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(reusedRect, "OARO_HallWin_CurBuff".Translate());
-        Text.Anchor = TextAnchor.UpperLeft;
 
         Rect buffRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 270f);
         float entryX = buffRect.x;
@@ -201,15 +232,12 @@ public partial class Window_OrderHall : OrderWindowBase
         int buffUseCount = Mathf.Max(9, buffCount);
         buffViewRect.height = buffUseCount * entryHeight;
 
-
         Widgets.BeginScrollView(buffRect, ref scrollPosition_Buff, buffViewRect);
-
-        Rect entryRect;
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
         for (int i = 0; i < buffHediffStageExplanation.Count; i++)
         {
-            entryRect = new(entryX, entryY, entryWidth, entryHeight);
+            Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
             if ((i & 1) == 0)
             {
@@ -222,11 +250,15 @@ public partial class Window_OrderHall : OrderWindowBase
         {
             for (int i = buffCount; i < buffUseCount; i++)
             {
-                entryRect = new(entryX, entryY, entryWidth, entryHeight);
+                Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryY += entryHeight;
                 if ((i & 1) == 0)
                 {
                     GUI.DrawTexture(entryRect, middleList_Dark);
+                }
+                if (i == buffCount)
+                {
+                    Widgets.Label(entryRect, "OARO_HallWin_EmptyBuff".Translate().Colorize(Color.gray));
                 }
             }
         }
@@ -236,10 +268,10 @@ public partial class Window_OrderHall : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, buffRect.yMax + 12f, 287f, 3f);
         GUI.DrawTexture(reusedRect, middleCuttingLine);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 256f, 32f);
+        Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 256f, 32f);
         Widgets.Label(reusedRect, "OARO_HallWin_NextLevelNeed".Translate());
-        Text.Anchor = TextAnchor.UpperLeft;
 
         Rect levelRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 210f);
         entryX = levelRect.x;
@@ -250,25 +282,43 @@ public partial class Window_OrderHall : OrderWindowBase
         levelBuffViewRect.width -= 16f;
         entryWidth = levelBuffViewRect.width;
 
-        int levelCount = 0;
-        int levelUseCount = Mathf.Max(18, levelCount);
+        int levelCount = HallLevelRestrictionDescs.Count;
+        int levelUseCount = Mathf.Max(7, levelCount);
         levelBuffViewRect.height = levelUseCount * entryHeight;
 
         Widgets.BeginScrollView(levelRect, ref scrollPosition_Level, levelBuffViewRect);
-        if (levelUseCount > buffCount)
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        for (int i = 0; i < levelCount; i++)
         {
-            for (int i = buffCount; i < levelUseCount; i++)
+            Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
+            entryY += entryHeight;
+            if ((i & 1) == 0)
             {
-                entryRect = new(entryX, entryY, entryWidth, entryHeight);
+                GUI.DrawTexture(entryRect, middleList_Dark);
+            }
+            Widgets.Label(entryRect, HallLevelRestrictionDescs[i]);
+        }
+
+        if (levelUseCount > levelCount)
+        {
+            for (int i = levelCount; i < levelUseCount; i++)
+            {
+                Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryY += entryHeight;
                 if ((i & 1) == 0)
                 {
                     GUI.DrawTexture(entryRect, middleList_Dark);
                 }
+                if (i == levelCount)
+                {
+                    Widgets.Label(entryRect, "OARO_HallWin_EmptyLevelDesc".Translate().Colorize(Color.gray));
+                }
             }
         }
         Widgets.EndScrollView();
 
+        OARO_WindowUtility.ResetText();
     }
 
     private void DrawAroundKnightGroups(Rect inRect)
@@ -323,6 +373,8 @@ public partial class Window_OrderHall : OrderWindowBase
             }
         }
 
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
         if (maxCount > groupCount)
         {
             for (int i = groupCount; i < maxCount; i++)
@@ -334,11 +386,13 @@ public partial class Window_OrderHall : OrderWindowBase
                 {
                     GUI.DrawTexture(reusedRect, rightList_Dark);
                 }
+
+                Widgets.Label(reusedRect, "OARO_HallWin_NoOtherAroundKnightGroup".Translate().Colorize(Color.gray));
             }
         }
 
         Widgets.EndScrollView();
-        Text.Anchor = TextAnchor.UpperLeft;
+        OARO_WindowUtility.ResetText();
     }
 
     private bool DrawAroundKnightGroup(Rect inRect, AroundKnightGroup group, float successRate, int index)
@@ -364,11 +418,19 @@ public partial class Window_OrderHall : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x + 176f, 72f, 32f);
         Widgets.Label(reusedRect, $"OARO_AroundKnightGroup_{group.CurBusyLevel}".Translate());
 
+        Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(reusedRect.xMax, inRect.y, 96f, inRect.height);
+        Rect routeRect = reusedRect;
+        routeRect.height = reusedRect.height / 3f;
+        Widgets.Label(routeRect, group.Source);
+        routeRect = new(reusedRect.x, reusedRect.y + reusedRect.height / 3f, reusedRect.width, reusedRect.height / 3f);
+        Widgets.Label(routeRect, "|");
+        routeRect = new(reusedRect.x, reusedRect.yMax - reusedRect.height / 3f, reusedRect.width, reusedRect.height / 3f);
+        Widgets.Label(routeRect, group.Destination);
 
+        Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(reusedRect.xMax, inRect.y, 64f, inRect.height);
         reusedRect.ContractedBy(2f);
-
         if (Mouse.IsOver(reusedRect))
         {
             if (index != AroundGroupTipIndex)
@@ -384,10 +446,10 @@ public partial class Window_OrderHall : OrderWindowBase
             }
         }
 
-        string buttonText = "OAFrame_Invite".Translate() + "\n";
+        string buttonText = "OAFrame_Invite".Translate() + "\n" + successRate.ToStringPercent("F0");
         if (OARO_WindowUtility.TextButtonImage(
             butRect: reusedRect,
-            label: buttonText + successRate.ToStringPercent("F0"),
+            label: buttonText,
             baseTex: aroundKnightGroupButton,
             downTex: aroundKnightGroupButton_Down))
         {

@@ -91,5 +91,5 @@ public static class KeyLibrary_CDRecord
     /// <summary>
     /// 金鸢尾兰洽谈
     /// </summary>
-    public const string OrderConferenceNegotiate = "OrderConferenceNegotiate";
+    public const string OberoniaConferenceNegotiate = "OberoniaConferenceNegotiate";
 }

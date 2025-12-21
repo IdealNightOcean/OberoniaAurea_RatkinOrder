@@ -239,32 +239,42 @@ public class Window_BranchDemand : OrderWindowBase
         GUI.DrawTexture(inRect, leftMainBackground);
         Rect outRect = inRect.ContractedBy(2f);
 
-        Rect viewRect = outRect;
-        viewRect.width = BranchDemandEntryDrawer.RectWidth;
-
-        float entryX = viewRect.x;
-        float entryY = viewRect.y;
-        float entryHeight = BranchDemandEntryDrawer.RectHeight;
-        viewRect.height = TabDemandEntryCaches.Count * entryHeight;
-
-        Vector2 entryPosition;
-        Widgets.BeginScrollView(outRect, ref scrollPosition_Demands, viewRect);
-        for (int i = 0; i < TabDemandEntryCaches.Count; i++)
+        if (TabDemandEntryCaches.Count > 0)
         {
-            entryPosition = new(entryX, entryY);
-            entryY += entryHeight - 2f;
+            Rect viewRect = outRect;
+            viewRect.width = BranchDemandEntryDrawer.RectWidth;
 
-            BranchDemandEntryDrawer.ButtonResult buttonResult = TabDemandEntryCaches[i].DrawDemandEntry(entryPosition);
-            if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckNormal)
+            float entryX = viewRect.x;
+            float entryY = viewRect.y;
+            float entryHeight = BranchDemandEntryDrawer.RectHeight;
+            viewRect.height = TabDemandEntryCaches.Count * entryHeight;
+
+            Vector2 entryPosition;
+            Widgets.BeginScrollView(outRect, ref scrollPosition_Demands, viewRect);
+            for (int i = 0; i < TabDemandEntryCaches.Count; i++)
             {
-                SelctDemand(TabDemandEntryCaches[i].Branch, isCritical: false);
+                entryPosition = new(entryX, entryY);
+                entryY += entryHeight - 2f;
+
+                BranchDemandEntryDrawer.ButtonResult buttonResult = TabDemandEntryCaches[i].DrawDemandEntry(entryPosition);
+                if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckNormal)
+                {
+                    SelctDemand(TabDemandEntryCaches[i].Branch, isCritical: false);
+                }
+                else if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckCritical)
+                {
+                    SelctDemand(TabDemandEntryCaches[i].Branch, isCritical: true);
+                }
             }
-            else if (buttonResult == BranchDemandEntryDrawer.ButtonResult.CheckCritical)
-            {
-                SelctDemand(TabDemandEntryCaches[i].Branch, isCritical: true);
-            }
+            Widgets.EndScrollView();
         }
-        Widgets.EndScrollView();
+        else
+        {
+            Text.Font = GameFont.Medium;
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(inRect, "OARO_DemandWin_NoDemandNow".Translate().Colorize(Color.gray));
+        }
+
         OARO_WindowUtility.ResetText();
     }
 

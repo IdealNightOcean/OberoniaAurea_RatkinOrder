@@ -182,6 +182,9 @@ public class Window_RatkinOrder : MainTabWindow
             }
         }
 
+        reusedRect = new(inRectX + 294f, inRectY + 405f, 14f, 23f);
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_OrderWin_RelationshipTip".Translate(), uniqueId: 96946587);
+
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, relationLabelRect.yMin - esteemTexture.Texture.height - 10f, esteemTexture.Texture.width, esteemTexture.Texture.height);
         GUI.DrawTexture(reusedRect, esteemTexture.Texture, ScaleMode.ScaleToFit);
 
@@ -201,8 +204,13 @@ public class Window_RatkinOrder : MainTabWindow
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(inRectX + 86f, inRectY + 540f, 128f, 20f);
         Widgets.Label(reusedRect, "OARO_OrderWin_OrderFund".Translate());
+        reusedRect = new(inRectX + 64f, inRectY + 560f, 65f, 50f);
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_OrderWin_OrderFundTip".Translate(), uniqueId: 32864398);
+
         reusedRect = new(inRectX + 303f, inRectY + 540f, 128f, 20f);
         Widgets.Label(reusedRect, "OARO_OrderWin_CurRecommendationLetter".Translate());
+        reusedRect = new(inRectX + 290f, inRectY + 560f, 65f, 50f);
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_OrderWin_CurRecommendationLetterTip".Translate(), uniqueId: 39400977);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
@@ -266,6 +274,7 @@ public class Window_RatkinOrder : MainTabWindow
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(inRectX + 64f, inRectY + 698f, 256f, 28f);
         Widgets.Label(reusedRect, "OARO_OrderWin_Esteem".Translate());
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_OrderWin_EsteemTip".Translate(), uniqueId: 54429128);
 
         Text.Anchor = TextAnchor.MiddleRight;
         reusedRect = new(inRectX + (420f - 110f), inRectY + 698f, 100f, 28f);
@@ -298,6 +307,8 @@ public class Window_RatkinOrder : MainTabWindow
         DrawNormalInteraction(reusedRect);
 
         OARO_WindowUtility.ResetText();
+
+
     }
 
     private void DrawNormalInteraction(Rect inRect)
@@ -558,12 +569,17 @@ public class Window_RatkinOrder : MainTabWindow
 
         Widgets.EndScrollView();
 
-
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(inRectX, inRect.yMax - 25f, inRect.width, 25f);
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, 120f, 25f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_OrderWin_ChangeFollowedBranches".Translate(), changeFollowedBranchesButton, changeFollowedBranchesButton_Down, doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OARO_OrderWin_ChangeFollowedBranches".Translate(),
+            acceptance: "OARO_NotCompleted".Translate(),
+            baseTex: changeFollowedBranchesButton,
+            downTex: changeFollowedBranchesButton_Down,
+            doMouseoverSound: true))
         {
 
         }
@@ -719,6 +735,9 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = new(inRectX + 298f, inRectY + 416f, 100f, 20f);
         OARO_WindowUtility.DrawRecommendationInfo(reusedRect, 1, textOffset: 2f);
 
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 505f, 372f, 320f);
+        DrawReformation(reusedRect);
+
         OARO_WindowUtility.ResetText();
     }
 
@@ -759,6 +778,14 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = OARO_WindowUtility.CenterRectOnY(progressRect, progressRect.xMin + 50f, 50f, 48f);
         GUI.DrawTexture(reusedRect, reserveRecord.Target.iconTexture.Texture, ScaleMode.ScaleToFit);
 
+        OARO_WindowUtility.ResetText();
+    }
+
+    private void DrawReformation(Rect inRect)
+    {
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Widgets.Label(inRect, "OARO_OrderWin_ReformationNotFinished".Translate());
         OARO_WindowUtility.ResetText();
     }
 

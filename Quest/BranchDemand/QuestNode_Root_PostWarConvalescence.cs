@@ -204,12 +204,21 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         // 完美完成
         string inSignalPerfectSuccess = QuestGenUtility.HardcodedSignalWithQuestID("Quest_PerfectSuccess");
         quest.SignalPassAll(inSignals: [outSigalPerfecState, successSignal], outSignal: inSignalPerfectSuccess);
+        QuestPart_RimOrderLetter questPart_RimOrderLetter_PerfectSuccess = new()
+        {
+            InSignal = inSignalPerfectSuccess,
+            RelatedOrder = Branch.RatkinOrder,
+            RelatedFaction = questParameter.faction,
+            LetterDef = OARO_LetterDefOf.OARO_Order_PositiveLetter
+        };
+        questPart_RimOrderLetter_PerfectSuccess.InitLetterTextRequest("[perfectSuccessLabel]", "[perfectSuccessText]");
+        quest.AddPart(questPart_RimOrderLetter_PerfectSuccess);
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange_PerfectSuccess = new()
         {
             InSignalTrigger = inSignalPerfectSuccess,
             RatkinOrder = Branch.RatkinOrder,
             Change = 4,
-            Reason = "OARO_PostWarConvalescence_Success".Translate()
+            Reason = "OARO_PostWarConvalescence_PerfectSuccess".Translate()
         };
         quest.AddPart(questPart_OrderEsteemChange_PerfectSuccess);
         QuestPart_OrderRecommendation questPart_OrderRecommendation_PerfectSuccess = new()

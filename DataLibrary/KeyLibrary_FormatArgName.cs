@@ -4,6 +4,7 @@ public static class KeyLibrary_FormatArgName
 {
     public const string CARAVANHELPDEF = "CARAVANHELPDEF";
     public const string FACTION = "FACTION";
+    public const string HONORDEF = "HONORDEF";
     public const string PAWN = "PAWN";
     public const string SKILL = "SKILL";
     public const string STUFF = "STUFF";

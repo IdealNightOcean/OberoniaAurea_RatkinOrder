@@ -34,7 +34,7 @@ public static class OrderLetterUtility
         orderLetter.Sender = sender ?? "OARO_Letter_UnkownSender".Translate();
         orderLetter.RelatedOrder = relatedOrder;
         orderLetter.RelatedBranch = relatedBranch;
-        orderLetter.RelatedFaction = relatedOrder.Faction;
+        orderLetter.RelatedFaction = relatedOrder?.Faction;
         orderLetter.RelatedLetterTypeValue = relatedLetterType;
 
         return orderLetter;

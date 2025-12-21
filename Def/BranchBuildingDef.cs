@@ -116,6 +116,14 @@ public class BranchBuildingDef : BranchConstructionDef
     /// </summary>
     public IEnumerable<string> GetBaseEffectDescriptions()
     {
+        if (customEffectDescriptions is not null)
+        {
+            foreach (string desc in customEffectDescriptions)
+            {
+                yield return desc;
+            }
+        }
+
         if (branchStatOffsets is not null)
         {
             foreach (BranchStatModifier modifier in branchStatOffsets)
@@ -131,14 +139,6 @@ public class BranchBuildingDef : BranchConstructionDef
                 yield return modifier.ToStringFactor();
             }
         }
-
-        if (customEffectDescriptions is not null)
-        {
-            foreach (string desc in customEffectDescriptions)
-            {
-                yield return desc;
-            }
-        }
     }
 
     /// <summary>繁荣等级的修正描述</summary>
@@ -149,6 +149,15 @@ public class BranchBuildingDef : BranchConstructionDef
         {
             yield break;
         }
+
+        if (advancedProperties.customEffectDescriptions is not null)
+        {
+            foreach (string desc in advancedProperties.customEffectDescriptions)
+            {
+                yield return desc;
+            }
+        }
+
         if (advancedProperties.branchStatOffsets is not null)
         {
             foreach (BranchStatModifier modifier in advancedProperties.branchStatOffsets)
@@ -162,14 +171,6 @@ public class BranchBuildingDef : BranchConstructionDef
             foreach (BranchStatModifier modifier in advancedProperties.branchStatFactors)
             {
                 yield return modifier.ToStringFactor();
-            }
-        }
-
-        if (advancedProperties.customEffectDescriptions is not null)
-        {
-            foreach (string desc in advancedProperties.customEffectDescriptions)
-            {
-                yield return desc;
             }
         }
     }

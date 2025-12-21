@@ -22,7 +22,6 @@ public static class KeyLibrary_EffectTag
     /// </summary>
     public const string CaravanPreventLoot = "CaravanPreventLoot";
 
-
     /// <summary>
     /// 禁用分队自然恢复
     /// </summary>
@@ -44,5 +43,10 @@ public static class KeyLibrary_EffectTag
     /// 分部戒严
     /// </summary>
     public const string MartialLaw = "MartialLaw";
+
+    /// <summary>
+    /// 危险预警
+    /// </summary>
+    public const string DangerWarning = "DangerWarning";
 
 }

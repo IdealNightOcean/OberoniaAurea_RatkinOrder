@@ -311,12 +311,11 @@ public static class BranchUtility
         {
             return false;
         }
-        /*
-        if(!branch.IsBranchOfType(branch.BranchType.Friendly))
+
+        if (!branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
-            return false;
+            return resultOnly ? false : "OARO_NotFriendlyBranch".Translate();
         }
-        */
 
         return true;
     }

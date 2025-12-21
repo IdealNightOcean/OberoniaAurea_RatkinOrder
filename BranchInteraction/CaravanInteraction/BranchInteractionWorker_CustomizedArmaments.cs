@@ -13,15 +13,27 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
     {
         List<ThingDef> customizableThings = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
 
-        DiaNode rootNode = new("OARO_CustomizedArmaments_Weapon".Translate());
+        DiaNode rootNode = new("OARO_CustomizedArmaments_Weapon".Translate(parms.Branch.Named(KeyLibrary_FormatArgName.BranchName)));
 
         foreach (ThingDef tDef in customizableThings)
         {
             DiaOption tDefOpt = new(tDef.label)
             {
-                linkLateBind = () => StuffNode(parms, tDef),
                 resolveTree = false
             };
+
+            if (tDef.MadeFromStuff)
+            {
+                tDefOpt.linkLateBind = () => StuffNode(parms, tDef);
+            }
+            else if (tDef.HasComp<CompQuality>())
+            {
+                tDefOpt.linkLateBind = () => QualityNode(parms, tDef, ThingDefOf.Steel);
+            }
+            else
+            {
+                tDefOpt.linkLateBind = () => ConfirmNode(parms, tDef, ThingDefOf.Steel, QualityCategory.Normal);
+            }
             rootNode.options.Add(tDefOpt);
         }
 
@@ -36,7 +48,8 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         {
             DiaOption sDefOpt = new(stuffDef.label)
             {
-                linkLateBind = () => QualityNode(parms, thingDef, stuffDef),
+                linkLateBind = () => thingDef.HasComp<CompQuality>() ? QualityNode(parms, thingDef, stuffDef)
+                                                                     : ConfirmNode(parms, thingDef, ThingDefOf.Steel, QualityCategory.Normal),
                 resolveTree = false
             };
             rootNode.options.Add(sDefOpt);
@@ -52,7 +65,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
 
     private DiaNode QualityNode(BranchInteractionParms parms, ThingDef thingDef, ThingDef stuffDef)
     {
-        int caravanSilver = parms.Caravan.GetCountOfThingDef(thingDef);
+        int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
         DiaNode rootNode = new("OARO_CustomizedArmaments_Quality".Translate());
 
         foreach (QualityCategory quality in QualityUtility.AllQualityCategories)
@@ -83,9 +96,13 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
     {
         int needSilver = GetPrice(thingDef, stuffDef, quality);
         int coolingDays = GetDelayDays(quality);
-
         return OAFrame_DiaUtility.ConfirmDiaNode(
-            text: "OARO_CustomizedArmaments_Confirm".Translate(thingDef.Named(KeyLibrary_FormatArgName.THING), stuffDef.Named(KeyLibrary_FormatArgName.STUFF), quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality), needSilver.ToString().Named("Price"), coolingDays.Named("DelayDays")),
+            text: "OARO_CustomizedArmaments_Confirm".Translate(
+                thingDef.Named(KeyLibrary_FormatArgName.THING),
+                stuffDef.Named(KeyLibrary_FormatArgName.STUFF),
+                quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality),
+                needSilver.ToString().Named("Price"),
+                coolingDays.Named("DelayDays")),
             acceptText: "Confirm".Translate(),
             acceptAction: () => Customization(parms, thingDef, stuffDef, quality),
             rejectText: "Cancel".Translate(),
@@ -97,13 +114,24 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         int coolingDays = GetDelayDays(quality);
 
         Thing thing = ThingMaker.MakeThing(thingDef, stuffDef);
+        if (thingDef.MadeFromStuff)
+        {
+            thing = ThingMaker.MakeThing(thingDef, stuffDef);
+        }
+        else
+        {
+            thing = ThingMaker.MakeThing(thingDef);
+        }
+
         thing.TryGetComp<CompQuality>()?.SetQuality(quality, ArtGenerationContext.Outsider);
 
         Branch branch = parms.Branch;
 
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-            label: "OARO_CustomizedArmaments_CompletedLabel".Translate(),
-            text: "OARO_CustomizedArmaments_CompletedText".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
+            label: "OARO_CustomizedArmaments_CompletedLabel".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
+            text: "OARO_CustomizedArmaments_CompletedText".Translate(
+                branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
             def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,
             relatedBranch: branch,

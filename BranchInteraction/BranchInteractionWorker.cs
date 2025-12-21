@@ -45,6 +45,21 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_BranchPopulation".Translate(Def.floorPopulation);
         }
+        if (Def.friendlyOnly && !branch.IsBranchOfType(Branch.BranchType.Friendly))
+        {
+            return resultOnly ? false : "OARO_NotFriendlyBranch".Translate();
+        }
+        if (Def.honorOnly)
+        {
+            if (branch.HonorDef is null)
+            {
+                return resultOnly ? false : "OARO_NotHonorBranch".Translate();
+            }
+            if (Def.honorDef is not null && branch.HonorDef != Def.honorDef)
+            {
+                return resultOnly ? false : "OARO_NotHonorBranchOf".Translate(Def.honorDef.Named(KeyLibrary_FormatArgName.HONORDEF));
+            }
+        }
         if (Def.hasCoolDown)
         {
             int cooldownTicksLeft = branch.CooldownManager.GetCooldownTicksLeft(Def.defName);

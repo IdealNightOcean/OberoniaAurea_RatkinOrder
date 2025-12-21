@@ -32,6 +32,7 @@ public partial class Window_BranchTask
         private Window_BranchTask Parent { get; }
         public Branch Branch { get; }
         private Map Map { get; }
+        private BranchTaskType ProtogenicTaskType { get; }
         private bool ShowDetail { get; set; }
 
         private JointPatrolManager JointPatrolManager => Branch.RatkinOrder.JointPatrolManager;
@@ -54,6 +55,7 @@ public partial class Window_BranchTask
             Parent = parent;
             Branch = branch;
             Map = map;
+            ProtogenicTaskType = Branch.MedalHandler.ProtogenicTaskType;
 
             JointBranchRecord = new(refreshFunc: RefreshJointBranchRecord);
 
@@ -199,7 +201,7 @@ public partial class Window_BranchTask
             }
 
             reusedRect = new(inRectX + 495f, inRectY + 24f, 25f, 20f);
-            OARO_WindowUtility.DrawBranchTaskTypeIcon(reusedRect, Branch.TaskHandler.FocusedTaskType, expand: false);
+            OARO_WindowUtility.DrawBranchTaskTypeIcon(reusedRect, Branch.TaskHandler.FocusedTaskType, primary: Branch.TaskHandler.FocusedTaskType == ProtogenicTaskType);
         }
 
         private void DrawJointPatrol(Rect inRect)
@@ -235,9 +237,11 @@ public partial class Window_BranchTask
 
             reusedRect = new(innerRectX + 30f, reusedRect.yMax + 10f, 300f, 20f);
             Widgets.Label(reusedRect, "OARO_TaskWin_PublicSecurityState".Translate());
+            TooltipHandler.TipRegion(reusedRect, () => "OARO_TaskWin_PublicSecurityStateTip".Translate(), uniqueId: 44673289);
 
             reusedRect = new(innerRectX + 30f, reusedRect.yMax + 10f, 300f, 20f);
             Widgets.Label(reusedRect, "OARO_TaskWin_TaskRisk".Translate());
+            TooltipHandler.TipRegion(reusedRect, () => "OARO_TaskWin_TaskRiskTip".Translate(), uniqueId: 24850234);
 
             reusedRect = new(innerRectX + 30f, reusedRect.yMax + 10f, 300f, 20f);
             Widgets.Label(reusedRect, "OARO_TaskWin_ExpectedTaskRevenue".Translate());
@@ -467,11 +471,17 @@ public partial class Window_BranchTask
             Widgets.BeginScrollView(medalsOutRect, ref scrollPosition_Medals, medalsViewRect, showScrollbars: false);
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleCenter;
-            foreach (var medalRecord in Branch.MedalHandler.MedalRecords)
+            BranchMedalDef primaryMedal = Branch.MedalHandler.PrimaryMedal;
+            foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> medalRecord in Branch.MedalHandler.MedalRecords)
             {
                 Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
+                BranchMedalDef medalDef = medalRecord.Key;
+                TooltipHandler.TipRegion(entryRect, () => medalDef.effectDescription ?? string.Empty, uniqueId: 21194707);
                 Rect reusedRect = OARO_WindowUtility.CenterRectOnY(entryRect, entryX + 5f, 32f, 28f);
-                GUI.DrawTexture(reusedRect, medalRecord.Key.iconTexture.Texture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(
+                    position: reusedRect,
+                    image: medalDef == primaryMedal ? medalDef.primaryIconTexture.Texture : medalDef.iconTexture.Texture,
+                    scaleMode: ScaleMode.ScaleToFit);
 
                 reusedRect = OARO_WindowUtility.CenterRectOnY(entryRect, entryX + 45f, 40f, 20f);
                 Widgets.Label(reusedRect, $"× {medalRecord.Value.Count}");

@@ -150,6 +150,49 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             questPart_OrderLetter.InitAttachments(rewards);
             QuestGen.quest.AddPart(questPart_OrderLetter);
 
+            QuestPart_OrderLetter questPart_OrderLetter_GuidanceI = new()
+            {
+                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
+                RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+                RelatedOrder = RatkinOrder,
+                RelatedBranch = Branch,
+            };
+            questPart_OrderLetter_GuidanceI.InitLetterTextRequest("[guidanceILetterLabel]", "[guidanceILetterText]", Branch.NameColored);
+            QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceI);
+
+            QuestPart_OrderLetter questPart_OrderLetter_GuidanceII = new()
+            {
+                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
+                RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+                RelatedOrder = RatkinOrder,
+                RelatedBranch = Branch,
+            };
+            questPart_OrderLetter_GuidanceI.InitLetterTextRequest("[guidanceIILetterLabel]", "[guidanceIILetterText]", Branch.NameColored);
+            QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceII);
+
+            QuestPart_OrderLetter questPart_OrderLetter_GuidanceIII = new()
+            {
+                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
+                RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+                RelatedOrder = RatkinOrder,
+                RelatedBranch = Branch,
+            };
+            questPart_OrderLetter_GuidanceI.InitLetterTextRequest("[guidanceIIILetterLabel]", "[guidanceIIILetterText]", Branch.NameColored);
+            QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceIII);
+
+            QuestPart_OrderLetter questPart_OrderLetter_GuidanceIV = new()
+            {
+                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
+                RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+                RelatedOrder = RatkinOrder,
+                RelatedBranch = Branch,
+            };
+            questPart_OrderLetter_GuidanceI.InitLetterTextRequest("[guidanceIVLetterLabel]", "[guidanceIVLetterText]", Branch.NameColored);
+            QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceIV);
         });
 
         quest.SignalPassActivable(action: delegate

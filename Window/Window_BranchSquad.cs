@@ -225,8 +225,12 @@ public class Window_BranchSquad : OrderWindowBase
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
             GUI.DrawTexture(reusedRect, honorDef.decorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
-            reusedRect = OARO_WindowUtility.CenterRect(areaRect, 190f, 107f);
+            reusedRect = OARO_WindowUtility.CenterRect(areaRect, 170f, 96f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
+
+            Text.Anchor = TextAnchor.UpperCenter;
+            reusedRect = areaRect.ContractedBy(4f);
+            Widgets.Label(reusedRect, honorDef.LabelCap.Colorize(honorDef.color));
         }
         else
         {
@@ -251,6 +255,10 @@ public class Window_BranchSquad : OrderWindowBase
         float middleBottomHeight = 38f;
         //中部左上区域
         areaRect = new(middleInnerRect.x, middleInnerRect.y, 260f, middleUpHeight);
+        TooltipHandler.TipRegion(areaRect, () => "OARO_SquadWin_RelationTip".Translate(), uniqueId: 51929580);
+
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(areaRect.x + 8f, areaRect.y + 6f, 72f, 24f);
         Widgets.Label(reusedRect, "OARO_SquadWin_Relation".Translate());
 
@@ -279,16 +287,18 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = new(middleInnerRect.x + 136f, middleInnerRect.y + 4f, 54f, 32f);
         Text.Font = GameFont.Medium;
         Widgets.Label(reusedRect, relation);
-        Text.Font = GameFont.Small;
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
         Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
 
         reusedRect = new(reusedRect.x, reusedRect.yMax + 8f, 120f, 24f);
+        Text.Font = GameFont.Small;
         Widgets.Label(reusedRect, friendlyExpireDate);
 
         //中部左下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 260f, middleBottomHeight);
+        TooltipHandler.TipRegion(areaRect, () => "OARO_SquadWin_ColonistsMemberTip".Translate(), uniqueId: 32068612);
+
         reusedRect = areaRect;
         reusedRect.xMax = areaRect.x + 100f;
         Widgets.Label(reusedRect, "OARO_SquadWin_ColonistsMember".Translate());
@@ -299,7 +309,7 @@ public class Window_BranchSquad : OrderWindowBase
                                                           label: "OARO_SquadWin_ClickToAdd".Translate(),
                                                           baseTex: middleClickToAddButton,
                                                           downTex: middleClickToAddButton_Down,
-                                                          acceptance: SelBranch.IsValid(),
+                                                          acceptance: "OARO_NotCompleted".Translate(),
                                                           doMouseoverSound: true))
         {
 
@@ -307,8 +317,10 @@ public class Window_BranchSquad : OrderWindowBase
 
         //中部中上区域
         areaRect = new(areaRect.xMax + 2f, middleInnerRect.y, 128f, middleUpHeight);
+
         reusedRect = new(areaRect.x, areaRect.y + 4f, 128f, 24f);
         Widgets.Label(reusedRect, "OARO_BranchSupplyState".Translate());
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_SquadWin_SupplyStateTip".Translate(), uniqueId: 63699179);
 
         if (SelBranch.IsValid())
         {
@@ -380,7 +392,9 @@ public class Window_BranchSquad : OrderWindowBase
         GUI.DrawTexture(reusedRect, middleMemberIcon);
 
         Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 10f, 135f, 24f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 141f, 24f);
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_SquadWin_MemberCountTip".Translate(), uniqueId: 10104735);
+
         if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, "OARO_SquadWin_MemberCountInfo".Translate(SelBranch.Squad.AllCrewCountInt, SelSquadInfo.CrewCeiling));
@@ -435,8 +449,10 @@ public class Window_BranchSquad : OrderWindowBase
 
         //中部右下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 186f, middleBottomHeight);
+
         reusedRect = new(areaRect.x + 4f, areaRect.y + 8f, 70f, 24f);
         Widgets.Label(reusedRect, "OARO_SquadWin_IncludeCommander".Translate());
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_SquadWin_IncludeCommanderTip".Translate(), uniqueId: 83834779);
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, reusedRect.xMax + 10f, 29f, 27f);
         GUI.DrawTexture(reusedRect, middleCommanderIcon);
@@ -610,16 +626,16 @@ public class Window_BranchSquad : OrderWindowBase
 
         if (!hasSupportAuthority)
         {
-            reusedRect = Rect.MinMaxRect(areaRect.xMin - 103f, supportOptRect.yMax, areaRect.xMax + 4f, areaRect.yMax + 8f);
+            reusedRect = Rect.MinMaxRect(areaRect.xMin - 103f, supportOptRect.yMax - 2f, areaRect.xMax + 4f, areaRect.yMax + 8f);
             GUI.DrawTexture(reusedRect, middleLockShade, ScaleMode.StretchToFill, alphaBlend: true);
 
             reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
             if (OARO_WindowUtility.TextButtonImageDisableable(
-                reusedRect,
-                string.Empty,
-                InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_UnlockSupportAuthority),
-                middleUnlockButton,
-                middleUnlockButton_Down,
+                butRect: reusedRect,
+                label: string.Empty,
+                acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_UnlockSupportAuthority),
+                baseTex: middleUnlockButton,
+                downTex: middleUnlockButton_Down,
                 doMouseoverSound: true))
             {
                 BranchInteractionParms parms = new(SelBranch, Map);
@@ -644,7 +660,7 @@ public class Window_BranchSquad : OrderWindowBase
             reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
             GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon);
             Text.Anchor = TextAnchor.MiddleCenter;
-            reusedRect = new(reusedRect.xMax + 8f, reusedRect.y, 80f, 24f);
+            reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 90f, 24f);
             Widgets.Label(reusedRect, "OARO_SquadWin_RequestUnlockSupport".Translate());
         }
 
@@ -668,30 +684,42 @@ public class Window_BranchSquad : OrderWindowBase
         Rect reusedRect = OARO_WindowUtility.CenterRect(inRect, 300f, 112f);
         GUI.DrawTexture(reusedRect, middleUpPeristele);
 
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        reusedRect = inRect;
+        reusedRect.height = 36f;
+        Widgets.Label(reusedRect, "OARO_SquadWin_MedalWall".Translate());
+
         //分部勋章
-        Rect medalOutRect = OARO_WindowUtility.CenterRect(inRect, 192f, 140f);
+        Rect medalOutRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMin + 36f, 200f, 95f);
         float entryX = medalOutRect.x;
         float entryY = medalOutRect.y;
-        float entryWidth = 80f;
-        float entryHeight = 70f;
-        float entryXInterval = 32f;
+        float entryWidth = 90f;
+        float entryHeight = 40f;
+        float entryXInterval = 20f;
+        float entryYInterval = 15f;
         int column = 0;
 
         Rect entryRect;
 
         Rect medalViewRect = medalOutRect;
         List<BranchMedalDef> allMedalDefs = DefDatabase<BranchMedalDef>.AllDefsListForReading;
-        medalViewRect.height = Mathf.Ceil(allMedalDefs.Count / 2f) * entryHeight;
+        medalViewRect.height = (allMedalDefs.Count / 2f + 1) * (entryHeight + entryYInterval) - entryYInterval;
 
         Widgets.BeginScrollView(medalOutRect, ref scrollPosition_Medals, medalViewRect, showScrollbars: false);
-        for (int i = 0; i < allMedalDefs.Count; i++)
+
+        BranchMedalDef primaryMedal = SelBranch.MedalHandler.PrimaryMedal;
+
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleRight;
+        foreach (BranchMedalDef medalDef in allMedalDefs)
         {
             entryRect = new(entryX, entryY, entryWidth, entryHeight);
             column++;
             if (column >= 2)
             {
                 entryX = medalOutRect.x;
-                entryY += entryHeight;
+                entryY += (entryHeight + entryYInterval);
                 column = 0;
             }
             else
@@ -699,12 +727,26 @@ public class Window_BranchSquad : OrderWindowBase
                 entryX += (entryWidth + entryXInterval);
             }
 
-            if (medalHandler.HasMedal(allMedalDefs[i]))
+            int medalCount = medalHandler.GetMedalCount(medalDef);
+            if (medalCount > 0)
             {
-                GUI.DrawTexture(entryRect, allMedalDefs[i].iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
+                Rect iconText = entryRect;
+                iconText.width = iconText.height;
+                GUI.DrawTexture(iconText, medalDef == primaryMedal ? medalDef.primaryIconTexture.Texture : medalDef.iconTexture.Texture, ScaleMode.ScaleToFit);
+                Widgets.Label(entryRect, $"× {medalCount}");
+                if (!string.IsNullOrEmpty(medalDef.effectDescription))
+                {
+                    TooltipHandler.TipRegion(entryRect, () => medalDef.effectDescription, uniqueId: 4131582);
+                }
             }
         }
         Widgets.EndScrollView();
+
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleRight;
+        reusedRect = new(inRect.x, inRect.yMax, inRect.width, 20f);
+        float medalPotencyFactor = medalHandler.TotalMedalCount * 0.015f;
+        Widgets.Label(reusedRect, "OARO_SquadWin_MedalPotencyFactor".Translate(medalPotencyFactor.ToStringPercentSigned()));
     }
 
     private void DrawBombardCount(Rect inRect)

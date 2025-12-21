@@ -84,8 +84,7 @@ public class OrderLetter : IExposable
         }
     }
 
-    public void OnReaded() => hasReaded = true;
-    public virtual void PostReaded(Building_OrderLetterBox letterBox = null) { }
+    public virtual void PostReaded(Building_OrderLetterBox letterBox = null) { hasReaded = true; }
 
     //获取信件的基本描述（UI右下角文本）
     public string GetLetterDesc()

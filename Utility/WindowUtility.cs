@@ -314,21 +314,21 @@ public static class OARO_WindowUtility
         }
     }
 
-    public static void DrawBranchTaskTypeIcon(Rect inRect, BranchTaskType taskType, bool expand)
+    public static void DrawBranchTaskTypeIcon(Rect inRect, BranchTaskType taskType, bool primary)
     {
         switch (taskType)
         {
             case BranchTaskType.CrimeFighting:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Courage.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Courage.iconTexture.Texture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Courage.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Courage.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             case BranchTaskType.StabilityMaintenance:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Tenacity.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Tenacity.iconTexture.Texture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Tenacity.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Tenacity.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             case BranchTaskType.Assistance:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Rescue.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Rescue.iconTexture.Texture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Rescue.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Rescue.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             case BranchTaskType.Supervision:
-                GUI.DrawTexture(inRect, expand ? BranchMedalDefOf.OARO_Justice.iconTexture.ExpandedTexture : BranchMedalDefOf.OARO_Justice.iconTexture.Texture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Justice.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Justice.iconTexture.Texture, ScaleMode.ScaleToFit);
                 return;
             default: return;
         }
@@ -337,6 +337,7 @@ public static class OARO_WindowUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static void ResetText()
     {
+        Text.WordWrap = true;
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
     }

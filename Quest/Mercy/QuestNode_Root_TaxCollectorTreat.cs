@@ -11,6 +11,8 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeBase
 {
+    protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_TaxTreatment;
+
     protected override Faction GetOrGenerateFaction()
     {
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
@@ -66,6 +68,12 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
         };
         questPart_WorkDisabled.pawns.AddRange(pawns);
         QuestGen.quest.AddPart(questPart_WorkDisabled);
+
+        foreach (Pawn p in pawns)
+        {
+            PostPawnGenerated(p, lodgerRecruitedSignal);
+        }
+
         return pawns;
     }
 

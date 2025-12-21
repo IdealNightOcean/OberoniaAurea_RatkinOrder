@@ -2,16 +2,45 @@
 using RimWorld;
 using RimWorld.Planet;
 using System.Linq;
+using System.Text;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWithFixedCaravan_Nameable
+public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWithFixedCaravan_Nameable, ISingleBranchRelated
 {
+    private Branch branch;
+    public Branch Branch => branch;
+    public RatkinOrder RatkinOrder => branch?.RatkinOrder;
+
     private float constricProgress = 0f;
     private bool autoCotrInofrmed;
     private int ticksToNextAutoCtor;
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_References.Look(ref branch, nameof(branch));
+        Scribe_Values.Look(ref constricProgress, nameof(constricProgress), 0f);
+        Scribe_Values.Look(ref autoCotrInofrmed, nameof(autoCotrInofrmed), defaultValue: false);
+        Scribe_Values.Look(ref ticksToNextAutoCtor, nameof(ticksToNextAutoCtor), 2500);
+    }
+
+    public void SetOrderBranch(Branch branch) => this.branch = branch;
+
+    public override string GetInspectString()
+    {
+        StringBuilder sb = new(base.GetInspectString());
+        sb.AppendLine("OARO_SupplyDepot_ConstricProgress".Translate(constricProgress.ToString("0.##"), 800));
+        if (constricProgress >= 400f)
+        {
+            sb.AppendLine("OARO_SupplyDepot_AutoConstructing".Translate());
+        }
+
+        return sb.ToString();
+    }
+
 
     protected override void TickInterval(int delta)
     {
@@ -25,8 +54,15 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
                 if (constricProgress >= 800f && !isWorking)
                 {
                     this.SendWorkResolvedSignal();
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_FinallyAutoFinished".Translate(), Faction));
-                    PlanetTile tile = Tile;
+                    ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+                        label: "OARO_SupplyDepot_FinallyAutoFinishedLabel".Translate(),
+                        text: "OARO_SupplyDepot_FinallyAutoFinishedText".Translate(),
+                        def: LetterDefOf.PositiveEvent,
+                        lookTargets: this,
+                        relatedFaction: RatkinOrder?.Faction,
+                        quest: quest);
+                    letter.RelatedOrder = RatkinOrder;
+                    Find.LetterStack.ReceiveLetter(letter);
                     this.SafeDestroy();
                 }
             }
@@ -51,7 +87,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
         if (constricProgress >= 800f)
         {
             this.SendWorkResolvedSignal();
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_FinallyFinished".Translate(), Faction));
+            Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_SupplyDepot_FinallyFinished".Translate(), RatkinOrder));
 
             PlanetTile tile = Tile;
             this.SafeDestroy();
@@ -61,7 +97,15 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
             if (!autoCotrInofrmed && constricProgress >= 400f)
             {
                 autoCotrInofrmed = true;
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_AutoCtorStar".Translate(gainProgress.ToString("0.##")), Faction));
+                ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+                    label: "OARO_SupplyDepot_AutoCtorAvailableLabel".Translate(),
+                    text: "OARO_SupplyDepot_AutoCtorAvailableText".Translate(),
+                    def: LetterDefOf.PositiveEvent,
+                    lookTargets: this,
+                    relatedFaction: RatkinOrder?.Faction,
+                    quest: quest);
+                letter.RelatedOrder = RatkinOrder;
+                Find.LetterStack.ReceiveLetter(letter);
             }
             else
             {
@@ -69,5 +113,23 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
             }
         }
     }
-    protected override void InterruptWork() { }
+    protected override void InterruptWork()
+    {
+        Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_SupplyDepot_InterruptWork".Translate(), RatkinOrder));
+    }
+
+    public void Notify_BranchDestroyed(Branch branch)
+    {
+        if (this.branch == branch)
+        {
+            this.SafeDestroy();
+        }
+    }
+    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
+    {
+        if (branch?.RatkinOrder == ratkinOrder)
+        {
+            this.SafeDestroy();
+        }
+    }
 }

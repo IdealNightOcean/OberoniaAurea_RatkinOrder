@@ -49,13 +49,13 @@ public class Window_Branch : OrderWindowBase
     private UnderConstructionRecord<BranchBuildingDef> SelUnderConstructionBuilding { get; set; }
     private BranchBuildingDefSummaryUICache SelBuildingDefCache { get; set; }
 
-
     private BranchFacilityDef SelFacilityDef { get; set; }
     private BranchFacilityStageSummaryUICache CurFacilityStageCache { get; set; }
     private BranchFacilityStageSummaryUICache NextFacilityStageCache { get; set; }
 
     private Lazy<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
 
+    private Vector2 scrollPosition_GreetingDesc;
     private Vector2 scrollPosition_Facilities;
     private Vector2 scrollPosition_CurFacilityStage;
     private Vector2 scrollPosition_NextFacilityStage;
@@ -214,6 +214,7 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
         reusedRect = new(reusedRect.xMin - 13f, reusedRect.y, 13f, 22f);
         GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_StoresReservesTip".Translate(), uniqueId: 73484661);
 
         void DrawEntry(Rect entryRect, float iconMargin, int index)
         {
@@ -411,7 +412,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect.yMax = inRect.yMax;
         reusedRect.yMin = preMaxY + 2f;
         reusedRect = reusedRect.ContractedBy(2f);
-        Widgets.Label(reusedRect, $"OARO_BranchFacilityLevel_{facilityLevel}".Translate());
+        Widgets.Label(reusedRect, facilityLevel.GetFacilityLevelLabel());
         Text.Anchor = TextAnchor.UpperLeft;
         Text.Font = GameFont.Small;
         if (facilityLevel == BranchFacilityLevel.Excellent)
@@ -425,6 +426,8 @@ public class Window_Branch : OrderWindowBase
             reusedRect.yMin = inRect.yMax - 12f;
             Widgets.FillableBar(reusedRect, record.Progress, BaseContent.WhiteTex, BaseContent.BlackTex, doBorder: true);
         }
+
+        TooltipHandler.TipRegion(inRect, () => facilityDef.description ?? string.Empty, uniqueId: 84832792);
 
         bool selected = ((CurSelectType == SelectType.Facility) && (SelFacilityDef == facilityDef));
         if (Widgets.ButtonInvisible(inRect))
@@ -789,6 +792,7 @@ public class Window_Branch : OrderWindowBase
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
         GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_CommonInteractionTip".Translate(), uniqueId: 58990376);
 
         Rect commonOutRect = commonRect;
         commonOutRect.yMin = commonRect.yMax - commonEntryHeight * 2f;
@@ -855,6 +859,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, label);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
         GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_BuildingInteractionTip".Translate(), uniqueId: 98968387);
 
         Rect buildingOutRect = Rect.MinMaxRect(buildingRect.x, buildingRect.yMin + 45f, buildingRect.xMax, buildingRect.yMax);
 
@@ -903,8 +908,9 @@ public class Window_Branch : OrderWindowBase
     {
         Rect reusedRect;
         Rect titleRect = new(inRect.x, inRect.y - (24f + 40f), inRect.width, 40f);
-        Text.Anchor = TextAnchor.MiddleLeft;
+
         Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleLeft;
         float textWidth = Text.CalcSize(Branch.Name).x;
         reusedRect = OARO_WindowUtility.CenterRectOnX(titleRect, titleRect.y, Mathf.Min(textWidth, 256f), 40f);
         reusedRect.xMax += 12f;
@@ -917,9 +923,10 @@ public class Window_Branch : OrderWindowBase
 
         inRect.ContractedBy(2f);
 
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.UpperLeft;
         Rect textRect = new(inRect.x, reusedRect.yMax + 2f, inRect.width, 420f);
-
-        Widgets.TextArea(textRect, "", readOnly: true);
+        Widgets.LabelScrollable(textRect.ContractedBy(18f), Branch.GreetingDesc, ref scrollPosition_GreetingDesc);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Small;
@@ -1079,6 +1086,7 @@ public class Window_Branch : OrderWindowBase
             reusedRect.xMin = textRect.xMax - silverCostWidth;
             Text.Anchor = TextAnchor.MiddleCenter;
             Widgets.Label(reusedRect, $"× {NextFacilityStageCache.SilverCost}");
+            TooltipHandler.TipRegion(reusedRect, () => NextFacilityStageCache?.GetSilverCostExplanation(Branch) ?? string.Empty, uniqueId: 15254109);
 
             reusedRect = new(reusedRect.xMin - 24f, reusedRect.y, 24f, 24f);
             Widgets.ThingIcon(reusedRect, ThingDefOf.Silver, graphicIndexOverride: 2);
@@ -1321,7 +1329,11 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(reusedRect, buildingDef.label);
 
+        Text.Font = GameFont.Tiny;
+
         List<string> baseEffectDesc = summaryUICache.BaseEffectDesc;
+
+        Text.WordWrap = false;
         if (baseEffectDesc.Count > 0)
         {
             reusedRect = new(textXMin, reusedRect.yMax, textWidth, textHeight);
@@ -1334,17 +1346,11 @@ public class Window_Branch : OrderWindowBase
             if (baseEffectDesc.Count > 2)
             {
                 Rect tipTriggerRect = new(textXMin, inRect.y + textHeight, textWidth, 2 * textHeight);
-                if (Mouse.IsOver(tipTriggerRect))
-                {
-                    string detailDesc = summaryUICache.BaseEffectDescJoint;
-                    if (!string.IsNullOrEmpty(detailDesc))
-                    {
-                        TooltipHandler.TipRegion(reusedRect, () => detailDesc, 64130862);
-                    }
-                }
             }
+            TooltipHandler.TipRegion(reusedRect, () => summaryUICache.BaseEffectDescJoint ?? string.Empty, uniqueId: 64130862);
         }
-
+        Text.WordWrap = true;
+        Text.Font = GameFont.Small;
         reusedRect = new(textXMin, inRect.yMax - textHeight, textWidth, textHeight);
         reusedRect.width /= 2f;
         Widgets.Label(reusedRect, summaryUICache.TimeCost.TicksToDays().ToString("0.#") + "Day".Translate());
@@ -1353,6 +1359,8 @@ public class Window_Branch : OrderWindowBase
         reusedRect = new(inRect.xMax - (textSize + 4f), reusedRect.y, textSize, textHeight);
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, $"× {summaryUICache.SilverCost}");
+        TooltipHandler.TipRegion(reusedRect, () => summaryUICache.GetSilverCostExplanation(Branch) ?? string.Empty, uniqueId: 63327679);
+
         reusedRect = new(reusedRect.xMin - textHeight, reusedRect.y, textHeight, textHeight);
         reusedRect = reusedRect.ContractedBy(2f);
         Widgets.ThingIcon(reusedRect, ThingDefOf.Silver, graphicIndexOverride: 2);
@@ -1390,6 +1398,7 @@ public class Window_Branch : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Small;
+        Text.WordWrap = false;
         Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect, showScrollbars: false);
 
 
@@ -1429,8 +1438,8 @@ public class Window_Branch : OrderWindowBase
             }
         }
         Widgets.EndScrollView();
-        Text.Anchor = TextAnchor.UpperLeft;
 
+        OARO_WindowUtility.ResetText();
         return rect;
     }
 

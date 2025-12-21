@@ -185,7 +185,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             {
                 return resultOnly ? false : "OARO_NeedACaravan".Translate();
             }
-            int silverCost = branch.GetBuildingSilverCost(buildingDef);
+            int silverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: false, out _);
             if (!CaravanInventoryUtility.HasThings(constructParam.Caravan, ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverCost.ToString());
@@ -259,7 +259,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
         if (constructParam.ByPlayer)
         {
-            int silverCost = branch.GetBuildingSilverCost(buildingDef);
+            int silverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: false, out _);
             OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.Caravan, ThingDefOf.Silver, silverCost);
         }
         branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);

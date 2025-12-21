@@ -85,13 +85,15 @@
     <Compile Include="BranchBuilding\BranchBuilding_Trader.cs" />
     <Compile Include="BranchBuilding\BuildingAdvancedProperties.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Interaction.cs" />
-    <Compile Include="BranchBuilding\BranchBuilding_OrderConferenceHall.cs" />
+    <Compile Include="BranchBuilding\BranchBuilding_OberoniaConferenceHall.cs" />
     <Compile Include="BranchBuilding\BranchBuilding_CommanderOffice.cs" />
     <Compile Include="BranchDemand\BranchDemand_Critical.cs" />
     <Compile Include="BranchInteraction\BranchInteractionParms.cs" />
     <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_CaravanOnly.cs" />
     <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_VisitKnightCommander.cs" />
     <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_RequestCaravanMedicalAssistance.cs" />
+    <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_SupplyAllocation.cs" />
+    <Compile Include="BranchInteraction\CaravanInteraction\BranchInteractionWorker_TravelRatkinTraderGroup.cs" />
     <Compile Include="BranchInteraction\TargetlessInteraction\BranchInteractionWorker_Targetless.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_MapOnly.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_MapSilverToSupply.cs" />
@@ -339,7 +341,7 @@
     <Compile Include="Hediff\Hediff_ByResidentKnightBuff.cs" />
     <Compile Include="Letter\ChoiceLetter_RatkinOrder.cs" />
     <Compile Include="Letter\ChoiceLetter_KnightGroupProactiveVisit.cs" />
-    <Compile Include="OrderHall\OrderHallBuildingRequirements.cs" />
+    <Compile Include="OrderHall\OrderHallLevelRestriction.cs" />
     <Compile Include="DefModExtension\OrderHallRestrictionExtension.cs" />
     <Compile Include="Quest\QuestPart\QuestPart_ResidentKnightWatcher.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightsManager.cs" />

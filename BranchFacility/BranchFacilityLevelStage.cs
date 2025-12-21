@@ -38,6 +38,14 @@ public class BranchFacilityLevelStage
 
     public IEnumerable<string> GetEffectDescriptions()
     {
+        if (customEffectDescriptions is not null)
+        {
+            foreach (string desc in customEffectDescriptions)
+            {
+                yield return desc;
+            }
+        }
+
         if (branchStatOffsets is not null)
         {
             foreach (BranchStatModifier modifier in branchStatOffsets)
@@ -52,15 +60,6 @@ public class BranchFacilityLevelStage
             {
                 yield return modifier.ToStringFactor();
             }
-        }
-
-        if (customEffectDescriptions is not null)
-        {
-            foreach (string desc in customEffectDescriptions)
-            {
-                yield return desc;
-            }
-
         }
     }
 }

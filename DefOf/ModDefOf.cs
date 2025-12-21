@@ -42,7 +42,7 @@ public static class OARO_ModDefOf
     /// 分部建筑 - 金鸢尾兰洽谈所
     /// </summary>
     [MayRequire("OARK.RatkinFaction.OberoniaAurea")]
-    public static HistoryEventDef OARK_OrderConferenceHall;
+    public static HistoryEventDef OARK_OberoniaConferenceHall;
 
     /// <summary>
     /// 荣誉分部 - 教导骑士
@@ -53,6 +53,7 @@ public static class OARO_ModDefOf
     /// 叛乱镇压 - 贵族领地战斗
     /// </summary>
     public static IncidentDef OARO_RaidNobilityTerritory;
+
 
     /// <summary>
     /// 丢东西的旅行商人

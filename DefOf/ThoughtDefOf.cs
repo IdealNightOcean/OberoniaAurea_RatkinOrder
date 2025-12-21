@@ -19,6 +19,11 @@ public static class OARO_ThoughtDefOf
     public static ThoughtDef OARO_Thought_TouristAreaPatrol;
 
     /// <summary>
+    /// 拖延征收官 - 强颜欢笑
+    /// </summary>
+    public static ThoughtDef OARO_Thought_TaxTreatment;
+
+    /// <summary>
     /// 联巡正面事件心情
     /// </summary>
     public static ThoughtDef OARO_Thought_JointPatrolPositive;

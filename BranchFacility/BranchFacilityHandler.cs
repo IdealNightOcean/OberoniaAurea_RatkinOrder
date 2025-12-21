@@ -130,7 +130,7 @@ public class BranchFacilityHandler : IExposable
             {
                 return resultOnly ? false : "OARO_NeedACaravan".Translate();
             }
-            int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
+            int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel, resultOnly: true, out _);
             if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverCost.ToString());
@@ -161,7 +161,7 @@ public class BranchFacilityHandler : IExposable
 
         if (byPlayer && caravan is not null)
         {
-            int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel);
+            int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel, resultOnly: true, out _);
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, silverCost);
         }
 

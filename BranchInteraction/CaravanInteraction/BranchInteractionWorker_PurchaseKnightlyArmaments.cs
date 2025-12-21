@@ -8,6 +8,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
+    private static readonly IReadOnlyList<ThingDef> stuffs =
+        [
+            ThingDefOf.WoodLog,
+            ThingDefOf.Cloth,
+            ThingDefOf.Steel,
+            ThingDefOf.Plasteel
+        ];
     protected override void ApplyInteraction(BranchInteractionParms parms)
     {
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(StuffNode(parms), parms.RatkinOrder);
@@ -18,19 +25,15 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
     {
         DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_Stuff".Translate());
 
-        DiaOption steelOpt = new(ThingDefOf.Steel.label)
+        foreach (ThingDef stuff in stuffs)
         {
-            linkLateBind = () => QualityNode(parms, ThingDefOf.Steel),
-            resolveTree = false
-        };
-        rootNode.options.Add(steelOpt);
-
-        DiaOption wolf = new(ThingDefOf.WoodLog.label)
-        {
-            linkLateBind = () => QualityNode(parms, ThingDefOf.WoodLog),
-            resolveTree = false
-        };
-        rootNode.options.Add(wolf);
+            DiaOption stuffOpt = new(stuff.label)
+            {
+                linkLateBind = () => QualityNode(parms, stuff),
+                resolveTree = false
+            };
+            rootNode.options.Add(stuffOpt);
+        }
 
         rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
 
@@ -103,7 +106,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
 
         parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, price);
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-            text: "OARO_PurchaseKnightlyArmamentsRoot_Purchased".Translate(quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality), stuffDef.label.Named(KeyLibrary_FormatArgName.STUFF), price.ToString().Named("Price")),
+            text: "OARO_PurchaseKnightlyArmamentsRoot_Purchased".Translate(quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality), stuffDef.Named(KeyLibrary_FormatArgName.STUFF), price.ToString().Named("Price")),
             ratkinOrder: parms.Branch.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
 

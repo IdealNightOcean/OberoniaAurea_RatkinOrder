@@ -4,11 +4,11 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchBuilding_OrderConferenceHall : BranchBuilding, ITickDay
+public class BranchBuilding_OberoniaConferenceHall : BranchBuilding, ITickDay
 {
     public void TickDay()
     {
-        if (branch.RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.OrderConferenceNegotiate))
+        if (branch.RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.OberoniaConferenceNegotiate))
         {
             return;
         }
@@ -38,11 +38,11 @@ public class BranchBuilding_OrderConferenceHall : BranchBuilding, ITickDay
             if (faction.HasGoodwill && !faction.IsPlayerSafe())
             {
                 int upgrade = hasUpgraded ? 12 : 7;
-                faction.TryAffectGoodwillWith(Faction.OfPlayer, upgrade, lookTarget: branch.BaseSite, reason: OARO_ModDefOf.OARK_OrderConferenceHall);
+                faction.TryAffectGoodwillWith(Faction.OfPlayer, upgrade, lookTarget: branch.BaseSite, reason: OARO_ModDefOf.OARK_OberoniaConferenceHall);
             }
         }
 
-        branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.OrderConferenceNegotiate, cdTicks: 20 * 60000, removeWhenExpired: true);
+        branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.OberoniaConferenceNegotiate, cdTicks: 20 * 60000, removeWhenExpired: true);
 
     }
 }

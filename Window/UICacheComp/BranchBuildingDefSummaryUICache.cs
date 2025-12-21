@@ -12,6 +12,8 @@ public class BranchBuildingDefSummaryUICache
     public int SilverCost { get; }
     public int TimeCost { get; }
 
+    private string silverCostExplanation;
+
     private List<string> baseEffectDesc;
     private List<string> advancedEffectDesc;
 
@@ -28,9 +30,26 @@ public class BranchBuildingDefSummaryUICache
     public BranchBuildingDefSummaryUICache(BranchBuildingDef buildingDef, Branch branch)
     {
         BuildingDef = buildingDef ?? throw new ArgumentNullException(nameof(buildingDef));
-        SilverCost = branch.GetBuildingSilverCost(buildingDef);
+        SilverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: false, out string silverCostExplanation);
         TimeCost = branch.GetBuildingTimeCost(buildingDef);
     }
+
+    public string GetSilverCostExplanation(Branch branch)
+    {
+        if (silverCostExplanation is null)
+        {
+            if (branch is null)
+            {
+                silverCostExplanation = string.Empty;
+            }
+            else
+            {
+                branch.GetBuildingSilverCost(BuildingDef, resultOnly: false, out silverCostExplanation);
+            }
+        }
+        return silverCostExplanation;
+    }
+
     private string JointEffectDesc(List<string> effectDesc)
     {
         if (effectDesc.NullOrEmpty())
@@ -40,6 +59,7 @@ public class BranchBuildingDefSummaryUICache
         StringBuilder sb = new();
         for (int i = 0; i < effectDesc.Count; i++)
         {
+            sb.Append("- ");
             sb.AppendLine(effectDesc[i]);
         }
         return sb.ToString();

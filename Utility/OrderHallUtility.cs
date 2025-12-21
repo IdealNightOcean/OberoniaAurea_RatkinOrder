@@ -15,6 +15,7 @@ public static class OrderHallUtility
 
     public static int GetOrderHallLevel(Room room)
     {
+        int maxOrderHallLevel = RestrictionExtension.MaxLevel;
         int maxPotentialLevel = 0;
         try
         {
@@ -28,7 +29,7 @@ public static class OrderHallUtility
             int impressivenessRestrict = Array.BinarySearch(impressivenessBoundaries, room.GetStat(RoomStatDefOf.Impressiveness));
             impressivenessRestrict = impressivenessRestrict < 0 ? ~impressivenessRestrict : impressivenessRestrict + 1;
 
-            maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, 7);
+            maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, maxOrderHallLevel);
             maxPotentialLevel = maxPotentialLevel < 1 ? 1 : maxPotentialLevel;
 
             if (maxPotentialLevel <= 1) { return 1; }
@@ -39,7 +40,7 @@ public static class OrderHallUtility
 
             maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
 
-            return Mathf.Clamp(maxPotentialLevel, 1, 7);
+            return Mathf.Clamp(maxPotentialLevel, 1, maxOrderHallLevel);
         }
         catch (Exception ex)
         {
@@ -192,7 +193,7 @@ public static class OrderHallUtility
 
         for (int i = maxPotentialLevel - 1; i >= 1; i--)
         {
-            List<ThingDefCountClass> buildingRequirements = RestrictionExtension.buildingRequirements[i].buildings;
+            List<ThingDefCountClass> buildingRequirements = RestrictionExtension.hallLevelRestriction[i].buildings;
             bool allMet = true;
             for (int j = 0; j < buildingRequirements.Count; j++)
             {
