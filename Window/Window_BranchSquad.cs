@@ -228,6 +228,7 @@ public class Window_BranchSquad : OrderWindowBase
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 170f, 96f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
+            Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.UpperCenter;
             reusedRect = areaRect.ContractedBy(4f);
             Widgets.Label(reusedRect, honorDef.LabelCap.Colorize(honorDef.color));
@@ -443,7 +444,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
         }
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 50f, 26f, 23f);
-        GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon);
+        GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 6f, 64f, 24f);
         Widgets.Label(reusedRect, BranchInteractionDefOf.OARO_MapRecommendationToKnight.label);
 
@@ -658,7 +659,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
 
             reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
-            GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon);
+            GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 90f, 24f);
             Widgets.Label(reusedRect, "OARO_SquadWin_RequestUnlockSupport".Translate());

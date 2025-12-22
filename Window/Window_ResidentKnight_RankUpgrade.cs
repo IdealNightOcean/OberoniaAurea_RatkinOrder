@@ -12,6 +12,8 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
     private Map Map { get; }
     private ResidentKnightRecord.Rank TargetRank { get; }
 
+    private Vector2 scrollPosition_Description;
+
     public Action PostAcceptAction { get; set; }
 
     public override Vector2 InitialSize => new(593f, 480f);
@@ -42,14 +44,14 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
             return;
         }
 
+        Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-
         Rect reusedRect = new(innerRectX, innerRectY + 24f, innerRect.width, 32f);
         Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}".Translate());
 
         Text.Font = GameFont.Small;
         reusedRect = new(innerRectX + 100f, innerRectY + 60f, innerRect.width - 200f, 64f);
-        Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}Desc".Translate());
+        Widgets.LabelScrollable(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}Desc".Translate(), ref scrollPosition_Description);
 
         Text.Font = GameFont.Medium;
         reusedRect = new(innerRectX, innerRectY + 137f, innerRect.width, 185f);
@@ -62,7 +64,11 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
 
         reusedRect = new(innerRectX + 150f, innerRectY + 356f, 71f, 22f);
 
-        if (Widgets.ButtonText(reusedRect, "Cancel".Translate()))
+        if (OARO_WindowUtility.TextButtonImage(butRect: reusedRect,
+            label: "Cancel".Translate(),
+            baseTex: smallButton,
+            downTex: smallButton_Down,
+            doMouseoverSound: true))
         {
             Close();
         }

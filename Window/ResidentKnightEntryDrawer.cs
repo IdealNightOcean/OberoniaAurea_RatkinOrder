@@ -502,7 +502,6 @@ public partial class Window_OrderHall
                     if (ResidentKnightsManager.Instance.TrySetResidentKnightRole(Record.Knight, roleDef, replaceCurRole: replaceCurRole))
                     {
                         RoleExplanationStr.MarkDirty();
-                        Parent.BuffHediffStageExplanation.MarkDirty();
                     }
                 });
             Find.WindowStack.Add(nodeTree);

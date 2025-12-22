@@ -72,7 +72,7 @@ public class Branch : IExposable, ILoadReferenceable
             {
                 return Color.green;
             }
-            return HonorDef?.color ?? RatkinOrder.Color;
+            return Color.white;
         }
     }
     public string NameColored => name.Colorize(Color);

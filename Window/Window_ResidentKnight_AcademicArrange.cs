@@ -35,6 +35,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     private ResidentKnightAcademicStage CheckAcademicStage { get; set; }
     private int CheckAcademicStageLevel { get; set; }
+    private Color CheckAcademicColor { get; set; }
     private Texture2D CheckAcademicColorTex { get; set; }
     private AcceptanceReport CheckAcademicStageAcceptance { get; set; }
 
@@ -153,16 +154,19 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     private void DarwAcademic(Rect inRect, ResidentKnightAcademicDef def)
     {
         GUI.DrawTexture(inRect, academicBackground);
-        if (def.isHonorAcademic && BranchHonor is not null)
-        {
-            GUI.DrawTexture(inRect.ContractedBy(3f), BranchHonor.decorationTexture.Texture, ScaleMode.ScaleToFit);
-        }
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
-
         Rect reusedRect = new(inRect.x, inRect.y + 14f, inRect.width, 20f);
-        Widgets.Label(reusedRect, def.label);
+        if (def.isHonorAcademic && BranchHonor is not null)
+        {
+            GUI.DrawTexture(inRect.ContractedBy(3f), BranchHonor.decorationTexture.Texture, ScaleMode.ScaleToFit);
+            Widgets.Label(reusedRect, def.LabelCap.Colorize(BranchHonor.color));
+        }
+        else
+        {
+            Widgets.Label(reusedRect, def.LabelCap);
+        }
 
         int academicLevel;
         if (def.isHonorAcademic)
@@ -206,8 +210,8 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        Rect reusedRect = new(innerX, innerY, innerRect.width, 32f);
-        Widgets.Label(reusedRect, SelAcademicDef.LabelCap);
+        Rect reusedRect = new(innerX + 24f, innerY, innerRect.width, 32f);
+        Widgets.Label(reusedRect, SelAcademicDef.LabelCap.Colorize(CheckAcademicColor));
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 180f, 968f, 198f);
         GUI.DrawTexture(reusedRect, stageBackground);
@@ -406,6 +410,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
 
         SelAcademicDef = academicDef;
+        CheckAcademicColor = SelAcademicDef.isHonorAcademic ? BranchHonor.color : SelAcademicDef.personality.GetPersonalityColor();
         CheckAcademicColorTex = SelAcademicDef.isHonorAcademic ? BranchHonor.HonorColorTex : SelAcademicDef.personality.GetPersonalityColorTex();
 
 

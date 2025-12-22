@@ -6,7 +6,11 @@ namespace OberoniaAurea.RatkinOrder;
 public class OrderHallLevelRestriction
 {
     public int level;
+    [MustTranslate]
+    public List<string> effectDescs = [];
+
     public List<ThingDefCountClass> buildings = [];
+    [MustTranslate]
     public List<string> otherRestrictionDescs = [];
 
     public IEnumerable<string> GetRestrictionDescs()

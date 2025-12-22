@@ -17,6 +17,7 @@ public static class BranchConstructUtility
         float cost = buildingDef.silverCost;
         if (!resultOnly)
         {
+            explanationSB.Append("- ");
             explanationSB.AppendLine("OARO_BuildSilverCost_Base".Translate(buildingDef.silverCost));
         }
 
@@ -26,8 +27,11 @@ public static class BranchConstructUtility
             cost *= costFactor;
             if (!resultOnly)
             {
-                explanationSB.Append("    ");
+                explanationSB.AppendLine();
+                explanationSB.Append("- ");
                 explanationSB.AppendLine("OARO_BuildSilverCost_CostFactor".Translate(costFactor.ToStringPercent("F1")).Colorize(costFactor < 1f ? Color.green : ColorLibrary.RedReadable));
+                StringBuilder statExplanation = BranchStatUtility.GetStatModifyExplanation(branch, BranchStatDefOf.OARO_ConstructionCostFactor, showResultValue: false);
+                explanationSB.Append(statExplanation);
             }
         }
         costFactor = branch.StoresReserveHandler.GetReserveCostReduce(buildingDef);
@@ -36,8 +40,10 @@ public static class BranchConstructUtility
             cost *= (1f - costFactor);
             if (!resultOnly)
             {
-                explanationSB.Append("    ");
+                explanationSB.AppendLine();
+                explanationSB.Append("- ");
                 explanationSB.AppendLine("OARO_BuildSilverCost_ReserveReduction".Translate((-costFactor).ToStringPercent("F1")).Colorize(Color.green));
+
             }
         }
         if (branch.PopulationHandler.Population < buildingDef.suggestedMinPopulation)
@@ -45,13 +51,16 @@ public static class BranchConstructUtility
             cost *= 2f;
             if (!resultOnly)
             {
-                explanationSB.Append("    ");
+                explanationSB.AppendLine();
+                explanationSB.Append("- ");
                 explanationSB.AppendLine("OARO_BuildSilverCost_InsufficientPopulation".Translate(2f.ToStringPercent("F0")).Colorize(ColorLibrary.RedReadable));
             }
         }
 
         if (!resultOnly)
         {
+            explanationSB.AppendLine();
+            explanationSB.Append("- ");
             explanationSB.AppendLine("OARO_BuildSilverCost_FinalCost".Translate(cost.ToString("F0")));
             explanation = explanationSB.ToString();
         }
@@ -78,6 +87,7 @@ public static class BranchConstructUtility
         float cost = facilityDef.GetLevelStage(targetLevel)?.silverCost ?? 2000f;
         if (!resultOnly)
         {
+            explanationSB.Append("- ");
             explanationSB.AppendLine("OARO_BuildSilverCost_Base".Translate(cost.ToString("F0")));
         }
 
@@ -87,8 +97,11 @@ public static class BranchConstructUtility
             cost *= costFactor;
             if (!resultOnly)
             {
-                explanationSB.Append("    ");
+                explanationSB.AppendLine();
+                explanationSB.Append("- ");
                 explanationSB.AppendLine("OARO_BuildSilverCost_CostFactor".Translate(costFactor.ToStringPercent("F1")).Colorize(costFactor < 1f ? Color.green : ColorLibrary.RedReadable));
+                StringBuilder statExplanation = BranchStatUtility.GetStatModifyExplanation(branch, BranchStatDefOf.OARO_ConstructionCostFactor, showResultValue: false);
+                explanationSB.Append(statExplanation);
             }
         }
         costFactor = branch.StoresReserveHandler.GetReserveCostReduce(facilityDef);
@@ -97,13 +110,16 @@ public static class BranchConstructUtility
             cost *= (1f - costFactor);
             if (!resultOnly)
             {
-                explanationSB.Append("    ");
+                explanationSB.AppendLine();
+                explanationSB.Append("- ");
                 explanationSB.AppendLine("OARO_BuildSilverCost_ReserveReduction".Translate((-costFactor).ToStringPercent("F1")).Colorize(Color.green));
             }
         }
 
         if (!resultOnly)
         {
+            explanationSB.AppendLine();
+            explanationSB.Append("- ");
             explanationSB.AppendLine("OARO_BuildSilverCost_FinalCost".Translate(cost.ToString("F0")));
             explanation = explanationSB.ToString();
         }

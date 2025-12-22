@@ -100,8 +100,8 @@ public class Window_BranchList : OrderWindowBase
         if (OARO_WindowUtility.TextButtonImage(
             butRect: reusedRectII,
             label: string.Empty,
-            baseTex: ellipsisButton,
-            downTex: ellipsisButton_Down,
+            baseTex: IconLibrary.ellipsisButton,
+            downTex: IconLibrary.ellipsisButton_Down,
             doMouseoverSound: true))
         {
             Window_Branch branchWin = new(branch, map: Map);
@@ -242,9 +242,6 @@ public class Window_BranchList : OrderWindowBase
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_MainBackground");
     private static readonly Texture2D entryBackground = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_EntryBackground");
-
-    private static readonly Texture2D ellipsisButton = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_EllipsisButton");
-    private static readonly Texture2D ellipsisButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_EllipsisButton_Down");
 
     private static readonly Texture2D squadButton = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_SquadButton");
     private static readonly Texture2D squadButton_Down = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_SquadButton_Down");

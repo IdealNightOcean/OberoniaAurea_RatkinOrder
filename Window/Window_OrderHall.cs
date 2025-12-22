@@ -23,11 +23,10 @@ public partial class Window_OrderHall : OrderWindowBase
 
     private Map Map { get; }
     private int CurOrderHallLevel { get; }
+    private IReadOnlyList<string> HallLevelEffectDescs { get; }
     private IReadOnlyList<string> HallLevelRestrictionDescs { get; }
     private Texture2D TopShieldTexture { get; }
     private ResidentKnightEntryDrawer ShowDetailDrawer { get; set; }
-
-    private LazyMutable<List<string>> BuffHediffStageExplanation { get; }
     private LazyMutable<List<KeyValuePair<AroundKnightGroup, float>>> AroundKnightGroups { get; }
     private int AroundGroupTipIndex { get; set; } = -1;
     private string AroundGroupTipCache { get; set; } = string.Empty;
@@ -38,7 +37,6 @@ public partial class Window_OrderHall : OrderWindowBase
     {
         Map = map;
 
-        BuffHediffStageExplanation = new(refreshFunc: RefreshBuffHediffStageExplanation);
         AroundKnightGroups = new(refreshFunc: RefreshAroundKnightGroups);
         PreferredBuildingsStr = GetPreferredBuildingsStr();
 
@@ -46,7 +44,10 @@ public partial class Window_OrderHall : OrderWindowBase
 
         CurOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
         TopShieldTexture = new CachedTexture($"UI/OrderHall/OARO_TopShield_{CurOrderHallLevel}").Texture;
+
         OrderHallRestrictionExtension hallRestriction = OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
+
+        HallLevelEffectDescs = [.. (hallRestriction.GetRestrictionOfLevel(CurOrderHallLevel)?.effectDescs ?? Enumerable.Empty<string>())];
         List<string> restrictionDescs;
         if (CurOrderHallLevel >= hallRestriction.MaxLevel)
         {
@@ -218,24 +219,23 @@ public partial class Window_OrderHall : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(reusedRect, "OARO_HallWin_CurBuff".Translate());
 
-        Rect buffRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 270f);
-        float entryX = buffRect.x;
-        float entryY = buffRect.y;
+        Rect effectRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 270f);
+        float entryX = effectRect.x;
+        float entryY = effectRect.y;
         float entryHeight = 30f;
 
-        Rect buffViewRect = buffRect;
-        buffViewRect.width -= 16f;
-        float entryWidth = buffViewRect.width;
+        Rect effectViewRect = effectRect;
+        effectViewRect.width -= 16f;
+        float entryWidth = effectViewRect.width;
 
-        List<string> buffHediffStageExplanation = BuffHediffStageExplanation.Value;
-        int buffCount = buffHediffStageExplanation.Count;
-        int buffUseCount = Mathf.Max(9, buffCount);
-        buffViewRect.height = buffUseCount * entryHeight;
+        int effectCount = HallLevelEffectDescs.Count;
+        int effectUseCount = Mathf.Max(9, effectCount);
+        effectViewRect.height = effectUseCount * entryHeight;
 
-        Widgets.BeginScrollView(buffRect, ref scrollPosition_Buff, buffViewRect);
+        Widgets.BeginScrollView(effectRect, ref scrollPosition_Buff, effectViewRect);
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
-        for (int i = 0; i < buffHediffStageExplanation.Count; i++)
+        for (int i = 0; i < HallLevelEffectDescs.Count; i++)
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
@@ -243,12 +243,12 @@ public partial class Window_OrderHall : OrderWindowBase
             {
                 GUI.DrawTexture(entryRect, middleList_Dark);
             }
-            Widgets.Label(entryRect, buffHediffStageExplanation[i]);
+            Widgets.Label(entryRect, HallLevelEffectDescs[i]);
         }
 
-        if (buffUseCount > buffCount)
+        if (effectUseCount > effectCount)
         {
-            for (int i = buffCount; i < buffUseCount; i++)
+            for (int i = effectCount; i < effectUseCount; i++)
             {
                 Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryY += entryHeight;
@@ -256,7 +256,7 @@ public partial class Window_OrderHall : OrderWindowBase
                 {
                     GUI.DrawTexture(entryRect, middleList_Dark);
                 }
-                if (i == buffCount)
+                if (i == effectCount)
                 {
                     Widgets.Label(entryRect, "OARO_HallWin_EmptyBuff".Translate().Colorize(Color.gray));
                 }
@@ -265,7 +265,7 @@ public partial class Window_OrderHall : OrderWindowBase
         Widgets.EndScrollView();
 
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, buffRect.yMax + 12f, 287f, 3f);
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, effectRect.yMax + 12f, 287f, 3f);
         GUI.DrawTexture(reusedRect, middleCuttingLine);
 
         Text.Font = GameFont.Medium;
@@ -458,35 +458,6 @@ public partial class Window_OrderHall : OrderWindowBase
             return true;
         }
         return false;
-    }
-
-    private List<string> RefreshBuffHediffStageExplanation()
-    {
-        HediffStage buffHediffStage = ResidentKnightsManager.Instance.BuffHediffStage;
-        if (buffHediffStage is null)
-        {
-            return [];
-        }
-
-        List<string> result = new(buffHediffStage.statFactors.Count + buffHediffStage.statOffsets.Count + 1);
-        foreach (StatDrawEntry item in buffHediffStage.SpecialDisplayStats())
-        {
-            try
-            {
-                string explanation = $"{item.LabelCap}  {item.ValueString}";
-                result.Add(explanation);
-            }
-            catch (Exception ex)
-            {
-                ModUtility.LogExceptionError(ex,
-                    errorDesc: $"get explanation from {nameof(StatDrawEntry)}.",
-                    typeName: nameof(Window_OrderHall),
-                    methodName: nameof(RefreshBuffHediffStageExplanation),
-                    needStackTrace: true);
-            }
-        }
-
-        return result;
     }
     private List<KeyValuePair<AroundKnightGroup, float>> RefreshAroundKnightGroups()
     {

@@ -12,6 +12,9 @@ public static class IconLibrary
     public static readonly Texture2D StarWhite = ContentFinder<Texture2D>.Get("UI/Common/OARO_StarWhite");
     public static readonly Texture2D StarBlack = ContentFinder<Texture2D>.Get("UI/Common/OARO_StarBlack");
 
+    public static readonly Texture2D ellipsisButton = ContentFinder<Texture2D>.Get("UI/Common/OARO_EllipsisButton");
+    public static readonly Texture2D ellipsisButton_Down = ContentFinder<Texture2D>.Get("UI/Common/OARO_EllipsisButton_Down");
+
     public static readonly Texture2D RecommendationIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_RecommendationIcon");
 
     public static readonly Texture2D BranchSummaryBackground = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BranchSummaryBackground");

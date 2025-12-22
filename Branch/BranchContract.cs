@@ -85,7 +85,11 @@ public class BranchContract : IExposable
 
     public AcceptanceReport CanFulfill(Caravan caravan)
     {
-        if (caravan is null || !ValidOngoing)
+        if (!ValidOngoing)
+        {
+            return false;
+        }
+        if (caravan is null)
         {
             return false;
         }

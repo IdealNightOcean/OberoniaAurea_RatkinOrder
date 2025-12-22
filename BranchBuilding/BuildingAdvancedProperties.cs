@@ -15,7 +15,7 @@ public class BuildingAdvancedProperties
     /// 升级后的建筑描述
     /// </summary>
     [MustTranslate]
-    public string extraDescription;
+    public string description;
 
     /// <summary>升级人口</summary>
     /// <remarks>- <see cref="BranchPopulationHandler.Population"/>大于等于该值时，<see cref="BranchBuilding"/> 会自动升级</remarks>

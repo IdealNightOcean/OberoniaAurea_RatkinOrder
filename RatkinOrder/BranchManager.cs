@@ -77,7 +77,7 @@ public class BranchManager : IExposable, ITickDay
     }
 
     private List<Branch> followedBranches = [];
-    public IReadOnlyList<Branch> FollowedBranches => followedBranches;
+    public List<Branch> FollowedBranches => followedBranches;
 
 
     private int invitedBranchCreationsCount;

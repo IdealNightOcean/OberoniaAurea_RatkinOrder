@@ -10,7 +10,6 @@ public abstract class SpecialLetterDefBase : Def
     /// <summary>
     /// 信件内容
     /// </summary>
-    /// <remarks>- 信件标题使用<see cref="Def.label"/>字段</remarks>
     [MustTranslate]
     public string text;
     /// <summary>

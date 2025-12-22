@@ -41,6 +41,7 @@ public class Window_RatkinOrder : MainTabWindow
     private (int urgency, int supplementary, int acceptable) normalDemandsCache;
     private (int friendly, int acceptable) criticalDemandsCache;
 
+    private LazyMutable<List<Branch>> FollowedBranches { get; }
     private Dictionary<OrderInteractionDef, AcceptanceReport> SpecialInteractionAcceptances { get; } = [];
     private List<KeyValuePair<OrderInteractionDef, AcceptanceReport>> NormalInteractionAcceptances { get; } = [];
 
@@ -58,6 +59,8 @@ public class Window_RatkinOrder : MainTabWindow
 
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(SelectedOrder, Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
+
+        FollowedBranches = new(refreshFunc: RefreshFollowerBranches);
     }
     public Window_RatkinOrder(Map map)
     {
@@ -554,7 +557,7 @@ public class Window_RatkinOrder : MainTabWindow
         float entryHeight = 25f;
 
         Rect viewRect = outRect;
-        IReadOnlyList<Branch> followedBranches = SelectedOrder.BranchManager.FollowedBranches;
+        List<Branch> followedBranches = FollowedBranches.Value;
         viewRect.height = (followedBranches.Count + 1) * entryHeight;
 
         Widgets.BeginScrollView(outRect, ref scrollPosition_FollowedBranches, viewRect, showScrollbars: false);
@@ -566,22 +569,20 @@ public class Window_RatkinOrder : MainTabWindow
             DrawFollowedBranch(entryRect, branch);
         }
 
-
         Widgets.EndScrollView();
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(inRectX, inRect.yMax - 25f, inRect.width, 25f);
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, 120f, 25f);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_WindowUtility.TextButtonImage(
             butRect: reusedRect,
             label: "OARO_OrderWin_ChangeFollowedBranches".Translate(),
-            acceptance: "OARO_NotCompleted".Translate(),
             baseTex: changeFollowedBranchesButton,
             downTex: changeFollowedBranchesButton_Down,
             doMouseoverSound: true))
         {
-
+            FollowedBranchesFloatMenu();
         }
         OARO_WindowUtility.ResetText();
     }
@@ -595,8 +596,16 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleLeft;
-        reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 3f, 128f, 20f);
-        Widgets.LabelEllipses(reusedRect, branch.NameColored);
+        float labelWidth = Text.CalcSize(branch.NameColored).x;
+        labelWidth = labelWidth > 128f ? 128f : labelWidth;
+        reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 3f, labelWidth, 20f);
+        Widgets.Label(reusedRect, branch.NameColored);
+        if (Widgets.ButtonInvisible(reusedRect.ContractedBy(2f)))
+        {
+            branch.RatkinOrder.BranchManager.FollowedBranches.Remove(branch);
+            FollowedBranches.MarkDirty();
+            return;
+        }
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 3f, 40f, 20f);
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
@@ -612,6 +621,14 @@ public class Window_RatkinOrder : MainTabWindow
         {
             reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 12f, inRect.height - 2f, inRect.height - 2f);
             GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+        }
+        reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 12f, inRect.height - 2f, inRect.height - 2f);
+        if (OARO_WindowUtility.TextButtonImage(reusedRect, string.Empty, IconLibrary.ellipsisButton, IconLibrary.ellipsisButton_Down, doMouseoverSound: false))
+        {
+            Window_Branch branchWin = new(branch, map: Map);
+            Find.WindowStack.Add(branchWin);
+            Close();
+            return;
         }
 
         if (branch.DemandHandler.NormalDemand is not null)
@@ -789,6 +806,32 @@ public class Window_RatkinOrder : MainTabWindow
         OARO_WindowUtility.ResetText();
     }
 
+    private void FollowedBranchesFloatMenu()
+    {
+        if (SelectedOrder is null)
+        {
+            return;
+        }
+
+        List<FloatMenuOption> options = [];
+        BranchManager branchManager = SelectedOrder.BranchManager;
+        foreach (Branch branch in branchManager.AllBranches)
+        {
+            if (branchManager.FollowedBranches.Contains(branch))
+            {
+                continue;
+            }
+
+            options.Add(new FloatMenuOption(branch.Name, action: delegate
+            {
+                branchManager.FollowedBranches.AddDistinct(branch);
+                FollowedBranches.MarkDirty();
+            }));
+        }
+
+        Find.WindowStack.Add(new FloatMenu(options));
+    }
+
     private void RefreshRatkinOrderCache()
     {
         ClearRatkinOrderCache();
@@ -872,6 +915,17 @@ public class Window_RatkinOrder : MainTabWindow
         SelectedOrder.PostApplyOrderInteraction += RefreshRatkinInteractionCache;
     }
 
+    private List<Branch> RefreshFollowerBranches()
+    {
+        if (SelectedOrder is null)
+        {
+            return [];
+        }
+
+        List<Branch> branches = [.. SelectedOrder.BranchManager.FollowedBranches];
+        return branches;
+    }
+
     private void RefreshRatkinInteractionCache(OrderInteractionDef interactionDef, RatkinOrder ratkinOrder, Map map, bool succeeded)
     {
         SpecialInteractionAcceptances.Clear();
@@ -945,6 +999,7 @@ public class Window_RatkinOrder : MainTabWindow
         normalDemandsCache = default;
         criticalDemandsCache = default;
 
+        FollowedBranches.MarkDirty();
         SpecialInteractionAcceptances.Clear();
         NormalInteractionAcceptances.Clear();
     }

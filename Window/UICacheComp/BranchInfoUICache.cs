@@ -44,6 +44,7 @@ public class BranchInfoUICache : BranchSummaryUICache
             {
                 (DailyPopulationGrowth_Bottom, DailyPopulationGrowth_Ceiling) = (DailyPopulationGrowth_Ceiling, DailyPopulationGrowth_Bottom);
             }
+            growthExplanation.Append("    ");
             growthExplanation.AppendLine("OARO_ExtraPopulationGrowthFloat".Translate());
             growthExplanation.AppendLine("OARO_FinalPopulationGrowth".Translate(DailyPopulationGrowth_Bottom.ToString(), DailyPopulationGrowth_Ceiling.ToString())
                                                                      .Colorize(dailyPopulationGrowth > 0f ? Color.green : ColorLibrary.RedReadable));

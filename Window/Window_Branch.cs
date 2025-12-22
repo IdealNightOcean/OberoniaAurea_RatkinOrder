@@ -56,6 +56,7 @@ public class Window_Branch : OrderWindowBase
     private Lazy<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
 
     private Vector2 scrollPosition_GreetingDesc;
+    private Vector2 scrollPosition_BuildingDesc;
     private Vector2 scrollPosition_Facilities;
     private Vector2 scrollPosition_CurFacilityStage;
     private Vector2 scrollPosition_NextFacilityStage;
@@ -534,7 +535,7 @@ public class Window_Branch : OrderWindowBase
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(innerRect, innerRect.x + 15f, 40f, 40f);
         GUI.DrawTexture(reusedRect, building.Def.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, 24f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, inRect.height);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, building.Label);
         Text.Anchor = TextAnchor.UpperLeft;
@@ -715,25 +716,18 @@ public class Window_Branch : OrderWindowBase
                     if (cooling)
                     {
                         GUI.DrawTexture(reusedRect, contractButton_Down);
-                        Widgets.Label(reusedRect, "Submit".Translate());
+                        Widgets.Label(reusedRect, "OAFramne_Submit".Translate());
                     }
-                    else if (acceptance)
+                    else if (OARO_WindowUtility.TextButtonImageDisableable(
+                        butRect: reusedRect,
+                        label: "OAFramne_Submit".Translate(),
+                        acceptance: acceptance,
+                        baseTex: contractButton,
+                        downTex: contractButton_Down,
+                        doMouseoverSound: true))
                     {
-                        if (OARO_WindowUtility.TextButtonImage(reusedRect, "Submit".Translate(), contractButton, contractButton_Down, doMouseoverSound: true))
-                        {
-                            contract.Fulfill(Caravan, Branch);
-                            ContractAcceptances.MarkDirty();
-                        }
-                    }
-                    else
-                    {
-                        GUI.DrawTexture(reusedRect, contractButton_Down);
-                        Widgets.Label(reusedRect, "Submit".Translate());
-                        if (!string.IsNullOrEmpty(acceptance.Reason) && Mouse.IsOver(reusedRect))
-                        {
-                            string reason = acceptance.Reason;
-                            TooltipHandler.TipRegion(reusedRect, () => reason, 67435700);
-                        }
+                        contract.Fulfill(Caravan, Branch);
+                        ContractAcceptances.MarkDirty();
                     }
 
                     reusedRect = Rect.MinMaxRect(reusedRect.xMax, reusedRect.yMin, inRect.xMax - 20f, reusedRect.yMax);
@@ -910,6 +904,10 @@ public class Window_Branch : OrderWindowBase
         Rect titleRect = new(inRect.x, inRect.y - (24f + 40f), inRect.width, 40f);
 
         Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        reusedRect = new(titleRect.x, titleRect.y - 40f, titleRect.width, 40f);
+        Widgets.Label(reusedRect, Branch.RatkinOrder.Name);
+
         Text.Anchor = TextAnchor.MiddleLeft;
         float textWidth = Text.CalcSize(Branch.Name).x;
         reusedRect = OARO_WindowUtility.CenterRectOnX(titleRect, titleRect.y, Mathf.Min(textWidth, 256f), 40f);
@@ -932,6 +930,7 @@ public class Window_Branch : OrderWindowBase
         Text.Font = GameFont.Small;
         reusedRect = new(inRect.x, textRect.yMax + 2f, 264f, 36f);
         Widgets.Label(reusedRect, "OARO_BranchWin_Population".Translate() + $"   {Branch.PopulationHandler.Population}");
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_PopulationTip".Translate(), uniqueId: 5344164);
         reusedRect = new(inRect.x, reusedRect.yMax + 2f, 264f, 36f);
         Widgets.Label(reusedRect, "OARO_BranchWin_PopulationCeiling".Translate() + $"   {CachedBranchInfo.PopulationCeiling}");
         TooltipHandler.TipRegion(reusedRect, () => NaturalPopulationCeilingExplanation.Value, 48614123);
@@ -1116,6 +1115,7 @@ public class Window_Branch : OrderWindowBase
     {
         BranchBuildingDef buildingDef;
         string buildingLabel;
+        string buildingDesc;
 
         switch (CurSelectType)
         {
@@ -1127,6 +1127,7 @@ public class Window_Branch : OrderWindowBase
                     }
                     buildingDef = SelBuilding.Def;
                     buildingLabel = SelBuilding.Label;
+                    buildingDesc = SelBuilding.Description;
                     break;
                 }
             case SelectType.ConstructingBuilding:
@@ -1137,6 +1138,7 @@ public class Window_Branch : OrderWindowBase
                     }
                     buildingDef = SelUnderConstructionBuilding.TargetDef;
                     buildingLabel = SelUnderConstructionBuilding.TargetDef.label;
+                    buildingDesc = SelUnderConstructionBuilding.TargetDef.description;
                     break;
                 }
             default: return;
@@ -1158,12 +1160,13 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, buildingLabel);
 
         Text.Anchor = TextAnchor.MiddleLeft;
-        Text.Font = GameFont.Small;
+        Text.Font = GameFont.Tiny;
         reusedRect = new(reusedRect.x, reusedRect.yMax, 185f, 48f);
-        Widgets.Label(reusedRect, buildingDef.description);
+        Widgets.LabelScrollable(reusedRect, buildingDesc, ref scrollPosition_BuildingDesc);
 
         float commonWidth = 298f;
 
+        Text.Font = GameFont.Small;
         Rect descRect = DrawEffectDescriptions(new Vector2(inRectX, reusedRect.yMax + 32f), "OARO_BranchWin_BuildingBaseEffect".Translate(), SelBuildingDefCache.BaseEffectDesc, ref scrollPosition_BuildingBaseEffect);
 
         if (buildingDef.IsUpgradable)
@@ -1318,22 +1321,20 @@ public class Window_Branch : OrderWindowBase
         BranchBuildingDef buildingDef = summaryUICache.BuildingDef;
 
         Rect reusedRect = new(inRect.x + 8f, inRect.y, inRect.height, inRect.height);
-        float textXMin = reusedRect.xMax;
+        float textXMin = reusedRect.xMax + 4f;
         reusedRect = reusedRect.ContractedBy(12f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
         float textHeight = inRect.height / 4f;
-        float textWidth = inRect.xMax - textXMin;
+        float textWidth = inRect.xMax - textXMin - 2f;
         reusedRect = new(textXMin, inRect.y, textWidth, textHeight);
 
-        Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(reusedRect, buildingDef.label);
-
-        Text.Font = GameFont.Tiny;
-
-        List<string> baseEffectDesc = summaryUICache.BaseEffectDesc;
+        Text.Anchor = TextAnchor.MiddleLeft;
+        Widgets.Label(reusedRect, buildingDef.label.Colorize(ColorLibrary.Gold));
 
         Text.WordWrap = false;
+        Text.Font = GameFont.Tiny;
+        List<string> baseEffectDesc = summaryUICache.BaseEffectDesc;
         if (baseEffectDesc.Count > 0)
         {
             reusedRect = new(textXMin, reusedRect.yMax, textWidth, textHeight);
@@ -1349,8 +1350,10 @@ public class Window_Branch : OrderWindowBase
             }
             TooltipHandler.TipRegion(reusedRect, () => summaryUICache.BaseEffectDescJoint ?? string.Empty, uniqueId: 64130862);
         }
+
         Text.WordWrap = true;
         Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(textXMin, inRect.yMax - textHeight, textWidth, textHeight);
         reusedRect.width /= 2f;
         Widgets.Label(reusedRect, summaryUICache.TimeCost.TicksToDays().ToString("0.#") + "Day".Translate());
@@ -1385,6 +1388,8 @@ public class Window_Branch : OrderWindowBase
         GUI.DrawTexture(inRect, effectDescBackground);
 
         Rect viewRect = inRect;
+        viewRect.yMin += 2f;
+        viewRect.yMax -= 2f;
         float entryX = viewRect.xMin + 2f;
         float entryY = viewRect.yMin;
         float entryWidth = viewRect.width - 5f;
@@ -1393,34 +1398,32 @@ public class Window_Branch : OrderWindowBase
         int useCount = Mathf.Max(6, entryCount);
         viewRect.height = entryHeight * useCount;
 
-        Rect entryRect;
         int column = 0;
 
-        Text.Anchor = TextAnchor.MiddleCenter;
-        Text.Font = GameFont.Small;
         Text.WordWrap = false;
+        Text.Font = GameFont.Small;
+        Text.Anchor = TextAnchor.MiddleLeft;
+
         Widgets.BeginScrollView(inRect, ref scrollPosition, viewRect, showScrollbars: false);
 
-
-        entryRect = new(entryX, entryY, entryWidth, entryHeight);
-        column++;
+        Rect reusedRect = new(entryX + 8f, entryY, entryWidth - 16f, entryHeight);
         entryY += entryHeight;
-        if ((column & 1) == 0)
+        if (((++column) & 1) == 0)
         {
-            GUI.DrawTexture(entryRect, effectDescEntry_Dark);
+            GUI.DrawTexture(reusedRect, effectDescEntry_Dark);
         }
-        Widgets.Label(entryRect, title);
-
+        Widgets.Label(reusedRect, title.Colorize(ColorLibrary.Gold));
 
         for (int i = 0; i < entryCount; i++)
         {
-            entryRect = new(entryX, entryY, entryWidth, entryHeight);
-            column++;
+            Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
-            if ((column & 1) == 0)
+            if (((++column) & 1) == 0)
             {
                 GUI.DrawTexture(entryRect, effectDescEntry_Dark);
             }
+            entryRect.xMin += 8f;
+            entryRect.xMax -= 8f;
             Widgets.Label(entryRect, stageEffectDesc[i]);
         }
 
@@ -1428,10 +1431,9 @@ public class Window_Branch : OrderWindowBase
         {
             for (int i = entryCount; i < useCount; i++)
             {
-                entryRect = new(entryX, entryY, entryWidth, entryHeight);
-                column++;
+                Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryY += entryHeight;
-                if ((column & 1) == 0)
+                if (((++column) & 1) == 0)
                 {
                     GUI.DrawTexture(entryRect, effectDescEntry_Dark);
                 }
@@ -1530,7 +1532,6 @@ public class Window_Branch : OrderWindowBase
 
     private List<KeyValuePair<BranchContract, AcceptanceReport>> RecacheContractAcceptance()
     {
-
         IReadOnlyList<BranchContract> contracts = Branch.PopulationHandler.Contracts;
         List<KeyValuePair<BranchContract, AcceptanceReport>> pairs = [];
         foreach (BranchContract contract in contracts)

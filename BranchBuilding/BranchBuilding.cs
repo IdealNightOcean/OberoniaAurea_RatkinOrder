@@ -20,9 +20,12 @@ public class BranchBuilding : IExposable
         set => hasUpgraded = value && def.IsUpgradable;
     }
 
-    public string Label => hasUpgraded ? def.advancedProperties.label : def.label;
-    public string Description => (hasUpgraded && def.advancedProperties.extraDescription is not null)
-        ? $"{def.description}\n\n{def.advancedProperties.extraDescription}"
+    public string Label => (hasUpgraded && def.advancedProperties.label is not null)
+        ? def.advancedProperties.label
+        : def.label;
+
+    public string Description => (hasUpgraded && def.advancedProperties.description is not null)
+        ? def.advancedProperties.description
         : def.description;
 
     public bool HasGreetingParagraph => !def.greetingParagraph.NullOrEmpty() || (hasUpgraded && !def.advancedProperties.greetingParagraph.NullOrEmpty());
