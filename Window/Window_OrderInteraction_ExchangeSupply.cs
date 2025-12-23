@@ -26,7 +26,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
 
         RatkinOrder = ratkinOrder;
         Map = map;
-        MapRecommendationCount = RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map);
+        MapRecommendationCount = RecommendationUtility.CurRecommendationOfMap(Map);
     }
 
     public override void PostClose()

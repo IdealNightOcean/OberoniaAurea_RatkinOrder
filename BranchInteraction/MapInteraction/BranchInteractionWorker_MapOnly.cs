@@ -22,7 +22,7 @@ public abstract class BranchInteractionWorker_MapOnly(BranchInteractionDef def) 
     protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
     {
         RatkinOrder ratkinOrder = parms.RatkinOrder;
-        if (Def.needRecommendation > 0 && !parms.Map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, Def.needRecommendation, (t) => ((OrderRecommendation)t).RatkinOrder == ratkinOrder))
+        if (Def.needRecommendation > 0 && !parms.Map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, Def.needRecommendation))
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
         }

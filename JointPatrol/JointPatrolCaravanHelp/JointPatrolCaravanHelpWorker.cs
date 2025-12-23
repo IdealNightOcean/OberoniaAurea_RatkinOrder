@@ -54,8 +54,7 @@ public abstract class JointPatrolCaravanHelpWorker
 
         if (Rand.Chance(Def.recommendationChance))
         {
-            OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
-            recommendation.SetRatkinOrder(branch.RatkinOrder);
+            OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
             orderLetter.AddAttachment(recommendation);
 
             extraRewardText.AppendLine();

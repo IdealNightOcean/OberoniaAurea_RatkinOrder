@@ -70,7 +70,6 @@ public class EsteemHandler : IExposable, ITickDay
     public void PostOrderGenerated()
     {
         relationship = GameComponent_RatkinOrder.Instance?.InitOrderRelationship ?? RelationshipKind.Stranger;
-        esteem = EsteemUtility.GetEsteemSoftCap(relationship);
     }
 
     public void ExposeData()
@@ -159,11 +158,18 @@ public class EsteemHandler : IExposable, ITickDay
                 {
                     if (reason is null)
                     {
-                        Messages.Message("OARO_Message_EsteemIncreaseNoReason".Translate(RatkinOrder.Name, lastEsteemChange), MessageTypeDefOf.PositiveEvent);
+                        Messages.Message(
+                            text: "OARO_Message_EsteemIncreaseNoReason".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                                                                                  lastEsteemChange.Named(KeyLibrary_FormatArgName.Count)),
+                            def: MessageTypeDefOf.PositiveEvent);
                     }
                     else
                     {
-                        Messages.Message("OARO_Message_EsteemIncrease".Translate(RatkinOrder.Name, lastEsteemChange, reason), MessageTypeDefOf.PositiveEvent);
+                        Messages.Message(
+                            text: "OARO_Message_EsteemIncrease".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                                                                          lastEsteemChange.Named(KeyLibrary_FormatArgName.Count),
+                                                                          reason.Named(KeyLibrary_FormatArgName.Reason)),
+                            def: MessageTypeDefOf.PositiveEvent);
                     }
 
                 }
@@ -171,11 +177,18 @@ public class EsteemHandler : IExposable, ITickDay
                 {
                     if (reason is null)
                     {
-                        Messages.Message("OARO_Message_EsteemDecreaseNoReason".Translate(RatkinOrder.Name, lastEsteemChange), MessageTypeDefOf.NegativeEvent);
+                        Messages.Message(
+                            text: "OARO_Message_EsteemDecreaseNoReason".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                                                                                  lastEsteemChange.Named(KeyLibrary_FormatArgName.Count)),
+                            def: MessageTypeDefOf.NegativeEvent);
                     }
                     else
                     {
-                        Messages.Message("OARO_Message_EsteemDecrease".Translate(RatkinOrder.Name, lastEsteemChange, reason), MessageTypeDefOf.NegativeEvent);
+                        Messages.Message(
+                            text: "OARO_Message_EsteemDecrease".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                                                                          lastEsteemChange.Named(KeyLibrary_FormatArgName.Count),
+                                                                          reason.Named(KeyLibrary_FormatArgName.Reason)),
+                            def: MessageTypeDefOf.NegativeEvent);
                     }
                 }
             }

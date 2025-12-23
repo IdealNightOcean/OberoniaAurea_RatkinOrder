@@ -386,8 +386,7 @@ public static class DebugRatkinOrders
             Map map = Find.CurrentMap;
             Find.Targeter.BeginTargeting(parms, action: delegate (LocalTargetInfo t)
             {
-                OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
-                recommendation.SetRatkinOrder(ratkinOrder);
+                OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
                 GenPlace.TryPlaceThing(recommendation, t.Cell, map, ThingPlaceMode.Near);
                 SpawnRecommendation(ratkinOrder);
             });

@@ -251,7 +251,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             }
             if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
             {
-                return RecommendationUtility.CurRecommendationOfMap(clique.RelatedBranch.RatkinOrder, OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true)) >= 1;
+                return RecommendationUtility.CurRecommendationOfMap(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true)) >= 1;
             }
         }
         return clique.Willingness > 0.999f;

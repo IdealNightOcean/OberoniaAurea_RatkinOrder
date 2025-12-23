@@ -38,7 +38,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
         }
 
         int recommendationNeed = GetRecommendationNeedCount(ratkinOrder);
-        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < recommendationNeed)
+        if (RecommendationUtility.CurRecommendationOfMap(map) < recommendationNeed)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed, ratkinOrder.Name);
         }

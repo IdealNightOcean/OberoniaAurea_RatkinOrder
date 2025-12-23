@@ -11,12 +11,10 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_RefugeeKnightBase
 {
-    private DemandType demandType;
-    private bool giveNormalRecommendation;
+    private DemandType DemandType { get; set; }
 
-    private string outSigalPerfecState;
-    private string outSigalMoodFailed;
-    private HediffDef specialHediff;
+    private string OutSigalPerfecState { get; set; }
+    private string OutSigalMoodFailed { get; set; }
 
     protected override bool InitQuestParameter()
     {
@@ -35,17 +33,16 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         Slate slate = QuestGen.slate;
         slate.Set(UniqueLeavingLetterSlate, true);
 
-        outSigalMoodFailed = QuestGenUtility.HardcodedSignalWithQuestID("Mood_Failed");
-        outSigalPerfecState = QuestGenUtility.HardcodedSignalWithQuestID("Quest_PerfectState");
-        giveNormalRecommendation = Rand.Chance(0.25f);
+        OutSigalMoodFailed = QuestGenUtility.HardcodedSignalWithQuestID("Mood_Failed");
+        OutSigalPerfecState = QuestGenUtility.HardcodedSignalWithQuestID("Quest_PerfectState");
 
         if (!InitRatkinOrder(initBranch: true))
         {
             return false;
         }
 
-        demandType = slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType);
-        if (demandType == DemandType.Supplementary)
+        DemandType = slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType);
+        if (DemandType == DemandType.Supplementary)
         {
             questParameter.LodgerCount = 1;
         }
@@ -56,7 +53,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
             Branch = Branch,
-            DemandType = demandType
+            DemandType = DemandType
         };
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
 
@@ -66,11 +63,10 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
     protected override void ClearQuestParameter()
     {
         base.ClearQuestParameter();
-        demandType = default;
-        specialHediff = null;
+        DemandType = default;
 
-        outSigalMoodFailed = null;
-        outSigalPerfecState = null;
+        OutSigalMoodFailed = null;
+        OutSigalPerfecState = null;
     }
 
     protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
@@ -78,7 +74,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
         OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
 
-        if (demandType == DemandType.Supplementary || specialHediff is null)
+        if (DemandType == DemandType.Supplementary)
         {
             return;
         }
@@ -116,15 +112,12 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         choice.rewards.Add(reward_OrderEsteem);
         choice.rewards.Add(reward_FriendlyBranch);
 
-        if (giveNormalRecommendation)
+        Reward_OrderRecommendation reward_OrderRecommendation = new()
         {
-            Reward_OrderRecommendation reward_OrderRecommendation = new()
-            {
-                RatkinOrder = Branch?.RatkinOrder,
-                Count = 1
-            };
-            choice.rewards.Add(reward_OrderRecommendation);
-        }
+            RatkinOrder = Branch?.RatkinOrder,
+            Count = 1
+        };
+        choice.rewards.Add(reward_OrderRecommendation);
     }
 
     protected override void SetPawnsLeaveComp(string lodgerArrivalSignal, string inSignalRemovePawn)
@@ -156,14 +149,14 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
             OutSignalSuccess = outSigalMoodSuccess,
             OutSignalBelowHighThreshold = outSigalMoodNormal,
-            OutSignalBelowLowThreshold = outSigalMoodFailed,
+            OutSignalBelowLowThreshold = OutSigalMoodFailed,
         };
         questPart_AvaerageMood.Pawns.AddRange(questParameter.pawns);
         quest.AddPart(questPart_AvaerageMood);
 
         string outSignalHas = QuestGenUtility.HardcodedSignalWithQuestID("Lodgers_HasInjury");
         string outSignalNoOneHas = QuestGenUtility.HardcodedSignalWithQuestID("Lodgers_NoOneHasInjury");
-        if (demandType != DemandType.Supplementary)
+        if (DemandType != DemandType.Supplementary)
         {
             QuestPart_AnyPawnHasSpecialHediff questPart_AnyPawnHasSpecialHediff = new()
             {
@@ -175,11 +168,11 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
             questPart_AnyPawnHasSpecialHediff.pawns.AddRange(questParameter.pawns);
             quest.AddPart(questPart_AnyPawnHasSpecialHediff);
 
-            quest.SignalPassAll(inSignals: [outSigalMoodSuccess, outSignalNoOneHas], outSignal: outSigalPerfecState);
+            quest.SignalPassAll(inSignals: [outSigalMoodSuccess, outSignalNoOneHas], outSignal: OutSigalPerfecState);
         }
 
-        quest.Leave(questParameter.pawns, inSignal: outSigalMoodFailed);
-        DefaultDelayLeaveComp(lodgerArrivalSignal, outSigalMoodFailed, inSignalRemovePawn);
+        quest.Leave(questParameter.pawns, inSignal: OutSigalMoodFailed);
+        DefaultDelayLeaveComp(lodgerArrivalSignal, OutSigalMoodFailed, inSignalRemovePawn);
     }
 
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
@@ -188,7 +181,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         // 因心情问题提前离开导致的失败
         string inSignalFailAny = QuestGenUtility.HardcodedSignalWithQuestID("Quest_FailAny");
-        quest.AnySignal(inSignals: [failSignal, delayFailSignal, outSigalMoodFailed], outSignals: [inSignalFailAny]);
+        quest.AnySignal(inSignals: [failSignal, delayFailSignal, OutSigalMoodFailed], outSignals: [inSignalFailAny]);
 
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange_Fail = new()
         {
@@ -203,7 +196,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         // 完美完成
         string inSignalPerfectSuccess = QuestGenUtility.HardcodedSignalWithQuestID("Quest_PerfectSuccess");
-        quest.SignalPassAll(inSignals: [outSigalPerfecState, successSignal], outSignal: inSignalPerfectSuccess);
+        quest.SignalPassAll(inSignals: [OutSigalPerfecState, successSignal], outSignal: inSignalPerfectSuccess);
         QuestPart_RimOrderLetter questPart_RimOrderLetter_PerfectSuccess = new()
         {
             InSignal = inSignalPerfectSuccess,
@@ -217,7 +210,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         {
             InSignalTrigger = inSignalPerfectSuccess,
             RatkinOrder = Branch.RatkinOrder,
-            Change = 4,
+            Change = 5,
             Reason = "OARO_PostWarConvalescence_PerfectSuccess".Translate()
         };
         quest.AddPart(questPart_OrderEsteemChange_PerfectSuccess);
@@ -254,22 +247,21 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
                     Reason = "OARO_PostWarConvalescence_Success".Translate()
                 };
                 quest.AddPart(questPart_OrderEsteemChange_NormalSuccess);
-                if (giveNormalRecommendation)
+
+                QuestPart_OrderRecommendation questPart_OrderRecommendation_NormalSuccess = new()
                 {
-                    QuestPart_OrderRecommendation questPart_OrderRecommendation_NormalSuccess = new()
-                    {
-                        InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-                        RatkinOrder = Branch.RatkinOrder,
-                        Count = 1
-                    };
-                    quest.AddPart(questPart_OrderRecommendation_NormalSuccess);
-                }
+                    InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                    RatkinOrder = Branch.RatkinOrder,
+                    Count = 1
+                };
+                quest.AddPart(questPart_OrderRecommendation_NormalSuccess);
+
                 quest.DropPods(mapParent: questParameter.map.Parent,
                                contents: OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, questParameter.LodgerCount * 280),
                                useTradeDropSpot: true,
                                faction: questParameter.faction);
             },
-            inSignalDisable: outSigalPerfecState,
+            inSignalDisable: OutSigalPerfecState,
             inSignal: successSignal);
 
         base.SetQuestEndComp(questPart_Interactions, failSignal, delayFailSignal, successSignal);

@@ -182,7 +182,7 @@ public partial class Window_BranchTask
             float inRectY = inRect.yMin;
 
             Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRectX + 325f, 40f, 20f);
-            Widgets.Label(reusedRect, Branch.Potency.ToStringPercent("F0"));
+            Widgets.Label(reusedRect, Branch.Potency.ToString("F0"));
 
             reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRectX + 420f, 24f, 24f);
             OARO_WindowUtility.DrawBranchStateIcon(reusedRect, Branch, expand: false);

@@ -22,7 +22,6 @@ public class AbilityComp_GiveKnightsOfMapHediff : CompAbilityEffect_WithDuration
         Pawn caster = parent.pawn;
         Faction casterFaction = caster.Faction;
         int durationSecondsOverride = GetDurationSeconds(caster).SecondsToTicks();
-        Log.Message("000");
         foreach (Pawn p in caster.MapHeld.mapPawns.AllHumanlikeSpawned)
         {
             if (p.HostileTo(casterFaction))

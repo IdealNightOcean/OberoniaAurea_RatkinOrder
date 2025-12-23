@@ -13,43 +13,34 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class RecommendationUtility
 {
-    public static bool IsRecommendationOfOrder(this Thing t, RatkinOrder order)
+    public static OrderRecommendation MakeRecommendationForPlayer(int count, RatkinOrder ratkinOrder = null)
     {
-        if (t is null || t.def != OARO_ThingDefOf.OARO_OrderRecommendation)
-        {
-            return false;
-        }
-
-        return ((OrderRecommendation)t).RatkinOrder == order;
+        OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
+        recommendation.stackCount = count;
+        recommendation.OnMakeForPlayer(ratkinOrder);
+        return recommendation;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int CurRecommendationOfMap(RatkinOrder order, Map map)
+    public static int CurRecommendationOfMap(Map map)
     {
-        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.OfType<OrderRecommendation>().Where(r => r.RatkinOrder == order).Sum(t => t.stackCount) ?? 0;
+        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.Sum(t => t.stackCount) ?? 0;
     }
 
-    public static void GiveRecommendationsToPlayer(RatkinOrder order, int count, Action<Thing> giveAction)
+    public static void GiveRecommendationsToPlayer(int count, Action<Thing> giveAction, RatkinOrder ratkinOrder = null)
     {
-        if (!order.IsValid() || count <= 0 || giveAction is null)
+        if (!ratkinOrder.IsValid() || count <= 0 || giveAction is null)
         {
             return;
         }
 
-        OrderRecommendation recommendations = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
-        recommendations.stackCount = count;
-        recommendations.SetRatkinOrder(order);
-
-        order.EsteemHandler.TotalRecommendation += count;
-
-        recommendations.OnGiveToPlayer();
+        OrderRecommendation recommendations = MakeRecommendationForPlayer(count, ratkinOrder);
         giveAction.Invoke(recommendations);
-
     }
 
-    public static void GiveRecommendationsToPlayer_Map(RatkinOrder ratkinOrder, int count, Map map, bool sendStandLetter = true, IntVec3? spawnCell = null, bool dropPod = false)
+    public static void GiveRecommendationsToPlayer_Map(int count, Map map, RatkinOrder ratkinOrder = null, bool sendStandLetter = true, IntVec3? spawnCell = null, bool dropPod = false)
     {
-        GiveRecommendationsToPlayer(ratkinOrder, count, MapGiveAction);
+        GiveRecommendationsToPlayer(count, MapGiveAction, ratkinOrder);
 
         void MapGiveAction(Thing recommendations)
         {
@@ -104,7 +95,6 @@ public static class RecommendationUtility
             map: map,
             thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
             count: useCount,
-            validator: (t) => ((OrderRecommendation)t).RatkinOrder == order,
             actualTakeCount: out int actualTakeCount);
 
         if (recommendations.NullOrEmpty())
@@ -130,8 +120,7 @@ public static class RecommendationUtility
 
         return OAFrame_CaravanUtility.RemoveThingsOfDef(caravan: caravan,
                                                         thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
-                                                        count: useCount,
-                                                        validator: (t) => ((OrderRecommendation)t).RatkinOrder == order);
+                                                        count: useCount);
 
     }
 
@@ -145,8 +134,7 @@ public static class RecommendationUtility
 
         return OAFrame_FixedCaravanUtility.RemoveThingsOfDef(fixedCaravan: fixedCaravan,
                                                             thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
-                                                            count: useCount,
-                                                            validator: (t) => ((OrderRecommendation)t).RatkinOrder == order);
+                                                            count: useCount);
     }
 
 

@@ -485,7 +485,7 @@ public class Branch : IExposable, ILoadReferenceable
                          * (0.9f + facilityHandler.TotalFacilityLevel * 0.025f + medalHandler.TotalMedalCount * 0.015f)
                          * (IsBranchOfType(BranchType.Honor) ? 1.25f : 1f);
 
-        return curPotency * 0.01f;
+        return curPotency;
     }
 
     private void OnZeroFactorUnmerged(IEnumerable<BranchStatDef> statDefs)

@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 [DefOf]
 public static class BranchResidentDefOf
 {
-    public static BranchResidentDef OARO_Deployment;
+    // public static BranchResidentDef OARO_Deployment;
 
     /// <summary>
     /// 医疗援助

@@ -26,7 +26,7 @@ public static class GlobalInteractionUtility
         }
 
         int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
-        if (RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < needRecommendation)
+        if (RecommendationUtility.CurRecommendationOfMap(map) < needRecommendation)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(needRecommendation, ratkinOrder.Name);
         }
@@ -64,7 +64,7 @@ public static class GlobalInteractionUtility
         ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
         RatkinOrder ratkinOrder = record.RatkinOrder;
         int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
-        if (recommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < recommendationNeed)
+        if (recommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(map) < recommendationNeed)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed, ratkinOrder.Name);
         }
@@ -98,7 +98,7 @@ public static class GlobalInteractionUtility
         {
             return resultOnly ? false : "OARO_EnoughResignationDaysLeft".Translate(20.ToString());
         }
-        if (RecommendationUtility.CurRecommendationOfMap(record.RatkinOrder, map) < 1)
+        if (RecommendationUtility.CurRecommendationOfMap(map) < 1)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, record.RatkinOrder.Name);
         }
@@ -134,7 +134,7 @@ public static class GlobalInteractionUtility
 
         if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed >= SeasonInvitationLimit())
         {
-            if (RecommendationUtility.CurRecommendationOfMap(knightGroup.RatkinOrder, map) < 1)
+            if (RecommendationUtility.CurRecommendationOfMap(map) < 1)
             {
                 return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, knightGroup.RatkinOrder.Name);
             }

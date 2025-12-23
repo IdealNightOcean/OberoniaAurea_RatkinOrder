@@ -18,7 +18,7 @@ public class OrderInteractionWorker_Sponsor(OrderInteractionDef def) : OrderInte
                                                        cdTicks: (60 - GenLocalDate.DayOfYear(map)) * 60000,
                                                        removeWhenExpired: true);
 
-            RecommendationUtility.GiveRecommendationsToPlayer_Map(ratkinOrder, 1, map, dropPod: true);
+            RecommendationUtility.GiveRecommendationsToPlayer_Map(count: 1, map, ratkinOrder, dropPod: true);
 
         }
 

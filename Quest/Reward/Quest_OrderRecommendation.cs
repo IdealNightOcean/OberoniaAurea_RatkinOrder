@@ -112,34 +112,29 @@ public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
         Count = 0;
         WorldObject = null;
         MapParent = null;
-        GiveToCaravan = false;
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         if (signal.tag == InSignalTrigger)
         {
-            if (!RatkinOrder.IsValid())
-            {
-                return;
-            }
-
             if (GiveToCaravan && GetCaravan(signal, out Caravan caravan))
             {
                 RecommendationUtility.GiveRecommendationsToPlayer(
-                    order: RatkinOrder,
                     count: Count,
                     giveAction: delegate (Thing t)
                     {
                         CaravanInventoryUtility.GiveThing(caravan, t);
-                    });
+                    },
+                    ratkinOrder: RatkinOrder);
+
             }
             else
             {
                 MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
                 if (MapParent is not null)
                 {
-                    RecommendationUtility.GiveRecommendationsToPlayer_Map(RatkinOrder, Count, MapParent.Map, dropPod: true);
+                    RecommendationUtility.GiveRecommendationsToPlayer_Map(count: Count, MapParent.Map, RatkinOrder, dropPod: true);
                 }
             }
         }

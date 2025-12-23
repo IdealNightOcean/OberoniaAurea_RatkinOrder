@@ -23,23 +23,26 @@ public static class EsteemUtility
             {
                 if (reason is null)
                 {
-                    Messages.Message("OARO_Message_AllOrdersEsteemIncreaseNoReason".Translate(change), MessageTypeDefOf.PositiveEvent);
+                    Messages.Message("OARO_Message_AllOrdersEsteemIncreaseNoReason".Translate(change.Named(KeyLibrary_FormatArgName.Count)), MessageTypeDefOf.PositiveEvent);
                 }
                 else
                 {
-                    Messages.Message("OARO_Message_AllOrdersEsteemIncrease".Translate(change, reason), MessageTypeDefOf.PositiveEvent);
+                    Messages.Message(
+                        "OARO_Message_AllOrdersEsteemIncrease".Translate(change.Named(KeyLibrary_FormatArgName.Count), reason.Named(KeyLibrary_FormatArgName.Reason)),
+                        MessageTypeDefOf.PositiveEvent);
                 }
-
             }
             else
             {
                 if (reason is null)
                 {
-                    Messages.Message("OARO_Message_AllOrdersEsteemDecreaseNoReason".Translate(change), MessageTypeDefOf.NegativeEvent);
+                    Messages.Message("OARO_Message_AllOrdersEsteemDecreaseNoReason".Translate(change.Named(KeyLibrary_FormatArgName.Count)), MessageTypeDefOf.NegativeEvent);
                 }
                 else
                 {
-                    Messages.Message("OARO_Message_AllOrdersEsteemDecrease".Translate(change, reason), MessageTypeDefOf.NegativeEvent);
+                    Messages.Message(
+                        "OARO_Message_AllOrdersEsteemDecrease".Translate(change.Named(KeyLibrary_FormatArgName.Count), reason.Named(KeyLibrary_FormatArgName.Reason)),
+                        MessageTypeDefOf.NegativeEvent);
                 }
             }
         }

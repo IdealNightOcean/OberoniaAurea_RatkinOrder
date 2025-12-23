@@ -38,7 +38,7 @@ public class Reward_AllOrdersEsteem : Reward
         yield return new QuestPart_AllOrdersEsteemChange(inSignalTrigger: QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal), Amount, ShowPlayerChangeMessage, Reason);
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_AllOrdersEsteemDesc".Translate(Amount).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_AllOrdersEsteemDesc".Translate(Amount.Named("Amount")).Resolve();
 
     public override string ToString() => $"{GetType().Name} (amount={Amount})";
 

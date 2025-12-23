@@ -59,7 +59,7 @@ public class Window_BranchDemand : OrderWindowBase
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
-        MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
+        MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
         SelDemandCliqueManager = new(refreshFunc: RefreshCliquesManager);
 
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
@@ -603,7 +603,7 @@ public class Window_BranchDemand : OrderWindowBase
 
             reusedRectII.yMin = reusedRectII.yMax;
             reusedRectII.yMax = reusedRect.yMax;
-            Widgets.Label(reusedRectII, Branch.Potency.ToString("0.##"));
+            Widgets.Label(reusedRectII, Branch.Potency.ToString("F0"));
 
             Rect normamDemandRect = new(innerRect.xMax - 352f, innerRect.y, 352f, 86f);
             DrawNormalDemand(normamDemandRect, Branch.DemandHandler.NormalDemand);

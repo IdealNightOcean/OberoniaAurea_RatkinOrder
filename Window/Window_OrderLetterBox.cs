@@ -73,7 +73,12 @@ public class Window_OrderLetterBox : OrderWindowBase
         //左侧下部按钮
         reusedRect = new(leftMainRect.xMin, leftMainRect.yMax + 2f, 414f, 92f);
         Text.Font = GameFont.Medium;
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_Epistolize".Translate(), leftButtonBackground, leftButtonBackground_Down))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OARO_Epistolize".Translate(),
+            acceptance: false,
+            baseTex: leftButtonBackground,
+            downTex: leftButtonBackground_Down))
         {
 
         }

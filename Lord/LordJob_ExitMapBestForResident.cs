@@ -1,9 +1,6 @@
-﻿using RimWorld;
-using Verse;
-using Verse.AI.Group;
+﻿namespace OberoniaAurea.RatkinOrder;
 
-namespace OberoniaAurea.RatkinOrder;
-
+/*
 public class LordJob_ExitMapBestForDeployment : LordJob_ExitMapBest
 {
     private Branch targetBranch;
@@ -34,3 +31,4 @@ public class LordJob_ExitMapBestForDeployment : LordJob_ExitMapBest
         Scribe_Defs.Look(ref targetSkill, nameof(targetSkill));
     }
 }
+*/

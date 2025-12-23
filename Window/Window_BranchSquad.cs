@@ -55,7 +55,7 @@ public class Window_BranchSquad : OrderWindowBase
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
 
         SupplyRecoveryRateExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationStr(SelBranch, BranchStatDefOf.OARO_SupplyRecoveryRate, showResultValue: true));
         BombardSupportCeiling = new(refreshFunc: () => (int)(SelBranch?.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling, immediateUpdate: true) ?? -1f));
@@ -230,8 +230,8 @@ public class Window_BranchSquad : OrderWindowBase
 
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.UpperCenter;
-            reusedRect = areaRect.ContractedBy(4f);
-            Widgets.Label(reusedRect, honorDef.LabelCap.Colorize(honorDef.color));
+            reusedRect = areaRect.ContractedBy(2f);
+            Widgets.Label(reusedRect, $"OARO_HonorSquadOf".Translate(honorDef.LabelCap).Colorize(honorDef.color));
         }
         else
         {
@@ -732,8 +732,15 @@ public class Window_BranchSquad : OrderWindowBase
             if (medalCount > 0)
             {
                 Rect iconText = entryRect;
-                iconText.width = iconText.height;
-                GUI.DrawTexture(iconText, medalDef == primaryMedal ? medalDef.primaryIconTexture.Texture : medalDef.iconTexture.Texture, ScaleMode.ScaleToFit);
+                iconText.width = 55f;
+                if (medalDef == primaryMedal)
+                {
+                    GUI.DrawTexture(iconText, medalDef.primaryIconTexture.Texture, ScaleMode.ScaleToFit);
+                }
+                else
+                {
+                    GUI.DrawTexture(iconText.ContractedBy(6f), medalDef.iconTexture.Texture, ScaleMode.ScaleToFit);
+                }
                 Widgets.Label(entryRect, $"× {medalCount}");
                 if (!string.IsNullOrEmpty(medalDef.effectDescription))
                 {
@@ -862,12 +869,6 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = new(inRectX + 30f, reusedRect.yMax + 10f, 35f, 24f);
         GUI.DrawTexture(reusedRect, rightSupportSquadIcon);
 
-
-        reusedRect.xMin = reusedRect.xMax + 2f;
-        reusedRect.xMax = inRect.xMin + 180f;
-        Text.Anchor = TextAnchor.LowerLeft;
-        Widgets.Label(reusedRect, "OARO_SquadWin_SupportSquadNum".Translate() + $" /");
-
         reusedRect = new(inRect.xMax - 64f, reusedRect.y, 58f, 24f);
         Text.Anchor = TextAnchor.LowerRight;
         OARO_WindowUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount.Value);
@@ -878,6 +879,9 @@ public class Window_BranchSquad : OrderWindowBase
         GUI.DrawTexture(mainRect, rightBackground);
         mainRect = mainRect.ContractedBy(2f);
 
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        Widgets.Label(mainRect, "OARO_ReformationNotFinished".Translate().Colorize(Color.gray));
 
     }
 

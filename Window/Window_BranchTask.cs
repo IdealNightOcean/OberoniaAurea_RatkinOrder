@@ -44,7 +44,7 @@ public partial class Window_BranchTask : OrderWindowBase
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(RatkinOrder, Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
         JointPatrolManager = RatkinOrder.JointPatrolManager;
         JointPatrolManager.TaskPotencys.MarkDirty();
         JointPatrolNeededTaskPotency = new(valueFactory: () => JointPatrolManager.NeededTaskPotency);

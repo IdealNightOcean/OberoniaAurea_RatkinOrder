@@ -129,8 +129,9 @@ public partial class Window_OrderHall : OrderWindowBase
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = new(reusedRect.x + 30f, reusedRect.yMax - (20f + 42f), reusedRect.width - 60f, 42f);
+        reusedRect = new(reusedRect.x + 30f, reusedRect.yMax - (20f + 38f), reusedRect.width - 60f, 38f);
         Widgets.Label(reusedRect, $"OARO_OrderHall_LevelLabel_{CurOrderHallLevel}".Translate());
+        TooltipHandler.TipRegion(reusedRect, () => "OARO_OrderHall_LevelLabelTip".Translate(), uniqueId: 3786490);
 
         //左侧上部竖旗
         reusedRect = new(4f, 57f, 70f, 325f);

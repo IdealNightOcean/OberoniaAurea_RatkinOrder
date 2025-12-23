@@ -48,12 +48,17 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
 
     protected override void AddQuestAward(QuestPart_Choice.Choice choice)
     {
-        Reward_AllOrdersEsteem reward = new()
+        Reward_AllOrdersEsteem reward_Esteem = new()
         {
             Amount = 2,
             Reason = "OARO_Childcare".Translate()
         };
-        choice.rewards.Add(reward);
+        Reward_OrderRecommendation reward_Recommendation = new()
+        {
+            Count = 1
+        };
+        choice.rewards.Add(reward_Esteem);
+        choice.rewards.Add(reward_Recommendation);
     }
 
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
@@ -63,5 +68,10 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
         quest.AddPart(new QuestPart_AllOrdersEsteemChange(failSignal, -20, reason: "OARO_HarmingChildren".Translate()));
         quest.AddPart(new QuestPart_AllOrdersEsteemChange(delayFailSignal, -20, reason: "OARO_HarmingChildren".Translate()));
         quest.AddPart(new QuestPart_AllOrdersEsteemChange(successSignal, 2, reason: "OARO_Childcare".Translate()));
+        quest.AddPart(new QuestPart_OrderRecommendation()
+        {
+            InSignalTrigger = successSignal,
+            Count = 1
+        });
     }
 }

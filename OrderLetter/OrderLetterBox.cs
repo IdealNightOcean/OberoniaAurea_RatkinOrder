@@ -108,6 +108,11 @@ public class OrderLetterBox : IExposable
 
     public void ReceiveLetter(OrderLetter letter, int delayDays = -1)
     {
+        if (letter is null)
+        {
+            return;
+        }
+
         if (delayDays > 0)
         {
             letter.ArrivalTick = Find.TickManager.TicksGame + delayDays * 60000;

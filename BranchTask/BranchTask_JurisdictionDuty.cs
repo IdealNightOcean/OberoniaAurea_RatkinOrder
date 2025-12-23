@@ -58,7 +58,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
             case BranchTaskType.CrimeFighting or BranchTaskType.StabilityMaintenance:
                 {
                     float fundGain = ratkinOrder.BranchManager.AllBranches.Count * 0.04f
-                                   + branch.Potency * 0.01f;
+                                   + branch.Potency * 0.0001f;
                     fundGain *= curRadicalismDegree switch
                     {
                         BranchTaskHandler.RadicalismDegree.StabilityFocused => 0.75f,
@@ -79,7 +79,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
             case BranchTaskType.Assistance or BranchTaskType.Supervision:
                 {
                     float processGain = branch.BranchManager.AllBranches.Count * 0.06f
-                                      + branch.Potency * 0.01f;
+                                      + branch.Potency * 0.0001f;
                     processGain *= curRadicalismDegree switch
                     {
                         BranchTaskHandler.RadicalismDegree.StabilityFocused => 0.75f,

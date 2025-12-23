@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
+using Verse.Sound;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -51,28 +52,61 @@ public class Window_RatkinOrder : MainTabWindow
 
     public Window_RatkinOrder()
     {
+        forcePause = true;
+        draggable = false;
+        resizeable = false;
+        doCloseButton = false;
+        doCloseX = false;
+
+        layer = WindowLayer.Dialog;  //窗体层级
         doWindowBackground = false; //绘制泰南的界面背景
-        Map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? throw new ArgumentNullException(nameof(Map));
+        drawShadow = false; //绘制主体界面阴影
+
+        //声音
+        //注：用的通讯台声音
+        soundAppear = SoundDefOf.CommsWindow_Open;
+        soundClose = SoundDefOf.CommsWindow_Close;
+
+        Map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
+        Map ??= Find.CurrentMap;
+        if (Map is null)
+        {
+            throw new ArgumentNullException(nameof(Map));
+        }
+
         SelectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
                    ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
                                                           + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
 
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(SelectedOrder, Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
 
         FollowedBranches = new(refreshFunc: RefreshFollowerBranches);
     }
     public Window_RatkinOrder(Map map)
     {
+        forcePause = true;
+        draggable = false;
+        resizeable = false;
+        doCloseButton = false;
+        doCloseX = false;
 
+        layer = WindowLayer.Dialog;  //窗体层级
         doWindowBackground = false; //绘制泰南的界面背景
+        drawShadow = false; //绘制主体界面阴影
+
+        //声音
+        //注：用的通讯台声音
+        soundAppear = SoundDefOf.CommsWindow_Open;
+        soundClose = SoundDefOf.CommsWindow_Close;
+
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
         SelectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
             ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
                                                    + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
 
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(SelectedOrder, Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
     }
 
@@ -167,9 +201,12 @@ public class Window_RatkinOrder : MainTabWindow
         Rect reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 206f, 400f, 32f);
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(reusedRect, SelectedOrder.Name);
+        Widgets.Label(reusedRect, SelectedOrder.NameColored);
 
         Text.Font = GameFont.Small;
+        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax, 400f, 20f);
+        Widgets.Label(reusedRect, SelectedOrder.Faction.NameColored);
+
         Rect relationLabelRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 407f, 100f, 20f);
         Widgets.Label(relationLabelRect, "OARO_OrderWin_Relationship".Translate());
 
@@ -385,11 +422,11 @@ public class Window_RatkinOrder : MainTabWindow
 
         reusedRect.xMax += 80f;
         reusedRect.xMin += 80f;
-        Widgets.Label(reusedRect, branchesTypeCache.frienly.ToString());
+        Widgets.Label(reusedRect, branchesTypeCache.honor.ToString());
 
         reusedRect.xMax += 80f;
         reusedRect.xMin += 80f;
-        Widgets.Label(reusedRect, branchesTypeCache.honor.ToString());
+        Widgets.Label(reusedRect, branchesTypeCache.frienly.ToString());
 
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 385f, 346f, 25f);
@@ -602,6 +639,7 @@ public class Window_RatkinOrder : MainTabWindow
         Widgets.Label(reusedRect, branch.NameColored);
         if (Widgets.ButtonInvisible(reusedRect.ContractedBy(2f)))
         {
+            SoundDefOf.Click.PlayOneShotOnCamera();
             branch.RatkinOrder.BranchManager.FollowedBranches.Remove(branch);
             FollowedBranches.MarkDirty();
             return;
@@ -623,7 +661,12 @@ public class Window_RatkinOrder : MainTabWindow
             GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
         }
         reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 12f, inRect.height - 2f, inRect.height - 2f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, string.Empty, IconLibrary.ellipsisButton, IconLibrary.ellipsisButton_Down, doMouseoverSound: false))
+        if (OARO_WindowUtility.TextButtonImage(
+            reusedRect,
+            string.Empty,
+            IconLibrary.ellipsisButton,
+            IconLibrary.ellipsisButton_Down,
+            doMouseoverSound: true))
         {
             Window_Branch branchWin = new(branch, map: Map);
             Find.WindowStack.Add(branchWin);
@@ -802,7 +845,7 @@ public class Window_RatkinOrder : MainTabWindow
     {
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        Widgets.Label(inRect, "OARO_OrderWin_ReformationNotFinished".Translate());
+        Widgets.Label(inRect, "OARO_ReformationNotFinished".Translate().Colorize(Color.gray));
         OARO_WindowUtility.ResetText();
     }
 

@@ -34,7 +34,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
                 return resultOnly ? false : "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
             }
         }
-        if (Def.needRecommendation > 0 && RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < Def.needRecommendation)
+        if (Def.needRecommendation > 0 && RecommendationUtility.CurRecommendationOfMap(map) < Def.needRecommendation)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
         }

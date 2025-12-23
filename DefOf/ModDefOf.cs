@@ -10,6 +10,8 @@ public static class OARO_ModDefOf
     public static BackstoryDef Ratkin_Knight;
     public static BackstoryDef Ratkin_KnightCommander;
 
+    public static BranchContractDef OARO_Contract_Silver;
+
     /// <summary>
     /// 防卫设施
     /// </summary>

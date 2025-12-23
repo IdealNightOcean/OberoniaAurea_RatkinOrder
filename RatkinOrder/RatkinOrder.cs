@@ -23,7 +23,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     public Faction Faction => faction;
 
     [Unsaved] private Color? color;
-    public Color Color => color ??= (def.color ?? faction.color ?? Color.white);
+    public Color Color => color ??= (def.color ?? faction?.Color ?? Color.white);
 
     private string name;
     public string Name

@@ -45,12 +45,10 @@ public class QuestPart_InDistressKnightLeaveLetter : QuestPart_RimOrderLetter
             if (signal.tag == InSignal)
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalMakeLeave));
-                return;
             }
             return;
         }
-
-        if (signal.tag == InSignalRemovePawn && signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
+        else if (signal.tag == InSignalRemovePawn && signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
         {
             Pawns.Remove(p);
         }
@@ -58,7 +56,7 @@ public class QuestPart_InDistressKnightLeaveLetter : QuestPart_RimOrderLetter
 
     protected override void PostGenerateLetter(ChoiceLetter choiceLetter, out bool letterValid)
     {
-        base.PostGenerateLetter(choiceLetter, out letterValid);
+        base.PostGenerateLetter(choiceLetter, out _);
         if (choiceLetter is ChoiceLetter_InDistressKnightLeave questLetter)
         {
             questLetter.OutSignalRecruit = OutSignalRecruit;
@@ -71,7 +69,7 @@ public class QuestPart_InDistressKnightLeaveLetter : QuestPart_RimOrderLetter
             }
         }
 
-        letterValid = !Pawns.NullOrEmpty();
+        letterValid = true;
     }
 
 }

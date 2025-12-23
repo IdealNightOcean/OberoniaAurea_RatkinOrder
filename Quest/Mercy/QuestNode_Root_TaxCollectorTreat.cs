@@ -86,12 +86,17 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
     protected override void AddQuestAward(QuestPart_Choice.Choice choice)
     {
         base.AddQuestAward(choice);
-        Reward_AllOrdersEsteem reward = new()
+        Reward_AllOrdersEsteem reward_Esteem = new()
         {
             Amount = 3,
             Reason = "OARO_PutOffTaxCollector".Translate()
         };
-        choice.rewards.Add(reward);
+        Reward_OrderRecommendation reward_Recommendation = new()
+        {
+            Count = 1
+        };
+        choice.rewards.Add(reward_Esteem);
+        choice.rewards.Add(reward_Recommendation);
     }
 
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
@@ -122,6 +127,12 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
             Reason = "OARO_PutOffTaxCollector".Translate(),
         };
         quest.AddPart(questPart_AllOrdersEsteemChange);
+        QuestPart_OrderRecommendation questPart_OrderRecommendation_Success = new()
+        {
+            InSignalTrigger = successSignal,
+            Count = 1
+        };
+        quest.AddPart(questPart_OrderRecommendation_Success);
         base.SetQuestEndComp(questPart_Interactions, failSignal, delayFailSignal, successSignal);
     }
 }

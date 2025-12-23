@@ -204,6 +204,11 @@ public class BranchPopulationHandler : IExposable, ITickDay
                 TryAddContract(contractDef);
             }
         }
+
+        if (contracts.Count < ContractCeilingByPop && !contracts.Any(c => c.RequestThingDef == ThingDefOf.Silver))
+        {
+            TryAddContract(OARO_ModDefOf.OARO_Contract_Silver);
+        }
     }
 
     public bool TryAddContract(BranchContractDef contractDef)

@@ -137,11 +137,11 @@ public class QuestClique : IExposable
     }
 
     /// <summary>
-    /// 将分队效能转换为任务派别效能，最大值50%
+    /// 将分队效能转换为任务派别效能，最大值100%
     /// </summary>
     public static float BranchPotencyToCliquePotency(float branchPotency)
     {
-        return Mathf.Clamp(branchPotency * 0.07f, 0.05f, 1f);
+        return Mathf.Clamp(branchPotency * 0.0007f, 0.05f, 1f);
     }
 
     public static string GetBranchCliqueKey(Branch branch) => branch is null ? string.Empty : "BranchClique_" + branch.GetUniqueLoadID();

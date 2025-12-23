@@ -133,7 +133,13 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             Reason = "OARO_LostItemsOfTrader_Success".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_Success);
-        quest.End(outcome: QuestEndOutcome.Fail, 50, parentFaction, inSignal: inSignalTeamSuccess, sendStandardLetter: true, playSound: true);
+        QuestPart_OrderRecommendation questPart_OrderRecommendation_Success = new()
+        {
+            InSignalTrigger = inSignalTeamSuccess,
+            Count = 1
+        };
+        quest.AddPart(questPart_OrderRecommendation_Success);
+        quest.End(outcome: QuestEndOutcome.Success, 50, parentFaction, inSignal: inSignalTeamSuccess, sendStandardLetter: true, playSound: true);
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Fail = new()
         {

@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -17,19 +18,8 @@ public class BranchFacilityHandler : IExposable
     private Dictionary<BranchFacilityDef, BranchFacilityLevel> facilities = [];
     public IReadOnlyDictionary<BranchFacilityDef, BranchFacilityLevel> Facilities => facilities;
 
-    [Unsaved] private int totalFacilityLevel = -1;
-    public int TotalFacilityLevel
-    {
-        get
-        {
-            if (totalFacilityLevel < 0)
-            {
-                totalFacilityLevel = Mathf.Max(0, facilities.Sum(kv => (int)kv.Value));
-            }
-            return totalFacilityLevel;
-        }
-        private set { totalFacilityLevel = value; }
-    }
+    private readonly LazyMutable<int> totalFacilityLevel;
+    public int TotalFacilityLevel => totalFacilityLevel.Value;
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
@@ -45,6 +35,7 @@ public class BranchFacilityHandler : IExposable
     internal BranchFacilityHandler(Branch branch)
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
+        totalFacilityLevel = new(refreshFunc: () => Mathf.Max(0, facilities.Sum(kv => (int)kv.Value)));
     }
 
     public void ExposeData()
@@ -244,7 +235,7 @@ public class BranchFacilityHandler : IExposable
             facilities[facilityDef] = targetLevel;
         }
 
-        TotalFacilityLevel += (targetLevel - oldLevel);
+        totalFacilityLevel.MarkDirty();
         if (targetLevel == BranchFacilityLevel.Excellent)
         {
             IsFacilityFullyCompleted = facilities.Count == facilities.Count(kv => kv.Value == BranchFacilityLevel.Excellent);
@@ -338,7 +329,7 @@ public class BranchFacilityHandler : IExposable
             }
         }
 
-        totalFacilityLevel = -1;
+        totalFacilityLevel.MarkDirty();
         IsFacilityFullyCompleted = facilities.Count == excellentFacilityCount;
     }
 

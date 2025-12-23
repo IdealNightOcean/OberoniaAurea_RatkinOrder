@@ -16,10 +16,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
     private string InSignalRecruited { get; set; }
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return RatkinOrderManager.Instance.AllRatkinOrders.Count > 0;
-    }
+    protected override bool TestRunInt(Slate slate) => RatkinOrderManager.Instance.AllRatkinOrders.Count > 0;
 
     protected override bool InitQuestParameter()
     {
@@ -74,7 +71,6 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
         {
             targetBranch = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(fallback: null)?.BranchManager.AllBranches.RandomElementWithFallback(fallback: null);
         }
-
         if (!targetBranch.IsValid())
         {
             return false;
@@ -144,8 +140,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             };
             questPart_OrderLetter.InitLetterTextRequest("[helpThankLetterLabel]", "[helpThankLetterText]", Branch.NameColored);
             List<Thing> rewards = OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, 500);
-            OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
-            recommendation.SetRatkinOrder(RatkinOrder);
+            OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
             rewards.Add(recommendation);
             questPart_OrderLetter.InitAttachments(rewards);
             QuestGen.quest.AddPart(questPart_OrderLetter);
@@ -169,7 +164,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
                 RelatedOrder = RatkinOrder,
                 RelatedBranch = Branch,
             };
-            questPart_OrderLetter_GuidanceI.InitLetterTextRequest("[guidanceIILetterLabel]", "[guidanceIILetterText]", Branch.NameColored);
+            questPart_OrderLetter_GuidanceII.InitLetterTextRequest("[guidanceIILetterLabel]", "[guidanceIILetterText]", Branch.NameColored);
             QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceII);
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceIII = new()
@@ -180,7 +175,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
                 RelatedOrder = RatkinOrder,
                 RelatedBranch = Branch,
             };
-            questPart_OrderLetter_GuidanceI.InitLetterTextRequest("[guidanceIIILetterLabel]", "[guidanceIIILetterText]", Branch.NameColored);
+            questPart_OrderLetter_GuidanceIII.InitLetterTextRequest("[guidanceIIILetterLabel]", "[guidanceIIILetterText]", Branch.NameColored);
             QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceIII);
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceIV = new()
@@ -191,8 +186,30 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
                 RelatedOrder = RatkinOrder,
                 RelatedBranch = Branch,
             };
-            questPart_OrderLetter_GuidanceI.InitLetterTextRequest("[guidanceIVLetterLabel]", "[guidanceIVLetterText]", Branch.NameColored);
+            questPart_OrderLetter_GuidanceIV.InitLetterTextRequest("[guidanceIVLetterLabel]", "[guidanceIVLetterText]", Branch.NameColored);
             QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceIV);
+
+            QuestPart_OrderLetter questPart_OrderLetter_GuidanceV = new()
+            {
+                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
+                RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+                RelatedOrder = RatkinOrder,
+                RelatedBranch = Branch,
+            };
+            questPart_OrderLetter_GuidanceV.InitLetterTextRequest("[guidanceVLetterLabel]", "[guidanceVLetterText]", Branch.NameColored);
+            QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceV);
+
+            QuestPart_OrderLetter questPart_OrderLetter_GuidanceVI = new()
+            {
+                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
+                RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+                RelatedOrder = RatkinOrder,
+                RelatedBranch = Branch,
+            };
+            questPart_OrderLetter_GuidanceVI.InitLetterTextRequest("[guidanceVILetterLabel]", "[guidanceVILetterText]", Branch.NameColored);
+            QuestGen.quest.AddPart(questPart_OrderLetter_GuidanceVI);
         });
 
         quest.SignalPassActivable(action: delegate
@@ -212,7 +229,6 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
     protected override void SetPawnsLeaveComp(string lodgerArrivalSignal, string inSignalRemovePawn)
     {
         Quest quest = QuestGen.quest;
-
         string inSignalMakeLeaved = QuestGenUtility.HardcodedSignalWithQuestID("Lodgers_MakeLeaved");
         quest.Delay(
             delayTicks: 7 * 60000,
@@ -228,16 +244,15 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
                     LetterDef = OARO_LetterDefOf.OARO_Order_InDistressKnightLeaveLetter,
                     LookTargets = new LookTargets(questParameter.pawns),
                     RelatedOrder = RatkinOrder,
-                    Pawns = []
+                    Pawns = [.. questParameter.pawns]
                 };
-                questPart_InDistressKnightLeaveLetter.Pawns.AddRange(questParameter.pawns);
                 questPart_InDistressKnightLeaveLetter.InitLetterTextRequest("[helpThanckLeaveQuizLetterLabel]", "[helpThanckLeaveQuizLetterText]");
                 QuestGen.quest.AddPart(questPart_InDistressKnightLeaveLetter);
             },
             isQuestTimeout: false,
-            inSignalEnable: "GuestsDepartsIn".Translate(),
-            inSignalDisable: "GuestsDepartsOn".Translate(),
-            outSignalComplete: "QuestDelay");
+            expiryInfoPart: "GuestsDepartsIn".Translate(),
+            expiryInfoPartTip: "GuestsDepartsOn".Translate(),
+            debugLabel: "QuestDelay");
 
         quest.SignalPassAny(
             action: delegate
@@ -247,6 +262,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
                     InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
                     RelatedOrder = RatkinOrder,
                     RelatedBranch = Branch,
+                    OrderLetterDef = OrderLetterDefOf.OARO_OfficialLetter,
                     RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
 
                     DelayDays = 1

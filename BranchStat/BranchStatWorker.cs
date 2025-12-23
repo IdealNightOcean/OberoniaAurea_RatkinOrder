@@ -9,7 +9,7 @@ public class BranchStatWorker(BranchStatDef statDef)
 {
     public readonly BranchStatDef StatDef = statDef ?? throw new ArgumentNullException(nameof(statDef));
 
-    private Dictionary<Branch, CacheEnty> temporaryStatCache = statDef.cacheable ? [] : null;
+    private readonly Dictionary<Branch, CacheEnty> temporaryStatCache = statDef.cacheable ? new(8) : null;
 
     public float GetValue(Branch branch, float? baseValueOverride = null, bool immediateUpdate = false)
     {
@@ -50,7 +50,7 @@ public class BranchStatWorker(BranchStatDef statDef)
 
     public void DeleteStatCache()
     {
-        temporaryStatCache = null;
+        temporaryStatCache.Clear();
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

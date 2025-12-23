@@ -63,7 +63,6 @@ public class BranchStatDef : Def
     /// </summary>
     public List<BranchStatPart> statParts;
 
-
     public override IEnumerable<string> ConfigErrors()
     {
         foreach (string error in base.ConfigErrors())

@@ -124,6 +124,22 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         quest.Leave(questParameter.pawns, inSignal: leaveSignal, sendStandardLetter: true, leaveOnCleanup: false, inSignalRemovePawn: inSignalRemovePawnNew, wakeUp: true);
     }
 
+    protected override void AddQuestAward(QuestPart_Choice.Choice choice)
+    {
+        base.AddQuestAward(choice);
+        Reward_AllOrdersEsteem reward_Esteem = new()
+        {
+            Amount = 3,
+            Reason = "OARO_LittleApprentice".Translate()
+        };
+        Reward_OrderRecommendation reward_Recommendation = new()
+        {
+            Count = 1
+        };
+        choice.rewards.Add(reward_Esteem);
+        choice.rewards.Add(reward_Recommendation);
+    }
+
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
     {
         Quest quest = QuestGen.quest;
@@ -158,11 +174,16 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Success = new()
         {
             InSignalTrigger = skillSuccessEndSignal,
-            Change = 2,
+            Change = 3,
             Reason = "OARO_LittleApprentice".Translate()
         };
-
         quest.AddPart(questPart_AllOrdersEsteemChange_Success);
+        QuestPart_OrderRecommendation questPart_OrderRecommendation_Success = new()
+        {
+            InSignalTrigger = successSignal,
+            Count = 1
+        };
+        quest.AddPart(questPart_OrderRecommendation_Success);
 
         quest.End(outcome: QuestEndOutcome.Success, inSignal: skillSuccessEndSignal, sendStandardLetter: true);
         quest.End(outcome: QuestEndOutcome.Fail, inSignal: skillFailEndSignal);

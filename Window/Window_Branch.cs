@@ -56,11 +56,14 @@ public class Window_Branch : OrderWindowBase
     private Lazy<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
 
     private Vector2 scrollPosition_GreetingDesc;
-    private Vector2 scrollPosition_BuildingDesc;
+
     private Vector2 scrollPosition_Facilities;
+    private Vector2 scrollPosition_FacilityDesc;
     private Vector2 scrollPosition_CurFacilityStage;
     private Vector2 scrollPosition_NextFacilityStage;
+
     private Vector2 scrollPosition_Buildings;
+    private Vector2 scrollPosition_BuildingDesc;
     private Vector2 scrollPosition_BuildingBaseEffect;
     private Vector2 scrollPosition_BuildingAdvancedEffect;
     private Vector2 scrollPosition_OptionalBuildings;
@@ -993,7 +996,7 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleLeft;
         Text.Font = GameFont.Small;
         reusedRect = new(reusedRect.x, reusedRect.yMax, 185f, 48f);
-        Widgets.Label(reusedRect, SelFacilityDef.description);
+        Widgets.LabelScrollable(reusedRect, SelFacilityDef.description, ref scrollPosition_FacilityDesc);
 
         float commonWidth = 298f;
         float stageRectHeight = 24f + 2f + 158f;

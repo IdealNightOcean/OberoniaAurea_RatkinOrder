@@ -21,8 +21,8 @@ public static class RelationshipUtility
             RelationshipKind.Stranger => Color.white,
             RelationshipKind.Acquaintance => Color.cyan,
             RelationshipKind.Friendly => Color.green,
-            RelationshipKind.Trustworthy => Color.green,
-            RelationshipKind.Soulmate => Color.green,
+            RelationshipKind.Trustworthy => Color.yellow,
+            RelationshipKind.Soulmate => ColorLibrary.Gold,
             _ => Color.white
         };
     }
@@ -124,7 +124,7 @@ public static class RelationshipUtility
             {
                 return resultOnly ? false : "OARO_Insufficient_FriendlyBranches".Translate(friendlyBranchesCount);
             }
-            if (byPlayer && curRecommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(ratkinOrder, map) < curRecommendationNeed)
+            if (byPlayer && curRecommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(map) < curRecommendationNeed)
             {
                 return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(curRecommendationNeed, ratkinOrder.Name);
             }
