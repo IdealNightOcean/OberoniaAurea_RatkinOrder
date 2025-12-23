@@ -23,9 +23,9 @@ public abstract class BranchInteractionWorker_CaravanOnly(BranchInteractionDef d
     protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
     {
         RatkinOrder ratkinOrder = parms.RatkinOrder;
-        if (Def.needRecommendation > 0 && CaravanInventoryUtility.HasThings(parms.Caravan, OARO_ThingDefOf.OARO_OrderRecommendation, Def.needRecommendation))
+        if (Def.needRecommendation > 0 && !parms.Caravan.HasEnoughRecommendation(count: Def.needRecommendation))
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation.Named(KeyLibrary_FormatArgName.Count));
         }
         if (Def.needSilver > 0 && !CaravanInventoryUtility.HasThings(parms.Caravan, ThingDefOf.Silver, Def.needSilver))
         {
@@ -38,7 +38,7 @@ public abstract class BranchInteractionWorker_CaravanOnly(BranchInteractionDef d
     {
         if (Def.needRecommendation > 0)
         {
-            RecommendationUtility.UseRecommendationOfCaravan(parms.RatkinOrder, parms.Caravan, Def.needRecommendation);
+            RecommendationUtility.UseRecommendationOfCaravan(parms.Caravan, Def.needRecommendation);
         }
         if (Def.needSilver > 0)
         {

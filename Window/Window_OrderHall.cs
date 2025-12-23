@@ -188,7 +188,7 @@ public partial class Window_OrderHall : OrderWindowBase
             foreach (ResidentKnightEntryDrawer drawer in ResidentKnightDrawers)
             {
                 Vector2 entryPos = new(entryX, entryY);
-                entryY += drawer.Draw(entryPos);
+                entryY = drawer.Draw(entryPos);
             }
             Widgets.EndScrollView();
         }

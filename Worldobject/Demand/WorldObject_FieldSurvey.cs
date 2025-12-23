@@ -202,8 +202,10 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
     public override void PostAdd()
     {
         base.PostAdd();
-        (Branch branch, demandType) = QuestPart_BranchDemandWatcher.GetBranchDemand(quest);
-        SetOrderBranch(branch);
+        if (quest.TryGetBranchDemandWatcher(out QuestPart_BranchDemandWatcher demandWatcher))
+        {
+            SetOrderBranch(demandWatcher.Branch);
+        }
 
         meteorologicalDataRequire = demandType == BranchDemand.DemandType.Urgency ? 3 : 2;
 

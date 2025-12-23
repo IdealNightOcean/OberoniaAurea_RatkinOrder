@@ -1,6 +1,5 @@
 ﻿using RimWorld;
 using RimWorld.QuestGen;
-using System.Linq;
 using Verse;
 using static OberoniaAurea.RatkinOrder.BranchDemand;
 
@@ -9,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestNode_BranchDemandWatcher : QuestNode
 {
     public SlateRef<Branch> branch;
-
+    public SlateRef<BranchDemandDef> demandDef;
     public SlateRef<DemandType?> demandType;
 
     protected override bool TestRunInt(Slate slate)
@@ -19,10 +18,12 @@ public class QuestNode_BranchDemandWatcher : QuestNode
 
     protected override void RunInt()
     {
+        Slate slate = QuestGen.slate;
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
-            Branch = branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
-            DemandType = demandType.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType)
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
+            DemandDef = demandDef.GetValue(slate) ?? slate.Get<BranchDemandDef>(KeyLibrary_SlateStoreAs.demandDef),
+            DemandType = demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType)
         };
 
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
@@ -31,15 +32,16 @@ public class QuestNode_BranchDemandWatcher : QuestNode
 
 public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
 {
-
     public Branch Branch;
+    public BranchDemandDef DemandDef;
     public DemandType DemandType;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref Branch, "Branch");
-        Scribe_Values.Look(ref DemandType, "DemandType", default);
+        Scribe_References.Look(ref Branch, nameof(Branch));
+        Scribe_Defs.Look(ref DemandDef, nameof(DemandDef));
+        Scribe_Values.Look(ref DemandType, nameof(DemandType));
     }
 
     public override void Cleanup()
@@ -48,6 +50,7 @@ public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
 
         AcceptedBranchDemandHandler.Instance.Notify_DemandQuestClean(quest);
         DemandType = default;
+        DemandDef = null;
         Branch = null;
     }
 
@@ -65,17 +68,5 @@ public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
         {
             Branch = null;
         }
-    }
-
-    public static (Branch branch, DemandType demandType) GetBranchDemand(Quest quest)
-    {
-        QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = quest?.PartsListForReading.OfType<QuestPart_BranchDemandWatcher>()?.FirstOrFallback(null);
-
-        if (questPart_BranchDemandWatcher is null)
-        {
-            return (null, DemandType.Normal);
-        }
-
-        return (questPart_BranchDemandWatcher.Branch, questPart_BranchDemandWatcher.DemandType);
     }
 }

@@ -26,9 +26,9 @@ public static class GlobalInteractionUtility
         }
 
         int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
-        if (RecommendationUtility.CurRecommendationOfMap(map) < needRecommendation)
+        if (RecommendationUtility.CurRecommendationCount(map) < needRecommendation)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(needRecommendation, ratkinOrder.Name);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(needRecommendation.Named(KeyLibrary_FormatArgName.Count));
         }
         return true;
     }
@@ -40,7 +40,7 @@ public static class GlobalInteractionUtility
     {
         int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
 
-        RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, needRecommendation);
+        RecommendationUtility.UseRecommendationOfMap(map, needRecommendation);
         throw new NotImplementedException();
 
     }
@@ -64,9 +64,9 @@ public static class GlobalInteractionUtility
         ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
         RatkinOrder ratkinOrder = record.RatkinOrder;
         int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
-        if (recommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(map) < recommendationNeed)
+        if (recommendationNeed > 0 && RecommendationUtility.CurRecommendationCount(map) < recommendationNeed)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed, ratkinOrder.Name);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed.Named(KeyLibrary_FormatArgName.Count));
         }
         */
         return true;
@@ -98,16 +98,16 @@ public static class GlobalInteractionUtility
         {
             return resultOnly ? false : "OARO_EnoughResignationDaysLeft".Translate(20.ToString());
         }
-        if (RecommendationUtility.CurRecommendationOfMap(map) < 1)
+        if (RecommendationUtility.CurRecommendationCount(map) < 1)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, record.RatkinOrder.Name);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1.Named(KeyLibrary_FormatArgName.Count));
         }
         return true;
     }
 
     public static void PostponeResidentKnightkResignation(ResidentKnightRecord record, Map map)
     {
-        RecommendationUtility.UseRecommendationOfMap(record.RatkinOrder, map, 1);
+        RecommendationUtility.UseRecommendationOfMap(map, 1);
         record.PostponeResignation(120);
     }
 
@@ -134,9 +134,9 @@ public static class GlobalInteractionUtility
 
         if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed >= SeasonInvitationLimit())
         {
-            if (RecommendationUtility.CurRecommendationOfMap(map) < 1)
+            if (RecommendationUtility.CurRecommendationCount(map) < 1)
             {
-                return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1, knightGroup.RatkinOrder.Name);
+                return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1.Named(KeyLibrary_FormatArgName.Count));
             }
         }
 
@@ -154,7 +154,7 @@ public static class GlobalInteractionUtility
             AroundKnightGroupsManager.Instance.SeasonInvitationUsed++;
             if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed > SeasonInvitationLimit())
             {
-                RecommendationUtility.UseRecommendationOfMap(knightGroup.RatkinOrder, map, 1);
+                RecommendationUtility.UseRecommendationOfMap(map, 1);
             }
         }
         else

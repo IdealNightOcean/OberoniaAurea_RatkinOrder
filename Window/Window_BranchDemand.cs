@@ -59,7 +59,7 @@ public class Window_BranchDemand : OrderWindowBase
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
-        MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
+        MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         SelDemandCliqueManager = new(refreshFunc: RefreshCliquesManager);
 
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
@@ -709,7 +709,8 @@ public class Window_BranchDemand : OrderWindowBase
                 Text.Anchor = TextAnchor.MiddleCenter;
                 if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_DemandWin_CliqueDetail".Translate(), checkButton, checkButton_Down))
                 {
-
+                    Window_QuestClique cliqueWin = new(demand.RelatedQuest, demand.Def);
+                    Find.WindowStack.Add(cliqueWin);
                 }
             }
             else

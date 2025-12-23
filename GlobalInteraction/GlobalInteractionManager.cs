@@ -11,6 +11,8 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
     public static void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_GlobalOrderInteractHandler());
 
+    [Unsaved] private readonly int tickHashOffset;
+
     private CooldownRecordManager cooldownManager;
     private TagStrToFloat simpleInteractRecord;
 
@@ -28,6 +30,8 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
         cooldownManager = new();
         simpleInteractRecord = new();
+
+        tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
     }
 
     internal void EnsureComponentsInit()
@@ -131,11 +135,14 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         Scribe_Deep.Look(ref mercyQuestHandler, nameof(mercyQuestHandler));
     }
 
-    public void TickDay()
+    public void Tick()
     {
-        aroundKnightGroupsManager.TickDay();
-        residentKnightsManager.TickDay();
-        mercyQuestHandler.PeriodicTriggerMercyQuest();
+        if (TickUtility.IsHashIntervalTick(tickHashOffset, interval: 60000))
+        {
+            aroundKnightGroupsManager.TickDay();
+            residentKnightsManager.TickDay();
+            mercyQuestHandler.PeriodicTriggerMercyQuest();
+        }
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)

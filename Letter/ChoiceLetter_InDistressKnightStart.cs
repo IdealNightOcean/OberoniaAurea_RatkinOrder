@@ -9,6 +9,8 @@ internal class ChoiceLetter_InDistressKnightStart : ChoiceLetter_RatkinOrder
     internal string OutSignalAccepted;
     internal string OutSignalRejected;
 
+    public override bool CanDismissWithRightClick => false;
+
     public override void ExposeData()
     {
         base.ExposeData();
@@ -30,7 +32,7 @@ internal class ChoiceLetter_InDistressKnightStart : ChoiceLetter_RatkinOrder
             yield return Option_Postpone;
             if (quest is not null)
             {
-                yield return Option_ViewInQuestsTab();
+                yield return Option_ViewInQuestsTab(postpone: true);
             }
         }
     }

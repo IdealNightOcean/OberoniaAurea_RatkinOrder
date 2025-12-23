@@ -19,7 +19,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
 
     private int yesterdayPopulation;
     private int yesterdayPopChange;
-    private readonly SimpleValueCache<float> naturalPopulationCeilingCache;
+    private SimpleValueCache<float> naturalPopulationCeilingCache;
     public int PopulationCeiling => (int)naturalPopulationCeilingCache.GetCachedResult();
     public float PopulationRatio => population / naturalPopulationCeilingCache.GetCachedResult();
 

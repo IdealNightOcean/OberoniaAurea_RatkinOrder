@@ -24,6 +24,10 @@ public class InteractionWorker_KnightlyTalk : InteractionWorker
         {
             return 0f;
         }
+        if (!KnightPawnsManager.Instance.IsKnight(initiator))
+        {
+            return 0f;
+        }
         return BaseSelectionWeight
             * CompatibilityFactorCurve.Evaluate(initiator.relations.CompatibilityWith(recipient))
             * (initiator.Faction.IsPlayerSafe() ? 1f : 5f);

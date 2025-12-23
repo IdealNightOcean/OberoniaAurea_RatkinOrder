@@ -33,7 +33,7 @@ public class OrderHallHandler : IExposable
     }
 
     [Unsaved]
-    private readonly SimpleValueCache<int> orderHallLevelCache;
+    private SimpleValueCache<int> orderHallLevelCache;
     public int OrderHallLevel => orderHallLevelCache.GetCachedResult();
 
     [Unsaved] private int nextHallBuildingCacheTick = -1;
@@ -63,14 +63,15 @@ public class OrderHallHandler : IExposable
         }
     }
 
-    public OrderHallHandler()
+    internal OrderHallHandler()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(OrderHallHandler));
         Instance = this;
-        orderHallLevelCache = new(cacheInterval: HallLevelRecacheInterval,
-                                  defaultValue: 0,
-                                  checker: () => OrderHallUtility.GetOrderHallLevel(OrderHallRoom));
+        orderHallLevelCache = new SimpleValueCache<int>(cacheInterval: HallLevelRecacheInterval,
+                                                        defaultValue: 0,
+                                                        checker: () => OrderHallUtility.GetOrderHallLevel(OrderHallRoom));
     }
+
     public static void ClearStaticCache() => Instance = null;
 
     public void RefreshCache()

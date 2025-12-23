@@ -34,9 +34,9 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
                 return resultOnly ? false : "WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod());
             }
         }
-        if (Def.needRecommendation > 0 && RecommendationUtility.CurRecommendationOfMap(map) < Def.needRecommendation)
+        if (Def.needRecommendation > 0 && RecommendationUtility.CurRecommendationCount(map) < Def.needRecommendation)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation.Named(KeyLibrary_FormatArgName.Count));
         }
         if (Def.needSilver > 0 && !map.HasEnoughThingsOfDef(ThingDefOf.Silver, Def.needSilver))
         {
@@ -79,7 +79,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
 
         if (Def.needRecommendation > 0)
         {
-            RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, Def.needRecommendation);
+            RecommendationUtility.UseRecommendationOfMap(map, Def.needRecommendation);
         }
         if (Def.needSilver > 0)
         {

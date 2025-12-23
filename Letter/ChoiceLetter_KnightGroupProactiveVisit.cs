@@ -7,6 +7,8 @@ public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
 {
     private AroundKnightGroup knightGroup;
 
+    public override bool CanDismissWithRightClick => false;
+
     public override void ExposeData()
     {
         base.ExposeData();

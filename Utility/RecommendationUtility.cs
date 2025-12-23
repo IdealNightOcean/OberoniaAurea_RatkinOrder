@@ -7,84 +7,110 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
 namespace OberoniaAurea.RatkinOrder;
 
+using static OberoniaAurea.RatkinOrder.EsteemHandler;
+
 public static class RecommendationUtility
 {
-    public static OrderRecommendation MakeRecommendationForPlayer(int count, RatkinOrder ratkinOrder = null)
+    public static OrderRecommendation MakeRecommendationForPlayer(int count)
     {
         OrderRecommendation recommendation = (OrderRecommendation)ThingMaker.MakeThing(OARO_ThingDefOf.OARO_OrderRecommendation);
         recommendation.stackCount = count;
-        recommendation.OnMakeForPlayer(ratkinOrder);
+        recommendation.OnMakeForPlayer();
         return recommendation;
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static int CurRecommendationOfMap(Map map)
+    public static int CurRecommendationCount(this Map map)
     {
         return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.Sum(t => t.stackCount) ?? 0;
     }
 
-    public static void GiveRecommendationsToPlayer(int count, Action<Thing> giveAction, RatkinOrder ratkinOrder = null)
+    public static bool HasEnoughRecommendation(this Map map, int count)
     {
-        if (!ratkinOrder.IsValid() || count <= 0 || giveAction is null)
+        return map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, count);
+    }
+
+    public static bool HasEnoughRecommendation(this Caravan caravan, int count)
+    {
+        if (caravan is null) return false;
+        return CaravanInventoryUtility.HasThings(caravan, OARO_ThingDefOf.OARO_OrderRecommendation, count);
+    }
+
+    public static void GiveRecommendationsToPlayer(int count, Action<Thing> giveAction)
+    {
+        if (count <= 0 || giveAction is null)
         {
             return;
         }
 
-        OrderRecommendation recommendations = MakeRecommendationForPlayer(count, ratkinOrder);
+        OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
         giveAction.Invoke(recommendations);
     }
 
-    public static void GiveRecommendationsToPlayer_Map(int count, Map map, RatkinOrder ratkinOrder = null, bool sendStandLetter = true, IntVec3? spawnCell = null, bool dropPod = false)
+    public static void GiveRecommendationsToCaravan(Caravan caravan, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null)
     {
-        GiveRecommendationsToPlayer(count, MapGiveAction, ratkinOrder);
-
-        void MapGiveAction(Thing recommendations)
+        if (caravan is null || count <= 0)
         {
-            if (dropPod)
+            return;
+        }
+        OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
+        CaravanInventoryUtility.GiveThing(caravan, recommendations);
+        if (sendStandLetter)
+        {
+            SendStandardGetRecommendationLetter(count, ratkinOrder, caravan);
+        }
+    }
+
+    public static void GiveRecommendationsToFixedCaravan(FixedCaravan fixedCaravan, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null)
+    {
+        if (fixedCaravan is null || count <= 0)
+        {
+            return;
+        }
+        OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
+        OAFrame_FixedCaravanUtility.GiveThing(fixedCaravan, recommendations);
+        if (sendStandLetter)
+        {
+            SendStandardGetRecommendationLetter(count, ratkinOrder, fixedCaravan);
+        }
+    }
+
+    public static void GiveRecommendationsToPlayerMap(Map map, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null, IntVec3? spawnCell = null, bool dropPod = false)
+    {
+        if (map is null || count <= 0)
+        {
+            return;
+        }
+        OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
+
+        Faction faction = ratkinOrder?.Faction;
+
+        if (dropPod)
+        {
+            spawnCell ??= DropCellFinder.TradeDropSpot(map);
+            DropPodUtility.DropThingsNear(spawnCell.Value, map, [recommendations], allowFogged: false, faction: faction);
+        }
+        else
+        {
+            if (!spawnCell.HasValue)
             {
-                spawnCell ??= DropCellFinder.TradeDropSpot(map);
-                DropPodUtility.DropThingsNear(spawnCell.Value, map, [recommendations], allowFogged: false, faction: ratkinOrder.Faction);
-                if (sendStandLetter)
-                {
-                    ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
-                        label: "OARO_LetterLabel_GetRecommendation_DropPod".Translate(),
-                        text: "OARO_Letter_GetRecommendation_DropPod".Translate(ratkinOrder.Name, count),
-                        def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
-                        lookTargets: new LookTargets(spawnCell.Value, map),
-                        relatedFaction: ratkinOrder.Faction);
-                    letter.RelatedOrder = ratkinOrder;
-                    Find.LetterStack.ReceiveLetter(letter);
-                }
+                CellFinder.TryRandomClosewalkCellNear(map.Center, map, 100, out IntVec3 cell);
+                spawnCell = cell;
             }
-            else
-            {
-                if (!spawnCell.HasValue)
-                {
-                    CellFinder.TryRandomClosewalkCellNear(map.Center, map, 100, out IntVec3 cell);
-                    spawnCell = cell;
-                }
-                GenPlace.TryPlaceThing(recommendations, spawnCell.Value, map, ThingPlaceMode.Near);
-                if (sendStandLetter)
-                {
-                    ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
-                        label: "OARO_LetterLabel_GetRecommendation_Map".Translate(),
-                        text: "OARO_Letter_GetRecommendation_Map".Translate(ratkinOrder.Name, count),
-                        def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
-                        lookTargets: new LookTargets(spawnCell.Value, map),
-                        relatedFaction: ratkinOrder.Faction);
-                    letter.RelatedOrder = ratkinOrder;
-                    Find.LetterStack.ReceiveLetter(letter);
-                }
-            }
+            GenPlace.TryPlaceThing(recommendations, spawnCell.Value, map, ThingPlaceMode.Near);
+        }
+
+        if (sendStandLetter)
+        {
+            SendStandardGetRecommendationLetter(count, ratkinOrder, new LookTargets(spawnCell.Value, map));
         }
     }
 
     /// <returns>实际使用数</returns>
-    public static int UseRecommendationOfMap(RatkinOrder order, Map map, int useCount)
+    public static int UseRecommendationOfMap(Map map, int useCount)
     {
         if (useCount <= 0 || map is null)
         {
@@ -111,7 +137,7 @@ public static class RecommendationUtility
     }
 
     /// <returns>实际使用数</returns>
-    public static int UseRecommendationOfCaravan(RatkinOrder order, Caravan caravan, int useCount)
+    public static int UseRecommendationOfCaravan(Caravan caravan, int useCount)
     {
         if (useCount <= 0 || caravan is null)
         {
@@ -125,7 +151,7 @@ public static class RecommendationUtility
     }
 
     /// <returns>实际使用数</returns>
-    public static int UseRecommendationOfFixedCaravan(RatkinOrder order, FixedCaravan fixedCaravan, int useCount)
+    public static int UseRecommendationOfFixedCaravan(FixedCaravan fixedCaravan, int useCount)
     {
         if (useCount <= 0 || fixedCaravan is null)
         {
@@ -186,5 +212,18 @@ public static class RecommendationUtility
             needCount--;
         }
         return needCount > 0 ? needCount : 0;
+    }
+
+    private static void SendStandardGetRecommendationLetter(int count, RatkinOrder ratkinOrder = null, LookTargets lookTargets = null)
+    {
+        ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
+            label: "OARO_LetterLabel_GetRecommendation".Translate(),
+            text: ratkinOrder is null ? "OARO_Letter_GetRecommendation".Translate(count.Named(KeyLibrary_FormatArgName.Count))
+                                      : "OARO_Letter_GetRecommendation_HasOrder".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), count.Named(KeyLibrary_FormatArgName.Count)),
+            def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
+            lookTargets: lookTargets,
+            relatedFaction: ratkinOrder?.Faction);
+        letter.RelatedOrder = ratkinOrder;
+        Find.LetterStack.ReceiveLetter(letter);
     }
 }

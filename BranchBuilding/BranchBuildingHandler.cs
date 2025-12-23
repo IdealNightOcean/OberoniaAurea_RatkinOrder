@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -181,12 +180,12 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
         if (constructParam.ByPlayer)
         {
-            if (constructParam.Caravan is null)
+            if (constructParam.Map is null)
             {
-                return resultOnly ? false : "OARO_NeedACaravan".Translate();
+                return resultOnly ? false : "OARO_NoAvailablePlayerHomeMap".Translate();
             }
             int silverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: false, out _);
-            if (!CaravanInventoryUtility.HasThings(constructParam.Caravan, ThingDefOf.Silver, silverCost))
+            if (!constructParam.Map.HasEnoughThingsOfDef(ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverCost.ToString());
             }
@@ -257,10 +256,10 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         underConstructionBuildings.Add(underConstructionBuilding);
         UnderConstructionBuildingDefs.Add(buildingDef);
 
-        if (constructParam.ByPlayer)
+        if (constructParam.ByPlayer && constructParam.Map is not null)
         {
             int silverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: false, out _);
-            OAFrame_CaravanUtility.RemoveThingsOfDef(constructParam.Caravan, ThingDefOf.Silver, silverCost);
+            constructParam.Map.DestoryThingsOfDef(ThingDefOf.Silver, silverCost);
         }
         branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);
         try

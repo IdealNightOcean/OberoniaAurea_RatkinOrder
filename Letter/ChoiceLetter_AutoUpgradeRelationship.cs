@@ -5,6 +5,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
 {
+    public override bool CanDismissWithRightClick => false;
+
     public override IEnumerable<DiaOption> Choices
     {
         get
@@ -18,6 +20,10 @@ public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
                 yield return Option_Accept;
                 yield return Option_Reject;
                 yield return Option_Postpone;
+                if (quest is not null)
+                {
+                    yield return Option_ViewInQuestsTab(postpone: true);
+                }
             }
         }
     }

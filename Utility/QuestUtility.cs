@@ -89,4 +89,10 @@ public static class OARO_QuestUtility
         return questPart_EffectTags is not null;
     }
 
+    public static bool TryGetBranchDemandWatcher(this Quest quest, out QuestPart_BranchDemandWatcher watcher)
+    {
+        watcher = quest?.PartsListForReading.OfType<QuestPart_BranchDemandWatcher>()?.FirstOrFallback(null);
+        return watcher is not null;
+    }
+
 }

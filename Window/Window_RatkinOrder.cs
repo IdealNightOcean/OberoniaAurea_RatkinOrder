@@ -9,6 +9,22 @@ using Verse.Sound;
 
 namespace OberoniaAurea.RatkinOrder;
 
+public class MainButtonWorker_RatkinOrderWin : MainButtonWorker_ToggleTab
+{
+    public override bool Disabled
+    {
+        get
+        {
+            if (RatkinOrderManager.Instance.AllRatkinOrders.Count <= 0)
+            {
+                return true;
+            }
+            return base.Disabled;
+        }
+    }
+}
+
+
 [StaticConstructorOnStartup]
 public class Window_RatkinOrder : MainTabWindow
 {
@@ -78,7 +94,7 @@ public class Window_RatkinOrder : MainTabWindow
                    ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
                                                           + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
 
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
 
         FollowedBranches = new(refreshFunc: RefreshFollowerBranches);
@@ -106,7 +122,7 @@ public class Window_RatkinOrder : MainTabWindow
             ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
                                                    + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
 
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
     }
 
@@ -870,6 +886,11 @@ public class Window_RatkinOrder : MainTabWindow
                 branchManager.FollowedBranches.AddDistinct(branch);
                 FollowedBranches.MarkDirty();
             }));
+        }
+
+        if (options.Count == 0)
+        {
+            options.Add(new FloatMenuOption("OARO_NoAvailableBranch".Translate(), action: null));
         }
 
         Find.WindowStack.Add(new FloatMenu(options));

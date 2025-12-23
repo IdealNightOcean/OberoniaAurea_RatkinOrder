@@ -32,7 +32,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             LodgerCount = 1,
             ChildCount = 0,
 
-            questDurationTicks = (5 + 7) * 60000
+            questDurationTicks = 7 * 60000
         };
 
         InSignalRecruited = QuestGenUtility.HardcodedSignalWithQuestID("Lodgers_Recruited");

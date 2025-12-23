@@ -192,6 +192,7 @@
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Window\BranchTaskEntryDrawer.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
+    <Compile Include="Window\Window_QuestClique.cs" />
     <Compile Include="Window\Window_ResidentKnight_AcademicArrange.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />

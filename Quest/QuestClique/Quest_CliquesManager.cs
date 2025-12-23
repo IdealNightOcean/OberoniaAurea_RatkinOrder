@@ -12,6 +12,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestNode_CliquesManager : QuestNode
 {
     public SlateRef<Branch> branch;
+
     protected override bool TestRunInt(Slate slate)
     {
         return true;
@@ -251,7 +252,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             }
             if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
             {
-                return RecommendationUtility.CurRecommendationOfMap(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true)) >= 1;
+                return RecommendationUtility.CurRecommendationCount(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true)) >= 1;
             }
         }
         return clique.Willingness > 0.999f;
@@ -298,7 +299,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
                 //邀请友好分部派别参与消耗1推荐信
                 if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
                 {
-                    RecommendationUtility.UseRecommendationOfMap(clique.RelatedBranch.RatkinOrder, OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
+                    RecommendationUtility.UseRecommendationOfMap(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
                 }
             }
             Active();

@@ -10,6 +10,8 @@ internal class ChoiceLetter_Apprentice_QuizStayIntention : ChoiceLetter
     public string outSignalLeave;
     public Pawn apprentice;
 
+    public override bool CanDismissWithRightClick => false;
+
     public override void ExposeData()
     {
         base.ExposeData();
@@ -45,7 +47,7 @@ internal class ChoiceLetter_Apprentice_QuizStayIntention : ChoiceLetter
 
             if (quest is not null)
             {
-                yield return Option_ViewInQuestsTab();
+                yield return Option_ViewInQuestsTab(postpone: true);
             }
         }
     }

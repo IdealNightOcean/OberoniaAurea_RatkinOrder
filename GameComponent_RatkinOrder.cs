@@ -38,6 +38,7 @@ public class GameComponent_RatkinOrder : GameComponent
             Log.Message("GameComponent_RatkinOrder Instance switched.".Colorize(Color.cyan));
         }
         Instance = this;
+
     }
 
     public static void ClearStaticCache()
@@ -90,6 +91,7 @@ public class GameComponent_RatkinOrder : GameComponent
     public override void GameComponentTick()
     {
         ratkinOrderManager.Tick();
+        globalInteractionManager.Tick();
         orderLetterBox.Tick();
     }
 

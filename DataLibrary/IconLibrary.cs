@@ -43,4 +43,6 @@ public static class IconLibrary
     public static readonly Texture2D OrangeTex = SolidColorMaterials.NewSolidColorTexture(ColorLibrary.Orange);
     public static readonly Texture2D SilverTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.75f, 0.75f, 0.75f));
 
+    public static readonly Texture2D TransTex = SolidColorMaterials.NewSolidColorTexture(new Color(0f, 0f, 0f, 0f));
+
 }

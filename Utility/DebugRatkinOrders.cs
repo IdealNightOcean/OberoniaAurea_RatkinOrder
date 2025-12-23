@@ -372,25 +372,18 @@ public static class DebugRatkinOrders
                  allowedGameStates = AllowedGameStates.PlayingOnMap)]
     private static void SpawnOrderRecommendation()
     {
-        RatkinOrderOptions(SpawnRecommendation);
-
-
-        void SpawnRecommendation(RatkinOrder ratkinOrder)
+        TargetingParameters parms = new()
         {
-            TargetingParameters parms = new()
-            {
-                canTargetLocations = true,
-                canTargetBuildings = false
-            };
+            canTargetLocations = true,
+            canTargetBuildings = false
+        };
 
-            Map map = Find.CurrentMap;
-            Find.Targeter.BeginTargeting(parms, action: delegate (LocalTargetInfo t)
-            {
-                OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
-                GenPlace.TryPlaceThing(recommendation, t.Cell, map, ThingPlaceMode.Near);
-                SpawnRecommendation(ratkinOrder);
-            });
-        }
+        Find.Targeter.BeginTargeting(parms, action: delegate (LocalTargetInfo t)
+        {
+            OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
+            GenPlace.TryPlaceThing(recommendation, t.Cell, Find.CurrentMap, ThingPlaceMode.Near);
+            SpawnOrderRecommendation();
+        });
     }
 
     /// <summary>

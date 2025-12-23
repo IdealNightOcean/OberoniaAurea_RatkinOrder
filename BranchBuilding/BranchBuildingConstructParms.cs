@@ -1,4 +1,4 @@
-﻿using RimWorld.Planet;
+﻿using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -8,7 +8,7 @@ public struct BranchBuildingConstructParms
     public BranchBuildingDef BuildingDef;
 
     public bool ByPlayer;
-    public Caravan Caravan;
+    public Map Map;
 
     public readonly bool NeedDoubleConfirm => ByPlayer && BuildingDef.ConstructChecker.DoubleComfirm;
     public readonly void DoubleComfirm() => BuildingDef.ConstructChecker.DoubleComfirmAction(this);

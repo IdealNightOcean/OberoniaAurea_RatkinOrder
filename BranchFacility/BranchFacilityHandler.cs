@@ -1,7 +1,6 @@
 ﻿using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -102,7 +101,7 @@ public class BranchFacilityHandler : IExposable
         }
     }
 
-    public AcceptanceReport CanConstructFacility(BranchFacilityDef facilityDef, bool byPlayer, Caravan caravan = null, bool resultOnly = false)
+    public AcceptanceReport CanConstructFacility(BranchFacilityDef facilityDef, bool byPlayer, Map map = null, bool resultOnly = false)
     {
         if (underConstructionFacilities.Count > 0 && underConstructionFacilities.ContainsKey(facilityDef))
         {
@@ -117,12 +116,12 @@ public class BranchFacilityHandler : IExposable
 
         if (byPlayer)
         {
-            if (caravan is null)
+            if (map is null)
             {
-                return resultOnly ? false : "OARO_NeedACaravan".Translate();
+                return resultOnly ? false : "OARO_NoAvailablePlayerHomeMap".Translate();
             }
             int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel, resultOnly: true, out _);
-            if (!CaravanInventoryUtility.HasThings(caravan, ThingDefOf.Silver, silverCost))
+            if (!map.HasEnoughThingsOfDef(ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverCost.ToString());
             }
@@ -131,7 +130,7 @@ public class BranchFacilityHandler : IExposable
         return true;
     }
 
-    public void StartFacilityConstruction(BranchFacilityDef facilityDef, bool byPlayer, Caravan caravan = null)
+    public void StartFacilityConstruction(BranchFacilityDef facilityDef, bool byPlayer, Map map = null)
     {
 
         BranchFacilityLevel oldLevel = GetFacilityLevel(facilityDef);
@@ -150,10 +149,10 @@ public class BranchFacilityHandler : IExposable
         underConstructionFacilities.Add(facilityDef, underConstructionFacility);
         underConstructionFacilitiesList.Add(underConstructionFacility);
 
-        if (byPlayer && caravan is not null)
+        if (byPlayer && map is not null)
         {
             int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel, resultOnly: true, out _);
-            OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, silverCost);
+            map.DestoryThingsOfDef(ThingDefOf.Silver, silverCost);
         }
 
         branch.StoresReserveHandler.Notify_BranchConstructStarted(facilityDef);

@@ -132,16 +132,14 @@ public partial class Window_OrderHall
                 Text.Anchor = TextAnchor.MiddleLeft;
                 Widgets.Label(buttomTextRect, "OARO_HallWin_ShowDetail".Translate());
                 Text.Anchor = TextAnchor.MiddleCenter;
+                float bottomY = DrawDetail(new Vector2(position.x, summaryRect.yMax));
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                     OARO_WindowUtility.ResetText();
-                    return summaryRect.yMax;
                 }
-                else
-                {
-                    return DrawDetail(new Vector2(position.x, summaryRect.yMax));
-                }
+
+                return bottomY;
             }
             else
             {

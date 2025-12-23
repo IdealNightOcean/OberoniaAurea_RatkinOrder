@@ -29,17 +29,15 @@ public static class OrderHallUtility
             int impressivenessRestrict = Array.BinarySearch(impressivenessBoundaries, room.GetStat(RoomStatDefOf.Impressiveness));
             impressivenessRestrict = impressivenessRestrict < 0 ? ~impressivenessRestrict : impressivenessRestrict + 1;
 
+
             maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, maxOrderHallLevel);
             maxPotentialLevel = maxPotentialLevel < 1 ? 1 : maxPotentialLevel;
 
             if (maxPotentialLevel <= 1) { return 1; }
-
             maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
-            // 最高可能索引为0，只能是1级
             if (maxPotentialLevel <= 1) { return 1; }
 
             maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
-
             return Mathf.Clamp(maxPotentialLevel, 1, maxOrderHallLevel);
         }
         catch (Exception ex)
@@ -190,8 +188,8 @@ public static class OrderHallUtility
             }
         }
 
-
-        for (int i = maxPotentialLevel - 1; i >= 1; i--)
+        int prePotentialLevelIndex = maxPotentialLevel - 1;
+        for (int i = prePotentialLevelIndex; i >= 1; i--)
         {
             List<ThingDefCountClass> buildingRequirements = RestrictionExtension.hallLevelRestriction[i].buildings;
             bool allMet = true;
@@ -199,7 +197,7 @@ public static class OrderHallUtility
             {
                 if (!orderHallBuildings.TryGetValue(buildingRequirements[j].thingDef, out int count) || count < buildingRequirements[j].count)
                 {
-                    maxPotentialLevel = i;
+                    maxPotentialLevel--;
                     allMet = false;
                     break;
                 }

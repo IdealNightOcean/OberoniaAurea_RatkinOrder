@@ -11,6 +11,8 @@ internal class ChoiceLetter_InDistressKnightLeave : ChoiceLetter_RatkinOrder
     internal string OutSignalMakeLeave;
     internal List<Pawn> Pawns;
 
+    public override bool CanDismissWithRightClick => false;
+
     public override IEnumerable<DiaOption> Choices
     {
         get
@@ -26,7 +28,7 @@ internal class ChoiceLetter_InDistressKnightLeave : ChoiceLetter_RatkinOrder
             yield return Option_Postpone;
             if (quest is not null)
             {
-                yield return Option_ViewInQuestsTab();
+                yield return Option_ViewInQuestsTab(postpone: true);
             }
         }
     }

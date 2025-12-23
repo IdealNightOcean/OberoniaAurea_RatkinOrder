@@ -26,7 +26,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
 
         RatkinOrder = ratkinOrder;
         Map = map;
-        MapRecommendationCount = RecommendationUtility.CurRecommendationOfMap(Map);
+        MapRecommendationCount = RecommendationUtility.CurRecommendationCount(Map);
     }
 
     public override void PostClose()
@@ -127,7 +127,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
             supplyButton_Down,
             doMouseoverSound: true))
         {
-            RecommendationUtility.UseRecommendationOfMap(RatkinOrder, Map, supply.needRecommendation);
+            RecommendationUtility.UseRecommendationOfMap(Map, supply.needRecommendation);
             MapRecommendationCount -= supply.needRecommendation;
 
             Thing thing = ThingMaker.MakeThing(supply.thing, supply.stuff);

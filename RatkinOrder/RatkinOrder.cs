@@ -112,7 +112,6 @@ public class RatkinOrder : IExposable, ILoadReferenceable
                 if (TickUtility.YearPassed() > curYearPassed)
                 {
                     curYearPassed = TickUtility.YearPassed();
-
                 }
             }
         }

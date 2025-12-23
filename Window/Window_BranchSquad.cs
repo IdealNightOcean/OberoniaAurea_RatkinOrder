@@ -55,7 +55,7 @@ public class Window_BranchSquad : OrderWindowBase
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationOfMap(Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
 
         SupplyRecoveryRateExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationStr(SelBranch, BranchStatDefOf.OARO_SupplyRecoveryRate, showResultValue: true));
         BombardSupportCeiling = new(refreshFunc: () => (int)(SelBranch?.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling, immediateUpdate: true) ?? -1f));

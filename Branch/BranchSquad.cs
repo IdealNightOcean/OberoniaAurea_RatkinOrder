@@ -30,8 +30,8 @@ public class BranchSquad : IExposable, ITickHourOfDay
     public float AllCrewCount => memberCount + commanderCount;
     public int AllCrewCountInt => Mathf.FloorToInt(memberCount + commanderCount);
 
-    [Unsaved] private readonly SimpleValueCache<float> memberCeilingCache;
-    [Unsaved] private readonly SimpleValueCache<float> commanderCeilingCache;
+    [Unsaved] private SimpleValueCache<float> memberCeilingCache;
+    [Unsaved] private SimpleValueCache<float> commanderCeilingCache;
 
     private float memberCount; //分队成员数量
     private float commanderCount; //分队骑士长数量

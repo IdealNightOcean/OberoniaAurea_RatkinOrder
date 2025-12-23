@@ -115,7 +115,7 @@ public class Window_Branch : OrderWindowBase
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         FacilityHandler = Branch.FacilityHandler;
         BuildingHandler = Branch.BuildingHandler;
-        Map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
+        Map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? Find.CurrentMap;
         Caravan = caravan;
         CachedBranchInfo = new(Branch, Map);
 
@@ -1101,10 +1101,10 @@ public class Window_Branch : OrderWindowBase
                 downTex: constructButton_Down,
                 doMouseoverSound: true))
             {
-                AcceptanceReport acceptance = FacilityHandler.CanConstructFacility(SelFacilityDef, byPlayer: true, caravan: Caravan, resultOnly: false);
+                AcceptanceReport acceptance = FacilityHandler.CanConstructFacility(SelFacilityDef, byPlayer: true, map: Map, resultOnly: false);
                 if (acceptance)
                 {
-                    FacilityHandler.StartFacilityConstruction(SelFacilityDef, byPlayer: true, caravan: Caravan);
+                    FacilityHandler.StartFacilityConstruction(SelFacilityDef, byPlayer: true, map: Map);
                 }
                 else
                 {
@@ -1305,7 +1305,7 @@ public class Window_Branch : OrderWindowBase
             BranchBuildingConstructParms constructParameter = new(Branch, SelBuildingDefCache.BuildingDef)
             {
                 ByPlayer = true,
-                Caravan = Caravan
+                Map = Map
             };
             AcceptanceReport acceptanceReport = BuildingHandler.CanConstructBuilding(constructParameter);
             if (acceptanceReport)

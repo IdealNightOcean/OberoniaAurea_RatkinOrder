@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Thought_VisitingKnight : Thought_Memory
 {
-    private static readonly SimpleValueCache<int> valueCache = new(cacheInterval: 2500, defaultValue: 0, GetMoodOffset);
+    private static SimpleValueCache<int> valueCache = new(cacheInterval: 2500, defaultValue: 0, GetMoodOffset);
 
     public override void ThoughtInterval()
     {

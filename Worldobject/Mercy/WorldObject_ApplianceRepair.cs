@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
+using System.Collections.Generic;
 using System.Text;
 using Verse;
 using Verse.Utility;
@@ -45,6 +46,18 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         faultType = EnumUtility.GetValues<FaultType>().RandomElement();
     }
 
+    public override string GetInspectString()
+    {
+        StringBuilder sb = new(base.GetInspectString());
+        if (hasFoundReason)
+        {
+            sb.AppendInNewLine("OARO_ApplianceRepair_CurFault".Translate());
+            sb.Append(": ");
+            sb.Append(FaultLabel);
+        }
+        return sb.ToString();
+    }
+
     public override void Notify_CaravanArrived(Caravan caravan)
     {
         if (!caravan.PawnsListForReading.Any(p => p.skills is not null && !p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled))
@@ -87,7 +100,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         }
         else
         {
-            if (Rand.Chance(0.1f))
+            if (Rand.Chance(GetSuccessChance(associatedFixedCaravan.PawnsListForReading)))
             {
                 hasFoundReason = true;
                 taggedString = "OARO_ApplianceRepair_FindReasonSuccess".Translate(maxPawn.Named(KeyLibrary_FormatArgName.PAWN), FaultLabel.Named(KeyLibrary_FormatArgName.Reason));
@@ -102,6 +115,12 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(taggedString, Faction));
     }
 
+    private float GetSuccessChance(IEnumerable<Pawn> pawns)
+    {
+        int maxSuccessChance = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Crafting);
+        return 0.25f + 0.05f * maxSuccessChance;
+    }
+
     protected override void InterruptWork()
     {
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
@@ -113,7 +132,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
     private void RepairDialog(Caravan caravan)
     {
         StringBuilder sb = new("OARO_ApplianceRepair_RepairInfo".Translate());
-        sb.AppendInNewLine("OARO_ApplianceRepair_CurFault");
+        sb.AppendInNewLine("OARO_ApplianceRepair_CurFault".Translate());
         sb.Append(": ");
         sb.Append(FaultLabel);
 

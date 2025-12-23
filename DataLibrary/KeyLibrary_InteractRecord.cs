@@ -5,6 +5,8 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class KeyLibrary_InteractRecord
 {
+    public static string TotalRecommendation = "TotalRecommendation"; //总获取推荐信数
+
     public static string SponsoredSilver = "SponsoredSilver"; //总赞助白银
 
     public static string BranchDemandCompleted = "BranchDemandCompleted"; //成功完成需求（全部）

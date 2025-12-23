@@ -138,7 +138,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         {
             action = delegate
             {
-                talkWith.MapHeld.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation).RandomElementWithFallback(fallback: null)?.SplitOff(1)?.Destroy();
+                RecommendationUtility.UseRecommendationOfMap(talkWith.MapHeld, useCount: 1);
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
@@ -146,7 +146,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                 text: "OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                 acceptText: "Confirm".Translate())
         };
-        if (!map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, 1))
+        if (!map.HasEnoughRecommendation(count: 1))
         {
             briberyOpt.Disable("OAFrame_NeedCountOfThing".Translate(OARO_ThingDefOf.OARO_OrderRecommendation.LabelCap, 1));
         }

@@ -87,7 +87,7 @@ public class BranchDemandHandler : ITickDay, IExposable
         CheckDemand();
         if (normalDemand is null && !branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandPeriodic))
         {
-            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandPeriodic, cdTicks: 3 * 18000, removeWhenExpired: true);
+            branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.NormalDemandPeriodic, cdTicks: 3 * 60000, removeWhenExpired: true);
             PeriodicTriggerNewNormalDemand();
         }
     }
@@ -176,7 +176,9 @@ public class BranchDemandHandler : ITickDay, IExposable
                 branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.DemandFriendlyInform, cdTicks: 12 * 60000, removeWhenExpired: true);
 
                 OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
-                                                   text: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), demandDef.Named("DEMAND")),
+                                                   text: "OARO_LetterLabel_DemandFriendlyInform".Translate(
+                                                       branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                                                       demandDef.Named("DEMAND")),
                                                    def: OrderLetterDefOf.OARO_OfficialLetter,
                                                    relatedOrder: branch.RatkinOrder,
                                                    relatedBranch: branch,

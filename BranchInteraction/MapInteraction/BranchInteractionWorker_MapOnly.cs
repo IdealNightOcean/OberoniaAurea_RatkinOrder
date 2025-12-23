@@ -22,9 +22,9 @@ public abstract class BranchInteractionWorker_MapOnly(BranchInteractionDef def) 
     protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
     {
         RatkinOrder ratkinOrder = parms.RatkinOrder;
-        if (Def.needRecommendation > 0 && !parms.Map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, Def.needRecommendation))
+        if (Def.needRecommendation > 0 && !parms.Map.HasEnoughRecommendation(Def.needRecommendation))
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation, ratkinOrder.Name);
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation.Named(KeyLibrary_FormatArgName.Count));
         }
         if (Def.needSilver > 0 && !parms.Map.HasEnoughThingsOfDef(ThingDefOf.Silver, Def.needSilver))
         {
@@ -37,7 +37,7 @@ public abstract class BranchInteractionWorker_MapOnly(BranchInteractionDef def) 
     {
         if (Def.needRecommendation > 0)
         {
-            RecommendationUtility.UseRecommendationOfMap(parms.RatkinOrder, parms.Map, Def.needRecommendation);
+            RecommendationUtility.UseRecommendationOfMap(parms.Map, Def.needRecommendation);
         }
         if (Def.needSilver > 0)
         {

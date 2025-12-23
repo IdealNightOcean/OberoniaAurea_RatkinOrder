@@ -4,11 +4,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderRecommendation : ThingWithComps
 {
-    public void OnMakeForPlayer(RatkinOrder ratkinOrder)
+    public void OnMakeForPlayer()
     {
-        if (ratkinOrder.IsValid())
-        {
-            ratkinOrder.EsteemHandler.TotalRecommendation += stackCount;
-        }
+        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.TotalRecommendation, offset: stackCount, addIfMiss: true);
     }
 }

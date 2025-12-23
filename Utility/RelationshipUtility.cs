@@ -90,43 +90,39 @@ public static class RelationshipUtility
         switch (newRelationship)
         {
             case RelationshipKind.Acquaintance:
-                return ValidateRelationshipRequirement(esteem: 20, totalRecommendation: 1);
+                return ValidateRelationshipRequirement(esteem: 20);
             case RelationshipKind.Friendly:
-                return ValidateRelationshipRequirement(esteem: 30, totalRecommendation: 3);
+                return ValidateRelationshipRequirement(esteem: 30);
             case RelationshipKind.Trustworthy:
                 if (ratkinOrder.BranchManager.NormalDemandFulfillCount < 2)
                 {
                     return resultOnly ? false : "OARO_Insufficient_NormalDemandFulfill".Translate(2);
                 }
-                return ValidateRelationshipRequirement(esteem: 40, totalRecommendation: 6, friendlyBranchesCount: 1);
+                return ValidateRelationshipRequirement(esteem: 40, friendlyBranchesCount: 1);
 
             case RelationshipKind.Soulmate:
                 if (ratkinOrder.BranchManager.CriticalDemandFulfillCount < 2)
                 {
                     return resultOnly ? false : "OARO_Insufficient_CriticalDemandFulfill".Translate(2);
                 }
-                return ValidateRelationshipRequirement(esteem: 50, totalRecommendation: 12, friendlyBranchesCount: 3);
+                return ValidateRelationshipRequirement(esteem: 50, friendlyBranchesCount: 3);
             default:
                 return true;
         }
 
-        AcceptanceReport ValidateRelationshipRequirement(int esteem, int totalRecommendation, int friendlyBranchesCount = -1)
+        AcceptanceReport ValidateRelationshipRequirement(int esteem, int friendlyBranchesCount = -1)
         {
             if (!byPlayer && ratkinOrder.Esteem < esteem)
             {
                 return resultOnly ? false : "OARO_Insufficient_Esteem".Translate(esteem);
             }
-            if (ratkinOrder.EsteemHandler.TotalRecommendation < totalRecommendation)
-            {
-                return resultOnly ? false : "OARO_Insufficient_TotalRecommendation".Translate(totalRecommendation, ratkinOrder.Name);
-            }
             if (friendlyBranchesCount > 0 && ratkinOrder.BranchManager.FriendlyBranchesCount.Value < friendlyBranchesCount)
             {
                 return resultOnly ? false : "OARO_Insufficient_FriendlyBranches".Translate(friendlyBranchesCount);
             }
-            if (byPlayer && curRecommendationNeed > 0 && RecommendationUtility.CurRecommendationOfMap(map) < curRecommendationNeed)
+            if (byPlayer && curRecommendationNeed > 0 && RecommendationUtility.CurRecommendationCount(map) < curRecommendationNeed)
             {
-                return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(curRecommendationNeed, ratkinOrder.Name);
+                return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(curRecommendationNeed.Named(KeyLibrary_FormatArgName.Count));
             }
             return true;
         }
@@ -156,7 +152,7 @@ public static class RelationshipUtility
             int recommendationNeed = RecommendationUtility.RecommendationNeed_OrderRelationUpgrade(targetRelation);
             if (recommendationNeed > 0)
             {
-                RecommendationUtility.UseRecommendationOfMap(ratkinOrder, map, recommendationNeed);
+                RecommendationUtility.UseRecommendationOfMap(map, recommendationNeed);
             }
             return true;
         }

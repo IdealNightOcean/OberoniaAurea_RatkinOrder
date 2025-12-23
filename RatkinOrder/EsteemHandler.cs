@@ -55,13 +55,6 @@ public class EsteemHandler : IExposable, ITickDay
     public string LastRelationshipChangeReason => lastRelationshipChangeReason;
 
 
-    private int totalRecommendation;
-    public int TotalRecommendation
-    {
-        get => totalRecommendation;
-        set => totalRecommendation += Mathf.Max(0, value);
-    }
-
     public EsteemHandler(RatkinOrder ratkinOrder)
     {
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
@@ -82,8 +75,6 @@ public class EsteemHandler : IExposable, ITickDay
         Scribe_Values.Look(ref relationship, nameof(relationship), RelationshipKind.Stranger);
         Scribe_Values.Look(ref lastRelationshipChangeTick, nameof(lastRelationshipChangeTick), -1);
         Scribe_Values.Look(ref lastRelationshipChangeReason, nameof(lastRelationshipChangeReason), string.Empty);
-
-        Scribe_Values.Look(ref totalRecommendation, nameof(totalRecommendation), 0);
     }
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
@@ -113,8 +104,6 @@ public class EsteemHandler : IExposable, ITickDay
             SetRelationship(relationship.RelationshipKindOffsetBy(-1), reason: "Dev", sendLetter: false);
         }
 
-        listing_Rect.Gap(6f);
-        listing_Rect.Label($"获取过的推荐信总数: {totalRecommendation}");
     }
 
     public void TickDay()

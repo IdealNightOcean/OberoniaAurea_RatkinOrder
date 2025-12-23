@@ -17,7 +17,6 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
     private float remainingMarkerValue;
     private int purchasedCount;
     private int totalCount;
-    private int SculpturesCount => sculptures.Count;
 
     public override void ExposeData()
     {
@@ -46,13 +45,13 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
             sculptures.TryAdd(sculptureMini);
         }
 
-        totalCount = SculpturesCount;
+        totalCount = sculptures.Count;
     }
 
     public override string GetInspectString()
     {
         StringBuilder sb = new(base.GetInspectString());
-        sb.AppendInNewLine("OARO_UnsalableArtcraft_Remaining".Translate(SculpturesCount, remainingMarkerValue.ToString("F0")));
+        sb.AppendInNewLine("OARO_UnsalableArtcraft_Remaining".Translate(sculptures.Count, remainingMarkerValue.ToString("F0")));
         sb.AppendInNewLine("OARO_UnsalableArtcraft_Purchased".Translate(purchasedCount));
         return sb.ToString();
     }
@@ -64,6 +63,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
 
     private void OpenPurchaseNode(Caravan caravan)
     {
+        int caravanSilver = caravan.GetCountOfThingDef(ThingDefOf.Silver);
         DiaNode rootNode = new("OARO_UnsalableArtcraft_PurchaseInfo".Translate());
 
         AddSilverOpt(100);
@@ -76,6 +76,10 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
             action = () => PurchaseOfSculptures(caravan, -1),
             resolveTree = true
         };
+        if (remainingMarkerValue > caravanSilver)
+        {
+            totalOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, remainingMarkerValue));
+        }
         rootNode.options.Add(totalOpt);
 
         rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
@@ -89,6 +93,10 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
                 action = () => PurchaseOfSculptures(caravan, silverNeed),
                 resolveTree = true
             };
+            if (silverNeed > caravanSilver)
+            {
+                subOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverNeed));
+            }
             rootNode.options.Add(subOpt);
         }
     }
@@ -100,9 +108,9 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
 
         List<Thing> inventoryItems = CaravanInventoryUtility.AllInventoryItems(caravan);
 
-        List<Thing> sculptures = [];
+        List<Thing> takeSculptures = [];
         float usedSilver = 0f;
-        for (int j = 0; j < SculpturesCount; j++)
+        for (int j = 0; j < sculptures.Count; j++)
         {
             float marketValue = sculptures[j].MarketValue * 0.7f;
             if (usedSilver + marketValue > caravanSilver)
@@ -110,10 +118,10 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
                 break;
             }
             usedSilver += marketValue;
-            sculptures.Add(sculptures[j]);
+            takeSculptures.Add(sculptures[j]);
         }
 
-        foreach (Thing t in sculptures)
+        foreach (Thing t in takeSculptures)
         {
             sculptures.Remove(t);
             CaravanInventoryUtility.GiveThing(caravan, t);
@@ -124,7 +132,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
 
         OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_UnsalableArtcraft_PurchaseResult".Translate(sculptures.Count, usedSilver.ToString("F0")));
 
-        if (SculpturesCount == 0)
+        if (sculptures.Count == 0)
         {
             remainingMarkerValue = 0f;
             purchasedCount = totalCount;
@@ -133,7 +141,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         else
         {
             remainingMarkerValue = 0f;
-            for (int k = 0; k < SculpturesCount; k++)
+            for (int k = 0; k < sculptures.Count; k++)
             {
                 remainingMarkerValue += (sculptures[k].MarketValue * 0.7f);
             }

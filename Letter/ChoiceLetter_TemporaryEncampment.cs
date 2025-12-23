@@ -8,6 +8,8 @@ internal class ChoiceLetter_TemporaryEncampment : ChoiceLetter_RatkinOrder
 {
     public WorldObject_TemporaryEncampment temporaryEncampment;
 
+    public override bool CanDismissWithRightClick => false;
+
     private DiaOption Option_Accept => new("Accept".Translate())
     {
         action = delegate
@@ -56,7 +58,7 @@ internal class ChoiceLetter_TemporaryEncampment : ChoiceLetter_RatkinOrder
                 }
                 if (quest is not null && !quest.hidden)
                 {
-                    yield return Option_ViewInQuestsTab("ViewRelatedQuest", postpone: true);
+                    yield return Option_ViewInQuestsTab(postpone: true);
                 }
             }
         }

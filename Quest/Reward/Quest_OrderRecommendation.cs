@@ -19,10 +19,7 @@ public class QuestNode_OrderRecommendation : QuestNode
     public SlateRef<bool> isReward;
     public SlateRef<bool> isSingleReward;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return true;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
@@ -30,7 +27,7 @@ public class QuestNode_OrderRecommendation : QuestNode
 
         RatkinOrder ratkinOrder = this.ratkinOrder.GetValue(slate);
         int recommendationCount = count.GetValue(slate);
-        if (!ratkinOrder.IsValid() || recommendationCount <= 0)
+        if (recommendationCount <= 0)
         {
             return;
         }
@@ -120,21 +117,14 @@ public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
         {
             if (GiveToCaravan && GetCaravan(signal, out Caravan caravan))
             {
-                RecommendationUtility.GiveRecommendationsToPlayer(
-                    count: Count,
-                    giveAction: delegate (Thing t)
-                    {
-                        CaravanInventoryUtility.GiveThing(caravan, t);
-                    },
-                    ratkinOrder: RatkinOrder);
-
+                RecommendationUtility.GiveRecommendationsToCaravan(caravan, Count);
             }
             else
             {
                 MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
                 if (MapParent is not null)
                 {
-                    RecommendationUtility.GiveRecommendationsToPlayer_Map(count: Count, MapParent.Map, RatkinOrder, dropPod: true);
+                    RecommendationUtility.GiveRecommendationsToPlayerMap(MapParent.Map, count: Count, sendStandLetter: true, ratkinOrder: RatkinOrder, dropPod: true);
                 }
             }
         }

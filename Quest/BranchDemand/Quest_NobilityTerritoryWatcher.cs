@@ -132,7 +132,7 @@ internal sealed class QuestPart_NobilityTerritoryWatcher : QuestPart
             if (map is not null)
             {
                 IntVec3 spawnCell = DropCellFinder.TradeDropSpot(map);
-                RecommendationUtility.GiveRecommendationsToPlayer_Map(count: extraRecommendation, map, Branch.RatkinOrder, sendStandLetter: false, spawnCell: spawnCell, dropPod: true);
+                RecommendationUtility.GiveRecommendationsToPlayerMap(map, count: extraRecommendation, sendStandLetter: false, ratkinOrder: Branch.RatkinOrder, spawnCell: spawnCell, dropPod: true);
                 ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
                     label: "OARO_NobilityTerritory_ExtraRecommendationLabel".Translate(),
                     text: "OARO_NobilityTerritory_ExtraRecommendationText".Translate(Branch?.RatkinOrder.Name, extraRecommendation),
