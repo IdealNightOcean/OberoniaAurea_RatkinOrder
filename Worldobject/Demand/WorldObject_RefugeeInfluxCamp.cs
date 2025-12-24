@@ -125,11 +125,11 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             ActiveDesc = "OARO_CliqueActiveDesc_Refugee".Translate(),
             InactiveDesc = "OARO_CliqueInactiveDesc_Refugee".Translate(),
             Potency = 0.2f,
-            Willingness = Rand.Range(0.15f, 0.25f),
             IsCommunicable = true,
 
             PreferredBuilding = BranchBuildingDefOf.OARO_Church
         };
+        refugeeClique.AdjustCliqueWillingness(Rand.Range(0.15f, 0.25f), showMessage: false);
 
         QuestClique royalArmyClique = new(RoyalArmyCliqueKey)
         {
@@ -539,16 +539,19 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         }
         diaNode.options.Add(branchOpt);
 
-        DiaOption townOpt = new("OARO_RefugeeInflux_DistributionFood_Town".Translate())
+        if (CliquesManager.TryGetClique("NearbyTown", out QuestClique clique))
         {
-            action = Distribute,
-            resolveTree = true
-        };
-        if (!CliquesManager.IsCliqueActive("NearbyTown"))
-        {
-            townOpt.Disable("OARO_Disable_CliqueInactive".Translate());
+            DiaOption townOpt = new("OARO_RefugeeInflux_DistributionFood_Town".Translate())
+            {
+                action = Distribute,
+                resolveTree = true
+            };
+            if (!clique.IsActive)
+            {
+                townOpt.Disable("OARO_CliqueInactive".Translate(clique.Name.Named(KeyLibrary_FormatArgName.CliqueName)));
+            }
+            diaNode.options.Add(townOpt);
         }
-        diaNode.options.Add(townOpt);
 
         DiaOption backOpt = new("GoBack".Translate())
         {

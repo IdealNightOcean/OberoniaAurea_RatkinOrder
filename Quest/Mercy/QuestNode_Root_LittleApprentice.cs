@@ -39,6 +39,8 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         questParameter = new QuestParameter()
         {
             allowAssaultColony = false,
+            allowJoinOffer = false,
+
             LodgerCount = 1,
             ChildCount = 1,
 
@@ -46,7 +48,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
             goodwillSuccess = 20,
             rewardValueRange = new FloatRange(1000, 2000),
 
-            questDurationTicks = Rand.RangeInclusive(8 * 60000, 12 * 60000)
+            questDurationTicks = 30 * 60000
         };
 
         QuestGen.slate.Set("uniqueQuestDesc", true);
@@ -74,6 +76,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
     protected override void SetPawnsLeaveComp(string lodgerArrivalSignal, string inSignalRemovePawn)
     {
         Quest quest = QuestGen.quest;
+        Pawn apprentice = questParameter.pawns[0];
 
         string leaveSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_Leave");
 
@@ -86,7 +89,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
             OutSignalStay = StaySignal,
 
             Faction = questParameter.faction,
-            Apprentice = questParameter.pawns[0]
+            Apprentice = apprentice
         };
 
         if (NormalLeave)
@@ -98,10 +101,10 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
             OAFrame_TileFinderUtility.TryFindNewAvaliableTile(out PlanetTile tile, questParameter.map.Parent.Tile, 4, 15);
             WorldObject_ApprenticeHome apprenticeHome = (WorldObject_ApprenticeHome)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_ApprenticeHome);
             apprenticeHome.Tile = tile;
-            apprenticeHome.Apprentice = questParameter.pawns[0];
+            apprenticeHome.Apprentice = apprentice;
             apprenticeHome.SetAssociatedQuest(quest);
             apprenticeHome.SetFaction(questParameter.faction);
-            apprenticeHome.Name = "OARO_ApprenticeHomeName".Translate(questParameter.faction.Name.Named(KeyLibrary_FormatArgName.FACTION), questParameter.pawns[0].Named(KeyLibrary_FormatArgName.PAWN));
+            apprenticeHome.Name = "OARO_ApprenticeHomeName".Translate(questParameter.faction.Named(KeyLibrary_FormatArgName.FACTION), apprentice.Named(KeyLibrary_FormatArgName.PAWN));
             QuestGen.slate.Set("apprenticeHome", apprenticeHome);
 
             quest.SpawnWorldObject(apprenticeHome, inSignal: DurationEndSignal);
@@ -148,8 +151,8 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
             inner: null,
             outSignalComplete: DurationEndSignal,
             isQuestTimeout: false,
-            expiryInfoPart: "GuestsDepartsIn".Translate(),
-            expiryInfoPartTip: "GuestsDepartsOn".Translate(),
+            expiryInfoPart: "OARO_ApprenticeDepartsIn".Translate(),
+            expiryInfoPartTip: "OARO_ApprenticeDepartsOn".Translate(),
             debugLabel: "QuestDelay");
 
         string skillSuccessEndSignal = QuestGenUtility.HardcodedSignalWithQuestID("Apprentice_SkillSuccessEnd");

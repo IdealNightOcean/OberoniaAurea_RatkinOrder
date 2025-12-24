@@ -71,7 +71,6 @@ public class QuestNode_AddGeneralClique : QuestNode
             InactiveDesc = inactiveDesc.GetValue(slate),
 
             Potency = initPotency.GetValue(slate) ?? 0f,
-            Willingness = initWillingness.GetValue(slate) ?? 0f,
 
             IsActivatable = isActivatable.GetValue(slate),
             IsCommunicable = isCommunicable.GetValue(slate),
@@ -80,6 +79,7 @@ public class QuestNode_AddGeneralClique : QuestNode
 
             PreferredBuilding = preferredBuilding.GetValue(slate)
         };
+        questClique.AdjustCliqueWillingness(initWillingness.GetValue(slate) ?? 0f, showMessage: false);
         return questClique;
     }
 }

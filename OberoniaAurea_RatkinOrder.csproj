@@ -235,7 +235,7 @@
     <Compile Include="OrderInteraction\OrderInteractionWorker_MediateFactionRelation.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_Sponsor.cs" />
     <Compile Include="OrderLetter\OrderLetterType.cs" />
-    <Compile Include="Quest\QuestClique\QuestNode_GetNearBranchClique.cs" />
+    <Compile Include="Quest\QuestClique\QuestNode_GetCriticalDemandBranchClique.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_BranchIsTypeOf.cs" />
     <Compile Include="Quest\BranchDemand\Quest_TownConstructionWatcher.cs" />
     <Compile Include="Quest\BranchDemand\Quest_NobilityTerritoryWatcher.cs" />

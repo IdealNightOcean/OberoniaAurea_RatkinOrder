@@ -5,21 +5,21 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
 {
-    private AroundKnightGroup knightGroup;
+    public AroundKnightGroup KnightGroup;
 
     public override bool CanDismissWithRightClick => false;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Deep.Look(ref knightGroup, "knightGroup");
+        Scribe_Deep.Look(ref KnightGroup, nameof(KnightGroup));
     }
 
     public override IEnumerable<DiaOption> Choices
     {
         get
         {
-            if (ArchivedOnly || knightGroup is null)
+            if (ArchivedOnly || KnightGroup is null)
             {
                 yield return Option_Close;
             }
@@ -40,19 +40,18 @@ public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
 
     private void ProactiveVisit()
     {
-        Find.LetterStack.RemoveLetter(this);
-
         Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-        if (map is null || !AroundKnightGroupsManager.Instance.TriggerVisitQuest(knightGroup, map))
+        if (!AroundKnightGroupsManager.Instance.TryTriggerVisitQuest(KnightGroup, map, isProactive: true, removeWhenInvalid: true))
         {
-            AroundKnightGroupsManager.Instance.RemoveKnightGroup(knightGroup);
-            GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup, isProactive: true);
+            AroundKnightGroupsManager.Instance.RemoveKnightGroup(KnightGroup);
+            GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(KnightGroup, isProactive: true);
         }
+        Find.LetterStack.RemoveLetter(this);
     }
 
     public override void Removed()
     {
         base.Removed();
-        knightGroup = null;
+        KnightGroup = null;
     }
 }

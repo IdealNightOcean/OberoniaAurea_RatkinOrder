@@ -365,38 +365,18 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
         {
-            clique.Willingness += change;
-            if (showMessage)
-            {
-                if (change > 0f)
-                {
-                    Messages.Message("OARO_CliqueWillingness_Increase".Translate(clique.Name, change.ToStringPercent("0.##")), MessageTypeDefOf.PositiveEvent);
-                }
-                else
-                {
-                    Messages.Message("OARO_CliqueWillingness_Decrease".Translate(clique.Name, (-change).ToStringPercent("0.##")), MessageTypeDefOf.NegativeEvent);
-                }
-            }
+            clique.AdjustCliqueWillingness(change, showMessage);
         }
     }
 
-    public bool CanBriberyClique(string cliqueKey, Map map)
+    public bool CanBriberyClique(string cliqueKey, Map map, bool resultOnly)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
-            return false;
-        }
-        if (!clique.IsBribable || clique.IsActive)
-        {
-            return false;
+            return clique.CanBribable(map, resultOnly: resultOnly);
         }
 
-        if (map is null || !map.HasEnoughThingsOfDef(ThingDefOf.Silver, clique.BriberyCost))
-        {
-            return false;
-        }
-
-        return true;
+        return false;
     }
 
     public void BriberyClique(string cliqueKey, Map map)
@@ -404,7 +384,9 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
             map.DestoryThingsOfDef(ThingDefOf.Silver, clique.BriberyCost);
-            clique.Willingness += (1f - clique.Willingness);
+            clique.AdjustCliqueWillingness(1f - clique.Willingness);
+
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(clique.Name.Named(KeyLibrary_FormatArgName.CliqueName))));
 
             if (CanActiveClique(clique))
             {
@@ -413,7 +395,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
     }
 
-    public void TryCommunicateWithClique(string cliqueKey, Pawn negotiant)
+    public void TryCommunicateWithClique(string cliqueKey)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique))
         {
@@ -422,11 +404,25 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
                 Log.Error($"[OARO] Trying to commiunicate with an incommunicable clique {clique.Name}.");
                 return;
             }
-
+            float willingnessGain = Rand.Range(0.05f, 0.15f);
+            string text;
             if (clique.PreferredBuilding is not null && branch.BuildingHandler.HasBuilding(clique.PreferredBuilding))
             {
-
+                willingnessGain += 0.15f;
+                text = "OARO_Clique_CommunicateInfoWithPrefer".Translate(
+                    clique.Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                    willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change),
+                    clique.PreferredBuilding.Named("BUILDING"));
             }
+            else
+            {
+                text = "OARO_Clique_CommunicateInfo".Translate(
+                    clique.Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                    willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change));
+            }
+
+            clique.AdjustCliqueWillingness(willingnessGain);
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(text.Translate()));
 
             if (CanActiveClique(clique))
             {

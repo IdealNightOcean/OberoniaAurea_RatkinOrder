@@ -23,6 +23,8 @@ public partial class Window_OrderHall : OrderWindowBase
 
     private Map Map { get; }
     private int CurOrderHallLevel { get; }
+    private int AroundGroupSeasonInvitationLimit { get; }
+
     private IReadOnlyList<string> HallLevelEffectDescs { get; }
     private IReadOnlyList<string> HallLevelRestrictionDescs { get; }
     private Texture2D TopShieldTexture { get; }
@@ -44,6 +46,7 @@ public partial class Window_OrderHall : OrderWindowBase
 
         CurOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
         TopShieldTexture = new CachedTexture($"UI/OrderHall/OARO_TopShield_{CurOrderHallLevel}").Texture;
+        AroundGroupSeasonInvitationLimit = GlobalInteractionUtility.SeasonInvitationLimit();
 
         OrderHallRestrictionExtension hallRestriction = OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
 
@@ -112,12 +115,15 @@ public partial class Window_OrderHall : OrderWindowBase
         Rect rightRect = new(reusedRect.xMax + 19f, infoRectY, 443f, infoRectHeight);
         DrawAroundKnightGroups(rightRect);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, rightRect.y - (36f + 42f), 256f, 42f);
-        Text.Anchor = TextAnchor.MiddleCenter;
-        Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, "OARO_HallWin_AroundKnightGroup".Translate());
         Text.Font = GameFont.Small;
-        Text.Anchor = TextAnchor.UpperLeft;
+        Text.Anchor = TextAnchor.MiddleRight;
+        reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, rightRect.yMin - 36f, 256f, 36f);
+        Widgets.Label(reusedRect, "OARO_HallWin_AroundKnightGroupLimit".Translate(AroundKnightGroupsManager.Instance.SeasonInvitationUsed, AroundGroupSeasonInvitationLimit));
+
+        Text.Font = GameFont.Medium;
+        Text.Anchor = TextAnchor.MiddleCenter;
+        reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, reusedRect.yMin - 42f, 256f, 42f);
+        Widgets.Label(reusedRect, "OARO_HallWin_AroundKnightGroup".Translate());
 
         //顶部绶带
         reusedRect = new(37f, 46f, 1388f, 104f);
@@ -275,9 +281,10 @@ public partial class Window_OrderHall : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_HallWin_NextLevelNeed".Translate());
 
         Rect levelRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 210f);
+        levelRect.yMax = inRect.yMax;
         entryX = levelRect.x;
         entryY = levelRect.y;
-        entryHeight = 30f;
+        entryHeight = levelRect.height / 7f - 0.001f;
 
         Rect levelBuffViewRect = levelRect;
         levelBuffViewRect.width -= 16f;

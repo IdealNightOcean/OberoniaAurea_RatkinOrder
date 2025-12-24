@@ -137,7 +137,6 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
                 Name = "OARO_CliqueName_NobilityCivilian".Translate(Name),
                 ActiveDesc = "OARO_CliqueActiveDesc_NobilityCivilian".Translate(),
                 Potency = -0.075f,
-                Willingness = 0f,
 
                 IsActivatable = true,
                 IsBribable = false,
@@ -156,21 +155,19 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             Name = nobilityName,
             ActiveDesc = "OARO_CliqueActiveDesc_Nobility".Translate(),
             InactiveDesc = "OARO_CliqueInactiveDesc_Nobility".Translate(),
-            Potency = 0.2f,
-            Willingness = 0f,
+            Potency = -0.2f,
 
             IsActivatable = true,
             IsBribable = false,
             IsCommunicable = false
         };
-        CliquesManager.TryAddClique(nobilityClique);
+        CliquesManager.TryAddClique(nobilityClique, defaultActive: true);
 
         QuestClique bureaucratClique = new(NobilityBureaucratCliqueKey)
         {
             Name = "OARO_CliqueName_NobilityBureaucrat".Translate(Name),
             ActiveDesc = "OARO_CliqueActiveDesc_NobilityBureaucrat".Translate(),
             Potency = -0.075f,
-            Willingness = 0f,
 
             IsActivatable = true,
             IsBribable = false,
@@ -358,7 +355,8 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             };
             if (CliquesManager.GetCliqueWillingness(NobilityCliqueKey) < 0.5f)
             {
-                negotiateOpt.Disable("OARO_Insufficient_CliqueWillingness".Translate(nobilityName, 0.5f.ToStringPercent("f2")));
+                negotiateOpt.Disable("OARO_Insufficient_CliqueWillingness".Translate(nobilityName.Named(KeyLibrary_FormatArgName.CliqueName),
+                                                                                     0.5f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance)));
             }
             rootNode.options.Add(negotiateOpt);
         }

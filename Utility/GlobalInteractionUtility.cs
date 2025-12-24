@@ -143,24 +143,46 @@ public static class GlobalInteractionUtility
         return true;
     }
 
+
+
+
     /// <summary>
     /// 玩家邀请附近骑士小组到访
     /// </summary>
     public static void InviteAroundKnightGroup(AroundKnightGroup knightGroup, Map map)
     {
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
-        if (Rand.Chance(chance) && AroundKnightGroupsManager.Instance.TriggerVisitQuest(knightGroup, map))
+        int seasonInvitationLimit = SeasonInvitationLimit();
+        TaggedString text = AroundKnightGroupsManager.Instance.SeasonInvitationUsed > seasonInvitationLimit ? "OARO_InviteAroundKnightGroup_ConfirmOverLimit".Translate(
+                                                                                                                    knightGroup.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                                                                                                                    chance.ToStringPercent().Named(KeyLibrary_FormatArgName.Chance))
+                                                                                                            : "OARO_InviteAroundKnightGroup_Confirm".Translate(
+                                                                                                                knightGroup.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                                                                                                                chance.ToStringPercent().Named(KeyLibrary_FormatArgName.Chance));
+
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+            text,
+            knightGroup.RatkinOrder,
+            acceptAction: Invite);
+
+        Find.WindowStack.Add(nodeTree);
+
+        void Invite()
         {
-            AroundKnightGroupsManager.Instance.SeasonInvitationUsed++;
-            if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed > SeasonInvitationLimit())
+            if (Rand.Chance(chance) && AroundKnightGroupsManager.Instance.TryTriggerVisitQuest(knightGroup, map, isProactive: false, removeWhenInvalid: true))
             {
-                RecommendationUtility.UseRecommendationOfMap(map, 1);
+                if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed > SeasonInvitationLimit())
+                {
+                    RecommendationUtility.UseRecommendationOfMap(map, 1);
+                }
+                AroundKnightGroupsManager.Instance.SeasonInvitationUsed++;
+
             }
-        }
-        else
-        {
-            AroundKnightGroupsManager.Instance.RemoveKnightGroup(knightGroup);
-            AroundKnightGroupVisitInvalidDialog(knightGroup, isProactive: false);
+            else
+            {
+                AroundKnightGroupsManager.Instance.RemoveKnightGroup(knightGroup);
+                AroundKnightGroupVisitInvalidDialog(knightGroup, isProactive: false);
+            }
         }
     }
 
@@ -271,7 +293,7 @@ public static class GlobalInteractionUtility
     /// <summary>
     /// 当前季度无花费邀请骑士小组上限
     /// </summary>
-    private static int SeasonInvitationLimit()
+    public static int SeasonInvitationLimit()
     {
         return OrderHallHandler.Instance.OrderHallLevel switch
         {

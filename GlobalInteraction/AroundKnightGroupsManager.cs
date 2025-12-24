@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean.Collection;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Concurrent;
@@ -84,10 +85,9 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
                 if (listing_Rect.ButtonText("强制触发拜访", widthPct: 0.4f))
                 {
                     Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-                    if (map is null || !TriggerVisitQuest(knightGroup, map))
+                    if (map is null)
                     {
-                        RemoveKnightGroup(knightGroup);
-                        GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(knightGroup, isProactive: false);
+                        TryTriggerVisitQuest(knightGroup, map, isProactive: false, removeWhenInvalid: true);
                     }
                     break;
                 }
@@ -112,33 +112,35 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         RemoveExpiredKnightGroups();
     }
 
-    public void RemoveKnightGroup(AroundKnightGroup knightGroup)
+    public bool RemoveKnightGroup(AroundKnightGroup knightGroup) => aroundKnightGroups.Remove(knightGroup);
+
+    public bool TryTriggerVisitQuest(AroundKnightGroup knightGroup, Map map, bool isProactive, bool removeWhenInvalid = true)
     {
-        if (Instance is null)
+        bool result = false;
+        if (knightGroup is not null && map is not null)
         {
-            Log.Error($"[OARO] Attempted to use {nameof(AroundKnightGroupsManager)} before initialization.");
-            return;
+            Slate slate = new();
+            slate.SetBasicBranchSlateVar(knightGroup.Branch, alsoSetOrder: true);
+            slate.Set("map", map);
+            slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsCount, knightGroup.MemberCount);
+            slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDelay, knightGroup.TravelTicks);
+            int duration = knightGroup.CurBusyLevel switch
+            {
+                AroundKnightGroup.BusyLevel.Leisure => 3 * 60000,
+                AroundKnightGroup.BusyLevel.Busy => 2 * 60000,
+                AroundKnightGroup.BusyLevel.VeryBusy => 1 * 60000,
+                _ => 2 * 60000
+            };
+            slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDuration, duration);
+
+            result = OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
         }
-        Instance.aroundKnightGroups.Remove(knightGroup);
-    }
 
-    public bool TriggerVisitQuest(AroundKnightGroup knightGroup, Map map)
-    {
-        Slate slate = new();
-        slate.SetBasicBranchSlateVar(knightGroup.Branch, alsoSetOrder: true);
-        slate.Set("map", map);
-        slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsCount, knightGroup.MemberCount);
-        slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDelay, knightGroup.TravelTicks);
-        int duration = knightGroup.CurBusyLevel switch
+        if (result || removeWhenInvalid)
         {
-            AroundKnightGroup.BusyLevel.Leisure => 3 * 60000,
-            AroundKnightGroup.BusyLevel.Busy => 2 * 60000,
-            AroundKnightGroup.BusyLevel.VeryBusy => 1 * 60000,
-            _ => 2 * 60000
-        };
-        slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDuration, duration);
-
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
+            RemoveKnightGroup(knightGroup);
+        }
+        return result;
     }
 
     private void CreateNewKnightGroups()
@@ -167,21 +169,8 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 
     private void RemoveExpiredKnightGroups()
     {
-
-        int firstIndexToRemove = 0;
-        for (int i = 0; i < aroundKnightGroups.Count; i++)
-        {
-            if (--aroundKnightGroups[i].DaysToExpired <= 0)
-            {
-                if (i != firstIndexToRemove)
-                {
-                    aroundKnightGroups[firstIndexToRemove] = aroundKnightGroups[i];
-                }
-                firstIndexToRemove++;
-            }
-        }
-
-        if (firstIndexToRemove >= aroundKnightGroups.Count)
+        List<AroundKnightGroup> expiredGroups = aroundKnightGroups.ExtractMatching(g => ((--g.DaysToExpired) <= 0));
+        if (expiredGroups.NullOrEmpty())
         {
             return;
         }
@@ -189,10 +178,9 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
         if (!GlobalInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.KnightGroupProactiveVisit)
             && !Find.QuestManager.ActiveQuestsListForReading.Any(q => q.root == OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit))
         {
-            List<AroundKnightGroup> toRemoveGroups = aroundKnightGroups.GetRange(firstIndexToRemove, aroundKnightGroups.Count - firstIndexToRemove);
-            AroundKnightGroup knightGroup = toRemoveGroups?.Where(g => g.CurBusyLevel == AroundKnightGroup.BusyLevel.Leisure
-                                                                       && g.Branch.IsBranchOfType(Branch.BranchType.Friendly))
-                                                           .RandomElementWithFallback(null);
+            AroundKnightGroup knightGroup = expiredGroups.Where(g => g.CurBusyLevel == AroundKnightGroup.BusyLevel.Leisure
+                                                                  && g.Branch.IsBranchOfType(Branch.BranchType.Friendly))
+                                                         .RandomElementWithFallback(null);
 
             if (knightGroup is not null)
             {
@@ -200,18 +188,16 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
                 QuizAutoVisit(knightGroup);
             }
         }
-
-        aroundKnightGroups.RemoveRange(firstIndexToRemove, aroundKnightGroups.Count - firstIndexToRemove);
     }
 
     private static void QuizAutoVisit(AroundKnightGroup knightGroup)
     {
         ChoiceLetter_KnightGroupProactiveVisit letter = (ChoiceLetter_KnightGroupProactiveVisit)LetterMaker.MakeLetter(
             label: "OARO_AroundKnightGroup_ProactiveVisitQuizLabel".Translate(),
-            text: "OARO_AroundKnightGroup_ProactiveVisitQuizText".Translate(knightGroup.Branch.Name),
+            text: "OARO_AroundKnightGroup_ProactiveVisitQuizText".Translate(knightGroup.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
             def: OARO_LetterDefOf.OARO_KnightGroupProactiveVisitLetter,
             relatedFaction: knightGroup.RatkinOrder.Faction);
-
+        letter.KnightGroup = knightGroup;
         letter.RelatedOrder = knightGroup.RatkinOrder;
         letter.StartTimeout(30000);
         Find.LetterStack.ReceiveLetter(letter);

@@ -104,17 +104,24 @@ public class BranchDemand : IExposable
 
     public string GetFullDesc()
     {
-        StringBuilder sb = new(def.description);
-        sb.AppendLine();
-        sb.AppendLine();
-        sb.Append("OARO_DemandTarget".Translate());
-        sb.AppendLine(":");
-        sb.AppendLine(def.targetDesc);
-        sb.AppendLine();
-        sb.Append("OARO_DemandReward".Translate());
-        sb.AppendLine(":");
-        sb.AppendLine(def.rewardDesc);
-        return sb.ToString();
+        if (def.demandType == DemandType.Critical)
+        {
+            StringBuilder sb = new(def.description);
+            sb.AppendLine();
+            sb.AppendLine();
+            sb.Append("OARO_DemandTarget".Translate());
+            sb.AppendLine(":");
+            sb.AppendLine(def.targetDesc);
+            sb.AppendLine();
+            sb.Append("OARO_DemandReward".Translate());
+            sb.AppendLine(":");
+            sb.AppendLine(def.rewardDesc);
+            return sb.ToString();
+        }
+        else
+        {
+            return def.description;
+        }
     }
 
     public override string ToString()

@@ -16,12 +16,14 @@ public static class KeyLibrary_FormatArgName
 
     public const string Caravan = "Caravan";
     public const string Chance = "Chance";
+    public const string Change = "Change";
     public const string Count = "Count";
     public const string Level = "Level";
 
     public const string ORDER = "ORDER";
     public const string BRANCH = "BRANCH";
 
+    public const string CliqueName = "CliqueName";
     public const string OrderName = "OrderName";
     public const string BranchName = "BranchName";
     public const string ThingsInfo = "ThingsInfo";

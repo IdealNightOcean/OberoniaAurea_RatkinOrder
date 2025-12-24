@@ -9,12 +9,9 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestNode_GetCriticalDemandBranchClique : QuestNode
 {
     public SlateRef<PlanetTile?> centerTile;
-    public SlateRef<int> baseCount = 3;
+    public SlateRef<int> maxCount = 8;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return true;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
@@ -31,7 +28,8 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
             {
                 IsActivatable = true,
                 IsBribable = false,
-                IsCommunicable = true
+                IsCommunicable = true,
+                Potency = QuestClique.BranchPotencyToCliquePotency(demandBranch.Potency)
             };
             demandBranchClique.InitForBranch(demandBranch);
             cliquesManager.TryAddClique(demandBranchClique, defaultActive: true);
@@ -44,7 +42,8 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
             {
                 IsActivatable = true,
                 IsBribable = false,
-                IsCommunicable = true
+                IsCommunicable = true,
+                Potency = QuestClique.BranchPotencyToCliquePotency(branch.Potency)
             };
             branchClique.InitForBranch(branch);
             cliquesManager.TryAddClique(branchClique);
@@ -59,37 +58,42 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
             yield break;
         }
 
-        int leftCount = Mathf.Max(1, baseCount.GetValue(slate));
+        int leftCount = Mathf.Max(1, maxCount.GetValue(slate));
         HashSet<Branch> addedDemandOrderBranch = [];
         RatkinOrder demandOrder = demandBranch?.RatkinOrder;
 
-        // 需求骑士团附近派系
-        if (demandOrder.IsValid())
+        //需求骑士团友好派系
+        foreach (Branch branch in demandBranch.BranchManager.FriendlyBranches)
         {
-            foreach (Branch branch in demandOrder.GetAllAffectedBranchForOrder(centerTile, ValidateBranch))
+            if (!ValidateBranch(branch))
             {
-                yield return branch;
+                continue;
+            }
+            if (Rand.Chance(0.2f))
+            {
                 addedDemandOrderBranch.Add(branch);
+                yield return branch;
                 leftCount--;
                 if (leftCount <= 0)
                 {
                     yield break;
                 }
             }
+        }
 
-            //需求骑士团友好派系
-            foreach (Branch branch in demandBranch.BranchManager.FriendlyBranches)
+        // 需求骑士团附近派系
+        if (demandOrder.IsValid())
+        {
+            foreach (Branch branch in demandOrder.GetAllAffectedBranchForOrder(centerTile, ValidateBranch))
             {
-                if (!ValidateBranch(branch) || addedDemandOrderBranch.Contains(branch))
+                if (Rand.Chance(0.1f) && !addedDemandOrderBranch.Contains(branch))
                 {
-                    continue;
-                }
-
-                yield return branch;
-                leftCount--;
-                if (leftCount <= 0)
-                {
-                    yield break;
+                    yield return branch;
+                    leftCount--;
+                    if (leftCount <= 0)
+                    {
+                        yield break;
+                    }
                 }
             }
         }
@@ -103,11 +107,14 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
             }
             foreach (Branch branch in demandOrder.GetAllAffectedBranchForOrder(centerTile, ValidateBranch))
             {
-                yield return branch;
-                leftCount--;
-                if (leftCount <= 0)
+                if (Rand.Chance(0.03f))
                 {
-                    yield break;
+                    yield return branch;
+                    leftCount--;
+                    if (leftCount <= 0)
+                    {
+                        yield break;
+                    }
                 }
             }
         }

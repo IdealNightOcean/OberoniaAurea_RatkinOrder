@@ -53,7 +53,7 @@ public class Window_BranchSquad : OrderWindowBase
     public Window_BranchSquad(RatkinOrder ratkinOrder, Map map) : base()
     {
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        Map = map ?? throw new ArgumentNullException(nameof(map));
+        Map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: false) ?? Find.CurrentMap ?? throw new ArgumentNullException(nameof(map));
 
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
 
@@ -360,7 +360,8 @@ public class Window_BranchSquad : OrderWindowBase
             acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapSilverToSupply),
             baseTex: middleCombatReadinessButton,
             downTex: middleCombatReadinessButton_Down,
-            doMouseoverSound: true))
+            doMouseoverSound: true,
+            tooltip: BranchInteractionDefOf.OARO_MapSilverToSupply.description))
         {
             BranchInteractionParms parms = new(SelBranch, Map);
             AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_MapSilverToSupply.Worker.CanUseInteraction(parms, resultOnly: false);
@@ -423,7 +424,8 @@ public class Window_BranchSquad : OrderWindowBase
             acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapRecommendationToKnight, fallback: false),
             baseTex: middleCombatReadinessButton,
             downTex: middleCombatReadinessButton_Down,
-            doMouseoverSound: true))
+            doMouseoverSound: true,
+            tooltip: BranchInteractionDefOf.OARO_MapRecommendationToKnight.description))
         {
             BranchInteractionParms parms = new(SelBranch, Map);
             AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_MapRecommendationToKnight.Worker.CanUseInteraction(parms, resultOnly: false);
@@ -527,7 +529,8 @@ public class Window_BranchSquad : OrderWindowBase
             acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_RequestCombatReadiness, fallback: false),
             baseTex: middleCombatReadinessButton,
             downTex: middleCombatReadinessButton_Down,
-            doMouseoverSound: true))
+            doMouseoverSound: true,
+            tooltip: BranchInteractionDefOf.OARO_RequestCombatReadiness.description))
         {
             BranchInteractionParms parms = new(SelBranch, Map);
             AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_RequestCombatReadiness.Worker.CanUseInteraction(parms, resultOnly: false);
@@ -637,7 +640,8 @@ public class Window_BranchSquad : OrderWindowBase
                 acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_UnlockSupportAuthority),
                 baseTex: middleUnlockButton,
                 downTex: middleUnlockButton_Down,
-                doMouseoverSound: true))
+                doMouseoverSound: true,
+                tooltip: BranchInteractionDefOf.OARO_UnlockSupportAuthority.description))
             {
                 BranchInteractionParms parms = new(SelBranch, Map);
                 AcceptanceReport acceptanceReport = BranchInteractionDefOf.OARO_UnlockSupportAuthority.Worker.CanUseInteraction(parms, resultOnly: false);

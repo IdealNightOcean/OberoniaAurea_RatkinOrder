@@ -36,11 +36,11 @@ public class QuestNode_AddBranchClique : QuestNode_AddGeneralClique
         {
             if (branch.IsOnJointPatrol())
             {
-                questClique.Willingness = Rand.Range(0.3f, 0.75f);
+                questClique.AdjustCliqueWillingness(Rand.Range(0.3f, 0.75f), showMessage: false);
             }
             else
             {
-                questClique.Willingness = Rand.Range(0.2f, 0.4f);
+                questClique.AdjustCliqueWillingness(Rand.Range(0.2f, 0.4f), showMessage: false);
             }
         }
         return questClique;

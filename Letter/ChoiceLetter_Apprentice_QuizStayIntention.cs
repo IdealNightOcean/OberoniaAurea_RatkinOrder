@@ -52,7 +52,7 @@ internal class ChoiceLetter_Apprentice_QuizStayIntention : ChoiceLetter
         }
     }
 
-    private DiaOption Option_Stay => new("OARO_Apprentice_Stay".Translate())
+    private DiaOption Option_Stay => new("OARO_Apprentice_Stay".Translate(apprentice.Named(KeyLibrary_FormatArgName.PAWN)))
     {
         action = delegate
         {
@@ -62,7 +62,7 @@ internal class ChoiceLetter_Apprentice_QuizStayIntention : ChoiceLetter
         resolveTree = true
     };
 
-    private DiaOption Option_Leave => new("OARO_Apprentice_Leave".Translate())
+    private DiaOption Option_Leave => new("OARO_Apprentice_Leave".Translate(apprentice.Named(KeyLibrary_FormatArgName.PAWN)))
     {
         action = delegate
         {

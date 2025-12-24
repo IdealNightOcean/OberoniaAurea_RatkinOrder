@@ -45,13 +45,12 @@ public class EsteemHandler : IExposable, ITickDay
     public string LastEsteemChangeReason => lastEsteemChangeReason;
     public float CurEsteemSoftCap => EsteemUtility.GetEsteemSoftCap(relationship);
 
-
     private RelationshipKind relationship = RelationshipKind.Stranger; //当前关系
-    private int lastRelationshipChangeTick = -1;
+    private int lastRelationChangeTick = -1;
     private string lastRelationshipChangeReason = string.Empty;
 
     public RelationshipKind Relationship => relationship;
-    public int LastRelationshipChangeTick => lastRelationshipChangeTick;
+    public int LastRelationChangeTick => lastRelationChangeTick;
     public string LastRelationshipChangeReason => lastRelationshipChangeReason;
 
 
@@ -73,7 +72,7 @@ public class EsteemHandler : IExposable, ITickDay
         Scribe_Values.Look(ref lastEsteemChangeReason, nameof(lastEsteemChangeReason), string.Empty);
 
         Scribe_Values.Look(ref relationship, nameof(relationship), RelationshipKind.Stranger);
-        Scribe_Values.Look(ref lastRelationshipChangeTick, nameof(lastRelationshipChangeTick), -1);
+        Scribe_Values.Look(ref lastRelationChangeTick, nameof(lastRelationChangeTick), -1);
         Scribe_Values.Look(ref lastRelationshipChangeReason, nameof(lastRelationshipChangeReason), string.Empty);
     }
 
@@ -93,7 +92,7 @@ public class EsteemHandler : IExposable, ITickDay
 
         listing_Rect.Gap(6f);
         listing_Rect.Label($"关系: {relationship}");
-        listing_Rect.Label($"最近变化时刻 (Tick): {lastRelationshipChangeTick}");
+        listing_Rect.Label($"最近变化时刻 (Tick): {lastRelationChangeTick}");
         listing_Rect.Label($"最近变化原因: {lastRelationshipChangeReason}");
         if (listing_Rect.ButtonText("提升一级关系", widthPct: 0.5f))
         {
@@ -113,12 +112,13 @@ public class EsteemHandler : IExposable, ITickDay
             esteem--;
         }
 
-        if (Rand.Value < RatkinOrder.GetChanceOfAutoUpgradeRelationship(resultOnly: true, out _))
+        float autoUpgradeChance = RatkinOrder.GetChanceOfAutoUpgradeRelationship(resultOnly: true, out _);
+        if (Rand.Chance(autoUpgradeChance))
         {
             Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
             if (map is not null)
             {
-                RatkinOrder.AutoUpgradeRelationship(map);
+                AutoUpgradeRelationship();
             }
         }
     }
@@ -195,11 +195,32 @@ public class EsteemHandler : IExposable, ITickDay
         relationship = newRelationship;
 
         lastRelationshipChangeReason = reason ?? string.Empty;
-        lastRelationshipChangeTick = Find.TickManager.TicksGame;
+        lastRelationChangeTick = Find.TickManager.TicksGame;
 
         if (sendLetter)
         {
             RelationshipUtility.SendNewRelationshipLetter(RatkinOrder, oldRelationship, newRelationship);
         }
+    }
+
+    /// <summary>
+    /// 骑士团主动提升关系
+    /// </summary>
+    private void AutoUpgradeRelationship()
+    {
+        if (relationship == RelationshipKind.Soulmate)
+        {
+            return;
+        }
+
+        RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AutoRelationshipUpgraded, cdTicks: 10 * 60000, removeWhenExpired: true);
+        ChoiceLetter_AutoUpgradeRelationship letter = (ChoiceLetter_AutoUpgradeRelationship)LetterMaker.MakeLetter(
+            label: "OARO_LetterLabel_AutoUpgradeRelationship".Translate(),
+            text: "OARO_Letter_AutoUpgradeRelationship".Translate(RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+            def: OARO_LetterDefOf.OARO_AutoUpgradeRelationshipQuizLetter,
+            relatedFaction: RatkinOrder.Faction);
+        letter.RelatedOrder = RatkinOrder;
+        letter.StartTimeout(30000);
+        Find.LetterStack.ReceiveLetter(letter);
     }
 }

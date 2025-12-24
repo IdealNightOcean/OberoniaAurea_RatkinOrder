@@ -118,4 +118,20 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         }
         return pawns;
     }
+
+    protected static void SetWorkPrioritySafe(Pawn p, WorkTypeDef workType, int priority)
+    {
+        if (p is null || p.workSettings is null)
+        {
+            return;
+        }
+        if (priority < 0 || priority > 4)
+        {
+            return;
+        }
+        if (!p.WorkTypeIsDisabled(workType))
+        {
+            p.workSettings.SetPriority(workType, priority);
+        }
+    }
 }

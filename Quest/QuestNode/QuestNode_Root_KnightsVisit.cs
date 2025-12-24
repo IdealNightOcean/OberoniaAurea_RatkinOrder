@@ -56,12 +56,12 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
     protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
     {
         base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
-
+        pawn.workSettings.EnableAndInitializeIfNotAlreadyInitialized();
         pawn.workSettings.DisableAll();
-        pawn.workSettings.SetPriority(WorkTypeDefOf.Firefighter, 3);
-        pawn.workSettings.SetPriority(WorkTypeDefOf.Cleaning, 3);
-        pawn.workSettings.SetPriority(WorkTypeDefOf.Handling, 3);
-        pawn.workSettings.SetPriority(OARO_RimWorldDefOf.Patient, 2);
+        SetWorkPrioritySafe(pawn, WorkTypeDefOf.Firefighter, 2);
+        SetWorkPrioritySafe(pawn, WorkTypeDefOf.Cleaning, 3);
+        SetWorkPrioritySafe(pawn, WorkTypeDefOf.Handling, 3);
+        SetWorkPrioritySafe(pawn, OARO_RimWorldDefOf.Patient, 2);
     }
 
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)

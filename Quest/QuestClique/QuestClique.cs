@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -41,12 +43,7 @@ public class QuestClique : IExposable
         }
         set => potency = Mathf.Clamp(value, -1f, 1f);
     }
-
-    public float Willingness
-    {
-        get => willingness;
-        set => willingness = Mathf.Clamp01(value);
-    }
+    public float Willingness => willingness;
 
     public bool IsActive;
     public bool IsActivatable;
@@ -86,12 +83,107 @@ public class QuestClique : IExposable
 
         if (string.IsNullOrEmpty(ActiveDesc))
         {
-            ActiveDesc = "OARO_QuestClique_DefaultBranchActive".Translate(relatedBranch.Name);
+            ActiveDesc = "OARO_QuestClique_DefaultBranchActive".Translate(relatedBranch.Name.Named(KeyLibrary_FormatArgName.BranchName));
         }
         if (string.IsNullOrEmpty(InactiveDesc))
         {
-            InactiveDesc = "OARO_QuestClique_DefaultBranchInactive".Translate(relatedBranch.Name);
+            InactiveDesc = "OARO_QuestClique_DefaultBranchInactive".Translate(relatedBranch.Name.Named(KeyLibrary_FormatArgName.BranchName));
         }
+    }
+
+    public void AdjustCliqueWillingness(float change, bool showMessage = true)
+    {
+        willingness = Mathf.Clamp01(willingness + change);
+        if (showMessage)
+        {
+            if (change > 0f)
+            {
+                Messages.Message(
+                    text: "OARO_CliqueWillingness_Increase".Translate(
+                        Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                        change.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
+                    def: MessageTypeDefOf.PositiveEvent);
+            }
+            else
+            {
+                Messages.Message(
+                    text: "OARO_CliqueWillingness_Decrease".Translate(
+                        Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                        (-change).ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
+                    def: MessageTypeDefOf.NegativeEvent);
+            }
+        }
+    }
+
+
+    public AcceptanceReport CanCommunicable(bool resultOnly)
+    {
+        if (IsActive)
+        {
+            return resultOnly ? false : "OARO_Clique_HasActive".Translate();
+        }
+        if (!IsCommunicable)
+        {
+            return resultOnly ? false : "OARO_Clique_NotCommunicable".Translate();
+        }
+
+        return true;
+    }
+
+    public AcceptanceReport CanActiveable(bool directly, bool resultOnly)
+    {
+        if (!IsActivatable)
+        {
+            return resultOnly ? false : "OARO_Clique_NotActivatable".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+        }
+        if (IsActive)
+        {
+            return resultOnly ? false : "OARO_Clique_HasActive".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+        }
+
+        if (directly)
+        {
+            return true;
+        }
+
+        if (TicksToActive > 0)
+        {
+            return resultOnly ? false : "OARO_Clique_PrepareActivation".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+        }
+
+        if (willingness < 0.9f)
+        {
+            return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                                                                                        0.9f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance));
+        }
+
+        return true;
+    }
+
+    public AcceptanceReport CanBribable(Map map, bool resultOnly)
+    {
+        if (IsActive)
+        {
+            return resultOnly ? false : "OARO_Clique_HasActive".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+        }
+        if (!IsBribable)
+        {
+            return resultOnly ? false : "OARO_Clique_NotBribable".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+        }
+
+
+        if (map is null)
+        {
+            return resultOnly ? false : "OARO_NeedAMap".Translate();
+
+        }
+
+        if (BriberyCost > 0 && map.HasEnoughThingsOfDef(ThingDefOf.Silver, BriberyCost))
+        {
+            return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.LabelCap, BriberyCost);
+        }
+
+        return true;
     }
 
     public void ExposeData()

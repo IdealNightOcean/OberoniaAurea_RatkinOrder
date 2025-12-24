@@ -520,6 +520,7 @@ public class Window_BranchDemand : OrderWindowBase
         public const float RectHeight = 264f;
 
         public Branch Branch { get; }
+        private Map Map { get; }
         public BranchSummaryUICache SummaryUICache { get; }
 
         private Vector2 scrollPosition_Medals;
@@ -529,6 +530,7 @@ public class Window_BranchDemand : OrderWindowBase
         public BranchDemandEntryDrawer(Branch branch, Map map)
         {
             Branch = branch;
+            Map = map;
             SummaryUICache = new(branch, map);
         }
 
@@ -709,7 +711,7 @@ public class Window_BranchDemand : OrderWindowBase
                 Text.Anchor = TextAnchor.MiddleCenter;
                 if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_DemandWin_CliqueDetail".Translate(), checkButton, checkButton_Down))
                 {
-                    Window_QuestClique cliqueWin = new(demand.RelatedQuest, demand.Def);
+                    Window_QuestClique cliqueWin = new(demand, Map);
                     Find.WindowStack.Add(cliqueWin);
                 }
             }
@@ -717,7 +719,6 @@ public class Window_BranchDemand : OrderWindowBase
             {
                 Widgets.Label(reusedRect, demand.TicksToExpire.ToStringTicksToPeriod().Colorize(Color.cyan));
             }
-
 
             Rect medalOutRect = new(infoRect.xMax - (10f + 168f), infoRect.yMax - (6f + 50f), 168f, 50f);
 

@@ -45,13 +45,9 @@ public class WorldObject_ApprenticeHome : WorldObject_Interactive_Nameable
         }
 
         Find.LetterStack.ReceiveLetter(label: "OARO_Apprentice_NoOnePickUpReasonLabel".Translate(),
-                                       text: "OARO_Apprentice_NoOnePickUpReasonText".Translate(
-                                           Apprentice.Named(KeyLibrary_FormatArgName.PAWN),
-                                           GenLabel.ThingsLabel(things).Named(KeyLibrary_FormatArgName.ThingsInfo)),
+                                       text: "OARO_Apprentice_NoOnePickUpReasonText".Translate(Apprentice.Named(KeyLibrary_FormatArgName.PAWN)),
                                        LetterDefOf.NegativeEvent,
                                        lookTargets: this);
-
-
 
         this.SendWorkResolvedSignal();
         this.SafeDestroy();

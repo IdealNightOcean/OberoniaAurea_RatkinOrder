@@ -830,7 +830,8 @@ public class Window_Branch : OrderWindowBase
                 acceptance: acceptance,
                 baseTex: commonInteractionButton,
                 downTex: commonInteractionButton_Down,
-                doMouseoverSound: true))
+                doMouseoverSound: true,
+                tooltip: interactionDef.description))
             {
                 interactionDef.Worker.TryApplyInteraction(new BranchInteractionParms(Branch, Caravan));
                 break;

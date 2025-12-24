@@ -71,16 +71,18 @@ public static class RelationshipUtility
 
         if (byPlayer)
         {
-            if (ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.RelationshipUpgraded))
+            int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(KeyLibrary_CDRecord.RelationshipUpgraded);
+            if (cooldownTicksLeft > 0)
             {
-                return resultOnly ? false : "OARO_Cooling_RelationshipUpgraded".Translate();
+                return resultOnly ? false : $"{"OARO_Cooling_RelationshipUpgraded".Translate()} ({"WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod())})";
             }
         }
         else
         {
-            if (ratkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.AutoRelationshipUpgraded))
+            int cooldownTicksLeft = ratkinOrder.CooldownManager.GetCooldownTicksLeft(KeyLibrary_CDRecord.RelationshipUpgraded);
+            if (cooldownTicksLeft > 0)
             {
-                return resultOnly ? false : "OARO_Cooling_AutoRelationshipUpgraded".Translate();
+                return resultOnly ? false : $"{"OARO_Cooling_AutoRelationshipUpgraded".Translate()} ({"WaitTime".Translate(cooldownTicksLeft.ToStringTicksToPeriod())})";
             }
         }
 
@@ -166,19 +168,22 @@ public static class RelationshipUtility
     public static float GetChanceOfAutoUpgradeRelationship(this RatkinOrder ratkinOrder, bool resultOnly, out string explain)
     {
         explain = string.Empty;
+        StringBuilder sb = resultOnly ? null : new StringBuilder(128);
 
         AcceptanceReport acceptanceReport = CanUpgradeRelationship(ratkinOrder, map: null, byPlayer: false, resultOnly: resultOnly);
         if (!acceptanceReport)
         {
             if (!resultOnly)
             {
-                explain = (acceptanceReport.Reason + ": " + 0f.ToStringPercent()).Colorize(ColorLibrary.Grey);
+                sb.AppendLine("OARO_AutoUpgradeRelationship_Value".Translate(0f.ToStringPercent("0.##")));
+                sb.Append("    ");
+                sb.AppendLine($"{acceptanceReport.Reason ?? string.Empty}: 0% ".Colorize(ColorLibrary.Grey));
+                explain = sb.ToString();
             }
             return 0f;
         }
 
         float curChance = 1f;
-        StringBuilder sb = resultOnly ? null : new StringBuilder();
 
         //认可度
         AddExplain((ratkinOrder.Esteem * 0.01f * 0.2f), "OARO_ChangeFactor_Esteem");
@@ -199,44 +204,33 @@ public static class RelationshipUtility
             AddExplain(1f + friendlyBranchCount * 0.1f, "OARO_ChangeFactor_FriendlyBranchesCount");
         }
 
+        curChance = Mathf.Clamp01(curChance);
+
         if (!resultOnly)
         {
+            sb.Insert(index: 0, "\n", count: 1);
+            sb.Insert(index: 0, "OARO_AutoUpgradeRelationship_Value".Translate(curChance.ToStringPercent("0.##")), count: 1);
             explain = sb.ToString();
         }
-        curChance = Mathf.Clamp01(curChance);
 
         return curChance;
 
         void AddExplain(float change, string reason)
         {
+            if (change == 1f)
+            {
+                return;
+            }
             curChance *= change;
             if (!resultOnly)
             {
-                sb.Append(reason.Translate(change.ToStringPercent("0.##")).Colorize(change < 1f ? ColorLibrary.Red : Color.green));
+                sb.Append("    ");
+                sb.AppendLine(reason.Translate(change.ToStringPercent("0.##")).Colorize(change < 1f ? ColorLibrary.RedReadable : Color.green));
             }
         }
     }
 
-    /// <summary>
-    /// 骑士团主动提升关系
-    /// </summary>
-    public static void AutoUpgradeRelationship(this RatkinOrder ratkinOrder, Map map)
-    {
-        if (ratkinOrder.Relationship == RelationshipKind.Soulmate)
-        {
-            return;
-        }
 
-        ratkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AutoRelationshipUpgraded, cdTicks: 10 * 60000, removeWhenExpired: true);
-        ChoiceLetter_AutoUpgradeRelationship letter = (ChoiceLetter_AutoUpgradeRelationship)LetterMaker.MakeLetter(
-            label: "OARO_LetterLabel_AutoUpgradeRelationship",
-            text: "OARO_Letter_AutoUpgradeRelationship".Translate(ratkinOrder.Name),
-            def: OARO_LetterDefOf.OARO_AutoUpgradeRelationshipQuizLetter,
-            relatedFaction: ratkinOrder.Faction);
-        letter.RelatedOrder = ratkinOrder;
-        letter.StartTimeout(30000);
-        Find.LetterStack.ReceiveLetter(letter);
-    }
 
     /// <summary>
     /// 触发关系提升任务
@@ -309,6 +303,7 @@ public static class RelationshipUtility
             text: sb.ToTaggedString(),
             def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: ratkinOrder,
+            sender: ratkinOrder.Name,
             relatedLetterType: upgraded ? OrderLetter.RelatedLetterType.Positive : OrderLetter.RelatedLetterType.Negative);
     }
 }

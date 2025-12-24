@@ -106,6 +106,10 @@ public static class OARO_WindowUtility
             {
                 TooltipHandler.TipRegion(butRect, acceptance.Reason);
             }
+            if (!string.IsNullOrEmpty(tooltip))
+            {
+                TooltipHandler.TipRegion(butRect, tooltip);
+            }
 
             TextAnchor preAnchor = Text.Anchor;
             Color preColor = GUI.color;

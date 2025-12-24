@@ -58,6 +58,7 @@ public class Window_RatkinOrder : MainTabWindow
     private (int urgency, int supplementary, int acceptable) normalDemandsCache;
     private (int friendly, int acceptable) criticalDemandsCache;
 
+    private LazyMutable<string> AutoUpgradeRelationshipDesc { get; }
     private LazyMutable<List<Branch>> FollowedBranches { get; }
     private Dictionary<OrderInteractionDef, AcceptanceReport> SpecialInteractionAcceptances { get; } = [];
     private List<KeyValuePair<OrderInteractionDef, AcceptanceReport>> NormalInteractionAcceptances { get; } = [];
@@ -97,6 +98,7 @@ public class Window_RatkinOrder : MainTabWindow
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
 
+        AutoUpgradeRelationshipDesc = new(refreshFunc: RefreshAutoUpgradeRelationshipDesc);
         FollowedBranches = new(refreshFunc: RefreshFollowerBranches);
     }
     public Window_RatkinOrder(Map map)
@@ -236,6 +238,10 @@ public class Window_RatkinOrder : MainTabWindow
             {
                 TooltipHandler.TipRegion(reusedRect, relationChangeReason);
             }
+            if (!string.IsNullOrEmpty(AutoUpgradeRelationshipDesc.Value))
+            {
+                TooltipHandler.TipRegion(reusedRect, AutoUpgradeRelationshipDesc.Value);
+            }
         }
 
         reusedRect = new(inRectX + 294f, inRectY + 405f, 14f, 23f);
@@ -249,10 +255,11 @@ public class Window_RatkinOrder : MainTabWindow
         if (OARO_WindowUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: OrderInteractionDefOf.OARO_EnhanceRelationship.LabelCap,
-            acceptance: GetIndependentAcceptanceReport(OrderInteractionDefOf.OARO_EnhanceRelationship),
+            acceptance: SpecialInteractionAcceptances.TryGetValue(OrderInteractionDefOf.OARO_EnhanceRelationship, fallback: false),
             baseTex: leftBigButton,
             downTex: leftBigButton_Down,
-            doMouseoverSound: true))
+            doMouseoverSound: true,
+            tooltip: OrderInteractionDefOf.OARO_EnhanceRelationship.description))
         {
             OrderInteractionDefOf.OARO_EnhanceRelationship.TryApplyInteraction(SelectedOrder, Map);
         }
@@ -292,10 +299,11 @@ public class Window_RatkinOrder : MainTabWindow
             if (OARO_WindowUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: OrderInteractionDefOf.OARO_SponsorOrder.LabelCap,
-                acceptance: GetIndependentAcceptanceReport(OrderInteractionDefOf.OARO_SponsorOrder),
+                acceptance: SpecialInteractionAcceptances.TryGetValue(OrderInteractionDefOf.OARO_SponsorOrder, fallback: false),
                 baseTex: leftBigButton,
                 downTex: leftBigButton_Down,
-                doMouseoverSound: true))
+                doMouseoverSound: true,
+                tooltip: OrderInteractionDefOf.OARO_SponsorOrder.description))
             {
                 OrderInteractionDefOf.OARO_SponsorOrder.TryApplyInteraction(SelectedOrder, Map);
             }
@@ -305,10 +313,11 @@ public class Window_RatkinOrder : MainTabWindow
             if (OARO_WindowUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: OrderInteractionDefOf.OARO_SponsorOrder.label,
-                acceptance: GetIndependentAcceptanceReport(OrderInteractionDefOf.OARO_SponsorOrder),
+                acceptance: SpecialInteractionAcceptances.TryGetValue(OrderInteractionDefOf.OARO_SponsorOrder, fallback: false),
                 baseTex: annualFirstSponsorButton,
                 downTex: annualFirstSponsorButton_Down,
-                doMouseoverSound: true))
+                doMouseoverSound: true,
+                tooltip: OrderInteractionDefOf.OARO_SponsorOrder.description))
             {
                 OrderInteractionDefOf.OARO_SponsorOrder.TryApplyInteraction(SelectedOrder, Map);
             }
@@ -318,10 +327,11 @@ public class Window_RatkinOrder : MainTabWindow
         if (OARO_WindowUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: OrderInteractionDefOf.OARO_ExchangeSupply.LabelCap,
-            acceptance: GetIndependentAcceptanceReport(OrderInteractionDefOf.OARO_ExchangeSupply),
+            acceptance: SpecialInteractionAcceptances.TryGetValue(OrderInteractionDefOf.OARO_ExchangeSupply, fallback: false),
             baseTex: leftBigButton,
             downTex: leftBigButton_Down,
-            doMouseoverSound: true))
+            doMouseoverSound: true,
+            tooltip: OrderInteractionDefOf.OARO_ExchangeSupply.description))
         {
             OrderInteractionDefOf.OARO_ExchangeSupply.TryApplyInteraction(SelectedOrder, Map);
         }
@@ -337,10 +347,10 @@ public class Window_RatkinOrder : MainTabWindow
         Widgets.Label(reusedRect, SelectedOrder.Esteem.ToString());
         if (Mouse.IsOver(reusedRect))
         {
-            if (string.IsNullOrEmpty(SelectedOrder.EsteemHandler.LastEsteemChangeReason))
+            string lastEsteemChangeTip = $"{SelectedOrder.EsteemHandler.LastEsteemChangeReason} ({SelectedOrder.EsteemHandler.LastEsteemChange.ToStringWithSign()})";
+            if (string.IsNullOrEmpty(lastEsteemChangeTip))
             {
-                string esteemChangeReason = $"{SelectedOrder.EsteemHandler.LastEsteemChangeReason} ({SelectedOrder.EsteemHandler.LastEsteemChange.ToStringWithSign()})";
-                TooltipHandler.TipRegion(reusedRect, esteemChangeReason);
+                TooltipHandler.TipRegion(reusedRect, () => lastEsteemChangeTip, uniqueId: 47525641);
             }
         }
 
@@ -404,7 +414,8 @@ public class Window_RatkinOrder : MainTabWindow
                 acceptance: kv.Value,
                 baseTex: normalInteractionButton,
                 downTex: normalInteractionButton_Down,
-                doMouseoverSound: true))
+                doMouseoverSound: true,
+                tooltip: kv.Key.description))
             {
                 kv.Key.Worker.TryApplyInteraction(SelectedOrder, Map);
             }
@@ -790,10 +801,11 @@ public class Window_RatkinOrder : MainTabWindow
         if (OARO_WindowUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: string.Empty,
-            acceptance: GetIndependentAcceptanceReport(OrderInteractionDefOf.OARO_InviteBranchCreation),
+            acceptance: SpecialInteractionAcceptances.TryGetValue(OrderInteractionDefOf.OARO_InviteBranchCreation, fallback: false),
             baseTex: inviteBranchCreationButton,
             downTex: inviteBranchCreationButton_Down,
-            doMouseoverSound: true))
+            doMouseoverSound: true,
+            tooltip: OrderInteractionDefOf.OARO_InviteBranchCreation.description))
         {
             Close();
             OrderInteractionDefOf.OARO_InviteBranchCreation.TryApplyInteraction(SelectedOrder, Map);
@@ -979,6 +991,17 @@ public class Window_RatkinOrder : MainTabWindow
         SelectedOrder.PostApplyOrderInteraction += RefreshRatkinInteractionCache;
     }
 
+    private string RefreshAutoUpgradeRelationshipDesc()
+    {
+        if (SelectedOrder is null)
+        {
+            return string.Empty;
+        }
+
+        SelectedOrder.GetChanceOfAutoUpgradeRelationship(resultOnly: false, out string explanation);
+        return explanation;
+    }
+
     private List<Branch> RefreshFollowerBranches()
     {
         if (SelectedOrder is null)
@@ -1032,15 +1055,6 @@ public class Window_RatkinOrder : MainTabWindow
                 }
             }
         }
-    }
-
-    private AcceptanceReport GetIndependentAcceptanceReport(OrderInteractionDef def)
-    {
-        if (SpecialInteractionAcceptances.TryGetValue(def, out AcceptanceReport acceptance))
-        {
-            return acceptance;
-        }
-        return false;
     }
 
     private void ClearRatkinOrderCache()
