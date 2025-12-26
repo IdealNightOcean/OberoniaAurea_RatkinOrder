@@ -25,6 +25,16 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
         base.Notify_CaravanArrived(caravan);
     }
 
+    public override bool StartWork(Caravan caravan)
+    {
+        if (base.StartWork(caravan))
+        {
+            Messages.Message("OARO_CelebrationHost_Arrival".Translate(this.Named(KeyLibrary_FormatArgName.WORLDOBJECT)), MessageTypeDefOf.PositiveEvent);
+            return true;
+        }
+        return false;
+    }
+
     protected override void FinishWork()
     {
         if (associatedFixedCaravan is not null)

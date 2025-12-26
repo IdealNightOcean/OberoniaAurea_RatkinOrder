@@ -99,7 +99,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
             Messages.Message(
                 text: "OARO_WolfDisasterGossipPoint_SearchFailed".Translate(),
                 lookTargets: caravan,
-                def: MessageTypeDefOf.NegativeEvent,
+                def: MessageTypeDefOf.NeutralEvent,
                 historical: false);
             return;
         }
@@ -163,7 +163,6 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
         Find.WindowStack.Add(new Dialog_NodeTreeWithFactionInfo(rootNode, Faction));
     }
-
 
     private DiaNode IntuitionRootNode(Caravan caravan)
     {

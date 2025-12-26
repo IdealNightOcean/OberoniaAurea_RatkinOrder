@@ -72,14 +72,9 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
+        map.DestoryThingsOfDef(ThingDefOf.Silver, ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
         ratkinOrder.BranchManager.Notify_NewBranchInviteCreated();
         return (true, true);
-    }
-
-    protected override void DoInteractionCost(RatkinOrder ratkinOrder, Map map)
-    {
-        base.DoInteractionCost(ratkinOrder, map);
-        map.DestoryThingsOfDef(ThingDefOf.Silver, ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
     }
 
     private static AcceptanceReport IsValidTileForInviteBranchCreation(RatkinOrder ratkinOrder, Map map, PlanetTile tile, bool resultOnly)

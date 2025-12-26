@@ -186,10 +186,9 @@ public static class RecommendationUtility
     {
         return ratkinOrder.Esteem switch
         {
-            < 30 => 5,
-            < 70 => 4,
-            < 90 => 3,
-            _ => 2
+            < 50 => 3,
+            < 90 => 2,
+            _ => 1
         };
     }
 

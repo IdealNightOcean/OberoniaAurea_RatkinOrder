@@ -38,7 +38,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
         float innerRectX = innerRect.xMin;
         float innerRectY = innerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX(innerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(innerRect))
         {
             Close();
             return;

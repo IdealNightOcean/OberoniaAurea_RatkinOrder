@@ -220,16 +220,12 @@ public class BranchManager : IExposable, ITickDay
             return;
         }
 
-        List<KeyValuePair<Branch, BranchStoresReserveHandler.ReserveRecord>> potentialReserves = AllPrimaryReserves.Where(pr => pr.Value.CostRateReduce >= 0.3f).ToList();
-
-        for (int i = potentialReserves.Count - 1; i >= 0; i--)
+        foreach ((Branch branch, BranchStoresReserveHandler.ReserveRecord reserve) in AllPrimaryReserves.Where(pr => pr.Value.CostRateReduce <= BranchStoresReserveHandler.ConstructionBoundary))
         {
             if (Rand.Chance(0.95f))
             {
                 continue;
             }
-
-            (Branch branch, BranchStoresReserveHandler.ReserveRecord reserve) = potentialReserves[i];
 
             bool successConstruct = false;
             if (reserve.Target is BranchBuildingDef reserveBuilding)

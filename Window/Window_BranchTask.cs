@@ -75,8 +75,15 @@ public partial class Window_BranchTask : OrderWindowBase
         float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
+            Close();
+            return;
+        }
+        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        {
+            Window_RatkinOrder ratkinOrderWin = new(Map);
+            Find.WindowStack.Add(ratkinOrderWin);
             Close();
             return;
         }

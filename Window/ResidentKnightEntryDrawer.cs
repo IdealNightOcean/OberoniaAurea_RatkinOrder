@@ -93,7 +93,7 @@ public partial class Window_OrderHall
             reusedRect = new(summaryInnerRectX + 30f, summaryInnerRectY, 50f, titleRectHeight);
             Widgets.Label(reusedRect, Record.Knight.NameShortColored);
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(tileRect, summaryInnerRectX + 115f, 45f, titleRectHeight - 2f);
+            reusedRect = OARO_WindowUtility.CenterRectOnY(tileRect, summaryInnerRectX + 105f, 45f, titleRectHeight - 2f);
             if (Record.CurRole is not null)
             {
                 GUI.DrawTexture(reusedRect, Record.CurRole.iconTexture.Texture, ScaleMode.ScaleToFit);
@@ -488,8 +488,20 @@ public partial class Window_OrderHall
 
         private void RoleChangeConfirmDialog(ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
         {
-            StringBuilder sb = new("OARO_HallWin_RoleChangeConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
-            sb.AppendLine();
+            StringBuilder sb = new(256);
+            ResidentKnightsManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnightRecord roleRecord);
+            if (roleRecord is null)
+            {
+                sb.AppendLine("OARO_HallWin_RoleChangeConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
+            }
+            else
+            {
+                sb.AppendLine("OARO_HallWin_RoleChangeConfirm_Replace".Translate(
+                    Record.Knight.Named(KeyLibrary_FormatArgName.PAWN),
+                    roleRecord.Knight.Named("OTHER"),
+                    roleDef.Named("ROLEDEF")));
+            }
+
             sb.AppendLine();
             sb.AppendLine(roleDef.GetRoleDetailDesc());
             Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(

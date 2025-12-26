@@ -32,7 +32,7 @@ public class BranchDemand : IExposable
 
     public BranchDemandDef Def => def;
     public bool HasAccepted => curState != DemandState.NotAccepted;
-    public bool IsOngoing => curState == DemandState.Ongoing;
+    public bool IsOngoing => curState == DemandState.Ongoing && relatedQuest?.State == QuestState.Ongoing;
     public DemandType DemandTypeValue => def.demandType;
     public Quest RelatedQuest => relatedQuest;
     public int TicksToExpire => expirationTick - Find.TickManager.TicksGame;

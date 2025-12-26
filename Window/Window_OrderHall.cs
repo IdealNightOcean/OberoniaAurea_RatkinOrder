@@ -78,7 +78,7 @@ public partial class Window_OrderHall : OrderWindowBase
         Rect mainInnerRect = mainRect.ContractedBy(4f);
         float mainInnerRectY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
@@ -163,6 +163,9 @@ public partial class Window_OrderHall : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         Rect reusedRect = new(innerRectX + 30f, innerRectY, 50f, 22f);
         Widgets.Label(reusedRect, "OARO_HallWin_Knight".Translate());
+
+        reusedRect = new(innerRectX + 105f, innerRectY, 45f, 22f);
+        Widgets.Label(reusedRect, "OARO_HallWin_KnightRole".Translate());
 
         reusedRect = new(innerRectX + 150f, innerRectY, 85f, 22f);
         Widgets.Label(reusedRect, "OARO_HallWin_MeditationFactor".Translate());

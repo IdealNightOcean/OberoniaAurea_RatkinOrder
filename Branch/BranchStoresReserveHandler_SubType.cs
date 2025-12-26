@@ -8,6 +8,9 @@ public partial class BranchStoresReserveHandler
     {
         public abstract BranchConstructionDef Target { get; }
 
+        /// <summary>
+        /// 花费减免（负数）
+        /// </summary>
         public float CostRateReduce;
 
         public ReserveRecord() { }

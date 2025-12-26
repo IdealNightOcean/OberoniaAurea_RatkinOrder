@@ -17,15 +17,17 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
     }
     private (Faction parentFaction, Faction subFaction) GetFactions()
     {
-        Faction parentFaction = OAFrame_FactionUtility.FirstAvailableFactionOf(validationParams: FactionValidationParams.NonHostileNormalFaction,
-                                                                               predicater: f => f.IsRatkinKindomFaction());
+        Faction parentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction);
+        parentFaction ??= OAFrame_FactionUtility.FirstAvailableFactionOf(validationParams: FactionValidationParams.NonHostileNormalFaction,
+                                                                       predicater: f => f.IsRatkinKindomFaction());
         if (parentFaction is null)
         {
             return (null, null);
         }
-        Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef: QuestGen.slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.subFactionDef) ?? OARO_ModDefOf.OARO_SubRakinia_Neutral,
-                                                                 parentFactionDef: parentFaction.def,
-                                                                 parentFaction: parentFaction);
+        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
+        subFaction ??= ModUtility.GenerateSubRatkinFaction(subFactionDef: QuestGen.slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.subFactionDef) ?? OARO_ModDefOf.OARO_SubRakinia_Neutral,
+                                                           parentFactionDef: parentFaction.def,
+                                                           parentFaction: parentFaction);
         return (parentFaction, subFaction);
     }
 
@@ -108,6 +110,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
 
         quest.Delay(delayTicks: 20000,
                     inner: null,
+                    inSignalEnable: inSignalPawnArrival,
                     inSignalDisable: outSignalResolved,
                     outSignalComplete: outSignalExpired,
                     reactivatable: false);
@@ -123,9 +126,6 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
             Reason = "OARO_TaxCollectorCome_Fail".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_Fail);
-
-        quest.End(QuestEndOutcome.Fail, -25, parentFaction, inSignalRemovePawn, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Fail, -5, parentFaction, outSignalExpired, sendStandardLetter: true);
 
         QuestPart_LordJob_TaxCollector questPart_LordJob_TaxCollector = new()
         {
@@ -152,6 +152,9 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         };
 
         quest.AddPart(questPart_AllOrdersEsteemChange_Suucess);
+
+        quest.End(QuestEndOutcome.Fail, -25, parentFaction, inSignalRemovePawn, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Fail, -5, parentFaction, outSignalExpired, sendStandardLetter: true);
         quest.End(QuestEndOutcome.Success, 0, null, outSignalResolved, sendStandardLetter: true);
         quest.End(QuestEndOutcome.Unknown, 0, null, outSignalTreatFail, sendStandardLetter: true);
     }

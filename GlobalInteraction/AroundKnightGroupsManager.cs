@@ -85,9 +85,9 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
                 if (listing_Rect.ButtonText("强制触发拜访", widthPct: 0.4f))
                 {
                     Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-                    if (map is null)
+                    if (map is not null)
                     {
-                        TryTriggerVisitQuest(knightGroup, map, isProactive: false, removeWhenInvalid: true);
+                        TryTriggerVisitQuest(knightGroup, map, removeWhenInvalid: true);
                     }
                     break;
                 }
@@ -114,7 +114,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 
     public bool RemoveKnightGroup(AroundKnightGroup knightGroup) => aroundKnightGroups.Remove(knightGroup);
 
-    public bool TryTriggerVisitQuest(AroundKnightGroup knightGroup, Map map, bool isProactive, bool removeWhenInvalid = true)
+    public bool TryTriggerVisitQuest(AroundKnightGroup knightGroup, Map map, bool removeWhenInvalid = true)
     {
         bool result = false;
         if (knightGroup is not null && map is not null)

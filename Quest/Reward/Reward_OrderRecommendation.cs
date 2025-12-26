@@ -22,7 +22,7 @@ public class Reward_OrderRecommendation : Reward
             yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_OrderRecommendation".Translate() + " " + Count.ToStringWithSign(),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
-                                                                            GUI.DrawTexture(r, null); //OARO_ThingDefOf.OARO_OrderRecommendation.uiIcon
+                                                                            GUI.DrawTexture(r, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
                                                                             GUI.color = Color.white;
                                                                         },
                                                                         tipGetter: () => "OARO_Reward_OrderRecommendationTip".Translate().Resolve());

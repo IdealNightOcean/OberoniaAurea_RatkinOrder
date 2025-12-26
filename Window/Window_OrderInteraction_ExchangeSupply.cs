@@ -44,7 +44,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1308f, 733f);
 
         Rect mainInnerRect = mainRect.ContractedBy(2f);
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;

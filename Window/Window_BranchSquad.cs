@@ -89,8 +89,15 @@ public class Window_BranchSquad : OrderWindowBase
         float areaRectY = mainInnerRectY + 205f;
         float areaRectHeight = 657f;
 
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
+            Close();
+            return;
+        }
+        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        {
+            Window_RatkinOrder ratkinOrderWin = new(Map);
+            Find.WindowStack.Add(ratkinOrderWin);
             Close();
             return;
         }

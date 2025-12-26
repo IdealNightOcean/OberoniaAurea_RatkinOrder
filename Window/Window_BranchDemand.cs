@@ -41,6 +41,8 @@ public class Window_BranchDemand : OrderWindowBase
 
     private LazyMutable<QuestPart_CliquesManager> SelDemandCliqueManager { get; }
 
+    public Action PostCloseAction { get; set; }
+
     private Vector2 scrollPosition_Demands;
     private Vector2 scrollPosition_DemandDesc;
 
@@ -142,9 +144,19 @@ public class Window_BranchDemand : OrderWindowBase
     public override void PostClose()
     {
         base.PostClose();
+
         BranchWithDemandsCache.Clear();
         TabDemandEntryCaches.Clear();
         Tabs.Clear();
+
+        try
+        {
+            PostCloseAction?.Invoke();
+        }
+        finally
+        {
+            PostCloseAction = null;
+        }
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -152,8 +164,15 @@ public class Window_BranchDemand : OrderWindowBase
         Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1339f, 908f);
         GUI.DrawTexture(mainRect, mainBackground);
         Rect mainInnerRect = mainRect.ContractedBy(3f);
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
+            Close();
+            return;
+        }
+        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        {
+            Window_RatkinOrder ratkinOrderWin = new(Map);
+            Find.WindowStack.Add(ratkinOrderWin);
             Close();
             return;
         }

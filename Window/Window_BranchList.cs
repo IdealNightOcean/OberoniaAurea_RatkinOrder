@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Window_BranchList : OrderWindowBase
 {
-    public override Vector2 InitialSize => new(713f, 685f);
+    public override Vector2 InitialSize => new(713f, 732f);
 
     private Vector2 scrollPosition_Branch;
 
@@ -30,7 +30,7 @@ public class Window_BranchList : OrderWindowBase
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect mainRect = inRect.BottomPartPixels(653f);
+        Rect mainRect = inRect.BottomPartPixels(700f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Tabs.Clear();
@@ -47,8 +47,15 @@ public class Window_BranchList : OrderWindowBase
 
         Rect mainInnerRect = mainRect.ContractedBy(2f);
 
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
+            Close();
+            return;
+        }
+        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        {
+            Window_RatkinOrder ratkinOrderWin = new(Map);
+            Find.WindowStack.Add(ratkinOrderWin);
             Close();
             return;
         }

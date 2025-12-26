@@ -73,6 +73,16 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         SkillCheckedSignal = null;
     }
 
+    protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
+    {
+        base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
+        if (pawn.ageTracker.AgeBiologicalYearsFloat < 7f)
+        {
+            float ageAddYear = 7f - pawn.ageTracker.AgeBiologicalYearsFloat;
+            pawn.ageTracker.AgeBiologicalTicks -= (long)((ageAddYear + 0.1f) * 3600000f);
+        }
+    }
+
     protected override void SetPawnsLeaveComp(string lodgerArrivalSignal, string inSignalRemovePawn)
     {
         Quest quest = QuestGen.quest;

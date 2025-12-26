@@ -37,12 +37,12 @@ public static class BranchConstructUtility
         costFactor = branch.StoresReserveHandler.GetReserveCostReduce(buildingDef);
         if (costFactor != 0f)
         {
-            cost *= (1f - costFactor);
+            cost *= (1f + costFactor);
             if (!resultOnly)
             {
                 explanationSB.AppendLine();
                 explanationSB.Append("- ");
-                explanationSB.AppendLine("OARO_BuildSilverCost_ReserveReduction".Translate((-costFactor).ToStringPercent("F1")).Colorize(Color.green));
+                explanationSB.AppendLine("OARO_BuildSilverCost_ReserveReduction".Translate(costFactor.ToStringPercent("F1")).Colorize(Color.green));
 
             }
         }
@@ -107,12 +107,12 @@ public static class BranchConstructUtility
         costFactor = branch.StoresReserveHandler.GetReserveCostReduce(facilityDef);
         if (costFactor != 0f)
         {
-            cost *= (1f - costFactor);
+            cost *= (1f + costFactor);
             if (!resultOnly)
             {
                 explanationSB.AppendLine();
                 explanationSB.Append("- ");
-                explanationSB.AppendLine("OARO_BuildSilverCost_ReserveReduction".Translate((-costFactor).ToStringPercent("F1")).Colorize(Color.green));
+                explanationSB.AppendLine("OARO_BuildSilverCost_ReserveReduction".Translate(costFactor.ToStringPercent("F1")).Colorize(Color.green));
             }
         }
 

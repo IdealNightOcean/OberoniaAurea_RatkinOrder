@@ -83,21 +83,21 @@ public class BranchContract : IExposable
         curState = ContractState.Ongoing;
     }
 
-    public AcceptanceReport CanFulfill(Caravan caravan)
+    public AcceptanceReport CanFulfill(Caravan caravan, bool resultOnly)
     {
         if (!ValidOngoing)
         {
-            return false;
+            return resultOnly ? false : "OARO_InvalidContract".Translate();
         }
         if (caravan is null)
         {
-            return false;
+            return resultOnly ? false : "OARO_NeedACaravan".Translate();
         }
         if (CaravanInventoryUtility.HasThings(caravan, RequestThingDef, requestCount))
         {
             return true;
         }
-        return "OAFrame_NeedCountOfThing".Translate(RequestThingDef.label, requestCount);
+        return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(RequestThingDef.label, requestCount);
     }
 
     public void Fulfill(Caravan caravan, Branch branch)

@@ -1,5 +1,4 @@
 ﻿using RimWorld;
-using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -15,10 +14,5 @@ internal sealed class QuestPart_CollectionTeam_MaterialSupply : QuestPart_Collec
         {
             Branch.Supply += 0.5f;
         }
-    }
-
-    protected override TaggedString GetTalkNodeText(Pawn talker, Pawn talkWith)
-    {
-        return "OARO_Demand_MaterialSupplyInfo".Translate(talkWith) + "\n\n" + RequestThingsSummary();
     }
 }

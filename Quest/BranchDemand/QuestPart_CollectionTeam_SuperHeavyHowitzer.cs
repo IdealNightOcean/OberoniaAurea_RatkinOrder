@@ -46,7 +46,7 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
 
     private new Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talker, Pawn talkWith, Map map)
     {
-        DiaNode rootNode = new(GetTalkNodeText(talker, talkWith));
+        DiaNode rootNode = new(RawTalkText.Formatted(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)));
 
         DiaOption giveOpt = new("OARO_GiveRequestThings".Translate())
         {
@@ -82,11 +82,6 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
 
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(rootNode, RatkinOrder);
         return nodeTree;
-    }
-
-    protected override TaggedString GetTalkNodeText(Pawn talker, Pawn talkWith)
-    {
-        return "OARO_Demand_SuperHeavyHowitzerInfo".Translate(talkWith) + "\n\n" + RequestThingsSummary(); ;
     }
 
     private AcceptanceReport CanGiveHowitzer(Map map)

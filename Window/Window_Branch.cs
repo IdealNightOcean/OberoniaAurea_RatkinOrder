@@ -291,7 +291,7 @@ public class Window_Branch : OrderWindowBase
             SwitchTab(TabType.Construction);
         }
         Rect demandTabRect = new(constructionTabRect.xMax, inRect.y, tabRectWidth, 45f);
-        if (OARO_WindowUtility.TextButtonImage(demandTabRect, "OARO_BranchWin_DemandTab".Translate(), middleTopButton, middleTopButton_Down))
+        if (OARO_WindowUtility.TextButtonImage(demandTabRect, "OARO_BranchWin_ContractTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Contract);
         }
@@ -719,11 +719,11 @@ public class Window_Branch : OrderWindowBase
                     if (cooling)
                     {
                         GUI.DrawTexture(reusedRect, contractButton_Down);
-                        Widgets.Label(reusedRect, "OAFramne_Submit".Translate());
+                        Widgets.Label(reusedRect, "OAFrame_Submit".Translate());
                     }
                     else if (OARO_WindowUtility.TextButtonImageDisableable(
                         butRect: reusedRect,
-                        label: "OAFramne_Submit".Translate(),
+                        label: "OAFrame_Submit".Translate(),
                         acceptance: acceptance,
                         baseTex: contractButton,
                         downTex: contractButton_Down,
@@ -876,13 +876,16 @@ public class Window_Branch : OrderWindowBase
         {
             entryRect = new(entryRectX, entryRectY, entryRectWidth, entryRectHeight);
             entryRectY += entryRectHeight;
-            DrawBuildingInteractionEntry(entryRect, buildingInteractionAcceptances[i].Item1, buildingInteractionAcceptances[i].Item2);
+            if (DrawBuildingInteractionEntry(entryRect, buildingInteractionAcceptances[i].Item1, buildingInteractionAcceptances[i].Item2))
+            {
+                break;
+            }
         }
         Text.Anchor = TextAnchor.UpperLeft;
         Widgets.EndScrollView();
     }
 
-    private void DrawBuildingInteractionEntry(Rect inRect, BranchBuildingComp_Interaction interactionComp, AcceptanceReport acceptance)
+    private bool DrawBuildingInteractionEntry(Rect inRect, BranchBuildingComp_Interaction interactionComp, AcceptanceReport acceptance)
     {
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x + 15f, 36f, 36f);
         GUI.DrawTexture(reusedRect, interactionComp.Parent.Def.iconTexture.Texture, ScaleMode.ScaleToFit);
@@ -899,7 +902,9 @@ public class Window_Branch : OrderWindowBase
             doMouseoverSound: true))
         {
             interactionComp.TryApplyInteraction(Caravan);
+            return true;
         }
+        return false;
     }
 
     private void DrawLeftRect(Rect inRect)
@@ -1543,7 +1548,7 @@ public class Window_Branch : OrderWindowBase
             AcceptanceReport acceptance;
             try
             {
-                acceptance = contract.CanFulfill(Caravan);
+                acceptance = contract.CanFulfill(Caravan, resultOnly: false);
             }
             catch
             {

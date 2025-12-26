@@ -1,6 +1,8 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -57,30 +59,44 @@ public class MercyQuestHandler : IExposable
 
     public void PeriodicTriggerMercyQuest()
     {
-        if (OrderHallHandler.Instance.OrderHallRoom is null || GlobalInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
+        if (TryPeriodicTriggerMercyQuest())
         {
-            return;
+            mercyQuestBaseChance = 0f;
         }
+        else
+        {
+            mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.1f, 0.8f);
+        }
+    }
+
+    private bool TryPeriodicTriggerMercyQuest()
+    {
+        if (OrderHallHandler.Instance.OrderHallRoom is null || GlobalInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
+            return false;
 
         GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, removeWhenExpired: true);
 
-        Map map;
-        if (Rand.Chance(1f - GetMercyQuestChance(mercyQuestBaseChance)) || (map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false)) is null)
-        {
-            mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.1f, 0.8f);
-            return;
-        }
+        if (Rand.Chance(1f - GetMercyQuestChance()))
+            return false;
 
-        foreach (MercyQuestDef mercyQuestDef in DefDatabase<MercyQuestDef>.AllDefsListForReading.TakeRandomElements(5))
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+        if (map is null)
+            return false;
+
+        int potentialCount = Mathf.Clamp(DefDatabase<MercyQuestDef>.DefCount / 3, 5, 10);
+        List<MercyQuestDef> potentialMercies = DefDatabase<MercyQuestDef>.AllDefsListForReading.TakeRandom(potentialCount).Where(m => m.secondSelectWeight > 0f).ToList();
+        while (potentialMercies.Count > 0)
         {
-            if (TryTriggerMercyQuest(mercyQuestDef, map))
+            MercyQuestDef mercyQuestDef = potentialMercies.RandomElementByWeight(m => m.secondSelectWeight);
+            if (mercyQuestDef is not null && TryTriggerMercyQuest(mercyQuestDef, map))
             {
                 mercyQuestBaseChance = 0f;
-                return;
+                return true;
             }
+            potentialMercies.Remove(mercyQuestDef);
         }
 
-        mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.1f, 0.8f);
+        return false;
     }
 
     public static bool TryTriggerMercyQuest(MercyQuestDef mercyQuestDef, Map map)
@@ -100,9 +116,9 @@ public class MercyQuestHandler : IExposable
             target: map);
     }
 
-    private static float GetMercyQuestChance(float baseChance)
+    private float GetMercyQuestChance()
     {
-        float chance = baseChance;
+        float chance = mercyQuestBaseChance;
         if (ResidentKnightsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnightRecord record))
         {
             chance *= (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(record.Knight) ?? 1f;

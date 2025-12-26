@@ -211,6 +211,17 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder) => RemoveAllInvalidRecord((record) => record.Branch.RatkinOrder == ratkinOrder);
     public void Notify_BranchDestroyed(Branch branch) => RemoveAllInvalidRecord((record) => record.Branch == branch);
 
+    public void AddResidentKnight(Pawn pawn)
+    {
+        if (!KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out KnightRecord kRecord))
+        {
+            Log.Error($"[OARO] Try add a non-knight pawn to {nameof(ResidentKnightsManager)}");
+            return;
+        }
+
+        AddResidentKnight(pawn, kRecord);
+    }
+
     public void AddResidentKnight(Pawn pawn, KnightRecord knightRecord)
     {
         if (!residentKnights.ContainsKey(pawn))
@@ -319,13 +330,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
                     rolesToKnights[roleDef] = pawnRecord;
                     break;
                 }
-            //双方交换职位
+            //替代对方职位
             case (not null, not null):
                 {
-                    curRolePawnRecord.ChangeRole(pOldRole);
+                    curRolePawnRecord.ChangeRole(null);
                     pawnRecord.ChangeRole(roleDef);
 
-                    rolesToKnights[pOldRole] = curRolePawnRecord;
+                    rolesToKnights.Remove(pOldRole);
                     rolesToKnights[roleDef] = pawnRecord;
                     break;
                 }

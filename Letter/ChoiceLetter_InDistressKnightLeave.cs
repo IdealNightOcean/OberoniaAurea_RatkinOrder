@@ -88,10 +88,7 @@ internal class ChoiceLetter_InDistressKnightLeave : ChoiceLetter_RatkinOrder
             foreach (Pawn p in Pawns)
             {
                 OAFrame_PawnUtility.MakePawnJoinPlayer(p);
-                if (KnightPawnsManager.Instance.TryGetKnightRecord(p, out KnightRecord record))
-                {
-                    ResidentKnightsManager.Instance.AddResidentKnight(p, record);
-                }
+                ResidentKnightsManager.Instance.AddResidentKnight(p);
             }
         }
 

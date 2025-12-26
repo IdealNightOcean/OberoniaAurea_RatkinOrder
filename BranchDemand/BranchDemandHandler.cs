@@ -233,7 +233,7 @@ public class BranchDemandHandler : ITickDay, IExposable
                 if (replaceCur)
                 {
                     return !normalDemand.IsOngoing
-                        && (ignoreCD || branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd));
+                        && (ignoreCD || !branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd));
                 }
                 else
                 {
@@ -242,7 +242,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             }
             else
             {
-                return ignoreCD || branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd);
+                return ignoreCD || !branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.NormalDemandAdd);
             }
         }
     }

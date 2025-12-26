@@ -56,11 +56,15 @@ public static class OARO_ModDefOf
     /// </summary>
     public static IncidentDef OARO_RaidNobilityTerritory;
 
-
     /// <summary>
     /// 丢东西的旅行商人
     /// </summary>
     public static IsolatedPawnGroupMakerDef OARO_LostItemsOfTrader;
+
+    /// <summary>
+    /// 骑士团总览
+    /// </summary>
+    public static MainButtonDef OARO_KnightOrdersOverview;
 
     public static RoomRoleDef OARO_RatkinOrderHall;
 

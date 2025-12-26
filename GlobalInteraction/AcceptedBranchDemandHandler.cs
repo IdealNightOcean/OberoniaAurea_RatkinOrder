@@ -29,7 +29,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (records.RemoveAll(r => r is null || !r.Branch.IsValid()) > 0)
+            if (records.RemoveAll(r => r is null || !r.IsValid) > 0)
             {
                 Log.Error($"[OARO] Some {nameof(AcceptedBranchDemand)} were null or invalided after loading and have been removed.");
             }

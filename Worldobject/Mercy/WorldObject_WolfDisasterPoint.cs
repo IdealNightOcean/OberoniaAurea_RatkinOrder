@@ -130,6 +130,10 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
             case WorkType.ObtainIntelligence:
                 {
                     intelligenceObtained = true;
+                    if (QuestPart_WolfDisasterWatcher.GetWolfDisasterWatcher(quest, out QuestPart_WolfDisasterWatcher watcher))
+                    {
+                        watcher.GainIntelligence(1);
+                    }
                     QuestUtility.SendQuestTargetSignals(questTags, "IntelligenceObtained");
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterPoint_ObtainIntelligence_Finished".Translate(),

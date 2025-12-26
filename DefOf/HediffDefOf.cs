@@ -37,6 +37,10 @@ public static class OARO_HediffDefOf
     /// 常驻骑士的Buff
     /// </summary>
     public static HediffDef OARO_Hediff_ByResidentKnightBuff;
+    /// <summary>
+    /// 可招募骑士
+    /// </summary>
+    public static HediffDef OARO_Hediff_RecruitKnight;
 
     /// <summary>
     /// 骑士激励

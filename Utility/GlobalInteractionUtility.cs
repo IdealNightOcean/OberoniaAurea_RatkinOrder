@@ -1,5 +1,5 @@
-﻿using RimWorld;
-using System;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -13,19 +13,23 @@ public static class GlobalInteractionUtility
     /// <summary>
     /// 能否招募骑士
     /// </summary>
-    public static AcceptanceReport CanRecruitKnight(RatkinOrder ratkinOrder, Map map, bool resultOnly)
+    public static AcceptanceReport CanRecruitKnight(Pawn knight, Map map, bool resultOnly)
     {
         if (OrderHallHandler.Instance.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
+        if (!KnightPawnsManager.Instance.TryGetKnightRecord(knight, out KnightRecord kRecord))
+        {
+            return resultOnly ? false : "OARO_PawnIsNotKnight".Translate(knight.Named(KeyLibrary_FormatArgName.PAWN));
+        }
 
-        if (ratkinOrder.Relationship < RelationshipKind.Trustworthy)
+        if (kRecord.RatkinOrder.Relationship < RelationshipKind.Trustworthy)
         {
             return resultOnly ? false : "OARO_Insufficient_Relationship".Translate(RelationshipUtility.GetLabel(RelationshipKind.Trustworthy));
         }
 
-        int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
+        int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(kRecord.RatkinOrder);
         if (RecommendationUtility.CurRecommendationCount(map) < needRecommendation)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(needRecommendation.Named(KeyLibrary_FormatArgName.Count));
@@ -36,13 +40,20 @@ public static class GlobalInteractionUtility
     /// <summary>
     /// 招募骑士
     /// </summary>
-    public static void RecruitmentKnight(RatkinOrder ratkinOrder, Map map, Pawn pawn)
+    public static void RecruitmentKnight(Pawn pawn, Map map)
     {
-        int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
+        if (!KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out KnightRecord kRecord))
+        {
+            Log.Error("[OARO] Try recruitment a pawn is not knight as knight.");
+            return;
+        }
+
+        int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(kRecord.RatkinOrder);
 
         RecommendationUtility.UseRecommendationOfMap(map, needRecommendation);
-        throw new NotImplementedException();
-
+        OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+        pawn.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_RecruitKnight);
+        ResidentKnightsManager.Instance.AddResidentKnight(pawn, kRecord);
     }
 
     /// <summary>
@@ -169,7 +180,7 @@ public static class GlobalInteractionUtility
 
         void Invite()
         {
-            if (Rand.Chance(chance) && AroundKnightGroupsManager.Instance.TryTriggerVisitQuest(knightGroup, map, isProactive: false, removeWhenInvalid: true))
+            if (Rand.Chance(chance) && AroundKnightGroupsManager.Instance.TryTriggerVisitQuest(knightGroup, map, removeWhenInvalid: true))
             {
                 if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed > SeasonInvitationLimit())
                 {

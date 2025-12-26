@@ -95,7 +95,10 @@ public sealed class CompSuperHeavyHowitzer : ThingComp
             }
         }
 
-        yield return new FloatMenuOption(label: "OARO_SuperHeavyHowitzer_Check".Translate(),
+        float checkChance = 0.2f + (selPawn.skills?.GetSkill(SkillDefOf.Construction).GetLevel() ?? 0f) * 0.035f;
+        yield return new FloatMenuOption(label: "OARO_SuperHeavyHowitzer_Check".Translate(
+                                                    parent.Label,
+                                                    checkChance.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance)),
                                          action: delegate { selPawn.jobs.TryTakeOrderedJob(JobMaker.MakeJob(Props.checkJob, parent), JobTag.Misc); });
 
     }
@@ -128,23 +131,28 @@ public sealed class CompSuperHeavyHowitzer : ThingComp
 
     public void CheckHowitzer(Pawn pawn)
     {
+        float checkChance = 0.2f + (pawn.skills?.GetSkill(SkillDefOf.Construction).GetLevel() ?? 0f) * 0.035f;
         if (latentFault <= 0 || latentFaultChecked == latentFault)
         {
-            Messages.Message("OARO_SuperHeavyHowitzer_NoLatentFault".Translate(pawn), MessageTypeDefOf.NeutralEvent);
+            if (Rand.Chance(checkChance))
+            {
+                Messages.Message("OARO_SuperHeavyHowitzer_NoLatentFault".Translate(parent.Label, pawn.Named(KeyLibrary_FormatArgName.PAWN)), MessageTypeDefOf.NeutralEvent);
+            }
+            else
+            {
+                Messages.Message("OARO_SuperHeavyHowitzer_NotFindLatentFault".Translate(parent.Label, pawn.Named(KeyLibrary_FormatArgName.PAWN)), MessageTypeDefOf.NeutralEvent);
+            }
             return;
         }
-
-        float checkChance = 0.2f + (pawn.skills?.GetSkill(SkillDefOf.Construction).GetLevel() ?? 0f) * 0.035f;
-        if (Rand.Chance(checkChance))
+        else if (Rand.Chance(checkChance))
         {
-            Messages.Message("OARO_SuperHeavyHowitzer_FindLatentFault".Translate(pawn), MessageTypeDefOf.PositiveEvent);
+            Messages.Message("OARO_SuperHeavyHowitzer_FindLatentFault".Translate(parent.Label, pawn.Named(KeyLibrary_FormatArgName.PAWN)), MessageTypeDefOf.PositiveEvent);
             latentFaultChecked++;
             extraFaultLeft += 3;
         }
         else
         {
-            Messages.Message("OARO_SuperHeavyHowitzer_NoLatentFault".Translate(), MessageTypeDefOf.NeutralEvent);
+            Messages.Message("OARO_SuperHeavyHowitzer_NotFindLatentFault".Translate(parent.Label, pawn.Named(KeyLibrary_FormatArgName.PAWN)), MessageTypeDefOf.NeutralEvent);
         }
     }
-
 }

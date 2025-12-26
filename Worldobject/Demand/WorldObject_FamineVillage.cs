@@ -22,8 +22,15 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         Feast
     }
 
-    private int ticksNeeded = 30000;
-    public override int TicksNeeded => ticksNeeded;
+    public override int TicksNeeded => curWorkType switch
+    {
+        WorkType.GainTrust => 6 * 2500,
+        WorkType.PryInfo => 8 * 2500,
+        WorkType.Precise => 4 * 2500,
+        WorkType.Feast => 2 * 2500,
+        _ => 30000
+    };
+
     private WorkType curWorkType;
 
     private ThingDef requestDef;
@@ -46,7 +53,6 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref ticksNeeded, "ticksNeeded", 0);
         Scribe_Values.Look(ref curWorkType, "curWorkType");
 
         Scribe_Defs.Look(ref requestDef, "requestDef");
@@ -103,10 +109,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         }
     }
 
-    public void SetOrderBranch(Branch branch)
-    {
-        this.branch = branch;
-    }
+    public void SetOrderBranch(Branch branch) => this.branch = branch;
 
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
     {
@@ -120,7 +123,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     {
         if (this.branch == branch)
         {
-            branch = null;
+            this.branch = null;
         }
     }
 
@@ -138,13 +141,12 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         requestCountLeft = -1;
     }
 
-    public override void Notify_CaravanArrived(Caravan caravan)
-    {
-        Find.WindowStack.Add(Dialog_StartWork(caravan));
-    }
+    public override void Notify_CaravanArrived(Caravan caravan) => Find.WindowStack.Add(Dialog_StartWork(caravan));
 
     private Dialog_NodeTreeWithFactionInfo Dialog_StartWork(Caravan caravan)
     {
+        int caravanThingCount = caravan.GetCountOfThingDef(requestDef);
+
         TaggedString nodeText = fulfillCount > 0 ? "OARO_FamineVillage_Star".Translate() : "OARO_FamineVillage_FirstStar".Translate();
         DiaNode rootNode = new(nodeText);
 
@@ -157,6 +159,10 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
             },
             resolveTree = true
         };
+        if (caravanThingCount < requestCountLeft)
+        {
+            directOpt.Disable("OAFrame_NeedCountOfThing".Translate(requestDef.LabelCap, requestCountLeft));
+        }
         rootNode.options.Add(directOpt);
 
         DiaOption gainTrustOpt = new("OARO_FamineVillage_GainTrust".Translate())
@@ -171,6 +177,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
             action = delegate { StartWork(WorkType.PryInfo, caravan); },
             resolveTree = true
         };
+
         rootNode.options.Add(pryInfoOpt);
 
         DiaOption preciseOpt = new("OARO_FamineVillage_Precise".Translate())
@@ -182,14 +189,17 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         {
             preciseOpt.Disable("OARO_FamineVillage_InsufficientInfo".Translate());
         }
+        else
+        {
+            int preciseNeedCount = Mathf.Min(requestCountLeft, Mathf.CeilToInt(requestCount / 3));
+            if (caravanThingCount < preciseNeedCount)
+            {
+                preciseOpt.Disable("OAFrame_NeedCountOfThing".Translate(requestDef.LabelCap, preciseNeedCount));
+            }
+        }
         rootNode.options.Add(preciseOpt);
 
-        DiaOption waitOpt = new("Wait".Translate())
-        {
-            resolveTree = true
-        };
-
-        rootNode.options.Add(waitOpt);
+        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
 
         return new Dialog_NodeTreeWithFactionInfo(rootNode, Faction);
     }
@@ -197,23 +207,6 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     private void StartWork(WorkType workType, Caravan caravan)
     {
         curWorkType = workType;
-        switch (curWorkType)
-        {
-            case WorkType.GainTrust:
-                ticksNeeded = 6 * 2500;
-                break;
-            case WorkType.PryInfo:
-                ticksNeeded = 8 * 2500;
-                break;
-            case WorkType.Precise:
-                ticksNeeded = 4 * 2500;
-                break;
-            case WorkType.Feast:
-                ticksNeeded = 2 * 2500;
-                break;
-            default: return;
-        }
-
         base.Notify_CaravanArrived(caravan);
     }
 
@@ -257,7 +250,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                 }
             case WorkType.Precise:
                 {
-                    FulfillRequest(associatedFixedCaravan);
+                    FulfillRequest_Precise(associatedFixedCaravan);
                     if (!HasFeastLater && requestCountLeft <= 0)
                     {
                         this.SafeDestroy();
@@ -355,7 +348,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         }
     }
 
-    public void FulfillRequest(FixedCaravan fixedCaravan)
+    public void FulfillRequest_Precise(FixedCaravan fixedCaravan)
     {
         int maxTakeCount = Mathf.Min(requestCountLeft, Mathf.CeilToInt(requestCount / 3 * validInfoCount));
         requestCountLeft -= fixedCaravan.RemoveThingsOfDef(requestDef, maxTakeCount);

@@ -146,6 +146,7 @@
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
+    <Compile Include="Hediff\Hediff_RecruitKnight.cs" />
     <Compile Include="InteractionWorker_KnightlyTalk.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\Alert_ResidentKnightWillResignation.cs" />
     <Compile Include="HarmonyPatch\CaravanDemand_CanFireNowSub_Patch.cs" />

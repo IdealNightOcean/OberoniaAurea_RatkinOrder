@@ -10,11 +10,25 @@ public class JointPatrolIncidentDef : JointPatrolInteractionDef
 {
     public enum IncidentType
     {
+        /// <summary>
+        /// 中性
+        /// </summary>
         Neutral,
+        /// <summary>
+        /// 正面
+        /// </summary>
         Positive,
+        /// <summary>
+        /// 负面
+        /// </summary>
         Negative,
+        /// <summary>
+        /// 建筑专属
+        /// </summary>
         Building,
-        Honor,
+        /// <summary>
+        /// 灾难
+        /// </summary>
         Disaster
     }
 
@@ -99,12 +113,8 @@ public class JointPatrolIncidentDef : JointPatrolInteractionDef
                 [
                     (IncidentType.Neutral,25f),
                     (IncidentType.Positive,25f),
-                    (IncidentType.Positive,15f)
+                    (IncidentType.Negative,15f)
                 ]);
-        }
-        if (record.Branch.IsBranchOfType(Branch.BranchType.Honor))
-        {
-            typeSelector.Add((IncidentType.Honor, 3f));
         }
 
         return typeSelector.RandomElementByWeight(t => t.Item2).Item1;

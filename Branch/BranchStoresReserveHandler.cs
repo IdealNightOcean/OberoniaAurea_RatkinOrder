@@ -10,18 +10,21 @@ namespace OberoniaAurea.RatkinOrder;
 
 public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
 {
-    [Unsaved] private readonly Branch branch;
-
+    /// <summary>
+    /// 自动建设储备建筑临界储备值
+    /// </summary>
+    public const float ConstructionBoundary = -0.3f;
     /// <summary>自动准备新建设的概率</summary>
     /// <remarks> - 只在可自动准备新建设时起效</remarks>
     private const float AutoStartReserveChacne = 0.1f;
-    private static readonly float[] CostRateReduceArr = [0.02f, 0.01f, 0.005f, 0.0025f];
-    private static readonly int CostRateReduceArrLen = CostRateReduceArr.Length;
-
     /// <summary>
     /// 建设储备项目上限
     /// </summary>
     private const int StoresReserveCeiling = 3;
+
+    [Unsaved] private readonly Branch branch;
+    private static readonly float[] CostRateReduceArr = [-0.02f, -0.01f, -0.005f, -0.0025f];
+    private static readonly int CostRateReduceArrLen = CostRateReduceArr.Length;
 
     private List<ReserveRecord> storesReserves = new(StoresReserveCeiling);
     public IReadOnlyList<ReserveRecord> StoresReserves => storesReserves;
@@ -136,18 +139,18 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     {
         if (hourOfDay == 5)
         {
-            float maxReduce = 0.3f;
+            float maxReduce = -0.3f;
             float reduceMulti = 1f;
             if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
             {
-                maxReduce = 0.4f;
+                maxReduce = -0.4f;
                 reduceMulti *= 2f;
             }
 
             for (int i = 0; i < storesReserves.Count; i++)
             {
-                float costRateReduce = storesReserves[i].CostRateReduce - (CostRateReduceArr[Mathf.Min(i, CostRateReduceArrLen - 1)] * reduceMulti);
-                storesReserves[i].CostRateReduce = Mathf.Min(costRateReduce, maxReduce);
+                float costRateReduce = storesReserves[i].CostRateReduce + (CostRateReduceArr[Mathf.Min(i, CostRateReduceArrLen - 1)] * reduceMulti);
+                storesReserves[i].CostRateReduce = Mathf.Max(costRateReduce, maxReduce);
             }
         }
         else if (hourOfDay == 17)
@@ -159,13 +162,15 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
     }
 
-
-
     public void Notify_BranchConstructStarted(BranchConstructionDef def)
     {
         RemoveReserve(def);
     }
 
+    /// <summary>
+    /// 获取材料储备减免
+    /// </summary>
+    /// <returns>减免百分比（负数）</returns>
     public float GetReserveCostReduce(BranchConstructionDef def)
     {
         for (int i = 0; i < storesReserves.Count; i++)

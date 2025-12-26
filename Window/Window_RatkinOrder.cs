@@ -84,8 +84,7 @@ public class Window_RatkinOrder : MainTabWindow
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
 
-        Map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true);
-        Map ??= Find.CurrentMap;
+        Map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? Find.CurrentMap;
         if (Map is null)
         {
             throw new ArgumentNullException(nameof(Map));
@@ -118,14 +117,23 @@ public class Window_RatkinOrder : MainTabWindow
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
 
-        Map = map ?? throw new ArgumentNullException(nameof(map));
+        def = OARO_ModDefOf.OARO_KnightOrdersOverview;
+
+        Map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true) ?? Find.CurrentMap;
+        if (Map is null)
+        {
+            throw new ArgumentNullException(nameof(Map));
+        }
 
         SelectedOrder = RatkinOrderManager.Instance.AllRatkinOrders.FirstOrFallback(fallback: null)
-            ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
-                                                   + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
+                   ?? throw new InvalidOperationException($"Failed to init {nameof(Window_RatkinOrder)}: No valid {nameof(RatkinOrder)} found. "
+                                                          + $"Context: Total orders = {RatkinOrderManager.Instance.AllRatkinOrders.Count()}, Source = {nameof(RatkinOrderManager)}.{nameof(RatkinOrderManager.Instance.AllRatkinOrders)}");
 
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
+
+        AutoUpgradeRelationshipDesc = new(refreshFunc: RefreshAutoUpgradeRelationshipDesc);
+        FollowedBranches = new(refreshFunc: RefreshFollowerBranches);
     }
 
     public override void PreOpen()
@@ -155,7 +163,7 @@ public class Window_RatkinOrder : MainTabWindow
         float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
@@ -373,8 +381,6 @@ public class Window_RatkinOrder : MainTabWindow
         DrawNormalInteraction(reusedRect);
 
         OARO_WindowUtility.ResetText();
-
-
     }
 
     private void DrawNormalInteraction(Rect inRect)
@@ -387,7 +393,6 @@ public class Window_RatkinOrder : MainTabWindow
         float entryY = inRect.yMin;
         float entryWidth = inRect.width / 3f - 0.01f;
         float entryHeight = 24f;
-
         viewRect.height = (NormalInteractionAcceptances.Count / 3 + 1) * entryHeight;
 
         Widgets.BeginScrollView(inRect, ref scrollPosition_NormalInteractions, viewRect);
@@ -418,6 +423,7 @@ public class Window_RatkinOrder : MainTabWindow
                 tooltip: kv.Key.description))
             {
                 kv.Key.Worker.TryApplyInteraction(SelectedOrder, Map);
+                break;
             }
         }
 

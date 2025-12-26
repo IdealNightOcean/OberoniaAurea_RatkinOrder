@@ -254,24 +254,31 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             expiryInfoPartTip: "GuestsDepartsOn".Translate(),
             debugLabel: "QuestDelay");
 
-        quest.SignalPassAny(
-            action: delegate
-            {
-                QuestPart_OrderLetter questPart_OrderLetter = new()
-                {
-                    InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-                    RelatedOrder = RatkinOrder,
-                    RelatedBranch = Branch,
-                    OrderLetterDef = OrderLetterDefOf.OARO_OfficialLetter,
-                    RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+        QuestPart_OrderLetter questPart_OrderLetter_Leave = new()
+        {
+            InSignal = inSignalMakeLeaved,
+            RelatedOrder = RatkinOrder,
+            RelatedBranch = Branch,
+            OrderLetterDef = OrderLetterDefOf.OARO_OfficialLetter,
+            RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
 
-                    DelayDays = 1
-                };
-                questPart_OrderLetter.InitLetterTextRequest("[helpThankFinalLetterLabel]", "[helpThankFinalLetterText]", Branch.NameColored);
-                QuestGen.quest.AddPart(questPart_OrderLetter);
-            },
-            inSignals: [inSignalMakeLeaved, InSignalRecruited]);
+            DelayDays = 1
+        };
+        questPart_OrderLetter_Leave.InitLetterTextRequest("[helpThankFinalLetterLabel]", "[helpThankFinalLetterText_Leave]", Branch.NameColored);
+        QuestGen.quest.AddPart(questPart_OrderLetter_Leave);
 
+        QuestPart_OrderLetter questPart_OrderLetter_Recruited = new()
+        {
+            InSignal = InSignalRecruited,
+            RelatedOrder = RatkinOrder,
+            RelatedBranch = Branch,
+            OrderLetterDef = OrderLetterDefOf.OARO_OfficialLetter,
+            RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
+
+            DelayDays = 1
+        };
+        questPart_OrderLetter_Recruited.InitLetterTextRequest("[helpThankFinalLetterLabel]", "[helpThankFinalLetterText_Recruited]", Branch.NameColored);
+        QuestGen.quest.AddPart(questPart_OrderLetter_Recruited);
 
         quest.SignalPassActivable(
             inSignal: inSignalMakeLeaved,

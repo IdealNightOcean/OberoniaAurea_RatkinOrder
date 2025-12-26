@@ -21,7 +21,7 @@ public class Reward_FriendlyBranch : Reward
             yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_FriendlyBranch".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
-                                                                            GUI.DrawTexture(r, null);
+                                                                            GUI.DrawTexture(r, IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
                                                                             GUI.color = Color.white;
                                                                         },
                                                                         tipGetter: () => "OARO_Reward_FriendlyBranchTip".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), DurationDays.Named("DurationDays")).Resolve());

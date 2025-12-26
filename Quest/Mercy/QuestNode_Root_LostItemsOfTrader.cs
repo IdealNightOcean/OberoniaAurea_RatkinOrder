@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -13,10 +14,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 {
     public static readonly IntRange SilverCountRange = new(5000, 8000);
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return true;
-    }
+    protected override bool TestRunInt(Slate slate) => true;
 
     protected override void RunInt()
     {
@@ -60,6 +58,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 
         if (parentFaction is null || Rand.Chance(0.5f))
         {
+            slate.Set("hasFollowUp", false);
             NoFurtherAction();
         }
         else
@@ -77,8 +76,8 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             inner: delegate
             {
                 quest.Letter(letterDef: LetterDefOf.PositiveEvent,
-                             text: "OARO_LostItemsOfTrader_NoFurtherText".Translate(),
-                             label: "OARO_LostItemsOfTrader_NoFurtherLabel".Translate());
+                             text: "[lostItemsOfTrader_NoFurtherText]",
+                             label: "[lostItemsOfTrader_NoFurtherLabel]");
                 QuestGen_End.End(quest, outcome: QuestEndOutcome.Success);
             });
     }
@@ -87,6 +86,17 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
     {
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
+
+        List<Pawn> collectionTeam = QuestPart_CollectionTeam.GenerateCaravanMembers(OARO_ModDefOf.OARO_LostItemsOfTrader, parentFaction, map);
+        if (collectionTeam.NullOrEmpty())
+        {
+            slate.Set("hasFollowUp", false);
+            NoFurtherAction();
+            return;
+        }
+
+        slate.Set("collectionTeam", collectionTeam);
+        slate.Set("collector", collectionTeam[0]);
 
         string inSignalMakePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsArrival");
         quest.Delay(delayTicks: GenMath.RoundTo(Rand.RangeInclusive(4 * 60000, 6 * 60000), 2500),
@@ -104,22 +114,33 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 
         QuestPart_CollectionTeam questPart_CollectionTeam = new()
         {
+            inSignalEnable = inSignalMakePawnsArrival,
+            InSignalMakePawnsLeave = inSignalPawnNegative,
+
             Faction = parentFaction,
             MapParent = map.Parent,
-            PawnGroupMakerDef = OARO_ModDefOf.OARO_LostItemsOfTrader,
 
             DurationTicks = 60000,
-        };
 
+            Pawns = [.. collectionTeam]
+        };
         questPart_CollectionTeam.InitWithDefaultSignal();
-        questPart_CollectionTeam.inSignalEnable = inSignalMakePawnsArrival;
-        questPart_CollectionTeam.InSignalMakePawnsLeave = inSignalPawnNegative;
         questPart_CollectionTeam.InitTalkTextRequest("[lostItemsOfTraderTalkText]");
         questPart_CollectionTeam.AddRequestThingDefCount(new ThingDefCountClass(ThingDefOf.Silver, Mathf.FloorToInt(silverCount * 0.8f)));
         quest.AddPart(questPart_CollectionTeam);
 
+        quest.Letter(
+            LetterDefOf.PositiveEvent,
+            inSignal: inSignalMakePawnsArrival,
+            label: "[lostItemsOfTraderArrivalLabel]",
+            text: "[lostItemsOfTraderArrivalText]");
+
         string inSignalTeamForceEnd = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_ForceEnd");
-        quest.Delay(delayTicks: 180000, inner: null, inSignalEnable: questPart_CollectionTeam.OutSignalPawnsArrived, outSignalComplete: inSignalTeamForceEnd);
+        quest.Delay(
+            delayTicks: 3 * 60000,
+            inner: null,
+            inSignalEnable: questPart_CollectionTeam.OutSignalPawnsArrived,
+            outSignalComplete: inSignalTeamForceEnd);
 
         string inSignalTeamSuccess = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Success");
         quest.SignalPassAll(inSignals: [questPart_CollectionTeam.OutSignalGive, inSignalTeamForceEnd], outSignal: inSignalTeamSuccess);

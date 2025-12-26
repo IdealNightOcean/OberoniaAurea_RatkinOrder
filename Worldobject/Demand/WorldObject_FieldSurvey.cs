@@ -173,15 +173,9 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
         };
     }
 
-    public void SetOrderBranch(Branch branch)
-    {
-        this.branch = branch;
-    }
+    public void SetOrderBranch(Branch branch) => this.branch = branch;
 
-    public bool HasRegionalFeature(RegionalFeature feature)
-    {
-        return regionalFeatureI == feature || regionalFeatureII == feature;
-    }
+    public bool HasRegionalFeature(RegionalFeature feature) => regionalFeatureI == feature || regionalFeatureII == feature;
 
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
     {

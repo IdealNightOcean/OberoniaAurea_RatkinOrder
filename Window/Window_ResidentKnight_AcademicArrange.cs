@@ -84,7 +84,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         float mainInnerX = mainInnerRect.xMin;
         float mainInnerY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX(mainInnerRect))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;

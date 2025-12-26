@@ -41,7 +41,7 @@ public class ChoiceLetter_KnightGroupProactiveVisit : ChoiceLetter_RatkinOrder
     private void ProactiveVisit()
     {
         Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
-        if (!AroundKnightGroupsManager.Instance.TryTriggerVisitQuest(KnightGroup, map, isProactive: true, removeWhenInvalid: true))
+        if (!AroundKnightGroupsManager.Instance.TryTriggerVisitQuest(KnightGroup, map, removeWhenInvalid: true))
         {
             AroundKnightGroupsManager.Instance.RemoveKnightGroup(KnightGroup);
             GlobalInteractionUtility.AroundKnightGroupVisitInvalidDialog(KnightGroup, isProactive: true);

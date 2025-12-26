@@ -16,13 +16,15 @@ public class MercyQuestDef : Def
     public FactionDef subFactionDef;
     public PawnKindDef helpSeekerPawnKind;
 
-    public bool useFixedParentFaction;
+    public bool hasParentFaction;
     public FactionValidationParams? parentFactionValidationParams;
     protected FactionDef fixedParentFactionDef;
 
     [MayTranslate]
     public string fixedHelpDesc;
     public RulePackDef helpDescRulePack;
+
+    public float secondSelectWeight = 1f;
 
     public override IEnumerable<string> ConfigErrors()
     {
@@ -42,35 +44,11 @@ public class MercyQuestDef : Def
         {
             yield return $"{nameof(needPreQuest)} is true, but has a null {nameof(helpSeekerPawnKind)}";
         }
-        if (useFixedParentFaction && fixedParentFactionDef is null)
-        {
-            yield return $"{nameof(useFixedParentFaction)} is true, but has a null {nameof(fixedParentFactionDef)}";
-        }
     }
 
     public bool TrySetQuestSlateValue(Slate slate)
     {
         slate.Set(KeyLibrary_SlateStoreAs.mercyQuestDef, this);
-
-        if (useFixedParentFaction)
-        {
-            if (fixedParentFactionDef is null)
-            {
-                return false;
-            }
-            else
-            {
-                slate.Set(KeyLibrary_SlateStoreAs.parentFactionDef, fixedParentFactionDef);
-                if (useFixedParentFaction)
-                {
-                    Faction parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(fixedParentFactionDef, parentFactionValidationParams ?? FactionValidationParams.NonHostileNormalFaction);
-                    if (parentFaction is null)
-                        return false;
-                    else
-                        slate.Set(KeyLibrary_SlateStoreAs.parentFaction, parentFaction);
-                }
-            }
-        }
 
         if (subFactionDef is null)
             return false;
@@ -81,6 +59,30 @@ public class MercyQuestDef : Def
             return false;
         else
             slate.Set(KeyLibrary_SlateStoreAs.helpSeekerPawnKind, helpSeekerPawnKind);
+
+        if (hasParentFaction)
+        {
+            Faction parentFaction;
+            if (fixedParentFactionDef is not null)
+            {
+                parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(
+                    def: fixedParentFactionDef,
+                    validationParams: parentFactionValidationParams ?? FactionValidationParams.NonHostileNormalFaction);
+            }
+            else
+            {
+                parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOf(parentFactionValidationParams ?? FactionValidationParams.NonHostileNormalFaction);
+            }
+
+            if (parentFaction is null)
+            {
+                return false;
+            }
+
+            slate.Set(KeyLibrary_SlateStoreAs.parentFactionDef, parentFaction.def);
+            slate.Set(KeyLibrary_SlateStoreAs.parentFaction, parentFaction);
+
+        }
 
         return true;
     }

@@ -41,6 +41,16 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
         return sb.ToString();
     }
 
+    public override bool StartWork(Caravan caravan)
+    {
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+            text: "OARO_SupplyDepot_Arrival".Translate(TicksNeeded.ToStringTicksToPeriod()),
+            ratkinOrder: branch.RatkinOrder,
+            acceptAction: () => base.StartWork(caravan));
+
+        Find.WindowStack.Add(nodeTree);
+        return true;
+    }
 
     protected override void TickInterval(int delta)
     {
@@ -77,7 +87,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
         }
 
         int totalSkillLevel = associatedFixedCaravan.PawnsListForReading.Sum(p => p.skills?.GetSkill(SkillDefOf.Construction).GetLevel() ?? 0);
-        float gainProgress = totalSkillLevel * 2f + associatedFixedCaravan.PawnsCount * 10f;
+        float gainProgress = totalSkillLevel * 4f + associatedFixedCaravan.PawnsCount * 20f;
         if (constricProgress >= 400f)
         {
             gainProgress *= 1.5f;

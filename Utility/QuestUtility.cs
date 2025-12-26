@@ -11,6 +11,15 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class OARO_QuestUtility
 {
+    public static void SendSignalSafeSilent(this SignalManager signalManager, Signal signal)
+    {
+        if (string.IsNullOrEmpty(signal.tag))
+        {
+            return;
+        }
+        signalManager.SendSignal(signal);
+    }
+
     public static void OnRatkinOrderRemoved(this QuestManager questManager, RatkinOrder order)
     {
         ConcurrentBag<IOnRatkinOrderRemoved> ratkinOrderRelateds = [];

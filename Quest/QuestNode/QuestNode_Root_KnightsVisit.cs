@@ -62,6 +62,22 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
         SetWorkPrioritySafe(pawn, WorkTypeDefOf.Cleaning, 3);
         SetWorkPrioritySafe(pawn, WorkTypeDefOf.Handling, 3);
         SetWorkPrioritySafe(pawn, OARO_RimWorldDefOf.Patient, 2);
+
+        Hediff hediff = pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_RecruitKnight);
+        HediffComp_Disappears disappearsComp = hediff?.TryGetComp<HediffComp_Disappears>();
+        if (disappearsComp is not null)
+        {
+            disappearsComp.ticksToDisappear = questParameter.arrivalDelayTicks + questParameter.questDurationTicks + 600;
+        }
+    }
+
+    protected override void PawnArrival(string lodgerArrivalSignal)
+    {
+        base.PawnArrival(lodgerArrivalSignal);
+        if (questParameter.arrivalDelayTicks > 0)
+        {
+            QuestGen.quest.Letter(LetterDefOf.PositiveEvent, label: "[arrivalDelayLabel]", text: "[arrivalDelayText]");
+        }
     }
 
     protected override void SetQuestEndComp(QuestPart_OARefugeeInteractions questPart_Interactions, string failSignal, string delayFailSignal, string successSignal)
