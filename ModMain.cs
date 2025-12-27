@@ -135,6 +135,7 @@ public class RatkinOrderSettings : ModSettings
             listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{nameof(MaxLetterRetentionDays)}".Translate(), ref MaxLetterRetentionDays, ref maxLetterRetentionDaysStr, 1f, 600f);
         }
 
+        listing_Rect.Gap(12f);
         MaxAcquiredPatrolInteractionPreType = (int)listing_Rect.SliderLabeled($"OARO_Setting_{nameof(MaxAcquiredPatrolInteractionPreType)}".Translate(MaxAcquiredPatrolInteractionPreType.ToString()), MaxAcquiredPatrolInteractionPreType, 1f, 20f);
 
         if (listing_Rect.ButtonText("OAFrame_Reset".Translate()))

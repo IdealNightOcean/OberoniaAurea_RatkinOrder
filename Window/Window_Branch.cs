@@ -925,6 +925,18 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, Branch.Name);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMin - (40f + 4f), 45f, 45f);
         GUI.DrawTexture(reusedRect, leftTopSiteIcon, ScaleMode.ScaleToFit);
+        if (Mouse.IsOver(reusedRect))
+        {
+            Widgets.DrawHighlight(reusedRect);
+            TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_SiteIconTip".Translate(), uniqueId: 5450869);
+        }
+        if (Widgets.ButtonInvisible(reusedRect))
+        {
+            if (Branch.BaseSite is not null)
+            {
+                CameraJumper.TryJumpAndSelect(Branch.BaseSite);
+            }
+        }
 
         reusedRect = OARO_WindowUtility.DrawBranchSummary(new Vector2(inRect.x, inRect.y), CachedBranchInfo);
 

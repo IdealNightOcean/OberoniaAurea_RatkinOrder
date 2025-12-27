@@ -14,7 +14,7 @@ public class AcceptedBranchDemand : IExposable
     public bool IsCritical => isCritical;
     public BranchDemand Demand => demand ??= (IsCritical ? branch.DemandHandler.CriticalDemand : branch.DemandHandler.NormalDemand);
 
-    public bool IsValid => branch.IsValid() && Demand is not null && Demand.IsOngoing;
+    public bool IsValid => branch.IsValid() && Demand is not null && !Demand.ShouldRemove;
 
     private AcceptedBranchDemand() : base() { }
     public AcceptedBranchDemand(Branch branch, bool isCritical)

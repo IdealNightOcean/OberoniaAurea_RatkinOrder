@@ -126,9 +126,9 @@ public class Window_BranchSquad : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
 
         Rect middleRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, areaRectY, 583f, areaRectHeight);
-        if (DrawMiddleRect(middleRect))
+        DrawMiddleRect(middleRect);
+        if (HasClosed)
         {
-            Close();
             return;
         }
 
@@ -160,7 +160,7 @@ public class Window_BranchSquad : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
     }
 
-    private bool DrawMiddleRect(Rect inRect)
+    private void DrawMiddleRect(Rect inRect)
     {
         float inRectX = inRect.x;
         float inRectY = inRect.y;
@@ -183,15 +183,20 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
-        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
-                                                          label: "OAFrame_LookOver".Translate(),
-                                                          baseTex: middleCheckButton,
-                                                          downTex: middleCheckButton_Down,
-                                                          acceptance: SelBranch.IsValid(),
-                                                          doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OAFrame_LookOver".Translate(),
+            baseTex: middleCheckButton,
+            downTex: middleCheckButton_Down,
+            acceptance: SelBranch.IsValid(),
+            doMouseoverSound: true))
         {
-            CameraJumper.TryJumpAndSelect(SelBranch.BaseSite);
-            return true;
+            if (SelBranch?.BaseSite is not null)
+            {
+                CameraJumper.TryJumpAndSelect(SelBranch.BaseSite);
+                Close();
+                return;
+            }
         }
 
         Text.Anchor = TextAnchor.MiddleRight;
@@ -675,8 +680,6 @@ public class Window_BranchSquad : OrderWindowBase
             reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 90f, 24f);
             Widgets.Label(reusedRect, "OARO_SquadWin_RequestUnlockSupport".Translate());
         }
-
-        return false;
     }
 
     private void DrawMedalRect(Rect inRect)

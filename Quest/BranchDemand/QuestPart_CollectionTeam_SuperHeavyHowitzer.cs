@@ -13,11 +13,12 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
 {
     private string outSignalRepaired;
     private string outSignalPerfectRepaired;
+
     public override void InitRequestThingDefCounts(IEnumerable<ThingDefCountClass> thingDefCounts)
     {
         outSignalRepaired ??= QuestGenUtility.HardcodedSignalWithQuestID("Howitzer_Repaired");
         outSignalPerfectRepaired ??= QuestGenUtility.HardcodedSignalWithQuestID("Howitzer_PerfectRepaired");
-        requestThingDefCounts = [new ThingDefCountClass(OARO_ThingDefOf.OARO_Turret_OrderSuperHeavyHowitzer, 2)];
+        base.InitRequestThingDefCounts(thingDefCounts);
     }
 
     public override void ExposeData()

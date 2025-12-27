@@ -7,10 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_Root_MercyQuestPre : QuestNode
 {
-    protected override bool TestRunInt(Slate slate)
-    {
-        return slate.TryGet(KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef _);
-    }
+    protected override bool TestRunInt(Slate slate) => slate.TryGet(KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef _);
 
     protected override void RunInt()
     {

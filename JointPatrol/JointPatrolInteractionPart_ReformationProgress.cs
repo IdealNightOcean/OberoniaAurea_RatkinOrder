@@ -10,6 +10,6 @@ public class JointPatrolInteractionPart_ReformationProgress : JointPatrolInterac
     public override void ApplyPart(JointPatrolInteractionDef def, JointBranchRecord record, StringBuilder effectExplain)
     {
         record.Branch.RatkinOrder.ReformationManager.ReformProgress += change;
-        effectExplain.AppendLine("OARO_ChangeOffset_ReformProgress".Translate(change.ToStringPercentSigned("0.##")));
+        effectExplain.AppendLine("OARO_ChangeOffset_ReformProgress".Translate(change.ToStringPercentSigned("0.##")).Colorize(partRecordColor));
     }
 }

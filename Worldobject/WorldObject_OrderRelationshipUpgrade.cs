@@ -1,4 +1,6 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
 
 public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixedCaravan_Nameable, ISingleRatkinOrderRelated
 {
@@ -6,12 +8,18 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
     public RatkinOrder RatkinOrder => ratkinOrder;
     public override int TicksNeeded => 15000;
 
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_References.Look(ref ratkinOrder, nameof(ratkinOrder));
+    }
+
     public void InitRatkinOrder(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder;
-        if (ratkinOrder is not null)
+        if (this.ratkinOrder is not null)
         {
-            Name = def.label + $" ({ratkinOrder.Name})";
+            Name = def.label + $" ({this.ratkinOrder.Name})";
         }
     }
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
@@ -29,7 +37,6 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
         {
             this.SendWorkResolvedSignal();
         }
-
         this.SafeDestroy();
     }
 

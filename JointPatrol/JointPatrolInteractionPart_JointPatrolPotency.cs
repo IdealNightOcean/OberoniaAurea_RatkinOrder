@@ -12,12 +12,12 @@ public class JointPatrolInteractionPart_JointPatrolPotency : JointPatrolInteract
         if (potencyFactorOffset != 0f)
         {
             record.PotencyFactor += potencyFactorOffset;
-            effectExplain.AppendLine("OARO_ChangeOffset_JointPatrolPotencyFactor".Translate(potencyFactorOffset.ToStringPercentSigned("0.##")));
+            effectExplain.AppendLine("OARO_ChangeOffset_JointPatrolPotencyFactor".Translate(potencyFactorOffset.ToStringPercentSigned("0.##")).Colorize(partRecordColor));
         }
         if (potencyOffsetOffset != 0f)
         {
             record.PotencyOffset += potencyOffsetOffset;
-            effectExplain.AppendLine("OARO_ChangeOffset_JointPatrolPotencyOffset".Translate(potencyFactorOffset.ToStringPercentSigned("0.##")));
+            effectExplain.AppendLine("OARO_ChangeOffset_JointPatrolPotencyOffset".Translate(potencyFactorOffset.ToStringPercentSigned("0.##")).Colorize(partRecordColor));
         }
     }
 }

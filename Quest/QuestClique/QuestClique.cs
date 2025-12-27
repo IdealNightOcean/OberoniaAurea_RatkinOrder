@@ -130,7 +130,7 @@ public class QuestClique : IExposable
         return true;
     }
 
-    public AcceptanceReport CanActiveable(bool directly, bool resultOnly)
+    public AcceptanceReport CanActiveNow(bool directly, int mapRecommendationCount = -1, bool resultOnly = false)
     {
         if (!IsActivatable)
         {
@@ -151,13 +151,45 @@ public class QuestClique : IExposable
             return resultOnly ? false : "OARO_Clique_PrepareActivation".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
         }
 
-        if (willingness < 0.9f)
+        if (IsBranchClique)
         {
-            return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName),
-                                                                                        0.9f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance));
-        }
+            if (IsFriendlyBranchClique)
+            {
+                mapRecommendationCount = mapRecommendationCount >= 0 ? mapRecommendationCount : RecommendationUtility.CurRecommendationCount(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true));
+                if (mapRecommendationCount < 1)
+                {
+                    return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(1.Named(KeyLibrary_FormatArgName.Count));
+                }
+                else
+                {
+                    return true;
+                }
+            }
+            else
+            {
+                if (RelatedBranch.Supply < 0.25f)
+                {
+                    return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate(0.25f.ToStringPercent());
+                }
+                if (willingness < 0.6f)
+                {
+                    return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                                                                                                0.6f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance));
+                }
 
-        return true;
+                return true;
+            }
+        }
+        else
+        {
+            if (willingness < 0.9f)
+            {
+                return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                                                                                            0.9f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance));
+            }
+
+            return true;
+        }
     }
 
     public AcceptanceReport CanBribable(Map map, bool resultOnly)

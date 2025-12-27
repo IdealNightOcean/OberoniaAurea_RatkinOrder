@@ -150,9 +150,9 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss))
         {
-            return "UNKOWN";
+            return clique.Name;
         }
-        return clique.Name;
+        return "UNKOWN";
     }
 
     public bool TryAddClique(QuestClique clique, bool replaceCur = false, bool defaultActive = false)
@@ -225,51 +225,23 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
-            return false;
+            return clique.CanActiveNow(directly: directly, resultOnly: true);
         }
-        return CanActiveClique(clique, directly);
-    }
-
-    private bool CanActiveClique(QuestClique clique, bool directly = false)
-    {
-        if (!clique.IsActivatable || clique.IsActive)
-        {
-            return false;
-        }
-        if (directly)
-        {
-            return true;
-        }
-        if (clique.TicksToActive > 0)
-        {
-            return false;
-        }
-        if (clique.IsBranchClique)
-        {
-            if (clique.RelatedBranch.Supply < 0.25f)
-            {
-                return false;
-            }
-            if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
-            {
-                return RecommendationUtility.CurRecommendationCount(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true)) >= 1;
-            }
-        }
-        return clique.Willingness > 0.999f;
+        return false;
     }
 
     public bool TryActiveClique(string cliqueKey, bool directly = false, int activeDelayTicks = -1)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
-            return false;
+            return TryActiveClique(clique, directly, activeDelayTicks);
         }
-        return TryActiveClique(clique, directly, activeDelayTicks);
+        return false;
     }
 
     private bool TryActiveClique(QuestClique clique, bool directly = false, int activeDelayTicks = -1)
     {
-        if (!CanActiveClique(clique, directly))
+        if (!clique.CanActiveNow(directly: directly, resultOnly: true))
         {
             return false;
         }
@@ -388,7 +360,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(clique.Name.Named(KeyLibrary_FormatArgName.CliqueName))));
 
-            if (CanActiveClique(clique))
+            if (clique.CanActiveNow(directly: false, resultOnly: true))
             {
                 TryActiveClique(clique, directly: false);
             }
@@ -424,17 +396,14 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             clique.AdjustCliqueWillingness(willingnessGain);
             Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(text.Translate()));
 
-            if (CanActiveClique(clique))
+            if (clique.CanActiveNow(directly: false, resultOnly: true))
             {
                 TryActiveClique(clique, directly: false);
             }
         }
     }
 
-    public void SetOrderBranch(Branch branch)
-    {
-        this.branch = branch;
-    }
+    public void SetOrderBranch(Branch branch) => this.branch = branch;
 
     public void Notify_BranchDestroyed(Branch branch)
     {

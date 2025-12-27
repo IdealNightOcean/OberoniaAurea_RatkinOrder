@@ -65,10 +65,7 @@ public sealed class QuestNode_CollectionTeam : QuestNode
 
     public SlateRef<IsolatedPawnGroupMakerDef> isolatedPawnGroupMakerDef;
 
-    protected override bool TestRunInt(Slate slate)
-    {
-        return questPartClass.GetValue(slate).IsSubclassOf(typeof(QuestPart_CollectionTeam));
-    }
+    protected override bool TestRunInt(Slate slate) => questPartClass.GetValue(slate).IsSubclassOf(typeof(QuestPart_CollectionTeam));
 
     protected override void RunInt()
     {
@@ -92,11 +89,13 @@ public sealed class QuestNode_CollectionTeam : QuestNode
         questPart_CollectionTeam.Faction = faction.GetValue(slate) ?? questPart_CollectionTeam.Branch?.RatkinOrder.Faction;
 
         questPart_CollectionTeam.inSignalEnable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalEnable.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
-        questPart_CollectionTeam.inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisable.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
+        questPart_CollectionTeam.inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisable.GetValue(slate));
         questPart_CollectionTeam.InSignalDisablePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID(inSignalDisablePawnsArrival.GetValue(slate));
         questPart_CollectionTeam.InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID(inSignalPawnsLeave.GetValue(slate));
         questPart_CollectionTeam.InSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID(inSignalRemovePawn.GetValue(slate));
         questPart_CollectionTeam.InSignalLeftMap = QuestGenUtility.HardcodedSignalWithQuestID(inSignalLeftMap.GetValue(slate));
+
+        questPart_CollectionTeam.signalListenMode = QuestPart.SignalListenMode.OngoingOnly;
 
         questPart_CollectionTeam.OutSignalPawnsArrived = QuestGenUtility.HardcodedSignalWithQuestID(outSignalPawnsArrived.GetValue(slate));
         questPart_CollectionTeam.OutSignalGive = QuestGenUtility.HardcodedSignalWithQuestID(outSignalGive.GetValue(slate));
@@ -372,7 +371,6 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
     protected override void ProcessQuestSignal(Signal signal)
     {
-        base.ProcessQuestSignal(signal);
         if (signal.tag == InSignalMakePawnsLeave)
         {
             canTryArrival = false;
@@ -381,28 +379,20 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
                 MakeLeave();
             }
         }
-
         if (Pawns is not null)
         {
-            if (signal.tag == InSignalLeftMap)
+            if (signal.tag == InSignalLeftMap && signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p1))
             {
-                if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
+                Pawns.Remove(p1);
+                if (Pawns.Count == 0)
                 {
-                    Pawns.Remove(p);
-                    if (Pawns.Count == 0)
-                    {
-                        if (hasFulfilled)
-                        {
-                            Find.SignalManager.SendSignal(new Signal(OutSignalAllLeftMapAndGive));
-                        }
-                        Find.SignalManager.SendSignal(new Signal(OutSignalAllLeftMap));
-                        Complete();
-                    }
+                    Find.SignalManager.SendSignal(new Signal(hasFulfilled ? OutSignalAllLeftMapAndGive : OutSignalAllLeftMap));
+                    Complete();
                 }
             }
-            else if (signal.tag == InSignalRemovePawn && signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p))
+            else if (signal.tag == InSignalRemovePawn && signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p2))
             {
-                Pawns.Remove(p);
+                Pawns.Remove(p2);
                 if (Pawns.Count == 0)
                 {
                     Disable();
@@ -414,6 +404,8 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             Find.SignalManager.SendSignal(new Signal(OutSignalAllLeftMap));
             Complete();
         }
+
+        base.ProcessQuestSignal(signal);
     }
 
     protected override void Enable(SignalArgs receivedArgs)
@@ -449,7 +441,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         }
     }
 
-    protected virtual bool TryMakeTeamArrive()
+    protected bool TryMakeTeamArrive()
     {
         if (Pawns.NullOrEmpty())
         {
@@ -458,7 +450,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
         if (MapParent is null)
         {
-            quest.End(QuestEndOutcome.Unknown, sendLetter: false, playSound: false);
+            return false;
         }
         Map map = MapParent.Map;
 
@@ -574,24 +566,6 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         }
     }
 
-    public void Notify_RatkinOrderRemoved(RatkinOrder order)
-    {
-        if (Branch?.RatkinOrder is not null && RatkinOrder == order)
-        {
-            Branch = null;
-            canTryArrival = false;
-        }
-    }
-
-    public void Notify_BranchDestroyed(Branch branch)
-    {
-        if (Branch is not null && Branch == branch)
-        {
-            Branch = null;
-            canTryArrival = false;
-        }
-    }
-
     protected AcceptanceReport CanGiveAllRequestThings(Map map)
     {
         if (map is null)
@@ -671,7 +645,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     protected void PostMakeDecision()
     {
         Find.SignalManager.SendSignal(new Signal(OutSignalDecided));
-        Disable();
+        MakeLeave();
     }
 
     public override void DoDebugWindowContents(Rect innerRect, ref float curY)
@@ -688,4 +662,23 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     }
 
     public override bool QuestPartReserves(Pawn p) => Pawns?.Contains(p) ?? false;
+
+    public void Notify_RatkinOrderRemoved(RatkinOrder order)
+    {
+        if (Branch?.RatkinOrder is not null && RatkinOrder == order)
+        {
+            Branch = null;
+            canTryArrival = false;
+        }
+    }
+
+    public void Notify_BranchDestroyed(Branch branch)
+    {
+        if (Branch is not null && Branch == branch)
+        {
+            Branch = null;
+            canTryArrival = false;
+        }
+    }
+
 }

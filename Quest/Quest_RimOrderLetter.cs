@@ -9,7 +9,7 @@ public class QuestNode_RimOrderLetter : QuestNode_ChoiceLetter
 {
     public SlateRef<RatkinOrder> ratkinOrder;
 
-    protected override Type PartClass => partClass.GetValue(QuestGen.slate) ?? typeof(ChoiceLetter_RatkinOrder);
+    protected override Type PartClass => partClass.GetValue(QuestGen.slate) ?? typeof(QuestPart_RimOrderLetter);
 
     protected override void PostGeneratePart(QuestPart_ChoiceLetter questPart_ChoiceLetter)
     {

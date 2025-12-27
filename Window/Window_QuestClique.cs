@@ -45,6 +45,7 @@ public class Window_QuestClique : OrderWindowBase
         Quest quest = demand.RelatedQuest ?? throw new ArgumentNullException(nameof(quest));
 
         Map = map ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: false) ?? Find.CurrentMap ?? throw new ArgumentNullException(nameof(map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
 
         if (!quest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
         {
@@ -58,8 +59,6 @@ public class Window_QuestClique : OrderWindowBase
         DemandWatcher = demandWatcher;
         MainBranch = DemandWatcher.Branch;
         DemandTexture = DemandDef.BackgroundTexture ?? IconLibrary.TransTex;
-
-        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -322,7 +321,7 @@ public class Window_QuestClique : OrderWindowBase
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
-            DrawInactiveClique_Clique(entryRect, clique);
+            DrawInactiveClique_Branch(entryRect, clique);
         }
         Widgets.EndScrollView();
         OARO_WindowUtility.ResetText();
@@ -426,7 +425,7 @@ public class Window_QuestClique : OrderWindowBase
         if (OARO_WindowUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_CliqueWin_Active".Translate(),
-            acceptance: clique.CanActiveable(directly: false, resultOnly: false),
+            acceptance: clique.CanActiveNow(directly: false, mapRecommendationCount: MapRecommendationCount.Value, resultOnly: false),
             baseTex: smallButton,
             downTex: smallButton_Down,
             doMouseoverSound: true))
@@ -461,7 +460,7 @@ public class Window_QuestClique : OrderWindowBase
         OARO_WindowUtility.ResetText();
     }
 
-    private void DrawInactiveClique_Clique(Rect inRect, QuestClique clique)
+    private void DrawInactiveClique_Branch(Rect inRect, QuestClique clique)
     {
         Branch branch = clique.RelatedBranch;
 
@@ -519,11 +518,11 @@ public class Window_QuestClique : OrderWindowBase
         {
             reusedRect = new(topRect.xMax - 138f, topRectY, 138f, topRectHeight);
             if (OARO_WindowUtility.TextButtonImageDisableable(
-                reusedRect,
-                "OARO_CliqueWin_Active".Translate(),
-                MapRecommendationCount.Value >= 1 ? true : "OARO_Insufficient_CurRecommendation".Translate(1.Named(KeyLibrary_FormatArgName.Count)),
-                bigButton,
-                bigButton_Down,
+                butRect: reusedRect,
+                label: "OARO_CliqueWin_Active".Translate(),
+                acceptance: clique.CanActiveNow(directly: false, mapRecommendationCount: MapRecommendationCount.Value, resultOnly: false),
+                baseTex: bigButton,
+                downTex: bigButton_Down,
                 doMouseoverSound: true,
                 tooltip: "OARO_CliqueWin_ActiveFriendlyCliqueTip".Translate()))
             {
@@ -544,7 +543,7 @@ public class Window_QuestClique : OrderWindowBase
             if (OARO_WindowUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: "OARO_CliqueWin_Active".Translate(),
-                acceptance: clique.CanActiveable(directly: false, resultOnly: false),
+                acceptance: clique.CanActiveNow(directly: false, mapRecommendationCount: MapRecommendationCount.Value, resultOnly: false),
                 baseTex: smallButton,
                 downTex: smallButton_Down,
                 doMouseoverSound: true))

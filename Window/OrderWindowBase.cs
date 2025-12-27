@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class OrderWindowBase : Window
 {
     protected override float Margin => 0f;
-    protected bool Closed { get; set; }
+    protected bool HasClosed { get; set; }
     public OrderWindowBase()
     {
         forcePause = true;
@@ -27,7 +27,7 @@ public abstract class OrderWindowBase : Window
 
     public override void Close(bool doCloseSound = true)
     {
-        Closed = true;
+        HasClosed = true;
         OARO_WindowUtility.ResetText();
         base.Close(doCloseSound);
     }

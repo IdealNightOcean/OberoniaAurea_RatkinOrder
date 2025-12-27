@@ -27,7 +27,14 @@ public static class ModUtility
     {
         if (worldObject is not null && !worldObject.Destroyed)
         {
-            worldObject.Destroy();
+            if (worldObject is MapParent mapParent && mapParent.HasMap)
+            {
+                mapParent.forceRemoveWorldObjectWhenMapRemoved = true;
+            }
+            else
+            {
+                worldObject.Destroy();
+            }
         }
     }
 

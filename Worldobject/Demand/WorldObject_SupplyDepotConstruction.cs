@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using RimWorld.Planet;
 using System.Linq;
 using System.Text;
@@ -67,7 +66,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
                     ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
                         label: "OARO_SupplyDepot_FinallyAutoFinishedLabel".Translate(),
                         text: "OARO_SupplyDepot_FinallyAutoFinishedText".Translate(),
-                        def: LetterDefOf.PositiveEvent,
+                        def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
                         lookTargets: this,
                         relatedFaction: RatkinOrder?.Faction,
                         quest: quest);
@@ -97,7 +96,9 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
         if (constricProgress >= 800f)
         {
             this.SendWorkResolvedSignal();
-            Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_SupplyDepot_FinallyFinished".Translate(), RatkinOrder));
+            Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                text: "OARO_SupplyDepot_FinallyFinished".Translate(),
+                ratkinOrder: RatkinOrder));
 
             PlanetTile tile = Tile;
             this.SafeDestroy();
@@ -110,7 +111,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
                 ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
                     label: "OARO_SupplyDepot_AutoCtorAvailableLabel".Translate(),
                     text: "OARO_SupplyDepot_AutoCtorAvailableText".Translate(),
-                    def: LetterDefOf.PositiveEvent,
+                    def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
                     lookTargets: this,
                     relatedFaction: RatkinOrder?.Faction,
                     quest: quest);
@@ -119,7 +120,9 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
             }
             else
             {
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_SupplyDepot_Finished".Translate(gainProgress.ToString("0.##")), Faction));
+                Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                    text: "OARO_SupplyDepot_Finished".Translate(gainProgress.ToString("0.##")),
+                    ratkinOrder: RatkinOrder));
             }
         }
     }

@@ -11,6 +11,6 @@ public class JointPatrolInteractionPart_Fund : JointPatrolInteractionPart
     public override void ApplyPart(JointPatrolInteractionDef def, JointBranchRecord record, StringBuilder effectExplain)
     {
         record.Branch.RatkinOrder.FundHandler.AdjustFundsImmediately(change, changeReason ?? def.label);
-        effectExplain.AppendLine("OARO_ChangeOffset_Fund".Translate(change.ToStringPercentSigned("0.##")));
+        effectExplain.AppendLine("OARO_ChangeOffset_Fund".Translate(change.ToStringPercentSigned("0.##")).Colorize(partRecordColor));
     }
 }

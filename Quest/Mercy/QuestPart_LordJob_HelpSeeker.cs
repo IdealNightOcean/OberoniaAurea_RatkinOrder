@@ -39,10 +39,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         ParentFaction = null;
     }
 
-    public override void TalkAction(Pawn talker, Pawn talkWith)
-    {
-        Find.WindowStack.Add(HelpQuizNodeTree(talkWith));
-    }
+    public override void TalkAction(Pawn talker, Pawn talkWith) => Find.WindowStack.Add(HelpQuizNodeTree(talkWith));
 
     private Dialog_NodeTree HelpQuizNodeTree(Pawn talkWith)
     {

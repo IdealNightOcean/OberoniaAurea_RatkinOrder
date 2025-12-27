@@ -24,7 +24,7 @@ public class Window_BranchDemand : OrderWindowBase
 
     private RatkinOrder RatkinOrder { get; }
     private Map Map { get; }
-    private LazyMutable<int> MapRecommendationLetterCount { get; }
+    private LazyMutable<int> MapRecommendationCount { get; }
 
     private TabType CurTab { get; set; } = TabType.All;
     private List<TabRecord> Tabs { get; } = new(3);
@@ -61,7 +61,7 @@ public class Window_BranchDemand : OrderWindowBase
         RatkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         Map = map ?? throw new ArgumentNullException(nameof(map));
 
-        MapRecommendationLetterCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
+        MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         SelDemandCliqueManager = new(refreshFunc: RefreshCliquesManager);
 
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
@@ -239,7 +239,7 @@ public class Window_BranchDemand : OrderWindowBase
         Widgets.Label(reusedRectII, "OARO_RecommendationLetter".Translate());
 
         reusedRectII = Rect.MinMaxRect(reusedRectII.xMax + 6f, reusedRect.yMin, reusedRect.xMax, reusedRect.yMax);
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRectII, MapRecommendationLetterCount.Value);
+        OARO_WindowUtility.DrawRecommendationInfo(reusedRectII, MapRecommendationCount.Value);
 
         reusedRect = inRect;
         reusedRect.width /= 2;

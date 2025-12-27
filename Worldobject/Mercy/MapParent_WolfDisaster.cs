@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class MapParent_WolfDisaster : MapParent_Enterable
 {
     private Pawn wolf;
-    private bool WolfDead { get; set; }
+    private bool WolfDeadMarked { get; set; }
     private int TicksToNextCheck { get; set; }
 
     public override void ExposeData()
@@ -21,11 +21,15 @@ public class MapParent_WolfDisaster : MapParent_Enterable
     {
         try
         {
-            IntVec3 spawnCell = CellFinder.RandomSpawnCellForPawnNear(Map.Center, Map);
-            PawnGenerationRequest request = new(OARO_RimWorldDefOf.Wolf_Timber, tile: Map.Tile, forceGenerateNewPawn: true);
+            Map map = Map;
+            if (!CellFinder.TryFindRandomSpawnCellForPawnNear(map.Center, map, out IntVec3 spawnCell, extraValidator: SpawnCellValidator))
+            {
+                spawnCell = CellFinder.RandomNotEdgeCell(40, map);
+            }
+            PawnGenerationRequest request = new(OARO_RimWorldDefOf.Wolf_Timber, tile: map.Tile, forceGenerateNewPawn: true);
             wolf = PawnGenerator.GeneratePawn(request);
             wolf.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_WolfDisaster);
-            GenSpawn.Spawn(wolf, spawnCell, Map);
+            GenSpawn.Spawn(wolf, spawnCell, map);
             wolf.mindState.mentalStateHandler.TryStartMentalState(MentalStateDefOf.Manhunter, forced: true, forceWake: true);
             Find.LetterStack.ReceiveLetter(
                 label: "OARO_Enter_WolfDisasterLabel".Translate(),
@@ -33,6 +37,11 @@ public class MapParent_WolfDisaster : MapParent_Enterable
                 textLetterDef: LetterDefOf.ThreatSmall,
                 lookTargets: wolf,
                 quest: AssociatedQuest);
+
+            bool SpawnCellValidator(IntVec3 c)
+            {
+                return c.Standable(map) && map.reachability.CanReachBiggestMapEdgeDistrict(c);
+            }
         }
         catch (Exception ex)
         {
@@ -54,7 +63,7 @@ public class MapParent_WolfDisaster : MapParent_Enterable
     protected override void TickInterval(int delta)
     {
         base.TickInterval(delta);
-        if (WolfDead)
+        if (WolfDeadMarked)
         {
             return;
         }
@@ -67,17 +76,30 @@ public class MapParent_WolfDisaster : MapParent_Enterable
                 return;
             }
 
-            if (wolf.DestroyedOrNull() || wolf.Dead)
+            CheckWolfState();
+        }
+    }
+
+    public override void Notify_MyMapAboutToBeRemoved()
+    {
+        base.Notify_MyMapAboutToBeRemoved();
+        CheckWolfState();
+    }
+
+    private void CheckWolfState()
+    {
+        if (WolfDeadMarked) return;
+
+        if (wolf.DestroyedOrNull() || wolf.Dead)
+        {
+            WolfDeadMarked = true;
+            QuestUtility.SendQuestTargetSignals(questTags, "WolfDead");
+            ThoughtDef thoughtDef = DefDatabase<ThoughtDef>.GetNamedSilentFail("OARO_Thought_KillDisasterWolf");
+            if (thoughtDef is not null)
             {
-                WolfDead = true;
-                QuestUtility.SendQuestTargetSignals(questTags, "WolfDead");
-                ThoughtDef thoughtDef = DefDatabase<ThoughtDef>.GetNamedSilentFail("OARO_Thought_KillDisasterWolf");
-                if (thoughtDef is not null)
+                foreach (Pawn p in Map.mapPawns.FreeColonistsSpawned)
                 {
-                    foreach (Pawn p in Map.mapPawns.FreeColonistsSpawned)
-                    {
-                        p.needs.mood?.thoughts.memories.TryGainMemory(thoughtDef);
-                    }
+                    p.needs.mood?.thoughts.memories.TryGainMemory(thoughtDef);
                 }
             }
         }

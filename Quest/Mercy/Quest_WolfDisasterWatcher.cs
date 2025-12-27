@@ -65,6 +65,8 @@ internal sealed class QuestPart_WolfDisasterWatcher : QuestPartActivable
         InSignalObservationEstablished = null;
     }
 
+    public override string ExpiryInfoPart => "OARO_WolfDisaster_IntelligenceCount".Translate(validIntelligenceCount, ValidIntelligenceForDiscover);
+
     public override void Notify_QuestSignalReceived(Signal signal)
     {
         if (!observationEstablished && signal.tag == InSignalObservationEstablished)

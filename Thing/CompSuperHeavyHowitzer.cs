@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 using Verse;
 using Verse.AI;
 
@@ -10,6 +11,8 @@ public sealed class CompProperties_SuperHeavyHowitzer : CompProperties
 {
     public JobDef repairJob;
     public JobDef checkJob;
+    public SimpleCurve checkLatentCurve;
+    public SimpleCurve doubleRepairCurve;
 
     public CompProperties_SuperHeavyHowitzer()
     {
@@ -95,7 +98,7 @@ public sealed class CompSuperHeavyHowitzer : ThingComp
             }
         }
 
-        float checkChance = 0.2f + (selPawn.skills?.GetSkill(SkillDefOf.Construction).GetLevel() ?? 0f) * 0.035f;
+        float checkChance = Props.checkLatentCurve.Evaluate(selPawn.GetSkillLevel(SkillDefOf.Construction));
         yield return new FloatMenuOption(label: "OARO_SuperHeavyHowitzer_Check".Translate(
                                                     parent.Label,
                                                     checkChance.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance)),
@@ -118,15 +121,19 @@ public sealed class CompSuperHeavyHowitzer : ThingComp
 
     public void RepairHowitzer(Pawn pawn)
     {
+        float doubleRepairChance = Props.doubleRepairCurve.Evaluate(pawn.GetSkillLevel(SkillDefOf.Construction));
+        int repairCount = Rand.Chance(doubleRepairChance) ? 2 : 1;
         if (normalFaultLeft > 0)
         {
-            normalFaultLeft--;
+            normalFaultLeft = Mathf.Max(normalFaultLeft - repairCount, 0);
         }
         else if (extraFaultLeft > 0)
         {
-            extraFaultLeft--;
+            extraFaultLeft = Mathf.Max(extraFaultLeft - repairCount, 0);
         }
-        Messages.Message("OARO_SuperHeavyHowitzer_Repaired".Translate(pawn), MessageTypeDefOf.PositiveEvent);
+        Messages.Message(
+            text: "OARO_SuperHeavyHowitzer_Repaired".Translate(parent.LabelCap, pawn.Named(KeyLibrary_FormatArgName.PAWN), repairCount.Named(KeyLibrary_FormatArgName.Count)),
+            def: MessageTypeDefOf.PositiveEvent);
     }
 
     public void CheckHowitzer(Pawn pawn)

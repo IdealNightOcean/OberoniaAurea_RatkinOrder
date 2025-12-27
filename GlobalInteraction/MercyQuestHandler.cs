@@ -65,7 +65,7 @@ public class MercyQuestHandler : IExposable
         }
         else
         {
-            mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.1f, 0.8f);
+            mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.05f, 0.8f);
         }
     }
 

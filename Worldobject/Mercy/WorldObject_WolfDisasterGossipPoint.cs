@@ -106,45 +106,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
         if (Rand.Chance(0.24f))
         {
-            if (Rand.Bool)
-            {
-                GainIntelligence();
-                Find.LetterStack.ReceiveLetter(
-                    label: "OARO_WolfDisasterGossipPoint_WitnessLabel".Translate(),
-                    text: "OARO_WolfDisasterGossipPoint_WitnessText".Translate(),
-                    textLetterDef: LetterDefOf.PositiveEvent,
-                    lookTargets: caravan,
-                    relatedFaction: Faction,
-                    quest: quest);
-            }
-            else
-            {
-                List<Thing> rewardThings = [];
-                Thing t = ThingMaker.MakeThing(ThingDefOf.Cloth);
-                t.stackCount = Rand.Range(180, 220);
-                rewardThings.Add(t);
-
-                t = ThingMaker.MakeThing(DefDatabase<ThingDef>.GetNamedSilentFail("RawRice"));
-                t.stackCount = Rand.Range(360, 440);
-                rewardThings.Add(t);
-
-                t = ThingMaker.MakeThing(ThingDefOf.Silver);
-                t.stackCount = Rand.Range(30, 60);
-                rewardThings.Add(t);
-
-                foreach (Thing item in rewardThings)
-                {
-                    CaravanInventoryUtility.GiveThing(caravan, item);
-                }
-
-                Find.LetterStack.ReceiveLetter(
-                    label: "OARO_WolfDisasterGossipPoint_FrightenedWitnessLabel".Translate(),
-                    text: "OARO_WolfDisasterGossipPoint_FrightenedWitnessText".Translate(GenLabel.ThingsLabel(rewardThings).Named(KeyLibrary_FormatArgName.ThingsInfo)),
-                    textLetterDef: LetterDefOf.PositiveEvent,
-                    lookTargets: caravan,
-                    relatedFaction: Faction,
-                    quest: quest);
-            }
+            TriggerGossipEvent(caravan);
         }
 
         DiaNode rootNode = gossipType switch
@@ -164,6 +126,49 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
         Find.WindowStack.Add(new Dialog_NodeTreeWithFactionInfo(rootNode, Faction));
     }
 
+    private void TriggerGossipEvent(Caravan caravan)
+    {
+        if (Rand.Bool)
+        {
+            GainIntelligence();
+            Find.LetterStack.ReceiveLetter(
+                label: "OARO_WolfDisasterGossipPoint_WitnessLabel".Translate(),
+                text: "OARO_WolfDisasterGossipPoint_WitnessText".Translate(),
+                textLetterDef: LetterDefOf.PositiveEvent,
+                lookTargets: caravan,
+                relatedFaction: Faction,
+                quest: quest);
+        }
+        else
+        {
+            List<Thing> rewardThings = [];
+            Thing t = ThingMaker.MakeThing(ThingDefOf.Cloth);
+            t.stackCount = Rand.Range(180, 220);
+            rewardThings.Add(t);
+
+            t = ThingMaker.MakeThing(DefDatabase<ThingDef>.GetNamedSilentFail("RawRice"));
+            t.stackCount = Rand.Range(360, 440);
+            rewardThings.Add(t);
+
+            t = ThingMaker.MakeThing(ThingDefOf.Silver);
+            t.stackCount = Rand.Range(30, 60);
+            rewardThings.Add(t);
+
+            foreach (Thing item in rewardThings)
+            {
+                CaravanInventoryUtility.GiveThing(caravan, item);
+            }
+
+            Find.LetterStack.ReceiveLetter(
+                label: "OARO_WolfDisasterGossipPoint_FrightenedWitnessLabel".Translate(),
+                text: "OARO_WolfDisasterGossipPoint_FrightenedWitnessText".Translate(GenLabel.ThingsLabel(rewardThings).Named(KeyLibrary_FormatArgName.ThingsInfo)),
+                textLetterDef: LetterDefOf.PositiveEvent,
+                lookTargets: caravan,
+                relatedFaction: Faction,
+                quest: quest);
+        }
+    }
+
     private DiaNode IntuitionRootNode(Caravan caravan)
     {
         (Pawn maxSkillPawn, _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(caravan.PawnsListForReading, SkillDefOf.Animals);
@@ -179,13 +184,11 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
             {
                 opt.action = delegate
                 {
+                    this.SafeDestroy();
                     GainIntelligence();
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterGossipPoint_Intuition_RightDirection".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN)),
                         Faction));
-
-                    this.SafeDestroy();
-
                 };
             }
             else
@@ -200,8 +203,6 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterGossipPoint_Intuition_WrongDirection".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN), 300.Named(KeyLibrary_FormatArgName.Count)),
                         Faction));
-
-                    this.SafeDestroy();
                 };
             }
             rootNode.options.Add(opt);
@@ -225,7 +226,6 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
         {
             action = delegate
             {
-                this.SafeDestroy();
                 Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                     text: "OARO_WolfDisasterGossipPoint_HabitatNotPass_Reply".Translate(),
                     faction: Faction));
@@ -242,7 +242,6 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
             if (maxSkillLevel >= 15)
             {
                 this.SafeDestroy();
-                GainIntelligence();
                 foreach (Pawn p in caravan.PawnsListForReading)
                 {
                     p.skills?.Learn(SkillDefOf.Animals, 1000f);
@@ -291,6 +290,8 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
                     }));
             }
+
+            GainIntelligence();
         }
     }
 
@@ -322,9 +323,9 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
         {
             action = delegate
             {
-                this.SafeDestroy();
                 if (Rand.Chance(successChance))
                 {
+                    this.SafeDestroy();
                     GainIntelligence(1);
                     Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterGossipPoint_DeliberateTraces_Success".Translate(),
@@ -347,7 +348,6 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
         {
             action = delegate
             {
-                this.SafeDestroy();
                 Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                          text: "OARO_WolfDisasterGossipPoint_DeliberateTraces_NotCheckReply".Translate(),
                          faction: Faction));

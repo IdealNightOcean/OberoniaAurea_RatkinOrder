@@ -27,7 +27,6 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
     private string FaultLabel => $"OARO_ApplianceFault_{faultType}".Translate();
 
     private bool hasFoundReason;
-    private float successChance;
 
     public override int TicksNeeded => hasFoundReason ? 30000 : 20000;
 
@@ -36,7 +35,6 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         base.ExposeData();
         Scribe_Values.Look(ref faultType, nameof(faultType), FaultType.Line);
         Scribe_Values.Look(ref repairType, nameof(repairType), FaultType.Line);
-        Scribe_Values.Look(ref successChance, nameof(successChance), 0f);
         Scribe_Values.Look(ref hasFoundReason, nameof(hasFoundReason), defaultValue: false);
     }
 
@@ -51,9 +49,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         StringBuilder sb = new(base.GetInspectString());
         if (hasFoundReason)
         {
-            sb.AppendInNewLine("OARO_ApplianceRepair_CurFault".Translate());
-            sb.Append(": ");
-            sb.Append(FaultLabel);
+            sb.AppendInNewLine("OARO_ApplianceRepair_CurFault".Translate(FaultLabel.Named(KeyLibrary_FormatArgName.Reason)));
         }
         return sb.ToString();
     }
@@ -88,7 +84,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
         if (hasFoundReason)
         {
-            if (Rand.Chance(successChance))
+            if (Rand.Chance(GetRepairChance(associatedFixedCaravan.PawnsListForReading)))
             {
                 taggedString = "OARO_ApplianceRepair_RepairSuccess".Translate(maxPawn.Named(KeyLibrary_FormatArgName.PAWN));
                 this.SendWorkResolvedSignal();
@@ -100,7 +96,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         }
         else
         {
-            if (Rand.Chance(GetSuccessChance(associatedFixedCaravan.PawnsListForReading)))
+            if (Rand.Chance(GetReasonFindChance(associatedFixedCaravan.PawnsListForReading)))
             {
                 hasFoundReason = true;
                 taggedString = "OARO_ApplianceRepair_FindReasonSuccess".Translate(maxPawn.Named(KeyLibrary_FormatArgName.PAWN), FaultLabel.Named(KeyLibrary_FormatArgName.Reason));
@@ -115,12 +111,6 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(taggedString, Faction));
     }
 
-    private float GetSuccessChance(IEnumerable<Pawn> pawns)
-    {
-        int maxSuccessChance = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Crafting);
-        return 0.25f + 0.05f * maxSuccessChance;
-    }
-
     protected override void InterruptWork()
     {
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
@@ -131,12 +121,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
     private void RepairDialog(Caravan caravan)
     {
-        StringBuilder sb = new("OARO_ApplianceRepair_RepairInfo".Translate());
-        sb.AppendInNewLine("OARO_ApplianceRepair_CurFault".Translate());
-        sb.Append(": ");
-        sb.Append(FaultLabel);
-
-        DiaNode repairNode = new(sb.ToString());
+        DiaNode repairNode = new("OARO_ApplianceRepair_RepairInfo".Translate(FaultLabel.Named(KeyLibrary_FormatArgName.Reason)));
 
         foreach (FaultType type in EnumUtility.GetValues<FaultType>())
         {
@@ -163,8 +148,18 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         {
             OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.ComponentIndustrial, 2);
         }
+        base.StartWork(caravan);
+    }
 
-        int maxConstructionSkill = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Crafting);
+    private float GetReasonFindChance(IEnumerable<Pawn> pawns)
+    {
+        int maxSuccessChance = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Crafting);
+        return 0.25f + 0.05f * maxSuccessChance;
+    }
+
+    private float GetRepairChance(IEnumerable<Pawn> pawns)
+    {
+        int maxConstructionSkill = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Crafting);
         float successChance = maxConstructionSkill * 0.05f;
         successChance *= faultType switch
         {
@@ -178,7 +173,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         {
             successChance *= 2f;
         }
-        this.successChance = successChance;
-        base.StartWork(caravan);
+
+        return successChance;
     }
 }
