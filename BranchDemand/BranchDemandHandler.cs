@@ -35,6 +35,7 @@ public class BranchDemandHandler : ITickDay, IExposable
         }
         else
         {
+            listing_Rect.SubLabel(normalDemand.Def.label, 0.8f);
             listing_Rect.SubLabel(normalDemand.ToString(), 0.8f);
             if (listing_Rect.ButtonText("Accept".Translate(), widthPct: 0.6f))
             {
@@ -169,7 +170,9 @@ public class BranchDemandHandler : ITickDay, IExposable
             bool showMessage = demandDef.IsCritical ? RatkinOrderSettings.CriticalDemandShowMess : RatkinOrderSettings.NoramlDemandShowMess;
             if (showMessage)
             {
-                Messages.Message("OARO_Message_DemandFriendlyInform".Translate(branch.Name, demandDef.label), MessageTypeDefOf.PositiveEvent);
+                Messages.Message(
+                    text: "OARO_Message_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.Named(KeyLibrary_FormatArgName.DEMAND)),
+                    def: MessageTypeDefOf.PositiveEvent);
             }
             if (Rand.Bool && !branch.RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.DemandFriendlyInform))
             {
@@ -178,7 +181,7 @@ public class BranchDemandHandler : ITickDay, IExposable
                 OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
                                                    text: "OARO_LetterLabel_DemandFriendlyInform".Translate(
                                                        branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
-                                                       demandDef.Named("DEMAND")),
+                                                       demandDef.Named(KeyLibrary_FormatArgName.DEMAND)),
                                                    def: OrderLetterDefOf.OARO_OfficialLetter,
                                                    relatedOrder: branch.RatkinOrder,
                                                    relatedBranch: branch,

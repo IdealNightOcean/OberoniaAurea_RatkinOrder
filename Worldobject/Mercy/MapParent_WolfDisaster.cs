@@ -26,7 +26,8 @@ public class MapParent_WolfDisaster : MapParent_Enterable
             {
                 spawnCell = CellFinder.RandomNotEdgeCell(40, map);
             }
-            PawnGenerationRequest request = new(OARO_RimWorldDefOf.Wolf_Timber, tile: map.Tile, forceGenerateNewPawn: true);
+            PawnKindDef timberDef = DefDatabase<PawnKindDef>.GetNamed("Wolf_Timber");
+            PawnGenerationRequest request = new(timberDef, tile: map.Tile, forceGenerateNewPawn: true);
             wolf = PawnGenerator.GeneratePawn(request);
             wolf.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_WolfDisaster);
             GenSpawn.Spawn(wolf, spawnCell, map);

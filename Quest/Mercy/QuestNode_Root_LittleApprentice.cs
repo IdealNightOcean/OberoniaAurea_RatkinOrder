@@ -79,7 +79,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         if (pawn.ageTracker.AgeBiologicalYearsFloat < 7f)
         {
             float ageAddYear = 7f - pawn.ageTracker.AgeBiologicalYearsFloat;
-            pawn.ageTracker.AgeBiologicalTicks -= (long)((ageAddYear + 0.1f) * 3600000f);
+            pawn.ageTracker.AgeBiologicalTicks += (long)((ageAddYear + 0.1f) * 3600000f);
         }
     }
 

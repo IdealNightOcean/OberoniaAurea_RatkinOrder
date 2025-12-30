@@ -124,8 +124,5 @@ public class BranchDemand : IExposable
         }
     }
 
-    public override string ToString()
-    {
-        return def.defName + "-" + curState.ToString();
-    }
+    public override string ToString() => $"{def.defName} - {curState}";
 }

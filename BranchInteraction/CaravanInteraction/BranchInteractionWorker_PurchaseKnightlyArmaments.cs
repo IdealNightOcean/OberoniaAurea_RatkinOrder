@@ -8,28 +8,43 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
-    private static readonly IReadOnlyList<ThingDef> stuffs =
-        [
-            ThingDefOf.WoodLog,
-            ThingDefOf.Cloth,
-            ThingDefOf.Steel,
-            ThingDefOf.Plasteel
-        ];
+    private ThingDef MetallicStuff { get; set; }
+    private ThingDef LeatheryFabricStuff { get; set; }
+    private QualityCategory Quality { get; set; }
+
     protected override void ApplyInteraction(BranchInteractionParms parms)
     {
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(StuffNode(parms), parms.RatkinOrder);
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(MetallicStuffNode(parms), parms.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
     }
 
-    private DiaNode StuffNode(BranchInteractionParms parms)
+    private DiaNode MetallicStuffNode(BranchInteractionParms parms)
     {
-        DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_Stuff".Translate());
+        DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_MetallicStuff".Translate());
 
-        foreach (ThingDef stuff in stuffs)
+        DiaOption woodLogOpt = new(ThingDefOf.WoodLog.label)
+        {
+            action = () => MetallicStuff = ThingDefOf.WoodLog,
+            linkLateBind = () => LeatheryFabricStuffNode(parms),
+            resolveTree = false
+        };
+        rootNode.options.Add(woodLogOpt);
+
+        DiaOption clothOpt = new(ThingDefOf.Cloth.label)
+        {
+            action = () => MetallicStuff = ThingDefOf.Cloth,
+            linkLateBind = () => LeatheryFabricStuffNode(parms),
+            resolveTree = false
+        };
+        rootNode.options.Add(clothOpt);
+
+        IEnumerable<ThingDef> metallicStuffs = GenStuff.AllowedStuffs([StuffCategoryDefOf.Metallic]);
+        foreach (ThingDef stuff in metallicStuffs)
         {
             DiaOption stuffOpt = new(stuff.label)
             {
-                linkLateBind = () => QualityNode(parms, stuff),
+                action = () => MetallicStuff = stuff,
+                linkLateBind = () => LeatheryFabricStuffNode(parms),
                 resolveTree = false
             };
             rootNode.options.Add(stuffOpt);
@@ -40,47 +55,79 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         return rootNode;
     }
 
-    private DiaNode QualityNode(BranchInteractionParms parms, ThingDef stuff)
+    private DiaNode LeatheryFabricStuffNode(BranchInteractionParms parms)
     {
-        int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
+        DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_LeatheryFabricStuff".Translate());
+
+        DiaOption woodLogOpt = new(ThingDefOf.WoodLog.label)
+        {
+            action = () => LeatheryFabricStuff = ThingDefOf.WoodLog,
+            linkLateBind = () => QualityNode(parms),
+            resolveTree = false
+        };
+        rootNode.options.Add(woodLogOpt);
+
+        DiaOption clothOpt = new(ThingDefOf.Steel.label)
+        {
+            action = () => LeatheryFabricStuff = ThingDefOf.Steel,
+            linkLateBind = () => QualityNode(parms),
+            resolveTree = false
+        };
+        rootNode.options.Add(clothOpt);
+
+        IEnumerable<ThingDef> metallicStuffs = GenStuff.AllowedStuffs([StuffCategoryDefOf.Leathery, StuffCategoryDefOf.Fabric]);
+        foreach (ThingDef stuff in metallicStuffs)
+        {
+            DiaOption stuffOpt = new(stuff.label)
+            {
+                action = () => LeatheryFabricStuff = stuff,
+                linkLateBind = () => QualityNode(parms),
+                resolveTree = false
+            };
+            rootNode.options.Add(stuffOpt);
+        }
+        DiaOption goBackOpt = new("GoBack".Translate())
+        {
+            linkLateBind = () => MetallicStuffNode(parms),
+            resolveTree = false
+        };
+        rootNode.options.Add(goBackOpt);
+        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+
+        return rootNode;
+    }
+
+    private DiaNode QualityNode(BranchInteractionParms parms)
+    {
         DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_Quality".Translate());
 
-        DiaOption goodOption = new(QualityCategory.Good.GetLabel() + (4000))
+        DiaOption goodOption = new(QualityCategory.Good.GetLabel())
         {
-            action = () => GiveKnightlyArmaments(parms, QualityCategory.Good, stuff, 4000),
-            resolveTree = true
+            action = () => Quality = QualityCategory.Good,
+            linkLateBind = () => ConfirmNode(parms),
+            resolveTree = false
         };
         rootNode.options.Add(goodOption);
-        if (caravanSilver < 4000)
-        {
-            goodOption.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, 4000.ToString()));
-        }
 
-        DiaOption excellentOption = new(QualityCategory.Excellent.GetLabel() + (6000))
+        DiaOption excellentOption = new(QualityCategory.Excellent.GetLabel())
         {
-            action = () => GiveKnightlyArmaments(parms, QualityCategory.Excellent, stuff, 6000),
-            resolveTree = true
+            action = () => Quality = QualityCategory.Excellent,
+            linkLateBind = () => ConfirmNode(parms),
+            resolveTree = false
         };
         rootNode.options.Add(excellentOption);
-        if (caravanSilver < 6000)
-        {
-            goodOption.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, 6000.ToString()));
-        }
 
-        DiaOption masterworkOption = new(QualityCategory.Masterwork.GetLabel() + (8000))
+        DiaOption masterworkOption = new(QualityCategory.Masterwork.GetLabel())
         {
-            action = () => GiveKnightlyArmaments(parms, QualityCategory.Excellent, stuff, 8000),
-            resolveTree = true
+            action = () => Quality = QualityCategory.Masterwork,
+            linkLateBind = () => ConfirmNode(parms),
+            resolveTree = false
         };
         rootNode.options.Add(masterworkOption);
-        if (caravanSilver < 8000)
-        {
-            goodOption.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, 8000.ToString()));
-        }
 
         DiaOption backOpt = new("GoBack".Translate())
         {
-            linkLateBind = () => StuffNode(parms),
+            linkLateBind = () => LeatheryFabricStuffNode(parms),
             resolveTree = false
         };
         rootNode.options.Add(backOpt);
@@ -88,7 +135,76 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         return rootNode;
     }
 
-    private void GiveKnightlyArmaments(BranchInteractionParms parms, QualityCategory quality, ThingDef stuffDef, int price)
+    private DiaNode ConfirmNode(BranchInteractionParms parms)
+    {
+        int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
+        int price = GetArmamentsPrice();
+        DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_Confirm".Translate(
+            MetallicStuff.Named("MetallicStuff"),
+            LeatheryFabricStuff.Named("LeatheryFabricStuff"),
+            Quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality),
+            price.Named(KeyLibrary_FormatArgName.Count)));
+
+        if (price > 0)
+        {
+            DiaOption confirmOpt = new("Confirm".Translate())
+            {
+                action = () => GiveKnightlyArmaments(parms, price),
+                resolveTree = true
+            };
+            rootNode.options.Add(confirmOpt);
+            if (caravanSilver < price)
+            {
+                confirmOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, price.ToString()));
+            }
+        }
+
+        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+
+        DiaOption backOpt = new("GoBack".Translate())
+        {
+            linkLateBind = () => QualityNode(parms),
+            resolveTree = false
+        };
+        rootNode.options.Add(backOpt);
+
+        return rootNode;
+    }
+
+    private int GetArmamentsPrice()
+    {
+        List<ThingDef> armaments = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
+        if (armaments.NullOrEmpty())
+        {
+            Log.Error($"[OARO] Null or Empty armaments list in {nameof(BranchInteractionWorker_PurchaseKnightlyArmaments)}.{nameof(GetArmamentsPrice)}");
+            return -1;
+        }
+
+        float totalPrice = 0f;
+
+        foreach (ThingDef def in armaments)
+        {
+            if (!def.MadeFromStuff)
+            {
+                totalPrice += StatDefOf.MarketValue.Worker.GetValue(StatRequest.For(def, stuffDef: null, quality: Quality));
+            }
+            else
+            {
+                if (def.stuffCategories.Contains(StuffCategoryDefOf.Metallic))
+                {
+                    totalPrice += StatDefOf.MarketValue.Worker.GetValue(StatRequest.For(def, stuffDef: MetallicStuff, quality: Quality));
+                }
+                else
+                {
+                    totalPrice += StatDefOf.MarketValue.Worker.GetValue(StatRequest.For(def, stuffDef: LeatheryFabricStuff, quality: Quality));
+                }
+            }
+        }
+
+        return (int)(totalPrice * 0.7f);
+    }
+
+    private void GiveKnightlyArmaments(BranchInteractionParms parms, int price)
     {
         List<ThingDef> armaments = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
         if (armaments.NullOrEmpty())
@@ -99,14 +215,33 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
 
         foreach (ThingDef def in armaments)
         {
-            Thing armament = ThingMaker.MakeThing(def, stuffDef);
-            armament.TryGetComp<CompQuality>()?.SetQuality(quality, ArtGenerationContext.Outsider);
+            Thing armament;
+            if (!def.MadeFromStuff)
+            {
+                armament = ThingMaker.MakeThing(def);
+
+            }
+            else
+            {
+                if (def.stuffCategories.Contains(StuffCategoryDefOf.Metallic))
+                {
+                    armament = ThingMaker.MakeThing(def, MetallicStuff);
+                }
+                else
+                {
+                    armament = ThingMaker.MakeThing(def, LeatheryFabricStuff);
+                }
+            }
             CaravanInventoryUtility.GiveThing(parms.Caravan, armament);
         }
 
         parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, price);
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-            text: "OARO_PurchaseKnightlyArmamentsRoot_Purchased".Translate(quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality), stuffDef.Named(KeyLibrary_FormatArgName.STUFF), price.ToString().Named("Price")),
+            text: "OARO_PurchaseKnightlyArmamentsRoot_Purchased".Translate(
+                MetallicStuff.Named("MetallicStuff"),
+                LeatheryFabricStuff.Named("LeatheryFabricStuff"),
+                Quality.GetLabel().Named(KeyLibrary_FormatArgName.Quality),
+                price.Named(KeyLibrary_FormatArgName.Count)),
             ratkinOrder: parms.Branch.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
 

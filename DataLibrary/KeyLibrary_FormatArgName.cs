@@ -22,6 +22,7 @@ public static class KeyLibrary_FormatArgName
 
     public const string ORDER = "ORDER";
     public const string BRANCH = "BRANCH";
+    public const string DEMAND = "DEMAND";
 
     public const string CliqueName = "CliqueName";
     public const string OrderName = "OrderName";

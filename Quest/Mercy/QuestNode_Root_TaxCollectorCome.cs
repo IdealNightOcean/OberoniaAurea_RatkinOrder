@@ -35,18 +35,17 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
     {
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
-        string rootInSignal = slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
         Map map = QuestGen_Get.GetMap();
         if (map is null)
         {
-            quest.End(QuestEndOutcome.Unknown, 0, null, rootInSignal, sendStandardLetter: false);
+            QuestGen_End.End(quest, QuestEndOutcome.Unknown, sendStandardLetter: false, playSound: false);
             return;
         }
 
         (Faction parentFaction, Faction subFaction) = GetFactions();
         if (parentFaction is null || subFaction is null)
         {
-            quest.End(QuestEndOutcome.Unknown, 0, null, rootInSignal, sendStandardLetter: false);
+            QuestGen_End.End(quest, QuestEndOutcome.Unknown, sendStandardLetter: false, playSound: false);
             return;
         }
 
@@ -153,9 +152,9 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
 
         quest.AddPart(questPart_AllOrdersEsteemChange_Suucess);
 
-        quest.End(QuestEndOutcome.Fail, -25, parentFaction, inSignalRemovePawn, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Fail, -5, parentFaction, outSignalExpired, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Success, 0, null, outSignalResolved, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Unknown, 0, null, outSignalTreatFail, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Fail, -25, parentFaction, inSignal: inSignalRemovePawn, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Fail, -5, parentFaction, inSignal: outSignalExpired, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Success, 0, null, inSignal: outSignalResolved, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Unknown, 0, null, inSignal: outSignalTreatFail, sendStandardLetter: true);
     }
 }

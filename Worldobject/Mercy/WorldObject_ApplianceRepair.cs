@@ -56,9 +56,9 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
     public override void Notify_CaravanArrived(Caravan caravan)
     {
-        if (!caravan.PawnsListForReading.Any(p => p.skills is not null && !p.skills.GetSkill(SkillDefOf.Crafting).TotallyDisabled))
+        if (!caravan.PawnsListForReading.Any(p => p.skills is not null && !p.skills.GetSkill(SkillDefOf.Construction).TotallyDisabled))
         {
-            Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Crafting.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
+            Messages.Message("OAFrame_MissSkillAvailablePawn".Translate(SkillDefOf.Construction.Named(KeyLibrary_FormatArgName.SKILL)), MessageTypeDefOf.RejectInput, historical: false);
             return;
         }
         base.Notify_CaravanArrived(caravan);
@@ -73,13 +73,17 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         }
         else
         {
+            float chance = GetReasonFindChance(caravan.PawnsListForReading);
+            Messages.Message(
+                text: "OARO_ApplianceRepair_ArrivalForReason".Translate(this.Named(KeyLibrary_FormatArgName.WORLDOBJECT), chance.ToStringPercent().Named(KeyLibrary_FormatArgName.Chance)),
+                def: MessageTypeDefOf.PositiveEvent);
             return base.StartWork(caravan);
         }
     }
 
     protected override void FinishWork()
     {
-        (Pawn maxPawn, int _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Crafting);
+        (Pawn maxPawn, int _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Construction);
         TaggedString taggedString;
 
         if (hasFoundReason)
@@ -153,13 +157,13 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
     private float GetReasonFindChance(IEnumerable<Pawn> pawns)
     {
-        int maxSuccessChance = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Crafting);
+        int maxSuccessChance = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Construction);
         return 0.25f + 0.05f * maxSuccessChance;
     }
 
     private float GetRepairChance(IEnumerable<Pawn> pawns)
     {
-        int maxConstructionSkill = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Crafting);
+        int maxConstructionSkill = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Construction);
         float successChance = maxConstructionSkill * 0.05f;
         successChance *= faultType switch
         {

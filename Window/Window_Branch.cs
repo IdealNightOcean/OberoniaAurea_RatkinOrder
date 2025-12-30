@@ -470,7 +470,7 @@ public class Window_Branch : OrderWindowBase
 
         float entryX = outRect.x;
         float entryY = outRect.y;
-        float entryHeight = 81f;
+        float entryHeight = outRect.height / 2f - 0.001f;
         Rect viewRect = outRect;
         viewRect.height = Mathf.Max(Mathf.CeilToInt(potentialBuildingCount / 3f), 2) * entryHeight;
         float entryWidth = viewRect.width / 3f;
@@ -505,11 +505,10 @@ public class Window_Branch : OrderWindowBase
         void AdjustEntryRect()
         {
             entryRect = new(entryX, entryY, entryWidth, entryHeight);
-            column++;
-            if (column >= 3)
+            if ((++column) >= 3)
             {
                 column = 0;
-                entryX = 0f;
+                entryX = outRect.x;
                 entryY += entryHeight;
             }
             else
@@ -607,7 +606,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x + 15f, 40f, 40f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, 24f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, inRect.height);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, buildingDef.LabelCap);
         Text.Anchor = TextAnchor.UpperLeft;

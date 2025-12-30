@@ -559,6 +559,8 @@ public class Branch : IExposable, ILoadReferenceable
         buildingHandler.PostLoadInit();
         populationHandler.PostLoadInit();
 
+        demandHandler.PostLoadInit();
+
         residentHandler.PostLoadInit();
         storesReserveHandler.PostLoadInit();
     }

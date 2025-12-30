@@ -30,6 +30,8 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
         questParameter = new QuestParameter()
         {
             allowAssaultColony = false,
+            allowJoinOffer = false,
+
             LodgerCount = lodgerCount,
             ChildCount = lodgerCount,
 

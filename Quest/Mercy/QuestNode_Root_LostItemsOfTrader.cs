@@ -24,7 +24,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         Map map = slate.Get<Map>("map") ?? OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
         if (map is null)
         {
-            quest.End(QuestEndOutcome.Unknown, inSignal: null);
+            QuestGen_End.End(quest, QuestEndOutcome.Unknown, sendStandardLetter: false, playSound: false);
             return;
         }
 

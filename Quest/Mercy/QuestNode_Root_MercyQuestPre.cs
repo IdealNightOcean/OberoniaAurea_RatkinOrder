@@ -17,7 +17,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         Map map = slate.Get<Map>("map") ?? QuestGen_Get.GetMap();
         if (map is null)
         {
-            quest.End(QuestEndOutcome.Unknown, inSignal: null);
+            QuestGen_End.End(quest, QuestEndOutcome.Unknown, sendStandardLetter: false, playSound: false);
             return;
         }
         slate.Set("map", map);
@@ -30,7 +30,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
         if (subFaction is null)
         {
-            quest.End(QuestEndOutcome.Unknown, inSignal: null);
+            QuestGen_End.End(quest, QuestEndOutcome.Unknown, sendStandardLetter: false, playSound: false);
             return;
         }
 
@@ -41,7 +41,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.helpSeekerPawnKind);
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
         slate.Set(KeyLibrary_SlateStoreAs.helpSeeker, helpSeeker);
-        quest.PawnsArrive([helpSeeker], inSignal: rootInSignal, map.Parent, arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn);
+        quest.PawnsArrive(
+            pawns: [helpSeeker],
+            inSignal: rootInSignal,
+            mapParent: map.Parent,
+            arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn,
+            customLetterLabel: "OARO_HelpSeeker_Alert".Translate(),
+            customLetterText: "OARO_HelpSeeker_AlertExp".Translate());
 
         string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("AcceptMercyQuest");
         string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest");

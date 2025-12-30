@@ -341,10 +341,10 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
             float poputionGrow = constructionScale switch
             {
                 0 => Rand.Range(4f, 10f),
-                1 => Population += Rand.Range(14f, 36f),
-                2 => Population += Rand.Range(48f, 102f),
-                3 => Population += Rand.Range(140f, 240f),
-                _ => Population += Rand.Range(225f, 400f)
+                1 => Rand.Range(14f, 36f),
+                2 => Rand.Range(48f, 102f),
+                3 => Rand.Range(140f, 240f),
+                _ => Rand.Range(225f, 400f)
             };
             if (CliquesManager.IsCliqueActive("TravelRatkin"))
             {

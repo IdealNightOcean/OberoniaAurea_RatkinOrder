@@ -118,7 +118,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
                      label: "[taxCollectorLeaveUnhappyLabel]",
                      relatedFaction: questParameter.faction);
 
-        quest.End(QuestEndOutcome.Fail, questParameter.goodwillFailure, questParameter.faction, outSignalsUnhappy, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Fail, questParameter.goodwillFailure, questParameter.faction, inSignal: outSignalsUnhappy, sendStandardLetter: true);
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange = new()
         {

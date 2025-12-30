@@ -13,6 +13,8 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Nameable, IThingHolder
 {
+    private const float MarketValueFactor = 0.6f;
+
     private ThingOwner<Thing> sculptures;
     private float remainingMarkerValue;
     private int purchasedCount;
@@ -34,12 +36,13 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         sculptures = new ThingOwner<Thing>(this);
 
         int sculpturesCount = Rand.RangeInclusive(15, 30);
+        ThingDef sculptureDef = DefDatabase<ThingDef>.GetNamed("SculptureSmall");
         for (int i = 0; i < sculpturesCount; i++)
         {
-            Thing sculpture = ThingMaker.MakeThing(OARO_RimWorldDefOf.SculptureSmall, ThingDefOf.WoodLog);
+            Thing sculpture = ThingMaker.MakeThing(sculptureDef, ThingDefOf.WoodLog);
             sculpture.TryGetComp<CompQuality>()?.SetQuality(Rand.Bool ? QualityCategory.Good : QualityCategory.Excellent, ArtGenerationContext.Outsider);
 
-            remainingMarkerValue += (sculpture.MarketValue * 0.7f);
+            remainingMarkerValue += (sculpture.MarketValue * MarketValueFactor);
 
             Thing sculptureMini = sculpture.TryMakeMinified();
             sculptures.TryAdd(sculptureMini);
@@ -112,7 +115,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         float usedSilver = 0f;
         for (int j = 0; j < sculptures.Count; j++)
         {
-            float marketValue = sculptures[j].MarketValue * 0.7f;
+            float marketValue = sculptures[j].MarketValue * MarketValueFactor;
             if (usedSilver + marketValue > caravanSilver)
             {
                 break;
@@ -143,7 +146,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
             remainingMarkerValue = 0f;
             for (int k = 0; k < sculptures.Count; k++)
             {
-                remainingMarkerValue += (sculptures[k].MarketValue * 0.7f);
+                remainingMarkerValue += (sculptures[k].MarketValue * MarketValueFactor);
             }
         }
     }
