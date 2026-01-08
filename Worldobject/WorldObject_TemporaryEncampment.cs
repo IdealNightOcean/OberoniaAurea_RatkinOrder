@@ -32,10 +32,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         Scribe_Values.Look(ref requestCount, "requestCount", 0);
     }
 
-    public void SetOrderBranch(Branch branch)
-    {
-        this.branch = branch;
-    }
+    public void SetOrderBranch(Branch branch) => this.branch = branch;
 
     public void Notify_BranchDestroyed(Branch branch)
     {

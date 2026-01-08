@@ -18,8 +18,6 @@ public class QuestNode_AddGeneralClique : QuestNode
     [MustTranslate]
     public SlateRef<string> inactiveDesc = string.Empty;
 
-
-
     public SlateRef<bool> isActivatable = true;
     public SlateRef<bool> isCommunicable;
     public SlateRef<bool> isBribable;

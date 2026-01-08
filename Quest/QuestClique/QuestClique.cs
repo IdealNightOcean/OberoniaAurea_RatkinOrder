@@ -7,6 +7,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestClique : IExposable
 {
+    public QuestPart_CliquesManager CliquesManager { get; set; }
+    public Quest Quest => CliquesManager?.quest;
+
     private string key;
     public string Key => key;
 
@@ -47,11 +50,15 @@ public class QuestClique : IExposable
 
     public bool IsActive;
     public bool IsActivatable;
-    public bool IsCommunicable;
-    public bool IsBribable;
-    public BranchBuildingDef PreferredBuilding;
-    public int BriberyCost = -1;
     public int TicksToActive = -1;
+
+    public bool IsCommunicable;
+    public int LastCommunicateTick = -1;
+
+    public bool IsBribable;
+    public int BriberyCost = -1;
+
+    public BranchBuildingDef PreferredBuilding;
 
     private Branch relatedBranch;
     public Branch RelatedBranch => relatedBranch;
@@ -93,15 +100,17 @@ public class QuestClique : IExposable
 
     public void AdjustCliqueWillingness(float change, bool showMessage = true)
     {
+        float trueChange = willingness;
         willingness = Mathf.Clamp01(willingness + change);
+        trueChange = willingness - trueChange;
         if (showMessage)
         {
-            if (change > 0f)
+            if (trueChange > 0f)
             {
                 Messages.Message(
                     text: "OARO_CliqueWillingness_Increase".Translate(
                         Name.Named(KeyLibrary_FormatArgName.CliqueName),
-                        change.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
+                        trueChange.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
                     def: MessageTypeDefOf.PositiveEvent);
             }
             else
@@ -109,12 +118,11 @@ public class QuestClique : IExposable
                 Messages.Message(
                     text: "OARO_CliqueWillingness_Decrease".Translate(
                         Name.Named(KeyLibrary_FormatArgName.CliqueName),
-                        (-change).ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
+                        (-trueChange).ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
                     def: MessageTypeDefOf.NegativeEvent);
             }
         }
     }
-
 
     public AcceptanceReport CanCommunicable(bool resultOnly)
     {
@@ -125,6 +133,11 @@ public class QuestClique : IExposable
         if (!IsCommunicable)
         {
             return resultOnly ? false : "OARO_Clique_NotCommunicable".Translate();
+        }
+        if (LastCommunicateTick > 0 && Find.TickManager.TicksGame < LastCommunicateTick + 60000)
+        {
+            int communicateCoolingTicksLeft = LastCommunicateTick + 60000 - Find.TickManager.TicksGame;
+            return resultOnly ? false : "WaitTime".Translate(communicateCoolingTicksLeft.ToStringTicksToPeriod());
         }
 
         return true;
@@ -218,6 +231,120 @@ public class QuestClique : IExposable
         return true;
     }
 
+    public bool TryActive(bool directly = false, Map map = null, int activeDelayTicks = -1)
+    {
+        if (!IsActivatable)
+        {
+            Log.Error($"[OARO] Trying to activate with an unactivatable clique {Name} ({key}).");
+            return false;
+        }
+
+        if (directly)
+        {
+            Active();
+            return true;
+        }
+
+        int delayTicks = activeDelayTicks;
+        //非友好分队派别激活参与有2~4天默认延迟
+        if (delayTicks < 0 && IsBranchClique && !RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
+        {
+            delayTicks = Rand.RangeInclusive(120000, 240000);
+        }
+
+        if (delayTicks > 0)
+        {
+            TicksToActive = Mathf.Min(TicksToActive, delayTicks);
+        }
+        else
+        {
+            if (IsBranchClique)
+            {
+                RelatedBranch.Supply -= 0.25f;
+                //邀请友好分部派别参与消耗1推荐信
+                if (RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
+                {
+                    RecommendationUtility.UseRecommendationOfMap(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
+                }
+            }
+            Active();
+        }
+
+        return true;
+
+        void Active()
+        {
+            IsActive = true;
+            TicksToActive = -1;
+            if (CliquesManager is not null)
+            {
+                CliquesManager.TotalPotency.MarkDirty();
+                Find.SignalManager.SendSignal(new Signal(QuestPart_CliquesManager.SignalCliqueActived(Quest), this.Named(KeyLibrary_FormatArgName.SUBJECT)));
+            }
+        }
+    }
+
+    public void Deactive()
+    {
+        if (!IsActive)
+        {
+            return;
+        }
+
+        IsActive = false;
+        if (CliquesManager is not null)
+        {
+            CliquesManager.TotalPotency.MarkDirty();
+            Find.SignalManager.SendSignal(new Signal(QuestPart_CliquesManager.SignalCliqueDeactived(Quest), this.Named(KeyLibrary_FormatArgName.SUBJECT)));
+        }
+    }
+
+    public void Communicate(Branch branch, Map map = null)
+    {
+        if (!IsCommunicable)
+        {
+            Log.Error($"[OARO] Trying to commiunicate with an incommunicable clique {Name} ({key}).");
+            return;
+        }
+        float willingnessGain = Rand.Range(0.05f, 0.15f);
+        string text;
+        if (PreferredBuilding is not null && branch.BuildingHandler.HasBuilding(PreferredBuilding))
+        {
+            willingnessGain += 0.15f;
+            text = "OARO_Clique_CommunicateInfoWithPrefer".Translate(
+                Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change),
+                PreferredBuilding.Named("BUILDING"));
+        }
+        else
+        {
+            text = "OARO_Clique_CommunicateInfo".Translate(
+                Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change));
+        }
+
+        AdjustCliqueWillingness(willingnessGain);
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(text.Translate()));
+
+        if (CanActiveNow(directly: false, resultOnly: true))
+        {
+            TryActive(directly: false, map: map);
+        }
+    }
+
+    public void Bribery(Map map)
+    {
+        map.DestoryThingsOfDef(ThingDefOf.Silver, BriberyCost);
+        AdjustCliqueWillingness(1f - Willingness + 0.1f);
+
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName))));
+
+        if (CanActiveNow(directly: false, resultOnly: true))
+        {
+            TryActive(directly: false);
+        }
+    }
+
     public void ExposeData()
     {
         Scribe_Values.Look(ref key, nameof(key), "UNKNOWN");
@@ -231,10 +358,14 @@ public class QuestClique : IExposable
         Scribe_Values.Look(ref lastWillingnessChange, nameof(lastWillingnessChange), 0f);
 
         Scribe_Values.Look(ref IsActive, nameof(IsActive), defaultValue: false);
+        Scribe_Values.Look(ref IsActivatable, nameof(IsActivatable), defaultValue: true);
+        Scribe_Values.Look(ref TicksToActive, nameof(TicksToActive), -1);
+
         Scribe_Values.Look(ref IsCommunicable, nameof(IsCommunicable), defaultValue: false);
+        Scribe_Values.Look(ref LastCommunicateTick, nameof(LastCommunicateTick), -1);
+
         Scribe_Values.Look(ref IsBribable, nameof(IsBribable), defaultValue: false);
         Scribe_Values.Look(ref BriberyCost, nameof(BriberyCost), -1);
-        Scribe_Values.Look(ref TicksToActive, nameof(TicksToActive), -1);
 
         Scribe_References.Look(ref relatedBranch, nameof(relatedBranch));
         Scribe_Values.Look(ref focusedTaskType, nameof(focusedTaskType), BranchTaskType.General);

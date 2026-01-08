@@ -24,6 +24,6 @@ public abstract class WorldObject_InteractWithFixedCaravan_Nameable : WorldObjec
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref name, "name", null);
+        Scribe_Values.Look(ref name, nameof(name), null);
     }
 }

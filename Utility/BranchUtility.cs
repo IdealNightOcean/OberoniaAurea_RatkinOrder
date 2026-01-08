@@ -135,7 +135,7 @@ public static class BranchUtility
         return result.ToList();
     }
 
-    public static List<Branch> GetAllAffectedBranch(PlanetTile tile, Predicate<Branch> predicate)
+    public static List<Branch> GetAllAffectedBranches(PlanetTile tile, Predicate<Branch> predicate)
     {
         ConcurrentBag<Branch> result = [];
         _ = BranchStatDefOf.OARO_AffectRadius.Worker;
@@ -144,6 +144,24 @@ public static class BranchUtility
             .ForAll(order =>
             {
                 IEnumerable<Branch> affectedBranches = order.BranchManager.AllBranches.Where(b => b.IsInAffectedRange(tile) && predicate(b));
+
+                foreach (Branch branch in affectedBranches)
+                {
+                    result.Add(branch);
+                }
+            });
+
+        return result.ToList();
+    }
+
+    public static List<Branch> GetAllAvailableBranches(Predicate<Branch> predicate)
+    {
+        ConcurrentBag<Branch> result = [];
+        RatkinOrderManager.Instance.AllRatkinOrders
+            .AsParallel()
+            .ForAll(order =>
+            {
+                IEnumerable<Branch> affectedBranches = order.BranchManager.AllBranches.Where(b => predicate(b));
 
                 foreach (Branch branch in affectedBranches)
                 {

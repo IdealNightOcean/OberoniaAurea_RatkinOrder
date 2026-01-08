@@ -749,7 +749,7 @@ public class Window_Branch : OrderWindowBase
                         Text.Font = GameFont.Medium;
                         Text.Anchor = TextAnchor.MiddleCenter;
                         Widgets.Label(inRect, "OARO_BranchWin_ContractCooling".Translate(contract.TicksToExpire.TicksToDays().ToString("0.##"))
-                                                                    .Colorize(Color.green));
+                                                                              .Colorize(Color.green));
                     }
 
                     Text.Anchor = TextAnchor.UpperLeft;

@@ -1,16 +1,23 @@
 ﻿using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class Alert_ResidentKnightWillResignation : Alert
+public class Alert_ResidentKnightWillResignation : Alert_Critical
 {
+    protected override Color BGColor => ResidentKnightsManager.Instance.MinResignationDays.Value < 5f ? BGColor : Color.clear;
+
     public Alert_ResidentKnightWillResignation()
     {
         defaultLabel = "OARO_SomeResidentKnightWillResignation".Translate();
     }
 
-    public override AlertReport GetReport() => ResidentKnightsManager.Instance.ShowResignationAlert.Value;
+    public override AlertReport GetReport()
+    {
+        float minResignationDays = ResidentKnightsManager.Instance.MinResignationDays.Value;
+        return minResignationDays >= 0f && minResignationDays <= 15f;
+    }
 
     protected override void OnClick()
     {

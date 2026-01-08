@@ -40,8 +40,5 @@ public class WorldObject_OrderRelationshipUpgrade : WorldObject_InteractWithFixe
         this.SafeDestroy();
     }
 
-    protected override void InterruptWork()
-    {
-        this.SafeDestroy();
-    }
+    protected override void InterruptWork() => this.SafeDestroy();
 }

@@ -131,7 +131,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
     public void PostponeResignation(int postponeDays)
     {
         ResignationTick += (postponeDays * 60000);
-        ResidentKnightsManager.Instance.ShowResignationAlert.MarkDirty();
+        ResidentKnightsManager.Instance.MinResignationDays.MarkDirty();
     }
 
     public static int GetNoAdditionalCostAcademicCeiling(Rank rank)

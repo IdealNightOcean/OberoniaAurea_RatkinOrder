@@ -2,6 +2,7 @@
 using RimWorld;
 using RimWorld.Planet;
 using System;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -33,14 +34,14 @@ public class BranchContract : IExposable
     private string requestReason = string.Empty;
     private ContractState curState;
 
-    public ThingDef RequestThingDef => def.requestThingDef;
+    public ThingDef RequestThingDef => def?.requestThingDef;
     public int RequestCount => requestCount;
     public string RequestReason => requestReason;
     public ContractState CurState => curState;
-    public bool ValidOngoing => curState == ContractState.Ongoing && def is not null && RequestThingDef is not null;
+    public bool ValidOngoing => curState == ContractState.Ongoing && RequestThingDef is not null;
 
     private int expirationTick = -1;
-    public int TicksToExpire => expirationTick - Find.TickManager.TicksGame;
+    public int TicksToExpire => Mathf.Max(0, expirationTick - Find.TickManager.TicksGame);
     public bool ShouldRemove
     {
         get
@@ -48,7 +49,7 @@ public class BranchContract : IExposable
             return curState switch
             {
                 ContractState.Invalid or ContractState.Finished => true,
-                ContractState.Ongoing => def is null,
+                ContractState.Ongoing => RequestThingDef is null || TicksToExpire <= 0,
                 ContractState.Cooling => TicksToExpire <= 0,
                 _ => true,
             };

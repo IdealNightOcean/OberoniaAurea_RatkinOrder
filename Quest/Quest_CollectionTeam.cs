@@ -16,7 +16,7 @@ namespace OberoniaAurea.RatkinOrder;
 /// <summary>
 /// 物资收集补给队 QuestNode（特化类）
 /// </summary>
-public sealed class QuestNode_CollectionTeam : QuestNode
+public class QuestNode_CollectionTeam : QuestNode
 {
     public SlateRef<Type> questPartClass = typeof(QuestPart_CollectionTeam);
 
@@ -71,13 +71,15 @@ public sealed class QuestNode_CollectionTeam : QuestNode
     {
         Slate slate = QuestGen.slate;
         Type questPartClass = this.questPartClass.GetValue(slate);
-        if (!questPartClass.IsSubclassOf(typeof(QuestPart_CollectionTeam)))
+        if (questPartClass != typeof(QuestPart_CollectionTeam) && !questPartClass.IsSubclassOf(typeof(QuestPart_CollectionTeam)))
         {
+            Log.Error($"[OARO] {nameof(this.questPartClass)} is not {nameof(QuestPart_CollectionTeam)} or it's subclass.");
             return;
         }
 
         if (!this.requestThingDefCounts.TryGetValue(slate, out IEnumerable<ThingDefCountClass> requestThingDefCounts))
         {
+            Log.Error($"[OARO] {nameof(this.requestThingDefCounts)} is null or empty.");
             return;
         }
         Map map = slate.Get<Map>("map");

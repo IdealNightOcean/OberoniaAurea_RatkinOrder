@@ -19,8 +19,8 @@ public class WorldObject_JointPatrolCaravanHelpSite_FixedCaravan : WorldObject_I
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Defs.Look(ref caravanIncidentDef, "caravanIncidentDef");
+        Scribe_References.Look(ref branch, nameof(branch));
+        Scribe_Defs.Look(ref caravanIncidentDef, nameof(caravanIncidentDef));
     }
 
     public void InitJointPatrolCaravanHelp(Branch branch, JointPatrolCaravanHelpDef def)

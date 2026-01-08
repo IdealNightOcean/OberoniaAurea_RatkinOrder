@@ -35,7 +35,6 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
             cliquesManager.TryAddClique(demandBranchClique, defaultActive: true);
         }
 
-
         foreach (Branch branch in GetAvailableBranches(QuestGen.slate, demandBranch))
         {
             QuestClique branchClique = new()

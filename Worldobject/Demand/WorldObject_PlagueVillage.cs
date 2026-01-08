@@ -347,6 +347,13 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
         }
         dispatchNode.options.Add(utratechOpt);
 
+        DiaOption backOpt = new("GoBack".Translate())
+        {
+            linkLateBind = () => ArrivedDiaNode(caravan),
+            resolveTree = false
+        };
+        dispatchNode.options.Add(backOpt);
+
         return dispatchNode;
 
         void DispatchResult(ThingDef thingDef, float spreadChange)

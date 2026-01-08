@@ -12,6 +12,8 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
 {
     public override Vector2 InitialSize => new(1402f, 827f);
 
+    private Vector2 scrollPosition_Supplies;
+
     private RatkinOrder RatkinOrder { get; }
     private Map Map { get; }
 
@@ -35,8 +37,6 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         PostCloseAction?.Invoke();
         PostCloseAction = null;
     }
-
-
 
     public override void DoWindowContents(Rect inRect)
     {
@@ -79,6 +79,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         viewRect.height = (ExchangeableSupplies.Count / columnCount + 1) * (entryY + entryYInterval);
 
         int column = 0;
+        Widgets.BeginScrollView(outRect, ref scrollPosition_Supplies, viewRect);
         foreach (ExchangeableSupply supply in ExchangeableSupplies)
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
@@ -95,6 +96,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
 
             DrawExchangeableSupply(entryRect, supply);
         }
+        Widgets.EndScrollView();
 
         OARO_WindowUtility.ResetText();
     }
@@ -132,6 +134,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
 
             Thing thing = ThingMaker.MakeThing(supply.thing, supply.stuff);
             thing.stackCount = supply.count;
+            thing.TryGetComp<CompQuality>()?.SetQuality(QualityCategory.Excellent, ArtGenerationContext.Outsider);
             OAFrame_DropPodUtility.DefaultDropThing([thing], Map, RatkinOrder.Faction);
         }
     }
