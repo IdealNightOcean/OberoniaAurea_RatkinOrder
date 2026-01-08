@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System;
 using System.Collections.Generic;
 using Verse;
 using Verse.Grammar;
@@ -11,17 +12,25 @@ namespace OberoniaAurea.RatkinOrder;
 public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 {
     public string OutSignalAccept;
+    public string OutSignalTransfer;
+    public string OutSignalTransferWithHelp;
     public string OutSignalReject;
 
     public MercyQuestDef MercyQuestDef;
     public Faction SubFaction;
     public Faction ParentFaction;
 
+    public string RawTalkText;
+
     public override void ExposeData()
     {
         base.ExposeData();
         Scribe_Values.Look(ref OutSignalAccept, nameof(OutSignalAccept));
+        Scribe_Values.Look(ref OutSignalTransfer, nameof(OutSignalTransfer));
+        Scribe_Values.Look(ref OutSignalTransferWithHelp, nameof(OutSignalTransferWithHelp));
         Scribe_Values.Look(ref OutSignalReject, nameof(OutSignalReject));
+
+        Scribe_Values.Look(ref RawTalkText, nameof(RawTalkText));
 
         Scribe_Defs.Look(ref MercyQuestDef, nameof(MercyQuestDef));
 
@@ -33,7 +42,12 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
     {
         base.Cleanup();
         OutSignalAccept = null;
+        OutSignalTransfer = null;
+        OutSignalTransferWithHelp = null;
         OutSignalReject = null;
+
+        RawTalkText = null;
+
         MercyQuestDef = null;
         SubFaction = null;
         ParentFaction = null;
@@ -49,6 +63,25 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             action = delegate
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
+                TalkActionUtility.DisableLordJobTalk(talkWith);
+            },
+            resolveTree = true
+        };
+        DiaOption transferOpt = new("OARO_TalkWithHelpSeeker_Transfer".Translate())
+        {
+            action = delegate
+            {
+                Find.SignalManager.SendSignal(new Signal(OutSignalTransfer, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
+                TalkActionUtility.DisableLordJobTalk(talkWith);
+            },
+            resolveTree = true
+        };
+
+        DiaOption transferWithHelpOpt = new("OARO_TalkWithHelpSeeker_TransferWithHelp".Translate())
+        {
+            action = delegate
+            {
+                Find.SignalManager.SendSignal(new Signal(OutSignalTransferWithHelp, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -77,6 +110,18 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 
     private TaggedString GetTalkText()
     {
+        if (!string.IsNullOrEmpty(RawTalkText))
+        {
+            try
+            {
+                return RawTalkText.Formatted(TextNamedArguments());
+            }
+            catch (Exception ex1)
+            {
+                Log.Warning($"[OARO] Failed to format {nameof(RawTalkText)} in {nameof(QuestPart_LordJob_HelpSeeker)}.{nameof(GetTalkText)}(). Exception:\n {ex1}");
+            }
+        }
+
         if (MercyQuestDef is null)
         {
             return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
@@ -89,21 +134,36 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             }
             if (MercyQuestDef.helpDescRulePack is not null)
             {
-                GrammarRequest grammarRequest = new();
-                grammarRequest.Includes.Add(MercyQuestDef.helpDescRulePack);
-                grammarRequest.Rules.AddRange(GrammarUtility.RulesForPawn("HELPSEEKER", TalkWith));
-                grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("SUBFACTION", SubFaction));
-                if (ParentFaction is not null)
+                try
                 {
-                    grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("PARENTFACTION", ParentFaction));
+                    GrammarRequest grammarRequest = new();
+                    grammarRequest.Includes.Add(MercyQuestDef.helpDescRulePack);
+                    grammarRequest.Rules.AddRange(GrammarUtility.RulesForPawn("HELPSEEKER", TalkWith));
+                    grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("SUBFACTION", SubFaction));
+                    if (ParentFaction is not null)
+                    {
+                        grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("PARENTFACTION", ParentFaction));
+                    }
+                    return GrammarResolver.Resolve("r_text", grammarRequest);
                 }
-                return GrammarResolver.Resolve("r_text", grammarRequest);
+                catch (Exception ex2)
+                {
+                    ModUtility.LogExceptionError(ex2,
+                        errorDesc: "resolve talk text",
+                        typeName: nameof(QuestPart_LordJob_HelpSeeker),
+                        methodName: nameof(GetTalkText),
+                        needStackTrace: true);
+                }
             }
+
             return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
         }
+        
     }
 
-    private NamedArgument[] TextNamedArguments()
+    public void SetRawTalkText(string talkText) => RawTalkText = talkText;
+
+    protected NamedArgument[] TextNamedArguments()
     {
         List<NamedArgument> arguments =
         [

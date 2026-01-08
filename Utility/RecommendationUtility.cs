@@ -91,7 +91,7 @@ public static class RecommendationUtility
         if (dropPod)
         {
             spawnCell ??= DropCellFinder.TradeDropSpot(map);
-            DropPodUtility.DropThingsNear(spawnCell.Value, map, [recommendations], allowFogged: false, faction: faction);
+            DropPodUtility.DropThingsNear(spawnCell.Value, map, [recommendations], forbid: false, allowFogged: false, faction: faction);
         }
         else
         {

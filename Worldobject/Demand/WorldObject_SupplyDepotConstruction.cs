@@ -31,10 +31,10 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
     public override string GetInspectString()
     {
         StringBuilder sb = new(base.GetInspectString());
-        sb.AppendLine("OARO_SupplyDepot_ConstricProgress".Translate(constricProgress.ToString("0.##"), 800));
+        sb.AppendInNewLine("OARO_SupplyDepot_ConstricProgress".Translate(constricProgress.ToString("0.##"), 800));
         if (constricProgress >= 400f)
         {
-            sb.AppendLine("OARO_SupplyDepot_AutoConstructing".Translate());
+            sb.AppendInNewLine("OARO_SupplyDepot_AutoConstructing".Translate());
         }
 
         return sb.ToString();

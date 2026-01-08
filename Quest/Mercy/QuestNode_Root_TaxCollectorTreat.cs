@@ -64,8 +64,10 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 
         QuestPart_WorkDisabled questPart_WorkDisabled = new()
         {
+            inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
             disabledWorkTags = WorkTags.AllWork,
         };
+        questPart_WorkDisabled.pawns ??= new(pawns.Count);
         questPart_WorkDisabled.pawns.AddRange(pawns);
         QuestGen.quest.AddPart(questPart_WorkDisabled);
 
@@ -73,7 +75,6 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
         {
             PostPawnGenerated(p, lodgerRecruitedSignal);
         }
-
         return pawns;
     }
 

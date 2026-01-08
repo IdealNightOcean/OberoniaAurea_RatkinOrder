@@ -155,8 +155,6 @@ public static class GlobalInteractionUtility
     }
 
 
-
-
     /// <summary>
     /// 玩家邀请附近骑士小组到访
     /// </summary>

@@ -27,8 +27,8 @@ public class WorldObject_BranchUnderConstruction : WorldObject
     public override string GetInspectString()
     {
         StringBuilder sb = new(base.GetInspectString());
-        sb.AppendLine(ratkinOrder?.Name);
-        sb.AppendLine("WaitTime".Translate((completedTick - Find.TickManager.TicksGame).ToStringTicksToPeriod()));
+        sb.AppendInNewLine(ratkinOrder?.Name);
+        sb.AppendInNewLine("WaitTime".Translate((completedTick - Find.TickManager.TicksGame).ToStringTicksToPeriod()));
         return sb.ToString();
     }
 

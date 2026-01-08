@@ -24,6 +24,12 @@ public class Hediff_HonorGlorious : Hediff
         }
     }
 
+    public override void PostMake()
+    {
+        base.PostMake();
+        InitStage();
+    }
+
     public override void TickInterval(int delta)
     {
         if (ticksToReset > 0 && (ticksToReset -= delta) <= 0)
@@ -45,7 +51,10 @@ public class Hediff_HonorGlorious : Hediff
     private void SetMeleeDamageFactor(float newValue)
     {
         curMeleeDamageFactor = Mathf.Clamp(newValue, 1.25f, 2.25f);
-        curStage.statFactors[2].value = curMeleeDamageFactor;
+        if (curStage is not null && !curStage.statFactors.NullOrEmpty())
+        {
+            curStage.statFactors[0].value = curMeleeDamageFactor;
+        }
     }
 
     private void InitStage()
@@ -57,15 +66,14 @@ public class Hediff_HonorGlorious : Hediff
         };
         curStage.statFactors.Add(new StatModifier()
         {
-            stat = StatDefOf.IncomingDamageFactor,
-            value = 0.9f
-        });
-        curStage.statFactors.Add(new StatModifier()
-        {
             stat = StatDefOf.MeleeDamageFactor,
             value = curMeleeDamageFactor
         });
-
+        curStage.statFactors.Add(new StatModifier()
+        {
+            stat = StatDefOf.IncomingDamageFactor,
+            value = 0.9f
+        });
         curStage.statOffsets.Add(new StatModifier()
         {
             stat = StatDefOf.ShootingAccuracyPawn,

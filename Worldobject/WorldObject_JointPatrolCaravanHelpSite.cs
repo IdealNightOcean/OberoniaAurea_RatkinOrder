@@ -24,10 +24,7 @@ public class WorldObject_JointPatrolCaravanHelpSite : WorldObject_Interactive_Na
         name = $"{def.label} ({branch?.Name})";
     }
 
-    public void SetOrderBranch(Branch branch)
-    {
-        this.branch = branch;
-    }
+    public void SetOrderBranch(Branch branch) => this.branch = branch;
 
     public override string GetInspectString()
     {

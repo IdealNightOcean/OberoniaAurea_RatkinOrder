@@ -29,7 +29,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
         int recommendationNeed = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
         if (RecommendationUtility.CurRecommendationCount(map) < recommendationNeed)
         {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation.Named(KeyLibrary_FormatArgName.Count));
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(recommendationNeed.Named(KeyLibrary_FormatArgName.Count));
         }
 
         return true;
@@ -39,7 +39,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
     {
         int recommendationNeed = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-            text: "OARO_InviteResidentKnight_Confirm".Translate(recommendationNeed.ToString().Named(KeyLibrary_FormatArgName.Count)),
+            text: "OARO_InviteResidentKnight_Confirm".Translate(recommendationNeed.Named(KeyLibrary_FormatArgName.Count)),
             ratkinOrder: ratkinOrder,
             acceptAction: () => base.ApplyInteraction(ratkinOrder, map));
 

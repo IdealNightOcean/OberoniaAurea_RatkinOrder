@@ -29,7 +29,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
     public override void PostExposeData()
     {
         base.PostExposeData();
-        Scribe_References.Look(ref branch, "branch");
+        Scribe_References.Look(ref branch, nameof(branch));
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             if (!branch.IsValid() && Props.independent)

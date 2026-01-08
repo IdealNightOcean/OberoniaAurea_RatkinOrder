@@ -114,10 +114,6 @@ public class BranchPopulationHandler : IExposable, ITickDay
         DailyPublicSecurityCheck(onMartialLaw);
         DailyContractCheck();
 
-        if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.ContractAddCheck))
-        {
-            ContractAddCheck();
-        }
     }
 
     public void Notify_ContractCompleted()
@@ -160,15 +156,20 @@ public class BranchPopulationHandler : IExposable, ITickDay
     private void DailyContractCheck()
     {
         contracts.RemoveAll(c => c.ShouldRemove);
+        hasContractBuff = false;
         for (int i = 0; i < contracts.Count; i++)
         {
             if (contracts[i].CurState == BranchContract.ContractState.Cooling)
             {
                 hasContractBuff = true;
-                return;
+                break;
             }
         }
-        hasContractBuff = false;
+
+        if (!branch.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.ContractAddCheck))
+        {
+            ContractAddCheck();
+        }
     }
 
     private void DailyPublicSecurityCheck(bool onMartialLaw)
