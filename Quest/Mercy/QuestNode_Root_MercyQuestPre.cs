@@ -50,6 +50,8 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             customLetterText: "OARO_HelpSeeker_AlertExp".Translate());
 
         string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("AcceptMercyQuest");
+        string inSignalTransfer = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest_Transfer");
+        string inSignalTransferWithHelp = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest_TransferWithHelp");
         string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest");
 
         float delayMulti = OrderHallHandler.Instance.OrderHallLevel switch
@@ -67,6 +69,8 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         {
             inSignal = rootInSignal,
             OutSignalAccept = inSignalAccept,
+            OutSignalTransfer = inSignalTransfer,
+            OutSignalTransferWithHelp = inSignalTransferWithHelp,
             OutSignalReject = inSignalReject,
 
             mapOfPawn = helpSeeker,
@@ -84,7 +88,9 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         TriggerMercyQuestPart(inSignalAccept, inSignalReject, subFaction, parentFaction, helpSeeker);
 
         string outSignalResolved = QuestGenUtility.HardcodedSignalWithQuestID("MercyQuest_Resolved");
-        quest.SignalPassAny(inSignals: [inSignalAccept, inSignalReject], outSignal: outSignalResolved);
+        quest.SignalPassAny(
+            inSignals: [inSignalAccept, inSignalTransfer, inSignalTransferWithHelp, inSignalReject],
+            outSignal: outSignalResolved);
         quest.Delay(delayTicks: helpSeekerLeaveDelay, inner: null, inSignalDisable: outSignalResolved, outSignalComplete: inSignalReject);
         quest.Alert(label: "OARO_HelpSeeker_Alert".Translate(),
                     explanation: "OARO_HelpSeeker_AlertExp".Translate(),
@@ -114,7 +120,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_PawnNegative = new()
         {
             InSignalTrigger = inSignalPawnNegative,
-            Change = -10,
+            Change = -5,
             Reason = "OARO_HarmingHelpSeeker".Translate()
         };
         quest.AddPart(questPart_AllOrdersEsteemChange_PawnNegative);

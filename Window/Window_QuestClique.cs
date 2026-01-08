@@ -430,7 +430,7 @@ public class Window_QuestClique : OrderWindowBase
             downTex: smallButton_Down,
             doMouseoverSound: true))
         {
-            CliquesManager.TryActiveClique(clique.Key);
+            clique.TryActive(directly: false, map: Map);
         }
 
         reusedRect = new(reusedRect.xMin - 92f, bottom.yMin, 92f, bottom.height);
@@ -443,7 +443,7 @@ public class Window_QuestClique : OrderWindowBase
             doMouseoverSound: true,
             tooltip: clique.IsBribable ? "OARO_CliqueWin_BribeTip".Translate(clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)) : null))
         {
-            CliquesManager.BriberyClique(clique.Key, Map);
+            clique.Bribery(map: Map);
         }
 
         reusedRect = new(reusedRect.xMin - 92f, bottom.yMin, 92f, bottom.height);
@@ -455,7 +455,7 @@ public class Window_QuestClique : OrderWindowBase
             downTex: smallButton_Down,
             doMouseoverSound: true))
         {
-            CliquesManager.TryCommunicateWithClique(clique.Key);
+            clique.Communicate(branch: CliquesManager.Branch, map: Map);
         }
         OARO_WindowUtility.ResetText();
     }
@@ -526,8 +526,7 @@ public class Window_QuestClique : OrderWindowBase
                 doMouseoverSound: true,
                 tooltip: "OARO_CliqueWin_ActiveFriendlyCliqueTip".Translate()))
             {
-                CliquesManager.TryActiveClique(clique.Key, directly: true);
-                RecommendationUtility.UseRecommendationOfMap(Map, 1);
+                clique.TryActive(directly: false, map: Map);
                 MapRecommendationCount.MarkDirty();
             }
         }
@@ -548,7 +547,7 @@ public class Window_QuestClique : OrderWindowBase
                 downTex: smallButton_Down,
                 doMouseoverSound: true))
             {
-                CliquesManager.TryActiveClique(clique.Key);
+                clique.TryActive(directly: false, map: Map);
             }
 
             reusedRect = new(reusedRect.xMin - 92f, bottom.yMin, 92f, bottom.height);
@@ -560,7 +559,7 @@ public class Window_QuestClique : OrderWindowBase
                 downTex: smallButton_Down,
                 doMouseoverSound: true))
             {
-                CliquesManager.TryCommunicateWithClique(clique.Key);
+                clique.Communicate(branch: CliquesManager.Branch, map: Map);
             }
         }
 

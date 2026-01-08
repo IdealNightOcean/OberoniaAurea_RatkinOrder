@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -36,7 +37,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
     public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnightRecord> RolesToKnights => RolesToKnights;
 
-    public LazyMutable<bool> ShowResignationAlert { get; }
+    public LazyMutable<float> MinResignationDays { get; }
     public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
     public LazyMutable<int> InstructorKnightsCount { get; }
 
@@ -69,7 +70,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         Instance = this;
 
         buffHediffStage = new HediffStage();
-        ShowResignationAlert = new(refreshFunc: () => residentKnights.Count > 0 && residentKnights.Values.Any(r => r.ResignationTick <= Find.TickManager.TicksGame + 15 * 60000));
+        MinResignationDays = new(refreshFunc: RefreshMinResignationDays);
         AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
         InstructorKnightsCount = new(refreshFunc: () => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
     }
@@ -163,7 +164,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
             }
         }
 
-        ShowResignationAlert.MarkDirty();
+        MinResignationDays.MarkDirty();
     }
 
     private void RemoveAllInvalidRecord(Predicate<ResidentKnightRecord> extraRemove = null)
@@ -345,12 +346,36 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         return true;
     }
 
+    private float RefreshMinResignationDays()
+    {
+        if (residentKnights.Count <= 0)
+        {
+            return -1f;
+        }
+        float minResignationDays = float.MaxValue;
+        int ticksGame = Find.TickManager.TicksGame;
+        foreach (ResidentKnightRecord record in residentKnights.Values)
+        {
+            if (record.ResignationTick > 0)
+            {
+                float resignationDays = Mathf.Max(0f, (record.ResignationTick - ticksGame) / 60000f);
+                if (resignationDays < minResignationDays)
+                {
+                    minResignationDays = resignationDays;
+                }
+            }
+        }
+
+        return minResignationDays;
+    }
+
     private void OnKnightsChanged()
     {
-        ShowResignationAlert.MarkDirty();
+        MinResignationDays.MarkDirty();
         AllHasPersonalityTypes.MarkDirty();
         InstructorKnightsCount.MarkDirty();
     }
+
 
     private void RegainRoleBuffStat()
     {

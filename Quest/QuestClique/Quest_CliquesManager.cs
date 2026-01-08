@@ -65,7 +65,14 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         Scribe_Values.Look(ref ticksToNextCheck, "ticksToNextCheck", 0);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            allCliques?.RemoveAll(kv => kv.Key is null || kv.Value is null);
+            if (allCliques is not null)
+            {
+                allCliques.RemoveAll(kv => kv.Value is null);
+                foreach (QuestClique clique in allCliques.Values)
+                {
+                    clique.CliquesManager = this;
+                }
+            }
         }
     }
 
@@ -123,7 +130,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 if (clique.TicksToActive > 0 && (clique.TicksToActive -= 1000) <= 0)
                 {
-                    TryActiveClique(clique, directly: true);
+                    clique.TryActive(directly: true);
                 }
             }
         }
@@ -169,7 +176,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 if (oldClique.IsActive)
                 {
-                    DeactiveClique(oldClique);
+                    oldClique.Deactive();
                 }
                 allCliques[clique.Key] = clique;
                 added = true;
@@ -188,10 +195,12 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
         if (added)
         {
+            clique.CliquesManager = this;
+
             clique.IsActive = false;
             if (defaultActive)
             {
-                TryActiveClique(clique, directly: true);
+                clique.TryActive(directly: true);
             }
             Find.SignalManager.SendSignal(new Signal(SignalCliqueAdded(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
             return true;
@@ -207,7 +216,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             Find.SignalManager.SendSignal(new Signal(SignalCliqueRemoved(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
             if (clique.IsActive)
             {
-                DeactiveClique(clique);
+                clique.Deactive();
             }
         }
     }
@@ -230,80 +239,21 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         return false;
     }
 
-    public bool TryActiveClique(string cliqueKey, bool directly = false, int activeDelayTicks = -1)
+    public bool TryActiveClique(string cliqueKey, bool directly = false, Map map = null, int activeDelayTicks = -1)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
-            return TryActiveClique(clique, directly, activeDelayTicks);
+            return clique.TryActive(directly: directly, map: map, activeDelayTicks: activeDelayTicks);
         }
         return false;
-    }
-
-    private bool TryActiveClique(QuestClique clique, bool directly = false, int activeDelayTicks = -1)
-    {
-        if (!clique.CanActiveNow(directly: directly, resultOnly: true))
-        {
-            return false;
-        }
-
-        if (directly)
-        {
-            Active();
-            return true;
-        }
-
-        int delayTicks = activeDelayTicks;
-        //非友好分队派别激活参与有2~4天默认延迟
-        if (delayTicks < 0 && clique.IsBranchClique && !clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
-        {
-            delayTicks = Rand.RangeInclusive(120000, 240000);
-        }
-
-        if (delayTicks > 0)
-        {
-            clique.TicksToActive = Mathf.Min(clique.TicksToActive, delayTicks);
-        }
-        else
-        {
-            if (clique.IsBranchClique)
-            {
-                clique.RelatedBranch.Supply -= 0.25f;
-                //邀请友好分部派别参与消耗1推荐信
-                if (clique.RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
-                {
-                    RecommendationUtility.UseRecommendationOfMap(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
-                }
-            }
-            Active();
-        }
-
-        return true;
-
-        void Active()
-        {
-            clique.IsActive = true;
-            clique.TicksToActive = -1;
-            TotalPotency.MarkDirty();
-            Find.SignalManager.SendSignal(new Signal(SignalCliqueActived(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
-        }
     }
 
     public void DeactiveClique(string cliqueKey)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique))
         {
-            if (clique.IsActive)
-            {
-                DeactiveClique(clique);
-            }
+            clique.Deactive();
         }
-    }
-
-    private void DeactiveClique(QuestClique clique)
-    {
-        clique.IsActive = false;
-        TotalPotency.MarkDirty();
-        Find.SignalManager.SendSignal(new Signal(SignalCliqueDeactived(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
     }
 
     public float GetCliquePotency(string cliqueKey, bool showErrorIfMiss = false)
@@ -355,51 +305,15 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     {
         if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
         {
-            map.DestoryThingsOfDef(ThingDefOf.Silver, clique.BriberyCost);
-            clique.AdjustCliqueWillingness(1f - clique.Willingness);
-
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(clique.Name.Named(KeyLibrary_FormatArgName.CliqueName))));
-
-            if (clique.CanActiveNow(directly: false, resultOnly: true))
-            {
-                TryActiveClique(clique, directly: false);
-            }
+            clique.Bribery(map);
         }
     }
 
-    public void TryCommunicateWithClique(string cliqueKey)
+    public void TryCommunicateWithClique(string cliqueKey, Map map = null)
     {
         if (TryGetClique(cliqueKey, out QuestClique clique))
         {
-            if (!clique.IsCommunicable)
-            {
-                Log.Error($"[OARO] Trying to commiunicate with an incommunicable clique {clique.Name}.");
-                return;
-            }
-            float willingnessGain = Rand.Range(0.05f, 0.15f);
-            string text;
-            if (clique.PreferredBuilding is not null && branch.BuildingHandler.HasBuilding(clique.PreferredBuilding))
-            {
-                willingnessGain += 0.15f;
-                text = "OARO_Clique_CommunicateInfoWithPrefer".Translate(
-                    clique.Name.Named(KeyLibrary_FormatArgName.CliqueName),
-                    willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change),
-                    clique.PreferredBuilding.Named("BUILDING"));
-            }
-            else
-            {
-                text = "OARO_Clique_CommunicateInfo".Translate(
-                    clique.Name.Named(KeyLibrary_FormatArgName.CliqueName),
-                    willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change));
-            }
-
-            clique.AdjustCliqueWillingness(willingnessGain);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(text.Translate()));
-
-            if (clique.CanActiveNow(directly: false, resultOnly: true))
-            {
-                TryActiveClique(clique, directly: false);
-            }
+            clique.Communicate(branch, map);
         }
     }
 
