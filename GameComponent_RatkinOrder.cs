@@ -17,7 +17,8 @@ public class GameComponent_RatkinOrder : GameComponent
     private GlobalInteractionManager globalInteractionManager;
 
     private OrderLetterBox orderLetterBox;
-    public SpecialLetterManager specialLetterManager;
+    private SpecialLetterManager specialLetterManager;
+    private AIInteractionHandler aiInteractionHandler;
 
 
     /// <summary>
@@ -49,6 +50,8 @@ public class GameComponent_RatkinOrder : GameComponent
         KnightPawnsManager.ClearStaticCache();
         OrderLetterBox.ClearStaticCache();
         GlobalInteractionManager.ClearStaticCache();
+
+        AIInteractionHandler.ClearStaticCache();
     }
 
     public override void ExposeData()
@@ -178,5 +181,20 @@ public class GameComponent_RatkinOrder : GameComponent
         }
 
         specialLetterManager ??= new(initCtor: true);
+
+        try
+        {
+            aiInteractionHandler ??= new AIInteractionHandler();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "initializing AIInteractionHandler",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            AIInteractionHandler.ClearStaticCache();
+            aiInteractionHandler = new AIInteractionHandler();
+        }
     }
 }

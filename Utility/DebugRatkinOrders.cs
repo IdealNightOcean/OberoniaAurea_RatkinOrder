@@ -1,5 +1,7 @@
 ﻿using LudeonTK;
+using OberoniaAurea_Frame;
 using RimWorld;
+using RimWorld.QuestGen;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -409,6 +411,56 @@ public static class DebugRatkinOrders
             mercyQuestOptions.Add(orderOption);
         }
         Find.WindowStack.Add(new Dialog_DebugOptionListLister(mercyQuestOptions));
+    }
+
+    /// <summary>
+    /// 触发善行任务
+    /// </summary>
+    [DebugAction(category: category,
+                 name: "触发善行任务（AI）",
+                 displayPriority: 860,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
+    private static void TriggerMercyQuestAI()
+    {
+        List<DebugMenuOption> mercyQuestOptions = [];
+
+        Map map = OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: true, canBeSpace: false);
+        map ??= Find.CurrentMap;
+        foreach (MercyQuestDef mercyQuestDef in DefDatabase<MercyQuestDef>.AllDefs)
+        {
+            DebugMenuOption orderOption = new(label: mercyQuestDef.label,
+                                              mode: DebugMenuOptionMode.Action,
+                                              method: () => TryTriggerMercyQuestAI(mercyQuestDef, map));
+
+            mercyQuestOptions.Add(orderOption);
+        }
+        Find.WindowStack.Add(new Dialog_DebugOptionListLister(mercyQuestOptions));
+
+        static bool TryTriggerMercyQuestAI(MercyQuestDef mercyQuestDef, Map map)
+        {
+            Slate slate = new();
+            slate.Set("map", map);
+            if (!mercyQuestDef.TrySetQuestSlateValue(slate))
+            {
+                return false;
+            }
+            // 善行任务的派系Test时未生成，只好强制触发了
+            if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(
+                quest: out Quest triggerQuest,
+                scriptDef: mercyQuestDef.needPreQuest ? mercyQuestDef.preQuestDef : mercyQuestDef.mainQuestDef,
+                slate: slate,
+                forced: true,
+                target: map))
+            {
+                AIInteractionHandler.Instance.ReplaceMercyQuestTalkText(triggerQuest, mercyQuestDef);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)
