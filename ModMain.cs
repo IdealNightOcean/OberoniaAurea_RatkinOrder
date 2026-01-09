@@ -71,6 +71,39 @@ public class RatkinOrderSettings : ModSettings
     /// </summary>
     public static int MaxAcquiredPatrolInteractionPreType = 3;
 
+    /// <summary>
+    /// 是否启用AI相关内容
+    /// </summary>
+    public static bool EnableAIContent = false;
+
+    /// <summary>
+    /// AI服务URL
+    /// </summary>
+    public static string AIServiceUrl = "https://api.siliconflow.cn/v1/chat/completions";
+
+    /// <summary>
+    /// AI模型名称
+    /// </summary>
+    public static string AIModelName = "deepseek-ai/DeepSeek-V3.2";
+
+    /// <summary>
+    /// API密钥
+    /// </summary>
+    public static string APIKey = "";
+
+    /// <summary>
+    /// AI Prompt文本
+    /// </summary>
+    private static string mainAIPrompt;
+    public static string MainAIPrompt
+    {
+        get => mainAIPrompt ??= "OARO_Prompt_DefaultMainAIPrompt".Translate();
+        private set => mainAIPrompt = value ?? string.Empty;
+    }
+
+    [Unsaved] private static string promptBuffer;
+    [Unsaved] private static bool promptBufferInitialized;
+
     public override void ExposeData()
     {
         base.ExposeData();
@@ -85,6 +118,13 @@ public class RatkinOrderSettings : ModSettings
         Scribe_Values.Look(ref MaxLetterRetentionDays, nameof(MaxLetterRetentionDays), 300);
 
         Scribe_Values.Look(ref MaxAcquiredPatrolInteractionPreType, nameof(MaxAcquiredPatrolInteractionPreType), 3);
+
+        // AI相关设置
+        Scribe_Values.Look(ref EnableAIContent, nameof(EnableAIContent), defaultValue: false);
+        Scribe_Values.Look(ref AIServiceUrl, nameof(AIServiceUrl), "https://api.openai.com/v1/chat/completions");
+        Scribe_Values.Look(ref AIModelName, nameof(AIModelName), "gpt-3.5-turbo");
+        Scribe_Values.Look(ref APIKey, nameof(APIKey), "");
+        Scribe_Values.Look(ref mainAIPrompt, nameof(mainAIPrompt));
     }
 
     private static void Reset()
@@ -102,6 +142,18 @@ public class RatkinOrderSettings : ModSettings
         maxLetterRetentionDaysStr = MaxLetterRetentionDays.ToString();
 
         MaxAcquiredPatrolInteractionPreType = 3;
+
+        EnableAIContent = false;
+
+    }
+
+    private static void ResetAISettings()
+    {
+        AIServiceUrl = "https://api.siliconflow.cn/v1/chat/completions";
+        AIModelName = "deepseek-ai/DeepSeek-V3.2";
+        APIKey = string.Empty;
+        MainAIPrompt = "OARO_Prompt_DefaultMainAIPrompt".Translate();
+        promptBuffer = MainAIPrompt;
     }
 
     public void DoSettingsWindowContents(Rect inRect)
@@ -113,7 +165,8 @@ public class RatkinOrderSettings : ModSettings
         Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
         Listing_Standard listing_Rect = new()
         {
-            ColumnWidth = viewRect.width
+            ColumnWidth = viewRect.width,
+            maxOneColumn = true
         };
         listing_Rect.Begin(viewRect);
 
@@ -138,15 +191,60 @@ public class RatkinOrderSettings : ModSettings
         listing_Rect.Gap(12f);
         MaxAcquiredPatrolInteractionPreType = (int)listing_Rect.SliderLabeled($"OARO_Setting_{nameof(MaxAcquiredPatrolInteractionPreType)}".Translate(MaxAcquiredPatrolInteractionPreType.ToString()), MaxAcquiredPatrolInteractionPreType, 1f, 20f);
 
+        // AI相关设置
+        listing_Rect.Gap(12f);
+        listing_Rect.Label("————————————————");
+        Text.Font = GameFont.Medium;
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{nameof(EnableAIContent)}".Translate(), ref EnableAIContent);
+        Text.Font = GameFont.Small;
+        if (EnableAIContent)
+        {
+            DrawAISettings(listing_Rect);
+        }
+
         if (listing_Rect.ButtonText("OAFrame_Reset".Translate()))
         {
             Reset();
         }
+
         listing_Rect.End();
         if (Event.current.type == EventType.Layout)
         {
             viewRectHeight = listing_Rect.MaxColumnHeightSeen + 50f;
         }
         Widgets.EndScrollView();
+    }
+
+    private static void DrawAISettings(Listing_Standard listing_Rect)
+    {
+        listing_Rect.Label($"OARO_Setting_AISettingDesc".Translate().Colorize(ColorLibrary.Orange));
+        listing_Rect.Gap(6f);
+        listing_Rect.Label($"OARO_Setting_{nameof(AIServiceUrl)}".Translate());
+        AIServiceUrl = listing_Rect.TextEntry(AIServiceUrl);
+        listing_Rect.Label($"OARO_Setting_{nameof(AIModelName)}".Translate());
+        AIModelName = listing_Rect.TextEntry(AIModelName);
+        listing_Rect.Label($"OARO_Setting_{nameof(APIKey)}".Translate());
+        APIKey = listing_Rect.TextEntry(APIKey);
+
+        listing_Rect.Gap(6f);
+
+        if (!promptBufferInitialized)
+        {
+            promptBuffer = MainAIPrompt;
+            promptBufferInitialized = true;
+        }
+        listing_Rect.Label($"OARO_Setting_{nameof(MainAIPrompt)}".Translate());
+        Rect rect = listing_Rect.GetRect(300f);
+        string newText = Widgets.TextArea(rect, promptBuffer);
+        if (newText != promptBuffer)
+        {
+            promptBuffer = newText;
+            MainAIPrompt = newText;
+        }
+        listing_Rect.Gap(6f);
+        if (listing_Rect.ButtonText("OARO_ResetAISettings".Translate()))
+        {
+            ResetAISettings();
+        }
     }
 }

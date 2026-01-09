@@ -108,12 +108,23 @@ public class MercyQuestHandler : IExposable
             return false;
         }
         // 善行任务的派系Test时未生成，只好强制触发了
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(
-            quest: out _,
+        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(
+            quest: out Quest quest,
             scriptDef: mercyQuestDef.needPreQuest ? mercyQuestDef.preQuestDef : mercyQuestDef.mainQuestDef,
             slate: slate,
             forced: true,
-            target: map);
+            target: map))
+        {
+            if (RatkinOrderSettings.EnableAIContent)
+            {
+                AIInteractionHandler.Instance?.ReplaceMercyQuestTalkText(quest, mercyQuestDef);
+            }
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     private float GetMercyQuestChance()

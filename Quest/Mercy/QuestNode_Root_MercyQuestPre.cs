@@ -13,7 +13,6 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
     {
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
-        string rootInSignal = slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
         Map map = slate.Get<Map>("map") ?? QuestGen_Get.GetMap();
         if (map is null)
         {
@@ -41,9 +40,12 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.helpSeekerPawnKind);
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
         slate.Set(KeyLibrary_SlateStoreAs.helpSeeker, helpSeeker);
+
+        string inSignalMakePawnArrival = QuestGenUtility.HardcodedSignalWithQuestID("MakePawnArrival");
+
         quest.PawnsArrive(
             pawns: [helpSeeker],
-            inSignal: rootInSignal,
+            inSignal: inSignalMakePawnArrival,
             mapParent: map.Parent,
             arrivalMode: PawnsArrivalModeDefOf.EdgeWalkIn,
             customLetterLabel: "OARO_HelpSeeker_Alert".Translate(),
@@ -53,6 +55,15 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         string inSignalTransfer = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest_Transfer");
         string inSignalTransferWithHelp = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest_TransferWithHelp");
         string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest");
+
+        string inSignalTalkTextReset = QuestGenUtility.HardcodedSignalWithQuestID("TalkTextResetSignal");
+
+        if (RatkinOrderSettings.EnableAIContent)
+        {
+            quest.SignalPass(inSignal: inSignalTalkTextReset, outSignal: inSignalMakePawnArrival);
+        }
+        int arrivalDelayTick = RatkinOrderSettings.EnableAIContent ? 30000 : 60;
+        quest.Delay(delayTicks: arrivalDelayTick, inner: null, inSignalDisable: inSignalMakePawnArrival, outSignalComplete: inSignalMakePawnArrival);
 
         float delayMulti = OrderHallHandler.Instance.OrderHallLevel switch
         {
@@ -67,11 +78,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         QuestPart_LordJob_HelpSeeker questPart_LordJob_HelpSeeker = new()
         {
-            inSignal = rootInSignal,
+            inSignal = inSignalMakePawnArrival,
             OutSignalAccept = inSignalAccept,
             OutSignalTransfer = inSignalTransfer,
             OutSignalTransferWithHelp = inSignalTransferWithHelp,
             OutSignalReject = inSignalReject,
+
+            OutSignalTalkTextReset = inSignalTalkTextReset,
 
             mapOfPawn = helpSeeker,
             pawns = [helpSeeker],
@@ -91,10 +104,11 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         quest.SignalPassAny(
             inSignals: [inSignalAccept, inSignalTransfer, inSignalTransferWithHelp, inSignalReject],
             outSignal: outSignalResolved);
-        quest.Delay(delayTicks: helpSeekerLeaveDelay, inner: null, inSignalDisable: outSignalResolved, outSignalComplete: inSignalReject);
+        quest.Delay(delayTicks: helpSeekerLeaveDelay, inner: null, inSignalEnable: inSignalMakePawnArrival, inSignalDisable: outSignalResolved, outSignalComplete: inSignalReject);
         quest.Alert(label: "OARO_HelpSeeker_Alert".Translate(),
                     explanation: "OARO_HelpSeeker_AlertExp".Translate(),
                     lookTargets: helpSeeker,
+                    inSignalEnable: inSignalMakePawnArrival,
                     inSignalDisable: outSignalResolved);
 
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_Negative");
@@ -126,6 +140,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         quest.AddPart(questPart_AllOrdersEsteemChange_PawnNegative);
 
         quest.End(QuestEndOutcome.Fail, inSignal: inSignalPawnNegative);
+
+        //5日强制结束任务
+        quest.Delay(delayTicks: 5 * 60000,
+            inner: delegate
+            {
+                QuestGen_End.End(quest, QuestEndOutcome.Unknown);
+            });
     }
 
     protected virtual void TriggerMercyQuestPart(string acceptSignal, string rejectSignal, Faction subFaction, Faction parentFaction, Pawn helpSeeker)
