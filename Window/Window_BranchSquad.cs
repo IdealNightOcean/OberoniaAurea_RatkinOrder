@@ -2,6 +2,7 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using UnityEngine;
 using Verse;
 using static OberoniaAurea.RatkinOrder.Branch;
@@ -57,7 +58,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
 
-        SupplyRecoveryRateExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationStr(SelBranch, BranchStatDefOf.OARO_SupplyRecoveryRate, showResultValue: true));
+        SupplyRecoveryRateExplanation = new(refreshFunc: RefreshSupplyRecoveryRateExplanation);
         BombardSupportCeiling = new(refreshFunc: () => (int)(SelBranch?.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling, immediateUpdate: true) ?? -1f));
         BombardSupportCeilingExplanation = new(refreshFunc: () => BranchStatUtility.GetStatModifyExplanationStr(SelBranch, BranchStatDefOf.OARO_BombardSupportCeiling, showResultValue: true));
 
@@ -97,6 +98,7 @@ public class Window_BranchSquad : OrderWindowBase
         if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
         {
             Window_RatkinOrder ratkinOrderWin = new(Map);
+            ratkinOrderWin.SelectRatkinOrder(RatkinOrder);
             Find.WindowStack.Add(ratkinOrderWin);
             Close();
             return;
@@ -1107,6 +1109,13 @@ public class Window_BranchSquad : OrderWindowBase
         SelSquadInfo?.ClearCache();
         SelBranchIndex = -1;
         SelSquadInfo = new();
+    }
+
+    private string RefreshSupplyRecoveryRateExplanation()
+    {
+        StringBuilder sb = BranchStatUtility.GetStatModifyExplanation(SelBranch, BranchStatDefOf.OARO_SupplyRecoveryRate, showResultValue: true);
+        sb.Insert(0, BranchStatDefOf.OARO_SupplyRecoveryRate.LabelCap + ": \n\n", count: 1);
+        return sb.ToString();
     }
 
     private void RefreshBranchStatCache()

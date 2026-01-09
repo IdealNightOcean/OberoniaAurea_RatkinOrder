@@ -106,17 +106,11 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
     {
         Map map = talkWith.MapHeld;
         Faction faction = talkWith.Faction;
-        List<Thing> silvers = map.listerThings.ThingsOfDef(ThingDefOf.Silver);
-        int totalSilverCount = 0;
-        for (int i = 0; i < silvers.Count; i++)
-        {
-            totalSilverCount += silvers[i].stackCount;
-        }
 
         DiaNode rootNode = new("OARO_TalkWithTaxCollectorInfo".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)));
 
         DiaOption briberyOpt = new("OARO_TalkWithTaxCollector_Bribery".Translate());
-        if (totalSilverCount < 1000)
+        if (!map.HasEnoughThingsOfDef(ThingDefOf.Silver, 1000))
         {
             briberyOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.LabelCap, 1000));
         }
@@ -134,48 +128,46 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         }
         rootNode.options.Add(briberyOpt);
 
-        DiaOption threatOpt = new("OARO_TalkWithTaxCollector_Threat".Translate())
-        {
-            action = delegate
-            {
-                RecommendationUtility.UseRecommendationOfMap(talkWith.MapHeld, useCount: 1);
-                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
-                TalkActionUtility.DisableLordJobTalk(talkWith);
-            },
-            linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
-                text: "OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
-                acceptText: "Confirm".Translate())
-        };
-        if (!map.HasEnoughRecommendation(count: 1))
-        {
-            briberyOpt.Disable("OAFrame_NeedCountOfThing".Translate(OARO_ThingDefOf.OARO_OrderRecommendation.LabelCap, 1));
-        }
-        rootNode.options.Add(threatOpt);
-
-        DiaOption treatOpt = new("OARO_TalkWithTaxCollector_Treat".Translate())
-        {
-            resolveTree = true
-        };
+        DiaOption threatOpt = new("OARO_TalkWithTaxCollector_Threat".Translate());
         if (OrderHallHandler.Instance.OrderHallRoom is null)
         {
-            treatOpt.action = delegate
+            threatOpt.action = delegate
             {
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             };
-            treatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+            threatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
                 text: "OARO_TalkWithTaxCollector_NoOrderHallLeave".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                 acceptText: "Confirm".Translate());
         }
         else
         {
-            treatOpt.resolveTree = true;
-            treatOpt.action = delegate
+            threatOpt.action = delegate
+                {
+                    RecommendationUtility.UseRecommendationOfMap(talkWith.MapHeld, useCount: 1);
+                    QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
+                    TalkActionUtility.DisableLordJobTalk(talkWith);
+                };
+            threatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+               text: "OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
+               acceptText: "Confirm".Translate());
+
+            if (!map.HasEnoughRecommendation(count: 1))
+            {
+                briberyOpt.Disable("OARO_Insufficient_CurRecommendation".Translate(1.Named(KeyLibrary_FormatArgName.Count)));
+            }
+        }
+        rootNode.options.Add(threatOpt);
+
+        DiaOption treatOpt = new("OARO_TalkWithTaxCollector_Treat".Translate())
+        {
+            resolveTree = true,
+            action = delegate
             {
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "TreatByOpt");
                 TalkActionUtility.DisableLordJobTalk(talkWith);
-            };
-        }
+            }
+        };
         rootNode.options.Add(treatOpt);
 
         DiaOption ignoreOpt = new("OARO_TalkWithTaxCollector_Ignore".Translate())

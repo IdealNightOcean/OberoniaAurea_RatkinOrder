@@ -93,7 +93,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             },
             resolveTree = true
         };
-        if (talkWith.MapHeld.HasEnoughThingsOfDef(ThingDefOf.Silver, 200))
+        if (!talkWith.MapHeld.HasEnoughThingsOfDef(ThingDefOf.Silver, 200))
         {
             transferWithHelpOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.LabelCap, 200));
         }

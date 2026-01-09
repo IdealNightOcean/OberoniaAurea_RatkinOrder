@@ -441,6 +441,8 @@ public class Branch : IExposable, ILoadReferenceable
             SetFriendly(false);
         }
 
+        Supply += this.GetStatValue(BranchStatDefOf.OARO_SupplyRecoveryRate);
+
         buildingHandler.TickDay();
         populationHandler.TickDay();
         demandHandler.TickDay();
