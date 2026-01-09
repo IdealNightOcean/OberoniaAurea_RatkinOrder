@@ -202,14 +202,15 @@ public class Window_RatkinOrder : MainTabWindow
             entryX += entryWidth;
             if (OARO_WindowUtility.TextButtonImage(entryRect, ratkinOrder.Name, orderSelButton, orderSelButton_Down, doMouseoverSound: true))
             {
-                OnOrderButtonDown(ratkinOrder);
+                SelectRatkinOrder(ratkinOrder);
             }
         }
         Widgets.EndScrollView();
 
         OARO_WindowUtility.ResetText();
     }
-    private void OnOrderButtonDown(RatkinOrder ratkinOrder)
+
+    public void SelectRatkinOrder(RatkinOrder ratkinOrder)
     {
         if (!ratkinOrder.IsValid() || SelectedOrder == ratkinOrder)
         {

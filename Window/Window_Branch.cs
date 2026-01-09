@@ -164,6 +164,14 @@ public class Window_Branch : OrderWindowBase
             Close();
             return;
         }
+        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        {
+            Window_RatkinOrder ratkinOrderWin = new(Map);
+            ratkinOrderWin.SelectRatkinOrder(Branch.RatkinOrder);
+            Find.WindowStack.Add(ratkinOrderWin);
+            Close();
+            return;
+        }
 
         float offsetMainInnerMidX = mainInnerRectX + 824f;
 
