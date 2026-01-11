@@ -36,10 +36,9 @@ public class GameComponent_RatkinOrder : GameComponent
         // OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance)); 
         if (Instance != this)
         {
-            Log.Message("GameComponent_RatkinOrder Instance switched.".Colorize(Color.cyan));
+            Log.Message($"[OARO] {nameof(GameComponent_RatkinOrder)} Instance switched.".Colorize(Color.cyan));
         }
         Instance = this;
-
     }
 
     public static void ClearStaticCache()
