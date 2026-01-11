@@ -133,7 +133,7 @@ public class OrderLetterBox : IExposable
         }
         catch (Exception ex)
         {
-            ModUtility.LogExceptionError(ex, errorDesc: "reading letter", typeName: nameof(OrderLetterBox), methodName: nameof(ReadSingleLetter));
+            ModUtility.LogExceptionError(ex, errorDesc: "读取信件", typeName: nameof(OrderLetterBox), methodName: nameof(ReadSingleLetter));
         }
         finally
         {
@@ -152,7 +152,7 @@ public class OrderLetterBox : IExposable
             }
             catch (Exception ex)
             {
-                ModUtility.LogExceptionError(ex, errorDesc: "reading letter", typeName: nameof(OrderLetterBox), methodName: nameof(ReadAllUnreadLetters));
+                ModUtility.LogExceptionError(ex, errorDesc: "读取信件", typeName: nameof(OrderLetterBox), methodName: nameof(ReadAllUnreadLetters));
             }
         }
 

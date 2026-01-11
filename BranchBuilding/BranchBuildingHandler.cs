@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -98,7 +98,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
                     catch (Exception ex)
                     {
                         ModUtility.LogExceptionError(ex,
-                            errorDesc: "finish branch-building construction",
+                            errorDesc: "完成分部建筑建造",
                             typeName: nameof(BranchBuildingHandler),
                             methodName: nameof(TickHour),
                             needStackTrace: true);
@@ -276,12 +276,12 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     {
         if (buildingDef.isSpecial && SpecialBuildingDef is not null)
         {
-            Log.Error($"[OARO] Attempted to add a new branch building to the special building slot of {branch}, but one already exists.");
+            Log.Error($"[OARO] 尝试向 {branch} 的特殊建筑槽添加新分部建筑，但已存在一个。");
             return;
         }
         else if (HasBuilding(buildingDef))
         {
-            Log.Error($"[OARO] Attempted to add a new branch building to {branch}, but one already exists.");
+            Log.Error($"[OARO] 尝试向 {branch} 添加新分部建筑，但已存在一个。");
             return;
         }
 
@@ -293,7 +293,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"generating building {buildingDef.defName} for {branch}",
+                errorDesc: $"为 {branch} 生成建筑 {buildingDef.defName} ",
                 typeName: nameof(BranchBuildingHandler),
                 methodName: nameof(AddBuilding),
                 needStackTrace: true);
@@ -393,7 +393,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     {
         if (underConstructionBuildings.RemoveAll(r => r is null) > 0)
         {
-            Log.Error($"[OARO] {branch} has null under construction buildings after loading, Removed.");
+            Log.Error($"[OARO] {branch} 在加载后有null的在建建筑，已移除。");
         }
 
         foreach (UnderConstructionRecord<BranchBuildingDef> constructionBuilding in underConstructionBuildings)
@@ -407,7 +407,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
         if (allBuildings.RemoveAll(b => b is null) > 0)
         {
-            Log.Error($"[OARO] {branch} has null buildings after loading, Removed.");
+            Log.Error($"[OARO] {branch} 在加载后有建筑为null，已移除。");
         }
 
         foreach (BranchBuilding building in allBuildings)

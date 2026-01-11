@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -309,11 +309,11 @@ public class BranchFacilityHandler : IExposable
     {
         if (facilities.RemoveAll(kv => kv.Value == BranchFacilityLevel.None) > 0)
         {
-            Log.Error($"[OARO] {branch} has null or None facilities after loading, Removed.");
+            Log.Error($"[OARO] {branch} 在加载后有空或级别为{BranchFacilityLevel.None}的设施，已移除。");
         }
         if (underConstructionFacilities.RemoveAll(kv => kv.Value is null || kv.Value.TargetDef is null) > 0)
         {
-            Log.Error($"[OARO] {branch} has null or Invalid under construction facilities after loading, Removed.");
+            Log.Error($"[OARO] {branch} 在加载后有空或无效的在建设施，已移除。");
         }
 
         underConstructionFacilitiesList = underConstructionFacilities.Values.ToList();

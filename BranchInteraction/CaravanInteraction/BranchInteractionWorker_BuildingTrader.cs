@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -24,7 +24,7 @@ public class BranchInteractionWorker_BuildingTrader(BranchInteractionDef def) : 
         BranchBuilding building = parms.Building;
         if (building is not BranchBuilding_Trader traderContainer || traderContainer.Trader is null)
         {
-            Log.Error($"[OARO] Failed to apply BranchInteraction: {nameof(building)} is not a {nameof(BranchBuilding_Trader)} or its {nameof(BranchBuilding_Trader.Trader)} is null. {nameof(BranchBuildingDef)}: {building?.Def?.defName ?? "Unknown"}");
+            Log.Error($"[OARO] 应用BranchInteraction失败：{nameof(building)} 不是 {nameof(BranchBuilding_Trader)} 或其 {nameof(BranchBuilding_Trader.Trader)} 为null。{nameof(BranchBuildingDef)}：{building?.Def?.defName ?? "Unknown"}");
             return (false, false);
         }
 

@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -29,7 +29,7 @@ public static class RatkinOrderGenerator
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: $"generating RatkinOrder for faction {faction.loadID}",
+                    errorDesc: $"为派系 {faction.loadID} 生成 RatkinOrder",
                     typeName: nameof(RatkinOrderGenerator),
                     methodName: nameof(StartNewGame),
                     needStackTrace: true);
@@ -79,7 +79,7 @@ public static class RatkinOrderGenerator
             ratkinOrderDef ??= faction.def.GetModExtension<RatkinOrderFactionExtension>().ratkinOrderDef;
             if (ratkinOrderDef is null)
             {
-                Log.Error("[OARO] Tried to create RatkinOrder for faction_" + faction.loadID + " but the faction has no RatkinOrderDef.");
+                Log.Error("[OARO] 尝试为 faction_" + faction.loadID + " 创建骑士团，但该阵营没有 RatkinOrderDef。");
                 return null;
             }
             ratkinOrder = new RatkinOrder(ratkinOrderDef, faction)
@@ -91,7 +91,7 @@ public static class RatkinOrderGenerator
         catch (Exception ex1)
         {
             ModUtility.LogExceptionError(ex1,
-                errorDesc: $"generating RatkinOrder for faction_{faction.loadID}",
+                errorDesc: $"为派系：{faction.Name} 生成 RatkinOrder",
                 typeName: nameof(RatkinOrderGenerator),
                 methodName: nameof(GenerateRatkinOrderForFaction),
                 needStackTrace: true);
@@ -105,7 +105,7 @@ public static class RatkinOrderGenerator
         catch (Exception ex2)
         {
             ModUtility.LogExceptionError(ex2,
-                errorDesc: $"initializing RatkinOrder for faction_{faction.loadID}",
+                errorDesc: $"为派系：{faction.Name} 初始化 RatkinOrder ",
                 typeName: nameof(RatkinOrderGenerator),
                 methodName: nameof(GenerateRatkinOrderForFaction),
                 needStackTrace: true);
@@ -140,7 +140,27 @@ public static class RatkinOrderGenerator
             catch (Exception ex1)
             {
                 ModUtility.LogExceptionError(ex1,
-                    errorDesc: $"Failed to generating a new branch for {ratkinOrder} at {settlement}",
+                    errorDesc: $"为 {ratkinOrder} 在 {settlement} 生成新分部失败",
+                    typeName: nameof(RatkinOrderGenerator),
+                    methodName: nameof(InitBranchForNewOrder),
+                    needStackTrace: true);
+            }
+        }
+
+        if(!atLeastOneSite)
+        {
+            Settlement settlement = Find.WorldObjects.Settlements.Where(s => s.Faction == ratkinOrder.Faction).RandomElement();
+            try
+            {
+                if (Branch.GenerateBranchFor(ratkinOrder, settlement, addToManager: true) is not null)
+                {
+                    atLeastOneSite = true;
+                }
+            }
+            catch (Exception ex1)
+            {
+                ModUtility.LogExceptionError(ex1,
+                    errorDesc: $"为 {ratkinOrder} 在 {settlement} 生成新分部失败",
                     typeName: nameof(RatkinOrderGenerator),
                     methodName: nameof(InitBranchForNewOrder),
                     needStackTrace: true);
@@ -168,7 +188,7 @@ public static class RatkinOrderGenerator
             catch (Exception ex2)
             {
                 ModUtility.LogExceptionError(ex2,
-                    errorDesc: $"Failed to add a honor building ({honorBuildingDef}) for {branch}",
+                    errorDesc: $"添加荣誉建筑 ({honorBuildingDef}) 到 {branch} 失败",
                     typeName: nameof(RatkinOrderGenerator),
                     methodName: nameof(InitBranchForNewOrder),
                     needStackTrace: true);
@@ -192,10 +212,10 @@ public static class RatkinOrderGenerator
                 catch (Exception ex2)
                 {
                     ModUtility.LogExceptionError(ex2,
-                        errorDesc: $"Failed to add a honor building ({honorBuildingDef}) for {branch}",
-                        typeName: nameof(RatkinOrderGenerator),
-                        methodName: nameof(InitBranchForNewOrder),
-                        needStackTrace: true);
+                    errorDesc: $"添加荣誉建筑 ({honorBuildingDef}) 到 {branch} 失败",
+                    typeName: nameof(RatkinOrderGenerator),
+                    methodName: nameof(InitBranchForNewOrder),
+                    needStackTrace: true);
                 }
             }
         }

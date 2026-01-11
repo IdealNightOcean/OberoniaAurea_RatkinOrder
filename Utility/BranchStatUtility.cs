@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -101,7 +101,7 @@ public static class BranchStatUtility
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"generating BranchStat modification explanation: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
+                errorDesc: $"生成BranchStat修改说明: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
                 typeName: nameof(BranchStatUtility),
                 methodName: nameof(GetStatModifyExplanation),
                 needStackTrace: true);
@@ -182,7 +182,7 @@ public static class BranchStatUtility
         {
             result = baseValueOverride ?? statDef?.baseValue ?? 0f;
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"calculating new BranchStat value: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
+                errorDesc: $"计算新的BranchStat值: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
                 typeName: nameof(BranchStatUtility),
                 methodName: nameof(GetNewStatValue),
                 needStackTrace: true);
@@ -215,7 +215,7 @@ public static class BranchStatUtility
         {
             result = baseValueOverride ?? statDef?.baseValue ?? 0f;
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"calculating new BranchStat value: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
+                errorDesc: $"计算新的BranchStat值: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
                 typeName: nameof(BranchStatUtility),
                 methodName: nameof(GetNewStatValueFormTrans),
                 needStackTrace: true);

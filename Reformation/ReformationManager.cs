@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -119,7 +119,7 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
             {
                 string processorTypeName = IPostCombatantGenerate[i]?.GetType()?.FullName ?? "UnknownProcessor";
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: $"execute post-combatant-generate processor: {processorTypeName}",
+                    errorDesc: $"执行战斗人员生成后处理器: {processorTypeName}",
                     typeName: nameof(ReformationManager),
                     methodName: nameof(PostCombatantGenerate),
                     needStackTrace: true);
@@ -139,7 +139,7 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
     {
         if (reformations.Remove(null))
         {
-            Log.Error($"[OARO] Some reformations of {ratkinOrder} were null after loading and have been removed.");
+            Log.Error($"[OARO] {ratkinOrder} 的自新在加载后为null，已被移除。");
         }
         foreach (OrderReformationDef def in reformations)
         {
@@ -150,7 +150,7 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: "reactive reformation {def.label} after load",
+                    errorDesc: $"加载后重新激活自新 {def?.label ?? "Unknown"}",
                     typeName: nameof(ReformationManager),
                     methodName: nameof(PostLoadInit),
                     needStackTrace: true);

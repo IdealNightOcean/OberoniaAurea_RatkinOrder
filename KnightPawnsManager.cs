@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Verse;
@@ -29,7 +29,7 @@ public class KnightPawnsManager : IExposable
         {
             if (knights.RemoveAll(kv => kv.Value is null || !kv.Value.RatkinOrder.IsValid()) > 0)
             {
-                Log.Error($"[OARO] Some knight records of {nameof(KnightPawnsManager)} were invalid after loading and have been removed.");
+                Log.Error($"[OARO] {nameof(KnightPawnsManager)} 的部分骑士记录在加载后无效，已被移除。");
             }
         }
     }
@@ -38,7 +38,7 @@ public class KnightPawnsManager : IExposable
     {
         if (!pawn.CanBeKnight())
         {
-            Log.Error($"[OARO] Failed to register pawn ({pawn}) to KnightPawnsManager: this pawn cannot be a knight.");
+            Log.Error($"[OARO] 将单位 ({pawn}) 注册到 KnightPawnsManager 失败：该单位不能是骑士。");
             return;
         }
         knights[pawn] = knightRecord;

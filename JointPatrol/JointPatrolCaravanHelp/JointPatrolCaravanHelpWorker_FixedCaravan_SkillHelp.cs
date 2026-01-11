@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -28,7 +28,7 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
 
         if (modEx_SkillHelp?.requireSkill is null)
         {
-            Log.Error($"[OARO] {nameof(SkillRequirement)} from {nameof(JointPatrolCaravanHelp_SkillHelpExtension)} is null");
+            Log.Error($"[OARO] {nameof(JointPatrolCaravanHelp_SkillHelpExtension)} 中的 {nameof(SkillRequirement)} 为null");
             return false;
         }
         else if (modEx_SkillHelp.minLevel > OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, modEx_SkillHelp.requireSkill))
@@ -87,7 +87,7 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "interrupt help work",
+                errorDesc: "中断帮助工作",
                 typeName: nameof(JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp),
                 methodName: nameof(InterruptWork),
                 needStackTrace: true);
@@ -121,7 +121,7 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "finish help work",
+                errorDesc: "完成帮助工作",
                 typeName: nameof(JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp),
                 methodName: nameof(FinishWork),
                 needStackTrace: true);

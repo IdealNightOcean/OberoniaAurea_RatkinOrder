@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System.Text;
@@ -61,7 +61,7 @@ public class WorldObject_JointPatrolCaravanHelpSite_FixedCaravan : WorldObject_I
         {
             if (caravanIncidentDef.Worker is not JointPatrolCaravanHelpWorker_FixedCaravan fixedCaravanWorker)
             {
-                Log.Error($"[OARO] CaravanIncidentDef.Worker is not {nameof(JointPatrolCaravanHelpWorker_FixedCaravan)} type. Current type: {caravanIncidentDef.Worker?.GetType().Name ?? "null"}");
+                Log.Error($"[OARO] CaravanIncidentDef.Worker 不是 {nameof(JointPatrolCaravanHelpWorker_FixedCaravan)} 类型。当前类型：{caravanIncidentDef.Worker?.GetType().Name ?? "null"}");
                 return;
             }
             fixedCaravanWorker.Notify_CaravanArrived(caravan, branch, this);
@@ -134,7 +134,7 @@ public class WorldObject_JointPatrolCaravanHelpSite_FixedCaravan : WorldObject_I
         {
             if (!silence)
             {
-                Log.Error($"[OARO] {nameof(caravanIncidentDef)} is null in {nameof(Notify_CaravanArrived)}");
+                Log.Error($"[OARO] {nameof(caravanIncidentDef)} 在 {nameof(Notify_CaravanArrived)} 中为null");
             }
             return false;
         }
@@ -142,7 +142,7 @@ public class WorldObject_JointPatrolCaravanHelpSite_FixedCaravan : WorldObject_I
         {
             if (!silence)
             {
-                Log.Error($"[OARO] {nameof(branch)} is invalid in {nameof(Notify_CaravanArrived)}");
+                Log.Error($"[OARO] {nameof(Notify_CaravanArrived)}使用了无效的{nameof(branch)}。");
             }
             return false;
         }
@@ -150,7 +150,7 @@ public class WorldObject_JointPatrolCaravanHelpSite_FixedCaravan : WorldObject_I
         {
             if (!silence)
             {
-                Log.Error($"[OARO] {nameof(JointPatrolManager)} state is not Ongoing (current: {branch.RatkinOrder.JointPatrolManager.CurState})");
+                Log.Error($"[OARO] {nameof(JointPatrolManager)} 状态不是{nameof(JointPatrolManager.PatrolState.Ongoing)}（当前状态：{branch.RatkinOrder.JointPatrolManager.CurState}）");
             }
             return false;
         }

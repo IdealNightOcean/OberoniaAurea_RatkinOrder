@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using RimWorld.Planet;
 using System;
 using System.Collections.Generic;
@@ -128,12 +128,12 @@ public class BranchManager : IExposable, ITickDay
     {
         if (branch is null)
         {
-            Log.Error("[OARO] Attempted to add a null branch.");
+            Log.Error("[OARO] 尝试添加null的分部。");
             return;
         }
         if (branch.RatkinOrder != ratkinOrder)
         {
-            Log.Error("[OARO] Attempted to add a branch belonging to another RatkinOrder.");
+            Log.Error("[OARO] 尝试添加属于其他骑士团的分部。");
             return;
         }
 
@@ -166,7 +166,7 @@ public class BranchManager : IExposable, ITickDay
     {
         if (!allBranches.Remove(branch))
         {
-            Log.Error($"[OARO] Attempted to destroy a branch that does not exist in {ratkinOrder}. Branch: {branch}.");
+            Log.Error($"[OARO] 尝试销毁 {ratkinOrder} 中不存在的分部。分部：{branch}。");
             return;
         }
         followedBranches.Remove(branch);
@@ -279,7 +279,7 @@ public class BranchManager : IExposable, ITickDay
 
         targetBranch.CommanderVisitable = true;
         ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
-            label: "OARO_AutoUnlockCommanderVisitLabel".Translate(),
+            label: "OARO_AutoUnlockCommanderVisitLabel".Translate(targetBranch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
             text: "OARO_AutoUnlockCommanderVisitText".Translate(
                 ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
                 targetBranch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
@@ -379,11 +379,11 @@ public class BranchManager : IExposable, ITickDay
     {
         if (allBranches.RemoveAll(b => b is null) > 0)
         {
-            Log.Error($"[OARO] Some branches of {ratkinOrder} were null after loading and have been removed.");
+            Log.Error($"[OARO] {ratkinOrder} 的部分分部在加载后为null，已被移除。");
         }
         if (followedBranches.RemoveAll(b => b is null) > 0)
         {
-            Log.Error($"[OARO] Some followed branches of {ratkinOrder} were null after loading and have been removed.");
+            Log.Error($"[OARO] {ratkinOrder} 的部分已关注分部在加载后为null，已被移除。");
         }
 
         for (int i = 0; i < allBranches.Count; i++)

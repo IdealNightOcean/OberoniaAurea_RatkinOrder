@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -119,7 +119,7 @@ public class BranchMedalHandler : IExposable
     {
         if (medalRecords.RemoveAll(kv => kv.Value.Count <= 0) > 0)
         {
-            Log.Error($"[OARO] Some Medal Records of were null or invalid after loading and have been removed.");
+            Log.Error($"[OARO] 部分勋章记录在加载后为null或无效，已被移除。");
         }
         totalMedalCount = -1;
     }

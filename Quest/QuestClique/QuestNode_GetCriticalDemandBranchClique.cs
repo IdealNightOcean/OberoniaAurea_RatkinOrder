@@ -1,4 +1,4 @@
-﻿using RimWorld.Planet;
+using RimWorld.Planet;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using UnityEngine;
@@ -17,7 +17,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
     {
         if (!QuestGen.quest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
         {
-            Log.Error($"[OARO] Failed to get QuestPart_CliquesManager from {QuestGen.quest}.");
+            Log.Error($"[OARO] 从 {QuestGen.quest} 获取 {nameof(QuestPart_CliquesManager)} 失败。");
             return;
         }
 

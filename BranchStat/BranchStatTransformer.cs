@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -18,7 +18,7 @@ public struct BranchStatTransformer
         factor = 1f;
     }
 
-    public BranchStatTransformer(float offset, float factor, float fixedOffset)
+    public BranchStatTransformer(float offset, float factor)
     {
         this.offset = offset;
         this.factor = factor < 0f ? 0f : factor;
@@ -42,7 +42,7 @@ public struct BranchStatTransformer
     {
         if (toRemove.factor == 0f)
         {
-            Log.Error($"[OARO] Unmerge failed: 'toRemove' has 0 factor.");
+            Log.Error($"[OARO] 分离失败：'toRemove' 的factor为0。");
             throw new ArgumentOutOfRangeException(
                 paramName: nameof(toRemove.factor),
                 message: "factor of 'toRemove' cannot be 0. Unmerge operation requires a non-zero factor to avoid calculation errors.");
@@ -59,7 +59,7 @@ public struct BranchStatTransformer
     {
         if (value == 0f)
         {
-            Log.Error($"[OARO] Unmerge failed: value is 0.");
+            Log.Error($"[OARO] 分离失败：值为0。");
             throw new ArgumentOutOfRangeException(
                 paramName: nameof(value),
                 message: "Unmerge operation requires a non-zero factor to avoid calculation errors.");

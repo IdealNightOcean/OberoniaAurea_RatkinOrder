@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System.Text;
 using UnityEngine;
@@ -44,7 +44,7 @@ public static class GlobalInteractionUtility
     {
         if (!KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out KnightRecord kRecord))
         {
-            Log.Error("[OARO] Try recruitment a pawn is not knight as knight.");
+            Log.Error("[OARO] 尝试招募非骑士单位作为骑士。");
             return;
         }
 

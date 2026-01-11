@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Linq;
 using UnityEngine;
@@ -240,7 +240,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"switch to task {newTaskDef} for branch {branch}",
+                errorDesc: $"为分部 {branch} 切换到任务 {newTaskDef} ",
                 typeName: nameof(BranchTaskHandler),
                 methodName: nameof(StartTask),
                 needStackTrace: true);

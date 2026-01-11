@@ -53,7 +53,7 @@ internal class AIInteractionHandler
             }
             catch (Exception ex1)
             {
-                Log.Error($"[OARO] The AI client update failed.: {ex1.Message}\n{ex1.StackTrace}");
+                Log.Error($"[OARO] AI客户端更新失败：{ex1.Message}\n{ex1.StackTrace}");
                 Messages.Message("OARO_Message_AIConfigError".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
                 Client = null;
             }
@@ -62,14 +62,15 @@ internal class AIInteractionHandler
         {
             try
             {
-                Client = new Client(
+                Client.SetClientConfig(
                     endPointURL: RatkinOrderSettings.AIServiceUrl,
                     model: RatkinOrderSettings.AIModelName,
-                    apiKey: RatkinOrderSettings.APIKey);
+                    apiKey: RatkinOrderSettings.APIKey
+                );
             }
             catch (Exception ex2)
             {
-                Log.Error($"[OARO] The AI client update failed.: {ex2.Message}\n{ex2.StackTrace}");
+                Log.Error($"[OARO] AI客户端更新失败：{ex2.Message}\n{ex2.StackTrace}");
                 Messages.Message("OARO_Message_AIConfigError".Translate(), MessageTypeDefOf.NegativeEvent, historical: false);
                 Client = null;
             }
@@ -104,7 +105,7 @@ internal class AIInteractionHandler
         }
         catch (Exception ex)
         {
-            Log.Warning($"[OARO] The AI stream chat completions failed.: {ex.Message}\n{ex.StackTrace}");
+            Log.Warning($"[OARO] AI流式对话失败：{ex.Message}\n{ex.StackTrace}");
             serverResponse = Invalid(ex.Message);
         }
 
@@ -119,7 +120,7 @@ internal class AIInteractionHandler
 
         if (!CurGameValid)
         {
-            Log.Warning("[OARO] Game switched before response received.");
+            Log.Warning("[OARO] 收到响应前游戏已切换。");
             return;
         }
 
@@ -130,7 +131,7 @@ internal class AIInteractionHandler
         }
 
         QuestState? questState = helpSeekerPart?.quest?.State;
-        if (questState.Value == QuestState.Ongoing || questState == QuestState.NotYetAccepted)
+        if (questState == QuestState.Ongoing || questState == QuestState.NotYetAccepted)
         {
             // Log.Message("[OARO] 已使用AI生成善行求助对话");
             helpSeekerPart.SetRawTalkText(serverResponse.Content);
@@ -142,19 +143,19 @@ internal class AIInteractionHandler
 
 public static class DecoratePrompt
 {
-    private const string Espace = "    ";
+    private const string Space = "    ";
 
     public static void GetOrderPrompt(StringBuilder promptBuilder, RatkinOrder ratkinOrder)
     {
         promptBuilder.AppendLine("OARO_Prompt_RatkinOrder".Translate(ratkinOrder.Name));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_RatkinOrderFunds".Translate(ratkinOrder.Funds.ToStringPercent("0.##")));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_RatkinOrderRelationship".Translate($"OARO_Relationship_{ratkinOrder.Relationship}".Translate()));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_RatkinOrderEsteem".Translate(ratkinOrder.Esteem));
     }
 
@@ -162,30 +163,30 @@ public static class DecoratePrompt
     {
         promptBuilder.AppendLine("OARO_Prompt_Branch".Translate(branch.Name));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_BranchWorkStateDesc".Translate(branch.CurWorkStateDesc));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_BranchSupplyState".Translate(branch.SupplyState, branch.Supply.ToStringPercent("0.##")));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_BranchPotency".Translate(branch.Potency.ToString("0.##")));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_BranchPopulation".Translate(branch.PopulationHandler.Population));
 
-        promptBuilder.Append(Espace);
+        promptBuilder.Append(Space);
         promptBuilder.AppendLine("OARO_Prompt_BranchPublicSecurity".Translate(branch.PopulationHandler.PublicSecurityLabel, branch.PopulationHandler.PublicSecurity.ToStringPercent("0.##")));
 
         if (branch.TaskHandler.HasTask)
         {
-            promptBuilder.Append(Espace);
+            promptBuilder.Append(Space);
             promptBuilder.AppendLine("OARO_Prompt_BranchSupplyTask".Translate(branch.TaskHandler.CurTask.Label));
         }
 
         if (branch.IsOnJointPatrol())
         {
-            promptBuilder.Append(Espace);
+            promptBuilder.Append(Space);
             promptBuilder.AppendLine("OARO_Prompt_BranchOnJointPatrol".Translate());
         }
     }

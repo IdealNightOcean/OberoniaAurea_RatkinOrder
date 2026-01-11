@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -65,7 +65,7 @@ public static class KnightGenerateUtility
         Branch branch = parms.Branch;
         if (!TryGetRandomPawnGroupMakerForOrder(ratkinOrder, branch, parms.PawnGroupKind, out PawnGroupOption groupOption))
         {
-            Log.Error($"[OARO] No usable {nameof(PawnGroupOption)} for {parms.PawnGroupKind} found in {ratkinOrder}");
+            Log.Error($"[OARO] 在 {ratkinOrder} 中未找到可用于 {parms.PawnGroupKind} 的 {nameof(PawnGroupOption)}");
             return pawns;
         }
 
@@ -94,7 +94,7 @@ public static class KnightGenerateUtility
                         catch (Exception subEx1)
                         {
                             ModUtility.LogExceptionError(subEx1,
-                                errorDesc: "generate the knight member",
+                                errorDesc: "生成普通骑士",
                                 typeName: nameof(KnightGenerateUtility),
                                 methodName: nameof(GenerateCombatantKnights),
                                 needStackTrace: true);
@@ -103,7 +103,7 @@ public static class KnightGenerateUtility
                 }
                 else
                 {
-                    Log.Error($"[OARO] No usable {nameof(PawnGenOption)} with tag \"KnightMember\" for select {nameof(PawnGroupOption)}");
+                    Log.Error($"[OARO] 未找到带有标签 \"KnightMember\" 的可用 {nameof(PawnGenOption)} 用于选择 {nameof(PawnGroupOption)}");
                 }
             }
 
@@ -125,7 +125,7 @@ public static class KnightGenerateUtility
                         catch (Exception subEx2)
                         {
                             ModUtility.LogExceptionError(subEx2,
-                                errorDesc: "generate the knight commander",
+                                errorDesc: "生成骑士长",
                                 typeName: nameof(KnightGenerateUtility),
                                 methodName: nameof(GenerateCombatantKnights),
                                 needStackTrace: true);
@@ -134,7 +134,7 @@ public static class KnightGenerateUtility
                 }
                 else
                 {
-                    Log.Error($"[OARO] No usable {nameof(PawnGenOption)} with tag \"KnightCommander\" for select {nameof(PawnGroupOption)}");
+                    Log.Error($"[OARO] 未找到带有标签 \"KnightCommander\" 的可用 {nameof(PawnGenOption)} 用于选择 {nameof(PawnGroupOption)}");
                 }
             }
 
@@ -155,7 +155,7 @@ public static class KnightGenerateUtility
                         catch (Exception subEx3)
                         {
                             ModUtility.LogExceptionError(subEx3,
-                                errorDesc: "generate the non-knight unit",
+                                errorDesc: "生成非骑士单位",
                                 typeName: nameof(KnightGenerateUtility),
                                 methodName: nameof(GenerateCombatantKnights),
                                 needStackTrace: true);
@@ -164,14 +164,14 @@ public static class KnightGenerateUtility
                 }
                 else
                 {
-                    Log.Error($"[OARO] No usable {nameof(PawnGroupMaker)} for {parms.PawnGroupKind} found in {faction}");
+                    Log.Error($"[OARO] 在 {faction} 中未找到可用于 {parms.PawnGroupKind} 的 {nameof(PawnGroupMaker)}");
                 }
             }
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "generate combatant knights",
+                errorDesc: "生成战斗骑士",
                 typeName: nameof(KnightGenerateUtility),
                 methodName: nameof(GenerateCombatantKnights),
                 needStackTrace: true);

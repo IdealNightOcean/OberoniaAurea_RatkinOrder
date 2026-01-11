@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -85,11 +85,11 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         {
             if (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
             {
-                Log.Error($"[OARO] Some resident knight records of {nameof(ResidentKnightsManager)} were null or invalid after loading and have been removed.");
+                Log.Error($"[OARO] {nameof(ResidentKnightsManager)} 的部分常驻骑士记录在加载后为null或无效，已被移除。");
             }
             if (rolesToKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
             {
-                Log.Error($"[OARO] Some resident knight roles of {nameof(ResidentKnightsManager)} were null or invalid after loading and have been removed.");
+                Log.Error($"[OARO] {nameof(ResidentKnightsManager)} 的部分常驻骑士角色在加载后为null或无效，已被移除。");
             }
 
             NextBuffStatRegainTick = -1;
@@ -216,7 +216,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     {
         if (!KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out KnightRecord kRecord))
         {
-            Log.Error($"[OARO] Try add a non-knight pawn to {nameof(ResidentKnightsManager)}");
+            Log.Error($"[OARO] 尝试将非骑士单位添加到 {nameof(ResidentKnightsManager)}");
             return;
         }
 

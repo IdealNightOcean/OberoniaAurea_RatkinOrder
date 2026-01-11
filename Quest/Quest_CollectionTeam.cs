@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
@@ -73,13 +73,13 @@ public class QuestNode_CollectionTeam : QuestNode
         Type questPartClass = this.questPartClass.GetValue(slate);
         if (questPartClass != typeof(QuestPart_CollectionTeam) && !questPartClass.IsSubclassOf(typeof(QuestPart_CollectionTeam)))
         {
-            Log.Error($"[OARO] {nameof(this.questPartClass)} is not {nameof(QuestPart_CollectionTeam)} or it's subclass.");
+            Log.Error($"[OARO] {nameof(this.questPartClass)} 不是 {nameof(QuestPart_CollectionTeam)} 或其子类。");
             return;
         }
 
         if (!this.requestThingDefCounts.TryGetValue(slate, out IEnumerable<ThingDefCountClass> requestThingDefCounts))
         {
-            Log.Error($"[OARO] {nameof(this.requestThingDefCounts)} is null or empty.");
+            Log.Error($"[OARO] {nameof(this.requestThingDefCounts)} 为null或为空集合。");
             return;
         }
         Map map = slate.Get<Map>("map");
@@ -418,7 +418,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             base.Enable(receivedArgs);
             if (!TryMakeTeamArrive())
             {
-                Log.Error($"[OARO] Failed to get team arrival in {nameof(QuestPart_CollectionTeam)}.");
+                Log.Error($"[OARO] 在 {nameof(QuestPart_CollectionTeam)} 的收集小队到达失败。");
                 Disable();
                 quest.End(QuestEndOutcome.Unknown, sendLetter: false, playSound: false);
             }

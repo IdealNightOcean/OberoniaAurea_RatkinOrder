@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
@@ -46,7 +46,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
     {
         if (storesReserves.RemoveAll(r => r.Target is null) > 0)
         {
-            Log.Error($"[OARO] Some Reserves of {branch} were null after loading and have been removed.");
+            Log.Error($"[OARO] {branch} 的部分{nameof(ReserveRecord)}.{nameof(ReserveRecord.Target)}在加载后为null，已被移除。");
         }
     }
 

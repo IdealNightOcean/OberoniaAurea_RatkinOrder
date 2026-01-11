@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -129,7 +129,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             }
             catch (Exception ex1)
             {
-                Log.Warning($"[OARO] Failed to format {nameof(RawTalkText)} in {nameof(QuestPart_LordJob_HelpSeeker)}.{nameof(GetTalkText)}(). Exception:\n {ex1}");
+                Log.Warning($"[OARO] 在 {nameof(QuestPart_LordJob_HelpSeeker)}.{nameof(GetTalkText)}() 中格式化 {nameof(RawTalkText)} 失败。异常：\n {ex1}");
             }
         }
 
@@ -160,7 +160,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
                 catch (Exception ex2)
                 {
                     ModUtility.LogExceptionError(ex2,
-                        errorDesc: "resolve talk text",
+                        errorDesc: "解析对话文本",
                         typeName: nameof(QuestPart_LordJob_HelpSeeker),
                         methodName: nameof(GetTalkText),
                         needStackTrace: true);

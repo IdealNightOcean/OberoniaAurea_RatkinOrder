@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -78,7 +78,7 @@ public class BranchContract : IExposable
         }
         catch (Exception ex)
         {
-            ModUtility.LogExceptionError(ex, "getting contract reason", nameof(BranchContract), nameof(PostInit));
+            ModUtility.LogExceptionError(ex, "获取合同订单原因", nameof(BranchContract), nameof(PostInit));
             requestReason = "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
         }
         curState = ContractState.Ongoing;
