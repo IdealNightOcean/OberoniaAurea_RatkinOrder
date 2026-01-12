@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -237,7 +237,7 @@ public class BranchPopulationHandler : IExposable, ITickDay
     {
         if (contracts.RemoveAll(c => c is null) > 0)
         {
-            Log.Error($"[OARO] Some of contracts in {branch} were null after loading. Removed.");
+            Log.Error($"[OARO] {branch} 的部分{nameof(BranchContract)}在加载后为null。已移除。");
         }
     }
 }

@@ -30,25 +30,25 @@ public class UniqueIDManager : IExposable
         {
             if (!Instance.wasLoaded)
             {
-                Log.Warning("Getting next unique ID during LoadingVars before UniqueIDsManager was loaded. Assigning a random value.");
+                Log.Warning("在 UniqueIDsManager 加载前的 LoadingVars 期间获取下一个唯一 ID。分配一个随机值。");
                 return Rand.Int;
             }
         }
         if (Scribe.mode == LoadSaveMode.Saving)
         {
-            Log.Warning("Getting next unique ID during saving This may cause bugs.");
+            Log.Warning("在保存期间获取下一个唯一 ID。这可能导致错误。");
         }
         int result = Instance.uniqueIDs.TryGetValue(key, fallback: -1);
         if (result < 0)
         {
-            Log.Warning("Current ID is Negative. May try get ID for non-referencable object type.");
+            Log.Warning("当前 ID 为负数。可能尝试获取不可引用对象类型的 ID。");
         }
         else
         {
             result++;
             if (result == int.MaxValue)
             {
-                Log.Warning("Next ID is at max value. Resetting to 0. This may cause bugs.");
+                Log.Warning("下一个 ID 达到最大值。重置为 0。这可能导致错误。");
                 result = 0;
             }
             Instance.uniqueIDs[key] = result;

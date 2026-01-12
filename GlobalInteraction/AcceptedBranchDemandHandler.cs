@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -31,7 +31,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         {
             if (records.RemoveAll(r => r is null || !r.IsValid) > 0)
             {
-                Log.Error($"[OARO] Some {nameof(AcceptedBranchDemand)} were null or invalided after loading and have been removed.");
+                Log.Error($"[OARO] 部分 {nameof(AcceptedBranchDemand)} 在加载后为null或无效，已被移除。");
             }
         }
     }
@@ -46,7 +46,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"process {nameof(PostDemandAccepted)} action",
+                errorDesc: $"处理 {nameof(PostDemandAccepted)}",
                 typeName: nameof(AcceptedBranchDemandHandler),
                 methodName: nameof(OnAcceptDemand),
                 needStackTrace: true);

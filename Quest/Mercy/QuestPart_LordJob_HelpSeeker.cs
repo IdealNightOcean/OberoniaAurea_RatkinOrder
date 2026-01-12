@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,8 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
     public string OutSignalTransferWithHelp;
     public string OutSignalReject;
 
+    public string OutSignalTalkTextReset;
+
     public MercyQuestDef MercyQuestDef;
     public Faction SubFaction;
     public Faction ParentFaction;
@@ -30,6 +32,8 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         Scribe_Values.Look(ref OutSignalTransfer, nameof(OutSignalTransfer));
         Scribe_Values.Look(ref OutSignalTransferWithHelp, nameof(OutSignalTransferWithHelp));
         Scribe_Values.Look(ref OutSignalReject, nameof(OutSignalReject));
+
+        Scribe_Values.Look(ref OutSignalTalkTextReset, nameof(OutSignalTalkTextReset));
 
         Scribe_Values.Look(ref RawTalkText, nameof(RawTalkText));
 
@@ -46,6 +50,8 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         OutSignalTransfer = null;
         OutSignalTransferWithHelp = null;
         OutSignalReject = null;
+
+        OutSignalTalkTextReset = null;
 
         RawTalkText = null;
 
@@ -68,7 +74,6 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             },
             resolveTree = true
         };
-        List<Branch> allAvailableBranches = BranchUtility.GetAllAvailableBranches(b => b.IsBranchOfType(Branch.BranchType.Friendly));
         DiaOption transferOpt = new("OARO_TalkWithHelpSeeker_Transfer".Translate())
         {
             action = delegate
@@ -78,16 +83,11 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             },
             resolveTree = true
         };
-        if (allAvailableBranches.NullOrEmpty())
-        {
-            transferOpt.Disable("OARO_NoAnyFriendlyBranch".Translate());
-        }
 
         DiaOption transferWithHelpOpt = new("OARO_TalkWithHelpSeeker_TransferWithHelp".Translate())
         {
             action = delegate
             {
-                talkWith.MapHeld?.DestoryThingsOfDef(ThingDefOf.Silver, 200);
                 Find.SignalManager.SendSignal(new Signal(OutSignalTransferWithHelp, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
@@ -113,8 +113,6 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         };
 
         rootNode.options.Add(acceptOpt);
-        rootNode.options.Add(transferOpt);
-        rootNode.options.Add(transferWithHelpOpt);
         rootNode.options.Add(rejectOpt);
         rootNode.options.Add(ignoreOpt);
 
@@ -131,7 +129,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             }
             catch (Exception ex1)
             {
-                Log.Warning($"[OARO] Failed to format {nameof(RawTalkText)} in {nameof(QuestPart_LordJob_HelpSeeker)}.{nameof(GetTalkText)}(). Exception:\n {ex1}");
+                Log.Warning($"[OARO] 在 {nameof(QuestPart_LordJob_HelpSeeker)}.{nameof(GetTalkText)}() 中格式化 {nameof(RawTalkText)} 失败。异常：\n {ex1}");
             }
         }
 
@@ -162,7 +160,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
                 catch (Exception ex2)
                 {
                     ModUtility.LogExceptionError(ex2,
-                        errorDesc: "resolve talk text",
+                        errorDesc: "解析对话文本",
                         typeName: nameof(QuestPart_LordJob_HelpSeeker),
                         methodName: nameof(GetTalkText),
                         needStackTrace: true);
@@ -174,7 +172,14 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 
     }
 
-    public void SetRawTalkText(string talkText) => RawTalkText = talkText;
+    public void SetRawTalkText(string talkText)
+    {
+        RawTalkText = talkText;
+        if (quest.State == QuestState.Ongoing && !string.IsNullOrEmpty(OutSignalTalkTextReset))
+        {
+            Find.SignalManager.SendSignal(new Signal(OutSignalTalkTextReset));
+        }
+    }
 
     protected NamedArgument[] TextNamedArguments()
     {

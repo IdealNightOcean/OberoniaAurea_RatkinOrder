@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using Verse;
 
@@ -100,7 +100,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
     {
         if (!ParmsValidate(parms, resultOnly: true))
         {
-            Log.Error($"[OARO] Attempt to apply BranchInteraction with a invalid {nameof(BranchInteractionParms)}.");
+            Log.Error($"[OARO] 尝试应用 BranchInteraction 时使用了无效的 {nameof(BranchInteractionParms)}。");
             return;
         }
 
@@ -145,7 +145,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             (succeeded, doPostApply) = (false, true);
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"{nameof(InteractionEffect)} for BranchInteraction[{Def?.defName}]",
+                errorDesc: $"执行 BranchInteraction[{Def?.defName}] 的交互效果",
                 typeName: nameof(BranchInteractionWorker),
                 methodName: nameof(ApplyInteraction),
                 needStackTrace: true);
@@ -160,7 +160,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: $"{nameof(DoInteractionCost)} for BranchInteraction[{Def?.defName}]",
+                    errorDesc: $"应用 BranchInteraction[{Def?.defName}] 的交互成本",
                     typeName: nameof(BranchInteractionWorker),
                     methodName: nameof(ApplyInteraction),
                     needStackTrace: true);
@@ -182,7 +182,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"call-back: {nameof(Branch)}.{nameof(Branch.PostApplyBranchInteraction)}",
+                errorDesc: $"回调: {nameof(Branch)}.{nameof(Branch.PostApplyBranchInteraction)}",
                 typeName: nameof(BranchInteractionWorker),
                 methodName: nameof(PostApplyInteraction),
                 needStackTrace: true);

@@ -235,7 +235,7 @@ public class QuestClique : IExposable
     {
         if (!IsActivatable)
         {
-            Log.Error($"[OARO] Trying to activate with an unactivatable clique {Name} ({key}).");
+            Log.Error($"[OARO] 尝试激活不可激活的派别 {Name} ({key})。");
             return false;
         }
 
@@ -303,7 +303,7 @@ public class QuestClique : IExposable
     {
         if (!IsCommunicable)
         {
-            Log.Error($"[OARO] Trying to commiunicate with an incommunicable clique {Name} ({key}).");
+            Log.Error($"[OARO] 尝试与不可通讯的派别 {Name} ({key}) 通讯。");
             return;
         }
         float willingnessGain = Rand.Range(0.05f, 0.15f);

@@ -1,4 +1,4 @@
-﻿using RimWorld.Planet;
+using RimWorld.Planet;
 using System.Text;
 using Verse;
 
@@ -71,7 +71,7 @@ public class WorldObject_JointPatrolCaravanHelpSite : WorldObject_Interactive_Na
         {
             if (!silence)
             {
-                Log.Error($"[OARO] {nameof(caravanIncidentDef)} is null in {nameof(Notify_CaravanArrived)}");
+                Log.Error($"[OARO] {nameof(caravanIncidentDef)} 在 {nameof(Notify_CaravanArrived)} 中为null");
             }
             return false;
         }
@@ -79,7 +79,7 @@ public class WorldObject_JointPatrolCaravanHelpSite : WorldObject_Interactive_Na
         {
             if (!silence)
             {
-                Log.Error($"[OARO] {nameof(branch)} is invalid in {nameof(Notify_CaravanArrived)}");
+                Log.Error($"[OARO] 在 {nameof(Notify_CaravanArrived)} 中使用了无效的{nameof(branch)}.");
             }
             return false;
         }
@@ -87,7 +87,7 @@ public class WorldObject_JointPatrolCaravanHelpSite : WorldObject_Interactive_Na
         {
             if (!silence)
             {
-                Log.Error($"[OARO] {nameof(JointPatrolManager)} state is not Ongoing (current: {branch.RatkinOrder.JointPatrolManager.CurState})");
+                Log.Error($"[OARO] {nameof(JointPatrolManager)} 状态不是{nameof(JointPatrolManager.PatrolState.Ongoing)}（当前状态：{branch.RatkinOrder.JointPatrolManager.CurState}）");
             }
             return false;
         }

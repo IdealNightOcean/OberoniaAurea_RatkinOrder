@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -229,7 +229,7 @@ public static class BranchSupportUtility
         int totalCount = memberCount + commanderCount + nonKnightCount;
         if (totalCount <= 0)
         {
-            Log.Error($"[OARO] No valid members to generate in {nameof(BranchSupportUtility)}.{nameof(GenerateCombatKnightGenerateParmsByDeploymentLevel)}: all counts are zero or negative.");
+            Log.Error($"[OARO] 在 {nameof(BranchSupportUtility)}.{nameof(GenerateCombatKnightGenerateParmsByDeploymentLevel)} 中没有有效的成员可生成：所有计数为零或负数。");
             return false;
         }
 

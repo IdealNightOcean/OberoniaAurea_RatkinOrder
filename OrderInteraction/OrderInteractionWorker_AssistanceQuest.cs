@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using Verse;
@@ -12,7 +12,7 @@ public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : O
         OrderInteraction_AssistanceQuestExtension modEx_AssistanceQuest = Def.GetModExtension<OrderInteraction_AssistanceQuestExtension>();
         if (modEx_AssistanceQuest is null || modEx_AssistanceQuest.assistanceQuest is null)
         {
-            Log.Error($"[OARO] Assistance quest data is missing ({nameof(OrderInteraction_AssistanceQuestExtension)} or {nameof(OrderInteraction_AssistanceQuestExtension)}.{nameof(OrderInteraction_AssistanceQuestExtension.assistanceQuest)} null)");
+            Log.Error($"[OARO] 援助任务数据缺失（{nameof(OrderInteraction_AssistanceQuestExtension)} 或 {nameof(OrderInteraction_AssistanceQuestExtension)}.{nameof(OrderInteraction_AssistanceQuestExtension.assistanceQuest)} 为null）");
             return;
         }
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(

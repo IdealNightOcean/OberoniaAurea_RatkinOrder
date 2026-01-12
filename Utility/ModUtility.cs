@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -85,7 +85,7 @@ public static class ModUtility
 
         if (!pawnsArrivalModeDef.Worker.CanUseOnMap(map))
         {
-            Log.Error($"[OARO] Tried to do pawns arrive on map: {map} but could not find a legal arrival mode, current method: {pawnsArrivalModeDef.defName}");
+            Log.Error($"[OARO] 尝试让单位到达地图 {map} 但找不到合法的到达方式，当前方法：{pawnsArrivalModeDef.defName}");
             return false;
         }
 
@@ -158,11 +158,11 @@ public static class ModUtility
     {
         if (needStackTrace)
         {
-            Log.Error($"[OARO] An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex}");
+            Log.Error($"[OARO] 在 {typeName}.{methodName} 中执行 {errorDesc} 时发生异常。\n异常：\n{ex}");
         }
         else
         {
-            Log.Error($"[OARO] An exception occurred during {errorDesc} in {typeName}.{methodName}. \nException: \n{ex.Message}");
+            Log.Error($"[OARO] 在 {typeName}.{methodName} 中执行 {errorDesc} 时发生异常。\n异常：\n{ex.Message}");
         }
     }
 }

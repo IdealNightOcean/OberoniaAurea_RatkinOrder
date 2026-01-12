@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
 using Verse;
@@ -77,7 +77,7 @@ public class WorldObjectComp_BranchSite : WorldObjectComp, ISingleBranchRelated
                 }
                 else
                 {
-                    Log.Error($"[OARO] {nameof(branch)} has already been set and cannot be assigned again.");
+                    Log.Error($"[OARO] {nameof(branch)} 已设置，无法再次分配。");
                     return;
                 }
             }

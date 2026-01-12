@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System.Collections.Generic;
 using System.Text;
 using UnityEngine;
@@ -121,7 +121,7 @@ public class Building_OrderFermentingBarrel : Building
         TemperatureRuinableComp.Reset();
         if (Fermented)
         {
-            Log.Warning("Tried to add raw material to a barrel full of product. Colonists should take the product first.");
+            Log.Warning("尝试向装满产品的桶添加原料。殖民者应先取出产品。");
             return;
         }
         int numToAdd = Mathf.Min(count, ModEx_FermentingBarrel.rawCount - rawCount);
@@ -190,7 +190,7 @@ public class Building_OrderFermentingBarrel : Building
     {
         if (!Fermented)
         {
-            Log.Warning("Tried to get product but it's not yet fermented.");
+            Log.Warning("尝试获取产品但尚未发酵完成。");
             return null;
         }
         Thing thing = ThingMaker.MakeThing(ModEx_FermentingBarrel.product);

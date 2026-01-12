@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -24,13 +24,13 @@ public class BranchBuilding_Trader : BranchBuildingWithComps, ITickDay
         BranchBuildingTrderSetter_Extension trderSetter = def.GetModExtension<BranchBuildingTrderSetter_Extension>();
         if (trderSetter is null)
         {
-            Log.Error($"[OARO] Missing BranchBuildingTrderSetter_Extension mod extension on def {def.defName}");
+            Log.Error($"[OARO] 在def {def.defName} 上缺少 {nameof(BranchBuildingTrderSetter_Extension)} mod extension");
             return;
         }
         TraderKindDef traderKindDef = trderSetter.potentialTraders?.RandomElementWithFallback();
         if (traderKindDef is null)
         {
-            Log.Error($"[OARO] No valid TraderKindDef found in potentialTraders for def {def.defName}");
+            Log.Error($"[OARO] 在def {def.defName} 的 {nameof(trderSetter.potentialTraders)} 中未找到有效的 {nameof(TraderKindDef)}");
             return;
         }
 

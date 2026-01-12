@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
@@ -85,7 +85,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             KnightGenerateUtility.TryGetRandomPawnGroupMakerForOrder(RatkinOrder, Branch, PawnGroupKind, out PawnGroupOption pawnGroupOption);
             if (pawnGroupOption is null)
             {
-                Log.Error($"[OARO] No usable {nameof(PawnGroupOption)} for {PawnGroupKind} found in {RatkinOrder}");
+                Log.Error($"[OARO] 在 {RatkinOrder} 中未找到可用于 {PawnGroupKind} 的 {nameof(PawnGroupOption)}");
             }
             else
             {
@@ -94,7 +94,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
 
             if (pawnGenOptions is null || pawnGenOptions.Count == 0)
             {
-                Log.Error($"[OARO] No usable {nameof(PawnGenOption)} with tag \"{PawnGenGroupTag}\" for select {nameof(PawnGroupOption)}");
+                Log.Error($"[OARO] 未找到带有标签 \"{PawnGenGroupTag}\" 的可用 {nameof(PawnGenOption)} 用于选择 {nameof(PawnGroupOption)}");
                 fixedPawnKind = OARO_PawnKindDefOf.RatkinKnight;
             }
         }

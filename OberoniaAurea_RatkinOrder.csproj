@@ -50,6 +50,9 @@
       <HintPath>..\..\NightOcean\obj\Release\netstandard2.0\NightOcean.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="NightOcean.SimpleAIClient">
+      <HintPath>..\..\SimpleAIClient\bin\Debug\netstandard2.1\NightOcean.SimpleAIClient.dll</HintPath>
+    </Reference>
     <Reference Include="OberoniaAurea_Frame">
       <HintPath>..\OberoniaAurea_Frame\Release\OberoniaAurea_Frame.dll</HintPath>
       <Private>False</Private>
@@ -77,6 +80,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ability\AbilityComp_GiveRatkinHediff.cs" />
+    <Compile Include="AIInteractionHandler.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Memorial.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_OrderEffectTags.cs" />

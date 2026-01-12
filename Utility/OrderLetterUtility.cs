@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
@@ -85,7 +85,7 @@ public static class OrderLetterUtility
             }
             else
             {
-                Log.Error($"[OARO] {letterDef.defName} has attachments but its letter class {specialLetter.GetType().Name} does not implement {nameof(IAttachments)} interface.");
+                Log.Error($"[OARO] {letterDef.defName} 有附件，但其信件类 {specialLetter.GetType().Name} 未实现 {nameof(IAttachments)} 接口。");
             }
         }
 
@@ -126,7 +126,7 @@ public static class OrderLetterUtility
             }
             else
             {
-                Log.Error($"[OARO] {letterDef.defName} has attachments but its letter class {dailyOrderLetter.GetType().Name} does not implement {nameof(IAttachments)} interface.");
+                Log.Error($"[OARO] {letterDef.defName} 有附件，但其信件类 {dailyOrderLetter.GetType().Name} 未实现 {nameof(IAttachments)} 接口。");
             }
         }
 

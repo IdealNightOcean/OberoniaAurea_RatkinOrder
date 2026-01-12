@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using Verse;
 
@@ -138,7 +138,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: "generate or initialize critical demand",
+                    errorDesc: "生成或初始化关键需求",
                     typeName: nameof(BranchDemandHandler),
                     methodName: nameof(AddNewDemand),
                     needStackTrace: true);
@@ -157,7 +157,7 @@ public class BranchDemandHandler : ITickDay, IExposable
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: "generate or initialize normal demand",
+                    errorDesc: "生成或初始化普通需求",
                     typeName: nameof(BranchDemandHandler),
                     methodName: nameof(AddNewDemand),
                     needStackTrace: true);

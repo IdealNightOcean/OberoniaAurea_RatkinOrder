@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using Verse;
@@ -49,12 +49,12 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
     {
         if (!ratkinOrder.IsValid())
         {
-            Log.Error("[OARO] RatkinOrder is invalid, cannot apply interaction.");
+            Log.Error("[OARO] RatkinOrder无效，无法应用交互。");
             return;
         }
         if (map is null)
         {
-            Log.Error("[OARO] Map is null, cannot apply interaction.");
+            Log.Error("[OARO] Map为null，无法应用交互。");
             return;
         }
 
@@ -98,7 +98,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         {
             (succeeded, doPostApply) = (false, true);
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"{nameof(InteractionEffect)} for BranchInteraction [{Def?.defName}]",
+                errorDesc: $"执行 BranchInteraction [{Def?.defName}] 的交互效果",
                 typeName: nameof(OrderInteractionWorker),
                 methodName: nameof(ApplyInteraction),
                 needStackTrace: true);
@@ -113,7 +113,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: $"{nameof(DoInteractionCost)} for BranchInteraction [{Def?.defName}]",
+                    errorDesc: $"应用 BranchInteraction [{Def?.defName}] 的交互代价",
                     typeName: nameof(OrderInteractionWorker),
                     methodName: nameof(ApplyInteraction),
                     needStackTrace: true);
@@ -141,7 +141,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"call-back: {nameof(RatkinOrder)}.{nameof(RatkinOrder.PostApplyOrderInteraction)}",
+                errorDesc: $"回调: {nameof(RatkinOrder)}.{nameof(RatkinOrder.PostApplyOrderInteraction)}",
                 typeName: nameof(OrderInteractionWorker),
                 methodName: nameof(TryApplyInteraction),
                 needStackTrace: true);

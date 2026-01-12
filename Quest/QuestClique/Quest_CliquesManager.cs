@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
@@ -147,7 +147,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
         if (showErrorIfMiss)
         {
-            Log.Error($"[OARO] No clique found in quest_{quest.id}.");
+            Log.Error($"[OARO] 在quest_{quest.id}中未找到派别：{cliqueKey}。");
         }
         clique = null;
         return false;
@@ -183,7 +183,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             }
             else
             {
-                Log.Warning($"Clique ({clique.Key}) already exists in quest.");
+                Log.Warning($"派别 ({clique.Key}) 已存在于任务中。");
                 added = false;
             }
         }

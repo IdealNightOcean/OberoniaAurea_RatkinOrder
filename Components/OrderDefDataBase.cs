@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
@@ -93,12 +93,12 @@ public static class OrderDefDataBase
     {
         if (buildingDef is null)
         {
-            Log.Error($"[OARO] Failed to add {nameof(ThingDef)} to to {nameof(OrderDefDataBase)}: {nameof(buildingDef)} cannot be null.");
+            Log.Error($"[OARO] 将 {nameof(ThingDef)} 添加到 {nameof(OrderDefDataBase)} 失败：{nameof(buildingDef)} 不能为空。");
             return;
         }
         if (personality == KnightPersonality.None)
         {
-            Log.Error($"[OARO] Failed to add {nameof(ThingDef)} to {nameof(OrderDefDataBase)}: {nameof(personality)} cannot be {nameof(KnightPersonality.None)}.");
+            Log.Error($"[OARO] 将 {nameof(ThingDef)} 添加到 {nameof(OrderDefDataBase)} 失败：{nameof(personality)} 不能为 {nameof(KnightPersonality.None)}。");
             return;
         }
 

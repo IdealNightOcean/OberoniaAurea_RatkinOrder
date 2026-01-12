@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -234,7 +234,7 @@ public class Branch : IExposable, ILoadReferenceable
     {
         if (!worldObject.CanBeSiteForNewBranch(ratkinOrder))
         {
-            Log.Error($"[OARO] {nameof(worldObject)} cannot be used as a {nameof(BaseSite)} for a new {nameof(Branch)}.");
+            Log.Error($"[OARO] {nameof(worldObject)} 不能用作新 {nameof(Branch)} 的 {nameof(BaseSite)}。");
             return null;
         }
 
@@ -359,7 +359,7 @@ public class Branch : IExposable, ILoadReferenceable
     {
         if (!replaceCur && HonorDef is not null)
         {
-            Log.Error($"[OARO] Failed to set {nameof(BranchHonorDef)}: {nameof(HonorDef)} already exists and {nameof(replaceCur)} is false. ");
+            Log.Error($"[OARO] 设置 {nameof(BranchHonorDef)} 失败：{nameof(HonorDef)} 已存在且 {nameof(replaceCur)} 为 false。");
             return;
         }
         SetBranchType(BranchType.Honor, active: true);

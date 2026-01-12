@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -31,7 +31,7 @@ public partial class BranchStoresReserveHandler
                 return new FacilityReserveRecord(facilityDef, costRateReduce);
             }
 
-            Log.Error($"[OARO] Unknown BranchConstructionDef type: {def.GetType().FullName}");
+            Log.Error($"[OARO] 未知的 BranchConstructionDef 类型：{def.GetType().FullName}");
             return null;
         }
 

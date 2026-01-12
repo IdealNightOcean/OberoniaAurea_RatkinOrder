@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
@@ -250,7 +250,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Prepare)
         {
-            Log.Error("[OARO] Trying to change participant branch when joint patrol is not in prepare state.");
+            Log.Error("[OARO] 尝试在联巡未处于准备状态时更改参与分部。");
             return;
         }
 
@@ -312,7 +312,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Prepare)
         {
-            Log.Error("[OARO] Trying to bring back resident knight when joint patrol is not in prepare state..");
+            Log.Error("[OARO] 尝试在联巡未处于准备状态时将常驻骑士带回队伍。");
             return false;
         }
 
@@ -369,7 +369,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Prepare)
         {
-            Log.Error("[OARO] Trying to add participant branch when joint patrol is not in prepare state.");
+            Log.Error("[OARO] 尝试在联巡未处于准备状态时添加参与分部。");
             return;
         }
 
@@ -419,7 +419,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (!forceClear && (curState == PatrolState.Ongoing))
         {
-            Log.Error("[OARO] Trying to clear joint patrol data when joint patrol is ongoing.");
+            Log.Error("[OARO] 尝试在联巡进行中时清理联巡数据。");
             return;
         }
 
@@ -441,7 +441,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         participatingResidentKnights.Clear();
         if (!forceClear && innerContainer.Count > 0)
         {
-            Log.Error("[OARO] Trying to clear joint patrol data when inner container is not empty.");
+            Log.Error($"[OARO] 尝试在{nameof(innerContainer)}不为空时清理联巡数据。");
         }
         innerContainer.Clear();
 
@@ -462,7 +462,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Invalid)
         {
-            Log.Error("[OARO] Trying to start joint patrol prep when joint patrol is already started.");
+            Log.Error("[OARO] 尝试在联巡已开始时开始联巡准备。");
             return;
         }
 
@@ -482,7 +482,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         catch (Exception ex)
         {
-            ModUtility.LogExceptionError(ex, "set joint patrol level", nameof(JointPatrolManager), nameof(TryStartPatrolPrep), needStackTrace: true);
+            ModUtility.LogExceptionError(ex, "设置联巡等级", nameof(JointPatrolManager), nameof(TryStartPatrolPrep), needStackTrace: true);
             patrolLevel = PatrolLevel.Popedom;
         }
 
@@ -529,7 +529,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         if (toRemove.Count > 0)
         {
-            Log.Error($"[OARO] Some branches cannot prepare for the Joint Patrol of {ratkinOrder}.");
+            Log.Error($"[OARO] 部分分部无法为 {ratkinOrder} 的联巡做准备。");
             foreach (Branch branch in toRemove)
             {
                 RemoveParticipant(branch);
@@ -539,7 +539,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         //PatrolState无任一分队参与联巡则清理，并在5~10天后尝试重新开始
         if (participants.NullOrEmpty())
         {
-            Log.Error($"[OARO] No branch can participate in the Joint Patrol of {ratkinOrder}.");
+            Log.Error($"[OARO] {ratkinOrder} 没有分部可以参与联巡。");
             curState = PatrolState.Invalid;
             ClearPatrolData(forState: PatrolState.Invalid);
             tickToNextStage = (int)(Rand.Range(5f, 10f) * 60000);
@@ -559,7 +559,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Ongoing)
         {
-            Log.Error("[OARO] Trying to apply a joint-patrol-caravan-incident when joint patrol is not ongoing.");
+            Log.Error("[OARO] 尝试在联巡未进行中时应用联巡远行队事件。");
             return false;
         }
 
@@ -576,7 +576,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Prepare)
         {
-            Log.Error("[OARO] Trying to start joint patrol when joint patrol is not in prepare state.");
+            Log.Error("[OARO] 尝试在联巡未处于准备状态时开始联巡。");
             return;
         }
 
@@ -612,7 +612,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Ongoing)
         {
-            Log.Error("[OARO] Trying to start joint patrol when joint patrol is not in ongoing state.");
+            Log.Error("[OARO] 尝试在联巡未处于进行中状态时开始联巡。");
             return;
         }
 
@@ -649,7 +649,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Ongoing)
         {
-            Log.Error("[OARO] Trying to end joint patrol when joint patrol is not ongoing.");
+            Log.Error("[OARO] 尝试在联巡未进行中时结束联巡。");
             return;
         }
 
@@ -661,7 +661,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         catch (Exception ex1)
         {
-            ModUtility.LogExceptionError(ex1, "bring resident knights back to player", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+            ModUtility.LogExceptionError(ex1, "将常驻骑士带回玩家", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
         }
 
         try
@@ -765,7 +765,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
             catch (Exception subEx1)
             {
-                ModUtility.LogExceptionError(subEx1, "calculate joint patrol task results", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+                ModUtility.LogExceptionError(subEx1, "计算联巡任务结果", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
             }
 
             switch (patrolLevel)
@@ -815,7 +815,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
             catch (Exception subEx2)
             {
-                ModUtility.LogExceptionError(subEx2, "apply joint patrol results", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+                ModUtility.LogExceptionError(subEx2, "应用联巡结果", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
             }
 
             try
@@ -848,7 +848,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
             catch (Exception subEx3)
             {
-                ModUtility.LogExceptionError(subEx3, "generate joint patrol completion summary", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+                ModUtility.LogExceptionError(subEx3, "生成联巡完成摘要", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
                 completionSummary = "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
             }
 
@@ -862,7 +862,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         catch (Exception ex2)
         {
-            ModUtility.LogExceptionError(ex2, "finalize joint patrol", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
+            ModUtility.LogExceptionError(ex2, "完成联巡", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
         }
 
         ClearPatrolData(forState: PatrolState.Invalid);
@@ -961,7 +961,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         catch (Exception ex)
         {
-            ModUtility.LogExceptionError(ex, "trigger patrol incident", nameof(JointPatrolManager), nameof(TryTriggerPatrolIncident), needStackTrace: true);
+            ModUtility.LogExceptionError(ex, "触发联巡事件", nameof(JointPatrolManager), nameof(TryTriggerPatrolIncident), needStackTrace: true);
         }
     }
 
@@ -969,7 +969,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (curState != PatrolState.Settlement)
         {
-            Log.Error("[OARO] Trying to bring back resident knight when joint patrol is in the process of settlement.");
+            Log.Error("[OARO] 尝试在联巡结算过程中将常驻骑士带回。");
             return;
         }
         if (innerContainer.Count == 0)
@@ -991,13 +991,13 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         // 使用非短路的 | 运算符，以确保两个列表都会被清理
         if (participatingResidentKnights.RemoveAll(k => k is null) > 0 | innerContainer.RemoveAll(p => p is null) > 0)
         {
-            Log.Error($"[OARO] Some participating resident knights of {ratkinOrder} were null after loading and have been removed.");
+            Log.Error($"[OARO] {ratkinOrder} 的部分参与常驻骑士在加载后为null，已被移除。");
         }
         if (curState != PatrolState.Invalid)
         {
             if (participants.RemoveAll(r => r is null || !r.Branch.IsValid()) > 0)
             {
-                Log.Error($"[OARO] Some participant branches of {ratkinOrder} were null after loading and have been removed.");
+                Log.Error($"[OARO] {ratkinOrder} 的部分参与分部在加载后为null，已被移除。");
             }
             participantsDict = participants.GroupBy(r => r.Branch).ToDictionary(g => g.Key, g => g.First());
         }
@@ -1071,7 +1071,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "give memory to resident knight",
+                errorDesc: "给予常驻骑士记忆",
                 typeName: nameof(JointPatrolManager),
                 methodName: nameof(ApplyJointInteractionEffect),
                 needStackTrace: true);

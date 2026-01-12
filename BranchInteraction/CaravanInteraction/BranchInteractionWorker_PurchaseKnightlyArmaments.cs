@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -176,7 +176,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         List<ThingDef> armaments = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
         if (armaments.NullOrEmpty())
         {
-            Log.Error($"[OARO] Null or Empty armaments list in {nameof(BranchInteractionWorker_PurchaseKnightlyArmaments)}.{nameof(GetArmamentsPrice)}");
+            Log.Error($"[OARO] 在 {nameof(BranchInteractionWorker_PurchaseKnightlyArmaments)}.{nameof(GetArmamentsPrice)} 中武器列表为null或为空集合");
             return -1;
         }
 
@@ -209,7 +209,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         List<ThingDef> armaments = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
         if (armaments.NullOrEmpty())
         {
-            Log.Error($"[OARO] Null or Empty armaments list in {nameof(BranchInteractionWorker_PurchaseKnightlyArmaments)}.{nameof(GiveKnightlyArmaments)}");
+            Log.Error($"[OARO] 在 {nameof(BranchInteractionWorker_PurchaseKnightlyArmaments)}.{nameof(GiveKnightlyArmaments)} 中武器列表为null或为空集合");
             return;
         }
 

@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.BaseGen;
 using RimWorld.Planet;
@@ -41,7 +41,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
         if (!MapGenerator.TryGetVar("SettlementRect", out CellRect settlementRect))
         {
             baseCenter = settlementRect.CenterCell;
-            Log.Error($"[OARO] No rect of settlement rect set when running {nameof(GenStep_NobilityTerritoryPawns)}!");
+            Log.Error($"[OARO] 运行 {nameof(GenStep_NobilityTerritoryPawns)} 时未设置{nameof(settlementRect)}！");
         }
         else
         {

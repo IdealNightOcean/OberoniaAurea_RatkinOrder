@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -92,7 +92,7 @@ public class OrderHallHandler : IExposable
     {
         if (pedestal is null)
         {
-            Log.Error("[OARO] Cannot set null OrderCodePedestal as main OrderCodePedestal.");
+            Log.Error("[OARO] 无法将 null 设置为主 OrderCodePedestal。");
             return false;
         }
         if (pedestal == mainOrderCodePedestal)
@@ -171,7 +171,7 @@ public class OrderHallHandler : IExposable
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"recache order hall buildings",
+                errorDesc: $"重新缓存分部大厅建筑",
                 typeName: nameof(OrderHallHandler),
                 methodName: nameof(RecacheOrderHallBuildings),
                 needStackTrace: true);

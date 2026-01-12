@@ -17,7 +17,8 @@ public class GameComponent_RatkinOrder : GameComponent
     private GlobalInteractionManager globalInteractionManager;
 
     private OrderLetterBox orderLetterBox;
-    public SpecialLetterManager specialLetterManager;
+    private SpecialLetterManager specialLetterManager;
+    private AIInteractionHandler aiInteractionHandler;
 
 
     /// <summary>
@@ -35,7 +36,7 @@ public class GameComponent_RatkinOrder : GameComponent
         // OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance)); 
         if (Instance != this)
         {
-            Log.Message($"[OARO] {nameof(GameComponent_RatkinOrder)} Instance switched.".Colorize(Color.cyan));
+            Log.Message($"[OARO] {nameof(GameComponent_RatkinOrder)} 实例已切换。".Colorize(Color.cyan));
         }
         Instance = this;
     }
@@ -48,6 +49,8 @@ public class GameComponent_RatkinOrder : GameComponent
         KnightPawnsManager.ClearStaticCache();
         OrderLetterBox.ClearStaticCache();
         GlobalInteractionManager.ClearStaticCache();
+
+        AIInteractionHandler.ClearStaticCache();
     }
 
     public override void ExposeData()
@@ -108,7 +111,7 @@ public class GameComponent_RatkinOrder : GameComponent
         catch (System.Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "initializing UniqueIDManager",
+                errorDesc: "初始化唯一ID管理器",
                 typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
@@ -123,7 +126,7 @@ public class GameComponent_RatkinOrder : GameComponent
         catch (System.Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "initializing KnightPawnsManager",
+                errorDesc: "初始化骑士角色管理器",
                 typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
@@ -138,7 +141,7 @@ public class GameComponent_RatkinOrder : GameComponent
         catch (System.Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "initializing RatkinOrderManager",
+                errorDesc: "初始化骑士团管理器",
                 typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
@@ -153,7 +156,7 @@ public class GameComponent_RatkinOrder : GameComponent
         catch (System.Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "initializing GlobalInteractionManager",
+                errorDesc: "初始化全局交互管理器",
                 typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
@@ -168,7 +171,7 @@ public class GameComponent_RatkinOrder : GameComponent
         catch (System.Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: "initializing OrderLetterBox",
+                errorDesc: "初始化骑士信箱",
                 typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
@@ -177,5 +180,20 @@ public class GameComponent_RatkinOrder : GameComponent
         }
 
         specialLetterManager ??= new(initCtor: true);
+
+        try
+        {
+            aiInteractionHandler ??= new AIInteractionHandler();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: "初始化AI交互处理器",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            AIInteractionHandler.ClearStaticCache();
+            aiInteractionHandler = new AIInteractionHandler();
+        }
     }
 }

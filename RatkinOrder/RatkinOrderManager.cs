@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
 using Verse;
@@ -99,7 +99,7 @@ public class RatkinOrderManager : IExposable
     {
         if (allRatkinOrders.RemoveAll(r => r is null) > 0)
         {
-            Log.Error($"[OARO] Some Ratkin Orders were null after loading and have been removed.");
+            Log.Error($"[OARO] 部分骑士团在加载后为null，已被移除。");
         }
         for (int i = 0; i < allRatkinOrders.Count; i++)
         {

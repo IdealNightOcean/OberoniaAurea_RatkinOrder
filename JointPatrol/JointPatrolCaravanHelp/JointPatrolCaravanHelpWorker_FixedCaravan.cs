@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld.Planet;
 using Verse;
 
@@ -11,7 +11,7 @@ public abstract class JointPatrolCaravanHelpWorker_FixedCaravan : JointPatrolCar
         extraRewardText.Clear();
         if (incidentSite is not WorldObject_JointPatrolCaravanHelpSite_FixedCaravan fixedCaravanIncidentSite)
         {
-            Log.Error($"[OARO] Failed to cast {nameof(incidentSite)} to {nameof(WorldObject_JointPatrolCaravanHelpSite_FixedCaravan)}.");
+            Log.Error($"[OARO] 将 {nameof(incidentSite)} 转换为 {nameof(WorldObject_JointPatrolCaravanHelpSite_FixedCaravan)} 失败。");
             return false;
         }
 
