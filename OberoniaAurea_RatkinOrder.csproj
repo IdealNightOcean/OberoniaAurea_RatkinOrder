@@ -150,6 +150,7 @@
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
+    <Compile Include="HarmonyPatch\IncidentWorker_TryExecute_Patch.cs" />
     <Compile Include="Hediff\Hediff_RecruitKnight.cs" />
     <Compile Include="InteractionWorker_KnightlyTalk.cs" />
     <Compile Include="GlobalInteraction\ResidentKnight\Alert_ResidentKnightWillResignation.cs" />

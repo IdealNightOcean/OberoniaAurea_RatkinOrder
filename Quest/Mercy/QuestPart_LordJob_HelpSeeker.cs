@@ -114,6 +114,8 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 
         rootNode.options.Add(acceptOpt);
         rootNode.options.Add(rejectOpt);
+        rootNode.options.Add(transferOpt);
+        rootNode.options.Add(transferWithHelpOpt);
         rootNode.options.Add(ignoreOpt);
 
         return new Dialog_NodeTreeWithFactionInfo(rootNode, talkWith.Faction);

@@ -307,7 +307,8 @@ public partial class Window_BranchTask
                     acceptance: focusedTaskType == taskType ? false : ChangeFocusedTaskTypeAcceptance.Value,
                     baseTex: GetTaskTypeButtonTex(taskType, downed: false, disable: taskType != focusedTaskType),
                     downTex: GetTaskTypeButtonTex(taskType, downed: true, disable: taskType != focusedTaskType),
-                    doMouseoverSound: true))
+                    doMouseoverSound: true,
+                    tooltip: "OARO_JointPatrolTaskTypeTip".Translate()))
                 {
                     Branch.TaskHandler.FocusedTaskType = taskType;
                     ChangeFocusedTaskTypeAcceptance.MarkDirty();
@@ -334,7 +335,8 @@ public partial class Window_BranchTask
                     acceptance: curRadicalismDegree == radicalismDegree ? false : ChangeRadicalismDegreeAcceptance.Value,
                     baseTex: radicalismDegreeButton,
                     downTex: radicalismDegreeButton_Down,
-                    doMouseoverSound: true))
+                    doMouseoverSound: true,
+                    tooltip: $"OARO_TaskRadicalismDegreeTip_{radicalismDegree}".Translate()))
                 {
                     Branch.TaskHandler.CurRadicalismDegree = radicalismDegree;
                     ChangeRadicalismDegreeAcceptance.MarkDirty();
@@ -405,7 +407,8 @@ public partial class Window_BranchTask
                     acceptance: interactionAcceptance.Value,
                     baseTex: patrolInteractionButton,
                     downTex: patrolInteractionButton_Down,
-                    doMouseoverSound: true))
+                    doMouseoverSound: true,
+                    tooltip: $"OARO_PatrolInteractionTypeTip_{interactionAcceptance.Key}".Translate()))
                 {
                     JointPatrolManager.TryActiveParticipantInteraction(JointBranchRecord.Value, interactionAcceptance.Key, Map);
                 }

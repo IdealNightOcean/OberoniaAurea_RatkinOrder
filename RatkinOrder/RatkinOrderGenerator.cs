@@ -147,7 +147,7 @@ public static class RatkinOrderGenerator
             }
         }
 
-        if(!atLeastOneSite)
+        if (!atLeastOneSite)
         {
             Settlement settlement = Find.WorldObjects.Settlements.Where(s => s.Faction == ratkinOrder.Faction).RandomElement();
             try

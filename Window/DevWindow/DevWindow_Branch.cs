@@ -45,6 +45,14 @@ public class DevWindow_Branch : DevWindowBase
         listing_Rect.Label($"ID: {branch.LoadID}");
         listing_Rect.Label($"名称: {branch.Name}");
         Text.Font = GameFont.Small;
+        listing_Rect.Gap(12f);
+        listing_Rect.Label("————————————————");
+        listing_Rect.Label($"友好分部: {branch.IsBranchOfType(Branch.BranchType.Friendly)}");
+        listing_Rect.Label($"荣誉分部: {branch.IsBranchOfType(Branch.BranchType.Honor)}");
+        if (listing_Rect.ButtonText("设为友好分部", widthPct: 0.5f))
+        {
+            branch.SetFriendly(active: true);
+        }
 
         listing_Rect.Gap(12f);
         listing_Rect.Label("————————————————");

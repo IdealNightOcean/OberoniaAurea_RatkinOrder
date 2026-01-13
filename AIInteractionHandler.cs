@@ -92,25 +92,77 @@ internal class AIInteractionHandler
         if (mercyQuestTalkPrompts.NullOrEmpty())
             return;
 
-        //Log.Message("[OARO] 获取AI客户端");
-        Client client = await GetAIClient();
-        if (client is null)
+        ServerResponse serverResponse = await TryGetStreamChatCompletionsAsync(mercyQuestTalkPrompts);
+        if (!serverResponse.IsUsable)
+        {
+            return;
+        }
+
+        QuestState? questState = helpSeekerPart?.quest?.State;
+        if (questState == QuestState.Ongoing || questState == QuestState.NotYetAccepted)
+        {
+            Log.Message("[OARO] 已使用AI生成善行求助对话");
+            helpSeekerPart.SetRawTalkText(serverResponse.Content);
+        }
+
+        Log.Message("[OARO] 异步任务完成");
+    }
+
+    public async Task SendIncidentConcernLetter(Branch branch, IncidentDef incidentDef, IncidentParms parms)
+    {
+        if (!branch.IsValid() || incidentDef is null || parms is null)
             return;
 
-        //Log.Message("[OARO] 呼唤大语言API");
+        int delayDays = Rand.Range(1, 3);
+        List<ClientMessage> incidentConcernPrompts = DecoratePrompt.GetIncidentConcernPrompt(branch, incidentDef, parms, delayDays).ToList();
+        if (incidentConcernPrompts.NullOrEmpty())
+            return;
+
+        ServerResponse serverResponse = await TryGetStreamChatCompletionsAsync(incidentConcernPrompts);
+        if (!serverResponse.IsUsable)
+        {
+            return;
+        }
+
+        if (branch.IsValid())
+        {
+            Log.Message("[OARO] 已使用AI生成来自友好分部的慰问");
+            OrderLetterUtility.ReceiveLetter(
+                label: "OARO_LetterLabel_IncidentConcern".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                text: serverResponse.Content,
+                def: OrderLetterDefOf.OARO_OfficialLetter,
+                relatedOrder: branch.RatkinOrder,
+                relatedBranch: branch,
+                sender: branch.Name,
+                delayDays: delayDays,
+                relatedLetterType: OrderLetter.RelatedLetterType.Positive
+                );
+        }
+
+        Log.Message("[OARO] 异步任务完成");
+    }
+
+    private async Task<ServerResponse> TryGetStreamChatCompletionsAsync(IEnumerable<ClientMessage> clientMessages)
+    {
+        Log.Message("[OARO] 获取AI客户端");
+        Client client = await GetAIClient();
+        if (client is null)
+            return ServerResponse.Invalid("[OARO] 获取AI客户端失败。");
+
+        Log.Message("[OARO] 呼唤大语言API");
         ServerResponse serverResponse;
         try
         {
-            serverResponse = await client.StreamChatCompletionsAsync(HttpClient, mercyQuestTalkPrompts).ConfigureAwait(continueOnCapturedContext: true);
+            serverResponse = await client.StreamChatCompletionsAsync(HttpClient, clientMessages).ConfigureAwait(continueOnCapturedContext: true);
         }
         catch (Exception ex)
         {
-            Log.Warning($"[OARO] AI流式对话失败：{ex.Message}\n{ex.StackTrace}");
+            Log.Warning($"[OARO] AI内容流式生成失败：{ex.Message}\n{ex.StackTrace}");
             serverResponse = Invalid(ex.Message);
         }
 
         if (serverResponse is null)
-            return;
+            return ServerResponse.Invalid("[OARO] 服务器回复为null");
 
         if (serverResponse.TotalTokensUsed > 0)
         {
@@ -120,24 +172,19 @@ internal class AIInteractionHandler
 
         if (!CurGameValid)
         {
-            Log.Warning("[OARO] 收到响应前游戏已切换。");
-            return;
+            string warning = "[OARO] 收到响应前游戏已切换。";
+            Log.Warning(warning);
+            serverResponse.LastErrorMessage ??= warning;
+            return serverResponse;
         }
 
-        if (serverResponse.Status == ResponseStatus.ErrorAndAbort || serverResponse.Status == ResponseStatus.Invalid)
+        if (serverResponse.Status == ResponseStatus.Abort || serverResponse.Status == ResponseStatus.Invalid)
         {
             Log.Warning($"[OARO] AI回复被废弃，原因：{serverResponse.LastErrorMessage}");
-            return;
+            return serverResponse;
         }
 
-        QuestState? questState = helpSeekerPart?.quest?.State;
-        if (questState == QuestState.Ongoing || questState == QuestState.NotYetAccepted)
-        {
-            // Log.Message("[OARO] 已使用AI生成善行求助对话");
-            helpSeekerPart.SetRawTalkText(serverResponse.Content);
-        }
-
-        // Log.Message("[OARO] 异步任务完成");
+        return serverResponse;
     }
 }
 
@@ -209,5 +256,49 @@ public static class DecoratePrompt
                                                                            : mercyQuestDef.fixedHelpDesc;
 
         yield return new ClientMessage(ClientMessage.RoleEnum.user, "OARO_Setting_MercyQuestPrompt_User".Translate(mercyQuestDef.Named("MERCYQUEST"), example.Named("Example")));
+    }
+
+    public static IEnumerable<ClientMessage> GetIncidentConcernPrompt(Branch branch, IncidentDef incidentDef, IncidentParms parms, int delayDays)
+    {
+        if (branch is null || incidentDef is null || parms is null)
+        {
+            yield break;
+        }
+
+        StringBuilder promptBuilder = new(RatkinOrderSettings.MainAIPrompt);
+        promptBuilder.AppendLine();
+        promptBuilder.AppendLine("OARO_Prompt_IncidentConcern_System".Translate());
+        GetOrderPrompt(promptBuilder, branch.RatkinOrder);
+        promptBuilder.AppendLine();
+        GetBranchPrompt(promptBuilder, branch);
+        yield return new ClientMessage(ClientMessage.RoleEnum.system, promptBuilder.ToString());
+
+        promptBuilder.Clear();
+        List<NamedArgument> arguments =
+            [
+                 incidentDef.LabelCap.Named("incidentLabel"),
+                 delayDays.Named("delayDays")
+            ];
+        arguments.Add(GenerateNamedArgument(incidentDef.category?.LabelCap, "category"));
+        arguments.Add(GenerateNamedArgument(parms.faction?.Name, "relatedFaction"));
+        arguments.Add(GenerateNamedArgument(parms.points.ToString("F0"), "points"));
+        arguments.Add(GenerateNamedArgument(parms.raidStrategy?.LabelCap, "raidStrategy"));
+        arguments.Add(GenerateNamedArgument(parms.raidArrivalMode?.LabelCap, "raidArrivalMode"));
+
+        promptBuilder.AppendLine("OARO_Prompt_IncidentConcern_User".Translate(arguments.ToArray()));
+        arguments.Clear();
+        yield return new ClientMessage(ClientMessage.RoleEnum.user, promptBuilder.ToString());
+    }
+
+    private static NamedArgument GenerateNamedArgument(string argument, string name)
+    {
+        if (string.IsNullOrEmpty(argument))
+        {
+            return "OARO_Prompt_NotAvailable".Translate().Named(name);
+        }
+        else
+        {
+            return argument.Named(name);
+        }
     }
 }

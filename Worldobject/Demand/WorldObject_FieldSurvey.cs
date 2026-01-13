@@ -313,7 +313,12 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                         }
                         else
                         {
-
+                            featureExposed = true;
+                            StringBuilder nodeSB = new("OARO_FieldSurvey_FirstFeatureExposed".Translate());
+                            nodeSB.AppendLine();
+                            nodeSB.AppendLine();
+                            GetRegionalFeatureDesc(nodeSB);
+                            Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(nodeSB.ToString(), branch?.RatkinOrder));
                         }
                     }
                     return;

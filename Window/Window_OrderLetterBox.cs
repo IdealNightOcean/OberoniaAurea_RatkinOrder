@@ -125,9 +125,7 @@ public class Window_OrderLetterBox : OrderWindowBase
         Rect letterTextRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, rightInnerRect.yMin + 130f, 564f, 408f);
         if (CurLetter is not null)
         {
-            Text.Font = GameFont.Medium;
             Widgets.LabelScrollable(letterTextRect, CurLetter.Text, ref scrollPosition_letterText);
-            Text.Font = GameFont.Small;
         }
 
         reusedRect = OARO_WindowUtility.CenterRect(letterTextRect, 342f, 367f);

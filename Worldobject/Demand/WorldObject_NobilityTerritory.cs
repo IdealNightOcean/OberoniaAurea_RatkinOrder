@@ -292,18 +292,6 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     {
         DiaNode rootNode = new("OARO_NobilityTerritory_ArrivalInfo".Translate(Name));
 
-        DiaOption infiltrateOpt = new("OARO_NobilityTerritory_Infiltrate".Translate())
-        {
-            action = delegate
-            {
-                curWork = WorkType.Infiltrate;
-                base.Notify_CaravanArrived(caravan);
-            },
-            resolveTree = true
-        };
-        rootNode.options.Add(infiltrateOpt);
-
-
         DiaOption assaultOpt = new("OARO_NobilityTerritory_Assault".Translate())
         {
             linkLateBind = () => AssaultNode(caravan),

@@ -92,6 +92,11 @@ public class RatkinOrderSettings : ModSettings
     public static string APIKey = "";
 
     /// <summary>
+    /// IncidentConcernLetter 生成概率 (0f~1f)
+    /// </summary>
+    public static float AIIncidentConcernLetterChance = 0.3f;
+
+    /// <summary>
     /// AI Prompt文本
     /// </summary>
     private static string mainAIPrompt;
@@ -119,11 +124,15 @@ public class RatkinOrderSettings : ModSettings
 
         Scribe_Values.Look(ref MaxAcquiredPatrolInteractionPreType, nameof(MaxAcquiredPatrolInteractionPreType), 3);
 
+
         // AI相关设置
         Scribe_Values.Look(ref EnableAIContent, nameof(EnableAIContent), defaultValue: false);
         Scribe_Values.Look(ref AIServiceUrl, nameof(AIServiceUrl), "https://api.openai.com/v1/chat/completions");
         Scribe_Values.Look(ref AIModelName, nameof(AIModelName), "gpt-3.5-turbo");
         Scribe_Values.Look(ref APIKey, nameof(APIKey), "");
+
+        Scribe_Values.Look(ref AIIncidentConcernLetterChance, nameof(AIIncidentConcernLetterChance), 0.3f);
+
         Scribe_Values.Look(ref mainAIPrompt, nameof(mainAIPrompt));
     }
 
@@ -143,8 +152,9 @@ public class RatkinOrderSettings : ModSettings
 
         MaxAcquiredPatrolInteractionPreType = 3;
 
-        EnableAIContent = false;
 
+
+        EnableAIContent = false;
     }
 
     private static void ResetAISettings()
@@ -152,6 +162,9 @@ public class RatkinOrderSettings : ModSettings
         AIServiceUrl = "https://api.siliconflow.cn/v1/chat/completions";
         AIModelName = "deepseek-ai/DeepSeek-V3.2";
         APIKey = string.Empty;
+
+        AIIncidentConcernLetterChance = 0.3f;
+
         MainAIPrompt = "OARO_Prompt_DefaultMainAIPrompt".Translate();
         promptBuffer = MainAIPrompt;
     }
@@ -226,8 +239,13 @@ public class RatkinOrderSettings : ModSettings
         listing_Rect.Label($"OARO_Setting_{nameof(APIKey)}".Translate());
         APIKey = listing_Rect.TextEntry(APIKey);
 
-        listing_Rect.Gap(6f);
+        listing_Rect.Gap(12f);
+        float aiIncidentConcernLetterChance = AIIncidentConcernLetterChance;
+        listing_Rect.Label($"OARO_Setting_{nameof(AIIncidentConcernLetterChance)}".Translate(aiIncidentConcernLetterChance.ToStringPercent("F0")));
+        aiIncidentConcernLetterChance = listing_Rect.Slider(aiIncidentConcernLetterChance, 0f, 1f);
+        AIIncidentConcernLetterChance = Mathf.Round(aiIncidentConcernLetterChance * 100f) / 100f;
 
+        listing_Rect.Gap(12f);
         if (!promptBufferInitialized)
         {
             promptBuffer = MainAIPrompt;
