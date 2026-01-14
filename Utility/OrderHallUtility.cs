@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -8,32 +9,37 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class OrderHallUtility
 {
-    private static readonly int[] areaBoundaries = [int.MinValue, 40, 50, 60, 80, 120, 160];
-    private static readonly float[] impressivenessBoundaries = [float.MinValue, 80f, 90f, 120f, 140f, 160f, 190f];
     private static OrderHallRestrictionExtension restrictionExtension;
-    private static OrderHallRestrictionExtension RestrictionExtension => restrictionExtension ??= OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
+    private static OrderHallRestrictionExtension RestrictionExtension
+    {
+        get
+        {
+            if (restrictionExtension is null)
+            {
+                restrictionExtension = OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
+                restrictionExtension?.hallLevelRestriction.OrderBy(r => r.level);
+            }
+            return restrictionExtension;
+        }
+    }
 
-    public static int GetOrderHallLevel(Room room)
+    public static int GetOrderHallLevel()
     {
         int maxOrderHallLevel = RestrictionExtension.MaxLevel;
         int maxPotentialLevel = 0;
         try
         {
-            if (room is null || room != OrderHallHandler.Instance.OrderHallRoom)
+            Room room = OrderHallHandler.Instance.OrderHallRoom;
+            if (room is null)
             {
-                return 0;
+                return -1;
             }
 
-            int areaRestrict = Array.BinarySearch(areaBoundaries, room.CellCount);
-            areaRestrict = areaRestrict < 0 ? ~areaRestrict : areaRestrict + 1;
-            int impressivenessRestrict = Array.BinarySearch(impressivenessBoundaries, room.GetStat(RoomStatDefOf.Impressiveness));
-            impressivenessRestrict = impressivenessRestrict < 0 ? ~impressivenessRestrict : impressivenessRestrict + 1;
-
-
+            int areaRestrict = AreaRestrict(room.CellCount);
+            int impressivenessRestrict = ImpressivenessRestrict(room.GetStat(RoomStatDefOf.Impressiveness));
             maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, maxOrderHallLevel);
-            maxPotentialLevel = maxPotentialLevel < 1 ? 1 : maxPotentialLevel;
-
             if (maxPotentialLevel <= 1) { return 1; }
+
             maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
             if (maxPotentialLevel <= 1) { return 1; }
 
@@ -43,7 +49,7 @@ public static class OrderHallUtility
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"get order hall level",
+                errorDesc: $"获取骑士大厅等级",
                 typeName: nameof(OrderHallUtility),
                 methodName: nameof(GetOrderHallLevel),
                 needStackTrace: true);
@@ -78,6 +84,32 @@ public static class OrderHallUtility
         }
 
         return allBuildingDefs;
+    }
+
+    private static int AreaRestrict(int cellCount)
+    {
+        List<OrderHallLevelRestriction> hallLevelRestriction = RestrictionExtension.hallLevelRestriction;
+        for (int i = 0; i < hallLevelRestriction.Count; i++)
+        {
+            if (cellCount < hallLevelRestriction[i].areaFloor)
+            {
+                return i + 1;
+            }
+        }
+        return RestrictionExtension.MaxLevel;
+    }
+
+    private static int ImpressivenessRestrict(float impressiveness)
+    {
+        List<OrderHallLevelRestriction> hallLevelRestriction = RestrictionExtension.hallLevelRestriction;
+        for (int i = 0; i < hallLevelRestriction.Count; i++)
+        {
+            if (impressiveness < hallLevelRestriction[i].impressivenessFloor)
+            {
+                return i + 1;
+            }
+        }
+        return RestrictionExtension.MaxLevel;
     }
 
     private static int TerrainRestrict(Room room, int maxPotentialLevel)
@@ -209,5 +241,117 @@ public static class OrderHallUtility
         }
 
         return maxPotentialLevel;
+    }
+
+    public static List<(string condition, bool isMet)> GetHallUpgradeInfo()
+    {
+        int curLevel = GetOrderHallLevel();
+        if (curLevel < 0 || curLevel >= RestrictionExtension.MaxLevel)
+        {
+            return null;
+        }
+
+        Room room = OrderHallHandler.Instance.OrderHallRoom;
+        OrderHallLevelRestriction nextLevelRestriction = RestrictionExtension.GetRestrictionOfLevel(curLevel + 1);
+        if (nextLevelRestriction is null)
+        {
+            return null;
+        }
+
+        List<(string condition, bool isMet)> result = new(16)
+        {
+            ("OARO_HallRestriction_OrderCodePedestal".Translate(), curLevel >= 1)
+        };
+
+        int cellCount = room.CellCount;
+        result.Add(("OARO_HallRestriction_Area".Translate(cellCount, nextLevelRestriction.areaFloor), cellCount >= nextLevelRestriction.areaFloor));
+
+        float impressiveness = room.GetStat(RoomStatDefOf.Impressiveness);
+        result.Add(("OARO_HallRestriction_Impressiveness".Translate(impressiveness.ToString("F0"), nextLevelRestriction.impressivenessFloor.ToString("F0")), impressiveness >= nextLevelRestriction.impressivenessFloor));
+
+        int targetLevel = curLevel + 1;
+        Map map = room.Map;
+        bool terrainMet = true;
+        string terrainTag = targetLevel <= 4 ? "Floor" : (targetLevel <= 6 ? "FineFloor" : "OARO_OrderFloor");
+        foreach (IntVec3 cell in room.Cells)
+        {
+            List<string> terrainTags = cell.GetTerrain(map).tags;
+
+            if (terrainTags.NullOrEmpty())
+            {
+                terrainMet = false;
+                break;
+            }
+
+            if (!terrainTags.Contains(terrainTag))
+            {
+                terrainMet = false;
+                break;
+            }
+        }
+        result.Add(($"OARO_TerrainTag_{terrainTag}".Translate(), terrainMet));
+
+        bool hasAltar = false;
+        HashSet<string> forbiddenBuildingTags = RestrictionExtension.ForbiddenBuildingTags;
+        Dictionary<ThingDef, int> orderHallBuildings = [];
+
+        HashSet<string> containedForbiddenBuildingTags = [];
+        foreach (Region region in room.Regions)
+        {
+            List<Thing> allThings = region.ListerThings.AllThings;
+            for (int i = 0; i < allThings.Count; i++)
+            {
+                ThingDef thingDef = allThings[i].def;
+
+                if (thingDef.isAltar)
+                {
+                    hasAltar = true;
+                }
+
+                if (thingDef.building is null || thingDef.building.buildingTags is null)
+                {
+                    continue;
+                }
+
+                for (int j = 0; j < thingDef.building.buildingTags.Count; j++)
+                {
+                    string tag = thingDef.building.buildingTags[j];
+
+                    if (forbiddenBuildingTags.Contains(tag))
+                    {
+                        containedForbiddenBuildingTags.Add(tag);
+                    }
+
+                    if (tag == "OARO_OrderHall")
+                    {
+                        if (orderHallBuildings.TryGetValue(thingDef, out int count))
+                        {
+                            orderHallBuildings[thingDef] = count + 1;
+                        }
+                        else
+                        {
+                            orderHallBuildings[thingDef] = 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        result.Add(("OARO_ForbiddenBuilding_Altar".Translate(), !hasAltar));
+        foreach (string tag in forbiddenBuildingTags)
+        {
+            result.Add(($"OARO_ForbiddenBuildingTag_{tag}".Translate(), !containedForbiddenBuildingTags.Contains(tag)));
+        }
+
+        if (!nextLevelRestriction.buildings.NullOrEmpty())
+        {
+            foreach (ThingDefCountClass buildingNeeded in nextLevelRestriction.buildings)
+            {
+                int currentCount = orderHallBuildings.TryGetValue(buildingNeeded.thingDef, out int count) ? count : 0;
+                result.Add((($"{buildingNeeded.LabelCap}: {currentCount} / {buildingNeeded.count}", currentCount >= buildingNeeded.count)));
+            }
+        }
+
+        return result;
     }
 }

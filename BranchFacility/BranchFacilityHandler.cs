@@ -22,7 +22,6 @@ public class BranchFacilityHandler : IExposable
 
     public bool IsFacilityFullyCompleted { get; private set; }
 
-
     private Dictionary<BranchFacilityDef, UnderConstructionRecord<BranchFacilityDef>> underConstructionFacilities = [];
     public IReadOnlyDictionary<BranchFacilityDef, UnderConstructionRecord<BranchFacilityDef>> UnderConstructionFacilities => underConstructionFacilities;
     [Unsaved] private List<UnderConstructionRecord<BranchFacilityDef>> underConstructionFacilitiesList = [];

@@ -73,6 +73,12 @@ public static class OARO_QuestUtility
         }
     }
 
+    public static bool TryGetMercyQuestWatcher(this Quest quest, out QuestPart_MercyQuestWatcher watcher)
+    {
+        watcher = quest?.PartsListForReading.OfType<QuestPart_MercyQuestWatcher>()?.FirstOrFallback(null);
+        return watcher is not null;
+    }
+
     public static bool TryGetCliquesManager(this Quest quest, bool addPartIfMiss, out QuestPart_CliquesManager questPart_CliquesManager)
     {
         questPart_CliquesManager = quest?.PartsListForReading.OfType<QuestPart_CliquesManager>()?.FirstOrFallback(null);

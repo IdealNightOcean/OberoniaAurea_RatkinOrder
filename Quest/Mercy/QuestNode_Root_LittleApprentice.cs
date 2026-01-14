@@ -25,6 +25,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
+            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
             SubFaction = subFaction,
             ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction)
         };

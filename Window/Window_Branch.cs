@@ -48,10 +48,12 @@ public class Window_Branch : OrderWindowBase
     private BranchBuilding SelBuilding { get; set; }
     private UnderConstructionRecord<BranchBuildingDef> SelUnderConstructionBuilding { get; set; }
     private BranchBuildingDefSummaryUICache SelBuildingDefCache { get; set; }
+    private LazyMutable<AcceptanceReport> BuildingConstructionAcceptance { get; }
 
     private BranchFacilityDef SelFacilityDef { get; set; }
     private BranchFacilityStageSummaryUICache CurFacilityStageCache { get; set; }
     private BranchFacilityStageSummaryUICache NextFacilityStageCache { get; set; }
+    private LazyMutable<AcceptanceReport> FacilityConstructionAcceptance { get; }
 
     private Lazy<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
 
@@ -121,8 +123,73 @@ public class Window_Branch : OrderWindowBase
 
         AllFacilityDefCount = DefDatabase<BranchFacilityDef>.DefCount;
 
-        OptionalBuildingDefs = new(valueFactory: GetOptionalBuildingDefs);
-        ContractAcceptances = new(refreshFunc: RecacheContractAcceptance);
+        FacilityConstructionAcceptance = new(refreshFunc: delegate
+        {
+            if (this.SelFacilityDef is null)
+            {
+                return false;
+            }
+            else
+            {
+                return this.Branch.FacilityHandler.CanConstructFacility(this.SelFacilityDef, byPlayer: true, map: this.Map, resultOnly: false);
+            }
+        });
+
+        BuildingConstructionAcceptance = new(refreshFunc: delegate
+        {
+            if (this.SelBuildingDefCache is null)
+            {
+                return false;
+            }
+            else
+            {
+                BranchBuildingConstructParms parms = new BranchBuildingConstructParms()
+                {
+                    BuildingDef = this.SelBuildingDefCache.BuildingDef,
+                    ByPlayer = true,
+                    Map = Map
+                };
+                return this.Branch.BuildingHandler.CanConstructBuilding(parms, resultOnly: false);
+            }
+        });
+
+        OptionalBuildingDefs = new(valueFactory: delegate
+        {
+            Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> options = new(DefDatabase<BranchBuildingDef>.DefCount - BuildingHandler.AllBuildingsCount);
+
+            HashSet<BranchBuildingDef> allBuildingDefsHash = BuildingHandler.AllBuildingDefsHash;
+            HashSet<BranchBuildingDef> underConstructionBuildingDefs = BuildingHandler.UnderConstructionBuildingDefs;
+            foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefs)
+            {
+                if (!allBuildingDefsHash.Contains(buildingDef) && !underConstructionBuildingDefs.Contains(buildingDef))
+                {
+                    options.Add(buildingDef, new BranchBuildingDefSummaryUICache(buildingDef, Branch));
+                }
+            }
+
+            return options;
+        });
+
+        ContractAcceptances = new(refreshFunc: delegate
+        {
+            IReadOnlyList<BranchContract> contracts = Branch.PopulationHandler.Contracts;
+            List<KeyValuePair<BranchContract, AcceptanceReport>> pairs = [];
+            foreach (BranchContract contract in contracts)
+            {
+                AcceptanceReport acceptance;
+                try
+                {
+                    acceptance = contract.CanFulfill(Caravan, resultOnly: false);
+                }
+                catch
+                {
+                    acceptance = false;
+                }
+                pairs.Add(new KeyValuePair<BranchContract, AcceptanceReport>(contract, acceptance));
+            }
+            return pairs;
+        });
+
         NaturalPopulationCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_NaturalPopulationCeiling, showResultValue: true));
         BuildingCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_BuildingCeiling, showResultValue: true));
     }
@@ -453,6 +520,7 @@ public class Window_Branch : OrderWindowBase
             {
                 SelFacilityDef = facilityDef;
                 CurFacilityStageCache = new(facilityDef, facilityLevel, Branch);
+                FacilityConstructionAcceptance.MarkDirty();
                 if (facilityLevel < BranchFacilityLevel.Excellent)
                 {
                     NextFacilityStageCache = new(facilityDef, facilityLevel.FacilityLevelOffSetBy(1), Branch);
@@ -588,7 +656,12 @@ public class Window_Branch : OrderWindowBase
                 DeselectConstruct();
             }
         }
-        else if (OARO_WindowUtility.TextButtonImage(inRect, "OARO_BranchWin_ClickToConstructBuilding".Translate(), buildingConstructButton, buildingConstructButton_Down, doMouseoverSound: true))
+        else if (OARO_WindowUtility.TextButtonImage(
+            butRect: inRect,
+            label: "OARO_BranchWin_ClickToConstructBuilding".Translate(),
+            baseTex: buildingConstructButton,
+            downTex: buildingConstructButton_Down,
+            doMouseoverSound: true))
         {
             SelBuilding = null;
             SelBuildingDefCache = null;
@@ -1119,8 +1192,9 @@ public class Window_Branch : OrderWindowBase
             Widgets.ThingIcon(reusedRect, ThingDefOf.Silver, graphicIndexOverride: 2);
 
             reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
-            if (OARO_WindowUtility.TextButtonImage(
+            if (OARO_WindowUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
+                acceptance: FacilityConstructionAcceptance.Value,
                 label: "OARO_BranchWin_StartConstruct".Translate(),
                 baseTex: constructButton,
                 downTex: constructButton_Down,
@@ -1304,6 +1378,7 @@ public class Window_Branch : OrderWindowBase
                 if (SelBuildingDefCache?.BuildingDef != summaryUICache.BuildingDef)
                 {
                     SelBuildingDefCache = new BranchBuildingDefSummaryUICache(summaryUICache.BuildingDef, Branch);
+                    BuildingConstructionAcceptance.MarkDirty();
                 }
             }
         }
@@ -1325,7 +1400,12 @@ public class Window_Branch : OrderWindowBase
         Widgets.TextArea(reusedRect, SelBuildingDefCache.BuildingDef.description, readOnly: true);
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 2f, 88f, 29f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_BranchWin_StartConstruct".Translate(), constructButton, constructButton_Down))
+        if (OARO_WindowUtility.TextButtonImageDisableable(
+            butRect: reusedRect,
+            label: "OARO_BranchWin_StartConstruct".Translate(),
+            acceptance: BuildingConstructionAcceptance.Value,
+            baseTex: constructButton,
+            downTex: constructButton_Down))
         {
             BranchBuildingConstructParms constructParameter = new(Branch, SelBuildingDefCache.BuildingDef)
             {
@@ -1503,6 +1583,7 @@ public class Window_Branch : OrderWindowBase
                 SelFacilityDef = null;
                 CurFacilityStageCache = null;
                 NextFacilityStageCache = null;
+                FacilityConstructionAcceptance.MarkDirty();
                 break;
             case SelectType.Building:
                 SelBuilding = null;
@@ -1532,6 +1613,9 @@ public class Window_Branch : OrderWindowBase
         NextFacilityStageCache = null;
 
         SelUnderConstructionBuilding = null;
+
+        FacilityConstructionAcceptance.MarkDirty();
+        BuildingConstructionAcceptance.MarkDirty();
     }
 
     private void ClearInteractionCache()
@@ -1539,43 +1623,6 @@ public class Window_Branch : OrderWindowBase
         InteractionAcceptanceDirty = true;
         commonInteractionAcceptances.Clear();
         buildingInteractionAcceptances.Clear();
-    }
-
-    private Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> GetOptionalBuildingDefs()
-    {
-        Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> options = new(DefDatabase<BranchBuildingDef>.DefCount - BuildingHandler.AllBuildingsCount);
-
-        HashSet<BranchBuildingDef> allBuildingDefsHash = BuildingHandler.AllBuildingDefsHash;
-        HashSet<BranchBuildingDef> underConstructionBuildingDefs = BuildingHandler.UnderConstructionBuildingDefs;
-        foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefs)
-        {
-            if (!allBuildingDefsHash.Contains(buildingDef) && !underConstructionBuildingDefs.Contains(buildingDef))
-            {
-                options.Add(buildingDef, new BranchBuildingDefSummaryUICache(buildingDef, Branch));
-            }
-        }
-
-        return options;
-    }
-
-    private List<KeyValuePair<BranchContract, AcceptanceReport>> RecacheContractAcceptance()
-    {
-        IReadOnlyList<BranchContract> contracts = Branch.PopulationHandler.Contracts;
-        List<KeyValuePair<BranchContract, AcceptanceReport>> pairs = [];
-        foreach (BranchContract contract in contracts)
-        {
-            AcceptanceReport acceptance;
-            try
-            {
-                acceptance = contract.CanFulfill(Caravan, resultOnly: false);
-            }
-            catch
-            {
-                acceptance = false;
-            }
-            pairs.Add(new KeyValuePair<BranchContract, AcceptanceReport>(contract, acceptance));
-        }
-        return pairs;
     }
 
     private void RecacheInteractionAcceptance()

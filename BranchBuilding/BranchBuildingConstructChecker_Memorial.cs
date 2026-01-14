@@ -22,10 +22,18 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
     public override void DoubleComfirmAction(BranchBuildingConstructParms constructParam)
     {
         constructParam.ByPlayer = true;
-        OberoniaAurea_Frame.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_ConstructionConfirm_Memorial".Translate(),
-                                                                         acceptAction: delegate
-                                                                         {
-                                                                             constructParam.Branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam);
-                                                                         });
+        Branch branch = constructParam.Branch;
+        if (constructParam.BuildingDef.honorDef is null)
+        {
+            branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam);
+            return;
+        }
+
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+            text: "OARO_ConstructionConfirm_Memorial".Translate(constructParam.BuildingDef.honorDef.Named(KeyLibrary_FormatArgName.HONORDEF)),
+            ratkinOrder: branch.RatkinOrder,
+            acceptAction: () => branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam));
+
+        Find.WindowStack.Add(nodeTree);
     }
 }

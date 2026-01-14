@@ -12,15 +12,17 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
 
     protected override Faction GetOrGenerateFaction()
     {
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
+        Slate slate = QuestGen.slate;
+        Faction subFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
+            MercyQuestDef = slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
             SubFaction = subFaction,
-            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction)
+            ParentFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction)
         };
         QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
 
-        QuestGen.slate.Set(IsMainFactionSlate, true);
+        slate.Set(IsMainFactionSlate, true);
         return subFaction;
     }
 

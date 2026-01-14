@@ -417,7 +417,7 @@ public partial class Window_OrderHall
             {
                 return (0, 0);
             }
-            if (OrderHallHandler.Instance.KnightJoyBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+            if (OrderHallHandler.Instance.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs))
             {
                 return (joyBuildingDefs.Count, allJoyBuildings.Count);
             }
@@ -430,7 +430,7 @@ public partial class Window_OrderHall
             {
                 return string.Empty;
             }
-            OrderHallHandler.Instance.KnightJoyBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs);
+            OrderHallHandler.Instance.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs);
             joyBuildingDefs ??= [];
 
             StringBuilder sb = new();

@@ -51,7 +51,7 @@ public class OrderHallHandler : IExposable
     }
 
     [Unsaved] private readonly Dictionary<KnightPersonality, HashSet<ThingDef>> preferBuildingDefsByKnightPersonality = new(EnumArraryLibrary.AvailablePersonalitiesCount);
-    public IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightJoyBuildingDefsByPersonality
+    public IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightBuildingDefsByPersonality
     {
         get
         {
@@ -69,7 +69,7 @@ public class OrderHallHandler : IExposable
         Instance = this;
         orderHallLevelCache = new SimpleValueCache<int>(cacheInterval: HallLevelRecacheInterval,
                                                         defaultValue: 0,
-                                                        checker: () => OrderHallUtility.GetOrderHallLevel(OrderHallRoom));
+                                                        checker: () => OrderHallUtility.GetOrderHallLevel());
     }
 
     public static void ClearStaticCache() => Instance = null;

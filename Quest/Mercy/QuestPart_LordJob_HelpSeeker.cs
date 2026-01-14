@@ -69,7 +69,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -78,7 +78,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalTransfer, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalTransfer, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -88,7 +88,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalTransferWithHelp, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalTransferWithHelp, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true
@@ -102,7 +102,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         {
             action = delegate
             {
-                Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named("MERCYQUEST")));
+                Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true

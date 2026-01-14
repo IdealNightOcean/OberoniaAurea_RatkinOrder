@@ -26,7 +26,7 @@ public partial class Window_OrderHall : OrderWindowBase
     private int AroundGroupSeasonInvitationLimit { get; }
 
     private IReadOnlyList<string> HallLevelEffectDescs { get; }
-    private IReadOnlyList<string> HallLevelRestrictionDescs { get; }
+    private IReadOnlyList<(string condition, bool isMet)> HallLevelRestrictionDescs { get; }
     private Texture2D TopShieldTexture { get; }
     private ResidentKnightEntryDrawer ShowDetailDrawer { get; set; }
     private LazyMutable<List<KeyValuePair<AroundKnightGroup, float>>> AroundKnightGroups { get; }
@@ -51,16 +51,7 @@ public partial class Window_OrderHall : OrderWindowBase
         OrderHallRestrictionExtension hallRestriction = OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
 
         HallLevelEffectDescs = [.. (hallRestriction.GetRestrictionOfLevel(CurOrderHallLevel)?.effectDescs ?? Enumerable.Empty<string>())];
-        List<string> restrictionDescs;
-        if (CurOrderHallLevel >= hallRestriction.MaxLevel)
-        {
-            restrictionDescs = ["OARO_ReachMax_OrderHallLevel".Translate()];
-        }
-        else
-        {
-            restrictionDescs = hallRestriction.GetRestrictionOfLevel(CurOrderHallLevel + 1)?.GetRestrictionDescs().ToList();
-        }
-        HallLevelRestrictionDescs = restrictionDescs ?? [];
+        HallLevelRestrictionDescs = OrderHallUtility.GetHallUpgradeInfo() ?? [];
 
         ResidentKnightDrawers = new(ResidentKnightsManager.Instance.ResidentKnights.Count + 1);
         foreach (ResidentKnightRecord record in ResidentKnightsManager.Instance.ResidentKnights.Values)
@@ -299,31 +290,58 @@ public partial class Window_OrderHall : OrderWindowBase
 
         Widgets.BeginScrollView(levelRect, ref scrollPosition_Level, levelBuffViewRect);
         Text.Font = GameFont.Small;
-        Text.Anchor = TextAnchor.MiddleCenter;
-        for (int i = 0; i < levelCount; i++)
+
+        int column = 0;
+        if (levelCount == 0)
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
-            if ((i & 1) == 0)
+            if (((++column) & 1) == 0)
             {
                 GUI.DrawTexture(entryRect, middleList_Dark);
             }
-            Widgets.Label(entryRect, HallLevelRestrictionDescs[i]);
-        }
 
-        if (levelUseCount > levelCount)
+            Text.Anchor = TextAnchor.MiddleCenter;
+            Widgets.Label(entryRect, "OARO_ReachMax_OrderHallLevel".Translate());
+        }
+        else
         {
-            for (int i = levelCount; i < levelUseCount; i++)
+            foreach ((string condition, bool isMet) restrictionDesc in HallLevelRestrictionDescs)
             {
                 Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryY += entryHeight;
-                if ((i & 1) == 0)
+                if (((++column) & 1) == 0)
                 {
                     GUI.DrawTexture(entryRect, middleList_Dark);
                 }
-                if (i == levelCount)
+                entryRect.xMin += 8f;
+                entryRect.xMax -= 8f;
+                bool isMet = restrictionDesc.isMet;
+                Text.Anchor = TextAnchor.MiddleLeft;
+                Widgets.Label(entryRect, restrictionDesc.condition.Colorize(isMet ? Color.green : ColorLibrary.RedReadable));
+                Text.Anchor = TextAnchor.MiddleRight;
+                Widgets.Label(entryRect, isMet ? "✓".Colorize(Color.green) : "×".Colorize(ColorLibrary.RedReadable));
+            }
+        }
+
+        Text.Anchor = TextAnchor.MiddleCenter;
+        if (levelUseCount > column)
+        {
+            Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
+            entryY += entryHeight;
+            if (((++column) & 1) == 0)
+            {
+                GUI.DrawTexture(entryRect, middleList_Dark);
+            }
+            Widgets.Label(entryRect, "OARO_HallWin_EmptyLevelDesc".Translate().Colorize(Color.gray));
+
+            while (column < levelUseCount)
+            {
+                Rect entryRectEmpty = new(entryX, entryY, entryWidth, entryHeight);
+                entryY += entryHeight;
+                if (((++column) & 1) == 0)
                 {
-                    Widgets.Label(entryRect, "OARO_HallWin_EmptyLevelDesc".Translate().Colorize(Color.gray));
+                    GUI.DrawTexture(entryRectEmpty, middleList_Dark);
                 }
             }
         }
@@ -420,9 +438,11 @@ public partial class Window_OrderHall : OrderWindowBase
 
         reusedRect = new(reusedRect.xMax + 8f, inRect.y + 24f, 105f, 32f);
         Widgets.LabelEllipses(reusedRect, group.Branch.Name);
+        TooltipHandler.TipRegion(reusedRect, () => group.Branch.NameColored ?? string.Empty, uniqueId: 3047428);
 
         reusedRect = new(reusedRect.xMin + 16f, reusedRect.yMax, 97f, 32f);
         Widgets.LabelEllipses(reusedRect, "└  " + group.RatkinOrder.Name);
+        TooltipHandler.TipRegion(reusedRect, () => group.RatkinOrder.NameColored ?? string.Empty, uniqueId: 3047429);
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
@@ -432,6 +452,8 @@ public partial class Window_OrderHall : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(reusedRect.xMax, inRect.y, 96f, inRect.height);
         Rect routeRect = reusedRect;
+        routeRect.yMin += 4f;
+        routeRect.yMax -= 4f;
         routeRect.height = reusedRect.height / 3f;
         Widgets.Label(routeRect, group.Source);
         routeRect = new(reusedRect.x, reusedRect.y + reusedRect.height / 3f, reusedRect.width, reusedRect.height / 3f);

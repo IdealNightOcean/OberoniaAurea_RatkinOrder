@@ -9,26 +9,7 @@ public class OrderHallLevelRestriction
     [MustTranslate]
     public List<string> effectDescs = [];
 
+    public int areaFloor = -1;
+    public float impressivenessFloor = -1f;
     public List<ThingDefCountClass> buildings = [];
-    [MustTranslate]
-    public List<string> otherRestrictionDescs = [];
-
-    public IEnumerable<string> GetRestrictionDescs()
-    {
-        if (!otherRestrictionDescs.NullOrEmpty())
-        {
-            foreach (string desc in otherRestrictionDescs)
-            {
-                yield return desc;
-            }
-        }
-
-        if (!buildings.NullOrEmpty())
-        {
-            foreach (ThingDefCountClass buildingNeeded in buildings)
-            {
-                yield return buildingNeeded.LabelCap;
-            }
-        }
-    }
 }

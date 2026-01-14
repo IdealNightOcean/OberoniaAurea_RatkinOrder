@@ -80,7 +80,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Ability\AbilityComp_GiveRatkinHediff.cs" />
-    <Compile Include="AIInteractionHandler.cs" />
+    <Compile Include="AIInteraction\AIInteractionUtility.cs" />
+    <Compile Include="AIInteraction\DecoratePromptUtility.cs" />
+    <Compile Include="AIInteraction\AIInteractionHandler.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_Memorial.cs" />
     <Compile Include="BranchBuilding\BranchBuildingComp_OrderEffectTags.cs" />

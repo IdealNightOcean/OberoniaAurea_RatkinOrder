@@ -58,7 +58,7 @@ public class StatPart_MeditationFactor : StatPart
         KnightPersonality resonatePersonality = KnightPersonalityUtility.GetResonatePersonality(record.Personality) & ResidentKnightsManager.Instance.AllHasPersonalityTypes.Value;
         val += KnightPersonalityUtility.GetContainedPersonalities(resonatePersonality).Count() * 0.1f;
 
-        if (OrderHallHandler.Instance.KnightJoyBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+        if (OrderHallHandler.Instance.KnightBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
         {
             val += joyBuildingDefs.Count * 0.1f;
         }
@@ -128,7 +128,7 @@ public class StatPart_MeditationFactor : StatPart
             sb.AppendLine("OARO_ChangeOffset_ResonatePersonality".Translate($"OARO_KnightPersonality_{rp}".Translate(), 0.1f.ToStringPercentSigned("0.##")));
         }
 
-        if (OrderHallHandler.Instance.KnightJoyBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+        if (OrderHallHandler.Instance.KnightBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
         {
             foreach (ThingDef building in joyBuildingDefs)
             {

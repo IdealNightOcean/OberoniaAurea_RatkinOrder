@@ -42,6 +42,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
+            MercyQuestDef = slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
             ParentFaction = parentFaction
         };
         quest.AddPart(questPart_MercyQuestWatcher);

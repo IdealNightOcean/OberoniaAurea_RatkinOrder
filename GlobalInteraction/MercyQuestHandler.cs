@@ -26,8 +26,11 @@ public class MercyQuestHandler : IExposable
         Scribe_Values.Look(ref mercyQuestBaseChance, nameof(mercyQuestBaseChance), 0f);
     }
 
-    public void Notify_MercyQuestSucceed(Quest quest)
+    public void Notify_MercyQuestSucceed(Quest quest, MercyQuestDef mercyQuestDef)
     {
+        if (quest is null)
+            return;
+
         ResidentKnightsManager.Instance.AllResidentKnightsGainMeditation(200f, directly: false);
 
         GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
@@ -37,23 +40,33 @@ public class MercyQuestHandler : IExposable
         {
             letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(record.Knight);
         }
-        if (Rand.Chance(letterChance))
+        if (true)//Rand.Chance(letterChance)
         {
-            RatkinOrder ratkinOrder = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(null);
-            if (!ratkinOrder.IsValid())
-            {
+            Branch branch = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(null)?.BranchManager.AllBranches.RandomElementWithFallback(null);
+            if (!branch.IsValid())
                 return;
+
+            if (RatkinOrderSettings.EnableAIContent)
+            {
+                AIInteractionUtility.SendMercyQuestAdmireLetter(branch, quest, mercyQuestDef);
             }
-            OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-                  label: "OARO_Offical_MercyQuestSuccessLabel".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
-                  text: "OARO_Offical_MercyQuestSuccessText".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), quest.name.Named("QuestName")),
-                  def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
-                  relatedOrder: ratkinOrder,
-                  sender: ratkinOrder.NameColored,
-                  relatedLetterType: OrderLetter.RelatedLetterType.Positive);
-            OrderRecommendation orderRecommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
-            orderLetter.AddAttachment(orderRecommendation);
-            OrderLetterBox.Instance.ReceiveLetter(orderLetter);
+            else
+            {
+                OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
+                    label: "OARO_LetterLabel_MercyQuestAdmire".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                    text: "OARO_Letter_MercyQuestAdmire".Translate(
+                              branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                              branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                              quest.name.Named("QuestName")),
+                    def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
+                    relatedOrder: branch.RatkinOrder,
+                    relatedBranch: branch,
+                    sender: branch.NameColored,
+                    relatedLetterType: OrderLetter.RelatedLetterType.Positive);
+                OrderRecommendation orderRecommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
+                orderLetter.AddAttachment(orderRecommendation);
+                OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays: Rand.Range(1, 5));
+            }
         }
     }
 
@@ -117,7 +130,7 @@ public class MercyQuestHandler : IExposable
         {
             if (RatkinOrderSettings.EnableAIContent)
             {
-                AIInteractionHandler.Instance?.ReplaceMercyQuestTalkText(quest, mercyQuestDef);
+                AIInteractionUtility.ReplaceMercyQuestTalkText(quest, mercyQuestDef);
             }
             return true;
         }

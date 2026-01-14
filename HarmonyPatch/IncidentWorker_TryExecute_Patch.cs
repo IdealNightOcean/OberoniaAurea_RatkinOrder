@@ -25,24 +25,19 @@ internal static class IncidentWorker_TryExecute_Patch
             return;
 
         Branch targetBranch = allAvailableBranches.RandomElement();
-        AIInteractionHandler.Instance?.SendIncidentConcernLetter(targetBranch, ___def, parms);
+        AIInteractionUtility.SendIncidentConcernLetter(targetBranch, ___def, parms);
     }
 
     private static bool IncidentValidator(IncidentDef def)
     {
         if (def.category == IncidentCategoryDefOf.ThreatSmall || def.category == IncidentCategoryDefOf.ThreatBig)
-        {
             return true;
-        }
 
         if (def.letterDef is null)
-        {
             return false;
-        }
+
         if (def.letterDef == LetterDefOf.ThreatSmall || def.letterDef == LetterDefOf.ThreatBig)
-        {
             return true;
-        }
 
         return false;
     }
