@@ -42,6 +42,21 @@ public class BranchMedalDef : Def
     /// </summary>
     public PathedTexture2D primaryIconTexture;
 
+    /// <summary>
+    /// 荣誉装饰框图标
+    /// </summary>
+    public PathedTexture2DWithExpanded honorDecorationTexture;
+
+    /// <summary>
+    /// 荣誉绶带图标
+    /// </summary>
+    public PathedTexture2D honorRibbonTexture;
+
+    /// <summary>
+    /// 荣誉背景图标
+    /// </summary>
+    public PathedTexture2D honorBackgroundTexture;
+
     public PathedTexture2D jointPatrolEntryBackgroundTexture;
 
     public PathedTexture2D jointPatrolEntryShadeTexture;

@@ -158,9 +158,13 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
         Rect reusedRect = new(inRect.x, inRect.y + 14f, inRect.width, 20f);
-        if (def.isHonorAcademic && BranchHonor is not null)
+        if (def.isHonorAcademic)
         {
-            GUI.DrawTexture(inRect.ContractedBy(3f), BranchHonor.decorationTexture.Texture, ScaleMode.ScaleToFit);
+            Texture2D honorDecorationTexture = BranchHonor?.medalDef?.honorDecorationTexture.Texture;
+            if (honorDecorationTexture is not null)
+            {
+                GUI.DrawTexture(inRect.ContractedBy(3f), honorDecorationTexture, ScaleMode.ScaleToFit);
+            }
             Widgets.Label(reusedRect, def.LabelCap.Colorize(BranchHonor.color));
         }
         else

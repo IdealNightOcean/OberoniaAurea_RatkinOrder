@@ -219,7 +219,6 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
             if (!def.MadeFromStuff)
             {
                 armament = ThingMaker.MakeThing(def);
-
             }
             else
             {
@@ -232,7 +231,11 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
                     armament = ThingMaker.MakeThing(def, LeatheryFabricStuff);
                 }
             }
-            CaravanInventoryUtility.GiveThing(parms.Caravan, armament);
+            if (armament is not null)
+            {
+                armament.TryGetComp<CompQuality>()?.SetQuality(Quality, ArtGenerationContext.Outsider);
+                CaravanInventoryUtility.GiveThing(parms.Caravan, armament);
+            }
         }
 
         parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, price);

@@ -42,24 +42,27 @@ public class Hediff_HonorPaladin : Hediff
 
         foreach (Pawn p in pawn.MapHeld.mapPawns.AllPawnsSpawned)
         {
-            if (!p.RaceProps.Humanlike || p.Position.DistanceToSquared(pawnPos) >= radiusSquared || p.HostileTo(faction))
+            if (!p.RaceProps.Humanlike || p != pawn || p.Position.DistanceToSquared(pawnPos) >= radiusSquared || p.HostileTo(faction))
             {
                 continue;
             }
 
-            if (p != pawn)
+            Hediff hediff = p.health.hediffSet.GetFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate);
+            if (hediff is null)
             {
-                Hediff hediff = p.health.hediffSet.GetFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate);
-                if (hediff is null)
-                {
-                    hediff = HediffMaker.MakeHediff(def, pawn);
-                    hediff.Severity = addSeverity;
-                    p.health.AddHediff(hediff);
-                }
-                else
-                {
-                    hediff.Severity += addSeverity;
-                }
+                hediff = HediffMaker.MakeHediff(OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate, pawn);
+                hediff.Severity = addSeverity;
+                p.health.AddHediff(hediff);
+            }
+            else
+            {
+                hediff.Severity += addSeverity;
+            }
+            HediffComp_Link hediffComp_Link = hediff.TryGetComp<HediffComp_Link>();
+            if (hediffComp_Link is not null)
+            {
+                hediffComp_Link.drawConnection = true;
+                hediffComp_Link.other = pawn;
             }
         }
     }

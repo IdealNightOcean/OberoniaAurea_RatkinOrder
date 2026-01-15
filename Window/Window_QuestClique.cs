@@ -138,11 +138,10 @@ public class Window_QuestClique : OrderWindowBase
             Rect medalOutRect = new(reusedRect.x, reusedRect.yMax + 32f, 150f, 40f);
             Rect medalViewRect = medalOutRect;
             float medalEntryX = medalOutRect.x;
-            float medalEntryY = medalOutRect.x;
+            float medalEntryY = medalOutRect.y;
             float medalEntryWidth = 40f;
             float medalEntryHeight = 40f;
             float medalEntryXInterval = 15f;
-
             Widgets.BeginScrollView(medalOutRect, ref scrollPosition_Medals, medalViewRect, showScrollbars: false);
             foreach (BranchMedalDef medal in criticalDemand.PotentialMedals)
             {

@@ -92,9 +92,10 @@ public class Window_BranchList : OrderWindowBase
 
         Rect reusedRect = new(innerX, innerY, 224f, 86f);
         Branch branch = branchSummary.Branch;
-        if (branch.HonorDef is not null)
+        Texture2D honorBackgroundTexture = branch.HonorDef?.medalDef?.honorBackgroundTexture.Texture;
+        if (honorBackgroundTexture is not null)
         {
-            GUI.DrawTexture(reusedRect, branch.HonorDef.backgroundTexture.Texture);
+            GUI.DrawTexture(reusedRect, honorBackgroundTexture);
         }
 
         reusedRect.xMin += 12f;

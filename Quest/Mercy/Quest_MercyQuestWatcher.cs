@@ -27,26 +27,14 @@ public class QuestNode_MercyQuestWatcher : QuestNode
 
 public class QuestPart_MercyQuestWatcher : QuestPart
 {
-    private MercyQuestDef mercyQuestDef;
-    public MercyQuestDef MercyQuestDef
-    {
-        get => mercyQuestDef;
-        set
-        {
-            if (value is not null)
-            {
-                Log.Message(value.defName);
-            }
-            mercyQuestDef = value;
-        }
-    }
+    public MercyQuestDef MercyQuestDef;
     public Faction SubFaction;
     public Faction ParentFaction;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        // Scribe_Defs.Look(ref MercyQuestDef, nameof(MercyQuestDef));
+        Scribe_Defs.Look(ref MercyQuestDef, nameof(MercyQuestDef));
         Scribe_References.Look(ref SubFaction, nameof(SubFaction));
         Scribe_References.Look(ref ParentFaction, nameof(ParentFaction));
     }

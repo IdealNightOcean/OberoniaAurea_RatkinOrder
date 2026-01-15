@@ -225,8 +225,7 @@ public class Window_Branch : OrderWindowBase
         float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
-        Rect reusedRect = new(mainInnerRect.xMax - 21f, mainInnerRectY + 1f, 20f, 20f);
-        if (Widgets.ButtonImage(reusedRect, IconLibrary.ColseX, doMouseoverSound: true))
+        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
@@ -242,7 +241,7 @@ public class Window_Branch : OrderWindowBase
 
         float offsetMainInnerMidX = mainInnerRectX + 824f;
 
-        reusedRect = new(mainInnerRectX + 546f, mainInnerRectY + 171f, 562f, 9f);
+        Rect reusedRect = new(mainInnerRectX + 546f, mainInnerRectY + 171f, 562f, 9f);
         Widgets.FillableBar(reusedRect, Mathf.Clamp01(FacilityHandler.TotalFacilityLevel / (AllFacilityDefCount * 4f)), IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: false);
 
         Text.Font = GameFont.Medium;
@@ -600,25 +599,32 @@ public class Window_Branch : OrderWindowBase
 
     private void DrawBulding(Rect inRect, BranchBuilding building)
     {
+        BranchBuildingDef buildingDef = building.Def;
         Rect innerRect = inRect.ContractedBy(5f);
-        if (building.Def.isSpecial)
+        if (buildingDef.isSpecial)
         {
             GUI.DrawTexture(innerRect, specialBuildingLace, ScaleMode.ScaleToFit);
+            Texture2D honorRibbonTexture = buildingDef.honorDef?.medalDef?.honorRibbonTexture.Texture;
+            if (honorRibbonTexture is not null)
+            {
+                Rect ribbonRect = new(inRect.xMin, inRect.yMin - 2f, inRect.width, 55f);
+                GUI.DrawTexture(ribbonRect, honorRibbonTexture, ScaleMode.StretchToFill);
+            }
         }
         else if (building.HasUpgraded)
         {
             GUI.DrawTexture(innerRect, upgradedBuildingLace, ScaleMode.ScaleToFit);
         }
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(innerRect, innerRect.x + 15f, 40f, 40f);
-        GUI.DrawTexture(reusedRect, building.Def.iconTexture.Texture, ScaleMode.ScaleToFit);
+        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(innerRect, innerRect.x, 64f, 64f);
+        GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, inRect.height);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax, 105f, inRect.height);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, building.Label);
         Text.Anchor = TextAnchor.UpperLeft;
 
-        bool selected = (CurSelectType == SelectType.Building) && (SelBuilding.Def == building.Def);
+        bool selected = (CurSelectType == SelectType.Building) && (SelBuilding.Def == buildingDef);
         if (Widgets.ButtonInvisible(inRect))
         {
             if (selected)
@@ -628,9 +634,9 @@ public class Window_Branch : OrderWindowBase
             else
             {
                 SelBuilding = building;
-                if (SelBuildingDefCache?.BuildingDef != building.Def)
+                if (SelBuildingDefCache?.BuildingDef != buildingDef)
                 {
-                    SelBuildingDefCache = new(building.Def, Branch);
+                    SelBuildingDefCache = new(buildingDef, Branch);
                 }
                 CurSelectType = SelectType.Building;
             }
@@ -684,10 +690,10 @@ public class Window_Branch : OrderWindowBase
             GUI.DrawTexture(reusedRect, specialBuildingLace, ScaleMode.ScaleToFit);
         }
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x + 15f, 40f, 40f);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x, 64f, 64f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 15f, 105f, inRect.height);
+        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax, 105f, inRect.height);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, buildingDef.LabelCap);
         Text.Anchor = TextAnchor.UpperLeft;
@@ -1083,17 +1089,17 @@ public class Window_Branch : OrderWindowBase
             return;
         }
         float inRectX = inRect.xMin;
-        Rect reusedRect = new(inRectX + 10f, inRect.y + 32f, 105f, 96f);
+        Rect reusedRect = new(inRectX, inRect.y + 32f, 105f, 96f);
         GUI.DrawTexture(reusedRect, SelFacilityDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 185f, 48f);
+        reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 195f, 48f);
         Widgets.Label(reusedRect, SelFacilityDef.LabelCap);
 
         Text.Anchor = TextAnchor.MiddleLeft;
         Text.Font = GameFont.Small;
-        reusedRect = new(reusedRect.x, reusedRect.yMax, 185f, 48f);
+        reusedRect = new(reusedRect.x, reusedRect.yMax, 195f, 48f);
         Widgets.LabelScrollable(reusedRect, SelFacilityDef.description, ref scrollPosition_FacilityDesc);
 
         float commonWidth = 298f;
@@ -1253,17 +1259,17 @@ public class Window_Branch : OrderWindowBase
 
         float inRectX = inRect.x;
 
-        Rect reusedRect = new(inRectX + 12f, inRect.y + 75f, 105f, 96f);
+        Rect reusedRect = new(inRectX, inRect.y + 32f, 105f, 96f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 185f, 48f);
+        reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 195f, 48f);
         Widgets.Label(reusedRect, buildingLabel);
 
         Text.Anchor = TextAnchor.MiddleLeft;
         Text.Font = GameFont.Tiny;
-        reusedRect = new(reusedRect.x, reusedRect.yMax, 185f, 48f);
+        reusedRect = new(reusedRect.x, reusedRect.yMax, 195f, 48f);
         Widgets.LabelScrollable(reusedRect, buildingDesc, ref scrollPosition_BuildingDesc);
 
         float commonWidth = 298f;
@@ -1424,15 +1430,17 @@ public class Window_Branch : OrderWindowBase
         }
     }
 
+    /// <summary>
+    /// 高96f
+    /// </summary>
     private bool DrawOptionalBuildingEntry(Rect inRect, BranchBuildingDefSummaryUICache summaryUICache)
     {
         BranchBuildingDef buildingDef = summaryUICache.BuildingDef;
 
-        Rect reusedRect = new(inRect.x + 8f, inRect.y, inRect.height, inRect.height);
-        float textXMin = reusedRect.xMax + 4f;
-        reusedRect = reusedRect.ContractedBy(12f);
+        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 64f, 64f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
+        float textXMin = reusedRect.xMax + 8f;
         float textHeight = inRect.height / 4f;
         float textWidth = inRect.xMax - textXMin - 2f;
         reusedRect = new(textXMin, inRect.y, textWidth, textHeight);

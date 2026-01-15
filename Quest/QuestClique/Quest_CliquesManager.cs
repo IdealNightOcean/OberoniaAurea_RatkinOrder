@@ -128,7 +128,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             }
             foreach (QuestClique clique in allCliques.Values)
             {
-                if (clique.TicksToActive > 0 && (clique.TicksToActive -= 1000) <= 0)
+                if (clique.ticksToInactive > 0 && (clique.ticksToInactive -= 1000) <= 0)
                 {
                     clique.TryActive(directly: true);
                 }
@@ -379,7 +379,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             QuestClique clique = kv.Value;
             sb.AppendInNewLine((i++).ToString());
-            sb.AppendInNewLine($"Key: {kv.Key},  Name:{clique.Name},  IsActive:{clique.IsActive} ({clique.TicksToActive})");
+            sb.AppendInNewLine($"Key: {kv.Key},  Name:{clique.Name},  IsActive:{clique.IsActive} ({clique.ticksToInactive})");
             sb.AppendInNewLine($"Potency: {clique.Potency:F2},  Willingness:{clique.Willingness:F2}");
             sb.AppendInNewLine($"IsBribable: {clique.IsBribable},  IsCommunicable: {clique.IsCommunicable}");
             sb.AppendInNewLine($"IsBranchClique: {clique.IsBranchClique}, RelatedBranch: {clique.RelatedBranch?.Name ?? "NULL"}");

@@ -460,9 +460,15 @@ public class Window_BranchDemand : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = OARO_WindowUtility.CenterRectOnX(cliqueRect, cliqueRect.yMax + 4f, 92f, 25f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_DemandWin_CliqueDetail".Translate(), checkButton, checkButton_Down, doMouseoverSound: true))
+        if (OARO_WindowUtility.TextButtonImage(
+            butRect: reusedRect,
+            label: "OARO_DemandWin_CliqueDetail".Translate(),
+            baseTex: checkButton,
+            downTex: checkButton_Down,
+            doMouseoverSound: true))
         {
-
+            Window_QuestClique cliqueWin = new(SelDemand, Map);
+            Find.WindowStack.Add(cliqueWin);
         }
 
         Rect potencyRect = new(inRect.xMax - (42f + 125f), inRect.yMax - (30f + 120f), 125f, 120f);
@@ -728,7 +734,11 @@ public class Window_BranchDemand : OrderWindowBase
                 Widgets.Label(reusedRect, "OARO_HasAccepted".Translate().Colorize(Color.green));
                 reusedRect = new(lookOverRect.xMax + 12f, lookOverRect.y, 92f, 25f);
                 Text.Anchor = TextAnchor.MiddleCenter;
-                if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_DemandWin_CliqueDetail".Translate(), checkButton, checkButton_Down))
+                if (OARO_WindowUtility.TextButtonImage(
+                    butRect: reusedRect,
+                    label: "OARO_DemandWin_CliqueDetail".Translate(),
+                    baseTex: checkButton,
+                    downTex: checkButton_Down))
                 {
                     Window_QuestClique cliqueWin = new(demand, Map);
                     Find.WindowStack.Add(cliqueWin);
@@ -757,7 +767,7 @@ public class Window_BranchDemand : OrderWindowBase
             {
                 Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryX += entryWidth;
-                GUI.DrawTexture(entryRect, medalDef.iconTexture.Texture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(entryRect.ContractedBy(4f), medalDef.iconTexture.Texture, ScaleMode.ScaleToFit);
             }
             Widgets.EndScrollView();
 

@@ -20,6 +20,11 @@ public class BranchHonorDef : Def
     public ResidentKnightAcademicDef academicDef;
 
     /// <summary>
+    /// 核心印记Def（<see cref="BranchMedalDef"/>）
+    /// </summary>
+    public BranchMedalDef medalDef;
+
+    /// <summary>
     /// 荣誉加成的专注任务类型
     /// </summary>
     public BranchTaskType focusedTaskType;
@@ -43,16 +48,6 @@ public class BranchHonorDef : Def
     /// 荣誉图标
     /// </summary>
     public PathedTexture2DWithExpanded iconTexture;
-
-    /// <summary>
-    /// 荣誉装饰框图标
-    /// </summary>
-    public PathedTexture2DWithExpanded decorationTexture;
-
-    /// <summary>
-    /// 荣誉背景图标
-    /// </summary>
-    public PathedTexture2D backgroundTexture;
 
     public bool TryGetRandomPawnGroupMaker(PawnGroupKindDef pawnGroupKindDef, out PawnGroupOption groupOption)
     {

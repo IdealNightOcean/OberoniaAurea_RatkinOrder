@@ -234,11 +234,14 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.x, 240f, areaRect.height - 5f);
         if (selIsHonor)
         {
-            GUI.DrawTexture(reusedRect, honorDef.backgroundTexture.Texture);
+            BranchMedalDef honorMedal = honorDef.medalDef;
+            if (honorMedal is not null)
+            {
+                GUI.DrawTexture(reusedRect, honorMedal.honorBackgroundTexture.Texture);
 
-            reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
-            GUI.DrawTexture(reusedRect, honorDef.decorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
-
+                reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
+                GUI.DrawTexture(reusedRect, honorMedal.honorDecorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
+            }
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 170f, 96f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
@@ -306,7 +309,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
         Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
 
-        reusedRect = new(reusedRect.x, reusedRect.yMax + 8f, 120f, 24f);
+        reusedRect = new(reusedRect.x, reusedRect.yMax + 4f, 120f, 32f);
         Text.Font = GameFont.Small;
         Widgets.Label(reusedRect, friendlyExpireDate);
 

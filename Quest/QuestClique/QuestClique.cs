@@ -50,10 +50,11 @@ public class QuestClique : IExposable
 
     public bool IsActive;
     public bool IsActivatable;
-    public int TicksToActive = -1;
+    public int ticksToInactive = -1;
+    private int TicksToInactive => ticksToInactive;
 
     public bool IsCommunicable;
-    public int LastCommunicateTick = -1;
+    private int lastCommunicateTick = -1;
 
     public bool IsBribable;
     public int BriberyCost = -1;
@@ -134,9 +135,9 @@ public class QuestClique : IExposable
         {
             return resultOnly ? false : "OARO_Clique_NotCommunicable".Translate();
         }
-        if (LastCommunicateTick > 0 && Find.TickManager.TicksGame < LastCommunicateTick + 60000)
+        if (lastCommunicateTick > 0 && Find.TickManager.TicksGame < lastCommunicateTick + 60000)
         {
-            int communicateCoolingTicksLeft = LastCommunicateTick + 60000 - Find.TickManager.TicksGame;
+            int communicateCoolingTicksLeft = lastCommunicateTick + 60000 - Find.TickManager.TicksGame;
             return resultOnly ? false : "WaitTime".Translate(communicateCoolingTicksLeft.ToStringTicksToPeriod());
         }
 
@@ -159,7 +160,7 @@ public class QuestClique : IExposable
             return true;
         }
 
-        if (TicksToActive > 0)
+        if (ticksToInactive > 0)
         {
             return resultOnly ? false : "OARO_Clique_PrepareActivation".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
         }
@@ -254,7 +255,7 @@ public class QuestClique : IExposable
 
         if (delayTicks > 0)
         {
-            TicksToActive = Mathf.Min(TicksToActive, delayTicks);
+            ticksToInactive = Mathf.Min(ticksToInactive, delayTicks);
         }
         else
         {
@@ -275,7 +276,7 @@ public class QuestClique : IExposable
         void Active()
         {
             IsActive = true;
-            TicksToActive = -1;
+            ticksToInactive = -1;
             if (CliquesManager is not null)
             {
                 CliquesManager.TotalPotency.MarkDirty();
@@ -307,6 +308,7 @@ public class QuestClique : IExposable
             return;
         }
         float willingnessGain = Rand.Range(0.05f, 0.15f);
+        lastCommunicateTick = Find.TickManager.TicksGame;
         string text;
         if (PreferredBuilding is not null && branch.BuildingHandler.HasBuilding(PreferredBuilding))
         {
@@ -359,10 +361,10 @@ public class QuestClique : IExposable
 
         Scribe_Values.Look(ref IsActive, nameof(IsActive), defaultValue: false);
         Scribe_Values.Look(ref IsActivatable, nameof(IsActivatable), defaultValue: true);
-        Scribe_Values.Look(ref TicksToActive, nameof(TicksToActive), -1);
+        Scribe_Values.Look(ref ticksToInactive, nameof(ticksToInactive), -1);
 
         Scribe_Values.Look(ref IsCommunicable, nameof(IsCommunicable), defaultValue: false);
-        Scribe_Values.Look(ref LastCommunicateTick, nameof(LastCommunicateTick), -1);
+        Scribe_Values.Look(ref lastCommunicateTick, nameof(lastCommunicateTick), -1);
 
         Scribe_Values.Look(ref IsBribable, nameof(IsBribable), defaultValue: false);
         Scribe_Values.Look(ref BriberyCost, nameof(BriberyCost), -1);

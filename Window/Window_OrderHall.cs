@@ -320,7 +320,7 @@ public partial class Window_OrderHall : OrderWindowBase
                 Text.Anchor = TextAnchor.MiddleLeft;
                 Widgets.Label(entryRect, restrictionDesc.condition.Colorize(isMet ? Color.green : ColorLibrary.RedReadable));
                 Text.Anchor = TextAnchor.MiddleRight;
-                Widgets.Label(entryRect, isMet ? "✓".Colorize(Color.green) : "×".Colorize(ColorLibrary.RedReadable));
+                Widgets.Label(entryRect, isMet ? "✓".Colorize(Color.green) : "✗".Colorize(ColorLibrary.RedReadable));
             }
         }
 

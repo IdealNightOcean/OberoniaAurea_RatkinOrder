@@ -83,12 +83,17 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             },
             resolveTree = true
         };
+        if (BranchUtility.GetAllAvailableBranches(b => b.IsBranchOfType(Branch.BranchType.Friendly)).NullOrEmpty())
+        {
+            transferOpt.Disable("OARO_NoAnyFriendlyBranch".Translate());
+        }
 
         DiaOption transferWithHelpOpt = new("OARO_TalkWithHelpSeeker_TransferWithHelp".Translate())
         {
             action = delegate
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalTransferWithHelp, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
+                talkWith.MapHeld?.DestoryThingsOfDef(ThingDefOf.Silver, 200);
                 TalkActionUtility.DisableLordJobTalk(talkWith);
             },
             resolveTree = true

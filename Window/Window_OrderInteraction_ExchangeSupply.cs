@@ -67,14 +67,14 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         Rect viewRect = outRect;
         viewRect.width -= 16f;
 
-        int columnCount = 5;
+        int columnCount = 6;
 
         float entryX = viewRect.xMin;
         float entryY = viewRect.yMin;
         float entryWidth = 100f;
         float entryHeight = 183f;
-        float entryXInterval = (viewRect.width - 100f * columnCount) / 4f - 0.5f;
-        float entryYInterval = 488f - 183f * 2f - 1f;
+        float entryXInterval = (viewRect.width - 100f * columnCount) / 5f - 0.01f;
+        float entryYInterval = 65f;//488f - 183f * 2f - 1f;
 
         viewRect.height = (ExchangeableSupplies.Count / columnCount + 1) * (entryY + entryYInterval);
 

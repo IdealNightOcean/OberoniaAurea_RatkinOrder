@@ -196,10 +196,10 @@ public static class OARO_WindowUtility
         if (isHonorBranch)
         {
             reusedRect = leftRect.ContractedBy(10f);
-            GUI.DrawTexture(reusedRect, honorDef.decorationTexture.Texture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.medalDef.honorDecorationTexture.Texture, ScaleMode.ScaleToFit);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            GUI.DrawTexture(reusedRect, honorDef.backgroundTexture.Texture);
+            GUI.DrawTexture(reusedRect, honorDef.medalDef.honorBackgroundTexture.Texture);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);

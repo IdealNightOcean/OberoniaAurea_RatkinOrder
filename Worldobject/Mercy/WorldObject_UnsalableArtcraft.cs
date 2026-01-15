@@ -81,7 +81,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         };
         if (remainingMarkerValue > caravanSilver)
         {
-            totalOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, remainingMarkerValue));
+            totalOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.LabelCap, remainingMarkerValue));
         }
         rootNode.options.Add(totalOpt);
 
@@ -98,7 +98,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
             };
             if (silverNeed > caravanSilver)
             {
-                subOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverNeed));
+                subOpt.Disable("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.LabelCap, silverNeed));
             }
             rootNode.options.Add(subOpt);
         }
@@ -170,10 +170,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
     }
 
 
-    public ThingOwner GetDirectlyHeldThings()
-    {
-        return sculptures;
-    }
+    public ThingOwner GetDirectlyHeldThings() => sculptures;
     public void GetChildHolders(List<IThingHolder> outChildren)
     {
         ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, GetDirectlyHeldThings());
