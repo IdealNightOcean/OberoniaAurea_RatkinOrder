@@ -43,7 +43,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
     public override bool StartWork(Caravan caravan)
     {
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-            text: "OARO_SupplyDepot_Arrival".Translate(TicksNeeded.ToStringTicksToPeriod()),
+            text: "OARO_SupplyDepot_ArrivalInfo".Translate(TicksNeeded.ToStringTicksToPeriod()),
             ratkinOrder: branch.RatkinOrder,
             acceptAction: () => base.StartWork(caravan));
 

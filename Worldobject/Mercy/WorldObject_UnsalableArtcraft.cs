@@ -13,12 +13,14 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Nameable, IThingHolder
 {
-    private const float MarketValueFactor = 0.6f;
+    private const float MarketValueFactor = 0.7f;
 
     private ThingOwner<Thing> sculptures;
     private float remainingMarkerValue;
     private int purchasedCount;
     private int totalCount;
+
+    private bool hasSettled;
 
     public override void ExposeData()
     {
@@ -106,8 +108,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
 
     private void PurchaseOfSculptures(Caravan caravan, int silverCountNeed = -1)
     {
-        silverCountNeed = silverCountNeed > 0 ? silverCountNeed : Mathf.CeilToInt(remainingMarkerValue);
-        OAFrame_CaravanUtility.TakeThingsOfDef(caravan, ThingDefOf.Silver, silverCountNeed, out int caravanSilver);
+        silverCountNeed = silverCountNeed > 0 ? silverCountNeed : Mathf.FloorToInt(remainingMarkerValue);
 
         List<Thing> inventoryItems = CaravanInventoryUtility.AllInventoryItems(caravan);
 
@@ -116,30 +117,31 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         for (int j = 0; j < sculptures.Count; j++)
         {
             float marketValue = sculptures[j].MarketValue * MarketValueFactor;
-            if (usedSilver + marketValue > caravanSilver)
+            if (usedSilver + marketValue > silverCountNeed)
             {
-                break;
+                continue;
             }
             usedSilver += marketValue;
             takeSculptures.Add(sculptures[j]);
         }
 
+        purchasedCount += takeSculptures.Count;
         foreach (Thing t in takeSculptures)
         {
             sculptures.Remove(t);
             CaravanInventoryUtility.GiveThing(caravan, t);
         }
         OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, (int)usedSilver);
-
-        purchasedCount += sculptures.Count;
-
-        OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_UnsalableArtcraft_PurchaseResult".Translate(sculptures.Count, usedSilver.ToString("F0")));
+        OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_UnsalableArtcraft_PurchaseResult".Translate(
+            takeSculptures.Count.Named(KeyLibrary_FormatArgName.Count),
+            usedSilver.ToString("F0").Named("Price")));
 
         if (sculptures.Count == 0)
         {
             remainingMarkerValue = 0f;
             purchasedCount = totalCount;
-            this.SafeDestroy();
+            hasSettled = true;
+            QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else
         {
@@ -153,19 +155,24 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
 
     public override void Destroy()
     {
-        float percentage = purchasedCount / totalCount;
-        if (percentage >= 0.99f)
+        if (!hasSettled)
         {
-            QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
+            hasSettled = true;
+            float percentage = purchasedCount / (float)totalCount;
+            if (percentage >= 0.99f)
+            {
+                QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
+            }
+            else if (percentage >= 0.5f)
+            {
+                QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
+            }
+            else if (percentage > 0f)
+            {
+                QuestUtility.SendQuestTargetSignals(questTags, "BarelyRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
+            }
         }
-        else if (percentage >= 0.5f)
-        {
-            QuestUtility.SendQuestTargetSignals(questTags, "RequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
-        }
-        else if (percentage > 0f)
-        {
-            QuestUtility.SendQuestTargetSignals(questTags, "BarelyRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
-        }
+
         base.Destroy();
     }
 

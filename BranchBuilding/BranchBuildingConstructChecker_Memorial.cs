@@ -14,7 +14,9 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
         }
         if (constructParam.Branch.MedalHandler.GetMedalCount(memorialComp.medalDef) < memorialComp.medalCount)
         {
-            return "OARO_Insufficient_SquadMedal".Translate();
+            return resultOnly ? false : "OARO_Insufficient_SquadMedalOf".Translate(
+                memorialComp.medalDef.Named("MEDAL"),
+                memorialComp.medalCount.Named(KeyLibrary_FormatArgName.Count));
         }
         return true;
     }

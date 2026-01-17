@@ -60,9 +60,15 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         ParentFaction = null;
     }
 
-    public override void TalkAction(Pawn talker, Pawn talkWith) => Find.WindowStack.Add(HelpQuizNodeTree(talkWith));
+    protected override void ForceTriggerTalk()
+    {
+        if (RatkinOrderSettings.MercyPreQuestForceDecision)
+        {
+            base.ForceTriggerTalk();
+        }
+    }
 
-    private Dialog_NodeTree HelpQuizNodeTree(Pawn talkWith)
+    public override void TalkAction(Pawn talkWith, Pawn talker = null, bool canPostpone = true)
     {
         DiaNode rootNode = new(GetTalkText());
         DiaOption acceptOpt = new("OARO_TalkWithHelpSeeker_Accept".Translate())
@@ -70,7 +76,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             action = delegate
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalAccept, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
-                TalkActionUtility.DisableLordJobTalk(talkWith);
+                DeregisterTalkAction(clearTalkWith: true);
             },
             resolveTree = true
         };
@@ -79,7 +85,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             action = delegate
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalTransfer, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
-                TalkActionUtility.DisableLordJobTalk(talkWith);
+                DeregisterTalkAction(clearTalkWith: true);
             },
             resolveTree = true
         };
@@ -94,7 +100,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalTransferWithHelp, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
                 talkWith.MapHeld?.DestoryThingsOfDef(ThingDefOf.Silver, 200);
-                TalkActionUtility.DisableLordJobTalk(talkWith);
+                DeregisterTalkAction(clearTalkWith: true);
             },
             resolveTree = true
         };
@@ -108,12 +114,8 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             action = delegate
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalReject, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
-                TalkActionUtility.DisableLordJobTalk(talkWith);
+                DeregisterTalkAction(clearTalkWith: true);
             },
-            resolveTree = true
-        };
-        DiaOption ignoreOpt = new("OARO_TalkWithHelpSeeker_Ignore".Translate())
-        {
             resolveTree = true
         };
 
@@ -121,9 +123,11 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         rootNode.options.Add(rejectOpt);
         rootNode.options.Add(transferOpt);
         rootNode.options.Add(transferWithHelpOpt);
-        rootNode.options.Add(ignoreOpt);
+        if (canPostpone)
+            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
 
-        return new Dialog_NodeTreeWithFactionInfo(rootNode, talkWith.Faction);
+        Dialog_NodeTreeWithFactionInfo nodeTree = new(rootNode, talkWith.Faction);
+        Find.WindowStack.Add(nodeTree);
     }
 
     private TaggedString GetTalkText()

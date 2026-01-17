@@ -102,7 +102,8 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         string inSignalMakePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsArrival");
         quest.Delay(delayTicks: GenMath.RoundTo(Rand.RangeInclusive(4 * 60000, 6 * 60000), 2500),
                     inner: null,
-                    outSignalComplete: inSignalMakePawnsArrival);
+                    outSignalComplete: inSignalMakePawnsArrival,
+                    debugLabel: "商人到达");
 
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Negative");
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
@@ -130,6 +131,11 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         questPart_CollectionTeam.AddRequestThingDefCount(new ThingDefCountClass(ThingDefOf.Silver, Mathf.FloorToInt(silverCount * 0.8f)));
         quest.AddPart(questPart_CollectionTeam);
 
+        quest.Alert(label: "OARO_LostItemsOfTrader_Alert".Translate(),
+                    explanation: "OARO_LostItemsOfTrader_AlertExp".Translate(parentFaction.Named(KeyLibrary_FormatArgName.FACTION)),
+                    lookTargets: collectionTeam,
+                    inSignalEnable: inSignalMakePawnsArrival);
+
         quest.Letter(
             LetterDefOf.PositiveEvent,
             inSignal: inSignalMakePawnsArrival,
@@ -141,7 +147,8 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             delayTicks: 3 * 60000,
             inner: null,
             inSignalEnable: questPart_CollectionTeam.OutSignalPawnsArrived,
-            outSignalComplete: inSignalTeamForceEnd);
+            outSignalComplete: inSignalTeamForceEnd,
+            debugLabel: "强制结束");
 
         string inSignalTeamSuccess = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Success");
         quest.SignalPassAll(inSignals: [questPart_CollectionTeam.OutSignalGive, inSignalTeamForceEnd], outSignal: inSignalTeamSuccess);

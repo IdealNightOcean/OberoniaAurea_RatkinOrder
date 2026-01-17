@@ -72,6 +72,16 @@ public class RatkinOrderSettings : ModSettings
     public static int MaxAcquiredPatrolInteractionPreType = 3;
 
     /// <summary>
+    /// 善行求助是否要求强制决定
+    /// </summary>
+    public static bool MercyPreQuestForceDecision = true;
+
+    /// <summary>
+    /// 自动续约常驻骑士
+    /// </summary>
+    public static bool AutoPostponeResignationResidentKnight = false;
+
+    /// <summary>
     /// 是否启用AI相关内容
     /// </summary>
     public static bool EnableAIContent = false;
@@ -124,6 +134,9 @@ public class RatkinOrderSettings : ModSettings
 
         Scribe_Values.Look(ref MaxAcquiredPatrolInteractionPreType, nameof(MaxAcquiredPatrolInteractionPreType), 3);
 
+        Scribe_Values.Look(ref MercyPreQuestForceDecision, nameof(MercyPreQuestForceDecision), defaultValue: true);
+
+        Scribe_Values.Look(ref AutoPostponeResignationResidentKnight, nameof(AutoPostponeResignationResidentKnight), defaultValue: false);
 
         // AI相关设置
         Scribe_Values.Look(ref EnableAIContent, nameof(EnableAIContent), defaultValue: false);
@@ -152,7 +165,9 @@ public class RatkinOrderSettings : ModSettings
 
         MaxAcquiredPatrolInteractionPreType = 3;
 
+        MercyPreQuestForceDecision = true;
 
+        AutoPostponeResignationResidentKnight = false;
 
         EnableAIContent = false;
     }
@@ -201,8 +216,12 @@ public class RatkinOrderSettings : ModSettings
             listing_Rect.TextFieldNumericLabeled(label: $"OARO_Setting_{nameof(MaxLetterRetentionDays)}".Translate(), ref MaxLetterRetentionDays, ref maxLetterRetentionDaysStr, 1f, 600f);
         }
 
-        listing_Rect.Gap(12f);
+        listing_Rect.Gap(3f);
         MaxAcquiredPatrolInteractionPreType = (int)listing_Rect.SliderLabeled($"OARO_Setting_{nameof(MaxAcquiredPatrolInteractionPreType)}".Translate(MaxAcquiredPatrolInteractionPreType.ToString()), MaxAcquiredPatrolInteractionPreType, 1f, 20f);
+        listing_Rect.Gap(3f);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{nameof(MercyPreQuestForceDecision)}".Translate(), ref MercyPreQuestForceDecision);
+        listing_Rect.Gap(3f);
+        listing_Rect.CheckboxLabeled($"OARO_Setting_{nameof(AutoPostponeResignationResidentKnight)}".Translate(), ref AutoPostponeResignationResidentKnight);
 
         // AI相关设置
         listing_Rect.Gap(12f);

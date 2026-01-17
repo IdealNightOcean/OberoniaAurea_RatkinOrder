@@ -35,17 +35,17 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         outSignalPerfectRepaired = null;
     }
 
-    public override void TalkAction(Pawn talker, Pawn talkWith)
+    public override void TalkAction(Pawn talkWith, Pawn talker = null, bool canPostpone = true)
     {
         Map map = talkWith?.Map ?? this.talkWith?.Map;
         if (map is null || requestThingDefCounts.NullOrEmpty())
         {
             return;
         }
-        Find.WindowStack.Add(TalkNodeTree(talker, talkWith, map));
+        Find.WindowStack.Add(TalkNodeTree(talkWith, map, talker, canPostpone));
     }
 
-    private new Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talker, Pawn talkWith, Map map)
+    private new Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talkWith, Map map, Pawn talker = null, bool canPostpone = true)
     {
         DiaNode rootNode = new(RawTalkText.Formatted(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)));
 
@@ -72,14 +72,11 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
             },
             resolveTree = true,
         };
-        DiaOption waitOpt = new("PostponeLetter".Translate())
-        {
-            resolveTree = true,
-        };
 
         rootNode.options.Add(giveOpt);
         rootNode.options.Add(rejectOpt);
-        rootNode.options.Add(waitOpt);
+        if (canPostpone)
+            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
 
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(rootNode, RatkinOrder);
         return nodeTree;

@@ -230,7 +230,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
 
     private Dialog_NodeTreeWithFactionInfo ArriveDialog(Caravan caravan)
     {
-        DiaNode arriveNode = new("OARO_FieldSurveyInfo".Translate());
+        DiaNode arriveNode = new("OARO_FieldSurvey_ArrivalInfo".Translate());
 
         DiaOption meteorologicalOpt = new("OARO_FieldSurvey_Meteorological".Translate())
         {
@@ -339,14 +339,12 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                     if (HasRegionalFeature(RegionalFeature.DangerousEcology) && maxSkillLevel < 15)
                     {
                         Messages.Message("OARO_FieldSurvey_Information_DangerousEcology".Translate(), MessageTypeDefOf.PositiveEvent);
-
                     }
                     else
                     {
-                        float gainInfo = maxSkillLevel * 1.5f + totalSkillLevel * 0.5f;
+                        float gainInfo = (maxSkillLevel * 1.5f + totalSkillLevel * 0.5f) * 0.01f;
                         InfoCompleteness += gainInfo;
                         Messages.Message("OARO_FieldSurvey_Information_Finished".Translate(gainInfo.ToStringPercent("0.##")), MessageTypeDefOf.PositiveEvent);
-
                     }
 
                     return;

@@ -97,12 +97,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         }
     }
 
-    public override void TalkAction(Pawn talker, Pawn talkWith)
-    {
-        Find.WindowStack.Add(TalkDialog(talker, talkWith));
-    }
-
-    private static Dialog_NodeTree TalkDialog(Pawn talker, Pawn talkWith)
+    public override void TalkAction(Pawn talkWith, Pawn talker = null, bool canPostpone = true)
     {
         Map map = talkWith.MapHeld;
         Faction faction = talkWith.Faction;
@@ -120,7 +115,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
             {
                 talkWith.MapHeld.DestoryThingsOfDef(ThingDefOf.Silver, 1000);
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
-                TalkActionUtility.DisableLordJobTalk(talkWith);
+                DeregisterTalkAction(clearTalkWith: true);
             };
             briberyOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
                 text: "OARO_TalkWithTaxCollector_BriberyReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
@@ -143,11 +138,11 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         else
         {
             threatOpt.action = delegate
-                {
-                    RecommendationUtility.UseRecommendationOfMap(talkWith.MapHeld, useCount: 1);
-                    QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
-                    TalkActionUtility.DisableLordJobTalk(talkWith);
-                };
+            {
+                RecommendationUtility.UseRecommendationOfMap(talkWith.MapHeld, useCount: 1);
+                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
+                DeregisterTalkAction(clearTalkWith: true);
+            };
             threatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
                text: "OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                acceptText: "Confirm".Translate());
@@ -165,17 +160,26 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
             action = delegate
             {
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "TreatByOpt");
-                TalkActionUtility.DisableLordJobTalk(talkWith);
+                DeregisterTalkAction(clearTalkWith: true);
             }
         };
         rootNode.options.Add(treatOpt);
 
-        DiaOption ignoreOpt = new("OARO_TalkWithTaxCollector_Ignore".Translate())
+        DiaOption rejectOpt = new("OARO_TalkWithTaxCollector_Reject".Translate())
         {
-            resolveTree = true
+            resolveTree = true,
+            action = delegate
+            {
+                QuestUtility.SendQuestTargetSignals(talkWith.questTags, "RejectByOpt");
+                DeregisterTalkAction(clearTalkWith: true);
+            }
         };
-        rootNode.options.Add(ignoreOpt);
+        rootNode.options.Add(rejectOpt);
 
-        return new Dialog_NodeTreeWithFactionInfo(rootNode, talkWith.Faction);
+        if (canPostpone)
+            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+
+        Dialog_NodeTreeWithFactionInfo nodeTree = new(rootNode, talkWith.Faction);
+        Find.WindowStack.Add(nodeTree);
     }
 }

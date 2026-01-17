@@ -8,21 +8,10 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
-    protected override void ApplyInteraction(BranchInteractionParms parms)
-    {
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.ConfirmDiaNodeTreeWithRatkinOrderInfo(
-            text: "OARO_BranchInteraction_RandomTradeConfirm".Translate(),
-            ratkinOrder: parms.RatkinOrder,
-            acceptText: "Confirm".Translate(),
-            acceptAction: () => base.ApplyInteraction(parms),
-            rejectText: "Cancel".Translate());
-        Find.WindowStack.Add(nodeTree);
-    }
-
     protected override void DoBranchCost(BranchInteractionParms parms)
     {
         base.DoBranchCost(parms);
-        parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: 5000, removeWhenExpired: true);
+        parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: 600, removeWhenExpired: true);
     }
 
     /// <returns>
@@ -51,10 +40,10 @@ public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : Bra
 
         trader.GenerateThings();
 
-        Dialog_BranchTrade branchTrade = new(negotiator, trader);
+        Dialog_BranchTrade_SingleUse branchTrade = new(negotiator, trader);
         branchTrade.InitForInteraction(parms);
         branchTrade.PostApplyBranchInteraction += PostApplyInteraction;
-        branchTrade.PostApplyBranchInteraction += (arg1, arg2) => trader.Destory();
+        branchTrade.PostApplyBranchInteraction += (arg1, arg2) => trader?.Destory();
 
         Find.WindowStack.Add(branchTrade);
 

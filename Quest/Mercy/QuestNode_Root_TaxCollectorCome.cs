@@ -19,7 +19,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
     {
         Faction parentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction);
         parentFaction ??= OAFrame_FactionUtility.FirstAvailableFactionOf(validationParams: FactionValidationParams.NonHostileNormalFaction,
-                                                                       predicater: f => f.IsRatkinKindomFaction());
+                                                                         predicater: f => f.IsRatkinKindomFaction());
         if (parentFaction is null)
         {
             return (null, null);
@@ -80,8 +80,11 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
 
         string inSignalLeave = QuestGenUtility.HardcodedSignalWithQuestID("collector.LeaveByOpt");
         string inSignalTreat = QuestGenUtility.HardcodedSignalWithQuestID("collector.TreatByOpt");
+        string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("collector.RejectByOpt");
+
         string outSignalTreatSuccess = QuestGenUtility.HardcodedSignalWithQuestID("Collector_TreatSuccess");
         string outSignalTreatFail = QuestGenUtility.HardcodedSignalWithQuestID("Collector_TreatFail");
+
         string outSignalResolved = QuestGenUtility.HardcodedSignalWithQuestID("Collector_Resolved");
         string outSignalExpired = QuestGenUtility.HardcodedSignalWithQuestID("Collector_Expired");
 
@@ -107,20 +110,37 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         };
         quest.AddPart(questPart_PawnNegativeSiganl);
 
+        string inSignalForceTriggerTalk = QuestGenUtility.HardcodedSignalWithQuestID("Collector_ForceTriggerTalk");
         quest.Delay(delayTicks: 20000,
+            inner: null,
+            inSignalEnable: inSignalPawnArrival,
+            inSignalDisable: outSignalResolved,
+            outSignalComplete: inSignalForceTriggerTalk,
+            reactivatable: false,
+            debugLabel: "强制决定");
+        quest.Delay(delayTicks: 60,
                     inner: null,
-                    inSignalEnable: inSignalPawnArrival,
+                    inSignalEnable: inSignalForceTriggerTalk,
                     inSignalDisable: outSignalResolved,
                     outSignalComplete: outSignalExpired,
-                    reactivatable: false);
+                    reactivatable: false,
+                    debugLabel: "征收官离开");
 
         string inSignalMakeLeave = QuestGenUtility.HardcodedSignalWithQuestID("Pawns_MakeLeave");
-        quest.AnySignal(inSignals: [inSignalLeave, outSignalExpired, inSignalRemovePawn], outSignals: [inSignalMakeLeave]);
+        quest.AnySignal(inSignals: [inSignalLeave, inSignalReject, outSignalExpired, inSignalRemovePawn], outSignals: [inSignalMakeLeave]);
         quest.Leave(pawns: pawns, inSignal: inSignalMakeLeave, leaveOnCleanup: false, inSignalRemovePawn: inSignalRemovePawn);
 
+        quest.Alert(label: "OARO_TaxCollector_Alert".Translate(),
+            explanation: "OARO_TaxCollector_AlertExp".Translate(parentFaction.Named(KeyLibrary_FormatArgName.FACTION)),
+            lookTargets: pawns,
+            inSignalEnable: inSignalPawnArrival,
+            inSignalDisable: inSignalMakeLeave);
+
+        string outSignalFail = QuestGenUtility.HardcodedSignalWithQuestID("Collector_QuestFail");
+        quest.AnySignal(inSignals: [inSignalReject, outSignalExpired], outSignals: [outSignalFail]);
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Fail = new()
         {
-            InSignalTrigger = outSignalExpired,
+            InSignalTrigger = outSignalFail,
             Change = -1,
             Reason = "OARO_TaxCollectorCome_Fail".Translate()
         };
@@ -129,17 +149,18 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         QuestPart_LordJob_TaxCollector questPart_LordJob_TaxCollector = new()
         {
             inSignal = inSignalPawnArrival,
+            InSignalForceTriggerTalk = inSignalForceTriggerTalk,
             InSignalTreat = inSignalTreat,
             inSignalRemovePawn = inSignalRemovePawn,
             OutSignalQuestSuccess = outSignalTreatSuccess,
             OutSignalQuestFail = outSignalTreatFail,
 
-            TalkWith = collector,
             mapOfPawn = collector,
 
             faction = parentFaction,
-            DurationTicks = 20000, // 8小时
+            DurationTicks = 20000 + 60, // 8小时
         };
+        questPart_LordJob_TaxCollector.SetTalkWith(collector);
         questPart_LordJob_TaxCollector.pawns.AddRange(pawns);
         quest.AddPart(questPart_LordJob_TaxCollector);
 
@@ -153,8 +174,8 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         quest.AddPart(questPart_AllOrdersEsteemChange_Suucess);
 
         quest.End(QuestEndOutcome.Fail, -25, parentFaction, inSignal: inSignalRemovePawn, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Fail, -5, parentFaction, inSignal: outSignalExpired, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Success, 0, null, inSignal: outSignalResolved, sendStandardLetter: true);
-        quest.End(QuestEndOutcome.Unknown, 0, null, inSignal: outSignalTreatFail, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Fail, -5, parentFaction, inSignal: outSignalFail, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Success, inSignal: outSignalResolved, sendStandardLetter: true);
+        quest.End(QuestEndOutcome.Unknown, inSignal: outSignalTreatFail, sendStandardLetter: true);
     }
 }

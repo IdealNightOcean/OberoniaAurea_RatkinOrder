@@ -4,16 +4,14 @@ namespace OberoniaAurea.RatkinOrder;
 
 public struct BranchBuildingConstructParms
 {
-    public Branch Branch;
-    public BranchBuildingDef BuildingDef;
+    public Branch Branch { get; }
+    public BranchBuildingDef BuildingDef { get; }
 
-    public bool ByPlayer;
-    public Map Map;
+    public bool ByPlayer { get; set; }
+    public Map Map { get; set; }
 
     public readonly bool NeedDoubleConfirm => ByPlayer && BuildingDef.ConstructChecker.DoubleComfirm;
-    public readonly void DoubleComfirm() => BuildingDef.ConstructChecker.DoubleComfirmAction(this);
-
-    public BranchBuildingConstructParms() { }
+    public readonly void DoubleComfirm() => BuildingDef.ConstructChecker?.DoubleComfirmAction(this);
 
     public BranchBuildingConstructParms(Branch branch, BranchBuildingDef buildingDef)
     {

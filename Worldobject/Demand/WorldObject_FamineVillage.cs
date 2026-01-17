@@ -147,7 +147,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     {
         int caravanThingCount = caravan.GetCountOfThingDef(requestDef);
 
-        TaggedString nodeText = fulfillCount > 0 ? "OARO_FamineVillage_Star".Translate() : "OARO_FamineVillage_FirstStar".Translate();
+        TaggedString nodeText = fulfillCount > 0 ? "OARO_FamineVillage_ArrivalInfo".Translate() : "OARO_FamineVillage_ArrivalInfo_First".Translate();
         DiaNode rootNode = new(nodeText);
 
         DiaOption directOpt = new("OARO_FamineVillage_Direct".Translate())

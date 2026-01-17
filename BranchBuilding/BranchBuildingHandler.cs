@@ -158,7 +158,15 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public AcceptanceReport CanConstructBuilding(BranchBuildingConstructParms constructParam, bool resultOnly = false)
     {
+        if (branch != constructParam.Branch)
+        {
+            return false;
+        }
         BranchBuildingDef buildingDef = constructParam.BuildingDef;
+        if (buildingDef is null)
+        {
+            return false;
+        }
         if (buildingDef.isSpecial && SpecialBuildingDef is not null)
         {
             return resultOnly ? false : "OARO_AlreadyHasSpecialBuilding".Translate();
@@ -184,7 +192,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             {
                 return resultOnly ? false : "OARO_NoAvailablePlayerHomeMap".Translate();
             }
-            int silverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: false, out _);
+            int silverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: true, out _);
             if (!constructParam.Map.HasEnoughThingsOfDef(ThingDefOf.Silver, silverCost))
             {
                 return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, silverCost.ToString());

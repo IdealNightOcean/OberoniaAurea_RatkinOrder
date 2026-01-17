@@ -13,7 +13,7 @@ public class JobDriver_CommonTalkWith : JobDriver_TalkWithAtOnce
         }
         if (GameComponent_RatkinOrder.Instance.TalkActionHandler.TryGetValue(talkWith, out ITalkAction talkAction))
         {
-            talkAction.TalkAction(talker, talkWith);
+            talkAction.TalkAction(talkWith: talkWith, talker: talker, canPostpone: true);
         }
     }
 }

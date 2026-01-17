@@ -153,7 +153,14 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
             if (record.ResignationTick <= ticksGame)
             {
-                toRemove.Add(knight);
+                if (RatkinOrderSettings.AutoPostponeResignationResidentKnight)
+                {
+                    record.PostponeResignation(120);
+                }
+                else
+                {
+                    toRemove.Add(knight);
+                }
             }
         }
         if (toRemove.Count > 0)

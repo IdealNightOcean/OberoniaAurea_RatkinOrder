@@ -143,9 +143,8 @@ public class Window_Branch : OrderWindowBase
             }
             else
             {
-                BranchBuildingConstructParms parms = new BranchBuildingConstructParms()
+                BranchBuildingConstructParms parms = new(this.Branch, this.SelBuildingDefCache.BuildingDef)
                 {
-                    BuildingDef = this.SelBuildingDefCache.BuildingDef,
                     ByPlayer = true,
                     Map = Map
                 };
@@ -232,9 +231,8 @@ public class Window_Branch : OrderWindowBase
         }
         if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
         {
-            Window_RatkinOrder ratkinOrderWin = new(Map);
-            ratkinOrderWin.SelectRatkinOrder(Branch.RatkinOrder);
-            Find.WindowStack.Add(ratkinOrderWin);
+            Window_BranchList branchListWin = new(Branch.RatkinOrder, Map, initWithConstructTab: false);
+            Find.WindowStack.Add(branchListWin);
             Close();
             return;
         }
@@ -744,10 +742,9 @@ public class Window_Branch : OrderWindowBase
         for (int i = 0; i < contractCount; i++)
         {
             entryRect = new(entryX, entryY, entryWidth, entryHeight);
-            GUI.DrawTexture(entryRect, contractBackground, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(entryRect, contractBackground);
             entryY += (entryHeight - 2f);
-            entryRect.ContractedBy(2f);
-            DrawContractEntry(entryRect, contractAcceptances[i].Key, contractAcceptances[i].Value);
+            DrawContractEntry(entryRect.ContractedBy(2f), contractAcceptances[i].Key, contractAcceptances[i].Value);
         }
 
         Text.Font = GameFont.Medium;
@@ -820,10 +817,10 @@ public class Window_Branch : OrderWindowBase
                     }
 
                     reusedRect = Rect.MinMaxRect(reusedRect.xMax, reusedRect.yMin, inRect.xMax - 20f, reusedRect.yMax);
-                    reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x + 8f, 115f, 33f);
+                    reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x + 8f, 115f, 32f);
                     GUI.DrawTexture(reusedRect, contractRequestBackground);
 
-                    Rect iconRect = new(reusedRect.x, reusedRect.y, 33f, 33f);
+                    Rect iconRect = new(reusedRect.x + 8f, reusedRect.y, 32f, 32f);
                     Widgets.ThingIcon(iconRect, contract.RequestThingDef);
 
                     reusedRect.xMin = iconRect.xMax + 2f;

@@ -10,19 +10,23 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
     public int DurationTicks;
     public bool NearOrderHall;
 
+    public string InSignalForceTriggerTalk;
+
+    protected bool talkable;
+
     protected Pawn talkWith;
-    public Pawn TalkWith
-    {
-        get { return talkWith; }
-        set { talkWith = value; }
-    }
+    public Pawn TalkWith => talkWith;
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref DurationTicks, "DurationTicks", 0);
-        Scribe_Values.Look(ref NearOrderHall, "NearOrderHall", defaultValue: false);
-        Scribe_References.Look(ref talkWith, KeyLibrary_FormatArgName.TALKWITH);
+        Scribe_Values.Look(ref DurationTicks, nameof(DurationTicks), 0);
+        Scribe_Values.Look(ref NearOrderHall, nameof(NearOrderHall), defaultValue: false);
+
+        Scribe_Values.Look(ref InSignalForceTriggerTalk, nameof(InSignalForceTriggerTalk));
+
+        Scribe_Values.Look(ref talkable, nameof(talkable), defaultValue: false);
+        Scribe_References.Look(ref talkWith, nameof(talkWith));
         if (Scribe.mode == LoadSaveMode.PostLoadInit && quest?.State == QuestState.Ongoing)
         {
             this.RegisterTalkAction();
@@ -35,6 +39,7 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
 
         DurationTicks = 0;
         NearOrderHall = false;
+        InSignalForceTriggerTalk = null;
 
         this.DeregisterTalkAction();
         talkWith = null;
@@ -63,9 +68,20 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
             signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p);
             if (p == talkWith)
             {
-                this.DeregisterTalkAction();
-                talkWith = null;
+                DeregisterTalkAction(clearTalkWith: true);
             }
+        }
+        if (signal.tag == InSignalForceTriggerTalk)
+        {
+            ForceTriggerTalk();
+        }
+    }
+
+    protected virtual void ForceTriggerTalk()
+    {
+        if (talkable && talkWith is not null)
+        {
+            TalkAction(talkWith: talkWith, canPostpone: false);
         }
     }
 
@@ -79,5 +95,35 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
         return LordMaker.MakeNewLord(faction, lordJob, Map);
     }
 
-    public abstract void TalkAction(Pawn talker, Pawn talkWith);
+    public abstract void TalkAction(Pawn talkWith, Pawn talker = null, bool canPostpone = true);
+
+    public void SetTalkWith(Pawn talkWith, bool resetTalkable = true)
+    {
+        if (this.talkWith is not null)
+            DeregisterTalkAction(clearTalkWith: true);
+
+        if (talkWith is null)
+            return;
+
+        if (resetTalkable)
+            talkable = true;
+
+        this.talkWith = talkWith;
+        if (talkWith.GetLord()?.LordJob is LordJob_VisitColonyTalkable talkableLordJob)
+        {
+            talkableLordJob.EnableTalk(talkWith);
+            this.talkWith = talkWith;
+            this.RegisterTalkAction();
+        }
+    }
+
+    protected void DeregisterTalkAction(bool clearTalkWith = true)
+    {
+        talkable = false;
+        TalkActionUtility.DeregisterTalkAction(this);
+        if (clearTalkWith)
+        {
+            talkWith = null;
+        }
+    }
 }

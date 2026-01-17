@@ -38,6 +38,8 @@ public class QuestNode_CollectionTeam : QuestNode
     public SlateRef<string> inSignalRemovePawn = "CollectionTeam_Negative";
     [NoTranslate]
     public SlateRef<string> inSignalLeftMap = "collectionTeam.LeftMap";
+    [NoTranslate]
+    public SlateRef<string> inSignalForceTriggerTalk = "CollectionTeam_ForceTriggerTalk";
 
     [NoTranslate]
     public SlateRef<string> outSignalPawnsArrived = "CollectionTeam_Arrived";
@@ -96,6 +98,7 @@ public class QuestNode_CollectionTeam : QuestNode
         questPart_CollectionTeam.InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID(inSignalPawnsLeave.GetValue(slate));
         questPart_CollectionTeam.InSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID(inSignalRemovePawn.GetValue(slate));
         questPart_CollectionTeam.InSignalLeftMap = QuestGenUtility.HardcodedSignalWithQuestID(inSignalLeftMap.GetValue(slate));
+        questPart_CollectionTeam.InSignalForceTriggerTalk = QuestGenUtility.HardcodedSignalWithQuestID(inSignalForceTriggerTalk.GetValue(slate));
 
         questPart_CollectionTeam.signalListenMode = QuestPart.SignalListenMode.OngoingOnly;
 
@@ -134,6 +137,12 @@ public class QuestNode_CollectionTeam : QuestNode
             lookTargets: collectionTeam,
             label: "[collectionTeamArrivalLetterLabel]",
             text: "[collectionTeamArrivalLetterText]");
+
+        QuestGen.quest.Alert(label: "OARO_CollectionTeam_Alert".Translate(),
+                             explanation: "OARO_CollectionTeam_AlertExp".Translate(),
+                             lookTargets: collectionTeam,
+                             inSignalEnable: questPart_CollectionTeam.OutSignalPawnsArrived,
+                             inSignalDisable: questPart_CollectionTeam.InSignalMakePawnsLeave);
     }
 }
 
@@ -157,6 +166,9 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     public string InSignalMakePawnsLeave;
     public string InSignalRemovePawn;
     public string InSignalLeftMap;
+
+    protected bool talkable;
+    public string InSignalForceTriggerTalk;
 
     public string OutSignalPawnsArrived;
     public string OutSignalGive;
@@ -198,6 +210,9 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         Scribe_Values.Look(ref InSignalMakePawnsLeave, nameof(InSignalMakePawnsLeave));
         Scribe_Values.Look(ref InSignalRemovePawn, nameof(InSignalRemovePawn));
         Scribe_Values.Look(ref InSignalLeftMap, nameof(InSignalLeftMap));
+
+        Scribe_Values.Look(ref talkable, nameof(talkable), defaultValue: false);
+        Scribe_Values.Look(ref InSignalForceTriggerTalk, nameof(InSignalForceTriggerTalk));
 
         Scribe_Values.Look(ref OutSignalPawnsArrived, nameof(OutSignalPawnsArrived));
         Scribe_Values.Look(ref OutSignalGive, nameof(OutSignalGive));
@@ -249,6 +264,8 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         InSignalRemovePawn = null;
         InSignalLeftMap = null;
 
+        InSignalForceTriggerTalk = null;
+
         OutSignalGive = null;
         OutSignalRejectGive = null;
         OutSignalDecided = null;
@@ -265,6 +282,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsLeave");
         InSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Negative");
         InSignalLeftMap = QuestGenUtility.HardcodedSignalWithQuestID("collectionTeam.LeftMap");
+        InSignalForceTriggerTalk = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_ForceTriggerTalk");
 
         OutSignalPawnsArrived = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Arrived");
         OutSignalGive = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Give");
@@ -400,6 +418,10 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
                     Disable();
                 }
             }
+            else if (talkable && talkWith is not null && signal.tag == InSignalForceTriggerTalk)
+            {
+                TalkAction(talkWith: talkWith, canPostpone: false);
+            }
         }
         else if (signal.tag == InSignalLeftMap)
         {
@@ -428,6 +450,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     protected override void Disable()
     {
         base.Disable();
+        talkable = false;
         canTryArrival = false;
         if (CanMakeLeave)
         {
@@ -437,9 +460,18 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
     public override void QuestPartTick()
     {
-        if (CanMakeLeave && Find.TickManager.TicksGame > enableTick + DurationTicks)
+        if (CanMakeLeave)
         {
-            MakeLeave();
+            int endTick = enableTick + DurationTicks;
+            if (Find.TickManager.TicksGame > endTick)
+            {
+                MakeLeave();
+            }
+            else if (talkable && talkWith is not null && Find.TickManager.TicksGame > endTick - 60)
+            {
+                TalkAction(talkWith: talkWith, canPostpone: false);
+                talkable = false;
+            }
         }
     }
 
@@ -478,11 +510,11 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         LordMaker.MakeNewLord(RelatedFaction, lordJob, map, Pawns);
 
         this.RegisterTalkAction();
-
+        talkable = true;
         return true;
     }
 
-    public virtual void TalkAction(Pawn talker, Pawn talkWith)
+    public virtual void TalkAction(Pawn talkWith, Pawn talker = null, bool canPostpone = true)
     {
         if (State != QuestPartState.Enabled)
         {
@@ -495,7 +527,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         {
             return;
         }
-        Find.WindowStack.Add(TalkNodeTree(talker, talkWith, map));
+        Find.WindowStack.Add(TalkNodeTree(talkWith, map, talker, canPostpone));
     }
 
     public static List<Pawn> GenerateCaravanMembers(IsolatedPawnGroupMakerDef groupMakerDef, Faction faction, Map map, Branch relatedBranch = null)
@@ -548,6 +580,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
         try
         {
+            talkable = false;
             if (!hasFulfilled)
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalFailureToCollect));
@@ -588,7 +621,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         return true;
     }
 
-    protected Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talker, Pawn talkWith, Map map)
+    protected Dialog_NodeTreeWithRatkinOrderInfo TalkNodeTree(Pawn talkWith, Map map, Pawn talker = null, bool canPostpone = true)
     {
         DiaNode rootNode = new(RawTalkText.Formatted(talker.Named(KeyLibrary_FormatArgName.TALKER), talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)));
 
@@ -615,17 +648,15 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             },
             resolveTree = true,
         };
-        DiaOption waitOpt = new("PostponeLetter".Translate())
-        {
-            resolveTree = true,
-        };
 
         rootNode.options.Add(giveOpt);
         rootNode.options.Add(rejectOpt);
-        rootNode.options.Add(waitOpt);
+        if (canPostpone)
+        {
+            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        }
 
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(rootNode, RatkinOrder);
-        return nodeTree;
+        return new Dialog_NodeTreeWithRatkinOrderInfo(rootNode, RatkinOrder);
     }
 
     protected virtual void GiveAction(Pawn talker, Pawn talkWith, Map map)
@@ -646,6 +677,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
     protected void PostMakeDecision()
     {
+        talkable = false;
         Find.SignalManager.SendSignal(new Signal(OutSignalDecided));
         MakeLeave();
     }

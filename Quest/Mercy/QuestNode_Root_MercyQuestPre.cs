@@ -51,12 +51,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             customLetterLabel: "OARO_HelpSeeker_Alert".Translate(),
             customLetterText: "OARO_HelpSeeker_AlertExp".Translate());
 
-        string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("AcceptMercyQuest");
-        string inSignalTransfer = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest_Transfer");
-        string inSignalTransferWithHelp = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest_TransferWithHelp");
-        string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("RejectMercyQuest");
+        string inSignalAccept = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_AcceptMercyQuest");
+        string inSignalTransfer = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_RejectMercyQuest_Transfer");
+        string inSignalTransferWithHelp = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_RejectMercyQuest_TransferWithHelp");
+        string inSignalReject = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_RejectMercyQuest");
+        string inSignalForceTriggerTalk = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_ForceTriggerTalk");
 
-        string inSignalTalkTextReset = QuestGenUtility.HardcodedSignalWithQuestID("TalkTextResetSignal");
+        string inSignalTalkTextReset = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_TalkTextResetSignal");
 
         if (RatkinOrderSettings.EnableAIContent)
         {
@@ -74,11 +75,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             7 => 2f,
             _ => 2f
         };
-        int helpSeekerLeaveDelay = (int)GenMath.RoundTo(60000 * delayMulti, 2500);
+        int helpSeekerLeaveDelay = (int)GenMath.RoundTo(60000 * delayMulti, 2500) - 300;
 
         QuestPart_LordJob_HelpSeeker questPart_LordJob_HelpSeeker = new()
         {
             inSignal = inSignalMakePawnArrival,
+            InSignalForceTriggerTalk = inSignalForceTriggerTalk,
+
             OutSignalAccept = inSignalAccept,
             OutSignalTransfer = inSignalTransfer,
             OutSignalTransferWithHelp = inSignalTransferWithHelp,
@@ -89,13 +92,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             mapOfPawn = helpSeeker,
             pawns = [helpSeeker],
 
-            TalkWith = helpSeeker,
             DurationTicks = helpSeekerLeaveDelay,
 
             MercyQuestDef = mercyQuestDef,
             SubFaction = subFaction,
             ParentFaction = parentFaction
         };
+        questPart_LordJob_HelpSeeker.SetTalkWith(helpSeeker);
         quest.AddPart(questPart_LordJob_HelpSeeker);
 
         TriggerMercyQuestPart(inSignalAccept, inSignalReject, subFaction, parentFaction, helpSeeker);
@@ -104,7 +107,23 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         quest.SignalPassAny(
             inSignals: [inSignalAccept, inSignalTransfer, inSignalTransferWithHelp, inSignalReject],
             outSignal: outSignalResolved);
-        quest.Delay(delayTicks: helpSeekerLeaveDelay, inner: null, inSignalEnable: inSignalMakePawnArrival, inSignalDisable: outSignalResolved, outSignalComplete: inSignalReject);
+
+        quest.Delay(
+            delayTicks: helpSeekerLeaveDelay,
+            inner: null,
+            inSignalEnable: inSignalMakePawnArrival,
+            inSignalDisable: outSignalResolved,
+            outSignalComplete: inSignalForceTriggerTalk,
+            debugLabel: "强制决定");
+
+        quest.Delay(
+            delayTicks: 300,
+            inner: null,
+            inSignalEnable: inSignalForceTriggerTalk,
+            inSignalDisable: outSignalResolved,
+            outSignalComplete: inSignalReject,
+            debugLabel: "强制离开");
+
         quest.Alert(label: "OARO_HelpSeeker_Alert".Translate(),
                     explanation: "OARO_HelpSeeker_AlertExp".Translate(),
                     lookTargets: helpSeeker,

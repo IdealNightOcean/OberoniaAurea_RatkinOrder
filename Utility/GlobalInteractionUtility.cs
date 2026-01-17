@@ -221,7 +221,7 @@ public static class GlobalInteractionUtility
     /// </summary>
     public static float InvitationAcceptanceChance(AroundKnightGroup knights, bool resultOnly, out string explain)
     {
-        explain = null;
+        explain = string.Empty;
         if (!AroundKnightGroup.Validate(knights))
         {
             return 0f;
@@ -233,9 +233,7 @@ public static class GlobalInteractionUtility
 
         float stepChange = (int)ratkinOrder.Relationship * 0.04f;
         if (stepChange != 0f)
-        {
             ApplyStepChange(stepChange, "OARO_ChangeOffset_Relationship");
-        }
 
         ApplyStepChange(ratkinOrder.Esteem * 0.01f, "OARO_ChangeOffset_Esteem");
 
@@ -247,32 +245,22 @@ public static class GlobalInteractionUtility
             _ => 0f
         };
         if (stepChange != 0f)
-        {
             ApplyStepChange(stepChange, $"OARO_AroundKnights_{knights.CurBusyLevel}_Offset");
-        }
 
         if (knights.TravelTicks >= 60000)
-        {
             ApplyStepChange(-0.15f, "OARO_AroundKnights_TravelTimeTooLong");
-        }
         else if (knights.TravelTicks <= 30000)
-        {
             ApplyStepChange(0.1f, "OARO_AroundKnights_TravelTimeShort");
-        }
 
         stepChange = (OrderHallHandler.Instance.OrderHallLevel - 2) * 0.05f;
         if (stepChange > 0f)
-        {
             ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");
-        }
 
         if (ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
             curChance += 0.2f;
             if (!resultOnly)
-            {
-                sb.AppendInNewLine("OARO_ChangeOffset_Reformation".Translate().Colorize(Color.green));
-            }
+                sb.AppendLine("OARO_ChangeOffset_Reformation".Translate().Colorize(Color.green));
         }
 
         if (knights.Branch.IsBranchOfType(Branch.BranchType.Friendly))
@@ -280,22 +268,24 @@ public static class GlobalInteractionUtility
             ApplyStepChange(0.25f, "OARO_ChangeOffset_FriendlyBranch");
 
             curChance *= 1.25f;
-            sb.AppendInNewLine("OARO_ChangeFactor_FriendlyBranch".Translate(1.25f.ToStringPercent("0.##")).Colorize(Color.green));
+
+            if (!resultOnly)
+                sb.AppendLine("OARO_ChangeFactor_FriendlyBranch".Translate(1.25f.ToStringPercent("0.##")).Colorize(Color.green));
         }
 
+        curChance = Mathf.Clamp01(curChance);
         if (!resultOnly)
         {
+            sb.AppendLine("OARO_AroundKnights_InvitationAcceptanceChance".Translate(curChance.ToStringPercent()));
             explain = sb.ToString();
         }
-        return Mathf.Clamp01(curChance);
+        return curChance;
 
         void ApplyStepChange(float change, string reason)
         {
             curChance += change;
             if (!resultOnly)
-            {
-                sb.AppendInNewLine(reason.Translate(change.ToStringPercentSigned("0.##")).Colorize(change < 0f ? ColorLibrary.RedReadable : Color.green));
-            }
+                sb.AppendLine(reason.Translate(change.ToStringPercentSigned("0.##")).Colorize(change < 0f ? ColorLibrary.RedReadable : Color.green));
         }
     }
 
