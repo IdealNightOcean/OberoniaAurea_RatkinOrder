@@ -190,6 +190,7 @@
     <Compile Include="Quest\InDistressKnight\QuestPart_InDistressKnightLeaveLetter.cs" />
     <Compile Include="Quest\InDistressKnight\QuestNode_Root_InDistressKnight.cs" />
     <Compile Include="Quest\InDistressKnight\QuestPart_DistressKnightCanLeaveNow.cs" />
+    <Compile Include="Quest\Mercy\QuestPart_MercyQuestPre_DangerConfirm.cs" />
     <Compile Include="Quest\Mercy\Quest_WolfDisasterWatcher.cs" />
     <Compile Include="Quest\Mercy\Quest_PreMercyQuestCleaner.cs" />
     <Compile Include="Quest\QuestNode\QuestNode_InitJointPatrolCaravanHelp.cs" />

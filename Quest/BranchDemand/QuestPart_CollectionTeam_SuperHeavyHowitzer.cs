@@ -53,7 +53,7 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         {
             action = delegate
             {
-                GiveAction(talker, talkWith, map);
+                GiveAction(talkWith, map, talker);
             },
             resolveTree = true,
         };
@@ -109,7 +109,7 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         return remainingCount <= 0;
     }
 
-    protected override void GiveAction(Pawn talker, Pawn talkWith, Map map)
+    protected override void GiveAction(Pawn talkWith, Map map, Pawn talker = null)
     {
         ThingDef requestDef = requestThingDefCounts[0].thingDef;
         int requestCount = requestThingDefCounts[0].count;

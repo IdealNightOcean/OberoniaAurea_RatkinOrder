@@ -16,7 +16,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
     private const float MarketValueFactor = 0.7f;
 
     private ThingOwner<Thing> sculptures;
-    private float remainingMarkerValue;
+    private int remainingMarkerValue;
     private int purchasedCount;
     private int totalCount;
 
@@ -26,7 +26,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
     {
         base.ExposeData();
         Scribe_Deep.Look(ref sculptures, nameof(sculptures));
-        Scribe_Values.Look(ref remainingMarkerValue, nameof(remainingMarkerValue), 0f);
+        Scribe_Values.Look(ref remainingMarkerValue, nameof(remainingMarkerValue), 0);
         Scribe_Values.Look(ref purchasedCount, nameof(purchasedCount), 0);
         Scribe_Values.Look(ref totalCount, nameof(totalCount), 0);
     }
@@ -34,22 +34,23 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
     public override void PostMake()
     {
         base.PostMake();
-        remainingMarkerValue = 0f;
         sculptures = new ThingOwner<Thing>(this);
 
         int sculpturesCount = Rand.RangeInclusive(15, 30);
         ThingDef sculptureDef = DefDatabase<ThingDef>.GetNamed("SculptureSmall");
+        float remainingMarkerValueF = 0f;
         for (int i = 0; i < sculpturesCount; i++)
         {
             Thing sculpture = ThingMaker.MakeThing(sculptureDef, ThingDefOf.WoodLog);
             sculpture.TryGetComp<CompQuality>()?.SetQuality(Rand.Bool ? QualityCategory.Good : QualityCategory.Excellent, ArtGenerationContext.Outsider);
 
-            remainingMarkerValue += (sculpture.MarketValue * MarketValueFactor);
+            remainingMarkerValueF += (sculpture.MarketValue * MarketValueFactor);
 
             Thing sculptureMini = sculpture.TryMakeMinified();
             sculptures.TryAdd(sculptureMini);
         }
 
+        remainingMarkerValue = Mathf.CeilToInt(remainingMarkerValueF);
         totalCount = sculptures.Count;
     }
 
@@ -108,7 +109,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
 
     private void PurchaseOfSculptures(Caravan caravan, int silverCountNeed = -1)
     {
-        silverCountNeed = silverCountNeed > 0 ? silverCountNeed : Mathf.FloorToInt(remainingMarkerValue);
+        silverCountNeed = silverCountNeed > 0 ? silverCountNeed : remainingMarkerValue;
 
         List<Thing> inventoryItems = CaravanInventoryUtility.AllInventoryItems(caravan);
 
@@ -138,18 +139,19 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
 
         if (sculptures.Count == 0)
         {
-            remainingMarkerValue = 0f;
+            remainingMarkerValue = 0;
             purchasedCount = totalCount;
             hasSettled = true;
             QuestUtility.SendQuestTargetSignals(questTags, "PerfectRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT));
         }
         else
         {
-            remainingMarkerValue = 0f;
+            float remainingMarkerValueF = 0f;
             for (int k = 0; k < sculptures.Count; k++)
             {
-                remainingMarkerValue += (sculptures[k].MarketValue * MarketValueFactor);
+                remainingMarkerValueF += (sculptures[k].MarketValue * MarketValueFactor);
             }
+            remainingMarkerValue = Mathf.CeilToInt(remainingMarkerValueF);
         }
     }
 

@@ -276,22 +276,22 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
 
     public void InitWithDefaultSignal()
     {
-        inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
-        inSignalDisable = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Disable");
-        InSignalDisablePawnsArrival = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_DisableArrival");
-        InSignalMakePawnsLeave = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsLeave");
-        InSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Negative");
-        InSignalLeftMap = QuestGenUtility.HardcodedSignalWithQuestID("collectionTeam.LeftMap");
-        InSignalForceTriggerTalk = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_ForceTriggerTalk");
+        inSignalEnable ??= QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal);
+        inSignalDisable ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Disable");
+        InSignalDisablePawnsArrival ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_DisableArrival");
+        InSignalMakePawnsLeave ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_MakePawnsLeave");
+        InSignalRemovePawn ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Negative");
+        InSignalLeftMap ??= QuestGenUtility.HardcodedSignalWithQuestID("collectionTeam.LeftMap");
+        InSignalForceTriggerTalk ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_ForceTriggerTalk");
 
-        OutSignalPawnsArrived = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Arrived");
-        OutSignalGive = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Give");
-        OutSignalRejectGive = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_RejectGive");
-        OutSignalPawnsArrived = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Arrived");
-        OutSignalDecided = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Decided");
-        OutSignalAllLeftMap = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_AllLeft");
-        OutSignalAllLeftMapAndGive = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_AllLeftAndGive");
-        OutSignalFailureToCollect = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_FailureToCollect");
+        OutSignalPawnsArrived ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Arrived");
+        OutSignalGive ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Give");
+        OutSignalRejectGive ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_RejectGive");
+        OutSignalPawnsArrived ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Arrived");
+        OutSignalDecided ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Decided");
+        OutSignalAllLeftMap ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_AllLeft");
+        OutSignalAllLeftMapAndGive ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_AllLeftAndGive");
+        OutSignalFailureToCollect ??= QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_FailureToCollect");
     }
 
     public void InitTalkTextRequest(string talkText, RulePack talkTextRules = null)
@@ -629,7 +629,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         {
             action = delegate
             {
-                GiveAction(talker, talkWith, map);
+                GiveAction(talkWith, map, talker);
             },
             resolveTree = true,
         };
@@ -659,7 +659,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         return new Dialog_NodeTreeWithRatkinOrderInfo(rootNode, RatkinOrder);
     }
 
-    protected virtual void GiveAction(Pawn talker, Pawn talkWith, Map map)
+    protected virtual void GiveAction(Pawn talkWith, Map map, Pawn talker = null)
     {
         hasFulfilled = true;
         foreach (ThingDefCountClass thingDefCount in requestThingDefCounts)

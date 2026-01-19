@@ -1,4 +1,5 @@
-﻿using Verse;
+﻿using System.Text;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -25,14 +26,20 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
     {
         constructParam.ByPlayer = true;
         Branch branch = constructParam.Branch;
-        if (constructParam.BuildingDef.honorDef is null)
+        BranchHonorDef honorDef = constructParam.BuildingDef.honorDef;
+        if (honorDef is null)
         {
             branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam);
             return;
         }
+        StringBuilder textBuilder = new("OARO_ConstructionConfirm_Memorial".Translate(honorDef.Named(KeyLibrary_FormatArgName.HONORDEF)));
+        textBuilder.AppendLine();
+        textBuilder.AppendLine();
+        textBuilder.AppendLine(honorDef.LabelCap);
+        textBuilder.AppendLine(honorDef.description);
 
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-            text: "OARO_ConstructionConfirm_Memorial".Translate(constructParam.BuildingDef.honorDef.Named(KeyLibrary_FormatArgName.HONORDEF)),
+            text: textBuilder.ToTaggedString(),
             ratkinOrder: branch.RatkinOrder,
             acceptAction: () => branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam));
 

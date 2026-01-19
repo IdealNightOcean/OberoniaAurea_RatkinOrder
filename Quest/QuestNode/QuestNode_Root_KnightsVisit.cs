@@ -9,7 +9,7 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
 {
     protected override PawnGroupKindDef PawnGroupKind => OARO_PawnGroupKindDefOf.OARO_KnightlyVisitor;
     protected override bool IsCombatant => true;
-    protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_VisitingKnight;
+
     protected override bool InitQuestParameter()
     {
         questParameter = new()

@@ -24,7 +24,7 @@ public class MercyQuestDef : Def
     public string fixedHelpDesc;
     public RulePackDef helpDescRulePack;
 
-    public float secondSelectWeight = 1f;
+    public float selectWeight = 1f;
 
     public override IEnumerable<string> ConfigErrors()
     {

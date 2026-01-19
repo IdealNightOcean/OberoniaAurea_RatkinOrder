@@ -1,3 +1,4 @@
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -21,7 +22,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     public IReadOnlyList<BranchBuilding> AllBuildings => allBuildings;
     public int AllBuildingsCount => allBuildings.Count;
 
-    public BranchBuildingDef SpecialBuildingDef { get; private set; }
+    public LazyMutable<BranchBuildingDef> SpecialBuildingDef { get; }
     public HashSet<BranchBuildingDef> AllBuildingDefsHash { get; } = [];
 
     [Unsaved] private List<ITickHour> tickHourHandlers;
@@ -43,6 +44,27 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
             cacheInterval: 2500,
             defaultValue: (int)BranchStatDefOf.OARO_BuildingCeiling.baseValue,
             checker: () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
+
+        SpecialBuildingDef = new LazyMutable<BranchBuildingDef>(refreshFunc: delegate
+        {
+            foreach (BranchBuilding building in allBuildings)
+            {
+                if (building.Def.isSpecial)
+                {
+                    return building.Def;
+                }
+            }
+
+            foreach (UnderConstructionRecord<BranchBuildingDef> constructionBuilding in underConstructionBuildings)
+            {
+                if (constructionBuilding.TargetDef.isSpecial)
+                {
+                    return constructionBuilding.TargetDef;
+                }
+            }
+
+            return null;
+        });
     }
 
     public void ExposeData()
@@ -54,13 +76,13 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
         listing_Rect.Label("特殊建筑:");
-        if (SpecialBuildingDef is null)
+        if (SpecialBuildingDef.Value is null)
         {
             listing_Rect.SubLabel("None".Translate(), 0.8f);
         }
         else
         {
-            listing_Rect.SubLabel(SpecialBuildingDef.label, 0.8f);
+            listing_Rect.SubLabel(SpecialBuildingDef.Value.LabelCap, 0.8f);
         }
 
         listing_Rect.Gap(6f);
@@ -167,7 +189,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         {
             return false;
         }
-        if (buildingDef.isSpecial && SpecialBuildingDef is not null)
+        if (buildingDef.isSpecial && SpecialBuildingDef.Value is not null)
         {
             return resultOnly ? false : "OARO_AlreadyHasSpecialBuilding".Translate();
         }
@@ -232,10 +254,8 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
                 }
             }
             UnderConstructionBuildingDefs.Remove(buildingDef);
-            if (buildingDef == SpecialBuildingDef)
-            {
-                SpecialBuildingDef = null;
-            }
+            if (buildingDef.isSpecial)
+                SpecialBuildingDef.MarkDirty();
 
             PostConstructionChanged?.Invoke(buildingDef, false);
         }
@@ -248,7 +268,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     public void StartBuildingConstructionDirectly(BranchBuildingConstructParms constructParam)
     {
         BranchBuildingDef buildingDef = constructParam.BuildingDef;
-        if (buildingDef.isSpecial && SpecialBuildingDef is not null)
+        if (buildingDef.isSpecial && SpecialBuildingDef.Value is not null)
         {
             return;
         }
@@ -282,14 +302,15 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
     public void AddBuilding(BranchBuildingDef buildingDef)
     {
-        if (buildingDef.isSpecial && SpecialBuildingDef is not null)
+        if (buildingDef.isSpecial && SpecialBuildingDef.Value is not null && HasBuilding(SpecialBuildingDef.Value))
         {
             Log.Error($"[OARO] 尝试向 {branch} 的特殊建筑槽添加新分部建筑，但已存在一个。");
             return;
         }
-        else if (HasBuilding(buildingDef))
+
+        if (HasBuilding(buildingDef))
         {
-            Log.Error($"[OARO] 尝试向 {branch} 添加新分部建筑，但已存在一个。");
+            Log.Error($"[OARO] 尝试向 {branch} 添加已经存在的分部建筑。");
             return;
         }
 
@@ -324,16 +345,13 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     {
         BranchBuilding building = GetBuilding(buildingDef);
         if (building is null)
-        {
             return;
-        }
 
         allBuildings.Remove(building);
-        if (buildingDef == SpecialBuildingDef)
-        {
-            SpecialBuildingDef = null;
-        }
         AllBuildingDefsHash.Remove(buildingDef);
+
+        if (buildingDef.isSpecial)
+            SpecialBuildingDef.MarkDirty();
 
         if (building is ITickHour ticksLong)
         {
@@ -401,15 +419,11 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
     {
         if (underConstructionBuildings.RemoveAll(r => r is null) > 0)
         {
-            Log.Error($"[OARO] {branch} 在加载后有null的在建建筑，已移除。");
+            Log.Error($"[OARO] {branch} 在加载后有在建建筑为null，已移除。");
         }
 
         foreach (UnderConstructionRecord<BranchBuildingDef> constructionBuilding in underConstructionBuildings)
         {
-            if (constructionBuilding.TargetDef.isSpecial)
-            {
-                SpecialBuildingDef = constructionBuilding.TargetDef;
-            }
             UnderConstructionBuildingDefs.Add(constructionBuilding.TargetDef);
         }
 
@@ -437,7 +451,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
 
         if (building.Def.isSpecial)
         {
-            SpecialBuildingDef = building.Def;
+            SpecialBuildingDef.MarkDirty();
             if (building.Def.IsHonorSymbol)
             {
                 branch.SetHonorDef(building.Def.honorDef);

@@ -517,11 +517,19 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
     {
         DiaNode diaNode = new("OARO_RefugeeInflux_DistributionFoodInfo".Translate());
 
-        DiaOption caravanOpt = new("OARO_RefugeeInflux_DistributionFood_Caravan".Translate())
+        DiaOption caravanOpt = new("OARO_RefugeeInflux_DistributionFood_Caravan".Translate(500))
         {
-
+            action = delegate
+            {
+                CaravanDistribute(caravan, 500f);
+                Distribute();
+            },
             resolveTree = true
         };
+        if (!HasEnoghtFood(caravan, 500f))
+        {
+            caravanOpt.Disable("OARO_RefugeeInflux_DistributionFood_InsufficientCaravanFood".Translate());
+        }
         diaNode.options.Add(caravanOpt);
 
         DiaOption branchOpt = new("OARO_RefugeeInflux_DistributionFood_Branch".Translate())
@@ -585,5 +593,49 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             QuestUtility.SendQuestTargetSignals(questTags, "PopulationSettled", this.Named(KeyLibrary_FormatArgName.SUBJECT), population.Named("POPULATION"));
         }
         base.Destroy();
+    }
+
+
+    private void CaravanDistribute(Caravan caravan, float needNutrition)
+    {
+        float foodNutrition = 0f;
+        List<Thing> takeThings = CaravanInventoryUtility.TakeThings(caravan, delegate (Thing t)
+        {
+            if (foodNutrition >= needNutrition)
+            {
+                return 0;
+            }
+            if (!t.def.IsNutritionGivingIngestible)
+            {
+                return 0;
+            }
+            float unitNutrition = t.GetStatValue(StatDefOf.Nutrition);
+            int takeCount = Mathf.Min(t.stackCount, Mathf.CeilToInt((500f - foodNutrition) / unitNutrition));
+            foodNutrition += unitNutrition * takeCount;
+            return takeCount;
+        });
+
+        foreach (Thing food in takeThings)
+        {
+            food.Destroy();
+        }
+    }
+
+    private bool HasEnoghtFood(Caravan caravan, float needNutrition)
+    {
+        float foodNutrition = 0f;
+        List<Thing> items = CaravanInventoryUtility.AllInventoryItems(caravan);
+        foreach (Thing item in items)
+        {
+            if (item.def.IsNutritionGivingIngestible)
+            {
+                foodNutrition += item.GetStatValue(StatDefOf.Nutrition) * item.stackCount;
+                if (foodNutrition >= needNutrition)
+                {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

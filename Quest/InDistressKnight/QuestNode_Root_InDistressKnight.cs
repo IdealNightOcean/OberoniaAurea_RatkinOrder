@@ -89,6 +89,15 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
         base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
         OAFrame_PawnUtility.TakeNonLethalDamage(pawn, injuriesCount: 6, fixedDamageDef: DamageDefOf.Blunt);
         pawn.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_InDistressKnight);
+
+        Thing cloth = ThingMaker.MakeThing(ThingDefOf.Cloth);
+        cloth.stackCount = 40;
+
+        Thing medicine = ThingMaker.MakeThing(ThingDefOf.MedicineIndustrial);
+        medicine.stackCount = 2;
+
+        pawn.inventory.TryAddAndUnforbid(cloth);
+        pawn.inventory.TryAddAndUnforbid(medicine);
     }
 
     protected override void PawnArrival(string lodgerArrivalSignal)

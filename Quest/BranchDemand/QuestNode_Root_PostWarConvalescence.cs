@@ -53,6 +53,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
             Branch = Branch,
+            DemandDef = slate.Get<BranchDemandDef>(KeyLibrary_SlateStoreAs.demandDef),
             DemandType = DemandType
         };
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
@@ -72,12 +73,13 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
     protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
     {
         base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
-        OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
 
-        if (DemandType == DemandType.Supplementary)
-        {
-            return;
-        }
+        if (DemandType != DemandType.Supplementary)
+            pawn.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_WarDeepInjury);
+        if (pawn.needs.mood is not null)
+            pawn.needs.mood.CurLevelPercentage = 0.8f;
+
+        OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
 
         pawn.workSettings.EnableAndInitializeIfNotAlreadyInitialized();
         pawn.workSettings.DisableAll();

@@ -56,6 +56,7 @@ public class Window_Branch : OrderWindowBase
     private LazyMutable<AcceptanceReport> FacilityConstructionAcceptance { get; }
 
     private Lazy<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
+    private Lazy<int> OptionalSpecialBuildingCount { get; }
 
     private Vector2 scrollPosition_GreetingDesc;
 
@@ -167,6 +168,15 @@ public class Window_Branch : OrderWindowBase
             }
 
             return options;
+        });
+
+        OptionalSpecialBuildingCount = new(valueFactory: delegate
+        {
+            if (this.OptionalBuildingDefs.IsValueCreated)
+            {
+                return this.OptionalBuildingDefs.Value.Values.Count(cache => cache.BuildingDef.isSpecial);
+            }
+            return 0;
         });
 
         ContractAcceptances = new(refreshFunc: delegate
@@ -1351,20 +1361,19 @@ public class Window_Branch : OrderWindowBase
         float entryHeight = 96f;
         Rect entryRect;
 
-        optionalViewRect.height = entryHeight * OptionalBuildingDefs.Value.Count;
-
-        Widgets.BeginScrollView(optionalOutRect, ref scrollPosition_OptionalBuildings, optionalViewRect);
-        int index = 0;
-
         IEnumerable<BranchBuildingDefSummaryUICache> optionalBuildingDefs;
-        if (BuildingHandler.SpecialBuildingDef is null)
+        if (BuildingHandler.SpecialBuildingDef.Value is null)
         {
             optionalBuildingDefs = OptionalBuildingDefs.Value.Values;
+            optionalViewRect.height = entryHeight * OptionalBuildingDefs.Value.Count;
         }
         else
         {
             optionalBuildingDefs = OptionalBuildingDefs.Value.Values.Where(v => !v.BuildingDef.isSpecial);
+            optionalViewRect.height = entryHeight * (OptionalBuildingDefs.Value.Count - OptionalSpecialBuildingCount.Value);
         }
+        Widgets.BeginScrollView(optionalOutRect, ref scrollPosition_OptionalBuildings, optionalViewRect);
+        int index = 0;
 
         foreach (BranchBuildingDefSummaryUICache summaryUICache in optionalBuildingDefs)
         {

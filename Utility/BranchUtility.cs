@@ -360,7 +360,7 @@ public static class BranchUtility
         else if (def is BranchBuildingDef buildingDef)
         {
             BranchBuildingHandler buildingHandler = branch.BuildingHandler;
-            if (buildingDef.isSpecial && buildingHandler.SpecialBuildingDef is not null)
+            if (buildingDef.isSpecial && buildingHandler.SpecialBuildingDef.Value is not null)
             {
                 return false;
             }

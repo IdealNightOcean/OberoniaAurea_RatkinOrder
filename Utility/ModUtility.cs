@@ -41,29 +41,45 @@ public static class ModUtility
     public static Faction GenerateSubRatkinFaction(FactionDef subFactionDef, FactionDef parentFactionDef = null, Faction parentFaction = null, bool addToManager = true)
     {
         if (parentFactionDef is null && parentFaction is not null)
-        {
             parentFactionDef = parentFaction.def;
-        }
+
         if (parentFactionDef is not null && parentFaction is null)
-        {
             parentFaction = Find.FactionManager.FirstFactionOfDef(parentFactionDef);
-        }
 
         FactionGeneratorParms parms = new(subFactionDef, default, hidden: true);
         if (ModsConfig.IdeologyActive)
-        {
             parms.ideoGenerationParms = parentFactionDef is null ? new IdeoGenerationParms(subFactionDef) : new IdeoGenerationParms(parentFactionDef);
+
+        Faction faction;
+        if (subFactionDef.permanentEnemy)
+        {
+            faction = FactionGenerator.NewGeneratedFaction(parms);
         }
-        Faction faction = FactionGenerator.NewGeneratedFaction(parms);
+        else
+        {
+            List<FactionRelation> factionRelations = new(Find.FactionManager.AllFactionsListForReading.Count);
+            foreach (Faction otherFaction in Find.FactionManager.AllFactionsListForReading)
+            {
+                if (!otherFaction.def.PermanentlyHostileTo(subFactionDef))
+                {
+                    factionRelations.Add(new FactionRelation
+                    {
+                        other = otherFaction,
+                        kind = FactionRelationKind.Neutral
+                    });
+                }
+            }
+            faction = FactionGenerator.NewGeneratedFactionWithRelations(parms, factionRelations);
+        }
+
         faction.temporary = true;
-        if (ModsConfig.IdeologyActive && parentFaction is not null && parentFaction.ideos?.PrimaryIdeo is not null)
-        {
+
+        if (ModsConfig.IdeologyActive && parentFaction?.ideos?.PrimaryIdeo is not null)
             faction.ideos?.SetPrimary(parentFaction.ideos.PrimaryIdeo);
-        }
+
         if (addToManager)
-        {
             Find.FactionManager.Add(faction);
-        }
+
         return faction;
     }
 

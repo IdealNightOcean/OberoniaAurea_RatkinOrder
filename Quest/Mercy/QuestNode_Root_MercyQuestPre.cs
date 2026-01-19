@@ -37,12 +37,23 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         slate.Set(KeyLibrary_SlateStoreAs.subFaction, subFaction);
 
+        string inSignalForceInterrupt = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_ForceInterrupt");
+        QuestPart_MercyQuestPre_DangerConfirm questPart_MercyQuestPre_DangerConfirm = new()
+        {
+            InSignal = slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            OutSignalForceInterrupt = inSignalForceInterrupt,
+
+            Map = map,
+            SubFaction = subFaction,
+        };
+        quest.AddPart(questPart_MercyQuestPre_DangerConfirm);
+        quest.End(QuestEndOutcome.Unknown, inSignal: inSignalForceInterrupt);
+
         PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.helpSeekerPawnKind);
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
         slate.Set(KeyLibrary_SlateStoreAs.helpSeeker, helpSeeker);
 
         string inSignalMakePawnArrival = QuestGenUtility.HardcodedSignalWithQuestID("MakePawnArrival");
-
         quest.PawnsArrive(
             pawns: [helpSeeker],
             inSignal: inSignalMakePawnArrival,
@@ -75,7 +86,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             7 => 2f,
             _ => 2f
         };
-        int helpSeekerLeaveDelay = (int)GenMath.RoundTo(60000 * delayMulti, 2500) - 300;
+        int helpSeekerLeaveDelay = (int)GenMath.RoundTo(60000 * delayMulti, 2500) + 60;
 
         QuestPart_LordJob_HelpSeeker questPart_LordJob_HelpSeeker = new()
         {
@@ -117,7 +128,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             debugLabel: "强制决定");
 
         quest.Delay(
-            delayTicks: 300,
+            delayTicks: 60,
             inner: null,
             inSignalEnable: inSignalForceTriggerTalk,
             inSignalDisable: outSignalResolved,

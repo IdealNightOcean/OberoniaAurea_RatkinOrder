@@ -13,6 +13,8 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
     protected override PawnKindDef FixedPawnKind => null;
     protected virtual PawnGroupKindDef PawnGroupKind => OARO_PawnGroupKindDefOf.OARO_KnightRefugee;
 
+    protected override ThoughtDef ThoughtToAdd => OARO_ThoughtDefOf.OARO_Thought_VisitingKnight;
+
     protected virtual bool IsCombatant => false;
     protected virtual bool IsCommander => false;
 
@@ -27,10 +29,9 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         {
             Branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
             if (!Branch.IsValid())
-            {
                 return false;
-            }
 
+            slate.SetBasicBranchSlateVar(Branch, alsoSetOrder: false);
             QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, RatkinOrder);
             QuestPart_CriticalBranch questPart_CriticalBranch = new()
             {
@@ -39,14 +40,13 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
                 EndOutcome = QuestEndOutcome.Fail
             };
             quest.AddPart(questPart_CriticalBranch);
-
-            slate.SetBasicBranchSlateVar(Branch, alsoSetOrder: false);
         }
+
         RatkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder) ?? Branch?.RatkinOrder;
         if (!RatkinOrder.IsValid())
-        {
             return false;
-        }
+
+        slate.SetBasicOrderSlateVar(RatkinOrder);
         QuestPart_InvolvedRatkinOrders.AddInvolvedRatkinOrder(quest, RatkinOrder);
         QuestPart_CriticalRatkinOrder questPart_CriticalRatkinOrder = new()
         {
@@ -55,7 +55,6 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             EndOutcome = QuestEndOutcome.Fail
         };
         quest.AddPart(questPart_CriticalRatkinOrder);
-        slate.SetBasicOrderSlateVar(RatkinOrder);
         return true;
     }
 

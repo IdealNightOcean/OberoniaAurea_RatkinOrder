@@ -213,6 +213,46 @@ public static class DebugRatkinOrders
     }
 
     /// <summary>
+    /// 添加分部印记
+    /// </summary>
+    [DebugAction(category: category,
+                 name: "添加分部印记",
+                 displayPriority: 915,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.Playing)]
+    private static void GiveBranchMedal()
+    {
+        OrderBranchOptions(SelectMedal);
+
+        void SelectMedal(Branch branch)
+        {
+            List<DebugMenuOption> medalTypeOptions = [];
+            foreach (BranchMedalDef medalDef in DefDatabase<BranchMedalDef>.AllDefs)
+            {
+                DebugMenuOption medalTypeOption = new(label: medalDef.LabelCap,
+                                                      mode: DebugMenuOptionMode.Action,
+                                                      method: () => SelectCount(branch, medalDef));
+                medalTypeOptions.Add(medalTypeOption);
+            }
+            Find.WindowStack.Add(new Dialog_DebugOptionListLister(medalTypeOptions));
+        }
+
+        void SelectCount(Branch branch, BranchMedalDef medalDef)
+        {
+            int[] countArr = [1, 3, 5, 10];
+            List<DebugMenuOption> medalCountOptions = [];
+            foreach (int count in countArr)
+            {
+                DebugMenuOption medalCountOption = new(label: $"× {count}",
+                                                      mode: DebugMenuOptionMode.Action,
+                                                      method: () => branch.MedalHandler.AddMedal(medalDef, count));
+                medalCountOptions.Add(medalCountOption);
+            }
+            Find.WindowStack.Add(new Dialog_DebugOptionListLister(medalCountOptions));
+        }
+    }
+
+    /// <summary>
     /// 添加分部需求
     /// </summary>
     [DebugAction(category: category,
@@ -231,7 +271,7 @@ public static class DebugRatkinOrders
             {
                 DebugMenuOption demandTypeOption = new(label: demandType.ToString(),
                                                        mode: DebugMenuOptionMode.Action,
-                                                       method: delegate { SelectDemand(branch, demandType); });
+                                                       method: () => SelectDemand(branch, demandType));
                 demandTypeOptions.Add(demandTypeOption);
             }
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(demandTypeOptions));
@@ -343,7 +383,7 @@ public static class DebugRatkinOrders
             foreach (BranchBuildingDef buildingDef in DefDatabase<BranchBuildingDef>.AllDefsListForReading)
             {
                 DebugMenuOption levelOption;
-                if (buildingHandler.HasBuilding(buildingDef) || (buildingDef.isSpecial && buildingHandler.SpecialBuildingDef is not null))
+                if (buildingHandler.HasBuilding(buildingDef) || (buildingDef.isSpecial && buildingHandler.SpecialBuildingDef.Value is not null))
                 {
                     levelOption = new(label: buildingDef.label + "(No)",
                                       mode: DebugMenuOptionMode.Action,
@@ -404,7 +444,7 @@ public static class DebugRatkinOrders
         {
             DebugMenuOption orderOption = new(label: mercyQuestDef.label,
                                               mode: DebugMenuOptionMode.Action,
-                                              method: () => MercyQuestHandler.TryTriggerMercyQuest(mercyQuestDef, map));
+                                              method: () => MercyQuestHandler.Instance?.TryTriggerMercyQuest(mercyQuestDef, map));
 
             mercyQuestOptions.Add(orderOption);
         }
