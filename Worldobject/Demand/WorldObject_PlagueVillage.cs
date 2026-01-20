@@ -165,6 +165,13 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
         {
             yield return gizmo;
         }
+        Command_Action command_Policy = new()
+        {
+            defaultLabel = "OARO_ChangePolicy".Translate(),
+            defaultDesc = "OARO_ChangePolicyDesc".Translate(this.Named(KeyLibrary_FormatArgName.WORLDOBJECT)),
+            action = () => Find.WindowStack.Add(new Dialog_NodeTree(PolicyChangeNode()))
+        };
+        yield return command_Policy;
 
         if (!DebugSettings.ShowDevGizmos)
         {
@@ -476,6 +483,22 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             nextPlagueSpreadTick = Find.TickManager.TicksGame + 60000;
             DailySpreadPlague();
         }
+    }
+
+    private DiaNode PolicyChangeNode()
+    {
+        DiaNode rootNode = new("OARO_PlagueVillage_PolicyInfo".Translate());
+
+        foreach (PolicyType policyType in EnumUtility.GetValues<PolicyType>())
+        {
+            DiaOption policyOpt = new($"OARO_PlagueVillage_{policyType}".Translate())
+            {
+                action = () => { curPolicy = policyType; },
+                resolveTree = true
+            };
+            rootNode.options.Add(policyOpt);
+        }
+        return rootNode;
     }
 
     private void DailySpreadPlague()

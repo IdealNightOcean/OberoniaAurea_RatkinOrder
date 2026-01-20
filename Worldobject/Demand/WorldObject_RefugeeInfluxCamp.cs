@@ -59,7 +59,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             {
                 return 1f;
             }
-            return distEfficiency;
+            return Mathf.Clamp01(distEfficiency + extraFixedDistEfficiency);
         }
         set
         {
@@ -195,7 +195,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         Command_Action command_Policy = new()
         {
             defaultLabel = "OARO_ChangePolicy".Translate(),
-            defaultDesc = "OARO_ChangePolicyDesc".Translate(),
+            defaultDesc = "OARO_ChangePolicyDesc".Translate(this.Named(KeyLibrary_FormatArgName.WORLDOBJECT)),
             action = () => Find.WindowStack.Add(new Dialog_NodeTree(PolicyChangeNode()))
         };
         yield return command_Policy;
@@ -425,7 +425,12 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             text = $"OARO_RefugeeInflux_GrainArrivalText_{corruptionLevel}".Translate(Name, 0.25f.ToStringPercent("0.##"), 0.2f.ToStringPercent("f2"));
         }
 
-        Find.LetterStack.ReceiveLetter("OARO_RefugeeInflux_GrainArrivalLabel".Translate(Name), text, letterDef, lookTargets: this, quest: quest);
+        Find.LetterStack.ReceiveLetter(
+            label: "OARO_RefugeeInflux_GrainArrivalLabel".Translate(Name),
+            text: text,
+            textLetterDef: letterDef,
+            lookTargets: this,
+            quest: quest);
     }
 
     private void RecacheExtraFixeddistEfficiency()
@@ -594,7 +599,6 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         }
         base.Destroy();
     }
-
 
     private void CaravanDistribute(Caravan caravan, float needNutrition)
     {

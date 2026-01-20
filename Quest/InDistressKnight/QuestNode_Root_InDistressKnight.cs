@@ -89,15 +89,6 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
         base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
         OAFrame_PawnUtility.TakeNonLethalDamage(pawn, injuriesCount: 6, fixedDamageDef: DamageDefOf.Blunt);
         pawn.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_InDistressKnight);
-
-        Thing cloth = ThingMaker.MakeThing(ThingDefOf.Cloth);
-        cloth.stackCount = 40;
-
-        Thing medicine = ThingMaker.MakeThing(ThingDefOf.MedicineIndustrial);
-        medicine.stackCount = 2;
-
-        pawn.inventory.TryAddAndUnforbid(cloth);
-        pawn.inventory.TryAddAndUnforbid(medicine);
     }
 
     protected override void PawnArrival(string lodgerArrivalSignal)
@@ -149,8 +140,18 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             };
             questPart_OrderLetter.InitLetterTextRequest("[helpThankLetterLabel]", "[helpThankLetterText]", Branch.NameColored);
             List<Thing> rewards = OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, 500);
+
             OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
             rewards.Add(recommendation);
+
+            Thing cloth = ThingMaker.MakeThing(ThingDefOf.Cloth);
+            cloth.stackCount = 60;
+            rewards.Add(cloth);
+
+            Thing medicine = ThingMaker.MakeThing(ThingDefOf.MedicineIndustrial);
+            medicine.stackCount = 2;
+            rewards.Add(medicine);
+
             questPart_OrderLetter.InitAttachments(rewards);
             QuestGen.quest.AddPart(questPart_OrderLetter);
 

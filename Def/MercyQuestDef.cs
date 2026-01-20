@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -17,12 +18,27 @@ public class MercyQuestDef : Def
     public PawnKindDef helpSeekerPawnKind;
 
     public bool hasParentFaction;
+
     public FactionValidationParams? parentFactionValidationParams;
     protected FactionDef fixedParentFactionDef;
 
+    public Type parentFactionFinderClass;
+    private MercyQuestParentFactionFinder parentFactionFinder;
+    public MercyQuestParentFactionFinder ParentFactionFinder
+    {
+        get
+        {
+            if (parentFactionFinder is null)
+            {
+                parentFactionFinderClass ??= typeof(MercyQuestParentFactionFinder_Default);
+                parentFactionFinder = (MercyQuestParentFactionFinder)Activator.CreateInstance(parentFactionFinderClass);
+            }
+            return parentFactionFinder;
+        }
+    }
+
     [MayTranslate]
-    public string fixedHelpDesc;
-    public RulePackDef helpDescRulePack;
+    public string reasonForHelp;
 
     public float selectWeight = 1f;
 
@@ -44,6 +60,11 @@ public class MercyQuestDef : Def
         {
             yield return $"{nameof(needPreQuest)} is true, but has a null {nameof(helpSeekerPawnKind)}";
         }
+        if (hasParentFaction && parentFactionFinderClass is null)
+        {
+            parentFactionFinderClass = typeof(MercyQuestParentFactionFinder_Default);
+            yield return $"{nameof(hasParentFaction)} is true, but has a null {nameof(parentFactionFinderClass)}, set to {nameof(MercyQuestParentFactionFinder_Default)}";
+        }
     }
 
     public bool TrySetQuestSlateValue(Slate slate)
@@ -62,26 +83,12 @@ public class MercyQuestDef : Def
 
         if (hasParentFaction)
         {
-            Faction parentFaction;
-            if (fixedParentFactionDef is not null)
-            {
-                parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(
-                    def: fixedParentFactionDef,
-                    validationParams: parentFactionValidationParams ?? FactionValidationParams.NonHostileNormalFaction);
-            }
-            else
-            {
-                parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOf(parentFactionValidationParams ?? FactionValidationParams.NonHostileNormalFaction);
-            }
-
+            Faction parentFaction = ParentFactionFinder?.FindParentFaction(this, parentFactionValidationParams, fixedParentFactionDef);
             if (parentFaction is null)
-            {
                 return false;
-            }
 
             slate.Set(KeyLibrary_SlateStoreAs.parentFactionDef, parentFaction.def);
             slate.Set(KeyLibrary_SlateStoreAs.parentFaction, parentFaction);
-
         }
 
         return true;

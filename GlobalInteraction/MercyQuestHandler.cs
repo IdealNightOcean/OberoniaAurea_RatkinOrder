@@ -41,13 +41,16 @@ public class MercyQuestHandler : IExposable
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            foreach (MercyQuestDef mercyQuestDef in tempLRUListForSave)
+            if (tempLRUListForSave is not null)
             {
-                if (mercyQuestDef is not null)
+                foreach (MercyQuestDef mercyQuestDef in tempLRUListForSave)
                 {
-                    LinkedListNode<MercyQuestDef> linkedNoed = new(mercyQuestDef);
-                    lruDict[mercyQuestDef] = linkedNoed;
-                    lruLinkedList.AddLast(linkedNoed);
+                    if (mercyQuestDef is not null)
+                    {
+                        LinkedListNode<MercyQuestDef> linkedNoed = new(mercyQuestDef);
+                        lruDict[mercyQuestDef] = linkedNoed;
+                        lruLinkedList.AddLast(linkedNoed);
+                    }
                 }
             }
         }

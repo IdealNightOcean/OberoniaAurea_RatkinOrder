@@ -18,7 +18,7 @@ public class Reward_BranchMedals : Reward
         get
         {
             Color color = Branch.RatkinOrder.Color;
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_BranchMedal".Translate(Branch.Name).Colorize(color) + " " + Amount.ToStringWithSign().Colorize(color),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_BranchMedal".Translate().Colorize(color),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
                                                                             GUI.DrawTexture(r, null);

@@ -9,43 +9,36 @@ public class StatPart_MeditationBase : StatPart
 {
     public override void TransformValue(StatRequest req, ref float val)
     {
-        Pawn pawn = req.Thing as Pawn;
-        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.Instance.MainOrderCodePedestal?.Map)
-        {
-            return;
-        }
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
-        {
-            return;
-        }
-
         if (OrderHallHandler.Instance.OrderHallRoom is not null)
-        {
-            val += 5f;
-        }
+            return;
 
+        Pawn pawn = req.Thing as Pawn;
+        if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
+            return;
+
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+            return;
+
+        val += 5f;
         val += Mathf.Min(OrderHallHandler.Instance.AcademicFurnituresCount * 2f, 30f);
         val += ResidentKnightsManager.Instance.InstructorKnightsCount.Value * 5f;
     }
 
     public override string ExplanationPart(StatRequest req)
     {
+        if (OrderHallHandler.Instance.OrderHallRoom is not null)
+            return null;
+
         Pawn pawn = req.Thing as Pawn;
-        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.Instance.MainOrderCodePedestal?.Map)
-        {
+        if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
             return null;
-        }
+
         if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
-        {
             return null;
-        }
 
         int stepChange;
-        StringBuilder sb = new();
-        if (OrderHallHandler.Instance.OrderHallRoom is not null)
-        {
-            sb.AppendLine("OARO_MeditationBase_OrderHallRoom".Translate(5.ToStringWithSign()));
-        }
+        StringBuilder sb = new(64);
+        sb.AppendLine("OARO_MeditationBase_OrderHallRoom".Translate(5.ToStringWithSign()));
 
         int academicFurnituresCount = OrderHallHandler.Instance.AcademicFurnituresCount;
         if (academicFurnituresCount > 0)

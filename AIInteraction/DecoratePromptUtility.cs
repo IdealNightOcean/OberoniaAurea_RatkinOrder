@@ -82,8 +82,8 @@ public static class DecoratePromptUtility
         yield return new ClientMessage(ClientMessageRole.system, promptBuilder.ToString());
 
 
-        string example = string.IsNullOrEmpty(mercyQuestDef.fixedHelpDesc) ? "OARO_Setting_MercyQuestPrompt_DefaultExample".Translate()
-                                                                           : mercyQuestDef.fixedHelpDesc;
+        string example = string.IsNullOrEmpty(mercyQuestDef.reasonForHelp) ? "OARO_Setting_MercyQuestPrompt_DefaultExample".Translate()
+                                                                           : mercyQuestDef.reasonForHelp;
 
         yield return new ClientMessage(ClientMessageRole.user, "OARO_Setting_MercyQuestPrompt_User".Translate(mercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST), example.Named("Example")));
     }

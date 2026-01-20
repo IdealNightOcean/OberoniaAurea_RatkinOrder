@@ -49,7 +49,7 @@ public class QuestClique : IExposable
     public float Willingness => willingness;
 
     public bool IsActive;
-    public bool IsActivatable;
+    public bool IsActivatable = true;
     public int ticksToInactive = -1;
     private int TicksToInactive => ticksToInactive;
 
@@ -221,10 +221,9 @@ public class QuestClique : IExposable
         if (map is null)
         {
             return resultOnly ? false : "OARO_NeedAMap".Translate();
-
         }
 
-        if (BriberyCost > 0 && map.HasEnoughThingsOfDef(ThingDefOf.Silver, BriberyCost))
+        if (BriberyCost > 0 && !map.HasEnoughThingsOfDef(ThingDefOf.Silver, BriberyCost))
         {
             return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.LabelCap, BriberyCost);
         }

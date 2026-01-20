@@ -180,6 +180,10 @@
     <Compile Include="Letter\ChoiceLetter_InDistressKnightLeave.cs" />
     <Compile Include="Letter\ChoiceLetter_InDistressKnightStart.cs" />
     <Compile Include="Lord\LordJob_ExitMapBestForJointPatrol.cs" />
+    <Compile Include="MercyQuest\MercyQuestParentFactionFinder_RatkinOrder.cs" />
+    <Compile Include="MercyQuest\MercyQuestParentFactionFinder.cs" />
+    <Compile Include="MercyQuest\MercyQuestParentFactionFinder_Default.cs" />
+    <Compile Include="MercyQuest\MercyQuestParentFactionFinder_Ratkin.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_ExchangeSupply.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_EnhanceRelationship.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker_InviteResidentKnight.cs" />

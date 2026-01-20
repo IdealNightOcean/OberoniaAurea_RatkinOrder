@@ -3,7 +3,6 @@ using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
-using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -144,43 +143,14 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             }
         }
 
-        if (MercyQuestDef is null)
+        if (MercyQuestDef is null || string.IsNullOrEmpty(MercyQuestDef.reasonForHelp))
         {
             return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
         }
         else
         {
-            if (!string.IsNullOrEmpty(MercyQuestDef.fixedHelpDesc))
-            {
-                return MercyQuestDef.fixedHelpDesc.Formatted(TextNamedArguments());
-            }
-            if (MercyQuestDef.helpDescRulePack is not null)
-            {
-                try
-                {
-                    GrammarRequest grammarRequest = new();
-                    grammarRequest.Includes.Add(MercyQuestDef.helpDescRulePack);
-                    grammarRequest.Rules.AddRange(GrammarUtility.RulesForPawn("HELPSEEKER", TalkWith));
-                    grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("SUBFACTION", SubFaction));
-                    if (ParentFaction is not null)
-                    {
-                        grammarRequest.Rules.AddRange(GrammarUtility.RulesForFaction("PARENTFACTION", ParentFaction));
-                    }
-                    return GrammarResolver.Resolve("r_text", grammarRequest);
-                }
-                catch (Exception ex2)
-                {
-                    ModUtility.LogExceptionError(ex2,
-                        errorDesc: "解析对话文本",
-                        typeName: nameof(QuestPart_LordJob_HelpSeeker),
-                        methodName: nameof(GetTalkText),
-                        needStackTrace: true);
-                }
-            }
-
-            return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
+            return MercyQuestDef.reasonForHelp.Formatted(TextNamedArguments());
         }
-
     }
 
     public void SetRawTalkText(string talkText)

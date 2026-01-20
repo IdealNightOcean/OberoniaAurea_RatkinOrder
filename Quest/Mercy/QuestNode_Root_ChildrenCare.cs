@@ -37,8 +37,6 @@ public class QuestNode_Root_ChildrenCare : QuestNode_Root_RefugeeBase
             LodgerCount = lodgerCount,
             ChildCount = lodgerCount,
 
-            goodwillFailure = -20,
-            goodwillSuccess = 20,
             rewardValueRange = new FloatRange(1000, 2000),
 
             questDurationTicks = Rand.RangeInclusive(8 * 60000, 12 * 60000)

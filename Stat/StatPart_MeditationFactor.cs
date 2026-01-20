@@ -11,15 +11,11 @@ public class StatPart_MeditationFactor : StatPart
     public override void TransformValue(StatRequest req, ref float val)
     {
         Pawn pawn = req.Thing as Pawn;
-        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.Instance.MainOrderCodePedestal?.Map)
-        {
+        if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
             return;
-        }
 
         if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
-        {
             return;
-        }
 
         val += OrderHallHandler.Instance.OrderHallLevel switch
         {
@@ -33,17 +29,13 @@ public class StatPart_MeditationFactor : StatPart
 
         Branch branch = record.Branch;
         if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
-        {
             val += 0.25f;
-        }
+
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
-        {
             val += 0.25f;
-        }
+
         if (branch.IsBranchOfType(Branch.BranchType.Honor))
-        {
             val += 0.25f;
-        }
 
         val += record.CurRank switch
         {
@@ -59,25 +51,20 @@ public class StatPart_MeditationFactor : StatPart
         val += KnightPersonalityUtility.GetContainedPersonalities(resonatePersonality).Count() * 0.1f;
 
         if (OrderHallHandler.Instance.KnightBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
-        {
             val += joyBuildingDefs.Count * 0.1f;
-        }
     }
 
     public override string ExplanationPart(StatRequest req)
     {
         Pawn pawn = req.Thing as Pawn;
-        if (!pawn.CanBeKnight() || pawn.Map != OrderHallHandler.Instance.MainOrderCodePedestal?.Map)
-        {
+        if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
             return null;
-        }
+
         if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
-        {
             return null;
-        }
 
         float stepChange;
-        StringBuilder sb = new();
+        StringBuilder sb = new(128);
 
         stepChange = OrderHallHandler.Instance.OrderHallLevel switch
         {
@@ -89,24 +76,18 @@ public class StatPart_MeditationFactor : StatPart
             _ => 0.25f
         };
         if (stepChange > 0f)
-        {
             sb.AppendLine("OARO_ChangeOffset_OrderHallLevel".Translate(stepChange.ToStringPercentSigned("0.##")));
-        }
 
         Branch branch = record.Branch;
         if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
-        {
             sb.AppendLine("OARO_ChangeOffset_Reformation".Translate(OrderReformationDefOf.OARO_ReformationPlaceholder.label, 0.25f.ToStringPercentSigned("0.##")));
-        }
 
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
-        {
             sb.AppendLine("OARO_ChangeOffset_FriendlyBranch".Translate(0.25f.ToStringPercentSigned("0.##")));
-        }
+
         if (branch.IsBranchOfType(Branch.BranchType.Honor))
-        {
             sb.AppendLine("OARO_ChangeOffset_HonorBranch".Translate(0.25f.ToStringPercentSigned("0.##")));
-        }
+
         stepChange = record.CurRank switch
         {
             ResidentKnightRecord.Rank.Elite => 0.1f,
@@ -115,9 +96,7 @@ public class StatPart_MeditationFactor : StatPart
             _ => 0f
         };
         if (stepChange > 0f)
-        {
             sb.AppendLine("OARO_ChangeOffset_ResidentKnightRank".Translate($"OARO_ResidentKnightRank_{record.CurRank}".Translate(), stepChange.ToStringPercentSigned("0.##")));
-        }
 
         stepChange = ((pawn.GetStatValue(StatDefOf.LearningRateFactor) - 1f) * 0.1f);
         sb.AppendLine(StatDefOf.LearningRateFactor.label + ": " + stepChange.ToStringPercentSigned("0.##"));

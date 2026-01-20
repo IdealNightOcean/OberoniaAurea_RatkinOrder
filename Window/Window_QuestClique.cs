@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -442,7 +443,11 @@ public class Window_QuestClique : OrderWindowBase
             doMouseoverSound: true,
             tooltip: clique.IsBribable ? "OARO_CliqueWin_BribeTip".Translate(clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)) : null))
         {
-            clique.Bribery(map: Map);
+            Dialog_NodeTree nodeTree = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
+                text: "OARO_Clique_BriberyConfirm".Translate(clique.Name.Named(KeyLibrary_FormatArgName.CliqueName), clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)),
+                acceptAction: () => clique.Bribery(map: Map));
+
+            Find.WindowStack.Add(nodeTree);
         }
 
         reusedRect = new(reusedRect.xMin - 92f, bottom.yMin, 92f, bottom.height);
