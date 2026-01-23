@@ -171,7 +171,8 @@ public static class OrderHallUtility
     private static int BuildingRestrict(Room room, int maxPotentialLevel)
     {
         HashSet<string> forbiddenBuildingTags = RestrictionExtension.ForbiddenBuildingTags;
-        Dictionary<ThingDef, int> orderHallBuildings = [];
+        HashSet<Thing> uniquePotentialBuildings = new(32);
+        Dictionary<ThingDef, int> orderHallBuildings = new(8);
 
         foreach (Region region in room.Regions)
         {
@@ -179,17 +180,15 @@ public static class OrderHallUtility
             for (int i = 0; i < allThings.Count; i++)
             {
                 ThingDef thingDef = allThings[i].def;
-
                 // 有祭坛最高1级
                 if (thingDef.isAltar)
-                {
                     return 1;
-                }
 
                 if (thingDef.building is null || thingDef.building.buildingTags is null)
-                {
                     continue;
-                }
+
+                if (!uniquePotentialBuildings.Add(allThings[i]))
+                    continue;
 
                 bool isPotentialBuilding = false;
                 foreach (string tag in thingDef.building.buildingTags)
@@ -200,10 +199,7 @@ public static class OrderHallUtility
                         return 1;
                     }
 
-                    if (tag == "OARO_OrderHall")
-                    {
-                        isPotentialBuilding = true;
-                    }
+                    isPotentialBuilding = isPotentialBuilding || tag == "OARO_OrderHall";
                 }
 
                 if (isPotentialBuilding)
@@ -247,16 +243,13 @@ public static class OrderHallUtility
     {
         int curLevel = GetOrderHallLevel();
         if (curLevel < 0 || curLevel >= RestrictionExtension.MaxLevel)
-        {
             return null;
-        }
+
 
         Room room = OrderHallHandler.Instance.OrderHallRoom;
         OrderHallLevelRestriction nextLevelRestriction = RestrictionExtension.GetRestrictionOfLevel(curLevel + 1);
         if (nextLevelRestriction is null)
-        {
             return null;
-        }
 
         List<(string condition, bool isMet)> result = new(16)
         {
@@ -291,11 +284,12 @@ public static class OrderHallUtility
         }
         result.Add(($"OARO_TerrainTag_{terrainTag}".Translate(), terrainMet));
 
-        bool hasAltar = false;
         HashSet<string> forbiddenBuildingTags = RestrictionExtension.ForbiddenBuildingTags;
-        Dictionary<ThingDef, int> orderHallBuildings = [];
 
-        HashSet<string> containedForbiddenBuildingTags = [];
+        HashSet<Thing> uniquePotentialBuildings = new(32);
+        HashSet<string> containedForbiddenBuildingTags = new(8);
+        Dictionary<ThingDef, int> orderHallBuildings = new(8);
+        bool hasAltar = false;
         foreach (Region region in room.Regions)
         {
             List<Thing> allThings = region.ListerThings.AllThings;
@@ -304,34 +298,34 @@ public static class OrderHallUtility
                 ThingDef thingDef = allThings[i].def;
 
                 if (thingDef.isAltar)
-                {
                     hasAltar = true;
-                }
 
                 if (thingDef.building is null || thingDef.building.buildingTags is null)
-                {
                     continue;
-                }
 
-                for (int j = 0; j < thingDef.building.buildingTags.Count; j++)
+                if (!uniquePotentialBuildings.Add(allThings[i]))
+                    continue;
+
+                bool isPotentialBuilding = false;
+                foreach (string tag in thingDef.building.buildingTags)
                 {
-                    string tag = thingDef.building.buildingTags[j];
-
                     if (forbiddenBuildingTags.Contains(tag))
                     {
                         containedForbiddenBuildingTags.Add(tag);
                     }
 
-                    if (tag == "OARO_OrderHall")
+                    isPotentialBuilding = isPotentialBuilding || tag == "OARO_OrderHall";
+                }
+
+                if (isPotentialBuilding)
+                {
+                    if (orderHallBuildings.TryGetValue(thingDef, out int count))
                     {
-                        if (orderHallBuildings.TryGetValue(thingDef, out int count))
-                        {
-                            orderHallBuildings[thingDef] = count + 1;
-                        }
-                        else
-                        {
-                            orderHallBuildings[thingDef] = 1;
-                        }
+                        orderHallBuildings[thingDef] = count + 1;
+                    }
+                    else
+                    {
+                        orderHallBuildings[thingDef] = 1;
                     }
                 }
             }

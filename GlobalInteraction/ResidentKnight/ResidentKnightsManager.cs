@@ -39,11 +39,13 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public LazyMutable<float> MinResignationDays { get; }
     public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
+
     public LazyMutable<int> InstructorKnightsCount { get; }
+    public LazyMutable<int> LawOrderKnightsCount { get; }
 
     [Unsaved] private readonly Dictionary<StatDef, float> statOffsets = [];
     [Unsaved] private readonly Dictionary<StatDef, float> statFactors = [];
-    [Unsaved] private HediffStage buffHediffStage;
+    [Unsaved] private readonly HediffStage buffHediffStage;
     private int NextBuffStatRegainTick { get; set; } = -1;
 
     public HediffStage BuffHediffStage
@@ -72,7 +74,9 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         buffHediffStage = new HediffStage();
         MinResignationDays = new(refreshFunc: RefreshMinResignationDays);
         AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
+
         InstructorKnightsCount = new(refreshFunc: () => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
+        LawOrderKnightsCount = new(refreshFunc: () => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_LawOrder).Count());
     }
     public static void ClearStaticCache() => Instance = null;
 
@@ -381,6 +385,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         MinResignationDays.MarkDirty();
         AllHasPersonalityTypes.MarkDirty();
         InstructorKnightsCount.MarkDirty();
+        LawOrderKnightsCount.MarkDirty();
     }
 
 
@@ -389,6 +394,17 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         statOffsets.Clear();
         statFactors.Clear();
         NextBuffStatRegainTick = Find.TickManager.TicksGame + 60000;
+
+        if (LawOrderKnightsCount.Value > 0)
+        {
+            AddStatModifier(
+                modifiers: [new StatModifier()
+                {
+                    stat = StatDefOf.GlobalLearningFactor,
+                    value = Mathf.Min(LawOrderKnightsCount.Value * 0.12f,0.6f)
+                }],
+                isFactor: false);
+        }
 
         foreach (KeyValuePair<ResidentKnightRoleDef, ResidentKnightRecord> kv in rolesToKnights)
         {

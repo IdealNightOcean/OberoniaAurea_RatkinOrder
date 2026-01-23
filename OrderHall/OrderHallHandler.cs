@@ -135,33 +135,37 @@ public class OrderHallHandler : IExposable
             {
                 return;
             }
+            HashSet<Thing> uniquePotentialBuildings = new(32);
             foreach (Region region in room.Regions)
             {
                 List<Thing> allThings = region.ListerThings.AllThings;
                 for (int i = 0; i < allThings.Count; i++)
                 {
-                    List<string> buildingTags = allThings[i].def.building?.buildingTags;
-                    if (buildingTags is null)
-                    {
+                    ThingDef thingDef = allThings[i].def;
+                    if (thingDef.building is null || thingDef.building.buildingTags is null)
                         continue;
-                    }
-                    if (buildingTags.Contains("OARO_KnightAcademic"))
-                    {
-                        academicFurnituresCount++;
-                    }
 
-                    if (buildingTags.Contains("OARO_ResidentKnightPrefer"))
+                    if (!uniquePotentialBuildings.Add(allThings[i]))
+                        continue;
+
+                    foreach (string tag in thingDef.building.buildingTags)
                     {
-                        ThingDef thingDef = allThings[i].def;
-                        if (OrderDefDataBase.TryGetKnightPersonalityByBuilding(thingDef, out KnightPersonality personality))
+                        if (tag == "OARO_KnightAcademic")
                         {
-                            if (preferBuildingDefsByKnightPersonality.TryGetValue(personality, out HashSet<ThingDef> defsHash))
+                            academicFurnituresCount++;
+                        }
+                        else if (tag == "OARO_ResidentKnightPrefer")
+                        {
+                            if (OrderDefDataBase.TryGetKnightPersonalityByBuilding(thingDef, out KnightPersonality personality))
                             {
-                                defsHash.Add(thingDef);
-                            }
-                            else
-                            {
-                                preferBuildingDefsByKnightPersonality.Add(personality, [thingDef]);
+                                if (preferBuildingDefsByKnightPersonality.TryGetValue(personality, out HashSet<ThingDef> defsHash))
+                                {
+                                    defsHash.Add(thingDef);
+                                }
+                                else
+                                {
+                                    preferBuildingDefsByKnightPersonality.Add(personality, [thingDef]);
+                                }
                             }
                         }
                     }

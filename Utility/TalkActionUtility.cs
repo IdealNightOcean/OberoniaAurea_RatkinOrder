@@ -30,19 +30,19 @@ public static class TalkActionUtility
 
     public static IntVec3 GetTalkPawnWanderCenterCell(this ITalkAction talkAction, bool nearOrderHall)
     {
+        IntVec3 result = IntVec3.Invalid;
+
         Pawn talkWith = talkAction?.TalkWith;
         if (talkWith is null || !talkWith.Spawned)
-        {
-            return IntVec3.Invalid;
-        }
-        IntVec3 result;
+            return result;
+
         if (nearOrderHall)
         {
             if (OrderHallHandler.Instance.MainOrderCodePedestal?.Map == talkWith.Map)
             {
                 IntVec3 searchRootPos = OrderHallHandler.Instance.MainOrderCodePedestal?.Position ?? talkWith.Position;
-                RCellFinder.TryFindRandomSpotJustOutsideColony(searchRootPos, talkWith.Map, talkWith, out result);
-                return result;
+                if (RCellFinder.TryFindRandomSpotJustOutsideColony(searchRootPos, talkWith.Map, talkWith, out result))
+                    return result;
             }
         }
 

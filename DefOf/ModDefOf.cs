@@ -50,6 +50,10 @@ public static class OARO_ModDefOf
     /// 荣誉分部 - 教导骑士
     /// </summary>
     public static BranchHonorDef OARO_Honor_Instructor;
+    /// <summary>
+    /// 荣誉分部 - 律令骑士
+    /// </summary>
+    public static BranchHonorDef OARO_Honor_LawOrder;
 
     /// <summary>
     /// 叛乱镇压 - 贵族领地战斗

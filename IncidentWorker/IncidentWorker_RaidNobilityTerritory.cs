@@ -40,7 +40,7 @@ internal sealed class IncidentWorker_RaidNobilityTerritory : IncidentWorker
         {
             if (nobilityTerritory.AssociatedQuest.TryGetCliquesManager(addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
             {
-                foreach (var clique in cliquesManager.AllCliques.Values)
+                foreach (QuestClique clique in cliquesManager.AllCliques.Values)
                 {
                     if (clique.IsBranchClique && clique.IsActive)
                     {

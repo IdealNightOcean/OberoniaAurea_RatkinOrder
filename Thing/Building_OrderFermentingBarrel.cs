@@ -40,10 +40,7 @@ public class Building_OrderFermentingBarrel : Building
     {
         get
         {
-            if (barFilledCachedMat is null)
-            {
-                barFilledCachedMat = SolidColorMaterials.SimpleSolidColorMaterial(Color.Lerp(BarZeroProgressColor, BarFermentedColor, Progress));
-            }
+            barFilledCachedMat ??= SolidColorMaterials.SimpleSolidColorMaterial(Color.Lerp(BarZeroProgressColor, BarFermentedColor, Progress));
             return barFilledCachedMat;
         }
     }
@@ -226,6 +223,7 @@ public class Building_OrderFermentingBarrel : Building
         {
             yield return gizmo;
         }
+
         if (!DebugSettings.ShowDevGizmos)
         {
             yield break;

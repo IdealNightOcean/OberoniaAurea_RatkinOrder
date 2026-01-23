@@ -211,7 +211,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         {
             StringBuilder sb = new(128);
             int i = 0;
-            foreach (var record in interactionRecords)
+            foreach (JointInteractionRecord record in interactionRecords)
             {
                 sb.AppendLine($"{++i}. {record}");
             }

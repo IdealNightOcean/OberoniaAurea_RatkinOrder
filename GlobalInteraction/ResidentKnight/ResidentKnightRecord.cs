@@ -99,7 +99,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         try
         {
             ResidentKnightAcademicDef initAcademicDef;
-            if (Personality != KnightPersonality.None && OrderDefDataBase.ResidentKnightAcademicGroupByPersonality.TryGetValue(Personality, out var potentialAcademics))
+            if (Personality != KnightPersonality.None && OrderDefDataBase.ResidentKnightAcademicGroupByPersonality.TryGetValue(Personality, out List<ResidentKnightAcademicDef> potentialAcademics))
             {
                 initAcademicDef = potentialAcademics.RandomElement();
             }

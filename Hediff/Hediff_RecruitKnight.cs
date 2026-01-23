@@ -44,7 +44,7 @@ internal class Hediff_RecruitKnight : HediffWithComps
 
     private void RecruitKnightDialog()
     {
-        if (!KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out var kRecord))
+        if (!KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out KnightRecord kRecord))
         {
             return;
         }

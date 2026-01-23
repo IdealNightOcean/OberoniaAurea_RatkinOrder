@@ -152,6 +152,7 @@
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
+    <Compile Include="HarmonyPatch\MutantTracker_TurnPatch.cs" />
     <Compile Include="HarmonyPatch\IncidentWorker_TryExecute_Patch.cs" />
     <Compile Include="Hediff\Hediff_RecruitKnight.cs" />
     <Compile Include="InteractionWorker_KnightlyTalk.cs" />
