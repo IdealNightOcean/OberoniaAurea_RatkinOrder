@@ -47,7 +47,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="NightOcean">
-      <HintPath>..\..\NightOcean\obj\Release\netstandard2.0\NightOcean.dll</HintPath>
+      <HintPath>..\..\RimWorldReference\NightOcean\NightOcean.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="NightOcean.SimpleAIClient">
@@ -111,10 +111,15 @@
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_RecommendationToKnight.cs" />
     <Compile Include="BranchInteraction\TargetlessInteraction\BranchInteractionWorker_RequestCombatReadiness.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_UnlockSupportAuthority.cs" />
+    <Compile Include="BranchStat\BranchStatPart_BranchPotency.cs" />
     <Compile Include="BranchStat\BranchStatPart_BranchEffectTagFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_BranchEffectTagOffset.cs" />
+    <Compile Include="BranchStat\BranchStatPart_BranchTypeFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_OrderReformationFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_OrderReformationOffset.cs" />
+    <Compile Include="BranchTradition\BranchTradition.cs" />
+    <Compile Include="BranchTradition\BranchTraditionHandler.cs" />
+    <Compile Include="BranchTradition\BranchTraditionStage.cs" />
     <Compile Include="Branch\UnderConstructionRecord.cs" />
     <Compile Include="BranchInteraction\BranchInteractionWorker.cs" />
     <Compile Include="BranchResident\BranchResident_Deployment.cs" />
@@ -148,6 +153,7 @@
     <Compile Include="DefOf\RulePackDefOf.cs" />
     <Compile Include="Def\BranchMedalDef.cs" />
     <Compile Include="Def\BranchResidentDef.cs" />
+    <Compile Include="Def\BranchTraditionDef.cs" />
     <Compile Include="Def\JointPatrolCaravanHelpDef.cs" />
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />

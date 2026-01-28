@@ -112,7 +112,7 @@ public class QuestPart_GiveBranchMedal : QuestPart
             BranchMedalDef medalType = PotentialDefs?.RandomElementWithFallback(null);
             if (medalType is not null)
             {
-                Branch.MedalHandler.AddMedal(medalType, Count);
+                Branch.MedalHandler.AdjustMedal(medalType, Count);
             }
         }
     }

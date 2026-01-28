@@ -11,6 +11,11 @@ public static class BranchStatDefOf
     public static BranchStatDef OARO_AffectRadius;
 
     /// <summary>
+    /// 分部效能
+    /// </summary>
+    public static BranchStatDef OARO_BranchPotency;
+
+    /// <summary>
     /// 分部普通建筑上限
     /// </summary>
     public static BranchStatDef OARO_BuildingCeiling;

@@ -1,10 +1,8 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Text;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -21,19 +19,9 @@ public class BranchMedalHandler : IExposable
     public int MedalTypeCount => medalRecords.Count;
     public IReadOnlyDictionary<BranchMedalDef, BranchMedalRecord> MedalRecords => medalRecords;
 
+
     [Unsaved] private int totalMedalCount = -1;
-    public int TotalMedalCount
-    {
-        get
-        {
-            if (totalMedalCount < 0)
-            {
-                totalMedalCount = Mathf.Max(0, medalRecords.Sum(kv => kv.Value.Count));
-            }
-            return totalMedalCount;
-        }
-        private set { totalMedalCount = value; }
-    }
+    public int TotalMedalCount => totalMedalCount;
 
     [Unsaved] private HediffStage medalHediffStage;
     [Unsaved] private bool medalHediffsDirty = true;
@@ -81,9 +69,9 @@ public class BranchMedalHandler : IExposable
         return 0;
     }
 
-    public void AddMedal(BranchMedalDef medal, int count = 1)
+    public void AdjustMedal(BranchMedalDef medal, int count)
     {
-        if (medal is null)
+        if (medal is null || count == 0)
         {
             return;
         }
@@ -92,7 +80,7 @@ public class BranchMedalHandler : IExposable
         {
             record.Count += count;
         }
-        else
+        else if (count > 0)
         {
             record = new BranchMedalRecord()
             {
@@ -100,9 +88,27 @@ public class BranchMedalHandler : IExposable
                 FirstGotTick = Find.TickManager.TicksGame
             };
         }
+        else
+        {
+            // 减少不存在的勋章，直接返回
+            return;
+        }
 
-        medalRecords[medal] = record;
-        totalMedalCount += count;
+        if (record.Count > 0)
+        {
+            medalRecords[medal] = record;
+        }
+        else
+        {
+            medalRecords.Remove(medal);
+            // 如果移除的勋章是主要勋章，则重新指定主要勋章
+            if (primaryMedal == medal)
+            {
+                _ = PrimaryMedal;
+            }
+        }
+
+        RecacheTotalMedalCount();
         medalHediffsDirty = true;
     }
 
@@ -112,7 +118,7 @@ public class BranchMedalHandler : IExposable
     internal void PostBranchGenerated()
     {
         primaryMedal = DefDatabase<BranchMedalDef>.AllDefsListForReading.RandomElement();
-        AddMedal(primaryMedal, 1);
+        AdjustMedal(primaryMedal, 1);
     }
 
     internal void PostLoadInit()
@@ -121,7 +127,16 @@ public class BranchMedalHandler : IExposable
         {
             Log.Error($"[OARO] 部分勋章记录在加载后为null或无效，已被移除。");
         }
-        totalMedalCount = -1;
+        RecacheTotalMedalCount();
+    }
+
+    private void RecacheTotalMedalCount()
+    {
+        totalMedalCount = 0;
+        foreach (BranchMedalRecord record in medalRecords.Values)
+        {
+            totalMedalCount += record.Count;
+        }
     }
 
     private void RecacheMedalHediffStage()

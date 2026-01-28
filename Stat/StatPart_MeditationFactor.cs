@@ -83,10 +83,16 @@ public class StatPart_MeditationFactor : StatPart
             sb.AppendLine("OARO_ChangeOffset_Reformation".Translate(OrderReformationDefOf.OARO_ReformationPlaceholder.label, 0.25f.ToStringPercentSigned("0.##")));
 
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
-            sb.AppendLine("OARO_ChangeOffset_FriendlyBranch".Translate(0.25f.ToStringPercentSigned("0.##")));
+        {
+            sb.AppendLine("OARO_ChangeOffset_BranchTypeOf".Translate($"OARO_{Branch.BranchType.Friendly}".Translate(),
+                                                                     0.25f.ToStringPercentSigned("0.##").Named(KeyLibrary_FormatArgName.Offset)));
+        }
 
         if (branch.IsBranchOfType(Branch.BranchType.Honor))
-            sb.AppendLine("OARO_ChangeOffset_HonorBranch".Translate(0.25f.ToStringPercentSigned("0.##")));
+        {
+            sb.AppendLine("OARO_ChangeOffset_BranchTypeOf".Translate($"OARO_{Branch.BranchType.Honor}".Translate(),
+                                                                     0.25f.ToStringPercentSigned("0.##").Named(KeyLibrary_FormatArgName.Offset)));
+        }
 
         stepChange = record.CurRank switch
         {

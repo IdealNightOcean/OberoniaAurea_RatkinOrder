@@ -245,7 +245,7 @@ public static class DebugRatkinOrders
             {
                 DebugMenuOption medalCountOption = new(label: $"× {count}",
                                                       mode: DebugMenuOptionMode.Action,
-                                                      method: () => branch.MedalHandler.AddMedal(medalDef, count));
+                                                      method: () => branch.MedalHandler.AdjustMedal(medalDef, count));
                 medalCountOptions.Add(medalCountOption);
             }
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(medalCountOptions));

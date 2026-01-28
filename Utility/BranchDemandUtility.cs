@@ -61,7 +61,6 @@ public static class BranchDemandUtility
         List<(string key, Func<float> calculator)> rules =
         [
             ("OARO_BranchCriticalDemandAdd_Base", () => 0.05f),
-            ("OARO_ChangeOffset_HonorBranch", () => branch.IsBranchOfType(BranchType.Honor) ? 0.02f : 0f),
             ("OARO_BranchCriticalDemandAdd_Facility", () => branch.FacilityHandler.TotalFacilityLevel * 0.005f),
             ("OARO_BranchCriticalDemandAdd_Medal", () => branch.MedalHandler.TotalMedalCount * 0.005f),
             ("OARO_BranchCriticalDemandAdd_Member", () => (1f - branch.Squad.MemberPercentage) * 0.05f),
@@ -79,6 +78,16 @@ public static class BranchDemandUtility
             if (!resultOnly && stepChange != 0f)
             {
                 sb.AppendInNewLine(key.Translate(stepChange.ToStringPercentSigned("0.##")).Colorize(stepChange >= 0f ? Color.green : ColorLibrary.RedReadable));
+            }
+        }
+        if (branch.IsBranchOfType(BranchType.Honor))
+        {
+            chance += 0.02f;
+            if (!resultOnly)
+            {
+                sb.AppendLine("OARO_ChangeOffset_BranchTypeOf".Translate($"OARO_{Branch.BranchType.Honor}".Translate(),
+                                                                         0.02f.ToStringPercentSigned("0.##").Named(KeyLibrary_FormatArgName.Offset))
+                                                              .Colorize(Color.green));
             }
         }
 

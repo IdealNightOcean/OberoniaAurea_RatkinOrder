@@ -164,7 +164,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
                 {
                     medalDef = potentialMedalDefs.RandomElement();
                     gainMedalCount = 1;
-                    medalHandler.AddMedal(medalDef, gainMedalCount);
+                    medalHandler.AdjustMedal(medalDef, gainMedalCount);
                     gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
                 }
             }
@@ -177,7 +177,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
                     if (gainMedalCount > 0)
                     {
                         medalDef = PotentialMedalDefs.RandomElement();
-                        medalHandler.AddMedal(medalDef, gainMedalCount);
+                        medalHandler.AdjustMedal(medalDef, gainMedalCount);
                         gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
                     }
                 }
@@ -187,7 +187,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
                     if (gainMedalCount > 0)
                     {
                         medalDef = PotentialMedalDefs.RandomElement();
-                        medalHandler.AddMedal(medalDef, gainMedalCount);
+                        medalHandler.AdjustMedal(medalDef, gainMedalCount);
                         gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
                     }
                 }

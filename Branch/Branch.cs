@@ -187,6 +187,7 @@ public class Branch : IExposable, ILoadReferenceable
     private BranchDemandHandler demandHandler;
     private BranchResidentHandler residentHandler;
     private BranchStoresReserveHandler storesReserveHandler;
+    private BranchTraditionHandler traditionHandler;
 
     public BranchMedalHandler MedalHandler => medalHandler;
     public BranchFacilityHandler FacilityHandler => facilityHandler;
@@ -197,6 +198,7 @@ public class Branch : IExposable, ILoadReferenceable
     public BranchDemandHandler DemandHandler => demandHandler;
     public BranchResidentHandler ResidentHandler => residentHandler;
     public BranchStoresReserveHandler StoresReserveHandler => storesReserveHandler;
+    public BranchTraditionHandler TraditionHandler => traditionHandler;
 
     public bool IsConstructionBusy => facilityHandler.IsBusy || buildingHandler.IsBusy;
 
@@ -217,6 +219,7 @@ public class Branch : IExposable, ILoadReferenceable
             demandHandler = new(this);
             residentHandler = new(this, initCtor: true);
             storesReserveHandler = new(this);
+            traditionHandler = new(this);
         }
 
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
@@ -290,6 +293,7 @@ public class Branch : IExposable, ILoadReferenceable
         Scribe_Deep.Look(ref demandHandler, nameof(demandHandler), ctorArgs: this);
         Scribe_Deep.Look(ref residentHandler, nameof(residentHandler), ctorArgs: [this, false]);
         Scribe_Deep.Look(ref storesReserveHandler, nameof(storesReserveHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref traditionHandler, nameof(traditionHandler), ctorArgs: this);
     }
 
     public void OpenDevWindow() => Find.WindowStack.Add(new DevWindow_Branch(this));
@@ -483,11 +487,7 @@ public class Branch : IExposable, ILoadReferenceable
 
     private float GetCurPotency()
     {
-        float curPotency = squad.AllCrewCount * 7f
-                         * (0.9f + facilityHandler.TotalFacilityLevel * 0.025f + medalHandler.TotalMedalCount * 0.015f)
-                         * (IsBranchOfType(BranchType.Honor) ? 1.25f : 1f);
-
-        return curPotency;
+        return this.GetStatValue(BranchStatDefOf.OARO_BranchPotency, baseValueOverride: squad.AllCrewCount * 7f);
     }
 
     private void OnZeroFactorUnmerged(IEnumerable<BranchStatDef> statDefs)
@@ -555,6 +555,8 @@ public class Branch : IExposable, ILoadReferenceable
 
     internal void PostLoadInit()
     {
+        traditionHandler ??= new(this);
+
         medalHandler.PostLoadInit();
 
         facilityHandler.PostLoadInit();
@@ -565,6 +567,8 @@ public class Branch : IExposable, ILoadReferenceable
 
         residentHandler.PostLoadInit();
         storesReserveHandler.PostLoadInit();
+
+        traditionHandler.PostLoadInit();
     }
 
     public string GetUniqueLoadID() => $"{nameof(Branch)}_{loadID}";

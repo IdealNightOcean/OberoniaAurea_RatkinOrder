@@ -751,7 +751,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                     {
                         foreach (Branch branch in taskBranches)
                         {
-                            branch?.MedalHandler.AddMedal(medalDef);
+                            branch?.MedalHandler.AdjustMedal(medalDef, 1);
                         }
                     }
                 }
@@ -809,7 +809,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                     if (kv.Value.HasInteraction(PatrolInteractionType.Diplomacy))
                     {
                         BranchMedalDef medalDef = DefDatabase<BranchMedalDef>.GetRandom();
-                        kv.Key.MedalHandler.AddMedal(medalDef);
+                        kv.Key.MedalHandler.AdjustMedal(medalDef, 1);
                     }
                 }
             }

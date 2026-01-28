@@ -41,7 +41,7 @@ public class BranchBuildingComp_Memorial : BranchBuildingComp
             int count = Props.medalCount - medalHandler.GetMedalCount(Props.medalDef);
             if (count > 0)
             {
-                medalHandler.AddMedal(Props.medalDef, count);
+                medalHandler.AdjustMedal(Props.medalDef, count);
             }
         }
     }

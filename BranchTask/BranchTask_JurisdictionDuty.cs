@@ -50,7 +50,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
         {
             BranchTaskType focusedTaskType = branch.TaskHandler.FocusedTaskType;
             BranchMedalDef medalDef = DefDatabase<BranchMedalDef>.AllDefsListForReading.RandomElementByWeight(weightSelector: d => d.focusedTaskType == focusedTaskType ? 40f : 20f);
-            branch.MedalHandler.AddMedal(medalDef, 1);
+            branch.MedalHandler.AdjustMedal(medalDef, 1);
         }
 
         switch (TaskType)

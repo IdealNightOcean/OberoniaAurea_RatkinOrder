@@ -265,12 +265,19 @@ public static class GlobalInteractionUtility
 
         if (knights.Branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
-            ApplyStepChange(0.25f, "OARO_ChangeOffset_FriendlyBranch");
-
+            curChance += 0.25f;
             curChance *= 1.25f;
 
             if (!resultOnly)
-                sb.AppendLine("OARO_ChangeFactor_FriendlyBranch".Translate(1.25f.ToStringPercent("0.##")).Colorize(Color.green));
+            {
+                sb.AppendLine("OARO_ChangeOffset_BranchTypeOf".Translate($"OARO_{Branch.BranchType.Friendly}".Translate(),
+                                                                         0.25f.ToStringPercentSigned("0.##").Named(KeyLibrary_FormatArgName.Offset))
+                                                              .Colorize(Color.green));
+
+                sb.AppendLine("OARO_ChangeFactor_BranchTypeOf".Translate($"OARO_{Branch.BranchType.Friendly}".Translate(),
+                                                                         1.25f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Factor))
+                                                              .Colorize(Color.green));
+            }
         }
 
         curChance = Mathf.Clamp01(curChance);
