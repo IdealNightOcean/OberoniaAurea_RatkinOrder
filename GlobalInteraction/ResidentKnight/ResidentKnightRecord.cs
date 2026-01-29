@@ -1,7 +1,4 @@
-﻿using NightOcean;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using UnityEngine;
 using Verse;
 using Verse.AI;
@@ -45,18 +42,11 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
     public KnightPersonality Personality => KnightRecord.Personality;
 
-    private Dictionary<ResidentKnightAcademicDef, int> genealAcademicDefs = [];
-    public IReadOnlyDictionary<ResidentKnightAcademicDef, int> GenealAcademicDefs => genealAcademicDefs;
-
-    public ResidentKnightAcademicDef HonorAcademicDef => Branch.HonorDef?.academicDef;
-
-    private int honorAcademicLevel;
-    public int HonorAcademicLevel => honorAcademicLevel;
-
-    public LazyMutable<int> TotalAcademicLevel { get; }
-
     private int residenceStartTick = -1;
     public int ResignationTick = -1;
+
+    private AcademicHandler academicHandler;
+    public AcademicHandler AcademicHandler => academicHandler;
 
     public void ExposeData()
     {
@@ -70,19 +60,14 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         Scribe_Defs.Look(ref curRole, nameof(curRole));
         Scribe_Values.Look(ref nextRoleChangeableTick, nameof(nextRoleChangeableTick), -1);
 
-        Scribe_Collections.Look(ref genealAcademicDefs, nameof(genealAcademicDefs), LookMode.Def, LookMode.Value);
-        Scribe_Values.Look(ref honorAcademicLevel, nameof(honorAcademicLevel), 0);
-
         Scribe_Values.Look(ref residenceStartTick, nameof(residenceStartTick), -1);
         Scribe_Values.Look(ref ResignationTick, nameof(ResignationTick), -1);
+
+        Scribe_Deep.Look(ref academicHandler, nameof(academicHandler));
     }
 
-    private ResidentKnightRecord()
-    {
-        TotalAcademicLevel = new(refreshFunc: () => honorAcademicLevel + genealAcademicDefs.Values.Sum());
-    }
-
-    public ResidentKnightRecord(Pawn knight, KnightRecord knightRecord) : this()
+    private ResidentKnightRecord() { }
+    public ResidentKnightRecord(Pawn knight, KnightRecord knightRecord)
     {
         this.knight = knight;
         this.knightRecord = knightRecord;
@@ -98,6 +83,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
         try
         {
+            /*
             ResidentKnightAcademicDef initAcademicDef;
             if (Personality != KnightPersonality.None && OrderDefDataBase.ResidentKnightAcademicGroupByPersonality.TryGetValue(Personality, out List<ResidentKnightAcademicDef> potentialAcademics))
             {
@@ -106,10 +92,11 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
             else
             {
                 initAcademicDef = DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading
-                    .Where(d => !d.isHonorAcademic)
+                    .Where(d => d.academicType == ResidentKnightAcademicDef.AcademicType.Geneal)
                     .RandomElement();
             }
             UpgradeAcademicLevel(initAcademicDef, usePoints: false);
+            */
         }
         catch (Exception ex)
         {
@@ -170,76 +157,6 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         };
     }
 
-    public AcceptanceReport CanUpgradeAcademicLevel(ResidentKnightAcademicDef academicDef, bool ignorePoints, bool resultOnly)
-    {
-        int academicLevel;
-        if (academicDef.isHonorAcademic)
-        {
-            if (academicDef != HonorAcademicDef)
-            {
-                return resultOnly ? false : "OARO_NotCorrespondingHonorAcademicDef".Translate();
-            }
-            academicLevel = honorAcademicLevel;
-        }
-        else
-        {
-            if (!genealAcademicDefs.TryGetValue(academicDef, out academicLevel))
-            {
-                academicLevel = 0;
-            }
-        }
-        if (academicLevel >= academicDef.MaxStageLevel)
-        {
-            return resultOnly ? false : "OARO_ReachMax_AcademicLevel".Translate();
-        }
-
-        if (!ignorePoints)
-        {
-            float neededPoints = GetMeditationPointsNeeded(academicDef, Personality, academicLevel + 1);
-            if (MeditationPoints < neededPoints)
-            {
-                return resultOnly ? false : "OARO_Insufficient_MeditationPoints".Translate(neededPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count));
-            }
-        }
-
-        return true;
-    }
-
-    public void UpgradeAcademicLevel(ResidentKnightAcademicDef academicDef, bool usePoints)
-    {
-        int targetLevel;
-        if (academicDef.isHonorAcademic)
-        {
-            if (honorAcademicLevel >= academicDef.MaxStageLevel)
-            {
-                return;
-            }
-            targetLevel = ++honorAcademicLevel;
-        }
-        else
-        {
-            if (!genealAcademicDefs.TryGetValue(academicDef, out int academicLevel))
-            {
-                academicLevel = 0;
-            }
-            if (academicLevel >= academicDef.MaxStageLevel)
-            {
-                return;
-            }
-            targetLevel = academicLevel + 1;
-            genealAcademicDefs[academicDef] = targetLevel;
-        }
-
-        TotalAcademicLevel.MarkDirty();
-        if (usePoints)
-        {
-            float neededPoints = GetMeditationPointsNeeded(academicDef, Personality, targetLevel);
-            MeditationPoints = Mathf.Max(0f, MeditationPoints - neededPoints);
-        }
-
-        academicDef.OnAcademicLevelUpgrade(knight, targetStageIndex: (targetLevel - 1));
-    }
-
     public void ChangeRole(ResidentKnightRoleDef newRole)
     {
         if (newRole == curRole)
@@ -270,26 +187,6 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         {
             LordMaker.MakeNewLord(RatkinOrder.Faction, new LordJob_ExitMapBest(LocomotionUrgency.Walk, canDefendSelf: true), knight.Map, startingPawns: [knight]);
         }
-    }
-
-    public static float GetMeditationPointsNeeded(ResidentKnightAcademicDef academicDef, KnightPersonality personality, int targetLevel)
-    {
-        if (targetLevel < 1)
-        {
-            return 0f;
-        }
-        if (targetLevel > academicDef.MaxStageLevel)
-        {
-            return float.MaxValue;
-        }
-
-        float baseUnitCost = academicDef.isHonorAcademic ? 500f : 250f;
-        float neededPoints = baseUnitCost + (targetLevel - 1) * baseUnitCost;
-        if ((academicDef.personality & personality) != 0)
-        {
-            neededPoints /= 2;
-        }
-        return neededPoints;
     }
 
     public string GetUniqueLoadID() => $"{nameof(ResidentKnightRecord)}_{loadID}";

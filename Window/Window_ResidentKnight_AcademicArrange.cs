@@ -7,16 +7,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+using static ResidentKnightAcademicDef;
+
 public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 {
-    private static IReadOnlyList<ResidentKnightAcademicDef> allGeneralAcademics;
-    private static IReadOnlyList<ResidentKnightAcademicDef> AllGeneralAcademics
-    {
-        get
-        {
-            return allGeneralAcademics ??= DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => !d.isHonorAcademic).ToList();
-        }
-    }
 
     public override Vector2 InitialSize => new(1402f, 789f);
     private Vector2 scrollPosition_Academic;
@@ -26,6 +20,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     public Action PostArrangeNewAcademic { get; set; }
 
     private ResidentKnightRecord Record { get; }
+    public AcademicHandler AcademicHandler { get; }
     private BranchHonorDef BranchHonor { get; }
     private int NoAdditionalCostAcademicCeiling { get; }
 
@@ -39,33 +34,39 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     private Texture2D CheckAcademicColorTex { get; set; }
     private AcceptanceReport CheckAcademicStageAcceptance { get; set; }
 
-    private IEnumerable<ResidentKnightAcademicDef> AllAvailableAcademics
-    {
-        get
-        {
-            if (Record.HonorAcademicDef is not null)
-            {
-                yield return Record.HonorAcademicDef;
-            }
-            foreach (ResidentKnightAcademicDef def in AllGeneralAcademics)
-            {
-                yield return def;
-            }
-        }
-    }
+    private IReadOnlyList<(ResidentKnightAcademicDef, bool)> AllAvailableAcademics { get; set; }
 
     public Window_ResidentKnight_AcademicArrange(ResidentKnightRecord record) : base()
     {
         Record = record;
+        AcademicHandler = record.AcademicHandler;
         BranchHonor = record.Branch.HonorDef;
         NoAdditionalCostAcademicCeiling = ResidentKnightRecord.GetNoAdditionalCostAcademicCeiling(Record.CurRank);
-        if (Record.GenealAcademicDefs.Count > 0)
+
+        HashSet<ResidentKnightAcademicDef> academicHash = new(AcademicHandler.Academics.Count);
+        List<(ResidentKnightAcademicDef, bool)> allAvailableAcademics = new(AcademicHandler.Academics.Count);
+        foreach (ResidentKnightAcademicDef academicDef in AcademicUtility.GetAllActivateAcademicsBySelf(Record))
         {
-            SwitchAcademic(Record.GenealAcademicDefs.First().Key);
+            academicHash.Add(academicDef);
+            allAvailableAcademics.Add((academicDef, true));
+        }
+        foreach (ResidentKnightAcademicDef academicDef in AcademicHandler.Academics.Keys)
+        {
+            if (academicHash.Add(academicDef))
+            {
+                allAvailableAcademics.Add((academicDef, false));
+            }
+        }
+
+        AllAvailableAcademics = allAvailableAcademics;
+        academicHash = null;
+        if (AllAvailableAcademics.Count > 0)
+        {
+            SwitchAcademic(AcademicHandler.Academics.First().Key);
         }
         else
         {
-            SwitchAcademic(DefDatabase<ResidentKnightAcademicDef>.AllDefs.First(d => !d.isHonorAcademic));
+            SwitchAcademic(DefDatabase<ResidentKnightAcademicDef>.AllDefs.First(d => d.academicType == AcademicType.Geneal));
         }
     }
 
@@ -123,7 +124,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 190f, innerWidth, 24f);
         Widgets.Label(reusedRect, "OARO_MeditationPoints".Translate(Record.MeditationPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count)));
         reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, reusedRect.yMax, innerWidth, 24f);
-        Widgets.Label(reusedRect, "OARO_NoAdditionalCostAcademicCeilingInfo".Translate(Record.TotalAcademicLevel.Value, NoAdditionalCostAcademicCeiling));
+        Widgets.Label(reusedRect, "OARO_NoAdditionalCostAcademicCeilingInfo".Translate(AcademicHandler.TotalAcademicLevel.Value, NoAdditionalCostAcademicCeiling));
 
         OARO_WindowUtility.ResetText();
     }
@@ -138,27 +139,27 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         float entryY = viewRect.yMin;
         float entryWidth = 198f;
         float entryHeight = 70f;
-        viewRect.height = (AllGeneralAcademics.Count + 1) * entryHeight;
+        viewRect.height = (AllAvailableAcademics.Count + 1) * entryHeight;
 
         Widgets.BeginScrollView(inRect, ref scrollPosition_Academic, viewRect, showScrollbars: false);
-        foreach (ResidentKnightAcademicDef def in AllAvailableAcademics)
+        foreach ((ResidentKnightAcademicDef def, bool activateBySelf) in AllAvailableAcademics)
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
-            DarwAcademic(entryRect, def);
+            DarwAcademic(entryRect, def, activateBySelf);
         }
         Widgets.EndScrollView();
         OARO_WindowUtility.ResetText();
     }
 
-    private void DarwAcademic(Rect inRect, ResidentKnightAcademicDef def)
+    private void DarwAcademic(Rect inRect, ResidentKnightAcademicDef def, bool activateBySelf)
     {
         GUI.DrawTexture(inRect, academicBackground);
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
         Rect reusedRect = new(inRect.x, inRect.y + 14f, inRect.width, 20f);
-        if (def.isHonorAcademic)
+        if (def.academicType == AcademicType.Honor)
         {
             Texture2D honorDecorationTexture = BranchHonor?.medalDef?.honorDecorationTexture.Texture;
             if (honorDecorationTexture is not null)
@@ -172,15 +173,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             Widgets.Label(reusedRect, def.LabelCap);
         }
 
-        int academicLevel;
-        if (def.isHonorAcademic)
-        {
-            academicLevel = Record.HonorAcademicLevel;
-        }
-        else
-        {
-            Record.GenealAcademicDefs.TryGetValue(def, out academicLevel);
-        }
+        int academicLevel = AcademicHandler.GetAcademicLevel(def);
         reusedRect = new(inRect.x, reusedRect.yMax + 10f, inRect.width, 20f);
         Widgets.Label(reusedRect, "OARO_AcademicArrange_UnlockNum".Translate(academicLevel, def.MaxStageLevel));
 
@@ -265,7 +258,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             Widgets.Label(
                 rect: reusedRect,
                 label: "OARO_MeditationPointsSuffix".Translate(MeditationPointForSelAcademicUpgrade.ToString("F0").Named(KeyLibrary_FormatArgName.Count))
-                                                    .Colorize(NoAdditionalCostAcademicCeiling < Record.TotalAcademicLevel.Value ? ColorLibrary.RedReadable : Color.white));
+                                                    .Colorize(NoAdditionalCostAcademicCeiling < AcademicHandler.TotalAcademicLevel.Value ? ColorLibrary.RedReadable : Color.white));
 
             reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 32f, 196f, 54f);
             if (OARO_WindowUtility.TextButtonImageDisableable(
@@ -276,10 +269,10 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                  downTex: unlockButton_Down,
                  doMouseoverSound: true))
             {
-                AcceptanceReport acceptance = Record.CanUpgradeAcademicLevel(SelAcademicDef, ignorePoints: false, resultOnly: false);
+                AcceptanceReport acceptance = AcademicHandler.CanUpgradeAcademic(SelAcademicDef, Record.Personality, directly: false, resultOnly: false);
                 if (acceptance)
                 {
-                    Record.UpgradeAcademicLevel(SelAcademicDef, usePoints: true);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Knight, Record.Personality, directly: false);
                     RefreshSelStageLevel();
                     PostArrangeNewAcademic?.Invoke();
                 }
@@ -298,7 +291,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                 reusedRect = new(reusedRect.xMax + 20f, reusedRect.yMax - 20f, 40f, 20f);
                 if (Widgets.ButtonText(reusedRect, "Dev"))
                 {
-                    Record.UpgradeAcademicLevel(SelAcademicDef, usePoints: false);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Knight, Record.Personality, directly: true);
                     PostArrangeNewAcademic?.Invoke();
                     RefreshSelStageLevel();
                 }
@@ -414,8 +407,8 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
 
         SelAcademicDef = academicDef;
-        CheckAcademicColor = SelAcademicDef.isHonorAcademic ? BranchHonor.color : SelAcademicDef.personality.GetPersonalityColor();
-        CheckAcademicColorTex = SelAcademicDef.isHonorAcademic ? BranchHonor.HonorColorTex : SelAcademicDef.personality.GetPersonalityColorTex();
+        CheckAcademicColor = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.color : SelAcademicDef.personality.GetPersonalityColor();
+        CheckAcademicColorTex = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.HonorColorTex : SelAcademicDef.personality.GetPersonalityColorTex();
 
 
         CheckAcademicStage = null;
@@ -435,8 +428,9 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         CheckAcademicStageLevel = stageIndex + 1;
         if (CheckAcademicStageLevel == SelAcademicStageLevel + 1)
         {
-            CheckAcademicStageAcceptance = Record.CanUpgradeAcademicLevel(academicDef: SelAcademicDef,
-                                                                          ignorePoints: false,
+            CheckAcademicStageAcceptance = AcademicHandler.CanUpgradeAcademic(academicDef: SelAcademicDef,
+                                                                            Record.Personality,
+                                                                          directly: false,
                                                                           resultOnly: false);
         }
         else
@@ -452,20 +446,9 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             SelAcademicStageLevel = -1;
         }
 
-        if (SelAcademicDef.isHonorAcademic)
-        {
-            SelAcademicStageLevel = Record.HonorAcademicLevel;
-        }
-        else if (Record.GenealAcademicDefs.TryGetValue(SelAcademicDef, out int selStageLevel))
-        {
-            SelAcademicStageLevel = selStageLevel;
-        }
-        else
-        {
-            SelAcademicStageLevel = 0;
-        }
+        SelAcademicStageLevel = AcademicHandler.GetAcademicLevel(SelAcademicDef);
 
-        MeditationPointForSelAcademicUpgrade = ResidentKnightRecord.GetMeditationPointsNeeded(SelAcademicDef, Record.Personality, SelAcademicStageLevel + 1);
+        MeditationPointForSelAcademicUpgrade = AcademicUtility.GetMeditationPointsNeeded(SelAcademicDef, Record.Personality, SelAcademicStageLevel + 1);
     }
 
     private void DrawRankBackGround(Rect inRect)

@@ -192,10 +192,18 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
             return null;
         }
         KnightPersonality personality = record.Personality;
-        ResidentKnightAcademicDef academicDef = record.GenealAcademicDefs.Where(kv => ((kv.Key.personality & personality) != 0) && (kv.Value < kv.Key.MaxStageLevel)).RandomElementWithFallback().Key;
-        academicDef ??= DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => (d.personality & personality) != 0).RandomElementWithFallback();
+        AcademicHandler academicHandler = record.AcademicHandler;
+        ResidentKnightAcademicDef academicDef = academicHandler.Academics.Where(kv => (kv.Key.academicType == ResidentKnightAcademicDef.AcademicType.Geneal) &&
+                                                                                      ((kv.Key.personality & personality) != 0) &&
+                                                                                      (kv.Value < kv.Key.MaxStageLevel))
+                                                                         .RandomElementWithFallback().Key;
 
-        if (academicDef is null || !record.CanUpgradeAcademicLevel(academicDef, ignorePoints: true, resultOnly: true))
+        academicDef ??= DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => (d.academicType == ResidentKnightAcademicDef.AcademicType.Geneal) &&
+                                                                                                ((d.personality & personality) != 0))
+
+                                                                                    .RandomElementWithFallback();
+
+        if (academicDef is null || !academicHandler.CanUpgradeAcademic(academicDef, directly: true, resultOnly: true))
         {
             float gainPoints = 1000f * record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
             record.MeditationPoints += gainPoints;
@@ -205,7 +213,7 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
         {
             float gainPoints = 500f * record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
             record.MeditationPoints += gainPoints;
-            record.UpgradeAcademicLevel(academicDef, usePoints: false);
+            academicHandler.UpgradeAcademic(academicDef, pawn, personality, directly: true);
             return "OARO_JointPatrol_MeditationPointsAndAcademic".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN), gainPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count), academicDef.Named("ACADEMIC"));
         }
     }

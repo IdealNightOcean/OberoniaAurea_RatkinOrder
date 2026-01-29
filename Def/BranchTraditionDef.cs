@@ -21,7 +21,7 @@ public class BranchTraditionDef : Def
     /// <summary>
     /// 可修行的课业
     /// </summary>
-    public Def academicDef;
+    public ResidentKnightAcademicDef academicDef;
 
     /// <summary>
     /// 基础设立消耗（印记数量）

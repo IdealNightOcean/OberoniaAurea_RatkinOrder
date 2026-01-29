@@ -67,7 +67,7 @@ public static class GlobalInteractionUtility
         }
 
         int noAdditionalCostAcademicCeiling = ResidentKnightRecord.GetNoAdditionalCostAcademicCeiling(record.CurRank);
-        if (record.TotalAcademicLevel.Value < noAdditionalCostAcademicCeiling)
+        if (record.AcademicHandler.TotalAcademicLevel.Value < noAdditionalCostAcademicCeiling)
         {
             return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.Named(KeyLibrary_FormatArgName.Count));
         }

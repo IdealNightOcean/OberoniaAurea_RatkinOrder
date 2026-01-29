@@ -158,6 +158,8 @@
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
+    <Compile Include="GlobalInteraction\ResidentKnight\ResidentColonistRecord.cs" />
+    <Compile Include="GlobalInteraction\ResidentKnight\ResidentKnightAcademicStage.cs" />
     <Compile Include="HarmonyPatch\MutantTracker_TurnPatch.cs" />
     <Compile Include="HarmonyPatch\IncidentWorker_TryExecute_Patch.cs" />
     <Compile Include="Hediff\Hediff_RecruitKnight.cs" />
@@ -209,7 +211,9 @@
     <Compile Include="Quest\Quest_OrderLetter.cs" />
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Quest\BranchDemand\Quest_GiveBranchMedal_CriticalDemand.cs" />
+    <Compile Include="ResidentKnight\AcademicHandler.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
+    <Compile Include="Utility\AcademicUtility.cs" />
     <Compile Include="Window\BranchTaskEntryDrawer.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
     <Compile Include="Window\Window_QuestClique.cs" />

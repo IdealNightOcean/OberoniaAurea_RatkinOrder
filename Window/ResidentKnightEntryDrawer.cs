@@ -18,8 +18,12 @@ public partial class Window_OrderHall
 
         private Vector2 scrollPosition_GenealAcademic;
         public Window_OrderHall Parent { get; }
-        public ResidentKnightRecord Record { get; }
         public Map Map { get; }
+
+        public ResidentKnightRecord Record { get; }
+        public AcademicHandler AcademicHandler { get; }
+        public ResidentKnightAcademicDef HonorAcademicDef { get; }
+
         private float MeditationFactor { get; }
         public bool ShowDetail { get; set; }
         public LazyMutable<string> RoleExplanationStr { get; }
@@ -34,8 +38,11 @@ public partial class Window_OrderHall
         public ResidentKnightEntryDrawer(Window_OrderHall parent, ResidentKnightRecord record, Map map)
         {
             Parent = parent;
-            Record = record;
             Map = map;
+            Record = record;
+            AcademicHandler = record.AcademicHandler;
+            HonorAcademicDef = record.Branch.HonorDef?.academicDef;
+
             MeditationFactor = record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
 
             RoleExplanationStr = new(refreshFunc: () => Record?.CurRole?.GetRoleDetailDesc() ?? string.Empty);
@@ -278,7 +285,7 @@ public partial class Window_OrderHall
             reusedRect = new(inRectX + 240f, reusedRect.yMax + 8f, 100f, 20f);
 
 
-            if (Record.HonorAcademicDef is null)
+            if (HonorAcademicDef is null)
             {
                 Widgets.Label(reusedRect, "None".Translate());
 
@@ -288,11 +295,11 @@ public partial class Window_OrderHall
             else
             {
                 BranchHonorDef honorDef = Record.Branch.HonorDef;
-                Widgets.Label(reusedRect, Record.HonorAcademicDef.label.Colorize(honorDef.color));
+                Widgets.Label(reusedRect, HonorAcademicDef.label.Colorize(honorDef.color));
                 reusedRect = new(inRectX + 320f, inRectY + 164f, 90f, 55f);
                 GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-                float honorAcademicProgress = Record.HonorAcademicLevel / (float)Record.HonorAcademicDef.MaxStageLevel;
+                float honorAcademicProgress = AcademicHandler.GetAcademicLevel(HonorAcademicDef) / (float)HonorAcademicDef.MaxStageLevel;
                 reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
                 Widgets.FillableBar(reusedRect, honorAcademicProgress, honorDef.HonorColorTex);
             }
@@ -320,10 +327,10 @@ public partial class Window_OrderHall
             float entryHeight = 22f;
             Rect academicViewRect = academicRect;
             float entryWidth = academicViewRect.width;
-            academicViewRect.height = (Record.GenealAcademicDefs.Count + 1) * entryHeight;
+            academicViewRect.height = (AcademicHandler.Academics.Count + 1) * entryHeight;
 
             Widgets.BeginScrollView(academicRect, ref scrollPosition_GenealAcademic, academicViewRect, showScrollbars: false);
-            foreach (KeyValuePair<ResidentKnightAcademicDef, int> kv in Record.GenealAcademicDefs)
+            foreach (KeyValuePair<ResidentKnightAcademicDef, int> kv in AcademicHandler.Academics)
             {
                 Vector2 entryPos = new(entryX, entryY);
                 entryY += entryHeight;

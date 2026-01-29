@@ -9,9 +9,9 @@ public class Hediff_ResidentAcademicBuff : HediffWithComps
 
     private int buffStageIndex;
 
-    public virtual void Notify_AcademicStageChanged(int newAcademicStageIndex)
+    public virtual void Notify_AcademicStageChanged(int newAcademicLevel)
     {
-        buffStageIndex = Mathf.Min(def.stages?.Count ?? 0, newAcademicStageIndex);
+        buffStageIndex = Mathf.Min(def.stages?.Count ?? 0, newAcademicLevel - 1);
     }
 
     public override void ExposeData()

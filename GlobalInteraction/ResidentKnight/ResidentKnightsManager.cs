@@ -32,10 +32,15 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     private Dictionary<Pawn, ResidentKnightRecord> residentKnights = [];
     private Dictionary<ResidentKnightRoleDef, ResidentKnightRecord> rolesToKnights = [];
+    private Dictionary<Pawn, ResidentColonistRecord> residentColonists = [];
 
     public int KnightsCount => residentKnights.Count;
     public IReadOnlyDictionary<Pawn, ResidentKnightRecord> ResidentKnights => residentKnights;
     public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnightRecord> RolesToKnights => RolesToKnights;
+
+    [Unsaved] private Dictionary<Pawn, HashSet<ResidentKnightRecord>> studentsToTeachers = [];
+    [Unsaved] private Dictionary<ResidentKnightRecord, HashSet<Pawn>> teachersToStudents = [];
+
 
     public LazyMutable<float> MinResignationDays { get; }
     public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
@@ -66,6 +71,8 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     private List<ResidentKnightRoleDef> rolesToKnightKeys;
     private List<ResidentKnightRecord> rolesToKnightValues;
 
+    private List<StudentTeacherPair> studentTeacherPairs;
+
     internal ResidentKnightsManager()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
@@ -85,6 +92,32 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         Scribe_Collections.Look(ref residentKnights, nameof(residentKnights), LookMode.Reference, LookMode.Deep, ref residentKnightKeys, ref residentKnightValues);
         Scribe_Collections.Look(ref rolesToKnights, nameof(rolesToKnights), LookMode.Def, LookMode.Reference, ref rolesToKnightKeys, ref rolesToKnightValues);
 
+        if (Scribe.mode == LoadSaveMode.Saving)
+        {
+            studentTeacherPairs = new(studentsToTeachers.Count);
+            foreach (KeyValuePair<Pawn, HashSet<ResidentKnightRecord>> kv in studentsToTeachers)
+            {
+                Pawn student = kv.Key;
+                if (student is null)
+                    continue;
+
+                foreach (ResidentKnightRecord record in kv.Value)
+                {
+                    StudentTeacherPair stPair = new()
+                    {
+                        student = student,
+                        teacher = record,
+                    };
+                }
+            }
+        }
+
+        Scribe_Collections.Look(ref studentTeacherPairs, nameof(studentTeacherPairs), LookMode.Deep);
+
+        if (Scribe.mode == LoadSaveMode.Saving)
+        {
+            studentTeacherPairs = null;
+        }
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             if (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
@@ -96,7 +129,15 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
                 Log.Error($"[OARO] {nameof(ResidentKnightsManager)} 的部分常驻骑士角色在加载后为null或无效，已被移除。");
             }
 
+            studentsToTeachers = studentTeacherPairs.GroupBy(p => p.student)
+                                                    .ToDictionary(g => g.Key,
+                                                                  g => g.Select(p => p.teacher).ToHashSet());
+
+            teachersToStudents = studentTeacherPairs.GroupBy(p => p.teacher)
+                                                    .ToDictionary(g => g.Key,
+                                                                  g => g.Select(p => p.student).ToHashSet());
             NextBuffStatRegainTick = -1;
+            studentTeacherPairs = null;
         }
     }
 
@@ -449,6 +490,20 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
                     target[modifier.stat] = modifier.value;
                 }
             }
+        }
+    }
+
+
+
+    private class StudentTeacherPair : IExposable
+    {
+        public Pawn student;
+        public ResidentKnightRecord teacher;
+
+        public void ExposeData()
+        {
+            Scribe_References.Look(ref student, nameof(student));
+            Scribe_References.Look(ref teacher, nameof(teacher));
         }
     }
 }
