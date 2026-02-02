@@ -14,7 +14,7 @@ internal class MutantTracker_TurnPatch
         if (!___pawn.Faction.IsPlayerSafe() || !ResidentKnightsManager.Instance.IsResidentKnight(___pawn))
             return;
 
-        ResidentKnightsManager.Instance.RemoveResidentKnight(___pawn);
+        ResidentKnightsManager.Instance.DeregisterKnight(___pawn);
         if (KnightPawnsManager.Instance.TryGetKnightRecord(___pawn, out KnightRecord record))
         {
             RatkinOrder ratkinOrder = record.RatkinOrder;

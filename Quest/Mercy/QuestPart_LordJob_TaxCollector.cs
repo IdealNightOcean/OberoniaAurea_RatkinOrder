@@ -128,8 +128,8 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         {
             threatOpt.action = delegate
             {
+                TalkActionUtility.DisableLordJobTalk(talkWith, dismiss: true);
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
-                TalkActionUtility.DisableLordJobTalk(talkWith);
             };
             threatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
                 text: "OARO_TalkWithTaxCollector_NoOrderHallLeave".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),

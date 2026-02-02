@@ -545,7 +545,7 @@ public partial class Window_BranchTask
                 return "OARO_JointPatrol_NotInOngoingStage".Translate();
             }
 
-            List<Thing> pawns = JointPatrolManager.ParticipatingResidentKnights.Where(r => r.Branch == Branch).Select(r => r.Knight).Cast<Thing>().ToList();
+            List<Thing> pawns = JointPatrolManager.ParticipatingResidentKnights.Where(r => r.Branch == Branch).Select(r => r.Pawn).Cast<Thing>().ToList();
             if (pawns.NullOrEmpty())
             {
                 return "OARO_TaskWin_NoKnightBackTeam".Translate();

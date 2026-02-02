@@ -19,11 +19,11 @@ public static class TalkActionUtility
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void DeregisterTalkAction(this ITalkAction talkAction)
+    public static void DeregisterTalkAction(this ITalkAction talkAction, bool dismiss)
     {
         if (talkAction?.TalkWith is not null)
         {
-            DisableLordJobTalk(talkAction.TalkWith);
+            DisableLordJobTalk(talkAction.TalkWith, dismiss);
             GameComponent_RatkinOrder.Instance.TalkActionHandler.Remove(talkAction.TalkWith);
         }
     }
@@ -68,16 +68,15 @@ public static class TalkActionUtility
         return true;
     }
 
-    public static void DisableLordJobTalk(Pawn pawn)
+    public static void DisableLordJobTalk(Pawn pawn, bool dismiss)
     {
         if (pawn.DestroyedOrNull())
         {
             return;
         }
-
         if (pawn.GetLord()?.LordJob is ILordJobWithTalk talkLordJob)
         {
-            talkLordJob.DisableTalk();
+            talkLordJob.DisableTalk(dismiss);
         }
     }
 }

@@ -68,7 +68,7 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
             action = delegate
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalRejectGive));
-                MakeLeave();
+                MakeLeave(force: false);
             },
             resolveTree = true,
         };

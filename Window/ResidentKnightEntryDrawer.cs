@@ -43,7 +43,7 @@ public partial class Window_OrderHall
             AcademicHandler = record.AcademicHandler;
             HonorAcademicDef = record.Branch.HonorDef?.academicDef;
 
-            MeditationFactor = record.Knight.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
+            MeditationFactor = record.Pawn.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
 
             RoleExplanationStr = new(refreshFunc: () => Record?.CurRole?.GetRoleDetailDesc() ?? string.Empty);
             ResonatePersonalitiesStr = new(refreshFunc: RefreshResonatePersonalitiesStr);
@@ -93,12 +93,12 @@ public partial class Window_OrderHall
             DrawRankBackGround(reusedRect);
 
             reusedRect = new(tileRect.x + 4f, tileRect.y + 1f, 24f, titleRectHeight - 2f);
-            GUI.DrawTexture(reusedRect, PortraitsCache.Get(Record.Knight, reusedRect.size, Rot4.South));
+            GUI.DrawTexture(reusedRect, PortraitsCache.Get(Record.Pawn, reusedRect.size, Rot4.South));
 
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(summaryInnerRectX + 30f, summaryInnerRectY, 50f, titleRectHeight);
-            Widgets.Label(reusedRect, Record.Knight.NameShortColored);
+            Widgets.Label(reusedRect, Record.Pawn.NameShortColored);
 
             reusedRect = OARO_WindowUtility.CenterRectOnY(tileRect, summaryInnerRectX + 105f, 45f, titleRectHeight - 2f);
             if (Record.CurRole is not null)
@@ -211,11 +211,11 @@ public partial class Window_OrderHall
             if (OARO_WindowUtility.TextButtonImage(buttonRect, "OARO_HallWin_DismissalKnight".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
             {
                 Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-                    text: "OARO_HallWin_DismissalKnightConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN)),
+                    text: "OARO_HallWin_DismissalKnightConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN)),
                     ratkinOrder: Record.RatkinOrder,
                     acceptAction: delegate
                     {
-                        ResidentKnightsManager.Instance.RemoveResidentKnight(Record.Knight);
+                        ResidentKnightsManager.Instance.DeregisterKnight(Record.Pawn);
                         Parent.OnShowDrawerDetailChanged(this);
                         Parent.ResidentKnightDrawers.Remove(this);
                     });
@@ -233,7 +233,7 @@ public partial class Window_OrderHall
                 if (acceptance)
                 {
                     Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-                        text: "OARO_HallWin_PostponeResignationConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+                        text: "OARO_HallWin_PostponeResignationConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
                         ratkinOrder: Record.RatkinOrder,
                         acceptAction: delegate
                         {
@@ -475,7 +475,7 @@ public partial class Window_OrderHall
                         {
                             int coolingTicksLeft = Record.NextRoleChangeableTick - ticksGame;
                             options.Add(new FloatMenuOption(
-                                label: $"{roleDef.label} ({otherRecord.Knight.NameShortColored}), " + "WaitTime".Translate(coolingTicksLeft.ToStringTicksToPeriod()),
+                                label: $"{roleDef.label} ({otherRecord.Pawn.NameShortColored}), " + "WaitTime".Translate(coolingTicksLeft.ToStringTicksToPeriod()),
                                 action: null));
                         }
                         else
@@ -499,13 +499,13 @@ public partial class Window_OrderHall
             ResidentKnightsManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnightRecord roleRecord);
             if (roleRecord is null)
             {
-                sb.AppendLine("OARO_HallWin_RoleChangeConfirm".Translate(Record.Knight.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
+                sb.AppendLine("OARO_HallWin_RoleChangeConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
             }
             else
             {
                 sb.AppendLine("OARO_HallWin_RoleChangeConfirm_Replace".Translate(
-                    Record.Knight.Named(KeyLibrary_FormatArgName.PAWN),
-                    roleRecord.Knight.Named("OTHER"),
+                    Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                    roleRecord.Pawn.Named("OTHER"),
                     roleDef.Named("ROLEDEF")));
             }
 
@@ -516,7 +516,7 @@ public partial class Window_OrderHall
                 Record.RatkinOrder,
                 acceptAction: delegate
                 {
-                    if (ResidentKnightsManager.Instance.TrySetResidentKnightRole(Record.Knight, roleDef, replaceCurRole: replaceCurRole))
+                    if (ResidentKnightsManager.Instance.TrySetKnightRole(Record.Pawn, roleDef, replaceCurRole: replaceCurRole))
                     {
                         RoleExplanationStr.MarkDirty();
                     }

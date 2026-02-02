@@ -127,12 +127,13 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             outSignalComplete: inSignalForceTriggerTalk,
             debugLabel: "强制决定");
 
+        string outSignalMakeLeave = QuestGenUtility.HardcodedSignalWithQuestID("MercyQuest_MakeLeave");
         quest.Delay(
             delayTicks: 60,
             inner: null,
             inSignalEnable: inSignalForceTriggerTalk,
             inSignalDisable: outSignalResolved,
-            outSignalComplete: inSignalReject,
+            outSignalComplete: outSignalMakeLeave,
             debugLabel: "强制离开");
 
         quest.Alert(label: "OARO_HelpSeeker_Alert".Translate(),
@@ -151,7 +152,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         };
         quest.AddPart(questPart_PawnNegativeSiganl);
 
-        quest.Leave(pawns: [helpSeeker], inSignal: outSignalResolved, leaveOnCleanup: true);
+        quest.Leave(pawns: [helpSeeker], inSignal: outSignalMakeLeave, leaveOnCleanup: true);
         quest.End(QuestEndOutcome.Success, inSignal: QuestGenUtility.HardcodedSignalWithQuestID("helpSeeker.LeftMap"));
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange_Reject = new()

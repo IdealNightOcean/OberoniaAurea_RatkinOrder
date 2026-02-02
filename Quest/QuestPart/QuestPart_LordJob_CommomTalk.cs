@@ -117,10 +117,10 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
         }
     }
 
-    protected void DeregisterTalkAction(bool clearTalkWith = true)
+    protected void DeregisterTalkAction(bool dismiss = true, bool clearTalkWith = true)
     {
         talkable = false;
-        TalkActionUtility.DeregisterTalkAction(this);
+        TalkActionUtility.DeregisterTalkAction(this, dismiss);
         if (clearTalkWith)
         {
             talkWith = null;

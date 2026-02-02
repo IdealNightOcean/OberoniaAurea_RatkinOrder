@@ -53,7 +53,7 @@ public static class GlobalInteractionUtility
         RecommendationUtility.UseRecommendationOfMap(map, needRecommendation);
         OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
         pawn.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_RecruitKnight);
-        ResidentKnightsManager.Instance.AddResidentKnight(pawn, kRecord);
+        ResidentKnightsManager.Instance.RegisterKnight(pawn, kRecord);
     }
 
     /// <summary>

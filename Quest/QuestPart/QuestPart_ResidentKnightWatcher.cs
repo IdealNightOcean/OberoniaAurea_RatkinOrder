@@ -20,7 +20,7 @@ public class QuestPart_ResidentKnightWatcher : QuestPart
 
     public override void Cleanup()
     {
-        ResidentKnightsManager.Instance.RemoveResidentKnight(Knight);
+        ResidentKnightsManager.Instance.DeregisterKnight(Knight);
         Knight = null;
         ResignationSignal = string.Empty;
     }

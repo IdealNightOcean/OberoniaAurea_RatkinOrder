@@ -6,7 +6,7 @@ using Verse.AI.Group;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ResidentKnightRecord : IExposable, ILoadReferenceable
+public class ResidentKnightRecord : ResidentColonistRecord
 {
     public enum Rank : byte
     {
@@ -17,20 +17,15 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
     }
     public static Rank RankOffsetBy(Rank rank, int offset) => (Rank)Mathf.Clamp((int)rank + offset, 0, 3);
 
-    private int loadID = -1;
-    public int LoadID => loadID;
-
-    private Pawn knight;
-    public Pawn Knight => knight;
-
     private KnightRecord knightRecord;
     public KnightRecord KnightRecord => knightRecord;
 
-    public bool IsValid => !knight.DestroyedOrNull() && !knight.Dead && knightRecord is not null;
-    public bool ShouldRemove => knight is null || knightRecord is null;
+    public override bool IsValid => base.IsValid && Branch.IsValid();
+    public bool ShouldTransToColonist => base.IsValid && !Branch.IsValid();
+
 
     public RatkinOrder RatkinOrder => knightRecord.RatkinOrder;
-    public Branch Branch => knightRecord.Branch;
+    public Branch Branch => knightRecord?.Branch;
 
     public Rank CurRank;
     public float MeditationPoints;
@@ -45,13 +40,10 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
     private int residenceStartTick = -1;
     public int ResignationTick = -1;
 
-    private AcademicHandler academicHandler;
-    public AcademicHandler AcademicHandler => academicHandler;
-
-    public void ExposeData()
+    public override void ExposeData()
     {
-        Scribe_Values.Look(ref loadID, nameof(loadID), -1);
-        Scribe_References.Look(ref knight, nameof(knight));
+        base.ExposeData();
+
         Scribe_References.Look(ref knightRecord, nameof(knightRecord));
 
         Scribe_Values.Look(ref CurRank, nameof(CurRank), Rank.Regular);
@@ -62,14 +54,11 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
 
         Scribe_Values.Look(ref residenceStartTick, nameof(residenceStartTick), -1);
         Scribe_Values.Look(ref ResignationTick, nameof(ResignationTick), -1);
-
-        Scribe_Deep.Look(ref academicHandler, nameof(academicHandler));
     }
 
-    private ResidentKnightRecord() { }
-    public ResidentKnightRecord(Pawn knight, KnightRecord knightRecord)
+    private ResidentKnightRecord() : base() { }
+    public ResidentKnightRecord(Pawn knight, KnightRecord knightRecord) : base(knight)
     {
-        this.knight = knight;
         this.knightRecord = knightRecord;
         residenceStartTick = Find.TickManager.TicksGame;
         if (RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
@@ -166,7 +155,7 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         ResidentKnightRoleDef oldRole = curRole;
         curRole = newRole;
 
-        oldRole?.RoleWorker.PostDeactiveRole(Knight);
+        oldRole?.RoleWorker.PostDeactiveRole(Pawn);
 
         if (newRole is null)
         {
@@ -175,19 +164,19 @@ public class ResidentKnightRecord : IExposable, ILoadReferenceable
         else
         {
             nextRoleChangeableTick = Find.TickManager.TicksGame + newRole.positionChangeCDDays * 60000;
-            newRole.RoleWorker.PostActiveRole(Knight);
+            newRole.RoleWorker.PostActiveRole(Pawn);
         }
     }
 
     public void PostRemoved()
     {
-        knight.SetFaction(RatkinOrder.Faction);
+        pawn.SetFaction(RatkinOrder.Faction);
         RatkinOrder.JointPatrolManager.OnResidentKnightRemoved(this);
-        if (knight.Spawned)
+        if (pawn.Spawned)
         {
-            LordMaker.MakeNewLord(RatkinOrder.Faction, new LordJob_ExitMapBest(LocomotionUrgency.Walk, canDefendSelf: true), knight.Map, startingPawns: [knight]);
+            LordMaker.MakeNewLord(RatkinOrder.Faction, new LordJob_ExitMapBest(LocomotionUrgency.Walk, canDefendSelf: true), pawn.Map, startingPawns: [pawn]);
         }
     }
 
-    public string GetUniqueLoadID() => $"{nameof(ResidentKnightRecord)}_{loadID}";
+    public override string GetUniqueLoadID() => $"{nameof(ResidentKnightRecord)}_{loadID}";
 }

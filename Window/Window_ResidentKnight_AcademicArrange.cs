@@ -110,12 +110,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         float innerY = innerRect.yMin;
         float innerWidth = innerRect.width;
         Rect reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 20f, 75f, 75f);
-        GUI.DrawTexture(reusedRect, PortraitsCache.Get(Record.Knight, reusedRect.size, Rot4.South));
+        GUI.DrawTexture(reusedRect, PortraitsCache.Get(Record.Pawn, reusedRect.size, Rot4.South));
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, reusedRect.yMax + 8f, innerWidth, 20f);
-        Widgets.Label(reusedRect, Record.Knight.NameShortColored);
+        Widgets.Label(reusedRect, Record.Pawn.NameShortColored);
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 125f, 114f, 41f);
         DrawRankBackGround(reusedRect);
@@ -272,7 +272,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                 AcceptanceReport acceptance = AcademicHandler.CanUpgradeAcademic(SelAcademicDef, Record.Personality, directly: false, resultOnly: false);
                 if (acceptance)
                 {
-                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Knight, Record.Personality, directly: false);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Personality, directly: false);
                     RefreshSelStageLevel();
                     PostArrangeNewAcademic?.Invoke();
                 }
@@ -291,7 +291,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                 reusedRect = new(reusedRect.xMax + 20f, reusedRect.yMax - 20f, 40f, 20f);
                 if (Widgets.ButtonText(reusedRect, "Dev"))
                 {
-                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Knight, Record.Personality, directly: true);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Personality, directly: true);
                     PostArrangeNewAcademic?.Invoke();
                     RefreshSelStageLevel();
                 }

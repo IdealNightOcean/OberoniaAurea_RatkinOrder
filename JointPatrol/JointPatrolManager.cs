@@ -357,7 +357,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     public void OnResidentKnightRemoved(ResidentKnightRecord record)
     {
         participatingResidentKnights?.Remove(record);
-        innerContainer?.Remove(record.Knight);
+        innerContainer?.Remove(record.Pawn);
     }
 
     public void ChangeHelpPolicy()
@@ -616,7 +616,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             return;
         }
 
-        participatingResidentKnights.RemoveAll(r => !r.IsValid && !r.Knight.Spawned);
+        participatingResidentKnights.RemoveAll(r => !r.IsValid && !r.Pawn.Spawned);
         if (participatingResidentKnights.NullOrEmpty())
         {
             return;
@@ -625,10 +625,10 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         foreach (ResidentKnightRecord record in participatingResidentKnights)
         {
-            record.Knight.SetFaction(record.RatkinOrder.Faction);
+            record.Pawn.SetFaction(record.RatkinOrder.Faction);
         }
 
-        List<Pawn> participatingPawns = participatingResidentKnights.Select(r => r.Knight).ToList();
+        List<Pawn> participatingPawns = participatingResidentKnights.Select(r => r.Pawn).ToList();
         Dictionary<Map, List<Pawn>> lordMapDict = participatingPawns.GroupBy(p => p.Map)
                                                                     .ToDictionary(g => g.Key, g => g.ToList());
         foreach (KeyValuePair<Map, List<Pawn>> kv in lordMapDict)
@@ -1065,7 +1065,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             ThoughtDef thoughtToAdd = jDef.ThoughtToAdd;
             foreach (ResidentKnightRecord kRecord in participatingResidentKnights)
             {
-                kRecord.Knight.needs?.mood?.thoughts.memories.TryGainMemory(thoughtToAdd);
+                kRecord.Pawn.needs?.mood?.thoughts.memories.TryGainMemory(thoughtToAdd);
             }
         }
         catch (Exception ex)

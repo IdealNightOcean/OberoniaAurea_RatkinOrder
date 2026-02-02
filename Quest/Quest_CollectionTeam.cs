@@ -244,8 +244,11 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     {
         base.Cleanup();
 
-        MakeLeave();
-        this.DeregisterTalkAction();
+        this.DeregisterTalkAction(dismiss: true);
+        if (Pawns is not null)
+        {
+            LeaveQuestPartUtility.MakePawnsLeave(Pawns, sendLetter: true, quest, wakeUp: true);
+        }
 
         talkWith = null;
         Pawns = null;
@@ -396,7 +399,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             canTryArrival = false;
             if (CanMakeLeave)
             {
-                MakeLeave();
+                MakeLeave(force: false);
             }
         }
         if (Pawns is not null)
@@ -454,7 +457,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         canTryArrival = false;
         if (CanMakeLeave)
         {
-            MakeLeave();
+            MakeLeave(force: true);
         }
     }
 
@@ -465,7 +468,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             int endTick = enableTick + DurationTicks;
             if (Find.TickManager.TicksGame > endTick)
             {
-                MakeLeave();
+                MakeLeave(force: true);
             }
             else if (talkable && talkWith is not null && Find.TickManager.TicksGame > endTick - 60)
             {
@@ -573,7 +576,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         return pawns;
     }
 
-    protected void MakeLeave()
+    protected void MakeLeave(bool force)
     {
         if (hasLeft)
             return;
@@ -581,18 +584,21 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         try
         {
             talkable = false;
+            if (force || talkWith is null)
+            {
+                if (Pawns is not null)
+                {
+                    LeaveQuestPartUtility.MakePawnsLeave(Pawns, sendLetter: true, quest, wakeUp: true);
+                }
+            }
+            else
+            {
+                this.DeregisterTalkAction(dismiss: true);
+            }
+
             if (!hasFulfilled)
             {
                 Find.SignalManager.SendSignal(new Signal(OutSignalFailureToCollect));
-            }
-            TalkActionUtility.DisableLordJobTalk(TalkWith);
-            if (Pawns is not null)
-            {
-                foreach (Pawn pawn in Pawns)
-                {
-                    pawn.GetLord()?.Notify_PawnLost(pawn, PawnLostCondition.ForcedByQuest);
-                }
-                LeaveQuestPartUtility.MakePawnsLeave(Pawns, sendLetter: true, quest, wakeUp: true);
             }
         }
         finally
@@ -679,7 +685,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
     {
         talkable = false;
         Find.SignalManager.SendSignal(new Signal(OutSignalDecided));
-        MakeLeave();
+        MakeLeave(force: false);
     }
 
     public override void DoDebugWindowContents(Rect innerRect, ref float curY)

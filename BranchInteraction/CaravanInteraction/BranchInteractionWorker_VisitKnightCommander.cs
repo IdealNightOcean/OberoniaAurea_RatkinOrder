@@ -21,7 +21,7 @@ public class BranchInteractionWorker_VisitKnightCommander(BranchInteractionDef d
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
         parms.RatkinOrder.EsteemHandler.AdjustEsteem(2, byPlayer: true, reason: Def.LabelCap);
-        ResidentKnightsManager.Instance.AllResidentKnightsGainMeditation(100f, parms.RatkinOrder, directly: false);
+        ResidentKnightsManager.Instance.AllKnightsGainMeditation(100f, parms.RatkinOrder, directly: false);
         ThingDef privateBrewDef = DefDatabase<ThingDef>.GetNamedSilentFail("OARO_CommanderPrivateBrew");
         Thing privateBrew = ThingMaker.MakeThing(privateBrewDef);
         privateBrew.stackCount = 5;

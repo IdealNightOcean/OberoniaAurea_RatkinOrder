@@ -436,7 +436,7 @@ public partial class Window_BranchTask : OrderWindowBase
             return string.Empty;
         }
 
-        return GenLabel.ThingsLabel(JointPatrolManager.ParticipatingResidentKnights.Select(r => r.Knight).Cast<Thing>());
+        return GenLabel.ThingsLabel(JointPatrolManager.ParticipatingResidentKnights.Select(r => r.Pawn).Cast<Thing>());
     }
 
     private string RefrshJointPatrolNotParticipateInKnightStr()
@@ -451,7 +451,7 @@ public partial class Window_BranchTask : OrderWindowBase
         {
             if (!JointPatrolManager.ParticipatingResidentKnights.Contains(record))
             {
-                notParticipatingPawns.Add(record.Knight);
+                notParticipatingPawns.Add(record.Pawn);
             }
         }
 

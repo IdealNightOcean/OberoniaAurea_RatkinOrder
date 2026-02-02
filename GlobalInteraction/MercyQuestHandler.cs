@@ -65,14 +65,14 @@ public class MercyQuestHandler : IExposable
         if (quest is null)
             return;
 
-        ResidentKnightsManager.Instance.AllResidentKnightsGainMeditation(200f, directly: false);
+        ResidentKnightsManager.Instance.AllKnightsGainMeditation(200f, directly: false);
 
         GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
         float letterChance = 0.2f;
 
         if (ResidentKnightsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnightRecord record))
         {
-            letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(record.Knight);
+            letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(record.Pawn);
         }
         if (Rand.Chance(letterChance))
         {
@@ -240,7 +240,7 @@ public class MercyQuestHandler : IExposable
         float chance = mercyQuestBaseChance;
         if (ResidentKnightsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnightRecord record))
         {
-            chance *= (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(record.Knight) ?? 1f;
+            chance *= (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(record.Pawn) ?? 1f;
         }
         return chance;
     }

@@ -24,7 +24,7 @@ public class Thought_VisitingKnight : Thought_Memory
     {
         if (ResidentKnightsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Clerk, out ResidentKnightRecord record))
         {
-            return (OARO_ModDefOf.OARO_Clerk.RoleWorker as ResidentKnightRoleWorker_Clerk)?.KnightMoodOffset(record.Knight) ?? 0;
+            return (OARO_ModDefOf.OARO_Clerk.RoleWorker as ResidentKnightRoleWorker_Clerk)?.KnightMoodOffset(record.Pawn) ?? 0;
         }
         return 0;
     }
