@@ -1,5 +1,6 @@
 using OberoniaAurea_Frame;
 using RimWorld;
+using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -288,6 +289,7 @@ public static class GlobalInteractionUtility
         }
         return curChance;
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         void ApplyStepChange(float change, string reason)
         {
             curChance += change;

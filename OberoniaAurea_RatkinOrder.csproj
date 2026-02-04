@@ -213,7 +213,10 @@
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Quest\BranchDemand\Quest_GiveBranchMedal_CriticalDemand.cs" />
     <Compile Include="ResidentKnight\AcademicHandler.cs" />
+    <Compile Include="Stat\StatWorker_PawnVirtue.cs" />
+    <Compile Include="Thought\ThoughtWorker_Situational_Virtue.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
+    <Compile Include="Thought\Thought_Situational_Virtue.cs" />
     <Compile Include="Utility\AcademicUtility.cs" />
     <Compile Include="Window\BranchTaskEntryDrawer.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />

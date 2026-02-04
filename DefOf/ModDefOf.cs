@@ -98,6 +98,10 @@ public static class OARO_ModDefOf
     /// 每日修行点获得基础
     /// </summary>
     public static StatDef OARO_Stat_MeditationBase;
+    /// <summary>
+    /// 美德
+    /// </summary>
+    public static StatDef OARO_Stat_PawnVirtue;
 
     public static TraitDef OARO_OrderKnight;
 

@@ -35,6 +35,12 @@ public static class OARO_ThoughtDefOf
     ///联巡灾难事件心情
     /// </summary>
     public static ThoughtDef OARO_Thought_JointPatrolDisaster;
+
+    /// <summary>
+    /// 美德社交意见修改器
+    /// </summary>
+    public static ThoughtDef OARO_Thought_VirtueSocialOpinion;
+
     static OARO_ThoughtDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ThoughtDefOf));

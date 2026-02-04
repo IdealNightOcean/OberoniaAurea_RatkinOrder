@@ -37,6 +37,9 @@ public class StatPart_MeditationFactor : StatPart
         if (branch.IsBranchOfType(Branch.BranchType.Honor))
             val += 0.25f;
 
+
+        val += branch.TraditionHandler.ExtraMeditationFactor.Value;
+
         val += record.CurRank switch
         {
             ResidentKnightRecord.Rank.Elite => 0.1f,
@@ -93,6 +96,10 @@ public class StatPart_MeditationFactor : StatPart
             sb.AppendLine("OARO_ChangeOffset_BranchTypeOf".Translate($"OARO_{Branch.BranchType.Honor}".Translate(),
                                                                      0.25f.ToStringPercentSigned("0.##").Named(KeyLibrary_FormatArgName.Offset)));
         }
+
+        stepChange = branch.TraditionHandler.ExtraMeditationFactor.Value;
+        if (stepChange != 0f)
+            sb.AppendLine("OARO_ChangeOffset_BranchTradition".Translate(stepChange.ToStringPercentSigned("0.##").Named(KeyLibrary_FormatArgName.Offset)));
 
         stepChange = record.CurRank switch
         {

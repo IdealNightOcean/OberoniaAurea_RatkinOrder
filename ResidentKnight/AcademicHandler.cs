@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -131,6 +132,17 @@ public class AcademicHandler : IExposable
         }
 
         return true;
+    }
+
+    public int GetTotalAcademicLevelOf(Predicate<ResidentKnightAcademicDef> predicate)
+    {
+        int totalLevel = 0;
+        foreach (KeyValuePair<ResidentKnightAcademicDef, int> kv in academics)
+        {
+            if (predicate(kv.Key))
+                totalLevel += kv.Value;
+        }
+        return totalLevel;
     }
 
     private void SetAcademicLevelDirectly(ResidentKnightAcademicDef academicDef, Pawn pawn, int targetLevel)
