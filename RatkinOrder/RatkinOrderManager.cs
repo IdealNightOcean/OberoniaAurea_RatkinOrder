@@ -97,9 +97,9 @@ public class RatkinOrderManager : IExposable
 
     private void PostLoadInit()
     {
-        if (allRatkinOrders.RemoveAll(r => r is null) > 0)
+        if (allRatkinOrders.RemoveAll(r => !r.IsValid()) > 0)
         {
-            Log.Error($"[OARO] 部分骑士团在加载后为null，已被移除。");
+            Log.Error($"[OARO] 部分骑士团在加载后失效，已被移除。");
         }
         for (int i = 0; i < allRatkinOrders.Count; i++)
         {

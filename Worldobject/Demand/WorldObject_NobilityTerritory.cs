@@ -138,7 +138,6 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
                 ActiveDesc = "OARO_CliqueActiveDesc_NobilityCivilian".Translate(),
                 Potency = -0.075f,
 
-                IsActivatable = true,
                 IsBribable = false,
                 IsCommunicable = false
             };
@@ -157,7 +156,6 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             InactiveDesc = "OARO_CliqueInactiveDesc_Nobility".Translate(),
             Potency = -0.2f,
 
-            IsActivatable = true,
             IsBribable = false,
             IsCommunicable = false
         };
@@ -169,7 +167,6 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             ActiveDesc = "OARO_CliqueActiveDesc_NobilityBureaucrat".Translate(),
             Potency = -0.075f,
 
-            IsActivatable = true,
             IsBribable = false,
             IsCommunicable = false
         };

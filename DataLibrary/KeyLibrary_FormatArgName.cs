@@ -25,6 +25,8 @@ public static class KeyLibrary_FormatArgName
     public const string DEMAND = "DEMAND";
     public const string MERCYQUEST = "MERCYQUEST";
 
+    public const string UNKOWN = "UNKOWN";
+
     public const string CliqueName = "CliqueName";
     public const string OrderName = "OrderName";
     public const string BranchName = "BranchName";

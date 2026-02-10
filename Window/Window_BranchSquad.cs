@@ -66,8 +66,8 @@ public class Window_BranchSquad : OrderWindowBase
         BombardAcceptance = new(refreshFunc: () => BranchSupportUtility.CanBombard(SelBranch, Map, resultOnly: false));
         InteractionAcceptances = new(refreshFunc: RefreshInteractionAcceptances);
 
-        BranchSummaryCaches = new(ratkinOrder.BranchManager.AllBranches.Count);
-        TabSummaryCaches = new(ratkinOrder.BranchManager.AllBranches.Count);
+        BranchSummaryCaches = new(ratkinOrder.BranchManager.AllBranchesCount);
+        TabSummaryCaches = new(ratkinOrder.BranchManager.AllBranchesCount);
         RecacheBranchSummary();
     }
 

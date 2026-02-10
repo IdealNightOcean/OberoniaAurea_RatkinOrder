@@ -18,7 +18,6 @@ public class QuestNode_AddGeneralClique : QuestNode
     [MustTranslate]
     public SlateRef<string> inactiveDesc = string.Empty;
 
-    public SlateRef<bool> isActivatable = true;
     public SlateRef<bool> isCommunicable;
     public SlateRef<bool> isBribable;
     public SlateRef<int> briberyCost = -1;
@@ -70,7 +69,6 @@ public class QuestNode_AddGeneralClique : QuestNode
 
             Potency = initPotency.GetValue(slate) ?? 0f,
 
-            IsActivatable = isActivatable.GetValue(slate),
             IsCommunicable = isCommunicable.GetValue(slate),
             IsBribable = isBribable.GetValue(slate),
             BriberyCost = briberyCost.GetValue(slate),

@@ -1,5 +1,4 @@
-﻿using RimWorld;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using Verse;
 using static OberoniaAurea.RatkinOrder.Branch;
@@ -28,14 +27,7 @@ public class BranchSummaryUICache
         Branch = branch ?? throw new ArgumentNullException(nameof(branch));
         SquadName = branch.Squad.Name;
 
-        if (branch.BaseSite is INameableWorldObject nameSite)
-        {
-            BaseSiteName = nameSite.Name;
-        }
-        else
-        {
-            BaseSiteName = branch.BaseSite.Label;
-        }
+        BaseSiteName = BranchUtility.GetBranchSiteName(branch);
 
         Distance = branch.DistanceTo(map.Tile);
         AffectedRange = branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);

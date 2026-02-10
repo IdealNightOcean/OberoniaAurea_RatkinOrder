@@ -18,8 +18,8 @@ public struct SimpleFloatChangeRecord : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref change, "change", 0f);
-        Scribe_Values.Look(ref explain, "explain", "UNKOWN");
+        Scribe_Values.Look(ref change, nameof(change), 0f);
+        Scribe_Values.Look(ref explain, nameof(explain), KeyLibrary_FormatArgName.UNKOWN);
     }
 }
 

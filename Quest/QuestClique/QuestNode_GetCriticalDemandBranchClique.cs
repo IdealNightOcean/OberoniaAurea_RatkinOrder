@@ -26,7 +26,6 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
         {
             QuestClique demandBranchClique = new()
             {
-                IsActivatable = true,
                 IsBribable = false,
                 IsCommunicable = true,
                 Potency = QuestClique.BranchPotencyToCliquePotency(demandBranch.Potency)
@@ -39,7 +38,6 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
         {
             QuestClique branchClique = new()
             {
-                IsActivatable = true,
                 IsBribable = false,
                 IsCommunicable = true,
                 Potency = QuestClique.BranchPotencyToCliquePotency(branch.Potency)
@@ -62,7 +60,7 @@ public class QuestNode_GetCriticalDemandBranchClique : QuestNode
         RatkinOrder demandOrder = demandBranch?.RatkinOrder;
 
         //需求骑士团友好派系
-        foreach (Branch branch in demandBranch.BranchManager.FriendlyBranches)
+        foreach (Branch branch in demandBranch.BranchManager.GetAllBranchesOfType(Branch.BranchType.Friendly))
         {
             if (!ValidateBranch(branch))
             {

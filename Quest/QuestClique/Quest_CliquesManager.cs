@@ -51,7 +51,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public QuestPart_CliquesManager()
     {
-        TotalPotency = new(refreshFunc: () => allCliques?.Values.Sum(c => c.Potency) ?? 0f);
+        TotalPotency = new(refreshFunc: () => allCliques?.Values.Where(c => c.IsActive).Sum(c => c.Potency) ?? 0f);
     }
 
     public override void ExposeData()
@@ -159,7 +159,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             return clique.Name;
         }
-        return "UNKOWN";
+        return KeyLibrary_FormatArgName.UNKOWN;
     }
 
     public bool TryAddClique(QuestClique clique, bool replaceCur = false, bool defaultActive = false)

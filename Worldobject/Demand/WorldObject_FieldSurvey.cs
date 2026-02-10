@@ -114,7 +114,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
 
         if (featureExposed)
         {
-            sb.AppendLine();
+            sb.AppendLine(" ");
             GetRegionalFeatureDesc(sb);
         }
 

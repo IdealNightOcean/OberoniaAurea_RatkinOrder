@@ -54,7 +54,7 @@ public class QuestNode_OrderLetter : QuestNode
 
         questPart_OrderLetter.RawLabel = "error";
         questPart_OrderLetter.RawText = "error";
-        questPart_OrderLetter.RawSender = "Unkown";
+        questPart_OrderLetter.RawSender = KeyLibrary_FormatArgName.UNKOWN;
 
         questPart_OrderLetter.DelayDays = delayDays.GetValue(slate);
 

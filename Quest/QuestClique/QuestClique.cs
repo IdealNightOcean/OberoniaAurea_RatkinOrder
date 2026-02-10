@@ -49,7 +49,6 @@ public class QuestClique : IExposable
     public float Willingness => willingness;
 
     public bool IsActive;
-    public bool IsActivatable = true;
     public int ticksToInactive = -1;
     private int TicksToInactive => ticksToInactive;
 
@@ -146,10 +145,6 @@ public class QuestClique : IExposable
 
     public AcceptanceReport CanActiveNow(bool directly, int mapRecommendationCount = -1, bool resultOnly = false)
     {
-        if (!IsActivatable)
-        {
-            return resultOnly ? false : "OARO_Clique_NotActivatable".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
-        }
         if (IsActive)
         {
             return resultOnly ? false : "OARO_Clique_HasActive".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
@@ -233,9 +228,9 @@ public class QuestClique : IExposable
 
     public bool TryActive(bool directly = false, Map map = null, int activeDelayTicks = -1)
     {
-        if (!IsActivatable)
+        if (!IsActive)
         {
-            Log.Error($"[OARO] 尝试激活不可激活的派别 {Name} ({key})。");
+            Log.Error($"[OARO] 尝试激活已激活的派别 {Name} ({key})。");
             return false;
         }
 
@@ -359,7 +354,6 @@ public class QuestClique : IExposable
         Scribe_Values.Look(ref lastWillingnessChange, nameof(lastWillingnessChange), 0f);
 
         Scribe_Values.Look(ref IsActive, nameof(IsActive), defaultValue: false);
-        Scribe_Values.Look(ref IsActivatable, nameof(IsActivatable), defaultValue: true);
         Scribe_Values.Look(ref ticksToInactive, nameof(ticksToInactive), -1);
 
         Scribe_Values.Look(ref IsCommunicable, nameof(IsCommunicable), defaultValue: false);

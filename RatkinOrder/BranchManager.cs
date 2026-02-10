@@ -19,35 +19,9 @@ public class BranchManager : IExposable, ITickDay
 
     private List<Branch> allBranches = [];
     public IReadOnlyList<Branch> AllBranches => allBranches;
+    public int AllBranchesCount => allBranches.Count;
 
     public LazyMutable<int> TotalKnightsCount { get; }
-
-    public IEnumerable<Branch> HonorBranches
-    {
-        get
-        {
-            foreach (Branch branch in allBranches)
-            {
-                if (branch.IsBranchOfType(BranchType.Honor))
-                {
-                    yield return branch;
-                }
-            }
-        }
-    }
-    public IEnumerable<Branch> FriendlyBranches
-    {
-        get
-        {
-            foreach (Branch branch in allBranches)
-            {
-                if (branch.IsBranchOfType(BranchType.Friendly))
-                {
-                    yield return branch;
-                }
-            }
-        }
-    }
 
     public LazyMutable<int> FriendlyBranchesCount { get; }
 
@@ -92,7 +66,7 @@ public class BranchManager : IExposable, ITickDay
     internal BranchManager(RatkinOrder ratkinOrder)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
-        FriendlyBranchesCount = new LazyMutable<int>(refreshFunc: () => FriendlyBranches.Count());
+        FriendlyBranchesCount = new LazyMutable<int>(refreshFunc: () => GetAllBranchesOfType(BranchType.Friendly).Count());
         TotalKnightsCount = new LazyMutable<int>(refreshFunc: () => allBranches.Sum(b => b.Squad.AllCrewCountInt));
     }
 
@@ -199,6 +173,17 @@ public class BranchManager : IExposable, ITickDay
             if (branch.RatkinOrder == ratkinOrder)
             {
                 followedBranches.Add(branch);
+            }
+        }
+    }
+
+    public IEnumerable<Branch> GetAllBranchesOfType(BranchType branchType)
+    {
+        foreach (Branch branch in allBranches)
+        {
+            if (branch.IsValid() && branch.IsBranchOfType(branchType))
+            {
+                yield return branch;
             }
         }
     }
@@ -377,13 +362,13 @@ public class BranchManager : IExposable, ITickDay
 
     internal void PostLoadInit()
     {
-        if (allBranches.RemoveAll(b => b is null) > 0)
+        if (allBranches.RemoveAll(b => !b.IsValid()) > 0)
         {
-            Log.Error($"[OARO] {ratkinOrder} 的部分分部在加载后为null，已被移除。");
+            Log.Error($"[OARO] {ratkinOrder} 的部分分部在加载后无效，已被移除。");
         }
-        if (followedBranches.RemoveAll(b => b is null) > 0)
+        if (followedBranches.RemoveAll(b => !b.IsValid()) > 0)
         {
-            Log.Error($"[OARO] {ratkinOrder} 的部分已关注分部在加载后为null，已被移除。");
+            Log.Error($"[OARO] {ratkinOrder} 的部分已关注分部在加载后无效，已被移除。");
         }
 
         for (int i = 0; i < allBranches.Count; i++)

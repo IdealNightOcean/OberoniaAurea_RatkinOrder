@@ -452,7 +452,7 @@ public class Window_RatkinOrder : MainTabWindow
         Widgets.Label(reusedRect, "OARO_OrderWin_BranchCount".Translate());
 
         reusedRect = new(inRectX + 200f, inRectY + 359f, 42f, 20f);
-        Widgets.Label(reusedRect, SelectedOrder.BranchManager.AllBranches.Count.ToString());
+        Widgets.Label(reusedRect, SelectedOrder.BranchManager.AllBranchesCount.ToString());
 
         reusedRect.xMax += 80f;
         reusedRect.xMin += 80f;
@@ -1016,7 +1016,7 @@ public class Window_RatkinOrder : MainTabWindow
             return [];
         }
 
-        List<Branch> branches = [.. SelectedOrder.BranchManager.FollowedBranches];
+        List<Branch> branches = [.. SelectedOrder.BranchManager.FollowedBranches.Where(b => b.IsValid())];
         return branches;
     }
 

@@ -133,7 +133,6 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
             {
                 Name = "OARO_CliqueName_Architects".Translate(),
                 ActiveDesc = "OARO_CliqueActiveDesc_Architects".Translate(),
-                IsActivatable = true,
             };
             CliquesManager.TryAddClique(architectClique, defaultActive: true);
         }

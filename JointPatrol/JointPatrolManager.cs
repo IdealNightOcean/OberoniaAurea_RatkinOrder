@@ -501,7 +501,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         burdenCount = participantCount;
 
         IEnumerable<Branch> tempEnumerables = BranchManager.AllBranches.Where(b => b.CanParticipateInJointPatrolFast())
-                                                                       .Take(participantCount);
+                                                                            .Take(participantCount);
 
         foreach (Branch branch in tempEnumerables)
         {

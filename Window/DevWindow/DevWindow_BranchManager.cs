@@ -63,11 +63,11 @@ public class DevWindow_BranchManager : DevWindowBase
         listing_Rect.Gap(6f);
         if (listing_Rect.ButtonText("荣誉分队", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllHonorBranchesName()));
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllBranchesOfTypeName(Branch.BranchType.Honor)));
         }
         if (listing_Rect.ButtonText("友好分队", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllFriendlyBranchesName()));
+            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllBranchesOfTypeName(Branch.BranchType.Friendly)));
         }
 
         listing_Rect.Gap(6f);
@@ -111,27 +111,11 @@ public class DevWindow_BranchManager : DevWindowBase
         }
     }
 
-    private string GetAllHonorBranchesName()
+    private string GetAllBranchesOfTypeName(Branch.BranchType branchType)
     {
         StringBuilder sb = new();
         int i = 0;
-        foreach (Branch branch in branchManager.HonorBranches)
-        {
-            sb.AppendInNewLine($"{++i}. {branch.Name}");
-        }
-
-        if (sb.Length > 0)
-        {
-            return sb.ToString();
-        }
-        return "None";
-    }
-
-    private string GetAllFriendlyBranchesName()
-    {
-        StringBuilder sb = new();
-        int i = 0;
-        foreach (Branch branch in branchManager.FriendlyBranches)
+        foreach (Branch branch in branchManager.GetAllBranchesOfType(Branch.BranchType.Honor))
         {
             sb.AppendInNewLine($"{++i}. {branch.Name}");
         }

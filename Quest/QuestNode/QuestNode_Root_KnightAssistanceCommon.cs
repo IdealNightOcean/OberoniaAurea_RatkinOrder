@@ -13,7 +13,7 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
     protected override PawnKindDef FixedPawnKind => _fixedPawnKind;
     protected override ThoughtDef ThoughtToAdd => _thoughtToAdd;
 
-    protected override Branch Branch { get => RatkinOrder.BranchManager.AllBranches.RandomElement(); }
+    protected override Branch Branch { get => RatkinOrder.BranchManager.AllBranches.RandomElementWithFallback(); }
 
     protected override bool InitQuestParameter()
     {

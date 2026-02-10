@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class WorldObjectCompProperties_BranchSite : WorldObjectCompProperties
 {
     /// <summary>是否为独立站点</summary>
-    /// <remarks>- 若为<see langword="true"/> 当对应 <see cref="Branch"/> 被移除后，对应 <see cref="WorldObjectComp.parent"/> 也将同时被移除</remarks>
+    /// <remarks>- 若为 <see langword="true"/> 当对应 <see cref="Branch"/> 被移除后，对应 <see cref="WorldObjectComp.parent"/> 也将同时被移除</remarks>
     public bool independent;
     public WorldObjectCompProperties_BranchSite()
     {

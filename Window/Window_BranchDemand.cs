@@ -65,11 +65,11 @@ public class Window_BranchDemand : OrderWindowBase
         SelDemandCliqueManager = new(refreshFunc: RefreshCliquesManager);
 
         IReadOnlyList<Branch> allBranches = ratkinOrder.BranchManager.AllBranches;
-        for (int i = 0; i < allBranches.Count; i++)
+        foreach (Branch branch in allBranches)
         {
-            if (allBranches[i].DemandHandler.HasDemand)
+            if (branch.DemandHandler.HasDemand)
             {
-                BranchWithDemandsCache.Add(new BranchDemandEntryDrawer(allBranches[i], map));
+                BranchWithDemandsCache.Add(new BranchDemandEntryDrawer(branch, map));
             }
         }
 

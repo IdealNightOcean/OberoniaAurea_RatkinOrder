@@ -198,7 +198,7 @@ public static class RatkinOrderGenerator
         /*
          * 保证至少一个荣誉分部
          */
-        if (!branchManager.AllBranches.Any(b => b.IsBranchOfType(Branch.BranchType.Honor)))
+        if (!branchManager.GetAllBranchesOfType(Branch.BranchType.Honor).Any())
         {
             Branch branch = branchManager.AllBranches.RandomElement();
             if (branch is not null)

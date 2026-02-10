@@ -44,7 +44,7 @@ public static class ModUtility
             parentFactionDef = parentFaction.def;
 
         if (parentFactionDef is not null && parentFaction is null)
-            parentFaction = Find.FactionManager.FirstFactionOfDef(parentFactionDef);
+            parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(parentFactionDef, FactionValidationParams.DefaultFaction);
 
         FactionGeneratorParms parms = new(subFactionDef, default, hidden: true);
         if (ModsConfig.IdeologyActive)

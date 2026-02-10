@@ -1,5 +1,4 @@
 ﻿using RimWorld;
-using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -55,8 +54,8 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
-        Branch branch = ratkinOrder.BranchManager.AllBranches.Where(b => b.IsBranchOfType(Branch.BranchType.Friendly)).RandomElementWithFallback(null);
-        branch ??= ratkinOrder.BranchManager.AllBranches.Where(b => b.IsBranchOfType(Branch.BranchType.Honor)).RandomElementWithFallback(null);
+        Branch branch = ratkinOrder.BranchManager.GetAllBranchesOfType(Branch.BranchType.Friendly).RandomElementWithFallback(null);
+        branch ??= ratkinOrder.BranchManager.GetAllBranchesOfType(Branch.BranchType.Honor).RandomElementWithFallback(null);
         branch ??= ratkinOrder.BranchManager.AllBranches.RandomElementWithFallback(null);
 
         if (!branch.IsValid())

@@ -21,7 +21,8 @@ public class Window_BranchList : OrderWindowBase
         RatkinOrder = ratkinOrder;
         Map = map;
         ConstructTab = initWithConstructTab;
-        BranchSummaryUICaches = new(RatkinOrder.BranchManager.AllBranches.Count);
+
+        BranchSummaryUICaches = new(RatkinOrder.BranchManager.AllBranchesCount);
         foreach (Branch branch in RatkinOrder.BranchManager.AllBranches)
         {
             BranchSummaryUICaches.Add(new BranchSummaryUICache(branch, Map));
@@ -69,7 +70,7 @@ public class Window_BranchList : OrderWindowBase
         float entryWidth = listViewRect.width;
         float entryHeight = 117f;
 
-        listViewRect.height = RatkinOrder.BranchManager.AllBranches.Count * entryHeight + 10f;
+        listViewRect.height = BranchSummaryUICaches.Count * entryHeight + 10f;
 
         Widgets.BeginScrollView(listOutRect, ref scrollPosition_Branch, listViewRect);
         foreach (BranchSummaryUICache branchSummary in BranchSummaryUICaches)

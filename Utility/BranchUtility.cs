@@ -13,8 +13,9 @@ public static class BranchUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool IsValid(this RatkinOrder ratkinOrder) => ratkinOrder is not null && !ratkinOrder.HasRemoved;
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsValid(this Branch branch) => branch is not null && branch.RatkinOrder is not null && !branch.RatkinOrder.HasRemoved;
+    public static bool IsValid(this Branch branch) => branch is not null && branch.BaseSite is not null && branch.RatkinOrder.IsValid();
 
     /// <summary>
     /// 地块是否在分部影响范围内
@@ -32,11 +33,32 @@ public static class BranchUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float DistanceTo(this Branch branch, PlanetTile tile)
     {
+        if (branch is null || branch.BaseSite is null)
+        {
+            return float.MaxValue;
+        }
         if (tile.Layer != branch.BaseSite.Tile.Layer)
         {
             return float.MaxValue;
         }
         return Find.WorldGrid.ApproxDistanceInTiles(branch.BaseSite.Tile, tile);
+    }
+
+    public static string GetBranchSiteName(Branch branch)
+    {
+        if (branch is null || branch.BaseSite is null)
+        {
+            return KeyLibrary_FormatArgName.UNKOWN;
+        }
+
+        if (branch.BaseSite is INameableWorldObject nameSite)
+        {
+            return nameSite.Name;
+        }
+        else
+        {
+            return branch.BaseSite.Label;
+        }
     }
 
     /// <summary>

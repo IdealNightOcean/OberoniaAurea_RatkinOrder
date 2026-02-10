@@ -53,9 +53,9 @@ public partial class Window_BranchTask : OrderWindowBase
         JointPatrolNotParticipateInKnightStr = new(refreshFunc: RefrshJointPatrolNotParticipateInKnightStr);
 
         TotalJointPatrolKnightCount = new(refreshFunc: () => JointPatrolManager?.ParticipantsDict.Keys.Sum(b => b.Squad.AllCrewCountInt) ?? 0);
-
-        BranchTaskEntryDrawers = new(RatkinOrder.BranchManager.AllBranches.Count);
         OrderResidentKnightCount = ResidentKnightsManager.Instance.ResidentKnights.Where(kv => kv.Value.RatkinOrder == RatkinOrder).Count();
+
+        BranchTaskEntryDrawers = new(RatkinOrder.BranchManager.AllBranchesCount);
         foreach (Branch branch in RatkinOrder.BranchManager.AllBranches)
         {
             BranchTaskEntryDrawers.Add(new BranchTaskEntryDrawer(this, branch, Map));
