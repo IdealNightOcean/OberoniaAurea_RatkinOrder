@@ -533,7 +533,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         };
         if (!HasEnoghtFood(caravan, 500f))
         {
-            caravanOpt.Disable("OARO_RefugeeInflux_DistributionFood_InsufficientCaravanFood".Translate());
+            caravanOpt.Disable(null);
         }
         diaNode.options.Add(caravanOpt);
 

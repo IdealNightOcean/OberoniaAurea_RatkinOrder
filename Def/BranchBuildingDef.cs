@@ -184,24 +184,24 @@ public class BranchBuildingDef : BranchConstructionDef
 
         if (!isSpecial && IsHonorSymbol)
         {
-            yield return $"'{nameof(IsHonorSymbol)}' only works when '{nameof(isSpecial)}' is true.";
+            yield return $"'{nameof(IsHonorSymbol)}' 仅在 '{nameof(isSpecial)}' 为 true 时生效。";
         }
 
         if (buildingClass is null)
         {
             buildingClass = defaultType;
-            yield return $"has null '{nameof(buildingClass)}'. Set to default.";
+            yield return $"'{nameof(buildingClass)}' 为 null，已设置为默认值。";
         }
         if (constructCheckerClass is null)
         {
             constructCheckerClass = defaultConstructCheckerClass;
-            yield return $"has null '{nameof(constructCheckerClass)}'. Set to default.";
+            yield return $"'{nameof(constructCheckerClass)}' 为 null，已设置为默认值。";
         }
         if (comps is not null && comps.Count > 0)
         {
             if (!typeof(BranchBuildingWithComps).IsAssignableFrom(buildingClass))
             {
-                yield return $"has {nameof(comps)} defined, but its '{nameof(buildingClass)}' is not '{nameof(BranchBuildingWithComps)}' or its subclass.";
+                yield return $"已定义 {nameof(comps)}，但 '{nameof(buildingClass)}' 不是 '{nameof(BranchBuildingWithComps)}' 或其子类。";
             }
             for (int i = 0; i < comps.Count; i++)
             {

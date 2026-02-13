@@ -74,20 +74,19 @@ public class BranchStatDef : Def
             if (minValue < 0f)
             {
                 minValue = 0f;
-                yield return $"{nonNegative} setting but {minValue} is negative";
+                yield return $"'{nameof(nonNegative)}' 已设置为 true，但 '{minValue}' 为负数。";
             }
             if (maxValue < 0f)
             {
                 maxValue = 0f;
-                yield return $"{nonNegative} setting but {maxValue} is negative";
+                yield return $"'{nameof(nonNegative)}' 已设置为 true，但 '{maxValue}' 为负数。";
             }
         }
 
-        // 最小值大于最大值校验
         if (minValue > maxValue)
         {
             (minValue, maxValue) = (maxValue, minValue);
-            yield return $"{minValue} is greater than {maxValue}";
+            yield return $"最小值 '{minValue}' 大于最大值 '{maxValue}'。";
         }
     }
 

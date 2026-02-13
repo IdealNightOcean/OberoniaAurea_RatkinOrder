@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -92,20 +92,20 @@ public class BranchDemandDef : Def
         if (weighterClass is null)
         {
             weighterClass = defaultWeighterClass;
-            yield return $"has a null {nameof(weighterClass)}. Set to default.";
+            yield return $"'{nameof(weighterClass)}' 为 null，已设置为默认值。";
         }
         if (demandClass is null)
         {
             demandClass = defaultWorkClass;
-            yield return $"has a null {nameof(demandClass)}. Set to default.";
+            yield return $"'{nameof(demandClass)}' 为 null，已设置为默认值。";
         }
         if (relatedQuestDef is null)
         {
-            yield return $"has a null {nameof(relatedQuestDef)}.";
+            yield return $"'{nameof(relatedQuestDef)}' 为 null。";
         }
         if (durationDays <= 0f)
         {
-            yield return $"should has a positive {nameof(durationDays)}.";
+            yield return $"'{nameof(durationDays)}' 必须大于 0。";
         }
     }
 }

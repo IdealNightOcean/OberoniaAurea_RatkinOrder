@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -32,7 +32,7 @@ public class OrderFundEventDef : Def
         if (immediately && durationDays > 0)
         {
             durationDays = 0;
-            yield return "has both an immediately true flag and a positive durationDays value at the same time. Set durationDays to 0.";
+            yield return $"不能同时设置 '{nameof(immediately)}' 为 true 和 '{nameof(durationDays)}' 为正数。已将 '{nameof(durationDays)}' 设置为 0。";
         }
     }
 }

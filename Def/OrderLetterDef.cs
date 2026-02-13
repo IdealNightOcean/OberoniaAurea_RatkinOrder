@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -41,12 +41,12 @@ public class OrderLetterDef : Def
         if (letterClass is null)
         {
             letterClass = defaultLetterClass;
-            yield return $"has a null '{nameof(letterClass)}'. Set to Default.";
+            yield return $"'{nameof(letterClass)}' 为 null，已设置为默认值。";
         }
         if (!canShowAsRimLetter && forceShowAsRimLetter)
         {
             forceShowAsRimLetter = false;
-            yield return $"Cannot '{nameof(forceShowAsRimLetter)}' because '{nameof(canShowAsRimLetter)}' is false";
+            yield return $"不能设置 '{nameof(forceShowAsRimLetter)}' 为 true，因为 '{nameof(canShowAsRimLetter)}' 为 false。";
         }
     }
 }

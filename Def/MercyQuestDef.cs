@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using System;
@@ -46,24 +46,24 @@ public class MercyQuestDef : Def
     {
         if (needPreQuest && preQuestDef is null)
         {
-            yield return $"has a null {nameof(preQuestDef)}";
+            yield return $"'{nameof(preQuestDef)}' 为 null。";
         }
         if (mainQuestDef is null)
         {
-            yield return $"has a null {nameof(mainQuestDef)}";
+            yield return $"'{nameof(mainQuestDef)}' 为 null。";
         }
         if (subFactionDef is null)
         {
-            yield return $"has a null {nameof(subFactionDef)}";
+            yield return $"'{nameof(subFactionDef)}' 为 null。";
         }
         if (needPreQuest && helpSeekerPawnKind is null)
         {
-            yield return $"{nameof(needPreQuest)} is true, but has a null {nameof(helpSeekerPawnKind)}";
+            yield return $"'{nameof(needPreQuest)}' 为 true，但 '{nameof(helpSeekerPawnKind)}' 为 null。";
         }
         if (hasParentFaction && parentFactionFinderClass is null)
         {
             parentFactionFinderClass = typeof(MercyQuestParentFactionFinder_Default);
-            yield return $"{nameof(hasParentFaction)} is true, but has a null {nameof(parentFactionFinderClass)}, set to {nameof(MercyQuestParentFactionFinder_Default)}";
+            yield return $"'{nameof(hasParentFaction)}' 为 true，但 '{nameof(parentFactionFinderClass)}' 为 null，已设置为 {nameof(MercyQuestParentFactionFinder_Default)}。";
         }
     }
 

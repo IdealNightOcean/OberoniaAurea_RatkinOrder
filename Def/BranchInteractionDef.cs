@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -58,11 +58,11 @@ public class BranchInteractionDef : InteractionDefBase
         }
         if (workerClass is null)
         {
-            yield return $"has a null {nameof(workerClass)}.";
+            yield return $"'{nameof(workerClass)}' 为 null。";
         }
         if (honorDef is not null && !honorOnly)
         {
-            yield return $"{honorDef} is not null but {honorOnly}  is false";
+            yield return $"'{honorDef}' 不为 null，但 '{honorOnly}' 为 false。";
         }
     }
 }

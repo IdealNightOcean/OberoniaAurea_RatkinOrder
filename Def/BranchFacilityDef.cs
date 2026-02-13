@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -30,19 +30,19 @@ public class BranchFacilityDef : BranchConstructionDef
 
         if (poorStage is null)
         {
-            yield return $"has null {nameof(poorStage)}.";
+            yield return $"'{nameof(poorStage)}' 为 null。";
         }
         if (normalStage is null)
         {
-            yield return $"has null {nameof(normalStage)}.";
+            yield return $"'{nameof(normalStage)}' 为 null。";
         }
         if (goodStage is null)
         {
-            yield return $"has null {nameof(goodStage)}.";
+            yield return $"'{nameof(goodStage)}' 为 null。";
         }
         if (excellentStage is null)
         {
-            yield return $"has null {nameof(excellentStage)}.";
+            yield return $"'{nameof(excellentStage)}' 为 null。";
         }
     }
 }

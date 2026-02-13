@@ -138,7 +138,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public bool HasClique(string cliqueKey) => allCliques?.ContainsKey(cliqueKey) ?? false;
 
-    public bool TryGetClique(string cliqueKey, out QuestClique clique, bool showErrorIfMiss = true)
+    public bool TryGetClique(string cliqueKey, out QuestClique clique, bool showErrorIfMiss = false)
     {
         if (allCliques is not null && allCliques.TryGetValue(cliqueKey, out clique))
         {
@@ -211,7 +211,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public void RemoveClique(string cliqueKey)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false) && allCliques.Remove(cliqueKey))
+        if (TryGetClique(cliqueKey, out QuestClique clique) && allCliques.Remove(cliqueKey))
         {
             Find.SignalManager.SendSignal(new Signal(SignalCliqueRemoved(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
             if (clique.IsActive)
@@ -223,7 +223,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public bool IsCliqueActive(string cliqueKey)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        if (TryGetClique(cliqueKey, out QuestClique clique))
         {
             return clique.IsActive;
         }
@@ -232,7 +232,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public bool CanActiveClique(string cliqueKey, bool directly = false)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        if (TryGetClique(cliqueKey, out QuestClique clique))
         {
             return clique.CanActiveNow(directly: directly, resultOnly: true);
         }
@@ -241,7 +241,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public bool TryActiveClique(string cliqueKey, bool directly = false, Map map = null, int activeDelayTicks = -1)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        if (TryGetClique(cliqueKey, out QuestClique clique))
         {
             return clique.TryActive(directly: directly, map: map, activeDelayTicks: activeDelayTicks);
         }
@@ -293,7 +293,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public bool CanBriberyClique(string cliqueKey, Map map, bool resultOnly)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        if (TryGetClique(cliqueKey, out QuestClique clique))
         {
             return clique.CanBribable(map, resultOnly: resultOnly);
         }
@@ -303,7 +303,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public void BriberyClique(string cliqueKey, Map map)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: false))
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: true))
         {
             clique.Bribery(map);
         }
@@ -311,7 +311,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public void TryCommunicateWithClique(string cliqueKey, Map map = null)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique))
+        if (TryGetClique(cliqueKey, out QuestClique clique, showErrorIfMiss: true))
         {
             clique.Communicate(branch, map);
         }

@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -49,12 +49,12 @@ public abstract class InteractionDefBase : Def
         if (!hasCoolDown && useDefaultCD)
         {
             useDefaultCD = false;
-            yield return $"'{nameof(useDefaultCD)}' disabled because '{nameof(hasCoolDown)}' is false.";
+            yield return $"'{nameof(useDefaultCD)}' 无法启用，因为 '{nameof(hasCoolDown)}' 为 false。";
         }
         if (useDefaultCD && defaultCdDays < 0)
         {
             defaultCdDays = 0;
-            yield return $"'{nameof(defaultCdDays)}' was negative. Set to 0.";
+            yield return $"'{nameof(defaultCdDays)}' 为负数，已设置为 0。";
         }
     }
 }

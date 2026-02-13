@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -24,7 +24,7 @@ public class BranchResidentDef : Def
         }
         if (residentClass is null)
         {
-            yield return $"has a null {nameof(residentClass)}";
+            yield return $"'{nameof(residentClass)}' 为 null。";
         }
     }
 }

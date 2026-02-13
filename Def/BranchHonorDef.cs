@@ -59,4 +59,17 @@ public class BranchHonorDef : Def
         return pawnGroupOptions.Where(g => g.kindDef == pawnGroupKindDef)
                                .TryRandomElementByWeight(g => g.commonality, out groupOption);
     }
+
+    public override IEnumerable<string> ConfigErrors()
+    {
+        foreach (string error in base.ConfigErrors())
+        {
+            yield return error;
+        }
+
+        if (academicDef is not null && academicDef.academicType != ResidentKnightAcademicDef.AcademicType.Honor)
+        {
+            yield return $"设置了{nameof(academicDef)}，但 {nameof(academicDef)} 的 {nameof(ResidentKnightAcademicDef.academicType)} 不为 {ResidentKnightAcademicDef.AcademicType.Honor}";
+        }
+    }
 }

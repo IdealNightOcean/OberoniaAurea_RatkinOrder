@@ -55,19 +55,19 @@ public class BranchContractDef : Def
         if (rewardWorkerClass is null)
         {
             rewardWorkerClass = defaultRewardClass;
-            yield return $"has a null {nameof(rewardWorkerClass)}. Set to default.";
+            yield return $"'{nameof(rewardWorkerClass)}' 为 null，已设置为默认值。";
         }
         if (requestThingDef is null)
         {
-            yield return $"has an invalid {nameof(requestThingDef)}";
+            yield return $"'{nameof(requestThingDef)}' 为 null。";
         }
         if (requestCountRange.min <= 0)
         {
-            yield return $"'s {nameof(requestCountRange)} may be negative";
+            yield return $"'{nameof(requestCountRange)}' 的最小值必须大于 0。";
         }
         if (requestCountRange.max <= 0)
         {
-            yield return $"'s {nameof(requestCountRange)} must be positive";
+            yield return $"'{nameof(requestCountRange)}' 的最大值必须大于 0。";
         }
     }
 }

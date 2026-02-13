@@ -16,13 +16,23 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
     protected override Faction GetOrGenerateFaction()
     {
         Slate slate = QuestGen.slate;
+        Quest quest = QuestGen.quest;
+
+        Faction subFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
+        QuestPart_InvolvedFactions questPart_InvolvedFactions = new()
+        {
+            factions = [subFaction]
+        };
+        quest.AddPart(questPart_InvolvedFactions);
+        quest.ReserveFaction(subFaction);
+
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
             MercyQuestDef = slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
-            SubFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction),
+            SubFaction = subFaction,
             ParentFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction),
         };
-        QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
+        quest.AddPart(questPart_MercyQuestWatcher);
 
         slate.Set(IsMainFactionSlate, true);
         return slate.Get<Faction>("faction");
@@ -30,7 +40,6 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 
     protected override bool InitQuestParameter()
     {
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
         questParameter = new()
         {
             allowAssaultColony = false,
@@ -48,14 +57,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
             questDurationTicks = 3 * 60000
         };
 
-        QuestGen.slate.Set(IsMainFactionSlate, true);
         QuestGen.slate.Set(UniqueLeavingLetterSlate, true);
-        QuestPart_InvolvedFactions questPart_InvolvedFactions = new()
-        {
-            factions = [subFaction]
-        };
-        QuestGen.quest.AddPart(questPart_InvolvedFactions);
-        QuestGen.quest.ReserveFaction(subFaction);
 
         return true;
     }

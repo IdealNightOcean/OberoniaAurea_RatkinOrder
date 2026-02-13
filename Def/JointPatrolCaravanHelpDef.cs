@@ -39,11 +39,11 @@ public class JointPatrolCaravanHelpDef : JointPatrolInteractionDef
         }
         if (workerClass is null)
         {
-            yield return $"has a null {nameof(workerClass)}";
+            yield return $"'{nameof(workerClass)}' 为 null。";
         }
         if (relatedWorldObject is null)
         {
-            yield return $"has a null {nameof(relatedWorldObject)}";
+            yield return $"'{nameof(relatedWorldObject)}' 为 null。";
         }
     }
 }

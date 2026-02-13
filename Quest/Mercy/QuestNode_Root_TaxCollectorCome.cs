@@ -158,6 +158,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
             mapOfPawn = collector,
 
             faction = parentFaction,
+            SubFaction = subFaction,
             DurationTicks = 20000 + 60, // 8小时
         };
         questPart_LordJob_TaxCollector.SetTalkWith(collector);

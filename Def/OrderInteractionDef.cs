@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -62,12 +62,12 @@ public class OrderInteractionDef : InteractionDefBase
         }
         if (workerClass is null)
         {
-            yield return $"has a null {nameof(workerClass)}.";
+            yield return $"'{nameof(workerClass)}' 为 null。";
         }
 
         if (needFund > 0f && fundEventDef is not null)
         {
-            yield return $"can't set both {nameof(needFund)} and {nameof(fundEventDef)}.";
+            yield return $"不能同时设置 '{nameof(needFund)}' 和 '{nameof(fundEventDef)}'。";
         }
     }
 }

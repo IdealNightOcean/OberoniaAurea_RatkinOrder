@@ -10,10 +10,10 @@ namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
 /// 军备订单交易点（特化类）
-/// </summary>
+/// </summary> 
 public sealed class WorldObject_ArmsOrderSite : WorldObject_InteractiveBase, IThingRequester
 {
-    private static readonly Texture2D FulfillIcon = ContentFinder<Texture2D>.Get("UI/Commands/FulfillTradeRequest");
+    private static readonly CachedTexture FulfillIcon = new("UI/Commands/FulfillTradeRequest");
 
     private ThingDef requestDef;
     private int requestCount = -1;
@@ -39,9 +39,9 @@ public sealed class WorldObject_ArmsOrderSite : WorldObject_InteractiveBase, ITh
         }
         if (IsRequestActive)
         {
-            Command_Action command_Fulfillment = new Command_Action()
+            Command_Action command_Fulfillment = new()
             {
-                icon = FulfillIcon,
+                icon = FulfillIcon.Texture,
                 action = delegate { FulfillRequest(caravan); }
             };
 

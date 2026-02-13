@@ -129,12 +129,12 @@ public class JointPatrolIncidentDef : JointPatrolInteractionDef
 
         if (incidentType == IncidentType.Building && relatedBuilding is null)
         {
-            yield return $"Incident type is '{nameof(IncidentType.Building)}', but '{nameof(relatedBuilding)}' is null.";
+            yield return $"事件类型为 '{nameof(IncidentType.Building)}'，但 '{nameof(relatedBuilding)}' 为 null。";
         }
         if (relatedBuilding is not null && incidentType != IncidentType.Building)
         {
             incidentType = IncidentType.Building;
-            yield return $"'{nameof(relatedBuilding)}' is specified, but incident type is not '{nameof(IncidentType.Building)}'. Type has been set to '{nameof(IncidentType.Building)}'.";
+            yield return $"已指定 '{nameof(relatedBuilding)}'，但事件类型不是 '{nameof(IncidentType.Building)}'。类型已设置为 '{nameof(IncidentType.Building)}'。";
         }
     }
 
