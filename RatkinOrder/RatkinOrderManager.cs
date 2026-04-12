@@ -45,13 +45,14 @@ public class RatkinOrderManager : IExposable
             return false;
         }
 
-        for (int i = 0; i < allRatkinOrders.Count; i++)
+        foreach (RatkinOrder ratkinOrder in allRatkinOrders)
         {
-            if (allRatkinOrders[i].Faction == faction)
+            if (ratkinOrder.Faction == faction)
             {
                 return true;
             }
         }
+
         return false;
     }
 
@@ -62,13 +63,14 @@ public class RatkinOrderManager : IExposable
             return null;
         }
 
-        for (int i = 0; i < allRatkinOrders.Count; i++)
+        foreach (RatkinOrder ratkinOrder in allRatkinOrders)
         {
-            if (allRatkinOrders[i].Faction == faction)
+            if (ratkinOrder.Faction == faction)
             {
-                return allRatkinOrders[i];
+                return ratkinOrder;
             }
         }
+
         return null;
     }
 

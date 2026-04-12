@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ResidentColonistRecord : IExposable, ILoadReferenceable
+public class ResidentPawn : IExposable, ILoadReferenceable
 {
     public const int PendingRemovalGracePeriodTicks = 5 * 60000;
 
@@ -54,10 +54,14 @@ public class ResidentColonistRecord : IExposable, ILoadReferenceable
         }
     }
 
-    protected ResidentColonistRecord() { }
-    public ResidentColonistRecord(Pawn pawn)
+    protected ResidentPawn() { }
+    public ResidentPawn(Pawn pawn)
     {
         this.pawn = pawn;
+
+        academicHandler = new AcademicHandler();
+
+        loadID = UniqueIDManager.GetUniqueID(nameof(ResidentPawn));
     }
 
     public virtual void ExposeData()
@@ -70,5 +74,5 @@ public class ResidentColonistRecord : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref pendingRemovalTick, nameof(pendingRemovalTick), -1);
     }
 
-    public virtual string GetUniqueLoadID() => $"{nameof(ResidentColonistRecord)}_{loadID}";
+    public virtual string GetUniqueLoadID() => $"{nameof(ResidentPawn)}_{loadID}";
 }

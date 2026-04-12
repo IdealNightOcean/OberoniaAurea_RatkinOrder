@@ -11,7 +11,8 @@ public class UniqueIDManager : IExposable
             { nameof(RatkinOrder), 0 },
             { nameof(Branch), 0 },
             { nameof(KnightRecord), 0 },
-            { nameof(ResidentKnightRecord), 0 }
+            { nameof(ResidentPawn), 0 },
+            { nameof(ResidentKnight), 0 }
         };
 
     private bool wasLoaded;

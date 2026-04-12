@@ -20,9 +20,9 @@ public partial class Window_OrderHall
         public Window_OrderHall Parent { get; }
         public Map Map { get; }
 
-        public ResidentKnightRecord Record { get; }
+        public ResidentKnight Record { get; }
         public AcademicHandler AcademicHandler { get; }
-        public ResidentKnightAcademicDef HonorAcademicDef { get; }
+        public KnightAcademicDef HonorAcademicDef { get; }
 
         private float MeditationFactor { get; }
         public bool ShowDetail { get; set; }
@@ -35,7 +35,7 @@ public partial class Window_OrderHall
         public LazyMutable<(int, int)> PreferredFurnitureCount { get; }
         public LazyMutable<string> PreferredFurnitureExplanation { get; }
 
-        public ResidentKnightEntryDrawer(Window_OrderHall parent, ResidentKnightRecord record, Map map)
+        public ResidentKnightEntryDrawer(Window_OrderHall parent, ResidentKnight record, Map map)
         {
             Parent = parent;
             Map = map;
@@ -126,7 +126,7 @@ public partial class Window_OrderHall
             Widgets.Label(reusedRect, Record.MeditationPoints.ToString("F0"));
 
             reusedRect = new(summaryInnerRectX + 320f, summaryInnerRectY, 85f, titleRectHeight);
-            Widgets.Label(reusedRect, ResidentKnightRecord.GetRankLabel(Record.CurRank));
+            Widgets.Label(reusedRect, Record.CurRank.GetLabel());
 
             reusedRect = summaryInnerRect;
             reusedRect.yMin = tileRect.yMax + 1f;
@@ -215,7 +215,7 @@ public partial class Window_OrderHall
                     ratkinOrder: Record.RatkinOrder,
                     acceptAction: delegate
                     {
-                        ResidentKnightsManager.Instance.DeregisterKnight(Record.Pawn);
+                        ResidentKnightsManager.Instance.DeregisterKnight(Record.Pawn, ResidentKnightRemovalReason.Player);
                         Parent.OnShowDrawerDetailChanged(this);
                         Parent.ResidentKnightDrawers.Remove(this);
                     });
@@ -256,7 +256,7 @@ public partial class Window_OrderHall
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, ResonatePersonalitiesStr.Value);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{Record.CurRank}Knight".Translate().Colorize(ResidentKnightRecord.GetRankColor(Record.CurRank)));
+            Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{Record.CurRank}Knight".Translate().Colorize(Record.CurRank.GetColor()));
 
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Rect starRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMin, 18f, 18f);
@@ -330,7 +330,7 @@ public partial class Window_OrderHall
             academicViewRect.height = (AcademicHandler.Academics.Count + 1) * entryHeight;
 
             Widgets.BeginScrollView(academicRect, ref scrollPosition_GenealAcademic, academicViewRect, showScrollbars: false);
-            foreach (KeyValuePair<ResidentKnightAcademicDef, int> kv in AcademicHandler.Academics)
+            foreach (KeyValuePair<KnightAcademicDef, int> kv in AcademicHandler.Academics)
             {
                 Vector2 entryPos = new(entryX, entryY);
                 entryY += entryHeight;
@@ -342,7 +342,7 @@ public partial class Window_OrderHall
             return inRect.yMax;
         }
 
-        private void DrawGenealAcademic(Vector2 position, ResidentKnightAcademicDef academicDef, int academicLevel)
+        private void DrawGenealAcademic(Vector2 position, KnightAcademicDef academicDef, int academicLevel)
         {
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleLeft;
@@ -373,22 +373,22 @@ public partial class Window_OrderHall
         {
             switch (Record.CurRank)
             {
-                case ResidentKnightRecord.Rank.Regular:
+                case ResidentKnightRank.Regular:
                     {
                         GUI.DrawTexture(inRect, rankBackGround_RegularS, ScaleMode.StretchToFill);
                         return;
                     }
-                case ResidentKnightRecord.Rank.Elite:
+                case ResidentKnightRank.Elite:
                     {
                         GUI.DrawTexture(inRect, rankBackGround_EliteS, ScaleMode.StretchToFill);
                         return;
                     }
-                case ResidentKnightRecord.Rank.Honor:
+                case ResidentKnightRank.Honor:
                     {
                         GUI.DrawTexture(inRect, rankBackGround_HonorS, ScaleMode.StretchToFill);
                         return;
                     }
-                case ResidentKnightRecord.Rank.Crown:
+                case ResidentKnightRank.Crown:
                     {
                         GUI.DrawTexture(inRect, rankBackGround_CrownS, ScaleMode.StretchToFill);
                         return;
@@ -469,7 +469,7 @@ public partial class Window_OrderHall
                 ResidentKnightsManager residentKnightsManager = ResidentKnightsManager.Instance;
                 foreach (ResidentKnightRoleDef roleDef in DefDatabase<ResidentKnightRoleDef>.AllDefsListForReading)
                 {
-                    if (residentKnightsManager.TryGetKnightOfRole(roleDef, out ResidentKnightRecord otherRecord))
+                    if (residentKnightsManager.TryGetKnightOfRole(roleDef, out ResidentKnight otherRecord))
                     {
                         if (otherRecord.NextRoleChangeableTick > ticksGame)
                         {
@@ -496,7 +496,7 @@ public partial class Window_OrderHall
         private void RoleChangeConfirmDialog(ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
         {
             StringBuilder sb = new(256);
-            ResidentKnightsManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnightRecord roleRecord);
+            ResidentKnightsManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
             if (roleRecord is null)
             {
                 sb.AppendLine("OARO_HallWin_RoleChangeConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));

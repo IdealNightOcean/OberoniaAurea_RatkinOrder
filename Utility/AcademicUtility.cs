@@ -9,7 +9,19 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class AcademicUtility
 {
-    public static float GetMeditationPointsNeeded(ResidentKnightAcademicDef academicDef, KnightPersonality personality, int targetLevel)
+    public static int GetNoAdditionalCostAcademicCeiling(ResidentKnightRank rank)
+    {
+        return rank switch
+        {
+            ResidentKnightRank.Regular => 5,
+            ResidentKnightRank.Elite => 10,
+            ResidentKnightRank.Honor => 20,
+            ResidentKnightRank.Crown => 60,
+            _ => 60
+        };
+    }
+
+    public static float GetMeditationPointsNeeded(KnightAcademicDef academicDef, KnightPersonality personality, int targetLevel)
     {
         if (targetLevel < 1)
         {
@@ -20,7 +32,7 @@ public static class AcademicUtility
             return float.MaxValue;
         }
 
-        float baseUnitCost = academicDef.academicType == ResidentKnightAcademicDef.AcademicType.Honor ? 500f : 250f;
+        float baseUnitCost = academicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
         float neededPoints = baseUnitCost + (targetLevel - 1) * baseUnitCost;
         if ((academicDef.personality & personality) != 0)
         {
@@ -29,19 +41,19 @@ public static class AcademicUtility
         return neededPoints;
     }
 
-    public static AcceptanceReport CanActivateAcademicBySelf(Pawn pawn, ResidentKnightAcademicDef academic, bool resultOnly)
+    public static AcceptanceReport CanActivateAcademicBySelf(Pawn pawn, KnightAcademicDef academic, bool resultOnly)
     {
         if (pawn is null || academic is null)
             return false;
 
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return false;
 
 
         return CanActivateAcademicBySelf(record, academic, resultOnly);
     }
 
-    public static AcceptanceReport CanActivateAcademicBySelf(ResidentKnightRecord record, ResidentKnightAcademicDef academic, bool resultOnly)
+    public static AcceptanceReport CanActivateAcademicBySelf(ResidentKnight record, KnightAcademicDef academic, bool resultOnly)
     {
         Branch branch = record.Branch;
         if (branch is null)
@@ -49,16 +61,16 @@ public static class AcademicUtility
 
         switch (academic.academicType)
         {
-            case ResidentKnightAcademicDef.AcademicType.Geneal:
+            case KnightAcademicDef.AcademicType.Geneal:
                 return true;
 
-            case ResidentKnightAcademicDef.AcademicType.Honor:
+            case KnightAcademicDef.AcademicType.Honor:
                 return branch.HonorDef?.academicDef == academic;
 
-            case ResidentKnightAcademicDef.AcademicType.Traditional:
+            case KnightAcademicDef.AcademicType.Traditional:
                 if (!branch.IsBranchOfType(Branch.BranchType.Friendly))
                     return false;
-                if (record.AcademicHandler.GetTotalAcademicLevelOf(a => a.academicType != ResidentKnightAcademicDef.AcademicType.Traditional) < 12)
+                if (record.AcademicHandler.GetTotalAcademicLevelOf(a => a.academicType != KnightAcademicDef.AcademicType.Traditional) < 12)
                     return false;
 
                 foreach (BranchTradition tradition in branch.TraditionHandler.Traditions)
@@ -73,14 +85,14 @@ public static class AcademicUtility
         }
     }
 
-    public static IEnumerable<ResidentKnightAcademicDef> GetAllActivateAcademicsBySelf(ResidentKnightRecord record)
+    public static IEnumerable<KnightAcademicDef> GetAllActivateAcademicsBySelf(ResidentKnight record)
     {
         if (record is null)
             yield break;
 
-        foreach (ResidentKnightAcademicDef def in DefDatabase<ResidentKnightAcademicDef>.AllDefs)
+        foreach (KnightAcademicDef def in DefDatabase<KnightAcademicDef>.AllDefs)
         {
-            if (def.academicType == ResidentKnightAcademicDef.AcademicType.Geneal)
+            if (def.academicType == KnightAcademicDef.AcademicType.Geneal)
                 yield return def;
         }
 
@@ -91,10 +103,10 @@ public static class AcademicUtility
         if (!branch.IsBranchOfType(Branch.BranchType.Friendly))
             yield break;
 
-        if (record.AcademicHandler.GetTotalAcademicLevelOf(a => a.academicType != ResidentKnightAcademicDef.AcademicType.Traditional) < 12)
+        if (record.AcademicHandler.GetTotalAcademicLevelOf(a => a.academicType != KnightAcademicDef.AcademicType.Traditional) < 12)
             yield break;
 
-        HashSet<ResidentKnightAcademicDef> traditionAcademics = [];
+        HashSet<KnightAcademicDef> traditionAcademics = [];
         foreach (BranchTradition tradition in record.Branch.TraditionHandler.Traditions)
         {
             if (tradition.Def.academicDef is not null && traditionAcademics.Add(tradition.Def.academicDef))
@@ -102,21 +114,21 @@ public static class AcademicUtility
         }
     }
 
-    public static IEnumerable<ResidentKnightAcademicDef> GetAllPotentialAcademics(ResidentKnightRecord recod)
+    public static IEnumerable<KnightAcademicDef> GetAllPotentialAcademics(ResidentKnight recod)
     {
         if (recod is null)
             yield break;
 
-        foreach (ResidentKnightAcademicDef def in DefDatabase<ResidentKnightAcademicDef>.AllDefs)
+        foreach (KnightAcademicDef def in DefDatabase<KnightAcademicDef>.AllDefs)
         {
-            if (def.academicType == ResidentKnightAcademicDef.AcademicType.Geneal)
+            if (def.academicType == KnightAcademicDef.AcademicType.Geneal)
                 yield return def;
         }
 
         if (recod.Branch.HonorDef?.academicDef is not null)
             yield return recod.Branch.HonorDef.academicDef;
 
-        HashSet<ResidentKnightAcademicDef> traditionAcademics = [];
+        HashSet<KnightAcademicDef> traditionAcademics = [];
         foreach (BranchTradition tradition in recod.Branch.TraditionHandler.Traditions)
         {
             if (tradition.Def.academicDef is not null && traditionAcademics.Add(tradition.Def.academicDef))
@@ -124,7 +136,7 @@ public static class AcademicUtility
         }
     }
 
-    public static float GetDailyTutoringSuccessChance(ResidentKnightRecord teacher, Pawn student, bool resultOnly, out string explain)
+    public static float GetDailyTutoringSuccessChance(ResidentKnight teacher, Pawn student, bool resultOnly, out string explain)
     {
         explain = string.Empty;
         if (teacher is null || student is null)
@@ -134,7 +146,7 @@ public static class AcademicUtility
         float curChance = 0.1f;
 
         // Get student record once and cache personality
-        bool hasStudentRecord = ResidentKnightsManager.Instance.TryGetKnightRecord(student, out ResidentKnightRecord studentRecord);
+        bool hasStudentRecord = ResidentKnightsManager.Instance.TryGetKnightRecord(student, out ResidentKnight studentRecord);
         KnightPersonality studentPersonality = hasStudentRecord ? studentRecord.Personality : KnightPersonality.None;
 
         // Apply personality factor
@@ -175,9 +187,9 @@ public static class AcademicUtility
         // Teacher rank factor
         float teacherRankFactor = teacher.CurRank switch
         {
-            ResidentKnightRecord.Rank.Elite => 1.1f,
-            ResidentKnightRecord.Rank.Honor => 1.25f,
-            ResidentKnightRecord.Rank.Crown => 1.5f,
+            ResidentKnightRank.Elite => 1.1f,
+            ResidentKnightRank.Honor => 1.25f,
+            ResidentKnightRank.Crown => 1.5f,
             _ => 1f
         };
         ApplyStepChange(teacherRankFactor, "");
@@ -197,14 +209,14 @@ public static class AcademicUtility
         }
     }
 
-    public static IEnumerable<(ResidentKnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(
+    public static IEnumerable<(KnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(
         AcademicHandler a,
         AcademicHandler b)
     {
         if (a is null || b is null)
             yield break;
 
-        foreach ((ResidentKnightAcademicDef def, int aLevel) in a.Academics)
+        foreach ((KnightAcademicDef def, int aLevel) in a.Academics)
         {
             int bLevel = b.GetAcademicLevel(def);
             if (bLevel == 0 || aLevel > bLevel)

@@ -49,8 +49,8 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     [Unsaved] private Dictionary<Branch, JointBranchRecord> participantsDict = [];
     public IReadOnlyDictionary<Branch, JointBranchRecord> ParticipantsDict => participantsDict;
 
-    private List<ResidentKnightRecord> participatingResidentKnights = [];
-    public IReadOnlyList<ResidentKnightRecord> ParticipatingResidentKnights => participatingResidentKnights;
+    private List<ResidentKnight> participatingResidentKnights = [];
+    public IReadOnlyList<ResidentKnight> ParticipatingResidentKnights => participatingResidentKnights;
     private ThingOwner<Pawn> innerContainer;
 
     private Dictionary<PatrolInteractionType, int> patrolInteractionAcquired = [];
@@ -308,7 +308,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     public void OnKnightSacrifice(int sacrificeCount) => this.sacrificeCount = Mathf.Max(0, this.sacrificeCount + sacrificeCount);
 
-    public bool MarkResidentKnightBackTeam(ResidentKnightRecord record)
+    public bool MarkResidentKnightBackTeam(ResidentKnight record)
     {
         if (curState != PatrolState.Prepare)
         {
@@ -329,7 +329,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     public void OnResidentKnightBackTeam(Pawn knight)
     {
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnight record))
         {
             return;
         }
@@ -340,10 +340,10 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             {
                 pRecord.PotencyOffset += record.CurRank switch
                 {
-                    ResidentKnightRecord.Rank.Regular => 5,
-                    ResidentKnightRecord.Rank.Elite => 10,
-                    ResidentKnightRecord.Rank.Honor => 20,
-                    ResidentKnightRecord.Rank.Crown => 40,
+                    ResidentKnightRank.Regular => 5,
+                    ResidentKnightRank.Elite => 10,
+                    ResidentKnightRank.Honor => 20,
+                    ResidentKnightRank.Crown => 40,
                     _ => 5
                 };
             }
@@ -354,7 +354,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
     }
 
-    public void OnResidentKnightRemoved(ResidentKnightRecord record)
+    public void OnResidentKnightRemoved(ResidentKnight record)
     {
         participatingResidentKnights?.Remove(record);
         innerContainer?.Remove(record.Pawn);
@@ -411,7 +411,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         bool ShouldRemoveResidentKnight(Pawn knight)
         {
-            return !ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnightRecord residentRecord) || residentRecord.Branch == branch;
+            return !ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnight residentRecord) || residentRecord.Branch == branch;
         }
     }
 
@@ -623,7 +623,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
 
 
-        foreach (ResidentKnightRecord record in participatingResidentKnights)
+        foreach (ResidentKnight record in participatingResidentKnights)
         {
             record.Pawn.SetFaction(record.RatkinOrder.Faction);
         }
@@ -1063,7 +1063,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             }
 
             ThoughtDef thoughtToAdd = jDef.ThoughtToAdd;
-            foreach (ResidentKnightRecord kRecord in participatingResidentKnights)
+            foreach (ResidentKnight kRecord in participatingResidentKnights)
             {
                 kRecord.Pawn.needs?.mood?.thoughts.memories.TryGainMemory(thoughtToAdd);
             }

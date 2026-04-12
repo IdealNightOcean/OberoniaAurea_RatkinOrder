@@ -187,18 +187,18 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
 
     private string ResidentKnightAcademic(Pawn pawn)
     {
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
         {
             return null;
         }
         KnightPersonality personality = record.Personality;
         AcademicHandler academicHandler = record.AcademicHandler;
-        ResidentKnightAcademicDef academicDef = academicHandler.Academics.Where(kv => (kv.Key.academicType == ResidentKnightAcademicDef.AcademicType.Geneal) &&
+        KnightAcademicDef academicDef = academicHandler.Academics.Where(kv => (kv.Key.academicType == KnightAcademicDef.AcademicType.Geneal) &&
                                                                                       ((kv.Key.personality & personality) != 0) &&
                                                                                       (kv.Value < kv.Key.MaxStageLevel))
                                                                          .RandomElementWithFallback().Key;
 
-        academicDef ??= DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading.Where(d => (d.academicType == ResidentKnightAcademicDef.AcademicType.Geneal) &&
+        academicDef ??= DefDatabase<KnightAcademicDef>.AllDefsListForReading.Where(d => (d.academicType == KnightAcademicDef.AcademicType.Geneal) &&
                                                                                                 ((d.personality & personality) != 0))
 
                                                                                     .RandomElementWithFallback();

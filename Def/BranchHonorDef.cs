@@ -15,9 +15,9 @@ public class BranchHonorDef : Def
     public HediffDef buffHediff;
 
     /// <summary>
-    /// 荣誉课业（<see cref="ResidentKnightAcademicDef"/>）
+    /// 荣誉课业（<see cref="KnightAcademicDef"/>）
     /// </summary>
-    public ResidentKnightAcademicDef academicDef;
+    public KnightAcademicDef academicDef;
 
     /// <summary>
     /// 核心印记Def（<see cref="BranchMedalDef"/>）
@@ -67,9 +67,9 @@ public class BranchHonorDef : Def
             yield return error;
         }
 
-        if (academicDef is not null && academicDef.academicType != ResidentKnightAcademicDef.AcademicType.Honor)
+        if (academicDef is not null && academicDef.academicType != KnightAcademicDef.AcademicType.Honor)
         {
-            yield return $"设置了{nameof(academicDef)}，但 {nameof(academicDef)} 的 {nameof(ResidentKnightAcademicDef.academicType)} 不为 {ResidentKnightAcademicDef.AcademicType.Honor}";
+            yield return $"设置了{nameof(academicDef)}，但 {nameof(academicDef)} 的 {nameof(KnightAcademicDef.academicType)} 不为 {KnightAcademicDef.AcademicType.Honor}";
         }
     }
 }

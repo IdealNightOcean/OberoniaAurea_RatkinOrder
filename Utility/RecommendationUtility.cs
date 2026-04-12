@@ -196,14 +196,14 @@ public static class RecommendationUtility
     /// 提升常驻骑士阶位所需推荐信数量
     /// </summary>
     /// <param name="targetRank">目标阶位</param>
-    public static int RecommendationNeed_ResidentKnightRankUpgrade(RatkinOrder ratkinOrder, ResidentKnightRecord.Rank targetRank)
+    public static int RecommendationNeed_ResidentKnightRankUpgrade(RatkinOrder ratkinOrder, ResidentKnightRank targetRank)
     {
         int needCount = targetRank switch
         {
-            ResidentKnightRecord.Rank.Regular => 0,
-            ResidentKnightRecord.Rank.Elite => 1,
-            ResidentKnightRecord.Rank.Honor => 2,
-            ResidentKnightRecord.Rank.Crown => 4,
+            ResidentKnightRank.Regular => 0,
+            ResidentKnightRank.Elite => 1,
+            ResidentKnightRank.Honor => 2,
+            ResidentKnightRank.Crown => 4,
             _ => 0
         };
         if (ratkinOrder.Relationship >= EsteemHandler.RelationshipKind.Soulmate)

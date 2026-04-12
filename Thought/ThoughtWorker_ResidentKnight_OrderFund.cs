@@ -12,7 +12,7 @@ public class ThoughtWorker_ResidentKnight_OrderFund : ThoughtWorker
             return ThoughtState.Inactive;
         }
 
-        if (ResidentKnightsManager.Instance.TryGetKnightRecord(p, out ResidentKnightRecord pRecord) && pRecord.RatkinOrder.Funds < 0.2f)
+        if (ResidentKnightsManager.Instance.TryGetKnightRecord(p, out ResidentKnight pRecord) && pRecord.RatkinOrder.Funds < 0.2f)
         {
             return ThoughtState.ActiveAtStage(pRecord.RatkinOrder.Funds <= 0.01f ? 1 : 0);
         }

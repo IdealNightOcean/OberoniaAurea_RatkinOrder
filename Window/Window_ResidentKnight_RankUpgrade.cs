@@ -8,9 +8,9 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
 {
-    private ResidentKnightRecord Record { get; }
+    private ResidentKnight Record { get; }
     private Map Map { get; }
-    private ResidentKnightRecord.Rank TargetRank { get; }
+    private ResidentKnightRank TargetRank { get; }
 
     private Vector2 scrollPosition_Description;
 
@@ -18,11 +18,11 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
 
     public override Vector2 InitialSize => new(593f, 480f);
 
-    public Window_ResidentKnight_RankUpgrade(ResidentKnightRecord record, Map map) : base()
+    public Window_ResidentKnight_RankUpgrade(ResidentKnight record, Map map) : base()
     {
         Record = record;
         Map = map;
-        TargetRank = ResidentKnightRecord.RankOffsetBy(Record.CurRank, offset: 1);
+        TargetRank = record.CurRank.OffsetBy(offset: 1);
     }
 
     public override void Close(bool doCloseSound = true)
@@ -56,7 +56,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
         Text.Font = GameFont.Medium;
         reusedRect = new(innerRectX, innerRectY + 137f, innerRect.width, 185f);
         DrawRankBackGround(reusedRect);
-        Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}Knight".Translate().Colorize(ResidentKnightRecord.GetRankColor(TargetRank)));
+        Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{TargetRank}Knight".Translate().Colorize(TargetRank.GetColor()));
 
         Text.Font = GameFont.Small;
         reusedRect = new(innerRectX, innerRectY + 330f, innerRect.width, 20f);
@@ -101,10 +101,10 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
     {
         Texture2D rankTex = TargetRank switch
         {
-            ResidentKnightRecord.Rank.Regular => rankBackground_Regular,
-            ResidentKnightRecord.Rank.Elite => rankBackground_Elite,
-            ResidentKnightRecord.Rank.Honor => rankBackground_Honor,
-            ResidentKnightRecord.Rank.Crown => rankBackground_Crown,
+            ResidentKnightRank.Regular => rankBackground_Regular,
+            ResidentKnightRank.Elite => rankBackground_Elite,
+            ResidentKnightRank.Honor => rankBackground_Honor,
+            ResidentKnightRank.Crown => rankBackground_Crown,
             _ => null,
         };
 

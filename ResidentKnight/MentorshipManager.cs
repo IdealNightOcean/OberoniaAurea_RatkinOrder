@@ -9,8 +9,8 @@ public class MentorshipManager : IExposable
 {
     public const int MaxStudentsPerKnight = 2;
 
-    [Unsaved] private Dictionary<Pawn, HashSet<ResidentKnightRecord>> studentsToTeachers = [];
-    [Unsaved] private Dictionary<ResidentKnightRecord, HashSet<Pawn>> teachersToStudents = [];
+    [Unsaved] private Dictionary<Pawn, HashSet<ResidentKnight>> studentsToTeachers = [];
+    [Unsaved] private Dictionary<ResidentKnight, HashSet<Pawn>> teachersToStudents = [];
 
     private List<StudentTeacherPair> studentTeacherPairs;
 
@@ -21,13 +21,13 @@ public class MentorshipManager : IExposable
         if (Scribe.mode == LoadSaveMode.Saving)
         {
             studentTeacherPairs = new List<StudentTeacherPair>(studentsToTeachers.Count);
-            foreach (KeyValuePair<Pawn, HashSet<ResidentKnightRecord>> kv in studentsToTeachers)
+            foreach (KeyValuePair<Pawn, HashSet<ResidentKnight>> kv in studentsToTeachers)
             {
                 Pawn student = kv.Key;
                 if (student is null)
                     continue;
 
-                foreach (ResidentKnightRecord record in kv.Value)
+                foreach (ResidentKnight record in kv.Value)
                 {
                     if (record is null)
                         continue;
@@ -69,7 +69,7 @@ public class MentorshipManager : IExposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool CanAcceptStudent(ResidentKnightRecord knightRecord)
+    public bool CanAcceptStudent(ResidentKnight knightRecord)
     {
         if (knightRecord is null)
             return false;
@@ -78,7 +78,7 @@ public class MentorshipManager : IExposable
         return students.Count < MaxStudentsPerKnight;
     }
 
-    public int GetStudentCount(ResidentKnightRecord knightRecord)
+    public int GetStudentCount(ResidentKnight knightRecord)
     {
         if (knightRecord is null)
             return 0;
@@ -87,7 +87,7 @@ public class MentorshipManager : IExposable
         return 0;
     }
 
-    public bool AddStudent(Pawn studentPawn, ResidentKnightRecord teacherRecord)
+    public bool AddStudent(Pawn studentPawn, ResidentKnight teacherRecord)
     {
         if (studentPawn is null || teacherRecord is null)
             return false;
@@ -96,7 +96,7 @@ public class MentorshipManager : IExposable
             Log.Warning($"[OARO] 常驻骑士 {teacherRecord.Pawn.Name} 已达到最大授导对象数量上限 ({MaxStudentsPerKnight})");
             return false;
         }
-        if (!studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnightRecord> teachers))
+        if (!studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
         {
             studentsToTeachers[studentPawn] = [teacherRecord];
         }
@@ -115,7 +115,7 @@ public class MentorshipManager : IExposable
         return true;
     }
 
-    public bool RemoveTeacher(ResidentKnightRecord teacher)
+    public bool RemoveTeacher(ResidentKnight teacher)
     {
         if (teacher is null)
             return false;
@@ -124,7 +124,7 @@ public class MentorshipManager : IExposable
 
         foreach (Pawn student in students)
         {
-            if (studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnightRecord> teachers))
+            if (studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnight> teachers))
             {
                 teachers.Remove(teacher);
                 if (teachers.Count == 0)
@@ -142,10 +142,10 @@ public class MentorshipManager : IExposable
     {
         if (student is null)
             return false;
-        if (!studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnightRecord> teachers))
+        if (!studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnight> teachers))
             return false;
 
-        foreach (ResidentKnightRecord teacher in teachers)
+        foreach (ResidentKnight teacher in teachers)
         {
             if (teachersToStudents.TryGetValue(teacher, out HashSet<Pawn> teacherStudents))
             {
@@ -161,25 +161,25 @@ public class MentorshipManager : IExposable
         return true;
     }
 
-    public IReadOnlyCollection<ResidentKnightRecord> GetTeachersOfStudent(Pawn studentPawn)
+    public IReadOnlyCollection<ResidentKnight> GetTeachersOfStudent(Pawn studentPawn)
     {
-        if (studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnightRecord> teachers))
+        if (studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
             return teachers;
         return [];
     }
 
-    public IReadOnlyCollection<Pawn> GetStudentsOfTeacher(ResidentKnightRecord teacherRecord)
+    public IReadOnlyCollection<Pawn> GetStudentsOfTeacher(ResidentKnight teacherRecord)
     {
         if (teachersToStudents.TryGetValue(teacherRecord, out HashSet<Pawn> students))
             return students;
         return [];
     }
 
-    public bool IsStudentOfKnight(Pawn studentPawn, ResidentKnightRecord knightRecord)
+    public bool IsStudentOfKnight(Pawn studentPawn, ResidentKnight knightRecord)
     {
         if (studentPawn is null || knightRecord is null)
             return false;
-        if (studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnightRecord> teachers))
+        if (studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
         {
             return teachers.Contains(knightRecord);
         }
@@ -194,7 +194,7 @@ public class MentorshipManager : IExposable
     private class StudentTeacherPair : IExposable
     {
         public Pawn student;
-        public ResidentKnightRecord teacher;
+        public ResidentKnight teacher;
 
         public void ExposeData()
         {

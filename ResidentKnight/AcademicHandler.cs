@@ -9,8 +9,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class AcademicHandler : IExposable
 {
-    private Dictionary<ResidentKnightAcademicDef, int> academics = [];
-    public IReadOnlyDictionary<ResidentKnightAcademicDef, int> Academics => academics;
+    private Dictionary<KnightAcademicDef, int> academics = [];
+    public IReadOnlyDictionary<KnightAcademicDef, int> Academics => academics;
 
     public LazyMutable<int> TotalAcademicLevel { get; }
 
@@ -25,13 +25,43 @@ public class AcademicHandler : IExposable
         TotalAcademicLevel = new(refreshFunc: () => academics?.Values.Sum() ?? 0);
     }
 
+    public AcademicHandler(Pawn pawn, KnightRecord knightRecord) : this()
+    {
+        try
+        {
+            /*
+            KnightAcademicDef initAcademicDef;
+            if (Personality != KnightPersonality.None && OrderDefDataBase.ResidentKnightAcademicGroupByPersonality.TryGetValue(Personality, out List<KnightAcademicDef> potentialAcademics))
+            {
+                initAcademicDef = potentialAcademics.RandomElement();
+            }
+            else
+            {
+                initAcademicDef = DefDatabase<KnightAcademicDef>.AllDefsListForReading
+                    .Where(d => d.academicType == KnightAcademicDef.AcademicType.Geneal)
+                    .RandomElement();
+            }
+            UpgradeAcademicLevel(initAcademicDef, usePoints: false);
+            */
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                $"initialize {nameof(AcademicHandler)} for a knight.",
+                typeName: nameof(AcademicHandler),
+                methodName: nameof(AcademicHandler),
+                needStackTrace: true);
+        }
+
+    }
+
     public void ExposeData()
     {
         Scribe_Collections.Look(ref academics, nameof(academics), LookMode.Def, LookMode.Value);
         Scribe_Values.Look(ref meditationPoints, nameof(meditationPoints), 0f);
     }
 
-    public bool HasAcademic(ResidentKnightAcademicDef academic)
+    public bool HasAcademic(KnightAcademicDef academic)
     {
         if (academic is null)
         {
@@ -40,7 +70,7 @@ public class AcademicHandler : IExposable
         return academics.ContainsKey(academic);
     }
 
-    public int GetAcademicLevel(ResidentKnightAcademicDef academic)
+    public int GetAcademicLevel(KnightAcademicDef academic)
     {
         if (academic is null)
         {
@@ -54,7 +84,7 @@ public class AcademicHandler : IExposable
     }
 
     public AcceptanceReport CanUpgradeAcademic(
-        ResidentKnightAcademicDef academicDef,
+        KnightAcademicDef academicDef,
         KnightPersonality personality = KnightPersonality.None,
         bool directly = false,
         bool resultOnly = false)
@@ -81,7 +111,7 @@ public class AcademicHandler : IExposable
     }
 
     public bool UpgradeAcademic(
-        ResidentKnightAcademicDef academicDef,
+        KnightAcademicDef academicDef,
         Pawn pawn,
         KnightPersonality personality = KnightPersonality.None,
         bool directly = false)
@@ -95,7 +125,7 @@ public class AcademicHandler : IExposable
     }
 
     public bool SetAcademicLevel(
-        ResidentKnightAcademicDef academicDef,
+        KnightAcademicDef academicDef,
         Pawn pawn,
         int targetLevel,
         KnightPersonality personality = KnightPersonality.None,
@@ -134,10 +164,10 @@ public class AcademicHandler : IExposable
         return true;
     }
 
-    public int GetTotalAcademicLevelOf(Predicate<ResidentKnightAcademicDef> predicate)
+    public int GetTotalAcademicLevelOf(Predicate<KnightAcademicDef> predicate)
     {
         int totalLevel = 0;
-        foreach (KeyValuePair<ResidentKnightAcademicDef, int> kv in academics)
+        foreach (KeyValuePair<KnightAcademicDef, int> kv in academics)
         {
             if (predicate(kv.Key))
                 totalLevel += kv.Value;
@@ -145,7 +175,7 @@ public class AcademicHandler : IExposable
         return totalLevel;
     }
 
-    private void SetAcademicLevelDirectly(ResidentKnightAcademicDef academicDef, Pawn pawn, int targetLevel)
+    private void SetAcademicLevelDirectly(KnightAcademicDef academicDef, Pawn pawn, int targetLevel)
     {
         academics[academicDef] = targetLevel;
         academicDef.OnAcademicLevelUpgrade(pawn, targetLevel: targetLevel);

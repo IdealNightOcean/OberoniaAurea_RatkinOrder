@@ -447,7 +447,7 @@ public partial class Window_BranchTask : OrderWindowBase
         }
         List<Thing> notParticipatingPawns = [];
 
-        foreach (ResidentKnightRecord record in ResidentKnightsManager.Instance.ResidentKnights.Values.Where(r => r.RatkinOrder == RatkinOrder))
+        foreach (ResidentKnight record in ResidentKnightsManager.Instance.ResidentKnights.Values.Where(r => r.RatkinOrder == RatkinOrder))
         {
             if (!JointPatrolManager.ParticipatingResidentKnights.Contains(record))
             {
@@ -507,7 +507,7 @@ public partial class Window_BranchTask : OrderWindowBase
             return;
         }
         List<FloatMenuOption> menuOptions = [];
-        foreach ((Pawn knight, ResidentKnightRecord record) in ResidentKnightsManager.Instance.ResidentKnights)
+        foreach ((Pawn knight, ResidentKnight record) in ResidentKnightsManager.Instance.ResidentKnights)
         {
             if (record.RatkinOrder != RatkinOrder || !record.IsValid || knight.Downed)
             {

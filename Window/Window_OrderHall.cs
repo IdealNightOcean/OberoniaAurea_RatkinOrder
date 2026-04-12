@@ -54,7 +54,7 @@ public partial class Window_OrderHall : OrderWindowBase
         HallLevelRestrictionDescs = OrderHallUtility.GetHallUpgradeInfo() ?? [];
 
         ResidentKnightDrawers = new(ResidentKnightsManager.Instance.ResidentKnights.Count + 1);
-        foreach (ResidentKnightRecord record in ResidentKnightsManager.Instance.ResidentKnights.Values)
+        foreach (ResidentKnight record in ResidentKnightsManager.Instance.ResidentKnights.Values)
         {
             ResidentKnightDrawers.Add(new ResidentKnightEntryDrawer(this, record, Map));
         }

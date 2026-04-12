@@ -7,7 +7,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-using static ResidentKnightAcademicDef;
+using static KnightAcademicDef;
 
 public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 {
@@ -19,12 +19,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     public Action PostArrangeNewAcademic { get; set; }
 
-    private ResidentKnightRecord Record { get; }
+    private ResidentKnight Record { get; }
     public AcademicHandler AcademicHandler { get; }
     private BranchHonorDef BranchHonor { get; }
     private int NoAdditionalCostAcademicCeiling { get; }
 
-    private ResidentKnightAcademicDef SelAcademicDef { get; set; }
+    private KnightAcademicDef SelAcademicDef { get; set; }
     private int SelAcademicStageLevel { get; set; }
     private float MeditationPointForSelAcademicUpgrade { get; set; }
 
@@ -34,23 +34,23 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     private Texture2D CheckAcademicColorTex { get; set; }
     private AcceptanceReport CheckAcademicStageAcceptance { get; set; }
 
-    private IReadOnlyList<(ResidentKnightAcademicDef, bool)> AllAvailableAcademics { get; set; }
+    private IReadOnlyList<(KnightAcademicDef, bool)> AllAvailableAcademics { get; set; }
 
-    public Window_ResidentKnight_AcademicArrange(ResidentKnightRecord record) : base()
+    public Window_ResidentKnight_AcademicArrange(ResidentKnight record) : base()
     {
         Record = record;
         AcademicHandler = record.AcademicHandler;
         BranchHonor = record.Branch.HonorDef;
-        NoAdditionalCostAcademicCeiling = ResidentKnightRecord.GetNoAdditionalCostAcademicCeiling(Record.CurRank);
+        NoAdditionalCostAcademicCeiling = AcademicUtility.GetNoAdditionalCostAcademicCeiling(Record.CurRank);
 
-        HashSet<ResidentKnightAcademicDef> academicHash = new(AcademicHandler.Academics.Count);
-        List<(ResidentKnightAcademicDef, bool)> allAvailableAcademics = new(AcademicHandler.Academics.Count);
-        foreach (ResidentKnightAcademicDef academicDef in AcademicUtility.GetAllActivateAcademicsBySelf(Record))
+        HashSet<KnightAcademicDef> academicHash = new(AcademicHandler.Academics.Count);
+        List<(KnightAcademicDef, bool)> allAvailableAcademics = new(AcademicHandler.Academics.Count);
+        foreach (KnightAcademicDef academicDef in AcademicUtility.GetAllActivateAcademicsBySelf(Record))
         {
             academicHash.Add(academicDef);
             allAvailableAcademics.Add((academicDef, true));
         }
-        foreach (ResidentKnightAcademicDef academicDef in AcademicHandler.Academics.Keys)
+        foreach (KnightAcademicDef academicDef in AcademicHandler.Academics.Keys)
         {
             if (academicHash.Add(academicDef))
             {
@@ -66,7 +66,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
         else
         {
-            SwitchAcademic(DefDatabase<ResidentKnightAcademicDef>.AllDefs.First(d => d.academicType == AcademicType.Geneal));
+            SwitchAcademic(DefDatabase<KnightAcademicDef>.AllDefs.First(d => d.academicType == AcademicType.Geneal));
         }
     }
 
@@ -142,7 +142,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         viewRect.height = (AllAvailableAcademics.Count + 1) * entryHeight;
 
         Widgets.BeginScrollView(inRect, ref scrollPosition_Academic, viewRect, showScrollbars: false);
-        foreach ((ResidentKnightAcademicDef def, bool activateBySelf) in AllAvailableAcademics)
+        foreach ((KnightAcademicDef def, bool activateBySelf) in AllAvailableAcademics)
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
@@ -152,7 +152,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         OARO_WindowUtility.ResetText();
     }
 
-    private void DarwAcademic(Rect inRect, ResidentKnightAcademicDef def, bool activateBySelf)
+    private void DarwAcademic(Rect inRect, KnightAcademicDef def, bool activateBySelf)
     {
         GUI.DrawTexture(inRect, academicBackground);
 
@@ -399,7 +399,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
     }
 
-    private void SwitchAcademic(ResidentKnightAcademicDef academicDef)
+    private void SwitchAcademic(KnightAcademicDef academicDef)
     {
         if (SelAcademicDef == academicDef)
         {
@@ -455,22 +455,22 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     {
         switch (Record.CurRank)
         {
-            case ResidentKnightRecord.Rank.Regular:
+            case ResidentKnightRank.Regular:
                 {
                     GUI.DrawTexture(inRect, rankBackground_Regular, ScaleMode.StretchToFill);
                     return;
                 }
-            case ResidentKnightRecord.Rank.Elite:
+            case ResidentKnightRank.Elite:
                 {
                     GUI.DrawTexture(inRect, rankBackground_Elite, ScaleMode.StretchToFill);
                     return;
                 }
-            case ResidentKnightRecord.Rank.Honor:
+            case ResidentKnightRank.Honor:
                 {
                     GUI.DrawTexture(inRect, rankBackground_Honor, ScaleMode.StretchToFill);
                     return;
                 }
-            case ResidentKnightRecord.Rank.Crown:
+            case ResidentKnightRank.Crown:
                 {
                     GUI.DrawTexture(inRect, rankBackground_Crown, ScaleMode.StretchToFill);
                     return;

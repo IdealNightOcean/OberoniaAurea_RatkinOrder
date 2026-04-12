@@ -14,7 +14,7 @@ public class StatPart_MeditationFactor : StatPart
         if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
             return;
 
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return;
 
         val += OrderHallHandler.Instance.OrderHallLevel switch
@@ -42,9 +42,9 @@ public class StatPart_MeditationFactor : StatPart
 
         val += record.CurRank switch
         {
-            ResidentKnightRecord.Rank.Elite => 0.1f,
-            ResidentKnightRecord.Rank.Honor => 0.25f,
-            ResidentKnightRecord.Rank.Crown => 0.5f,
+            ResidentKnightRank.Elite => 0.1f,
+            ResidentKnightRank.Honor => 0.25f,
+            ResidentKnightRank.Crown => 0.5f,
             _ => 0f
         };
 
@@ -63,7 +63,7 @@ public class StatPart_MeditationFactor : StatPart
         if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
             return null;
 
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return null;
 
         float stepChange;
@@ -103,9 +103,9 @@ public class StatPart_MeditationFactor : StatPart
 
         stepChange = record.CurRank switch
         {
-            ResidentKnightRecord.Rank.Elite => 0.1f,
-            ResidentKnightRecord.Rank.Honor => 0.25f,
-            ResidentKnightRecord.Rank.Crown => 0.5f,
+            ResidentKnightRank.Elite => 0.1f,
+            ResidentKnightRank.Honor => 0.25f,
+            ResidentKnightRank.Crown => 0.5f,
             _ => 0f
         };
         if (stepChange > 0f)

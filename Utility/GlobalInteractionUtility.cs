@@ -60,20 +60,20 @@ public static class GlobalInteractionUtility
     /// <summary>
     /// 能否提升常驻骑士阶位
     /// </summary>
-    public static AcceptanceReport CanUpgradeResidentKnightRank(ResidentKnightRecord record, Map map, bool resultOnly)
+    public static AcceptanceReport CanUpgradeResidentKnightRank(ResidentKnight record, Map map, bool resultOnly)
     {
-        if (record.CurRank == ResidentKnightRecord.Rank.Crown)
+        if (record.CurRank == ResidentKnightRank.Crown)
         {
             return resultOnly ? false : "OARO_ReachMax_ResidentKnightRank".Translate();
         }
 
-        int noAdditionalCostAcademicCeiling = ResidentKnightRecord.GetNoAdditionalCostAcademicCeiling(record.CurRank);
+        int noAdditionalCostAcademicCeiling = AcademicUtility.GetNoAdditionalCostAcademicCeiling(record.CurRank);
         if (record.AcademicHandler.TotalAcademicLevel.Value < noAdditionalCostAcademicCeiling)
         {
             return resultOnly ? false : "OARO_Insufficient_TotalAcademicLevel".Translate(noAdditionalCostAcademicCeiling.Named(KeyLibrary_FormatArgName.Count));
         }
         /*
-        ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
+        ResidentKnight.ResidentKnightRank targetRank = ResidentKnight.RankOffsetBy(record.CurRank, 1);
         RatkinOrder ratkinOrder = record.RatkinOrder;
         int recommendationNeed = RecommendationUtility.RecommendationNeed_ResidentKnightRankUpgrade(ratkinOrder, targetRank);
         if (recommendationNeed > 0 && RecommendationUtility.CurRecommendationCount(map) < recommendationNeed)
@@ -84,9 +84,9 @@ public static class GlobalInteractionUtility
         return true;
     }
 
-    public static void UpgradeResidentKnightRank(ResidentKnightRecord record, Map map)
+    public static void UpgradeResidentKnightRank(ResidentKnight record, Map map)
     {
-        ResidentKnightRecord.Rank targetRank = ResidentKnightRecord.RankOffsetBy(record.CurRank, 1);
+        ResidentKnightRank targetRank = record.CurRank.OffsetBy(1);
         if (targetRank == record.CurRank)
         {
             return;
@@ -104,7 +104,7 @@ public static class GlobalInteractionUtility
         record.CurRank = targetRank;
     }
 
-    public static AcceptanceReport CanPostponeResidentKnightkResignation(ResidentKnightRecord record, Map map, bool resultOnly)
+    public static AcceptanceReport CanPostponeResidentKnightkResignation(ResidentKnight record, Map map, bool resultOnly)
     {
         if (record.ResignationTick >= Find.TickManager.TicksGame + 20 * 60000)
         {
@@ -117,7 +117,7 @@ public static class GlobalInteractionUtility
         return true;
     }
 
-    public static void PostponeResidentKnightkResignation(ResidentKnightRecord record, Map map)
+    public static void PostponeResidentKnightkResignation(ResidentKnight record, Map map)
     {
         RecommendationUtility.UseRecommendationOfMap(map, 1);
         record.PostponeResignation(120);

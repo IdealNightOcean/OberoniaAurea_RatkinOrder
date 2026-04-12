@@ -16,7 +16,7 @@ public class StatPart_MeditationBase : StatPart
         if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
             return;
 
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return;
 
         val += 5f;
@@ -33,7 +33,7 @@ public class StatPart_MeditationBase : StatPart
         if (!pawn.CanBeKnight() || !pawn.Faction.IsPlayerSafe())
             return null;
 
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnightRecord record))
+        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return null;
 
         int stepChange;

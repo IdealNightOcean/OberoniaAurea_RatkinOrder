@@ -18,18 +18,18 @@ public static class OrderDefDataBase
         }
     }
 
-    private static Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> residentKnightAcademicGroupByPersonality;
-    public static Dictionary<KnightPersonality, List<ResidentKnightAcademicDef>> ResidentKnightAcademicGroupByPersonality
+    private static Dictionary<KnightPersonality, List<KnightAcademicDef>> residentKnightAcademicGroupByPersonality;
+    public static Dictionary<KnightPersonality, List<KnightAcademicDef>> ResidentKnightAcademicGroupByPersonality
     {
         get
         {
-            return residentKnightAcademicGroupByPersonality ??= DefDatabase<ResidentKnightAcademicDef>.AllDefsListForReading
+            return residentKnightAcademicGroupByPersonality ??= DefDatabase<KnightAcademicDef>.AllDefsListForReading
                 .GroupBy(d => d.personality)
                 .ToDictionary(g => g.Key, g => g.ToList());
         }
     }
 
-    private static Dictionary<BranchTaskType, List<BranchMedalDef>> branchMedalDefGruopByTaskType = [];
+    private static readonly Dictionary<BranchTaskType, List<BranchMedalDef>> branchMedalDefGruopByTaskType = [];
 
     private static readonly Dictionary<ThingDef, KnightPersonality> preferredBuildingToKnightPersonality = [];
     private static readonly Dictionary<KnightPersonality, List<ThingDef>> preferredBuildingGroupByPersonality = [];
@@ -80,9 +80,9 @@ public static class OrderDefDataBase
         return preferredBuildingGroupByPersonality.TryGetValue(personality, out joyBuildings);
     }
 
-    public static ResidentKnightAcademicDef GetRandomKnightAcademicOfPersonality(KnightPersonality personality)
+    public static KnightAcademicDef GetRandomKnightAcademicOfPersonality(KnightPersonality personality)
     {
-        if (ResidentKnightAcademicGroupByPersonality.TryGetValue(personality, out List<ResidentKnightAcademicDef> defsList))
+        if (ResidentKnightAcademicGroupByPersonality.TryGetValue(personality, out List<KnightAcademicDef> defsList))
         {
             return defsList.RandomElementWithFallback(null);
         }
