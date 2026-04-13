@@ -6,6 +6,6 @@ public class RoomRoleWorker_RatkinOrderHall : RoomRoleWorker
 {
     public override float GetScore(Room room)
     {
-        return OrderHallHandler.Instance.OrderHallRoom == room ? 99999f : 0f;
+        return OrderStationHandler.Instance.OrderHallRoom == room ? 99999f : 0f;
     }
 }

@@ -42,9 +42,9 @@ public partial class Window_OrderHall : OrderWindowBase
         AroundKnightGroups = new(refreshFunc: RefreshAroundKnightGroups);
         PreferredBuildingsStr = GetPreferredBuildingsStr();
 
-        OrderHallHandler.Instance.RefreshCache();
+        OrderStationHandler.Instance.RefreshCache();
 
-        CurOrderHallLevel = Mathf.Max(1, OrderHallHandler.Instance.OrderHallLevel);
+        CurOrderHallLevel = Mathf.Max(1, OrderStationHandler.Instance.OrderHallLevel);
         TopShieldTexture = new CachedTexture($"UI/OrderHall/OARO_TopShield_{CurOrderHallLevel}").Texture;
         AroundGroupSeasonInvitationLimit = GlobalInteractionUtility.SeasonInvitationLimit();
 
@@ -53,8 +53,8 @@ public partial class Window_OrderHall : OrderWindowBase
         HallLevelEffectDescs = [.. (hallRestriction.GetRestrictionOfLevel(CurOrderHallLevel)?.effectDescs ?? Enumerable.Empty<string>())];
         HallLevelRestrictionDescs = OrderHallUtility.GetHallUpgradeInfo() ?? [];
 
-        ResidentKnightDrawers = new(ResidentKnightsManager.Instance.ResidentKnights.Count + 1);
-        foreach (ResidentKnight record in ResidentKnightsManager.Instance.ResidentKnights.Values)
+        ResidentKnightDrawers = new(ResidentPawnsManager.Instance.ResidentKnights.Count + 1);
+        foreach (ResidentKnight record in ResidentPawnsManager.Instance.ResidentKnights.Values)
         {
             ResidentKnightDrawers.Add(new ResidentKnightEntryDrawer(this, record, Map));
         }
@@ -197,7 +197,7 @@ public partial class Window_OrderHall : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
 
         reusedRect = new(innerRectX, innerRectY + 462f, 245f, 120f);
-        Widgets.Label(reusedRect, "OARO_HallWin_ResidentKnightCeiling".Translate(ResidentKnightsManager.ResidentKnightCeiling.ToString()));
+        Widgets.Label(reusedRect, "OARO_HallWin_ResidentKnightCeiling".Translate(ResidentPawnsManager.ResidentKnightCeiling.ToString()));
 
         Text.Font = GameFont.Small;
         reusedRect = new(innerRect.xMax - 190f, innerRectY + 462f, 190f, 24f);
@@ -549,7 +549,7 @@ public partial class Window_OrderHall : OrderWindowBase
         try
         {
             StringBuilder sb = new(string.Empty);
-            HashSet<ThingDef> allPreferredBuildings = OrderHallUtility.GetAllResidentKnightPreferredBuildingDefs(OrderHallHandler.Instance.OrderHallRoom);
+            HashSet<ThingDef> allPreferredBuildings = OrderHallUtility.GetAllResidentKnightPreferredBuildingDefs(OrderStationHandler.Instance.OrderHallRoom);
 
             foreach (ThingDef def in OrderDefDataBase.AllResidentPreferredBuildings)
             {

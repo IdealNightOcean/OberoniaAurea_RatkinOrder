@@ -73,7 +73,7 @@ internal class ChoiceLetter_InDistressKnightLeave : ChoiceLetter_RatkinOrder
             resolveTree = true
         };
 
-        if (OrderHallHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderHallRoom is null)
         {
             opt.Disable("OARO_NoRatkinOrderHall".Translate());
         }
@@ -88,7 +88,7 @@ internal class ChoiceLetter_InDistressKnightLeave : ChoiceLetter_RatkinOrder
             foreach (Pawn p in Pawns)
             {
                 OAFrame_PawnUtility.MakePawnJoinPlayer(p);
-                ResidentKnightsManager.Instance.RegisterKnight(p);
+                ResidentPawnsManager.Instance.RegisterKnight(p);
             }
         }
 

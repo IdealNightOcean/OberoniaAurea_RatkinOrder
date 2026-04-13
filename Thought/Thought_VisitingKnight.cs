@@ -10,7 +10,7 @@ public class Thought_VisitingKnight : Thought_Memory
     public override void ThoughtInterval()
     {
         age += 150;
-        int index = OrderHallHandler.Instance.OrderHallLevel;
+        int index = OrderStationHandler.Instance.OrderHallLevel;
         SetForcedStage(index > 0 ? index - 1 : 0);
 
     }
@@ -22,7 +22,7 @@ public class Thought_VisitingKnight : Thought_Memory
 
     private static int GetMoodOffset()
     {
-        if (ResidentKnightsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Clerk, out ResidentKnight record))
+        if (ResidentPawnsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Clerk, out ResidentKnight record))
         {
             return (OARO_ModDefOf.OARO_Clerk.RoleWorker as ResidentKnightRoleWorker_Clerk)?.KnightMoodOffset(record.Pawn) ?? 0;
         }

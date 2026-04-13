@@ -4,17 +4,6 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-[Flags]
-public enum KnightPersonality : byte
-{
-    None = 0,
-    Courage = 1, //勇气
-    Tenacity = 2, //坚毅
-    Compassion = 4, //怜悯
-    Oath = 8, //誓言
-    Justice = 16 //正义
-}
-
 public class KnightRecord : IExposable, ILoadReferenceable
 {
     private int loadID = -1;
@@ -43,7 +32,7 @@ public class KnightRecord : IExposable, ILoadReferenceable
             throw new ArgumentException();
         }
         this.branch = branch;
-        this.personality = personality == KnightPersonality.None ? KnightPersonalityUtility.GetRandomAvailablePersonality() : personality;
+        this.personality = personality == KnightPersonality.None ? KnightPersonalityExtension.GetRandomAvailablePersonality() : personality;
         this.isCommander = isCommander;
         this.isCombatant = isCombatant && branch is not null;
 

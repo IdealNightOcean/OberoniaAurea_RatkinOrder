@@ -65,12 +65,12 @@ public class MercyQuestHandler : IExposable
         if (quest is null)
             return;
 
-        ResidentKnightsManager.Instance.AllKnightsGainMeditation(200f, directly: false);
+        ResidentPawnsManager.Instance.AllKnightsGainMeditation(200f, directly: false);
 
         GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
         float letterChance = 0.2f;
 
-        if (ResidentKnightsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
+        if (ResidentPawnsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
         {
             letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(record.Pawn);
         }
@@ -114,7 +114,7 @@ public class MercyQuestHandler : IExposable
 
     private bool TryPeriodicTriggerMercyQuest()
     {
-        if (OrderHallHandler.Instance.OrderHallRoom is null || GlobalInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
+        if (OrderStationHandler.Instance.OrderHallRoom is null || GlobalInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
             return false;
 
         GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, removeWhenExpired: true);
@@ -238,7 +238,7 @@ public class MercyQuestHandler : IExposable
     private float GetMercyQuestChance()
     {
         float chance = mercyQuestBaseChance;
-        if (ResidentKnightsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
+        if (ResidentPawnsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
         {
             chance *= (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(record.Pawn) ?? 1f;
         }

@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Building_OrderCodePedestal : Building
 {
-    public bool IsMainPedestal => this == OrderHallHandler.Instance.MainOrderCodePedestal;
+    public bool IsMainPedestal => this == OrderStationHandler.Instance.MainOrderCodePedestal;
 
     public override void DeSpawn(DestroyMode mode = DestroyMode.Vanish)
     {
@@ -13,11 +13,11 @@ public class Building_OrderCodePedestal : Building
         {
             if (BeingTransportedOnGravship)
             {
-                OrderHallHandler.Instance.RefreshCache();
+                OrderStationHandler.Instance.RefreshCache();
             }
             else
             {
-                OrderHallHandler.Instance.TryUnsetMainPedestal(this);
+                OrderStationHandler.Instance.TryUnsetMainPedestal(this);
             }
         }
         base.DeSpawn(mode);
@@ -28,7 +28,7 @@ public class Building_OrderCodePedestal : Building
         base.PostSwapMap();
         if (Spawned && IsMainPedestal)
         {
-            OrderHallHandler.Instance.RefreshCache();
+            OrderStationHandler.Instance.RefreshCache();
         }
     }
 
@@ -40,7 +40,6 @@ public class Building_OrderCodePedestal : Building
             return;
         }
 
-        _ = ResidentKnightsManager.Instance.BuffHediffStage;
         foreach (Pawn p in Map.mapPawns.FreeColonistsSpawned)
         {
             Hediff hediff = p.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_ByResidentKnightBuff);
@@ -83,7 +82,7 @@ public class Building_OrderCodePedestal : Building
             {
                 defaultLabel = "OARO_CodePedestal_Unset".Translate(),
                 defaultDesc = "OARO_CodePedestal_UnsetDesc".Translate(),
-                action = delegate { OrderHallHandler.Instance.TryUnsetMainPedestal(this); }
+                action = delegate { OrderStationHandler.Instance.TryUnsetMainPedestal(this); }
             };
             yield return command_UnsetAsMain;
 
@@ -91,7 +90,7 @@ public class Building_OrderCodePedestal : Building
             {
                 defaultLabel = "OARO_CodePedestal_RecheckHallLevel".Translate(),
                 defaultDesc = "OARO_CodePedestal_RecheckHallLevelDesc".Translate(),
-                action = OrderHallHandler.Instance.RefreshCache
+                action = OrderStationHandler.Instance.RefreshCache
             };
             yield return command_RecheckHallLevel;
         }
@@ -101,14 +100,14 @@ public class Building_OrderCodePedestal : Building
             {
                 defaultLabel = "OARO_CodePedestal_SetAsMain".Translate(),
                 defaultDesc = "OARO_CodePedestal_SetAsMainDesc".Translate(),
-                action = delegate { OrderHallHandler.Instance.TrySetMainPedestal(this, replaceCur: false); }
+                action = delegate { OrderStationHandler.Instance.TrySetMainPedestal(this, replaceCur: false); }
             };
 
             Command_Action command_SetAsOrReplaceMain = new()
             {
                 defaultLabel = "OARO_CodePedestal_ForceSetAsMain".Translate(),
                 defaultDesc = "OARO_CodePedestal_ForceSetAsMainDesc".Translate(),
-                action = delegate { OrderHallHandler.Instance.TrySetMainPedestal(this, replaceCur: true); }
+                action = delegate { OrderStationHandler.Instance.TrySetMainPedestal(this, replaceCur: true); }
             };
 
             yield return command_SetAsMain;

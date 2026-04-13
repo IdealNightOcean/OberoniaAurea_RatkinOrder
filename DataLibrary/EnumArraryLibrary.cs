@@ -5,8 +5,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class EnumArraryLibrary
 {
-    public static KnightPersonality[] KnightPersonalitiesArr { get; } = (KnightPersonality[])Enum.GetValues(typeof(KnightPersonality));
-    public static int AvailablePersonalitiesCount { get; } = 5; // KnightPersonality.None不计数
 
     public static BranchTaskType[] JointPatrolTaskTypeArr { get; } = [BranchTaskType.CrimeFighting, BranchTaskType.StabilityMaintenance, BranchTaskType.Assistance, BranchTaskType.Supervision];
 

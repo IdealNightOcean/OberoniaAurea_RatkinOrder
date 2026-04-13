@@ -100,7 +100,7 @@ public class ResidentKnight : ResidentPawn
     public void PostponeResignation(int postponeDays)
     {
         ResignationTick += (postponeDays * 60000);
-        ResidentKnightsManager.Instance.MinResignationDays.MarkDirty();
+        ResidentPawnsManager.Instance.MinResignationDays.MarkDirty();
     }
 
     public void ChangeRole(ResidentKnightRoleDef newRole)

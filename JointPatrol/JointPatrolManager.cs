@@ -329,7 +329,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
     public void OnResidentKnightBackTeam(Pawn knight)
     {
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnight record))
+        if (!ResidentPawnsManager.Instance.TryGetKnightRecord(knight, out ResidentKnight record))
         {
             return;
         }
@@ -411,7 +411,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
 
         bool ShouldRemoveResidentKnight(Pawn knight)
         {
-            return !ResidentKnightsManager.Instance.TryGetKnightRecord(knight, out ResidentKnight residentRecord) || residentRecord.Branch == branch;
+            return !ResidentPawnsManager.Instance.TryGetKnightRecord(knight, out ResidentKnight residentRecord) || residentRecord.Branch == branch;
         }
     }
 

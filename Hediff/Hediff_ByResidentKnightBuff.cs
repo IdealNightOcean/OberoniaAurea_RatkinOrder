@@ -4,5 +4,18 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Hediff_ByResidentKnightBuff : HediffWithComps
 {
-    public override HediffStage CurStage => ResidentKnightsManager.Instance.BuffHediffStage;
+    private HediffStage cachedStage;
+    private int nextStageCacheTick = -1;
+    public override HediffStage CurStage
+    {
+        get
+        {
+            if (Find.TickManager.TicksGame > nextStageCacheTick)
+            {
+                cachedStage = ResidentPawnsManager.Instance.GetNewBuffStage();
+                nextStageCacheTick = Find.TickManager.TicksGame + 60000;
+            }
+            return cachedStage;
+        }
+    }
 }

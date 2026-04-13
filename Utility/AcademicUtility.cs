@@ -46,7 +46,7 @@ public static class AcademicUtility
         if (pawn is null || academic is null)
             return false;
 
-        if (!ResidentKnightsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
+        if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return false;
 
 
@@ -146,7 +146,7 @@ public static class AcademicUtility
         float curChance = 0.1f;
 
         // Get student record once and cache personality
-        bool hasStudentRecord = ResidentKnightsManager.Instance.TryGetKnightRecord(student, out ResidentKnight studentRecord);
+        bool hasStudentRecord = ResidentPawnsManager.Instance.TryGetKnightRecord(student, out ResidentKnight studentRecord);
         KnightPersonality studentPersonality = hasStudentRecord ? studentRecord.Personality : KnightPersonality.None;
 
         // Apply personality factor
@@ -154,7 +154,7 @@ public static class AcademicUtility
         {
             ApplyStepChange(0.7f, "");
         }
-        else if (KnightPersonalityUtility.IsResonatePersonality(teacher.Personality, studentPersonality))
+        else if (KnightPersonalityExtension.IsResonatePersonality(teacher.Personality, studentPersonality))
         {
             ApplyStepChange(1.5f, "");
         }

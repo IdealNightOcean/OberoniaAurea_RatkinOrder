@@ -124,7 +124,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         rootNode.options.Add(briberyOpt);
 
         DiaOption threatOpt = new("OARO_TalkWithTaxCollector_Threat".Translate());
-        if (OrderHallHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderHallRoom is null)
         {
             threatOpt.action = delegate
             {

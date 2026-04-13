@@ -29,7 +29,7 @@ public static class OrderHallUtility
         int maxPotentialLevel = 0;
         try
         {
-            Room room = OrderHallHandler.Instance.OrderHallRoom;
+            Room room = OrderStationHandler.Instance.OrderHallRoom;
             if (room is null)
             {
                 return -1;
@@ -246,7 +246,7 @@ public static class OrderHallUtility
             return null;
 
 
-        Room room = OrderHallHandler.Instance.OrderHallRoom;
+        Room room = OrderStationHandler.Instance.OrderHallRoom;
         OrderHallLevelRestriction nextLevelRestriction = RestrictionExtension.GetRestrictionOfLevel(curLevel + 1);
         if (nextLevelRestriction is null)
             return null;

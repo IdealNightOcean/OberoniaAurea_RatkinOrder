@@ -139,6 +139,7 @@
     <Compile Include="Branch\BranchPopulationHandler.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
     <Compile Include="Components\PathedTexture2D.cs" />
+    <Compile Include="Components\HediffStageTemplate.cs" />
     <Compile Include="DataLibrary\KeyLibrary_FormatArgName.cs" />
     <Compile Include="DefModExtension\BranchBuildingTrderSetter_Extension.cs" />
     <Compile Include="DefModExtension\ThingList_Extension.cs" />
@@ -163,6 +164,8 @@
     <Compile Include="KnightVirtue\KnightVirtueHandler.cs" />
     <Compile Include="KnightVirtue\KnightVirtueType.cs" />
     <Compile Include="Def\KnightVirtueTraitDef.cs" />
+    <Compile Include="OrderHall\OrderStationTraditionsManager.cs" />
+    <Compile Include="OrderHall\OrderStationBuildingHandler.cs" />
     <Compile Include="ResidentKnight\ResidentKnightRemovalReason.cs" />
     <Compile Include="ResidentKnight\ResidentKnightRank.cs" />
     <Compile Include="ResidentKnight\MentorshipManager.cs" />
@@ -249,7 +252,7 @@
     <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\KnightAcademicDef.cs" />
     <Compile Include="Def\SpecialGameLetterDef.cs" />
-    <Compile Include="OrderHall\OrderHallHandler.cs" />
+    <Compile Include="OrderHall\OrderStationHandler.cs" />
     <Compile Include="ResidentKnight\ResidentKnight.cs" />
     <Compile Include="HarmonyPatch\HotReloadDefs_Patch.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
@@ -365,7 +368,7 @@
     <Compile Include="Utility\BranchConstructUtility.cs" />
     <Compile Include="DataLibrary\EnumArraryLibrary.cs" />
     <Compile Include="DataLibrary\IconLibrary.cs" />
-    <Compile Include="Utility\KnightPersonalityUtility.cs" />
+    <Compile Include="Components\KnightPersonality.cs" />
     <Compile Include="Utility\WindowUtility.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
     <Compile Include="Utility\QuestUtility.cs" />
@@ -379,7 +382,7 @@
     <Compile Include="Letter\ChoiceLetter_KnightGroupProactiveVisit.cs" />
     <Compile Include="OrderHall\OrderHallLevelRestriction.cs" />
     <Compile Include="DefModExtension\OrderHallRestrictionExtension.cs" />
-    <Compile Include="ResidentKnight\ResidentKnightsManager.cs" />
+    <Compile Include="ResidentKnight\ResidentPawnsManager.cs" />
     <Compile Include="ResidentKnight\ResidentKnightRoleWorker.cs" />
     <Compile Include="Thing\Building_OrderCodePedestal.cs" />
     <Compile Include="RatkinOrder\OrderFundEvent.cs" />

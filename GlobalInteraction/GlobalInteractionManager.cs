@@ -16,10 +16,10 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
     private CooldownRecordManager cooldownManager;
     private TagStrToFloat simpleInteractRecord;
 
-    private OrderHallHandler orderHallHandler;
+    private OrderStationHandler orderStationHandler;
     private AcceptedBranchDemandHandler acceptedBranchDemandHandler;
 
-    private ResidentKnightsManager residentKnightsManager;
+    private ResidentPawnsManager residentPawnsManager;
     private AroundKnightGroupsManager aroundKnightGroupsManager;
     private MercyQuestHandler mercyQuestHandler;
 
@@ -38,7 +38,7 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
     {
         try
         {
-            orderHallHandler ??= new OrderHallHandler();
+            orderStationHandler ??= new OrderStationHandler(initCtor: true);
         }
         catch (System.Exception ex)
         {
@@ -47,8 +47,8 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
                 typeName: nameof(GlobalInteractionManager),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
-            OrderHallHandler.ClearStaticCache();
-            orderHallHandler = new OrderHallHandler();
+            OrderStationHandler.ClearStaticCache();
+            orderStationHandler = new OrderStationHandler(initCtor: true);
         }
 
         try
@@ -68,7 +68,7 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
         try
         {
-            residentKnightsManager ??= new ResidentKnightsManager();
+            residentPawnsManager ??= new ResidentPawnsManager();
         }
         catch (System.Exception ex)
         {
@@ -77,8 +77,8 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
                 typeName: nameof(GlobalInteractionManager),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
-            ResidentKnightsManager.ClearStaticCache();
-            residentKnightsManager = new ResidentKnightsManager();
+            ResidentPawnsManager.ClearStaticCache();
+            residentPawnsManager = new ResidentPawnsManager();
         }
 
         try
@@ -117,8 +117,8 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         Instance = null;
 
         AcceptedBranchDemandHandler.ClearStaticCache();
-        OrderHallHandler.ClearStaticCache();
-        ResidentKnightsManager.ClearStaticCache();
+        OrderStationHandler.ClearStaticCache();
+        ResidentPawnsManager.ClearStaticCache();
         AroundKnightGroupsManager.ClearStaticCache();
         MercyQuestHandler.ClearStaticCache();
     }
@@ -128,9 +128,9 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         Scribe_Deep.Look(ref cooldownManager, nameof(cooldownManager));
         Scribe_Deep.Look(ref simpleInteractRecord, nameof(simpleInteractRecord));
 
-        Scribe_Deep.Look(ref orderHallHandler, nameof(orderHallHandler));
+        Scribe_Deep.Look(ref orderStationHandler, nameof(orderStationHandler), ctorArgs: false);
         Scribe_Deep.Look(ref acceptedBranchDemandHandler, nameof(acceptedBranchDemandHandler));
-        Scribe_Deep.Look(ref residentKnightsManager, nameof(residentKnightsManager));
+        Scribe_Deep.Look(ref residentPawnsManager, nameof(residentPawnsManager));
         Scribe_Deep.Look(ref aroundKnightGroupsManager, nameof(aroundKnightGroupsManager));
         Scribe_Deep.Look(ref mercyQuestHandler, nameof(mercyQuestHandler));
     }
@@ -140,7 +140,7 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         if (TickUtility.IsHashIntervalTick(tickHashOffset, interval: 60000))
         {
             aroundKnightGroupsManager.TickDay();
-            residentKnightsManager.TickDay();
+            residentPawnsManager.TickDay();
             mercyQuestHandler.PeriodicTriggerMercyQuest();
         }
     }
@@ -148,14 +148,14 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
     public void Notify_RatkinOrderRemoved(RatkinOrder order)
     {
         acceptedBranchDemandHandler.Notify_RatkinOrderRemoved(order);
-        residentKnightsManager.Notify_RatkinOrderRemoved(order);
+        residentPawnsManager.Notify_RatkinOrderRemoved(order);
         aroundKnightGroupsManager.Notify_RatkinOrderRemoved(order);
     }
 
     public void Notify_BranchDestroyed(Branch branch)
     {
         acceptedBranchDemandHandler.Notify_BranchDestroyed(branch);
-        residentKnightsManager.Notify_BranchDestroyed(branch);
+        residentPawnsManager.Notify_BranchDestroyed(branch);
         aroundKnightGroupsManager.Notify_BranchDestroyed(branch);
     }
 }

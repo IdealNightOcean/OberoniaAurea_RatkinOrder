@@ -19,18 +19,18 @@ internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("主团规台:");
         Text.Font = GameFont.Small;
-        if (OrderHallHandler.Instance.MainOrderCodePedestal is null)
+        if (OrderStationHandler.Instance.MainOrderCodePedestal is null)
         {
             listing_Rect.Label("None".Translate());
         }
         else
         {
-            listing_Rect.Label($"物品 Thing: {OrderHallHandler.Instance.MainOrderCodePedestal}");
-            listing_Rect.Label($"地图 Map: {OrderHallHandler.Instance.MainOrderCodePedestal.MapHeld}");
-            listing_Rect.Label($"骑士大厅等级: {OrderHallHandler.Instance.OrderHallLevel}");
+            listing_Rect.Label($"物品 Thing: {OrderStationHandler.Instance.MainOrderCodePedestal}");
+            listing_Rect.Label($"地图 Map: {OrderStationHandler.Instance.MainOrderCodePedestal.MapHeld}");
+            listing_Rect.Label($"骑士大厅等级: {OrderStationHandler.Instance.OrderHallLevel}");
             if (listing_Rect.ButtonText("JumpTo".Translate(), widthPct: 0.4f))
             {
-                CameraJumper.TryJumpAndSelect(OrderHallHandler.Instance.MainOrderCodePedestal);
+                CameraJumper.TryJumpAndSelect(OrderStationHandler.Instance.MainOrderCodePedestal);
             }
         }
 
@@ -39,7 +39,7 @@ internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
         Text.Font = GameFont.Medium;
         listing_Rect.Label("常驻骑士:");
         Text.Font = GameFont.Small;
-        ResidentKnightsManager.Instance.DrawDevWindow(listing_Rect);
+        ResidentPawnsManager.Instance.DrawDevWindow(listing_Rect);
 
         listing_Rect.Gap(6f);
         listing_Rect.Label("————————————————");

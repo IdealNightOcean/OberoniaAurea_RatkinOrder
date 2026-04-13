@@ -11,10 +11,10 @@ internal class MutantTracker_TurnPatch
     [HarmonyPostfix]
     public static void Postfix(Pawn ___pawn)
     {
-        if (!___pawn.Faction.IsPlayerSafe() || !ResidentKnightsManager.Instance.IsResidentKnight(___pawn))
+        if (!___pawn.Faction.IsPlayerSafe() || !ResidentPawnsManager.Instance.IsResidentKnight(___pawn))
             return;
 
-        ResidentKnightsManager.Instance.DeregisterKnight(___pawn, ResidentKnightRemovalReason.Player);
+        ResidentPawnsManager.Instance.DeregisterKnight(___pawn, ResidentKnightRemovalReason.Player);
         if (KnightPawnsManager.Instance.TryGetKnightRecord(___pawn, out KnightRecord record))
         {
             RatkinOrder ratkinOrder = record.RatkinOrder;

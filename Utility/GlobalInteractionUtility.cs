@@ -16,7 +16,7 @@ public static class GlobalInteractionUtility
     /// </summary>
     public static AcceptanceReport CanRecruitKnight(Pawn knight, Map map, bool resultOnly)
     {
-        if (OrderHallHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -54,7 +54,7 @@ public static class GlobalInteractionUtility
         RecommendationUtility.UseRecommendationOfMap(map, needRecommendation);
         OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
         pawn.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_RecruitKnight);
-        ResidentKnightsManager.Instance.RegisterKnight(pawn, kRecord);
+        ResidentPawnsManager.Instance.RegisterKnight(pawn, kRecord);
     }
 
     /// <summary>
@@ -134,7 +134,7 @@ public static class GlobalInteractionUtility
             return false;
         }
 
-        if (OrderHallHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
@@ -253,7 +253,7 @@ public static class GlobalInteractionUtility
         else if (knights.TravelTicks <= 30000)
             ApplyStepChange(0.1f, "OARO_AroundKnights_TravelTimeShort");
 
-        stepChange = (OrderHallHandler.Instance.OrderHallLevel - 2) * 0.05f;
+        stepChange = (OrderStationHandler.Instance.OrderHallLevel - 2) * 0.05f;
         if (stepChange > 0f)
             ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");
 
@@ -303,7 +303,7 @@ public static class GlobalInteractionUtility
     /// </summary>
     public static int SeasonInvitationLimit()
     {
-        return OrderHallHandler.Instance.OrderHallLevel switch
+        return OrderStationHandler.Instance.OrderHallLevel switch
         {
             < 2 => 0,
             2 => 1,

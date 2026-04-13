@@ -53,7 +53,7 @@ public partial class Window_BranchTask : OrderWindowBase
         JointPatrolNotParticipateInKnightStr = new(refreshFunc: RefrshJointPatrolNotParticipateInKnightStr);
 
         TotalJointPatrolKnightCount = new(refreshFunc: () => JointPatrolManager?.ParticipantsDict.Keys.Sum(b => b.Squad.AllCrewCountInt) ?? 0);
-        OrderResidentKnightCount = ResidentKnightsManager.Instance.ResidentKnights.Where(kv => kv.Value.RatkinOrder == RatkinOrder).Count();
+        OrderResidentKnightCount = ResidentPawnsManager.Instance.ResidentKnights.Where(kv => kv.Value.RatkinOrder == RatkinOrder).Count();
 
         BranchTaskEntryDrawers = new(RatkinOrder.BranchManager.AllBranchesCount);
         foreach (Branch branch in RatkinOrder.BranchManager.AllBranches)
@@ -447,7 +447,7 @@ public partial class Window_BranchTask : OrderWindowBase
         }
         List<Thing> notParticipatingPawns = [];
 
-        foreach (ResidentKnight record in ResidentKnightsManager.Instance.ResidentKnights.Values.Where(r => r.RatkinOrder == RatkinOrder))
+        foreach (ResidentKnight record in ResidentPawnsManager.Instance.ResidentKnights.Values.Where(r => r.RatkinOrder == RatkinOrder))
         {
             if (!JointPatrolManager.ParticipatingResidentKnights.Contains(record))
             {
@@ -507,7 +507,7 @@ public partial class Window_BranchTask : OrderWindowBase
             return;
         }
         List<FloatMenuOption> menuOptions = [];
-        foreach ((Pawn knight, ResidentKnight record) in ResidentKnightsManager.Instance.ResidentKnights)
+        foreach ((Pawn knight, ResidentKnight record) in ResidentPawnsManager.Instance.ResidentKnights)
         {
             if (record.RatkinOrder != RatkinOrder || !record.IsValid || knight.Downed)
             {

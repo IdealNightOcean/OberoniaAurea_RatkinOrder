@@ -8,15 +8,15 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
 
     public override AcceptanceReport CanUseInteraction(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
-        if (OrderHallHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderHallRoom is null)
         {
             return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
         }
 
-        int residentKnightCeiling = ResidentKnightsManager.ResidentKnightCeiling;
-        if (ResidentKnightsManager.Instance.KnightsCount >= residentKnightCeiling)
+        int residentKnightCeiling = ResidentPawnsManager.ResidentKnightCeiling;
+        if (ResidentPawnsManager.Instance.KnightsCount >= residentKnightCeiling)
         {
-            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(ResidentKnightsManager.Instance.KnightsCount, residentKnightCeiling);
+            return resultOnly ? false : "OARO_ReachMax_ResidentKnights".Translate(ResidentPawnsManager.Instance.KnightsCount, residentKnightCeiling);
         }
 
         AcceptanceReport baseAcceptance = base.CanUseInteraction(ratkinOrder, map, resultOnly);
@@ -75,7 +75,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
             return (false, false);
         }
 
-        ResidentKnightsManager.Instance.RegisterKnight(knight, knightRecord);
+        ResidentPawnsManager.Instance.RegisterKnight(knight, knightRecord);
         return (true, true);
     }
 }

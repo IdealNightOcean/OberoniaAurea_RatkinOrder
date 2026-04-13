@@ -13,16 +13,16 @@ namespace OberoniaAurea.RatkinOrder;
 /// <summary>
 /// 常驻人员管理器
 /// </summary>
-public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
+public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 {
-    public static ResidentKnightsManager Instance { get; private set; }
+    public static ResidentPawnsManager Instance { get; private set; }
 
     public static int ResidentKnightCeiling
     {
         get
         {
             int ceiling = 1;
-            ceiling += OrderHallHandler.Instance.OrderHallLevel switch
+            ceiling += OrderStationHandler.Instance.OrderHallLevel switch
             {
                 < 3 => 0,
                 < 5 => 3,
@@ -51,22 +51,8 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     public LazyMutable<int> InstructorKnightsCount { get; }
     public LazyMutable<int> LawOrderKnightsCount { get; }
 
-    [Unsaved] private readonly Dictionary<StatDef, float> statOffsets = [];
-    [Unsaved] private readonly Dictionary<StatDef, float> statFactors = [];
-    [Unsaved] private readonly HediffStage buffHediffStage;
-    private int NextBuffStatRegainTick { get; set; } = -1;
-
-    public HediffStage BuffHediffStage
-    {
-        get
-        {
-            if (Find.TickManager.TicksGame > NextBuffStatRegainTick)
-            {
-                RegainRoleBuffStat();
-            }
-            return buffHediffStage;
-        }
-    }
+    private HediffStageTemplate BuffStageTemplate { get; }
+    private int nextBuffStageForceRefreshTick;
 
     private List<Pawn> residentKnightKeys;
     private List<ResidentKnight> residentKnightValues;
@@ -74,12 +60,12 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     private List<ResidentKnightRoleDef> rolesToKnightKeys;
     private List<ResidentKnight> rolesToKnightValues;
 
-    internal ResidentKnightsManager()
+    internal ResidentPawnsManager()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
         Instance = this;
 
-        buffHediffStage = new HediffStage();
+        BuffStageTemplate = new();
         MinResignationDays = new(refreshFunc: RefreshMinResignationDays);
         AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
 
@@ -100,14 +86,12 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         {
             if (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
             {
-                Log.Error($"[OARO] {nameof(ResidentKnightsManager)} 的部分常驻骑士记录在加载后为null或无效，已被移除。");
+                Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻骑士记录在加载后为null或无效，已被移除。");
             }
             if (rolesToKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
             {
-                Log.Error($"[OARO] {nameof(ResidentKnightsManager)} 的部分常驻骑士角色在加载后为null或无效，已被移除。");
+                Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻骑士角色在加载后为null或无效，已被移除。");
             }
-
-            NextBuffStatRegainTick = -1;
         }
     }
 
@@ -154,7 +138,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     {
         if (knightRecord is null && !KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out knightRecord))
         {
-            Log.Error($"[OARO] 尝试将非骑士单位添加到 {nameof(ResidentKnightsManager)}");
+            Log.Error($"[OARO] 尝试将非骑士单位添加到 {nameof(ResidentPawnsManager)}");
             return;
         }
 
@@ -179,7 +163,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
     {
         if (SetResidentKnightRole(pawn, roleDef, replaceCurRole))
         {
-            NextBuffStatRegainTick = -1;
+            BuffStageTemplate.MarkInvalid();
             return true;
         }
         return false;
@@ -215,11 +199,29 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
 
     public void TickDay()
     {
+        if (Find.TickManager.TicksGame > nextBuffStageForceRefreshTick)
+        {
+            nextBuffStageForceRefreshTick = Find.TickManager.TicksGame + 60000;
+            BuffStageTemplate.MarkInvalid();
+        }
+
         DailyColonistsCheck();
         DailyKnightsCheck();
         mentorshipManager.TickDay();
     }
 
+    /// <summary>
+    /// 获取新的Buff阶段。会根据当前常驻骑士的职位情况刷新Buff阶段模板。
+    /// </summary>
+    public HediffStage GetNewBuffStage()
+    {
+        if (!BuffStageTemplate.IsReady)
+        {
+            RefreshRoleBuffStageTemplate();
+        }
+
+        return BuffStageTemplate.GetNewHediffStage();
+    }
 
     public void AllKnightsGainMeditation(float gain, RatkinOrder ratkinOrder = null, bool directly = false)
     {
@@ -337,7 +339,7 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         if (record.CurRole is not null)
         {
             rolesToKnights.Remove(record.CurRole);
-            NextBuffStatRegainTick = -1;
+            BuffStageTemplate.MarkInvalid();
         }
         record.PostRemoved(reason);
         OnKnightsChanged();
@@ -464,66 +466,27 @@ public class ResidentKnightsManager : IExposable, IOnBranchDestroyed
         LawOrderKnightsCount.MarkDirty();
     }
 
-    private void RegainRoleBuffStat()
+    private void RefreshRoleBuffStageTemplate()
     {
-        statOffsets.Clear();
-        statFactors.Clear();
-        NextBuffStatRegainTick = Find.TickManager.TicksGame + 60000;
+        BuffStageTemplate.ResetTemplate();
 
         if (LawOrderKnightsCount.Value > 0)
         {
-            AddStatModifier(
-                modifiers: [new StatModifier()
-                {
-                    stat = StatDefOf.GlobalLearningFactor,
-                    value = Mathf.Min(LawOrderKnightsCount.Value * 0.12f,0.6f)
-                }],
-                isFactor: false);
+            BuffStageTemplate.AddOffset(StatDefOf.GlobalLearningFactor, Mathf.Min(LawOrderKnightsCount.Value * 0.12f, 0.6f));
         }
 
         foreach (KeyValuePair<ResidentKnightRoleDef, ResidentKnight> kv in rolesToKnights)
         {
             (ResidentKnightRoleDef roldDef, Pawn pawn) = (kv.Key, kv.Value.Pawn);
 
-            AddStatModifier(roldDef.statOffsets, isFactor: false);
-            AddStatModifier(roldDef.RoleWorker.RoleStatOffsets(pawn), isFactor: false);
+            BuffStageTemplate.AddOffsets(roldDef.statOffsets);
+            BuffStageTemplate.AddOffsets(roldDef.RoleWorker.RoleStatOffsets(pawn));
 
-            AddStatModifier(roldDef.statFactors, isFactor: true);
-            AddStatModifier(roldDef.RoleWorker.RoleStatFactors(pawn), isFactor: true);
+            BuffStageTemplate.AddFactors(roldDef.statFactors);
+            BuffStageTemplate.AddFactors(roldDef.RoleWorker.RoleStatFactors(pawn));
         }
 
-        buffHediffStage.statOffsets = statOffsets.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
-        buffHediffStage.statFactors = statFactors.Select(pair => new StatModifier { stat = pair.Key, value = pair.Value }).ToList();
-
-        statOffsets.Clear();
-        statFactors.Clear();
-
-        void AddStatModifier(IEnumerable<StatModifier> modifiers, bool isFactor)
-        {
-            if (modifiers is null)
-            {
-                return;
-            }
-            Dictionary<StatDef, float> target = isFactor ? statFactors : statOffsets;
-
-            foreach (StatModifier modifier in modifiers)
-            {
-                if (target.TryGetValue(modifier.stat, out float curValue))
-                {
-                    if (isFactor)
-                    {
-                        target[modifier.stat] = curValue * modifier.value;
-                    }
-                    else
-                    {
-                        target[modifier.stat] = curValue + modifier.value;
-                    }
-                }
-                else
-                {
-                    target[modifier.stat] = modifier.value;
-                }
-            }
-        }
+        nextBuffStageForceRefreshTick = Find.TickManager.TicksGame + 60000;
+        BuffStageTemplate.FinalizeTemplate();
     }
 }

@@ -407,8 +407,8 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
 
         SelAcademicDef = academicDef;
-        CheckAcademicColor = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.color : SelAcademicDef.personality.GetPersonalityColor();
-        CheckAcademicColorTex = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.HonorColorTex : SelAcademicDef.personality.GetPersonalityColorTex();
+        CheckAcademicColor = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.color : SelAcademicDef.personality.GetColor();
+        CheckAcademicColorTex = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.HonorColorTex : SelAcademicDef.personality.GetColorTex();
 
 
         CheckAcademicStage = null;

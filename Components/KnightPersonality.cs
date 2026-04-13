@@ -1,27 +1,34 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class KnightPersonalityUtility
+[Flags]
+public enum KnightPersonality : byte
 {
-    public static KnightPersonality GetRandomAvailablePersonality() => EnumArraryLibrary.KnightPersonalitiesArr[Rand.Range(1, EnumArraryLibrary.KnightPersonalitiesArr.Length)];
+    None = 0,
+    Courage = 1, //勇气
+    Tenacity = 2, //坚毅
+    Compassion = 4, //怜悯
+    Oath = 8, //誓言
+    Justice = 16 //正义
+}
 
-    public static string GetPersonalityLabel(KnightPersonality personality)
-    {
-        return $"OARO_KnightPersonality_{personality}".Translate();
-    }
-
+public static class KnightPersonalityExtension
+{
+    public const int AvailablePersonalitiesCount = 5;
+    public static KnightPersonality[] EnumsArrary => (KnightPersonality[])Enum.GetValues(typeof(KnightPersonality));
+    public static KnightPersonality GetRandomAvailablePersonality() => EnumsArrary[Rand.Range(1, EnumsArrary.Length)];
 
     public static IEnumerable<KnightPersonality> GetContainedPersonalities(KnightPersonality personality)
     {
-        KnightPersonality[] knightPersonalitiesArr = EnumArraryLibrary.KnightPersonalitiesArr;
-        for (int i = 1; i < knightPersonalitiesArr.Length; i++)
+        for (int i = 1; i < EnumsArrary.Length; i++)
         {
-            if ((personality & knightPersonalitiesArr[i]) != 0)
+            if ((personality & EnumsArrary[i]) != 0)
             {
-                yield return knightPersonalitiesArr[i];
+                yield return EnumsArrary[i];
             }
         }
     }
@@ -60,7 +67,12 @@ public static class KnightPersonalityUtility
         };
     }
 
-    public static Color GetPersonalityColor(this KnightPersonality personality)
+    public static string GetLabel(this KnightPersonality personality)
+    {
+        return $"OARO_KnightPersonality_{personality}".Translate();
+    }
+
+    public static Color GetColor(this KnightPersonality personality)
     {
         return personality switch
         {
@@ -74,7 +86,7 @@ public static class KnightPersonalityUtility
         };
     }
 
-    public static Texture2D GetPersonalityColorTex(this KnightPersonality personality)
+    public static Texture2D GetColorTex(this KnightPersonality personality)
     {
         return personality switch
         {

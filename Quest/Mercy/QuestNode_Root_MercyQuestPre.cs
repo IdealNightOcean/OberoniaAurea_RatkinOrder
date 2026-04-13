@@ -77,7 +77,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         int arrivalDelayTick = RatkinOrderSettings.EnableAIContent ? 30000 : 60;
         quest.Delay(delayTicks: arrivalDelayTick, inner: null, inSignalDisable: inSignalMakePawnArrival, outSignalComplete: inSignalMakePawnArrival);
 
-        float delayMulti = OrderHallHandler.Instance.OrderHallLevel switch
+        float delayMulti = OrderStationHandler.Instance.OrderHallLevel switch
         {
             < 4 => 1f,
             4 => 1.25f,

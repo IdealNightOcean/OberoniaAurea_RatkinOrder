@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using RimWorld;
+using System;
+using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
@@ -8,6 +10,11 @@ public class KnightVirtueHandler : IExposable
 {
     public const int MaxVirtues = 4;
 
+    private ResidentKnight knight;
+
+    public Pawn Pawn => knight.Pawn;
+
+
     private List<KnightVirtue> virtues = new(4);
 
     public IReadOnlyList<KnightVirtue> Virtues => virtues;
@@ -16,7 +23,18 @@ public class KnightVirtueHandler : IExposable
 
     public int TotalVirtueLevel => virtues.Sum(v => v.Level);
 
-    private bool virtuesDirty = true;
+    private HediffStageTemplate BuffStageTemplate { get; } = new();
+    public KnightVirtueHandler() { }
+    public KnightVirtueHandler(ResidentKnight knight)
+    {
+        this.knight = knight ?? throw new ArgumentNullException(nameof(knight));
+    }
+
+    public void ExposeData()
+    {
+        Scribe_References.Look(ref knight, nameof(knight));
+        Scribe_Collections.Look(ref virtues, nameof(virtues), LookMode.Deep);
+    }
 
     public bool AddVirtue(KnightVirtueDef virtueDef, int level)
     {
@@ -29,7 +47,7 @@ public class KnightVirtueHandler : IExposable
             return false;
         }
         virtues.Add(new KnightVirtue(virtueDef, level));
-        virtuesDirty = true;
+        VirtuesChanged();
         return true;
     }
 
@@ -45,7 +63,7 @@ public class KnightVirtueHandler : IExposable
             return false;
         }
         virtue.Level++;
-        virtuesDirty = true;
+        VirtuesChanged();
         return true;
     }
 
@@ -80,7 +98,7 @@ public class KnightVirtueHandler : IExposable
             if (virtue == virtues[i].Def)
             {
                 virtues.RemoveAt(i);
-                virtuesDirty = true;
+                VirtuesChanged();
                 return true;
             }
         }
@@ -105,10 +123,32 @@ public class KnightVirtueHandler : IExposable
         return true;
     }
 
-
-    public void ExposeData()
+    public HediffStage GetNewBuffStage()
     {
-        Scribe_Collections.Look(ref virtues, nameof(virtues), LookMode.Deep);
+        if (!BuffStageTemplate.IsReady)
+        {
+            RefreshBuffStage();
+        }
+
+        return BuffStageTemplate.GetNewHediffStage();
+    }
+
+    private void VirtuesChanged()
+    {
+        BuffStageTemplate.MarkInvalid();
+    }
+
+    private void RefreshBuffStage()
+    {
+        BuffStageTemplate.ResetTemplate();
+
+        float virtueStatvalue = knight.Pawn.GetStatValue(OARO_ModDefOf.OARO_Stat_PawnVirtue);
+        foreach (KnightVirtue virtue in virtues)
+        {
+
+        }
+
+        BuffStageTemplate.FinalizeTemplate();
     }
 
 }

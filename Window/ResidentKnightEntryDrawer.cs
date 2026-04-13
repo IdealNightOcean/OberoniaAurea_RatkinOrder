@@ -215,7 +215,7 @@ public partial class Window_OrderHall
                     ratkinOrder: Record.RatkinOrder,
                     acceptAction: delegate
                     {
-                        ResidentKnightsManager.Instance.DeregisterKnight(Record.Pawn, ResidentKnightRemovalReason.Player);
+                        ResidentPawnsManager.Instance.DeregisterKnight(Record.Pawn, ResidentKnightRemovalReason.Player);
                         Parent.OnShowDrawerDetailChanged(this);
                         Parent.ResidentKnightDrawers.Remove(this);
                     });
@@ -252,7 +252,7 @@ public partial class Window_OrderHall
             reusedRect = new(inRectX + 260f, inRectY + 4f, 128f, 20f);
             Widgets.Label(reusedRect, Record.Branch.NameColored);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, KnightPersonalityUtility.GetPersonalityLabel(Record.Personality));
+            Widgets.Label(reusedRect, KnightPersonalityExtension.GetLabel(Record.Personality));
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, ResonatePersonalitiesStr.Value);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
@@ -400,19 +400,19 @@ public partial class Window_OrderHall
         private string RefreshResonatePersonalitiesStr()
         {
             string result = string.Empty;
-            foreach (KnightPersonality personality in KnightPersonalityUtility.GetContainedPersonalities(KnightPersonalityUtility.GetResonatePersonality(Record.Personality)))
+            foreach (KnightPersonality personality in KnightPersonalityExtension.GetContainedPersonalities(KnightPersonalityExtension.GetResonatePersonality(Record.Personality)))
             {
                 if (!string.IsNullOrEmpty(result))
                 {
                     result += "  ";
                 }
-                if ((ResidentKnightsManager.Instance.AllHasPersonalityTypes.Value & personality) != 0)
+                if ((ResidentPawnsManager.Instance.AllHasPersonalityTypes.Value & personality) != 0)
                 {
-                    result += KnightPersonalityUtility.GetPersonalityLabel(personality);
+                    result += KnightPersonalityExtension.GetLabel(personality);
                 }
                 else
                 {
-                    result += KnightPersonalityUtility.GetPersonalityLabel(personality).Colorize(Color.gray);
+                    result += KnightPersonalityExtension.GetLabel(personality).Colorize(Color.gray);
                 }
             }
             return result;
@@ -424,7 +424,7 @@ public partial class Window_OrderHall
             {
                 return (0, 0);
             }
-            if (OrderHallHandler.Instance.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+            if (OrderStationHandler.BuildingHandler.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs))
             {
                 return (joyBuildingDefs.Count, allJoyBuildings.Count);
             }
@@ -437,7 +437,7 @@ public partial class Window_OrderHall
             {
                 return string.Empty;
             }
-            OrderHallHandler.Instance.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs);
+            OrderStationHandler.BuildingHandler.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs);
             joyBuildingDefs ??= [];
 
             StringBuilder sb = new();
@@ -466,7 +466,7 @@ public partial class Window_OrderHall
             }
             else
             {
-                ResidentKnightsManager residentKnightsManager = ResidentKnightsManager.Instance;
+                ResidentPawnsManager residentKnightsManager = ResidentPawnsManager.Instance;
                 foreach (ResidentKnightRoleDef roleDef in DefDatabase<ResidentKnightRoleDef>.AllDefsListForReading)
                 {
                     if (residentKnightsManager.TryGetKnightOfRole(roleDef, out ResidentKnight otherRecord))
@@ -496,7 +496,7 @@ public partial class Window_OrderHall
         private void RoleChangeConfirmDialog(ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
         {
             StringBuilder sb = new(256);
-            ResidentKnightsManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
+            ResidentPawnsManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
             if (roleRecord is null)
             {
                 sb.AppendLine("OARO_HallWin_RoleChangeConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
@@ -516,7 +516,7 @@ public partial class Window_OrderHall
                 Record.RatkinOrder,
                 acceptAction: delegate
                 {
-                    if (ResidentKnightsManager.Instance.TrySetKnightRole(Record.Pawn, roleDef, replaceCurRole: replaceCurRole))
+                    if (ResidentPawnsManager.Instance.TrySetKnightRole(Record.Pawn, roleDef, replaceCurRole: replaceCurRole))
                     {
                         RoleExplanationStr.MarkDirty();
                     }

@@ -1,4 +1,6 @@
-﻿using Verse;
+﻿using RimWorld;
+using System.Collections.Generic;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -7,5 +9,11 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class KnightVirtueTraitDef : Def
 {
+    public List<StatModifier> statOffsets;
 
+    public List<StatModifier> statFactors;
+
+    public List<StatModifierBySeverity> statOffsetsByVirtue;
+
+    public List<StatModifierBySeverity> statFactorsByVirtue;
 }

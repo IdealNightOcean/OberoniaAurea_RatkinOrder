@@ -10,7 +10,7 @@ public class StatWorker_MeditationPointBase : StatWorker
     protected static bool CanApplyOn(StatRequest req)
     {
         Pawn pawn = req.Pawn ?? (req.Thing as Pawn);
-        return pawn.CanBeKnight() && pawn.Faction.IsPlayerSafe() && ResidentKnightsManager.Instance.IsResidentKnight(pawn);
+        return pawn.CanBeKnight() && pawn.Faction.IsPlayerSafe() && ResidentPawnsManager.Instance.IsResidentKnight(pawn);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -18,7 +18,7 @@ public class StatWorker_MeditationPointBase : StatWorker
     {
         if (thing is Pawn pawn)
         {
-            return pawn.CanBeKnight() && pawn.Faction.IsPlayerSafe() && ResidentKnightsManager.Instance.IsResidentKnight(pawn);
+            return pawn.CanBeKnight() && pawn.Faction.IsPlayerSafe() && ResidentPawnsManager.Instance.IsResidentKnight(pawn);
         }
         return false;
     }

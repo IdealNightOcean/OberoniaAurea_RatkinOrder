@@ -33,7 +33,7 @@ public static class OARO_MapUtility
             return map;
         }
 
-        map = OrderHallHandler.Instance.MainOrderCodePedestal?.MapHeld;
+        map = OrderStationHandler.Instance.MainOrderCodePedestal?.MapHeld;
         if (map is not null && map.IsPlayerHome && (canBeSpace || !map.Tile.LayerDef.isSpace))
         {
             return map;

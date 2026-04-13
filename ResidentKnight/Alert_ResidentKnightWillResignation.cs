@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Alert_ResidentKnightWillResignation : Alert_Critical
 {
-    protected override Color BGColor => ResidentKnightsManager.Instance.MinResignationDays.Value < 5f ? BGColor : Color.clear;
+    protected override Color BGColor => ResidentPawnsManager.Instance.MinResignationDays.Value < 5f ? BGColor : Color.clear;
 
     public Alert_ResidentKnightWillResignation()
     {
@@ -15,24 +15,24 @@ public class Alert_ResidentKnightWillResignation : Alert_Critical
 
     public override AlertReport GetReport()
     {
-        float minResignationDays = ResidentKnightsManager.Instance.MinResignationDays.Value;
+        float minResignationDays = ResidentPawnsManager.Instance.MinResignationDays.Value;
         return minResignationDays >= 0f && minResignationDays <= 15f;
     }
 
     protected override void OnClick()
     {
-        if (OrderHallHandler.Instance.MainOrderCodePedestal?.Map is null)
+        if (OrderStationHandler.Instance.MainOrderCodePedestal?.Map is null)
         {
             return;
         }
-        Window_OrderHall hallWin = new(OrderHallHandler.Instance.MainOrderCodePedestal.Map);
+        Window_OrderHall hallWin = new(OrderStationHandler.Instance.MainOrderCodePedestal.Map);
         Find.WindowStack.Add(hallWin);
     }
 
     public override TaggedString GetExplanation()
     {
         TaggedString explanation = "OARO_SomeResidentKnightWillResignationDesc".Translate();
-        if (OrderHallHandler.Instance.MainOrderCodePedestal?.Map is not null)
+        if (OrderStationHandler.Instance.MainOrderCodePedestal?.Map is not null)
         {
             explanation += ("\n\n(" + "OARO_ClickToOpenOrderHallWin".Translate() + ")");
         }
