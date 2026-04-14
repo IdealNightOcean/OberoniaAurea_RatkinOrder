@@ -509,7 +509,7 @@ public partial class Window_BranchTask : OrderWindowBase
         List<FloatMenuOption> menuOptions = [];
         foreach ((Pawn knight, ResidentKnight record) in ResidentPawnsManager.Instance.ResidentKnights)
         {
-            if (record.RatkinOrder != RatkinOrder || !record.IsValid || knight.Downed)
+            if (record.RatkinOrder != RatkinOrder || record.CurState != ResidentPawnState.Normal || knight.Downed)
             {
                 continue;
             }

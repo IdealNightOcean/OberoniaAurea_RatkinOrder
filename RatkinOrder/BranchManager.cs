@@ -156,6 +156,7 @@ public class BranchManager : IExposable, ITickDay
         }
 
         ratkinOrder.JointPatrolManager.Notify_BranchDestroyed(branch);
+        ResidentPawnsManager.Instance.Notify_BranchDestroyed(branch);
         GlobalInteractionManager.Instance.Notify_BranchDestroyed(branch);
         MapComponent_RatkinOrder.OnBranchDestroyed(branch);
         Find.QuestManager.OnBranchDestroyed(branch);

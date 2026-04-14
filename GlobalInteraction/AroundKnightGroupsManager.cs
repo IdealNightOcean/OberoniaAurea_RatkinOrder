@@ -175,7 +175,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
             return;
         }
 
-        if (!GlobalInteractionManager.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.KnightGroupProactiveVisit)
+        if (!GameComponent_RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.KnightGroupProactiveVisit)
             && !Find.QuestManager.ActiveQuestsListForReading.Any(q => q.root == OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit))
         {
             AroundKnightGroup knightGroup = expiredGroups.Where(g => g.CurBusyLevel == AroundKnightGroup.BusyLevel.Leisure
@@ -184,7 +184,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 
             if (knightGroup is not null)
             {
-                GlobalInteractionManager.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.KnightGroupProactiveVisit, cdTicks: 30 * 60000, removeWhenExpired: true);
+                GameComponent_RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.KnightGroupProactiveVisit, cdTicks: 30 * 60000, removeWhenExpired: true);
                 QuizAutoVisit(knightGroup);
             }
         }

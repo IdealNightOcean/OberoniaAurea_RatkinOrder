@@ -109,7 +109,8 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             generationRequest.AllowedDevelopmentalStages = (i < adultCount ? DevelopmentalStage.Adult : DevelopmentalStage.Child);
 
             Pawn pawn = quest.GeneratePawn(generationRequest);
-            KnightGenerateUtility.PostKnightGenerate(pawn, new KnightRecord(RatkinOrder, Branch, isCombatant: isCombatant, isCommander: isCommander));
+            KnightRecord knightRecord = new(RatkinOrder, Branch, isCombatant: isCombatant, isCommander: isCommander);
+            KnightGenerateUtility.PostKnightGenerate(pawn, knightRecord);
 
             pawns.Add(pawn);
 

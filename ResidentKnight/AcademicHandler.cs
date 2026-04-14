@@ -25,7 +25,7 @@ public class AcademicHandler : IExposable
         TotalAcademicLevel = new(refreshFunc: () => academics?.Values.Sum() ?? 0);
     }
 
-    public AcademicHandler(Pawn pawn, KnightRecord knightRecord) : this()
+    public AcademicHandler(ResidentKnight knight) : this()
     {
         try
         {

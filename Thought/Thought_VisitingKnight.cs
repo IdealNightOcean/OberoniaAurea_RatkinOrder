@@ -22,7 +22,7 @@ public class Thought_VisitingKnight : Thought_Memory
 
     private static int GetMoodOffset()
     {
-        if (ResidentPawnsManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Clerk, out ResidentKnight record))
+        if (ResidentPawnsManager.RoleManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Clerk, out ResidentKnight record))
         {
             return (OARO_ModDefOf.OARO_Clerk.RoleWorker as ResidentKnightRoleWorker_Clerk)?.KnightMoodOffset(record.Pawn) ?? 0;
         }

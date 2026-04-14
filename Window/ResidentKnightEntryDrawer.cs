@@ -466,10 +466,10 @@ public partial class Window_OrderHall
             }
             else
             {
-                ResidentPawnsManager residentKnightsManager = ResidentPawnsManager.Instance;
+                ResidentRoleManager roleManager = ResidentPawnsManager.RoleManager;
                 foreach (ResidentKnightRoleDef roleDef in DefDatabase<ResidentKnightRoleDef>.AllDefsListForReading)
                 {
-                    if (residentKnightsManager.TryGetKnightOfRole(roleDef, out ResidentKnight otherRecord))
+                    if (roleManager.TryGetKnightOfRole(roleDef, out ResidentKnight otherRecord))
                     {
                         if (otherRecord.NextRoleChangeableTick > ticksGame)
                         {
@@ -496,7 +496,7 @@ public partial class Window_OrderHall
         private void RoleChangeConfirmDialog(ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
         {
             StringBuilder sb = new(256);
-            ResidentPawnsManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
+            ResidentPawnsManager.RoleManager.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
             if (roleRecord is null)
             {
                 sb.AppendLine("OARO_HallWin_RoleChangeConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
@@ -516,7 +516,7 @@ public partial class Window_OrderHall
                 Record.RatkinOrder,
                 acceptAction: delegate
                 {
-                    if (ResidentPawnsManager.Instance.TrySetKnightRole(Record.Pawn, roleDef, replaceCurRole: replaceCurRole))
+                    if (ResidentPawnsManager.RoleManager.TrySetKnightRole(Record.Pawn, roleDef, replaceCurRole: replaceCurRole))
                     {
                         RoleExplanationStr.MarkDirty();
                     }

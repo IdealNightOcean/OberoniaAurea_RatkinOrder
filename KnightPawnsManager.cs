@@ -12,8 +12,8 @@ public class KnightPawnsManager : IExposable
     private Dictionary<Pawn, KnightRecord> knights = new(32);
     public IReadOnlyDictionary<Pawn, KnightRecord> AllKnights => knights;
 
-    private List<Pawn> knightKeys;
-    private List<KnightRecord> knightValues;
+    private readonly Dictionary<RatkinOrder, List<KnightRecord>> orderToKnights = [];
+    private readonly Dictionary<Branch, List<KnightRecord>> branchToKnights = [];
 
     public KnightPawnsManager()
     {
@@ -27,36 +27,56 @@ public class KnightPawnsManager : IExposable
         Scribe_Collections.Look(ref knights, nameof(knights), LookMode.Reference, LookMode.Deep, ref knightKeys, ref knightValues);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (knights.RemoveAll(kv => kv.Value is null || !kv.Value.RatkinOrder.IsValid()) > 0)
+            if (knights.RemoveAll(kv => kv.Value is null || kv.Value.Pawn.DestroyedOrNull() || !kv.Value.RatkinOrder.IsValid()) > 0)
             {
                 Log.Error($"[OARO] {nameof(KnightPawnsManager)} 的部分骑士记录在加载后无效，已被移除。");
+            }
+
+            foreach (KnightRecord knightRecord in knights.Values)
+            {
+                AddKnightToLookupDicts(knightRecord);
             }
         }
     }
 
-    public void RegisterKnight(Pawn pawn, KnightRecord knightRecord)
+    public bool RegisterKnight(Pawn pawn, KnightRecord knightRecord)
     {
+        if (pawn is null || knightRecord == null)
+            return false;
+
         if (!pawn.CanBeKnight())
         {
-            Log.Error($"[OARO] 将单位 ({pawn}) 注册到 KnightPawnsManager 失败：该单位不能是骑士。");
-            return;
+            Log.Error($"[OARO] 将单位 ({pawn}) 注册到 KnightPawnsManager 失败：该单位不能成为骑士。");
+            return false;
         }
-        knights[pawn] = knightRecord;
+
+        knightRecord.BindPawn(pawn);
+        knights[knightRecord.Pawn] = knightRecord;
+        AddKnightToLookupDicts(knightRecord);
+
+        return true;
     }
 
-    public bool DeregisterKnight(Pawn pawn) => knights.Remove(pawn);
+    public bool DeregisterKnight(Pawn pawn)
+    {
+        if (!knights.TryGetValue(pawn, out KnightRecord record))
+            return false;
+
+        knights.Remove(pawn);
+        if (record.RatkinOrder is not null && orderToKnights.TryGetValue(record.RatkinOrder, out List<KnightRecord> orderKnights))
+        {
+            orderKnights?.Remove(record);
+        }
+        if (record.Branch is not null && branchToKnights.TryGetValue(record.Branch, out List<KnightRecord> branchKnights))
+        {
+            branchKnights?.Remove(record);
+        }
+
+        return true;
+    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsKnight(Pawn pawn) => pawn.CanBeKnight() && knights.ContainsKey(pawn);
-
-    public bool IsKnightCommander(Pawn pawn)
-    {
-        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
-        {
-            return record.IsCommander;
-        }
-        return false;
-    }
 
     public KnightRecord GetKnightRecord(Pawn pawn)
     {
@@ -67,45 +87,39 @@ public class KnightPawnsManager : IExposable
         return null;
     }
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryGetKnightRecord(Pawn pawn, out KnightRecord record)
     {
         record = null;
         return pawn.CanBeKnight() && knights.TryGetValue(pawn, out record);
     }
 
-    public RatkinOrder GetKnightOrder(Pawn pawn)
+    private void AddKnightToLookupDicts(KnightRecord knightRecord)
     {
-        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
+        if (knightRecord.RatkinOrder is not null)
         {
-            return record.RatkinOrder;
+            if (orderToKnights.TryGetValue(knightRecord.RatkinOrder, out List<KnightRecord> orderKnights))
+            {
+                orderKnights.Add(knightRecord);
+            }
+            else
+            {
+                orderToKnights[knightRecord.RatkinOrder] = [knightRecord];
+            }
         }
-        return null;
+        if (knightRecord.Branch is not null)
+        {
+            if (branchToKnights.TryGetValue(knightRecord.Branch, out List<KnightRecord> branchKnights))
+            {
+                branchKnights.Add(knightRecord);
+            }
+            else
+            {
+                branchToKnights[knightRecord.Branch] = [knightRecord];
+            }
+        }
     }
 
-    public Branch GetKnightBranch(Pawn pawn)
-    {
-        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
-        {
-            return record.Branch;
-        }
-        return null;
-    }
-
-    public bool IsKnightOfOrder(Pawn pawn, RatkinOrder ratkinOrder)
-    {
-        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
-        {
-            return record.RatkinOrder == ratkinOrder;
-        }
-        return false;
-    }
-
-    public bool IsKnightOfBranch(Pawn pawn, Branch branch)
-    {
-        if (pawn.CanBeKnight() && knights.TryGetValue(pawn, out KnightRecord record))
-        {
-            return record.Branch == branch;
-        }
-        return false;
-    }
+    private List<Pawn> knightKeys;
+    private List<KnightRecord> knightValues;
 }

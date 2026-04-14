@@ -9,12 +9,14 @@ public class KnightRecord : IExposable, ILoadReferenceable
     private int loadID = -1;
     public int LoadID => loadID;
 
+    private Pawn pawn;
     private RatkinOrder ratkinOrder;
     private Branch branch;
     private KnightPersonality personality = KnightPersonality.None;
     private bool isCommander;
     private bool isCombatant;
 
+    public Pawn Pawn => pawn;
     public RatkinOrder RatkinOrder => ratkinOrder;
     public Branch Branch => branch;
     public KnightPersonality Personality => personality;
@@ -23,7 +25,6 @@ public class KnightRecord : IExposable, ILoadReferenceable
     public bool IsFriendly => ratkinOrder.Faction?.HostileTo(Faction.OfPlayer) is not true;
 
     public KnightRecord() { }
-    public KnightRecord(Branch branch, KnightPersonality personality = KnightPersonality.None, bool isCombatant = false, bool isCommander = false) : this(branch.RatkinOrder, branch, personality, isCombatant, isCommander) { }
     public KnightRecord(RatkinOrder ratkinOrder, Branch branch = null, KnightPersonality personality = KnightPersonality.None, bool isCombatant = false, bool isCommander = false)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
@@ -39,16 +40,27 @@ public class KnightRecord : IExposable, ILoadReferenceable
         loadID = UniqueIDManager.GetUniqueID(nameof(KnightRecord));
     }
 
+    public void BindPawn(Pawn pawn, bool forceReplace = false)
+    {
+        if (!forceReplace && this.pawn is not null)
+        {
+            throw new ArgumentException($"{nameof(this.pawn)} is not null.");
+        }
+
+        this.pawn = pawn;
+    }
+
     public void ExposeData()
     {
-        Scribe_Values.Look(ref loadID, "loadID", -1);
+        Scribe_Values.Look(ref loadID, nameof(loadID), -1);
 
-        Scribe_References.Look(ref ratkinOrder, "ratkinOrder");
-        Scribe_References.Look(ref branch, "branch");
-        Scribe_Values.Look(ref personality, "personality", defaultValue: KnightPersonality.None);
+        Scribe_References.Look(ref pawn, nameof(pawn));
+        Scribe_References.Look(ref ratkinOrder, nameof(ratkinOrder));
+        Scribe_References.Look(ref branch, nameof(branch));
+        Scribe_Values.Look(ref personality, nameof(personality), defaultValue: KnightPersonality.None);
 
-        Scribe_Values.Look(ref isCommander, "isCommander", defaultValue: false);
-        Scribe_Values.Look(ref isCombatant, "isCombatant", defaultValue: false);
+        Scribe_Values.Look(ref isCommander, nameof(isCommander), defaultValue: false);
+        Scribe_Values.Look(ref isCombatant, nameof(isCombatant), defaultValue: false);
     }
 
     public string GetUniqueLoadID() => $"{nameof(KnightRecord)}_{loadID}";

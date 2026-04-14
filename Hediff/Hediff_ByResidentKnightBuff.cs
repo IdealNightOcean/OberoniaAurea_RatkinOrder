@@ -12,7 +12,7 @@ public class Hediff_ByResidentKnightBuff : HediffWithComps
         {
             if (Find.TickManager.TicksGame > nextStageCacheTick)
             {
-                cachedStage = ResidentPawnsManager.Instance.GetNewBuffStage();
+                cachedStage = ResidentPawnsManager.RoleManager.GetNewBuffStage();
                 nextStageCacheTick = Find.TickManager.TicksGame + 60000;
             }
             return cachedStage;

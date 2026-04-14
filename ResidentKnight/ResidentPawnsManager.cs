@@ -15,6 +15,8 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 {
+    private readonly int tickHashOffset;
+
     public static ResidentPawnsManager Instance { get; private set; }
 
     public static int ResidentKnightCeiling
@@ -34,63 +36,66 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     }
 
     private Dictionary<Pawn, ResidentKnight> residentKnights = [];
-    private Dictionary<ResidentKnightRoleDef, ResidentKnight> rolesToKnights = [];
-    private Dictionary<Pawn, ResidentPawn> residentColonists = [];
-
     public int KnightsCount => residentKnights.Count;
     public IReadOnlyDictionary<Pawn, ResidentKnight> ResidentKnights => residentKnights;
-    public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnight> RolesToKnights => RolesToKnights;
 
+    private Dictionary<Pawn, ResidentPawn> residentColonists = [];
+    public IReadOnlyDictionary<Pawn, ResidentPawn> ResidentColonists => residentColonists;
+
+    private ResidentRoleManager roleManager;
+    public static ResidentRoleManager RoleManager => Instance?.roleManager;
 
     private MentorshipManager mentorshipManager;
-    public MentorshipManager MentorshipManager => mentorshipManager;
+    public static MentorshipManager MentorshipManager => Instance?.mentorshipManager;
 
     public LazyMutable<float> MinResignationDays { get; }
     public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
 
     public LazyMutable<int> InstructorKnightsCount { get; }
-    public LazyMutable<int> LawOrderKnightsCount { get; }
 
-    private HediffStageTemplate BuffStageTemplate { get; }
-    private int nextBuffStageForceRefreshTick;
-
-    private List<Pawn> residentKnightKeys;
-    private List<ResidentKnight> residentKnightValues;
-
-    private List<ResidentKnightRoleDef> rolesToKnightKeys;
-    private List<ResidentKnight> rolesToKnightValues;
-
-    internal ResidentPawnsManager()
+    internal ResidentPawnsManager(bool initCtor)
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
         Instance = this;
+        tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
 
-        BuffStageTemplate = new();
         MinResignationDays = new(refreshFunc: RefreshMinResignationDays);
         AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
 
         InstructorKnightsCount = new(refreshFunc: () => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
-        LawOrderKnightsCount = new(refreshFunc: () => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_LawOrder).Count());
+
+        if (initCtor)
+        {
+            EnsureComponentsInit();
+        }
     }
+
     public static void ClearStaticCache() => Instance = null;
+
+    private void EnsureComponentsInit()
+    {
+        roleManager ??= new ResidentRoleManager(this);
+        mentorshipManager ??= new MentorshipManager(this);
+    }
 
     public void ExposeData()
     {
         Scribe_Collections.Look(ref residentKnights, nameof(residentKnights), LookMode.Reference, LookMode.Deep, ref residentKnightKeys, ref residentKnightValues);
-        Scribe_Collections.Look(ref rolesToKnights, nameof(rolesToKnights), LookMode.Def, LookMode.Reference, ref rolesToKnightKeys, ref rolesToKnightValues);
-        Scribe_Collections.Look(ref residentColonists, nameof(residentColonists), LookMode.Reference, LookMode.Deep);
+        Scribe_Collections.Look(ref residentColonists, nameof(residentColonists), LookMode.Reference, LookMode.Deep, ref residentColonistKeys, ref residentColonistValues);
 
-        Scribe_Deep.Look(ref mentorshipManager, nameof(mentorshipManager));
+        Scribe_Deep.Look(ref roleManager, nameof(roleManager), ctorArgs: this);
+        Scribe_Deep.Look(ref mentorshipManager, nameof(mentorshipManager), ctorArgs: this);
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
+            EnsureComponentsInit();
+            if (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.CurState == ResidentPawnState.ForceRemove) > 0)
             {
                 Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻骑士记录在加载后为null或无效，已被移除。");
             }
-            if (rolesToKnights.RemoveAll(kv => kv.Value is null || kv.Value.ShouldRemove) > 0)
+            if (residentColonists.RemoveAll(kv => kv.Value is null || kv.Value.CurState == ResidentPawnState.ForceRemove) > 0)
             {
-                Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻骑士角色在加载后为null或无效，已被移除。");
+                Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻殖民者记录在加载后为null或无效，已被移除。");
             }
         }
     }
@@ -111,18 +116,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         }
 
         listing_Rect.Gap(12f);
-        listing_Rect.Label($"常驻骑士职位: {rolesToKnights.Count}");
-        if (rolesToKnights.NullOrEmpty())
-        {
-            listing_Rect.SubLabel("None".Translate(), widthPct: 0.8f);
-        }
-        else
-        {
-            foreach (KeyValuePair<ResidentKnightRoleDef, ResidentKnight> kv in rolesToKnights)
-            {
-                listing_Rect.SubLabel(kv.Key.label + ": " + kv.Value.Pawn.Name, widthPct: 0.8f);
-            }
-        }
+        roleManager.DrawDevWindow(listing_Rect);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -131,9 +125,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryGetKnightRecord(Pawn pawn, out ResidentKnight record) => residentKnights.TryGetValue(pawn, out record);
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetKnightOfRole(ResidentKnightRoleDef roleDef, out ResidentKnight record) => rolesToKnights.TryGetValue(roleDef, out record);
-
     public void RegisterKnight(Pawn pawn, KnightRecord knightRecord = null)
     {
         if (knightRecord is null && !KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out knightRecord))
@@ -141,12 +132,16 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
             Log.Error($"[OARO] 尝试将非骑士单位添加到 {nameof(ResidentPawnsManager)}");
             return;
         }
+        if (knightRecord.Pawn != pawn)
+        {
+            Log.Error($"[OARO] 骑士记录的 Pawn ({knightRecord.Pawn}) 与尝试注册的 Pawn ({pawn}) 不匹配，无法添加到 {nameof(ResidentPawnsManager)}");
+            return;
+        }
 
         if (!IsResidentKnight(pawn))
         {
-            RegisterKnightDirectly(pawn, knightRecord);
+            RegisterKnightDirectly(knightRecord);
         }
-        RegisterKnight(pawn, knightRecord);
     }
 
     public void DeregisterKnight(Pawn pawn, ResidentKnightRemovalReason reason)
@@ -158,17 +153,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
         DeregisterKnightDirectly(record, reason);
     }
-
-    public bool TrySetKnightRole(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
-    {
-        if (SetResidentKnightRole(pawn, roleDef, replaceCurRole))
-        {
-            BuffStageTemplate.MarkInvalid();
-            return true;
-        }
-        return false;
-    }
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsResidentColonist(Pawn pawn) => residentColonists.ContainsKey(pawn);
@@ -196,31 +180,20 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         DeregisterColonistDirectly(pawn);
     }
 
-
-    public void TickDay()
+    public void Tick()
     {
-        if (Find.TickManager.TicksGame > nextBuffStageForceRefreshTick)
+        if (TickUtility.IsHashIntervalTick(tickHashOffset, 2500))
         {
-            nextBuffStageForceRefreshTick = Find.TickManager.TicksGame + 60000;
-            BuffStageTemplate.MarkInvalid();
+            if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
+            {
+                DailyColonistsCheck();
+                DailyKnightsCheck();
+                mentorshipManager.TickDay();
+            }
+
+
         }
 
-        DailyColonistsCheck();
-        DailyKnightsCheck();
-        mentorshipManager.TickDay();
-    }
-
-    /// <summary>
-    /// 获取新的Buff阶段。会根据当前常驻骑士的职位情况刷新Buff阶段模板。
-    /// </summary>
-    public HediffStage GetNewBuffStage()
-    {
-        if (!BuffStageTemplate.IsReady)
-        {
-            RefreshRoleBuffStageTemplate();
-        }
-
-        return BuffStageTemplate.GetNewHediffStage();
     }
 
     public void AllKnightsGainMeditation(float gain, RatkinOrder ratkinOrder = null, bool directly = false)
@@ -249,19 +222,15 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-
     private void DailyColonistsCheck()
     {
         List<Pawn> toRemove = [];
         foreach (KeyValuePair<Pawn, ResidentPawn> kv in residentColonists)
         {
-            if (kv.Value.ShouldRemove)
+            kv.Value.CheckPendingRemoval();
+            if (kv.Value.CurState == ResidentPawnState.ForceRemove)
             {
                 toRemove.Add(kv.Key);
-            }
-            else
-            {
-                kv.Value.CheckPendingRemoval();
             }
         }
         foreach (Pawn pawn in toRemove)
@@ -270,54 +239,86 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
             residentColonists.Remove(pawn);
         }
     }
+
     private void DailyKnightsCheck()
     {
-        List<ResidentKnight> toRemove = [];
+        List<(ResidentKnight, ResidentPawnState)> toProcess = [];
         int ticksGame = Find.TickManager.TicksGame;
         foreach (ResidentKnight record in residentKnights.Values)
         {
             record.CheckPendingRemoval();
-            if (record.ShouldRemove)
+            ResidentPawnState knightState = record.CurState;
+            switch (knightState)
             {
-                toRemove.Add(record);
-            }
-            else
-            {
-                float gainPoints = record.Pawn.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationDailyGain);
-                record.MeditationPoints += gainPoints;
-            }
+                case ResidentPawnState.Normal:
+                    {
+                        float gainPoints = record.Pawn.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationDailyGain);
+                        record.MeditationPoints += gainPoints;
 
-            if (record.ResignationTick <= ticksGame)
-            {
-                if (RatkinOrderSettings.AutoPostponeResignationResidentKnight)
-                {
-                    record.PostponeResignation(120);
-                }
-                else
-                {
-                    toRemove.Add(record);
-                }
+                        if (record.ResignationTick <= ticksGame)
+                        {
+                            if (RatkinOrderSettings.AutoPostponeResignationResidentKnight)
+                            {
+                                record.PostponeResignation(120);
+                            }
+                            else
+                            {
+                                record.SetForceState(ResidentPawnState.ReadyResignation);
+                                toProcess.Add((record, ResidentPawnState.ReadyResignation));
+                            }
+                        }
+                        continue;
+                    }
+                case ResidentPawnState.ReadyResignation or ResidentPawnState.ForceRemove or ResidentPawnState.PendingConvertToColonist:
+                    {
+                        toProcess.Add((record, knightState));
+                        continue;
+                    }
+                default: continue;
             }
         }
 
-        foreach (ResidentKnight r in toRemove)
+        foreach ((ResidentKnight, ResidentPawnState) pair in toProcess)
         {
-            DeregisterKnightDirectly(r, ResidentKnightRemovalReason.Overdue);
+            if (pair.Item2 == ResidentPawnState.PendingConvertToColonist)
+            {
+                CoverKnightToColonist(pair.Item1);
+                continue;
+            }
+
+            ResidentKnightRemovalReason removalReason = pair.Item2 switch
+            {
+                ResidentPawnState.ReadyResignation => ResidentKnightRemovalReason.Overdue,
+                ResidentPawnState.ForceRemove => ResidentKnightRemovalReason.Invalid,
+                _ => ResidentKnightRemovalReason.Unknown
+            };
+
+            DeregisterKnightDirectly(pair.Item1, removalReason);
         }
 
         MinResignationDays.MarkDirty();
     }
 
-    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder) => RemoveAllInvalidRecord(extraRemove: (record) => record.RatkinOrder == ratkinOrder,
-                                                                                             extraRemoveReason: ResidentKnightRemovalReason.OrderDestory);
-    public void Notify_BranchDestroyed(Branch branch) => RemoveAllInvalidRecord(extraRemove: (record) => record.Branch == branch,
-                                                                                extraRemoveReason: ResidentKnightRemovalReason.BranchDestory);
-
-    private void RegisterKnightDirectly(Pawn pawn, KnightRecord knightRecord)
+    public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
     {
-        residentKnights.Add(pawn, new ResidentKnight(pawn, knightRecord));
+        List<ResidentKnight> toColonist = residentKnights.Values.Where(rk => rk.RatkinOrder == ratkinOrder).ToList();
+        foreach (ResidentKnight knight in toColonist)
+        {
+            CoverKnightToColonist(knight);
+        }
+    }
+
+    public void Notify_BranchDestroyed(Branch branch)
+    {
+        throw new NotImplementedException();
+    }
+
+    private void RegisterKnightDirectly(KnightRecord knightRecord)
+    {
+        residentKnights.Add(knightRecord.Pawn, new ResidentKnight(knightRecord));
         OnKnightsChanged();
     }
+
     private void DeregisterColonistDirectly(Pawn pawn)
     {
         if (!residentColonists.Remove(pawn))
@@ -331,79 +332,25 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     private void DeregisterKnightDirectly(ResidentKnight record, ResidentKnightRemovalReason reason)
     {
         if (!residentKnights.Remove(record.Pawn))
-        {
             return;
-        }
 
+        roleManager.OnResidentKnightDeregistered(record, reason);
         mentorshipManager.RemoveTeacher(record);
-        if (record.CurRole is not null)
-        {
-            rolesToKnights.Remove(record.CurRole);
-            BuffStageTemplate.MarkInvalid();
-        }
+
         record.PostRemoved(reason);
         OnKnightsChanged();
     }
 
-    private bool SetResidentKnightRole(Pawn pawn, ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
+    private void CoverKnightToColonist(ResidentKnight record)
     {
-        if (!residentKnights.TryGetValue(pawn, out ResidentKnight pawnRecord))
-        {
-            return false;
-        }
+        if (record is null)
+            return;
 
-        if (rolesToKnights.TryGetValue(roleDef, out ResidentKnight curRolePawnRecord))
-        {
-            if (curRolePawnRecord.Pawn == pawn)
-            {
-                return true;
-            }
-            if (!replaceCurRole)
-            {
-                return false;
-            }
-        }
+        DeregisterKnightDirectly(record, ResidentKnightRemovalReason.ConvertToColonist);
+        if (record.Pawn is null || residentColonists.ContainsKey(record.Pawn))
+            return;
 
-        ResidentKnightRoleDef pOldRole = pawnRecord.CurRole;
-
-        switch (curRolePawnRecord, pOldRole)
-        {
-            //新增职位
-            case (null, null):
-                {
-                    pawnRecord.ChangeRole(roleDef);
-                    rolesToKnights[roleDef] = pawnRecord;
-                    break;
-                }
-            //两人交接职位
-            case (not null, null):
-                {
-                    curRolePawnRecord.ChangeRole(null);
-                    pawnRecord.ChangeRole(roleDef);
-                    rolesToKnights[roleDef] = pawnRecord;
-                    break;
-                }
-            //本人职位改变
-            case (null, not null):
-                {
-                    pawnRecord.ChangeRole(roleDef);
-                    rolesToKnights.Remove(pOldRole);
-                    rolesToKnights[roleDef] = pawnRecord;
-                    break;
-                }
-            //替代对方职位
-            case (not null, not null):
-                {
-                    curRolePawnRecord.ChangeRole(null);
-                    pawnRecord.ChangeRole(roleDef);
-
-                    rolesToKnights.Remove(pOldRole);
-                    rolesToKnights[roleDef] = pawnRecord;
-                    break;
-                }
-        }
-
-        return true;
+        residentColonists.Add(record.Pawn, new ResidentPawn(record));
     }
 
     private void RemoveAllInvalidRecord(Predicate<ResidentKnight> extraRemove = null, ResidentKnightRemovalReason extraRemoveReason = ResidentKnightRemovalReason.Unknown)
@@ -463,30 +410,10 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         MinResignationDays.MarkDirty();
         AllHasPersonalityTypes.MarkDirty();
         InstructorKnightsCount.MarkDirty();
-        LawOrderKnightsCount.MarkDirty();
     }
 
-    private void RefreshRoleBuffStageTemplate()
-    {
-        BuffStageTemplate.ResetTemplate();
-
-        if (LawOrderKnightsCount.Value > 0)
-        {
-            BuffStageTemplate.AddOffset(StatDefOf.GlobalLearningFactor, Mathf.Min(LawOrderKnightsCount.Value * 0.12f, 0.6f));
-        }
-
-        foreach (KeyValuePair<ResidentKnightRoleDef, ResidentKnight> kv in rolesToKnights)
-        {
-            (ResidentKnightRoleDef roldDef, Pawn pawn) = (kv.Key, kv.Value.Pawn);
-
-            BuffStageTemplate.AddOffsets(roldDef.statOffsets);
-            BuffStageTemplate.AddOffsets(roldDef.RoleWorker.RoleStatOffsets(pawn));
-
-            BuffStageTemplate.AddFactors(roldDef.statFactors);
-            BuffStageTemplate.AddFactors(roldDef.RoleWorker.RoleStatFactors(pawn));
-        }
-
-        nextBuffStageForceRefreshTick = Find.TickManager.TicksGame + 60000;
-        BuffStageTemplate.FinalizeTemplate();
-    }
+    private List<Pawn> residentKnightKeys;
+    private List<ResidentKnight> residentKnightValues;
+    private List<Pawn> residentColonistKeys;
+    private List<ResidentPawn> residentColonistValues;
 }

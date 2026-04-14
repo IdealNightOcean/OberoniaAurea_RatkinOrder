@@ -140,6 +140,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
     <Compile Include="Components\PathedTexture2D.cs" />
     <Compile Include="Components\HediffStageTemplate.cs" />
+    <Compile Include="Components\PlayerPawnsTempRetention.cs" />
     <Compile Include="DataLibrary\KeyLibrary_FormatArgName.cs" />
     <Compile Include="DefModExtension\BranchBuildingTrderSetter_Extension.cs" />
     <Compile Include="DefModExtension\ThingList_Extension.cs" />
@@ -164,8 +165,8 @@
     <Compile Include="KnightVirtue\KnightVirtueHandler.cs" />
     <Compile Include="KnightVirtue\KnightVirtueType.cs" />
     <Compile Include="Def\KnightVirtueTraitDef.cs" />
-    <Compile Include="OrderHall\OrderStationTraditionsManager.cs" />
-    <Compile Include="OrderHall\OrderStationBuildingHandler.cs" />
+    <Compile Include="OrderStation\OrderStationTraditionsManager.cs" />
+    <Compile Include="OrderStation\OrderStationBuildingHandler.cs" />
     <Compile Include="ResidentKnight\ResidentKnightRemovalReason.cs" />
     <Compile Include="ResidentKnight\ResidentKnightRank.cs" />
     <Compile Include="ResidentKnight\MentorshipManager.cs" />
@@ -223,6 +224,8 @@
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Quest\BranchDemand\Quest_GiveBranchMedal_CriticalDemand.cs" />
     <Compile Include="ResidentKnight\AcademicHandler.cs" />
+    <Compile Include="ResidentKnight\ResidentPawnState.cs" />
+    <Compile Include="ResidentKnight\ResidentRoleManager.cs" />
     <Compile Include="Stat\StatWorker_PawnVirtue.cs" />
     <Compile Include="Thought\ThoughtWorker_Situational_Virtue.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
@@ -252,7 +255,7 @@
     <Compile Include="Def\InteractionDefBase.cs" />
     <Compile Include="Def\KnightAcademicDef.cs" />
     <Compile Include="Def\SpecialGameLetterDef.cs" />
-    <Compile Include="OrderHall\OrderStationHandler.cs" />
+    <Compile Include="OrderStation\OrderStationHandler.cs" />
     <Compile Include="ResidentKnight\ResidentKnight.cs" />
     <Compile Include="HarmonyPatch\HotReloadDefs_Patch.cs" />
     <Compile Include="HarmonyPatch\RemoveAndDiscardPawnViaGC_Patch.cs" />
@@ -380,7 +383,7 @@
     <Compile Include="Hediff\Hediff_ByResidentKnightBuff.cs" />
     <Compile Include="Letter\ChoiceLetter_RatkinOrder.cs" />
     <Compile Include="Letter\ChoiceLetter_KnightGroupProactiveVisit.cs" />
-    <Compile Include="OrderHall\OrderHallLevelRestriction.cs" />
+    <Compile Include="OrderStation\OrderHallLevelRestriction.cs" />
     <Compile Include="DefModExtension\OrderHallRestrictionExtension.cs" />
     <Compile Include="ResidentKnight\ResidentPawnsManager.cs" />
     <Compile Include="ResidentKnight\ResidentKnightRoleWorker.cs" />
@@ -395,7 +398,7 @@
     <Compile Include="Job\JobDriver_RepairHowitzer.cs" />
     <Compile Include="ModMain.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker.cs" />
-    <Compile Include="OrderHall\RoomRoleWorker_RatkinOrderHall.cs" />
+    <Compile Include="OrderStation\RoomRoleWorker_RatkinOrderHall.cs" />
     <Compile Include="GlobalInteraction\GlobalInteractionManager.cs" />
     <Compile Include="Thing\OrderRecommendation.cs" />
     <Compile Include="IncidentWorker\IncidentWorker_RaidNobilityTerritory.cs" />

@@ -12,15 +12,13 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class ResidentKnight : ResidentPawn
 {
-    public override bool IsValid => base.IsValid && Branch.IsValid();
-    public bool ShouldTransToColonist => base.IsValid && !Branch.IsValid();
+    protected override bool IsDisabled => base.IsDisabled || !Branch.IsValid();
 
     private KnightRecord knightRecord;
     public KnightRecord KnightRecord => knightRecord;
     public RatkinOrder RatkinOrder => knightRecord.RatkinOrder;
     public Branch Branch => knightRecord.Branch;
     public KnightPersonality Personality => knightRecord.Personality;
-
 
     private ResidentKnightRank curRank;
     public ResidentKnightRank CurRank
@@ -51,10 +49,8 @@ public class ResidentKnight : ResidentPawn
     public ResidentKnightRoleDef CurRole => curRole;
     public int NextRoleChangeableTick => nextRoleChangeableTick;
 
-
     private KnightVirtueHandler knightVirtueHandler;
     public KnightVirtueHandler KnightVirtueHandler => knightVirtueHandler;
-
 
     public override void ExposeData()
     {
@@ -71,17 +67,18 @@ public class ResidentKnight : ResidentPawn
         Scribe_Values.Look(ref residenceStartTick, nameof(residenceStartTick), -1);
         Scribe_Values.Look(ref resignationTick, nameof(resignationTick), -1);
 
-        Scribe_Deep.Look(ref knightVirtueHandler, nameof(knightVirtueHandler));
+        Scribe_Deep.Look(ref academicHandler, nameof(academicHandler));
+        Scribe_Deep.Look(ref knightVirtueHandler, nameof(knightVirtueHandler), ctorArgs: this);
     }
 
     private ResidentKnight() : base() { }
-    public ResidentKnight(Pawn knight, KnightRecord knightRecord)
+    public ResidentKnight(KnightRecord knightRecord)
     {
-        this.pawn = knight ?? throw new ArgumentNullException(nameof(knight));
         this.knightRecord = knightRecord ?? throw new ArgumentNullException(nameof(knightRecord));
+        this.pawn = knightRecord.Pawn ?? throw new ArgumentNullException(nameof(knightRecord.Pawn));
 
-        academicHandler = new AcademicHandler(knight, knightRecord);
-        knightVirtueHandler = new();
+        academicHandler = new(this);
+        knightVirtueHandler = new(this);
 
         residenceStartTick = Find.TickManager.TicksGame;
         if (RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
@@ -148,6 +145,5 @@ public class ResidentKnight : ResidentPawn
     {
         return $"Branch: {Branch.Name}, Rank: {CurRank}, MeditationPoints: {MeditationPoints}, Role: {CurRole} ";
     }
-
     public override string GetUniqueLoadID() => $"{nameof(ResidentKnight)}_{loadID}";
 }

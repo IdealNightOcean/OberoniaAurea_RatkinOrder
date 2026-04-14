@@ -12,7 +12,7 @@ public class LordJob_ExitMapBestForDeployment : LordJob_ExitMapBest
         if (condition == PawnLostCondition.ExitedMap)
         {
             p.DeSpawnOrDeselect();
-            if (!targetBranch.IsValid() || targetSkill is null)
+            if (!targetBranch.IsDisabled() || targetSkill is null)
             {
                 return;
             }

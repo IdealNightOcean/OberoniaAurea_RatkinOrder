@@ -92,6 +92,7 @@ public class RatkinOrderManager : IExposable
         allRatkinOrders.Remove(order);
         order.OnRemoved();
 
+        ResidentPawnsManager.Instance.Notify_RatkinOrderRemoved(order);
         GlobalInteractionManager.Instance.Notify_RatkinOrderRemoved(order);
         MapComponent_RatkinOrder.OnRatkinOrderRemoved(order);
         Find.QuestManager.OnRatkinOrderRemoved(order);

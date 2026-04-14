@@ -35,7 +35,7 @@ public class OrderStationTraditionWorker
 public class OrderStationTraditionsManager : IExposable
 {
     public HashSet<OrderStationTraditionDef> activeTraditions = [];
-    private bool traditionsChanged = false;
+    private bool TraditionsChanged { get; set; } = false;
 
     public void TickDay()
     {
@@ -47,7 +47,7 @@ public class OrderStationTraditionsManager : IExposable
                 {
                     activeTraditions.Add(tradition);
                     tradition.Worker.PostActive();
-                    traditionsChanged = true;
+                    TraditionsChanged = true;
                 }
             }
             else
@@ -56,12 +56,12 @@ public class OrderStationTraditionsManager : IExposable
                 {
                     activeTraditions.Remove(tradition);
                     tradition.Worker.PostDeactive();
-                    traditionsChanged = true;
+                    TraditionsChanged = true;
                 }
             }
         }
 
-        if (traditionsChanged)
+        if (TraditionsChanged)
         {
             ReapplyTraditionEffects();
         }
@@ -69,7 +69,7 @@ public class OrderStationTraditionsManager : IExposable
 
     public void ReapplyTraditionEffects()
     {
-        traditionsChanged = false;
+        TraditionsChanged = false;
         throw new NotImplementedException();
 
     }

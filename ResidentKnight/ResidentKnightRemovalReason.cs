@@ -26,11 +26,7 @@ public enum ResidentKnightRemovalReason
     /// </summary>
     Overdue,
     /// <summary>
-    /// 所属分部被销毁
-    /// </summary>
-    BranchDestory,
-    /// <summary>
     /// 所属骑士团被销毁
     /// </summary>
-    OrderDestory,
+    ConvertToColonist,
 }

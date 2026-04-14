@@ -331,6 +331,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     {
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(knight, out ResidentKnight record))
         {
+            PlayerDespawnedPawnsTempRetention.Instance.AddPawn(knight);
             return;
         }
         if (innerContainer.TryAddOrTransfer(knight))
@@ -350,6 +351,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         else
         {
+            PlayerDespawnedPawnsTempRetention.Instance.AddPawn(knight);
             participatingResidentKnights.Remove(record);
         }
     }
@@ -616,7 +618,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             return;
         }
 
-        participatingResidentKnights.RemoveAll(r => !r.IsValid && !r.Pawn.Spawned);
+        participatingResidentKnights.RemoveAll(r => r.CurState != ResidentPawnState.Normal && !r.Pawn.Spawned);
         if (participatingResidentKnights.NullOrEmpty())
         {
             return;

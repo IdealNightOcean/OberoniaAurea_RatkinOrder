@@ -7,38 +7,22 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class MentorshipManager : IExposable
 {
+    private ResidentPawnsManager Parent { get; }
     public const int MaxStudentsPerKnight = 2;
 
     [Unsaved] private Dictionary<Pawn, HashSet<ResidentKnight>> studentsToTeachers = [];
     [Unsaved] private Dictionary<ResidentKnight, HashSet<Pawn>> teachersToStudents = [];
 
-    private List<StudentTeacherPair> studentTeacherPairs;
-
-    public MentorshipManager() { }
+    public MentorshipManager(ResidentPawnsManager parent)
+    {
+        Parent = parent;
+    }
 
     public void ExposeData()
     {
         if (Scribe.mode == LoadSaveMode.Saving)
         {
-            studentTeacherPairs = new List<StudentTeacherPair>(studentsToTeachers.Count);
-            foreach (KeyValuePair<Pawn, HashSet<ResidentKnight>> kv in studentsToTeachers)
-            {
-                Pawn student = kv.Key;
-                if (student is null)
-                    continue;
-
-                foreach (ResidentKnight record in kv.Value)
-                {
-                    if (record is null)
-                        continue;
-                    StudentTeacherPair stPair = new()
-                    {
-                        student = student,
-                        teacher = record,
-                    };
-                    studentTeacherPairs.Add(stPair);
-                }
-            }
+            PrepareForSaving();
         }
 
         Scribe_Collections.Look(ref studentTeacherPairs, nameof(studentTeacherPairs), LookMode.Deep);
@@ -49,22 +33,7 @@ public class MentorshipManager : IExposable
         }
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (studentTeacherPairs is not null)
-            {
-                studentsToTeachers = studentTeacherPairs.GroupBy(p => p.student)
-                                                        .ToDictionary(g => g.Key,
-                                                                      g => g.Select(p => p.teacher).ToHashSet());
-
-                teachersToStudents = studentTeacherPairs.GroupBy(p => p.teacher)
-                                                        .ToDictionary(g => g.Key,
-                                                                      g => g.Select(p => p.student).ToHashSet());
-            }
-            else
-            {
-                studentsToTeachers = [];
-                teachersToStudents = [];
-            }
-            studentTeacherPairs = null;
+            ConstructFromSavedData();
         }
     }
 
@@ -87,15 +56,21 @@ public class MentorshipManager : IExposable
         return 0;
     }
 
-    public bool AddStudent(Pawn studentPawn, ResidentKnight teacherRecord)
+    public bool TryAddStudent(Pawn studentPawn, ResidentKnight teacherRecord)
     {
-        if (studentPawn is null || teacherRecord is null)
-            return false;
         if (!CanAcceptStudent(teacherRecord))
         {
             Log.Warning($"[OARO] 常驻骑士 {teacherRecord.Pawn.Name} 已达到最大授导对象数量上限 ({MaxStudentsPerKnight})");
             return false;
         }
+        return AddStudentDirectly(studentPawn, teacherRecord);
+    }
+
+    public bool AddStudentDirectly(Pawn studentPawn, ResidentKnight teacherRecord)
+    {
+        if (studentPawn is null || teacherRecord is null)
+            return false;
+
         if (!studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
         {
             studentsToTeachers[studentPawn] = [teacherRecord];
@@ -179,6 +154,7 @@ public class MentorshipManager : IExposable
     {
         if (studentPawn is null || knightRecord is null)
             return false;
+
         if (studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
         {
             return teachers.Contains(knightRecord);
@@ -191,6 +167,48 @@ public class MentorshipManager : IExposable
 
     }
 
+    private void PrepareForSaving()
+    {
+        studentTeacherPairs = new List<StudentTeacherPair>(studentsToTeachers.Count);
+        foreach (KeyValuePair<Pawn, HashSet<ResidentKnight>> kv in studentsToTeachers)
+        {
+            Pawn student = kv.Key;
+            if (student is null)
+                continue;
+            foreach (ResidentKnight record in kv.Value)
+            {
+                if (record is null)
+                    continue;
+                StudentTeacherPair stPair = new()
+                {
+                    student = student,
+                    teacher = record,
+                };
+                studentTeacherPairs.Add(stPair);
+            }
+        }
+    }
+
+    private void ConstructFromSavedData()
+    {
+        if (studentTeacherPairs is not null)
+        {
+            studentsToTeachers = studentTeacherPairs.GroupBy(p => p.student)
+                                                    .ToDictionary(g => g.Key,
+                                                                  g => g.Select(p => p.teacher).ToHashSet());
+            teachersToStudents = studentTeacherPairs.GroupBy(p => p.teacher)
+                                                    .ToDictionary(g => g.Key,
+                                                                  g => g.Select(p => p.student).ToHashSet());
+        }
+        else
+        {
+            studentsToTeachers = [];
+            teachersToStudents = [];
+        }
+        studentTeacherPairs = null;
+    }
+
+    private List<StudentTeacherPair> studentTeacherPairs;
     private class StudentTeacherPair : IExposable
     {
         public Pawn student;

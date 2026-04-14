@@ -13,54 +13,86 @@ public class ResidentPawn : IExposable, ILoadReferenceable
     protected Pawn pawn;
     public Pawn Pawn => pawn;
 
-    protected AcademicHandler academicHandler;
-    public AcademicHandler AcademicHandler => academicHandler;
-
-    private int pendingRemovalTick = -1;
-    public int PendingRemovalTick => pendingRemovalTick;
-
-    public virtual bool IsValid => !pawn.DestroyedOrNull() && !pawn.Dead;
-
-    public bool ShouldRemove
+    private ResidentPawnState? forceState;
+    public ResidentPawnState CurState
     {
         get
         {
             if (pawn.DestroyedOrNull())
             {
-                return true;
+                return ResidentPawnState.ForceRemove;
             }
-
-            if (pendingRemovalTick > 0)
+            if (forceState.HasValue)
             {
-                return Find.TickManager.TicksGame >= pendingRemovalTick;
+                return forceState.Value;
             }
-
-            return false;
+            if (removalTick > 0)
+            {
+                if (Find.TickManager.TicksGame >= removalTick)
+                {
+                    forceState = ResidentPawnState.ForceRemove;
+                    return ResidentPawnState.ForceRemove;
+                }
+                else
+                {
+                    return ResidentPawnState.PendingRemoval;
+                }
+            }
+            if (!IsDisabled)
+            {
+                return ResidentPawnState.Disabled;
+            }
+            return ResidentPawnState.Normal;
         }
+    }
+
+    protected AcademicHandler academicHandler;
+    public AcademicHandler AcademicHandler => academicHandler;
+
+    private int removalTick = -1;
+    public int RemovalTick => removalTick;
+
+    protected virtual bool IsDisabled => pawn.DestroyedOrNull() || pawn.Dead || pawn.RaceProps.IsAnomalyEntity;
+
+    public void SetForceState(ResidentPawnState? state)
+    {
+        forceState = state;
     }
 
     public void CheckPendingRemoval()
     {
-        bool shouldPendingRemoval = pawn.Dead || pawn.Faction.IsPlayerSafe();
-        if (pendingRemovalTick >= 0 && !shouldPendingRemoval)
+        if (CurState == ResidentPawnState.ForceRemove)
         {
-            pendingRemovalTick = -1;
             return;
         }
 
-        if (pendingRemovalTick < 0 && shouldPendingRemoval)
+        bool shouldPendingRemoval = pawn.Dead || pawn.Faction.IsPlayerSafe();
+        if (removalTick >= 0 && !shouldPendingRemoval)
         {
-            pendingRemovalTick = Find.TickManager.TicksGame + PendingRemovalGracePeriodTicks;
+            removalTick = -1;
+            return;
+        }
+
+        if (removalTick < 0 && shouldPendingRemoval)
+        {
+            removalTick = Find.TickManager.TicksGame + PendingRemovalGracePeriodTicks;
         }
     }
 
     protected ResidentPawn() { }
     public ResidentPawn(Pawn pawn)
     {
-        this.pawn = pawn;
+        this.pawn = pawn ?? throw new System.ArgumentNullException(nameof(pawn));
 
         academicHandler = new AcademicHandler();
 
+        loadID = UniqueIDManager.GetUniqueID(nameof(ResidentPawn));
+    }
+
+    public ResidentPawn(ResidentKnight residentKnight)
+    {
+        this.pawn = residentKnight.Pawn ?? throw new System.ArgumentNullException(nameof(residentKnight.Pawn));
+        this.academicHandler = residentKnight.AcademicHandler ?? new();
         loadID = UniqueIDManager.GetUniqueID(nameof(ResidentPawn));
     }
 
@@ -71,7 +103,7 @@ public class ResidentPawn : IExposable, ILoadReferenceable
 
         Scribe_Deep.Look(ref academicHandler, nameof(academicHandler));
 
-        Scribe_Values.Look(ref pendingRemovalTick, nameof(pendingRemovalTick), -1);
+        Scribe_Values.Look(ref removalTick, nameof(removalTick), -1);
     }
 
     public virtual string GetUniqueLoadID() => $"{nameof(ResidentPawn)}_{loadID}";
