@@ -362,6 +362,11 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
+# 压缩文件
+*.zip
+*.rar
+*.7z
+
 .trae/
 .kiro/
 .idea/
