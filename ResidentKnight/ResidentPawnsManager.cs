@@ -35,12 +35,15 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    private Dictionary<Pawn, ResidentKnight> residentKnights = [];
+    private List<ResidentKnight> residentKnights = [];
+    private Dictionary<Pawn, ResidentKnight> residentKnightsDict = [];
     public int KnightsCount => residentKnights.Count;
-    public IReadOnlyDictionary<Pawn, ResidentKnight> ResidentKnights => residentKnights;
+    public IReadOnlyList<ResidentKnight> ResidentKnights => residentKnights;
 
-    private Dictionary<Pawn, ResidentPawn> residentColonists = [];
-    public IReadOnlyDictionary<Pawn, ResidentPawn> ResidentColonists => residentColonists;
+    private List<ResidentPawn> residentColonists = [];
+    public IReadOnlyList<ResidentPawn> ResidentColonists => residentColonists;
+    private Dictionary<Pawn, ResidentPawn> residentColonistsDict = [];
+
 
     private ResidentRoleManager roleManager;
     public static ResidentRoleManager RoleManager => Instance?.roleManager;
@@ -60,9 +63,9 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
 
         MinResignationDays = new(refreshFunc: RefreshMinResignationDays);
-        AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Values.Aggregate(KnightPersonality.None, (acc, rk) => acc | (rk?.Personality ?? KnightPersonality.None)));
+        AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Aggregate(KnightPersonality.None, (acc, r) => acc | (r?.Personality ?? KnightPersonality.None)));
 
-        InstructorKnightsCount = new(refreshFunc: () => residentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
+        InstructorKnightsCount = new(refreshFunc: () => residentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
 
         if (initCtor)
         {
@@ -80,8 +83,8 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref residentKnights, nameof(residentKnights), LookMode.Reference, LookMode.Deep, ref residentKnightKeys, ref residentKnightValues);
-        Scribe_Collections.Look(ref residentColonists, nameof(residentColonists), LookMode.Reference, LookMode.Deep, ref residentColonistKeys, ref residentColonistValues);
+        Scribe_Collections.Look(ref residentColonists, nameof(residentColonists), LookMode.Deep);
+        Scribe_Collections.Look(ref residentKnights, nameof(residentKnights), LookMode.Deep);
 
         Scribe_Deep.Look(ref roleManager, nameof(roleManager), ctorArgs: this);
         Scribe_Deep.Look(ref mentorshipManager, nameof(mentorshipManager), ctorArgs: this);
@@ -89,14 +92,19 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             EnsureComponentsInit();
-            if (residentKnights.RemoveAll(kv => kv.Value is null || kv.Value.CurState == ResidentPawnState.ForceRemove) > 0)
-            {
-                Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻骑士记录在加载后为null或无效，已被移除。");
-            }
-            if (residentColonists.RemoveAll(kv => kv.Value is null || kv.Value.CurState == ResidentPawnState.ForceRemove) > 0)
-            {
+            if (residentColonists.RemoveAll(r => r is null || r.CurState == ResidentPawnState.ForceRemove) > 0)
                 Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻殖民者记录在加载后为null或无效，已被移除。");
-            }
+
+            if (residentKnights.RemoveAll(r => r is null || r.CurState == ResidentPawnState.ForceRemove) > 0)
+                Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻骑士记录在加载后为null或无效，已被移除。");
+
+            residentColonistsDict = new(residentColonists.Count);
+            foreach (ResidentPawn r in residentColonists)
+                residentColonistsDict.Add(r.Pawn, r);
+
+            residentKnightsDict = new(residentKnights.Count);
+            foreach (ResidentKnight r in residentKnights)
+                residentKnightsDict.Add(r.Pawn, r);
         }
     }
 
@@ -109,9 +117,9 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         }
         else
         {
-            foreach (KeyValuePair<Pawn, ResidentKnight> kv in residentKnights)
+            foreach (ResidentKnight residentKnight in residentKnights)
             {
-                listing_Rect.SubLabel(kv.Key.Name + ": " + kv.Value.ToString(), widthPct: 0.8f);
+                listing_Rect.SubLabel(residentKnight.Pawn.Name + ": " + residentKnight.ToString(), widthPct: 0.8f);
             }
         }
 
@@ -120,64 +128,83 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsResidentKnight(Pawn pawn) => residentKnights.ContainsKey(pawn);
+    public bool IsResidentKnight(Pawn pawn) => residentKnightsDict.ContainsKey(pawn);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetKnightRecord(Pawn pawn, out ResidentKnight record) => residentKnights.TryGetValue(pawn, out record);
+    public bool TryGetKnightRecord(Pawn pawn, out ResidentKnight record) => residentKnightsDict.TryGetValue(pawn, out record);
 
-    public void RegisterKnight(Pawn pawn, KnightRecord knightRecord = null)
+    public bool TryRegisterKnight(Pawn pawn, KnightRecord knightRecord = null)
     {
         if (knightRecord is null && !KnightPawnsManager.Instance.TryGetKnightRecord(pawn, out knightRecord))
         {
             Log.Error($"[OARO] 尝试将非骑士单位添加到 {nameof(ResidentPawnsManager)}");
-            return;
+            return false;
         }
         if (knightRecord.Pawn != pawn)
         {
             Log.Error($"[OARO] 骑士记录的 Pawn ({knightRecord.Pawn}) 与尝试注册的 Pawn ({pawn}) 不匹配，无法添加到 {nameof(ResidentPawnsManager)}");
-            return;
+            return false;
         }
 
-        if (!IsResidentKnight(pawn))
+        if (IsResidentColonist(pawn))
         {
-            RegisterKnightDirectly(knightRecord);
+            Log.Error($"[OARO] 尝试将常驻殖民者同时注册为常驻骑士: {pawn}");
+            return false;
         }
+
+        if (IsResidentKnight(pawn))
+        {
+            Log.Error($"[OARO] 尝试重复注册常驻骑士: {pawn}");
+            return false;
+        }
+
+        RegisterKnightDirectly(knightRecord);
+        return true;
     }
 
-    public void DeregisterKnight(Pawn pawn, ResidentKnightRemovalReason reason)
+    public bool DeregisterKnight(Pawn pawn, ResidentKnightRemovalReason reason)
     {
-        if (pawn is null || !residentKnights.TryGetValue(pawn, out ResidentKnight record))
-        {
-            return;
-        }
+        if (pawn is null || !residentKnightsDict.TryGetValue(pawn, out ResidentKnight record))
+            return false;
 
-        DeregisterKnightDirectly(record, reason);
+        return DeregisterKnightDirectly(record, reason);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsResidentColonist(Pawn pawn) => residentColonists.ContainsKey(pawn);
+    public bool IsResidentColonist(Pawn pawn) => residentColonistsDict.ContainsKey(pawn);
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool TryGetColonistRecord(Pawn pawn, out ResidentPawn record) => residentColonists.TryGetValue(pawn, out record);
+    public bool TryGetColonistRecord(Pawn pawn, out ResidentPawn record) => residentColonistsDict.TryGetValue(pawn, out record);
 
-    public void RegisterColonist(Pawn pawn)
+    public bool TryRegisterColonist(Pawn pawn)
     {
         if (pawn is null)
-            return;
-        if (IsResidentKnight(pawn) || IsResidentColonist(pawn))
-            return;
+            return false;
 
-        residentColonists.Add(pawn, new ResidentPawn(pawn));
+        if (IsResidentColonist(pawn))
+        {
+            Log.Error($"[OARO] 尝试重复注册常驻殖民者: {pawn}");
+            return false;
+        }
+
+        if (IsResidentKnight(pawn))
+        {
+            Log.Error($"[OARO] 尝试将常驻殖民者同时注册为常驻骑士: {pawn}");
+            return false;
+        }
+
+        ResidentPawn residentPawn = new(pawn);
+        residentColonistsDict.Add(pawn, residentPawn);
+        residentColonists.Add(residentPawn);
+        return true;
     }
 
-    public void DeregisterColonist(Pawn pawn)
+    public bool DeregisterColonist(Pawn pawn)
     {
-        if (pawn is null)
-            return;
-        if (!IsResidentColonist(pawn))
-            return;
+        if (pawn is null || !TryGetColonistRecord(pawn, out ResidentPawn residentPawn))
+            return false;
 
-        DeregisterColonistDirectly(pawn);
+        return DeregisterColonistDirectly(residentPawn);
     }
 
     public void Tick()
@@ -186,19 +213,20 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         {
             if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
             {
-                DailyColonistsCheck();
                 DailyKnightsCheck();
+                DailyColonistsCheck();
+
+                DailyKnightsVirtueCheck();
+
                 mentorshipManager.TickDay();
             }
-
-
         }
 
     }
 
     public void AllKnightsGainMeditation(float gain, RatkinOrder ratkinOrder = null, bool directly = false)
     {
-        foreach (ResidentKnight record in residentKnights.Values)
+        foreach (ResidentKnight record in residentKnights)
         {
             if (ratkinOrder is null || record.RatkinOrder == ratkinOrder)
             {
@@ -210,41 +238,46 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
     public void Notify_SquadBeAttackedOnTask(RatkinOrder ratkinOrder, Branch branch)
     {
-        foreach ((Pawn p, ResidentKnight record) in ResidentKnights)
+        foreach (ResidentKnight residentKnight in residentKnights)
         {
-            if (record.RatkinOrder != ratkinOrder || p.needs is null || p.needs.mood is null)
+            if (residentKnight.RatkinOrder != ratkinOrder || residentKnight.Pawn.needs is null || residentKnight.Pawn.needs.mood is null)
             {
                 continue;
             }
-            int forceStage = record.Branch == branch ? 1 : 0;
+            int forceStage = residentKnight.Branch == branch ? 1 : 0;
             Thought_Memory memory = ThoughtMaker.MakeThought(OARO_ThoughtDefOf.OARO_Thought_ResidentKnight_SquadBeAttackedOnTask, forceStage);
-            p.needs.mood.thoughts.memories.TryGainMemory(memory);
+            residentKnight.Pawn.needs.mood.thoughts.memories.TryGainMemory(memory);
         }
     }
 
+    /// <summary>
+    /// 每日检测 - 移除无效常驻殖民者
+    /// </summary>
     private void DailyColonistsCheck()
     {
-        List<Pawn> toRemove = [];
-        foreach (KeyValuePair<Pawn, ResidentPawn> kv in residentColonists)
+        List<ResidentPawn> toRemove = [];
+        foreach (ResidentPawn residentPawn in residentColonists)
         {
-            kv.Value.CheckPendingRemoval();
-            if (kv.Value.CurState == ResidentPawnState.ForceRemove)
+            residentPawn.CheckPendingRemoval();
+            if (residentPawn.CurState == ResidentPawnState.ForceRemove)
             {
-                toRemove.Add(kv.Key);
+                toRemove.Add(residentPawn);
             }
         }
-        foreach (Pawn pawn in toRemove)
+        foreach (ResidentPawn residentPawn in toRemove)
         {
-            mentorshipManager.RemoveStudent(pawn);
-            residentColonists.Remove(pawn);
+            DeregisterColonistDirectly(residentPawn);
         }
     }
 
+    /// <summary>
+    /// 每日检测 - 移除无效常驻骑士（离职、离开、转化为常驻殖民者）
+    /// </summary>
     private void DailyKnightsCheck()
     {
         List<(ResidentKnight, ResidentPawnState)> toProcess = [];
         int ticksGame = Find.TickManager.TicksGame;
-        foreach (ResidentKnight record in residentKnights.Values)
+        foreach (ResidentKnight record in residentKnights)
         {
             record.CheckPendingRemoval();
             ResidentPawnState knightState = record.CurState;
@@ -299,9 +332,25 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         MinResignationDays.MarkDirty();
     }
 
+    private void DailyKnightsVirtueCheck()
+    {
+        foreach (ResidentKnight residentKnight in residentKnights)
+        {
+            if (!Rand.Chance(0.005f))
+                continue;
+
+            KnightVirtueDef virtueDef = residentKnight.GetRandomAvailableVirtue();
+            if (virtueDef is null)
+                continue;
+            int newVirtueLevel = KnightVirtueUtility.GetRandomNewVirtueLevel_Daily(residentKnight);
+
+            residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef, newVirtueLevel);
+        }
+    }
+
     public void Notify_RatkinOrderRemoved(RatkinOrder ratkinOrder)
     {
-        List<ResidentKnight> toColonist = residentKnights.Values.Where(rk => rk.RatkinOrder == ratkinOrder).ToList();
+        List<ResidentKnight> toColonist = residentKnights.Where(r => r.RatkinOrder == ratkinOrder).ToList();
         foreach (ResidentKnight knight in toColonist)
         {
             CoverKnightToColonist(knight);
@@ -315,49 +364,60 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
     private void RegisterKnightDirectly(KnightRecord knightRecord)
     {
-        residentKnights.Add(knightRecord.Pawn, new ResidentKnight(knightRecord));
+        ResidentKnight residentKnight = new(knightRecord);
+        residentKnightsDict.Add(knightRecord.Pawn, residentKnight);
+        residentKnights.Add(residentKnight);
         OnKnightsChanged();
     }
 
-    private void DeregisterColonistDirectly(Pawn pawn)
+    private bool DeregisterColonistDirectly(ResidentPawn residentPawn)
     {
-        if (!residentColonists.Remove(pawn))
+        if (!residentColonistsDict.Remove(residentPawn.Pawn))
         {
-            return;
+            return false;
         }
-
-        mentorshipManager.RemoveStudent(pawn);
+        residentColonists.Remove(residentPawn);
+        mentorshipManager.RemoveStudent(residentPawn.Pawn);
+        return true;
     }
 
-    private void DeregisterKnightDirectly(ResidentKnight record, ResidentKnightRemovalReason reason)
+    private bool DeregisterKnightDirectly(ResidentKnight record, ResidentKnightRemovalReason reason)
     {
-        if (!residentKnights.Remove(record.Pawn))
-            return;
+        if (!residentKnightsDict.Remove(record.Pawn))
+            return false;
 
+        residentKnights.Remove(record);
         roleManager.OnResidentKnightDeregistered(record, reason);
         mentorshipManager.RemoveTeacher(record);
+        mentorshipManager.RemoveStudent(record.Pawn);
 
         record.PostRemoved(reason);
         OnKnightsChanged();
+        return true;
     }
 
-    private void CoverKnightToColonist(ResidentKnight record)
+    private bool CoverKnightToColonist(ResidentKnight record)
     {
         if (record is null)
-            return;
+            return false;
 
-        DeregisterKnightDirectly(record, ResidentKnightRemovalReason.ConvertToColonist);
-        if (record.Pawn is null || residentColonists.ContainsKey(record.Pawn))
-            return;
+        if (IsResidentColonist(record.Pawn))
+            return false;
 
-        residentColonists.Add(record.Pawn, new ResidentPawn(record));
+        if (!DeregisterKnightDirectly(record, ResidentKnightRemovalReason.ConvertToColonist))
+            return false;
+
+        ResidentPawn residentPawn = new(record);
+        residentColonistsDict.Add(residentPawn.Pawn, residentPawn);
+        residentColonists.Add(residentPawn);
+        return true;
     }
 
     private void RemoveAllInvalidRecord(Predicate<ResidentKnight> extraRemove = null, ResidentKnightRemovalReason extraRemoveReason = ResidentKnightRemovalReason.Unknown)
     {
         List<ResidentKnight> recordsToRemove = [];
         List<ResidentKnight> recordsToExtraRemove = extraRemove is null ? null : [];
-        foreach (ResidentKnight record in residentKnights.Values)
+        foreach (ResidentKnight record in residentKnights)
         {
             if (record is null || record.Pawn is null)
             {
@@ -390,7 +450,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         }
         float minResignationDays = float.MaxValue;
         int ticksGame = Find.TickManager.TicksGame;
-        foreach (ResidentKnight record in residentKnights.Values)
+        foreach (ResidentKnight record in residentKnights)
         {
             if (record.ResignationTick > 0)
             {
@@ -411,9 +471,4 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         AllHasPersonalityTypes.MarkDirty();
         InstructorKnightsCount.MarkDirty();
     }
-
-    private List<Pawn> residentKnightKeys;
-    private List<ResidentKnight> residentKnightValues;
-    private List<Pawn> residentColonistKeys;
-    private List<ResidentPawn> residentColonistValues;
 }

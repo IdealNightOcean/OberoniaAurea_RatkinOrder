@@ -6,7 +6,6 @@ public enum KnightVirtueType
     /// 普通
     /// </summary>
     Normal,
-
     /// <summary>
     /// 课业
     /// </summary>

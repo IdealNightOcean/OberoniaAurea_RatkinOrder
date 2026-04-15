@@ -10,7 +10,6 @@ namespace OberoniaAurea.RatkinOrder;
 public class KnightVirtueHandler : IExposable
 {
     private readonly ResidentKnight knight;
-
     public Pawn Pawn => knight.Pawn;
 
 
@@ -36,7 +35,7 @@ public class KnightVirtueHandler : IExposable
     private int curKnightCreedLevel;
 
     private HediffStageTemplate BuffStageTemplate { get; } = new();
-    private SimpleValueCache<float> VirtueStatValueCache { get; }
+    public SimpleValueCache<float> VirtueStatValueCache { get; }
 
     public KnightVirtueHandler(ResidentKnight knight)
     {
@@ -56,16 +55,39 @@ public class KnightVirtueHandler : IExposable
         CheckKnightCreed();
     }
 
-    public bool TryAddVirtue(KnightVirtueDef virtueDef, int level)
+    public bool HasVirtue(KnightVirtueDef virtueDef)
     {
-        if (virtues.Count >= CurMaxVirtueCount)
+        for (int i = 0; i < virtues.Count; i++)
         {
-            return false;
+            if (virtueDef == virtues[i].Def)
+            {
+                return true;
+            }
         }
-        return AddVirtue(virtueDef, level);
+        return false;
     }
 
+    public bool TryAddVirtue(KnightVirtueDef virtueDef, int level, string reason = null)
+    {
+        if (virtues.Count >= CurMaxVirtueCount)
+            return false;
 
+        if (!AddVirtue(virtueDef, level))
+            return false;
+
+        reason ??= string.Empty;
+
+        Find.LetterStack.ReceiveLetter(
+            label: "OARO_LetterLabel_VirtueGained".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN)),
+            text: "OARO_LetterText_VirtueUpgraded".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                                             virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                                             level.Named(KeyLibrary_FormatArgName.Level),
+                                                             reason.Named(KeyLibrary_FormatArgName.Reason)),
+            textLetterDef: LetterDefOf.PositiveEvent,
+            lookTargets: Pawn);
+
+        return true;
+    }
 
     public bool UpgradeVirtue(KnightVirtueDef virtueDef)
     {
@@ -74,25 +96,19 @@ public class KnightVirtueHandler : IExposable
         {
             return false;
         }
-        if (virtue.Level >= virtueDef.maxLevel)
-        {
-            return false;
-        }
-        virtue.Level++;
-        VirtuesChanged();
-        return true;
-    }
 
-    public bool HasVirtue(KnightVirtueDef virtue)
-    {
-        for (int i = 0; i < virtues.Count; i++)
-        {
-            if (virtue == virtues[i].Def)
-            {
-                return true;
-            }
-        }
-        return false;
+        int newLevel = UpgradeVirtue(virtue);
+        if (newLevel < 0)
+            return false;
+
+        Messages.Message(
+            text: "OARO_Message_VirtueUpgraded".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                                          virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                                          newLevel.Named(KeyLibrary_FormatArgName.Level)),
+            lookTargets: Pawn,
+            def: MessageTypeDefOf.PositiveEvent);
+
+        return true;
     }
 
     public KnightVirtue GetVirtue(KnightVirtueDef virtue)
@@ -106,7 +122,6 @@ public class KnightVirtueHandler : IExposable
         }
         return null;
     }
-
 
     public bool AbandonVirtue(ResidentKnight record, KnightVirtueDef virtue)
     {
@@ -161,6 +176,17 @@ public class KnightVirtueHandler : IExposable
         return false;
     }
 
+    /// <returns>升级后的新等级，返回 -1 表示升级失败</returns>
+    private int UpgradeVirtue(KnightVirtue virtue)
+    {
+        if (virtue.Level >= virtue.Def.maxLevel)
+        {
+            return -1;
+        }
+        virtue.Level++;
+        VirtuesChanged();
+        return virtue.Level;
+    }
 
     private void VirtuesChanged()
     {

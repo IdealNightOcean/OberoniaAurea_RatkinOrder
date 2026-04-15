@@ -75,7 +75,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
             return (false, false);
         }
 
-        ResidentPawnsManager.Instance.RegisterKnight(knightRecord.Pawn, knightRecord);
+        ResidentPawnsManager.Instance.TryRegisterKnight(knightRecord.Pawn, knightRecord);
         return (true, true);
     }
 }

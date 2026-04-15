@@ -154,7 +154,7 @@ public class ResidentRoleManager : IExposable
     {
         BuffStageTemplate.ResetTemplate();
 
-        int lawOrderKnightsCount = Parent.ResidentKnights.Values.Where(rk => rk?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_LawOrder).Count();
+        int lawOrderKnightsCount = Parent.ResidentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_LawOrder).Count();
         if (lawOrderKnightsCount > 0)
         {
             BuffStageTemplate.AddOffset(StatDefOf.GlobalLearningFactor, Mathf.Min(lawOrderKnightsCount * 0.12f, 0.6f));

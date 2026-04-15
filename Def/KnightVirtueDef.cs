@@ -16,6 +16,7 @@ public class KnightVirtueDef : Def
     public KnightVirtueType virtueType = KnightVirtueType.Normal;
 
     public KnightAcademicDef relatedAcademicDef;
+    public int unlockOnAcademicLevel = -1;
 
     public override IEnumerable<string> ConfigErrors()
     {

@@ -4,19 +4,19 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class PlayerDespawnedPawnsTempRetention : IExposable
+public class PlayerDespawnedPawnsTempRetention : IExposable, IPawnRetentionHolder, IThingHolder
 {
     public static PlayerDespawnedPawnsTempRetention Instance { get; private set; }
 
     private readonly int tickHashOffset;
-
-    private List<Pawn> pawns = [];
+    private ThingOwner<Pawn> pawns;
 
     public PlayerDespawnedPawnsTempRetention()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(PlayerDespawnedPawnsTempRetention));
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
+        pawns = new();
     }
     public static void ClearStaticCache() => Instance = null;
 
@@ -25,12 +25,12 @@ public class PlayerDespawnedPawnsTempRetention : IExposable
         if (!TickUtility.IsHashIntervalTick(tickHashOffset, 15000))
             return;
 
-        if (pawns.NullOrEmpty())
+        if (!pawns.Any)
             return;
 
         pawns.RemoveAll(p => p.DestroyedOrNull() || p.Spawned);
 
-        if (pawns.NullOrEmpty())
+        if (!pawns.Any)
             return;
 
         Map map = Find.RandomPlayerHomeMap;
@@ -46,7 +46,7 @@ public class PlayerDespawnedPawnsTempRetention : IExposable
             return;
         if (!pawns.Contains(pawn))
         {
-            pawns.Add(pawn);
+            pawns.TryAddOrTransfer(pawn);
         }
     }
 
@@ -57,7 +57,8 @@ public class PlayerDespawnedPawnsTempRetention : IExposable
             return;
         }
 
-        foreach (Pawn pawn in pawns)
+        List<Pawn> pawnsForModify = [.. pawns.InnerListForReading];
+        foreach (Pawn pawn in pawnsForModify)
         {
             GenSpawn.Spawn(pawn, spawnCenter, map, WipeMode.VanishOrMoveAside);
         }
@@ -67,10 +68,14 @@ public class PlayerDespawnedPawnsTempRetention : IExposable
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref pawns, nameof(pawns), LookMode.Reference);
+        Scribe_Deep.Look(ref pawns, nameof(pawns));
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             pawns.RemoveAll(p => p.DestroyedOrNull() || p.Spawned);
         }
     }
+
+    public IThingHolder ParentHolder => null;
+    public void GetChildHolders(List<IThingHolder> outChildren) => ThingOwnerUtility.AppendThingHoldersFromThings(outChildren, GetDirectlyHeldThings());
+    public ThingOwner GetDirectlyHeldThings() => pawns;
 }
