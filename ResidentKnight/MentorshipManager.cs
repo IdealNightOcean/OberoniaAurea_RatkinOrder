@@ -10,8 +10,8 @@ public class MentorshipManager : IExposable
     private ResidentPawnsManager Parent { get; }
     public const int MaxStudentsPerKnight = 2;
 
-    [Unsaved] private Dictionary<Pawn, HashSet<ResidentKnight>> studentsToTeachers = [];
-    [Unsaved] private Dictionary<ResidentKnight, HashSet<Pawn>> teachersToStudents = [];
+    [Unsaved] private Dictionary<ResidentPawn, HashSet<ResidentKnight>> studentsToTeachers = [];
+    [Unsaved] private Dictionary<ResidentKnight, HashSet<ResidentPawn>> teachersToStudents = [];
 
     public MentorshipManager(ResidentPawnsManager parent)
     {
@@ -42,7 +42,7 @@ public class MentorshipManager : IExposable
     {
         if (knightRecord is null)
             return false;
-        if (!teachersToStudents.TryGetValue(knightRecord, out HashSet<Pawn> students))
+        if (!teachersToStudents.TryGetValue(knightRecord, out HashSet<ResidentPawn> students))
             return true;
         return students.Count < MaxStudentsPerKnight;
     }
@@ -51,41 +51,41 @@ public class MentorshipManager : IExposable
     {
         if (knightRecord is null)
             return 0;
-        if (teachersToStudents.TryGetValue(knightRecord, out HashSet<Pawn> students))
+        if (teachersToStudents.TryGetValue(knightRecord, out HashSet<ResidentPawn> students))
             return students.Count;
         return 0;
     }
 
-    public bool TryAddStudent(Pawn studentPawn, ResidentKnight teacherRecord)
+    public bool TryAddStudent(ResidentPawn student, ResidentKnight teacher)
     {
-        if (!CanAcceptStudent(teacherRecord))
+        if (!CanAcceptStudent(teacher))
         {
-            Log.Warning($"[OARO] 常驻骑士 {teacherRecord.Pawn.Name} 已达到最大授导对象数量上限 ({MaxStudentsPerKnight})");
+            Log.Warning($"[OARO] 常驻骑士 {teacher.Pawn.Name} 已达到最大授导对象数量上限 ({MaxStudentsPerKnight})");
             return false;
         }
-        return AddStudentDirectly(studentPawn, teacherRecord);
+        return AddStudentDirectly(student, teacher);
     }
 
-    public bool AddStudentDirectly(Pawn studentPawn, ResidentKnight teacherRecord)
+    public bool AddStudentDirectly(ResidentPawn student, ResidentKnight teacher)
     {
-        if (studentPawn is null || teacherRecord is null)
+        if (student is null || teacher is null)
             return false;
 
-        if (!studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
+        if (!studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnight> teachers))
         {
-            studentsToTeachers[studentPawn] = [teacherRecord];
+            studentsToTeachers[student] = [teacher];
         }
         else
         {
-            teachers.Add(teacherRecord);
+            teachers.Add(teacher);
         }
-        if (!teachersToStudents.TryGetValue(teacherRecord, out HashSet<Pawn> students))
+        if (!teachersToStudents.TryGetValue(teacher, out HashSet<ResidentPawn> students))
         {
-            teachersToStudents[teacherRecord] = [studentPawn];
+            teachersToStudents[teacher] = [student];
         }
         else
         {
-            students.Add(studentPawn);
+            students.Add(student);
         }
         return true;
     }
@@ -94,10 +94,10 @@ public class MentorshipManager : IExposable
     {
         if (teacher is null)
             return false;
-        if (!teachersToStudents.TryGetValue(teacher, out HashSet<Pawn> students))
+        if (!teachersToStudents.TryGetValue(teacher, out HashSet<ResidentPawn> students))
             return false;
 
-        foreach (Pawn student in students)
+        foreach (ResidentPawn student in students)
         {
             if (studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnight> teachers))
             {
@@ -109,11 +109,10 @@ public class MentorshipManager : IExposable
             }
         }
 
-        teachersToStudents.Remove(teacher);
-        return true;
+        return teachersToStudents.Remove(teacher);
     }
 
-    public bool RemoveStudent(Pawn student)
+    public bool RemoveStudent(ResidentPawn student)
     {
         if (student is null)
             return false;
@@ -122,9 +121,9 @@ public class MentorshipManager : IExposable
 
         foreach (ResidentKnight teacher in teachers)
         {
-            if (teachersToStudents.TryGetValue(teacher, out HashSet<Pawn> teacherStudents))
+            if (teachersToStudents.TryGetValue(teacher, out HashSet<ResidentPawn> teacherStudents))
             {
-                teachers.Remove(teacher);
+                teacherStudents.Remove(student);
                 if (teacherStudents.Count == 0)
                 {
                     teachersToStudents.Remove(teacher);
@@ -132,32 +131,33 @@ public class MentorshipManager : IExposable
             }
         }
 
-        studentsToTeachers.Remove(student);
-        return true;
+        return studentsToTeachers.Remove(student);
     }
 
-    public IReadOnlyCollection<ResidentKnight> GetTeachersOfStudent(Pawn studentPawn)
+    public IReadOnlyCollection<ResidentKnight> GetTeachersOfStudent(ResidentPawn student)
     {
-        if (studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
+        if (studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnight> teachers))
             return teachers;
-        return [];
+        else
+            return [];
     }
 
-    public IReadOnlyCollection<Pawn> GetStudentsOfTeacher(ResidentKnight teacherRecord)
+    public IReadOnlyCollection<ResidentPawn> GetStudentsOfTeacher(ResidentKnight teacher)
     {
-        if (teachersToStudents.TryGetValue(teacherRecord, out HashSet<Pawn> students))
+        if (teachersToStudents.TryGetValue(teacher, out HashSet<ResidentPawn> students))
             return students;
-        return [];
+        else
+            return [];
     }
 
-    public bool IsStudentOfKnight(Pawn studentPawn, ResidentKnight knightRecord)
+    public bool IsStudentOfKnight(ResidentPawn student, ResidentKnight residentKnight)
     {
-        if (studentPawn is null || knightRecord is null)
+        if (student is null || residentKnight is null)
             return false;
 
-        if (studentsToTeachers.TryGetValue(studentPawn, out HashSet<ResidentKnight> teachers))
+        if (studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnight> teachers))
         {
-            return teachers.Contains(knightRecord);
+            return teachers.Contains(residentKnight);
         }
         return false;
     }
@@ -170,19 +170,19 @@ public class MentorshipManager : IExposable
     private void PrepareForSaving()
     {
         studentTeacherPairs = new List<StudentTeacherPair>(studentsToTeachers.Count);
-        foreach (KeyValuePair<Pawn, HashSet<ResidentKnight>> kv in studentsToTeachers)
+        foreach ((ResidentPawn student, HashSet<ResidentKnight> teachers) in studentsToTeachers)
         {
-            Pawn student = kv.Key;
-            if (student is null)
+            if (student?.Pawn is null)
                 continue;
-            foreach (ResidentKnight record in kv.Value)
+
+            foreach (ResidentKnight teacher in teachers)
             {
-                if (record is null)
+                if (teacher is null)
                     continue;
                 StudentTeacherPair stPair = new()
                 {
                     student = student,
-                    teacher = record,
+                    teacher = teacher,
                 };
                 studentTeacherPairs.Add(stPair);
             }
@@ -191,6 +191,8 @@ public class MentorshipManager : IExposable
 
     private void ConstructFromSavedData()
     {
+        studentTeacherPairs?.RemoveAll(pair => pair is null || pair.teacher is null || pair.student is null);
+
         if (studentTeacherPairs is not null)
         {
             studentsToTeachers = studentTeacherPairs.GroupBy(p => p.student)
@@ -211,7 +213,7 @@ public class MentorshipManager : IExposable
     private List<StudentTeacherPair> studentTeacherPairs;
     private class StudentTeacherPair : IExposable
     {
-        public Pawn student;
+        public ResidentPawn student;
         public ResidentKnight teacher;
 
         public void ExposeData()

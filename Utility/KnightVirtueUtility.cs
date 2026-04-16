@@ -12,7 +12,7 @@ public static class KnightVirtueUtility
 
         KnightVirtueHandler virtueHandler = knight.KnightVirtueHandler;
 
-        if (virtueHandler.TotalVirtueCount >= virtueHandler.CurMaxVirtueCount)
+        if (virtueHandler.TotalVirtueCount >= virtueHandler.CurVirtueCountLimit)
             return false;
 
         if (virtueHandler.HasVirtue(virtueDef))
@@ -51,7 +51,7 @@ public static class KnightVirtueUtility
         }
     }
 
-    public static KnightVirtueDef GetRandomAvailableVirtue(this ResidentKnight knight)
+    public static KnightVirtueDef GetRandomAvailableVirtue(ResidentKnight knight)
     {
         return knight.GetAllAvailableVirtues().RandomElement();
     }
@@ -75,8 +75,8 @@ public static class KnightVirtueUtility
         (int, float)[] weightSelector =
             [
                 (1, 30f),
-            (2, 20f + virtueStatValue * 2f),
-            (3, virtueStatValue * 3f)
+                (2, 20f + virtueStatValue * 2f),
+                (3, virtueStatValue * 3f)
             ];
 
         return weightSelector.RandomElementByWeight(p => p.Item2).Item1;

@@ -5,7 +5,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -51,7 +50,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     private MentorshipManager mentorshipManager;
     public static MentorshipManager MentorshipManager => Instance?.mentorshipManager;
 
-    public LazyMutable<float> MinResignationDays { get; }
     public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
 
     public LazyMutable<int> InstructorKnightsCount { get; }
@@ -62,7 +60,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
 
-        MinResignationDays = new(refreshFunc: RefreshMinResignationDays);
         AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Aggregate(KnightPersonality.None, (acc, r) => acc | (r?.Personality ?? KnightPersonality.None)));
 
         InstructorKnightsCount = new(refreshFunc: () => residentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
@@ -328,8 +325,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
             DeregisterKnightDirectly(pair.Item1, removalReason);
         }
-
-        MinResignationDays.MarkDirty();
     }
 
     private void DailyKnightsVirtueCheck()
@@ -339,12 +334,14 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
             if (!Rand.Chance(0.005f))
                 continue;
 
-            KnightVirtueDef virtueDef = residentKnight.GetRandomAvailableVirtue();
+            KnightVirtueDef virtueDef = KnightVirtueUtility.GetRandomAvailableVirtue(residentKnight);
             if (virtueDef is null)
                 continue;
-            int newVirtueLevel = KnightVirtueUtility.GetRandomNewVirtueLevel_Daily(residentKnight);
 
-            residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef, newVirtueLevel);
+            int newVirtueLevel = KnightVirtueUtility.GetRandomNewVirtueLevel_Daily(residentKnight);
+            residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef: virtueDef,
+                                                            level: newVirtueLevel,
+                                                            reason: "OARO_KnightVirtueGainReason_Daily".Translate());
         }
     }
 
@@ -377,37 +374,37 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
             return false;
         }
         residentColonists.Remove(residentPawn);
-        mentorshipManager.RemoveStudent(residentPawn.Pawn);
+        mentorshipManager.RemoveStudent(residentPawn);
         return true;
     }
 
-    private bool DeregisterKnightDirectly(ResidentKnight record, ResidentKnightRemovalReason reason)
+    private bool DeregisterKnightDirectly(ResidentKnight residentKnight, ResidentKnightRemovalReason reason)
     {
-        if (!residentKnightsDict.Remove(record.Pawn))
+        if (!residentKnightsDict.Remove(residentKnight.Pawn))
             return false;
 
-        residentKnights.Remove(record);
-        roleManager.OnResidentKnightDeregistered(record, reason);
-        mentorshipManager.RemoveTeacher(record);
-        mentorshipManager.RemoveStudent(record.Pawn);
+        residentKnights.Remove(residentKnight);
+        roleManager.OnResidentKnightDeregistered(residentKnight, reason);
+        mentorshipManager.RemoveTeacher(residentKnight);
+        mentorshipManager.RemoveStudent(residentKnight);
 
-        record.PostRemoved(reason);
+        residentKnight.PostRemoved(reason);
         OnKnightsChanged();
         return true;
     }
 
-    private bool CoverKnightToColonist(ResidentKnight record)
+    private bool CoverKnightToColonist(ResidentKnight residentKnight)
     {
-        if (record is null)
+        if (residentKnight is null)
             return false;
 
-        if (IsResidentColonist(record.Pawn))
+        if (IsResidentColonist(residentKnight.Pawn))
             return false;
 
-        if (!DeregisterKnightDirectly(record, ResidentKnightRemovalReason.ConvertToColonist))
+        if (!DeregisterKnightDirectly(residentKnight, ResidentKnightRemovalReason.ConvertToColonist))
             return false;
 
-        ResidentPawn residentPawn = new(record);
+        ResidentPawn residentPawn = new(residentKnight);
         residentColonistsDict.Add(residentPawn.Pawn, residentPawn);
         residentColonists.Add(residentPawn);
         return true;
@@ -442,32 +439,10 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         }
     }
 
-    private float RefreshMinResignationDays()
-    {
-        if (residentKnights.Count <= 0)
-        {
-            return -1f;
-        }
-        float minResignationDays = float.MaxValue;
-        int ticksGame = Find.TickManager.TicksGame;
-        foreach (ResidentKnight record in residentKnights)
-        {
-            if (record.ResignationTick > 0)
-            {
-                float resignationDays = Mathf.Max(0f, (record.ResignationTick - ticksGame) / 60000f);
-                if (resignationDays < minResignationDays)
-                {
-                    minResignationDays = resignationDays;
-                }
-            }
-        }
-
-        return minResignationDays;
-    }
-
     private void OnKnightsChanged()
     {
-        MinResignationDays.MarkDirty();
+        Alert_ResidentKnightWillResignation.MarkDirty();
+
         AllHasPersonalityTypes.MarkDirty();
         InstructorKnightsCount.MarkDirty();
     }

@@ -2,7 +2,6 @@
 using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -12,13 +11,32 @@ public class KnightVirtueHandler : IExposable
     private readonly ResidentKnight knight;
     public Pawn Pawn => knight.Pawn;
 
-
     private List<KnightVirtue> virtues = [];
 
     public IReadOnlyList<KnightVirtue> Virtues => virtues;
     public int TotalVirtueCount => virtues.Count;
-    public int TotalVirtueLevel => virtues.Sum(v => v.Level);
-    public int CurMaxVirtueCount
+    public int TotalVirtueLevel
+    {
+        get
+        {
+            int totalLevel = 0;
+            foreach (KnightVirtue virtue in virtues)
+                totalLevel += virtue.Level;
+            return totalLevel;
+        }
+    }
+    public bool HasUnusedTraitSlot
+    {
+        get
+        {
+            foreach (KnightVirtue virtue in virtues)
+                if (virtue.HasUnusedTraitSlot)
+                    return true;
+            return false;
+        }
+    }
+
+    public int CurVirtueCountLimit
     {
         get
         {
@@ -69,7 +87,7 @@ public class KnightVirtueHandler : IExposable
 
     public bool TryAddVirtue(KnightVirtueDef virtueDef, int level, string reason = null)
     {
-        if (virtues.Count >= CurMaxVirtueCount)
+        if (virtues.Count >= CurVirtueCountLimit)
             return false;
 
         if (!AddVirtue(virtueDef, level))

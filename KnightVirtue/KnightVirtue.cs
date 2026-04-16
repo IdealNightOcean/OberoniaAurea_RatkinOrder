@@ -20,7 +20,7 @@ public class KnightVirtue : IExposable
     private List<KnightVirtueTraitDef> selectedTraits = [];
     public IReadOnlyList<KnightVirtueTraitDef> SelectedTraits => selectedTraits;
     public int SelectedTraitMaxLevel => selectedTraits.Count;
-    public bool HasEmptyTraitSlot => selectedTraits.Count < level;
+    public bool HasUnusedTraitSlot => selectedTraits.Count < level;
 
     public KnightVirtue() { }
     public KnightVirtue(KnightVirtueDef def, int level)
