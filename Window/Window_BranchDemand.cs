@@ -444,7 +444,7 @@ public class Window_BranchDemand : OrderWindowBase
         int column = 0;
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleLeft;
-        foreach (QuestClique clique in cliqueManager.AllCliques.Values)
+        foreach (QuestClique clique in cliqueManager.AllCliques)
         {
             Rect entryRect = new(cliqueRect.x, cliqueRect.y + column * 30f, 27f, 30f);
             //

@@ -11,10 +11,12 @@ public class KnightVirtueHandler : IExposable
     private readonly ResidentKnight knight;
     public Pawn Pawn => knight.Pawn;
 
+    private int curKnightCreedLevel;
     private List<KnightVirtue> virtues = [];
 
     public IReadOnlyList<KnightVirtue> Virtues => virtues;
     public int TotalVirtueCount => virtues.Count;
+
     public int TotalVirtueLevel
     {
         get
@@ -23,6 +25,17 @@ public class KnightVirtueHandler : IExposable
             foreach (KnightVirtue virtue in virtues)
                 totalLevel += virtue.Level;
             return totalLevel;
+        }
+    }
+
+    public bool HasUpgradableVirtue
+    {
+        get
+        {
+            foreach (KnightVirtue virtue in virtues)
+                if (virtue.Level < virtue.Def.maxLevel)
+                    return true;
+            return false;
         }
     }
     public bool HasUnusedTraitSlot
@@ -36,6 +49,7 @@ public class KnightVirtueHandler : IExposable
         }
     }
 
+    public SimpleValueCache<float> VirtueStatValueCache { get; }
     public int CurVirtueCountLimit
     {
         get
@@ -50,11 +64,8 @@ public class KnightVirtueHandler : IExposable
         }
     }
 
-    private int curKnightCreedLevel;
-
     private HediffStageTemplate BuffStageTemplate { get; } = new();
-    public SimpleValueCache<float> VirtueStatValueCache { get; }
-
+    
     public KnightVirtueHandler(ResidentKnight knight)
     {
         this.knight = knight ?? throw new ArgumentNullException(nameof(knight));
@@ -109,9 +120,13 @@ public class KnightVirtueHandler : IExposable
 
     public bool UpgradeVirtue(KnightVirtueDef virtueDef)
     {
+        if (virtueDef is null)
+            return false;
+
         KnightVirtue virtue = GetVirtue(virtueDef);
         if (virtue is null)
         {
+            Log.Error("");
             return false;
         }
 

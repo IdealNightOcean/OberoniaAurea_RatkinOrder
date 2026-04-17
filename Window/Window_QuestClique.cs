@@ -34,7 +34,6 @@ public class Window_QuestClique : OrderWindowBase
     private Texture2D DemandTexture { get; }
 
     private LazyMutable<int> MapRecommendationCount { get; }
-    private IEnumerable<QuestClique> AllCliques => CliquesManager.AllCliques.Values;
 
     private Vector2 scrollPosition_ActiveCliques;
     private Vector2 scrollPosition_InactiveCliques;
@@ -188,7 +187,7 @@ public class Window_QuestClique : OrderWindowBase
         float entryWidth = viewRect.width;
         float entryHeight = 40f;
 
-        IEnumerable<QuestClique> ActiveCliques = AllCliques.Where(c => c.IsActive);
+        IEnumerable<QuestClique> ActiveCliques = CliquesManager.AllCliques.Where(c => c.IsActive);
         viewRect.height = entryHeight * ActiveCliques.Count();
 
         Widgets.BeginScrollView(outRect, ref scrollPosition_ActiveCliques, viewRect);
@@ -266,7 +265,7 @@ public class Window_QuestClique : OrderWindowBase
         float entryWidth = viewRect.width;
         float entryHeight = 60f;
 
-        IEnumerable<QuestClique> showCliques = AllCliques.Where(c => !c.IsActive && !c.IsBranchClique);
+        IEnumerable<QuestClique> showCliques = CliquesManager.AllCliques.Where(c => !c.IsActive && !c.IsBranchClique);
         viewRect.height = entryHeight * showCliques.Count();
 
         Widgets.BeginScrollView(outRect, ref scrollPosition_InactiveCliques, viewRect);
@@ -313,7 +312,7 @@ public class Window_QuestClique : OrderWindowBase
         float entryWidth = viewRect.width;
         float entryHeight = 65f;
 
-        IEnumerable<QuestClique> showCliques = AllCliques.Where(c => !c.IsActive && c.IsBranchClique);
+        IEnumerable<QuestClique> showCliques = CliquesManager.AllCliques.Where(c => !c.IsActive && c.IsBranchClique);
         viewRect.height = entryHeight * showCliques.Count();
 
         Widgets.BeginScrollView(outRect, ref scrollPosition_InactiveCliques, viewRect);

@@ -23,22 +23,9 @@ public class AcceptedBranchDemand : IExposable
         this.isCritical = isCritical;
     }
 
-    public void Notify_DemandQuestClean(QuestState questState)
+    public void Notify_DemandQuestPreCleanup(Quest quest)
     {
-        branch.DemandHandler.RemoveDemand(isCritical);
-        if (questState == QuestState.EndedSuccess)
-        {
-            GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchDemandCompleted, 1, addIfMiss: true);
-            if (isCritical)
-            {
-                GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.CriticalDemandCompleted, 1, addIfMiss: true);
-            }
-            else
-            {
-                GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.NormalDemandCompleted, 1, addIfMiss: true);
-            }
-            branch.BranchManager.Notify_DemandQuestCompleted(isCritical);
-        }
+
     }
 
     public void ExposeData()

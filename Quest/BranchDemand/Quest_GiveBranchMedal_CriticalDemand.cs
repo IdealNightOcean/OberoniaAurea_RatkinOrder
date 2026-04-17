@@ -144,7 +144,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
         float totalPotency = cliquesManager.TotalPotency.Value;
 
         Dictionary<BranchMedalDef, int> gainMedals = [];
-        foreach (QuestClique clique in cliquesManager.AllCliques.Values)
+        foreach (QuestClique clique in cliquesManager.AllCliques)
         {
             if (!clique.IsBranchClique)
             {

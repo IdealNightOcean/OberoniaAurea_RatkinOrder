@@ -44,11 +44,16 @@ public class QuestPart_BranchDemandWatcher : QuestPart, IOnBranchDestroyed
         Scribe_Values.Look(ref DemandType, nameof(DemandType));
     }
 
+    public override void Notify_PreCleanup()
+    {
+        base.Notify_PreCleanup();
+        AcceptedBranchDemandHandler.Instance.Notify_DemandQuestPreCleanup(quest);
+    }
+
     public override void Cleanup()
     {
         base.Cleanup();
 
-        AcceptedBranchDemandHandler.Instance.Notify_DemandQuestClean(quest);
         DemandType = default;
         DemandDef = null;
         Branch = null;

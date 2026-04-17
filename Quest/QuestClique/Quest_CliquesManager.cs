@@ -39,8 +39,9 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     private Branch branch;
     public Branch Branch => branch;
 
-    private Dictionary<string, QuestClique> allCliques;
-    public IReadOnlyDictionary<string, QuestClique> AllCliques => allCliques;
+    private List<QuestClique> allCliques;
+    private Dictionary<string, QuestClique> allCliquesDict;
+    public IReadOnlyList<QuestClique> AllCliques => allCliques;
 
     public string InSignalOutPotency;
     public string OutSignalOutPotency;
@@ -51,26 +52,27 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public QuestPart_CliquesManager()
     {
-        TotalPotency = new(refreshFunc: () => allCliques?.Values.Where(c => c.IsActive).Sum(c => c.Potency) ?? 0f);
+        TotalPotency = new(refreshFunc: () => allCliques?.Where(c => c.IsActive).Sum(c => c.Potency) ?? 0f);
     }
 
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Collections.Look(ref allCliques, "allCliques", LookMode.Value, LookMode.Deep);
+        Scribe_Collections.Look(ref allCliques, nameof(allCliques), LookMode.Deep);
 
-        Scribe_Values.Look(ref InSignalOutPotency, "InSignalOutPotency");
-        Scribe_Values.Look(ref OutSignalOutPotency, "OutSignalOutPotency");
+        Scribe_Values.Look(ref InSignalOutPotency, nameof(InSignalOutPotency));
+        Scribe_Values.Look(ref OutSignalOutPotency, nameof(OutSignalOutPotency));
 
-        Scribe_Values.Look(ref ticksToNextCheck, "ticksToNextCheck", 0);
+        Scribe_Values.Look(ref ticksToNextCheck, nameof(ticksToNextCheck), 0);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             if (allCliques is not null)
             {
-                allCliques.RemoveAll(kv => kv.Value is null);
-                foreach (QuestClique clique in allCliques.Values)
+                allCliques.RemoveAll(c => c is null || string.IsNullOrEmpty(c.Key));
+                allCliquesDict = new(allCliques.Count);
+                foreach (QuestClique clique in allCliques)
                 {
-                    clique.CliquesManager = this;
+                    allCliquesDict.Add(clique.Key, clique);
                 }
             }
         }
@@ -82,6 +84,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         InSignalOutPotency = null;
         OutSignalOutPotency = null;
         allCliques = null;
+        allCliquesDict = null;
     }
 
     public override void Notify_QuestSignalReceived(Signal signal)
@@ -96,14 +99,14 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     protected override void Enable(SignalArgs receivedArgs)
     {
         base.Enable(receivedArgs);
-        if (allCliques.NullOrEmpty())
+        if (allCliquesDict.NullOrEmpty())
         {
             return;
         }
 
         StringBuilder branchCliqueInfoSB = new("OARO_BranchCliquesInfoText_Header".Translate(branch.RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)));
         branchCliqueInfoSB.AppendLine();
-        foreach (Branch cliqueBranch in allCliques.Values.Where(c => c.IsBranchClique).Select(c => c.RelatedBranch).OrderBy(b => b?.RatkinOrder.LoadID ?? int.MinValue))
+        foreach (Branch cliqueBranch in allCliques.Where(c => c.IsBranchClique).Select(c => c.RelatedBranch).OrderBy(b => b?.RatkinOrder.LoadID ?? int.MinValue))
         {
             branchCliqueInfoSB.AppendLine($"{cliqueBranch.RatkinOrder.Name} - {cliqueBranch.Name}".Colorize(cliqueBranch.IsBranchOfType(Branch.BranchType.Friendly) ? Color.green : Color.white));
         }
@@ -126,7 +129,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             {
                 return;
             }
-            foreach (QuestClique clique in allCliques.Values)
+            foreach (QuestClique clique in allCliques)
             {
                 if (clique.ticksToInactive > 0 && (clique.ticksToInactive -= 1000) <= 0)
                 {
@@ -136,11 +139,11 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
     }
 
-    public bool HasClique(string cliqueKey) => allCliques?.ContainsKey(cliqueKey) ?? false;
+    public bool HasClique(string cliqueKey) => allCliquesDict?.ContainsKey(cliqueKey) ?? false;
 
     public bool TryGetClique(string cliqueKey, out QuestClique clique, bool showErrorIfMiss = false)
     {
-        if (allCliques is not null && allCliques.TryGetValue(cliqueKey, out clique))
+        if (allCliquesDict is not null && allCliquesDict.TryGetValue(cliqueKey, out clique))
         {
             return true;
         }
@@ -165,12 +168,10 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
     public bool TryAddClique(QuestClique clique, bool replaceCur = false, bool defaultActive = false)
     {
         bool added = false;
-        if (allCliques is null)
-        {
-            allCliques = new Dictionary<string, QuestClique> { { clique.Key, clique } };
-            added = true;
-        }
-        else if (allCliques.TryGetValue(clique.Key, out QuestClique oldClique))
+        allCliques ??= [];
+        allCliquesDict ??= [];
+
+        if (allCliquesDict.TryGetValue(clique.Key, out QuestClique oldClique))
         {
             if (replaceCur)
             {
@@ -178,7 +179,10 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
                 {
                     oldClique.Deactive();
                 }
-                allCliques[clique.Key] = clique;
+
+                allCliquesDict[clique.Key] = clique;
+                allCliques.Remove(oldClique);
+                allCliques.Add(clique);
                 added = true;
             }
             else
@@ -189,7 +193,8 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
         else
         {
-            allCliques[clique.Key] = clique;
+            allCliquesDict.Add(clique.Key, clique);
+            allCliques.Add(clique);
             added = true;
         }
 
@@ -211,8 +216,9 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public void RemoveClique(string cliqueKey)
     {
-        if (TryGetClique(cliqueKey, out QuestClique clique) && allCliques.Remove(cliqueKey))
+        if (TryGetClique(cliqueKey, out QuestClique clique) && allCliquesDict.Remove(cliqueKey))
         {
+            allCliques.Remove(clique);
             Find.SignalManager.SendSignal(new Signal(SignalCliqueRemoved(quest), clique.Named(KeyLibrary_FormatArgName.SUBJECT)));
             if (clique.IsActive)
             {
@@ -325,12 +331,12 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             this.branch = null;
         }
-        List<string> keysToRemove = allCliques?.Where(kv => kv.Value.RelatedBranch == branch).Select(kv => kv.Key).ToList();
-        if (keysToRemove is not null)
+        List<QuestClique> toRemove = allCliques?.Where(c => c.RelatedBranch == branch).ToList();
+        if (toRemove is not null)
         {
-            foreach (string key in keysToRemove)
+            foreach (QuestClique clique in toRemove)
             {
-                RemoveClique(key);
+                RemoveClique(clique.Key);
             }
         }
     }
@@ -342,12 +348,12 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             branch = null;
         }
 
-        List<string> keysToRemove = allCliques?.Where(kv => kv.Value.RelatedRatkinOrder == ratkinOrder).Select(kv => kv.Key).ToList();
-        if (keysToRemove is not null)
+        List<QuestClique> toRemove = allCliques?.Where(c => c.RelatedRatkinOrder == ratkinOrder).ToList();
+        if (toRemove is not null)
         {
-            foreach (string key in keysToRemove)
+            foreach (QuestClique clique in toRemove)
             {
-                RemoveClique(key);
+                RemoveClique(clique.Key);
             }
         }
     }
@@ -375,11 +381,10 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         }
         StringBuilder sb = new();
         int i = 0;
-        foreach (KeyValuePair<string, QuestClique> kv in allCliques)
+        foreach (QuestClique clique in allCliques)
         {
-            QuestClique clique = kv.Value;
             sb.AppendInNewLine((i++).ToString());
-            sb.AppendInNewLine($"Key: {kv.Key},  Name:{clique.Name},  IsActive:{clique.IsActive} ({clique.ticksToInactive})");
+            sb.AppendInNewLine($"Key: {clique.Key},  Name:{clique.Name},  IsActive:{clique.IsActive} ({clique.ticksToInactive})");
             sb.AppendInNewLine($"Potency: {clique.Potency:F2},  Willingness:{clique.Willingness:F2}");
             sb.AppendInNewLine($"IsBribable: {clique.IsBribable},  IsCommunicable: {clique.IsCommunicable}");
             sb.AppendInNewLine($"IsBranchClique: {clique.IsBranchClique}, RelatedBranch: {clique.RelatedBranch?.Name ?? "NULL"}");

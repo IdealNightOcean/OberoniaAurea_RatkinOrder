@@ -66,42 +66,8 @@ public class MercyQuestHandler : IExposable
             return;
 
         ResidentPawnsManager.Instance.AllKnightsGainMeditation(200f, directly: false);
-
-        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
-        float letterChance = 0.2f;
-
-        if (ResidentPawnsManager.RoleManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
-        {
-            letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(record.Pawn);
-        }
-        if (Rand.Chance(letterChance))
-        {
-            Branch branch = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(null)?.BranchManager.AllBranches.RandomElementWithFallback(null);
-            if (!branch.IsValid())
-                return;
-
-            if (RatkinOrderSettings.EnableAIContent)
-            {
-                AIInteractionUtility.SendMercyQuestAdmireLetter(branch, quest, mercyQuestDef);
-            }
-            else
-            {
-                OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-                    label: "OARO_LetterLabel_MercyQuestAdmire".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
-                    text: "OARO_Letter_MercyQuestAdmire".Translate(
-                              branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
-                              branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-                              quest.name.Named("QuestName")),
-                    def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
-                    relatedOrder: branch.RatkinOrder,
-                    relatedBranch: branch,
-                    sender: branch.NameColored,
-                    relatedLetterType: OrderLetter.RelatedLetterType.Positive);
-                OrderRecommendation orderRecommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
-                orderLetter.AddAttachment(orderRecommendation);
-                OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays: Rand.Range(1, 5));
-            }
-        }
+        KnightsVirtuesReward();
+        ThanksLetter(quest, mercyQuestDef);
     }
 
     public void PeriodicTriggerMercyQuest()
@@ -233,6 +199,55 @@ public class MercyQuestHandler : IExposable
         {
             AIInteractionUtility.ReplaceMercyQuestTalkText(quest, mercyQuestDef);
         }
+    }
+
+    private static void ThanksLetter(Quest quest, MercyQuestDef mercyQuestDef)
+    {
+        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
+        float letterChance = 0.2f;
+
+        if (ResidentPawnsManager.RoleManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
+        {
+            letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(record.Pawn);
+        }
+
+        if (!Rand.Chance(letterChance))
+            return;
+
+        Branch branch = RatkinOrderManager.Instance.AllRatkinOrders.RandomElementWithFallback(null)?.BranchManager.AllBranches.RandomElementWithFallback(null);
+        if (!branch.IsValid())
+            return;
+
+        if (RatkinOrderSettings.EnableAIContent)
+        {
+            AIInteractionUtility.SendMercyQuestAdmireLetter(branch, quest, mercyQuestDef);
+        }
+        else
+        {
+            OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
+                label: "OARO_LetterLabel_MercyQuestAdmire".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                text: "OARO_Letter_MercyQuestAdmire".Translate(
+                          branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                          branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                          quest.name.Named("QuestName")),
+                def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
+                relatedOrder: branch.RatkinOrder,
+                relatedBranch: branch,
+                sender: branch.NameColored,
+                relatedLetterType: OrderLetter.RelatedLetterType.Positive);
+            OrderRecommendation orderRecommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
+            orderLetter.AddAttachment(orderRecommendation);
+            OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays: Rand.Range(1, 5));
+        }
+    }
+
+    private static void KnightsVirtuesReward()
+    {
+        ResidentKnight targetKnight = ResidentPawnsManager.Instance.ResidentKnights.Where(r => r.KnightVirtueHandler.HasUpgradableVirtue)
+                                                                                   .RandomElementWithFallback(null);
+
+        KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(targetKnight);
+        targetKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue);
     }
 
     private float GetMercyQuestChance()

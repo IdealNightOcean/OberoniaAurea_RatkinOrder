@@ -2,6 +2,8 @@ using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -53,26 +55,71 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         }
     }
 
-    public void Notify_DemandQuestClean(Quest quest)
+    public void Notify_DemandQuestPreCleanup(Quest quest)
     {
-        AcceptedBranchDemand toRmove = null;
-        foreach (AcceptedBranchDemand acceptedDemand in records)
+        AcceptedBranchDemand acceptedDemand = null;
+        foreach (AcceptedBranchDemand demand in records)
         {
-            if (quest == acceptedDemand.Demand.RelatedQuest)
+            if (quest == demand.Demand.RelatedQuest)
             {
-                toRmove = acceptedDemand;
-                toRmove.Notify_DemandQuestClean(quest.State);
+                acceptedDemand = demand;
                 break;
             }
         }
-
-        if (toRmove is not null)
+        if (acceptedDemand is null)
         {
-            records.Remove(toRmove);
+            return;
+        }
+
+        Branch branch = acceptedDemand.Branch;
+        BranchDemand relatedDemand = acceptedDemand.Demand;
+
+        records.Remove(acceptedDemand);
+        branch.DemandHandler.RemoveDemand(acceptedDemand.IsCritical);
+        if (quest.State != QuestState.EndedSuccess)
+            return;
+
+        branch.BranchManager.Notify_DemandQuestCompleted(acceptedDemand.IsCritical);
+
+        KnightsVirtuesReward(relatedDemand, quest);
+
+        GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.BranchDemandCompleted, 1, addIfMiss: true);
+        if (acceptedDemand.IsCritical)
+        {
+            GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.CriticalDemandCompleted, 1, addIfMiss: true);
+        }
+        else
+        {
+            GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.NormalDemandCompleted, 1, addIfMiss: true);
         }
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order) => records.RemoveAll(r => r is null || !r.Branch.IsValid() || r.Branch.RatkinOrder == order);
 
     public void Notify_BranchDestroyed(Branch branch) => records.RemoveAll(r => r is null || !r.Branch.IsValid() || r.Branch == branch);
+
+
+    private static void KnightsVirtuesReward(BranchDemand demand, Quest quest)
+    {
+        if (demand.DemandTypeValue != BranchDemand.DemandType.Critical)
+            return;
+
+
+        if (!OARO_QuestUtility.TryGetCliquesManager(quest, addPartIfMiss: false, out QuestPart_CliquesManager cliquesManager))
+            return;
+
+        int knight = Mathf.FloorToInt(cliquesManager.TotalPotency.NewestValue / 0.6f);
+        if (knight <= 0)
+            return;
+
+        IEnumerable<ResidentKnight> targetKnights = ResidentPawnsManager.Instance.ResidentKnights.Where(r => r.KnightVirtueHandler.HasUpgradableVirtue)
+                                                                                                 .TakeRandomElements(knight);
+
+        foreach (ResidentKnight residentKnight in targetKnights)
+        {
+            KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(residentKnight);
+            residentKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue);
+        }
+    }
+
 }
