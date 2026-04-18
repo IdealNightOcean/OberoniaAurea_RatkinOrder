@@ -506,7 +506,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         Find.SignalManager.SendSignal(new Signal(OutSignalPawnsArrived));
 
         talkWith ??= Pawns[0];
-        IntVec3 wanderCell = this.GetTalkPawnWanderCenterCell(nearOrderHall: true);
+        IntVec3 wanderCell = this.GetTalkPawnWanderCenterCell(nearOrderStation: true);
 
         LordJob_VisitColonyTalkable lordJob = new(RelatedFaction, wanderCell, DurationTicks);
         lordJob.SetTalkAction(talkWith, OARO_JobDefOf.OARO_Job_CommonTalkWith, initTalkActive: true);

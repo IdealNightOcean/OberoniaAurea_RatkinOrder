@@ -17,7 +17,7 @@ public class StatPart_MeditationFactor : StatPart
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return;
 
-        val += OrderStationHandler.Instance.OrderHallLevel switch
+        val += OrderStationHandler.Instance.OrderStationLevel switch
         {
             < 2 => 0f,
             < 4 => 0.05f,
@@ -69,7 +69,7 @@ public class StatPart_MeditationFactor : StatPart
         float stepChange;
         StringBuilder sb = new(128);
 
-        stepChange = OrderStationHandler.Instance.OrderHallLevel switch
+        stepChange = OrderStationHandler.Instance.OrderStationLevel switch
         {
             < 2 => 0f,
             < 4 => 0.05f,
@@ -79,7 +79,7 @@ public class StatPart_MeditationFactor : StatPart
             _ => 0.25f
         };
         if (stepChange > 0f)
-            sb.AppendLine("OARO_ChangeOffset_OrderHallLevel".Translate(stepChange.ToStringPercentSigned("0.##")));
+            sb.AppendLine("OARO_ChangeOffset_OrderStationLevel".Translate(stepChange.ToStringPercentSigned("0.##")));
 
         Branch branch = record.Branch;
         if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))

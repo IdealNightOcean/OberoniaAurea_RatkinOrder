@@ -8,9 +8,9 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
 
     public override AcceptanceReport CanUseInteraction(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
-        if (OrderStationHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderStationRoom is null)
         {
-            return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
+            return resultOnly ? false : "OARO_NoRatkinOrderStation".Translate();
         }
 
         int residentKnightCeiling = ResidentPawnsManager.ResidentKnightCeiling;

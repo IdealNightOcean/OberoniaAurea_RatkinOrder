@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class OrderHallLevelRestriction
+public class OrderStationLevelRestriction
 {
     public int level;
     [MustTranslate]

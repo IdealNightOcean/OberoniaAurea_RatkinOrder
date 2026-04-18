@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAction
 {
     public int DurationTicks;
-    public bool NearOrderHall;
+    public bool NearOrderStation;
 
     public string InSignalForceTriggerTalk;
 
@@ -21,7 +21,7 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
     {
         base.ExposeData();
         Scribe_Values.Look(ref DurationTicks, nameof(DurationTicks), 0);
-        Scribe_Values.Look(ref NearOrderHall, nameof(NearOrderHall), defaultValue: false);
+        Scribe_Values.Look(ref NearOrderStation, nameof(NearOrderStation), defaultValue: false);
 
         Scribe_Values.Look(ref InSignalForceTriggerTalk, nameof(InSignalForceTriggerTalk));
 
@@ -38,7 +38,7 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
         base.Cleanup();
 
         DurationTicks = 0;
-        NearOrderHall = false;
+        NearOrderStation = false;
         InSignalForceTriggerTalk = null;
 
         this.DeregisterTalkAction();
@@ -89,7 +89,7 @@ public abstract class QuestPart_LordJob_CommomTalk : QuestPart_MakeLord, ITalkAc
     {
         pawns.AddDistinct(mapOfPawn);
 
-        IntVec3 wanderCell = this.GetTalkPawnWanderCenterCell(NearOrderHall);
+        IntVec3 wanderCell = this.GetTalkPawnWanderCenterCell(NearOrderStation);
         LordJob_VisitColonyTalkable lordJob = new(faction, wanderCell, durationTicks: DurationTicks);
         lordJob.SetTalkAction(mapOfPawn, OARO_JobDefOf.OARO_Job_CommonTalkWith);
         return LordMaker.MakeNewLord(faction, lordJob, Map);

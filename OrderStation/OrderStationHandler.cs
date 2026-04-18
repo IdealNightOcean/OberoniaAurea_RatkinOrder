@@ -6,33 +6,33 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderStationHandler : IExposable
 {
-    private const int HallRoomRecacheInterval = 250;
-    private const int HallLevelRecacheInterval = 15000;
-    private const int HallBuildingsRecacheInterval = 30000;
+    private const int StationRoomRecacheInterval = 250;
+    private const int StationLevelRecacheInterval = 15000;
+    private const int StationBuildingsRecacheInterval = 30000;
 
     public static OrderStationHandler Instance { get; private set; }
 
     private Building_OrderCodePedestal mainOrderCodePedestal;
     public Building_OrderCodePedestal MainOrderCodePedestal => mainOrderCodePedestal;
 
-    [Unsaved] private Room orderHallRoom;
-    [Unsaved] private int nextHallRoomCacheTick = -1;
-    public Room OrderHallRoom
+    [Unsaved] private Room orderStationRoom;
+    [Unsaved] private int nextStationRoomCacheTick = -1;
+    public Room OrderStationRoom
     {
         get
         {
-            if (Find.TickManager.TicksGame > nextHallRoomCacheTick)
+            if (Find.TickManager.TicksGame > nextStationRoomCacheTick)
             {
-                nextHallRoomCacheTick = Find.TickManager.TicksGame + HallRoomRecacheInterval;
-                orderHallRoom = mainOrderCodePedestal?.GetRoom();
+                nextStationRoomCacheTick = Find.TickManager.TicksGame + StationRoomRecacheInterval;
+                orderStationRoom = mainOrderCodePedestal?.GetRoom();
             }
-            return orderHallRoom;
+            return orderStationRoom;
         }
     }
 
     [Unsaved]
-    private SimpleValueCache<int> orderHallLevelCache;
-    public int OrderHallLevel => orderHallLevelCache.GetCachedResult();
+    private SimpleValueCache<int> orderStationLevelCache;
+    public int OrderStationLevel => orderStationLevelCache.GetCachedResult();
 
     private OrderStationBuildingHandler buildingHandler;
     public static OrderStationBuildingHandler BuildingHandler => Instance.buildingHandler;
@@ -44,9 +44,9 @@ public class OrderStationHandler : IExposable
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(OrderStationHandler));
         Instance = this;
-        orderHallLevelCache = new SimpleValueCache<int>(cacheInterval: HallLevelRecacheInterval,
+        orderStationLevelCache = new SimpleValueCache<int>(cacheInterval: StationLevelRecacheInterval,
                                                         defaultValue: 0,
-                                                        checker: () => OrderHallUtility.GetOrderHallLevel());
+                                                        checker: () => OrderStationUtility.GetOrderStationLevel());
 
         buildingHandler = new();
         if (initCtor)
@@ -59,8 +59,8 @@ public class OrderStationHandler : IExposable
 
     public void RefreshCache()
     {
-        nextHallRoomCacheTick = -1;
-        orderHallLevelCache.Reset();
+        nextStationRoomCacheTick = -1;
+        orderStationLevelCache.Reset();
         buildingHandler.RefreshCache();
     }
 

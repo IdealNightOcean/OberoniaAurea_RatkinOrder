@@ -73,9 +73,9 @@ internal class ChoiceLetter_InDistressKnightLeave : ChoiceLetter_RatkinOrder
             resolveTree = true
         };
 
-        if (OrderStationHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderStationRoom is null)
         {
-            opt.Disable("OARO_NoRatkinOrderHall".Translate());
+            opt.Disable("OARO_NoRatkinOrderStation".Translate());
         }
         return opt;
     }

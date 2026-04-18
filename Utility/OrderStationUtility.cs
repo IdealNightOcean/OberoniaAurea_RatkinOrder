@@ -7,29 +7,29 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public static class OrderHallUtility
+public static class OrderStationUtility
 {
-    private static OrderHallRestrictionExtension restrictionExtension;
-    private static OrderHallRestrictionExtension RestrictionExtension
+    private static OrderStationRestrictionExtension restrictionExtension;
+    private static OrderStationRestrictionExtension RestrictionExtension
     {
         get
         {
             if (restrictionExtension is null)
             {
-                restrictionExtension = OARO_ModDefOf.OARO_RatkinOrderHall.GetModExtension<OrderHallRestrictionExtension>();
-                restrictionExtension?.hallLevelRestriction.OrderBy(r => r.level);
+                restrictionExtension = OARO_ModDefOf.OARO_RatkinOrderStation.GetModExtension<OrderStationRestrictionExtension>();
+                restrictionExtension?.stationLevelRestriction.OrderBy(r => r.level);
             }
             return restrictionExtension;
         }
     }
 
-    public static int GetOrderHallLevel()
+    public static int GetOrderStationLevel()
     {
-        int maxOrderHallLevel = RestrictionExtension.MaxLevel;
+        int maxOrderStationLevel = RestrictionExtension.MaxLevel;
         int maxPotentialLevel = 0;
         try
         {
-            Room room = OrderStationHandler.Instance.OrderHallRoom;
+            Room room = OrderStationHandler.Instance.OrderStationRoom;
             if (room is null)
             {
                 return -1;
@@ -37,21 +37,21 @@ public static class OrderHallUtility
 
             int areaRestrict = AreaRestrict(room.CellCount);
             int impressivenessRestrict = ImpressivenessRestrict(room.GetStat(RoomStatDefOf.Impressiveness));
-            maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, maxOrderHallLevel);
+            maxPotentialLevel = Mathf.Min(areaRestrict, impressivenessRestrict, maxOrderStationLevel);
             if (maxPotentialLevel <= 1) { return 1; }
 
             maxPotentialLevel = TerrainRestrict(room, maxPotentialLevel);
             if (maxPotentialLevel <= 1) { return 1; }
 
             maxPotentialLevel = BuildingRestrict(room, maxPotentialLevel);
-            return Mathf.Clamp(maxPotentialLevel, 1, maxOrderHallLevel);
+            return Mathf.Clamp(maxPotentialLevel, 1, maxOrderStationLevel);
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"获取骑士大厅等级",
-                typeName: nameof(OrderHallUtility),
-                methodName: nameof(GetOrderHallLevel),
+                errorDesc: $"获取骑士驻地等级",
+                typeName: nameof(OrderStationUtility),
+                methodName: nameof(GetOrderStationLevel),
                 needStackTrace: true);
             return maxPotentialLevel;
         }
@@ -88,10 +88,10 @@ public static class OrderHallUtility
 
     private static int AreaRestrict(int cellCount)
     {
-        List<OrderHallLevelRestriction> hallLevelRestriction = RestrictionExtension.hallLevelRestriction;
-        for (int i = 0; i < hallLevelRestriction.Count; i++)
+        List<OrderStationLevelRestriction> stationLevelRestriction = RestrictionExtension.stationLevelRestriction;
+        for (int i = 0; i < stationLevelRestriction.Count; i++)
         {
-            if (cellCount < hallLevelRestriction[i].areaFloor)
+            if (cellCount < stationLevelRestriction[i].areaFloor)
             {
                 return i + 1;
             }
@@ -101,10 +101,10 @@ public static class OrderHallUtility
 
     private static int ImpressivenessRestrict(float impressiveness)
     {
-        List<OrderHallLevelRestriction> hallLevelRestriction = RestrictionExtension.hallLevelRestriction;
-        for (int i = 0; i < hallLevelRestriction.Count; i++)
+        List<OrderStationLevelRestriction> stationLevelRestriction = RestrictionExtension.stationLevelRestriction;
+        for (int i = 0; i < stationLevelRestriction.Count; i++)
         {
-            if (impressiveness < hallLevelRestriction[i].impressivenessFloor)
+            if (impressiveness < stationLevelRestriction[i].impressivenessFloor)
             {
                 return i + 1;
             }
@@ -172,7 +172,7 @@ public static class OrderHallUtility
     {
         HashSet<string> forbiddenBuildingTags = RestrictionExtension.ForbiddenBuildingTags;
         HashSet<Thing> uniquePotentialBuildings = new(32);
-        Dictionary<ThingDef, int> orderHallBuildings = new(8);
+        Dictionary<ThingDef, int> orderStationBuildings = new(8);
 
         foreach (Region region in room.Regions)
         {
@@ -199,18 +199,18 @@ public static class OrderHallUtility
                         return 1;
                     }
 
-                    isPotentialBuilding = isPotentialBuilding || tag == "OARO_OrderHall";
+                    isPotentialBuilding = isPotentialBuilding || tag == "OARO_OrderStation";
                 }
 
                 if (isPotentialBuilding)
                 {
-                    if (orderHallBuildings.TryGetValue(thingDef, out int count))
+                    if (orderStationBuildings.TryGetValue(thingDef, out int count))
                     {
-                        orderHallBuildings[thingDef] = count + 1;
+                        orderStationBuildings[thingDef] = count + 1;
                     }
                     else
                     {
-                        orderHallBuildings[thingDef] = 1;
+                        orderStationBuildings[thingDef] = 1;
                     }
                 }
             }
@@ -219,11 +219,11 @@ public static class OrderHallUtility
         int prePotentialLevelIndex = maxPotentialLevel - 1;
         for (int i = prePotentialLevelIndex; i >= 1; i--)
         {
-            List<ThingDefCountClass> buildingRequirements = RestrictionExtension.hallLevelRestriction[i].buildings;
+            List<ThingDefCountClass> buildingRequirements = RestrictionExtension.stationLevelRestriction[i].buildings;
             bool allMet = true;
             for (int j = 0; j < buildingRequirements.Count; j++)
             {
-                if (!orderHallBuildings.TryGetValue(buildingRequirements[j].thingDef, out int count) || count < buildingRequirements[j].count)
+                if (!orderStationBuildings.TryGetValue(buildingRequirements[j].thingDef, out int count) || count < buildingRequirements[j].count)
                 {
                     maxPotentialLevel--;
                     allMet = false;
@@ -239,28 +239,28 @@ public static class OrderHallUtility
         return maxPotentialLevel;
     }
 
-    public static List<(string condition, bool isMet)> GetHallUpgradeInfo()
+    public static List<(string condition, bool isMet)> GetStationUpgradeInfo()
     {
-        int curLevel = GetOrderHallLevel();
+        int curLevel = GetOrderStationLevel();
         if (curLevel < 0 || curLevel >= RestrictionExtension.MaxLevel)
             return null;
 
 
-        Room room = OrderStationHandler.Instance.OrderHallRoom;
-        OrderHallLevelRestriction nextLevelRestriction = RestrictionExtension.GetRestrictionOfLevel(curLevel + 1);
+        Room room = OrderStationHandler.Instance.OrderStationRoom;
+        OrderStationLevelRestriction nextLevelRestriction = RestrictionExtension.GetRestrictionOfLevel(curLevel + 1);
         if (nextLevelRestriction is null)
             return null;
 
         List<(string condition, bool isMet)> result = new(16)
         {
-            ("OARO_HallRestriction_OrderCodePedestal".Translate(), curLevel >= 1)
+            ("OARO_StationRestriction_OrderCodePedestal".Translate(), curLevel >= 1)
         };
 
         int cellCount = room.CellCount;
-        result.Add(("OARO_HallRestriction_Area".Translate(cellCount, nextLevelRestriction.areaFloor), cellCount >= nextLevelRestriction.areaFloor));
+        result.Add(("OARO_StationRestriction_Area".Translate(cellCount, nextLevelRestriction.areaFloor), cellCount >= nextLevelRestriction.areaFloor));
 
         float impressiveness = room.GetStat(RoomStatDefOf.Impressiveness);
-        result.Add(("OARO_HallRestriction_Impressiveness".Translate(impressiveness.ToString("F0"), nextLevelRestriction.impressivenessFloor.ToString("F0")), impressiveness >= nextLevelRestriction.impressivenessFloor));
+        result.Add(("OARO_StationRestriction_Impressiveness".Translate(impressiveness.ToString("F0"), nextLevelRestriction.impressivenessFloor.ToString("F0")), impressiveness >= nextLevelRestriction.impressivenessFloor));
 
         int targetLevel = curLevel + 1;
         Map map = room.Map;
@@ -288,7 +288,7 @@ public static class OrderHallUtility
 
         HashSet<Thing> uniquePotentialBuildings = new(32);
         HashSet<string> containedForbiddenBuildingTags = new(8);
-        Dictionary<ThingDef, int> orderHallBuildings = new(8);
+        Dictionary<ThingDef, int> orderStationBuildings = new(8);
         bool hasAltar = false;
         foreach (Region region in room.Regions)
         {
@@ -314,18 +314,18 @@ public static class OrderHallUtility
                         containedForbiddenBuildingTags.Add(tag);
                     }
 
-                    isPotentialBuilding = isPotentialBuilding || tag == "OARO_OrderHall";
+                    isPotentialBuilding = isPotentialBuilding || tag == "OARO_OrderStation";
                 }
 
                 if (isPotentialBuilding)
                 {
-                    if (orderHallBuildings.TryGetValue(thingDef, out int count))
+                    if (orderStationBuildings.TryGetValue(thingDef, out int count))
                     {
-                        orderHallBuildings[thingDef] = count + 1;
+                        orderStationBuildings[thingDef] = count + 1;
                     }
                     else
                     {
-                        orderHallBuildings[thingDef] = 1;
+                        orderStationBuildings[thingDef] = 1;
                     }
                 }
             }
@@ -341,7 +341,7 @@ public static class OrderHallUtility
         {
             foreach (ThingDefCountClass buildingNeeded in nextLevelRestriction.buildings)
             {
-                int currentCount = orderHallBuildings.TryGetValue(buildingNeeded.thingDef, out int count) ? count : 0;
+                int currentCount = orderStationBuildings.TryGetValue(buildingNeeded.thingDef, out int count) ? count : 0;
                 result.Add((($"{buildingNeeded.LabelCap}: {currentCount} / {buildingNeeded.count}", currentCount >= buildingNeeded.count)));
             }
         }

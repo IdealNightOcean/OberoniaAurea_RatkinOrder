@@ -65,7 +65,7 @@ public class KnightVirtueHandler : IExposable
     }
 
     private HediffStageTemplate BuffStageTemplate { get; } = new();
-    
+
     public KnightVirtueHandler(ResidentKnight knight)
     {
         this.knight = knight ?? throw new ArgumentNullException(nameof(knight));

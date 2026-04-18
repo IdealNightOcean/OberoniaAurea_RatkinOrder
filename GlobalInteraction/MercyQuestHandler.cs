@@ -80,7 +80,7 @@ public class MercyQuestHandler : IExposable
 
     private bool TryPeriodicTriggerMercyQuest()
     {
-        if (OrderStationHandler.Instance.OrderHallRoom is null || GameComponent_RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
+        if (OrderStationHandler.Instance.OrderStationRoom is null || GameComponent_RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.MercyQuestTryTriggered))
             return false;
 
         GameComponent_RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.MercyQuestTryTriggered, cdTicks: 3 * 60000, removeWhenExpired: true);

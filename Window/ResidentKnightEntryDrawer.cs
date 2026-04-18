@@ -7,7 +7,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public partial class Window_OrderHall
+public partial class Window_OrderStation
 {
     [StaticConstructorOnStartup]
     private class ResidentKnightEntryDrawer
@@ -17,7 +17,7 @@ public partial class Window_OrderHall
         public const float DetailHeight = 288f;
 
         private Vector2 scrollPosition_GenealAcademic;
-        public Window_OrderHall Parent { get; }
+        public Window_OrderStation Parent { get; }
         public Map Map { get; }
 
         public ResidentKnight Record { get; }
@@ -35,7 +35,7 @@ public partial class Window_OrderHall
         public LazyMutable<(int, int)> PreferredFurnitureCount { get; }
         public LazyMutable<string> PreferredFurnitureExplanation { get; }
 
-        public ResidentKnightEntryDrawer(Window_OrderHall parent, ResidentKnight record, Map map)
+        public ResidentKnightEntryDrawer(Window_OrderStation parent, ResidentKnight record, Map map)
         {
             Parent = parent;
             Map = map;
@@ -137,7 +137,7 @@ public partial class Window_OrderHall
                 GUI.DrawTexture(reusedRect, detailButton_Down);
                 Text.Font = GameFont.Small;
                 Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label(buttomTextRect, "OARO_HallWin_ShowDetail".Translate());
+                Widgets.Label(buttomTextRect, "OARO_StationWin_ShowDetail".Translate());
                 Text.Anchor = TextAnchor.MiddleCenter;
                 float bottomY = DrawDetail(new Vector2(position.x, summaryRect.yMax));
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
@@ -153,7 +153,7 @@ public partial class Window_OrderHall
                 GUI.DrawTexture(reusedRect, detailButton);
                 Text.Font = GameFont.Small;
                 Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label(buttomTextRect, "OARO_HallWin_ShowDetail".Translate());
+                Widgets.Label(buttomTextRect, "OARO_StationWin_ShowDetail".Translate());
                 Text.Anchor = TextAnchor.MiddleCenter;
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
@@ -176,18 +176,18 @@ public partial class Window_OrderHall
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleLeft;
             Rect reusedRect = new(inRectX + 32f, inRectY + 4f, 128f, 20f);
-            Widgets.Label(reusedRect, "OARO_HallWin_AttachToBranch".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_AttachToBranch".Translate());
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, "OARO_HallWin_KnightPersonality".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_KnightPersonality".Translate());
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, "OARO_HallWin_KnightResonatePersonalities".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_KnightResonatePersonalities".Translate());
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, "OARO_HallWin_KnightRank".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_KnightRank".Translate());
 
             Rect buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 335f, 71f, 22f);
             if (OARO_WindowUtility.TextButtonImageDisableable(
                 butRect: buttonRect,
-                label: "OARO_HallWin_UpgradeRank".Translate(),
+                label: "OARO_StationWin_UpgradeRank".Translate(),
                 acceptance: RankUpgradeAcceptance.Value,
                 baseTex: smallButton,
                 downTex: smallButton_Down,
@@ -199,19 +199,19 @@ public partial class Window_OrderHall
             }
 
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, "OARO_HallWin_PreferredFurniture".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_PreferredFurniture".Translate());
 
             reusedRect = new(inRectX + 32f, inRectY + 140f, 256f, 20f);
 
-            Widgets.Label(reusedRect, "OARO_HallWin_ResignationDay".Translate(
+            Widgets.Label(reusedRect, "OARO_StationWin_ResignationDay".Translate(
                 GenDate.DateFullStringAt(
                     absTicks: GenDate.TickGameToAbs(Record.ResignationTick),
                     location: Find.WorldGrid.LongLatOf(Map.Tile))));
             buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 264f, 71f, 22f);
-            if (OARO_WindowUtility.TextButtonImage(buttonRect, "OARO_HallWin_DismissalKnight".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
+            if (OARO_WindowUtility.TextButtonImage(buttonRect, "OARO_StationWin_DismissalKnight".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
             {
                 Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-                    text: "OARO_HallWin_DismissalKnightConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN)),
+                    text: "OARO_StationWin_DismissalKnightConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN)),
                     ratkinOrder: Record.RatkinOrder,
                     acceptAction: delegate
                     {
@@ -223,7 +223,7 @@ public partial class Window_OrderHall
             }
             buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 335f, 71f, 22f);
             if (OARO_WindowUtility.TextButtonImageDisableable(buttonRect,
-                label: "OARO_HallWin_PostponeResignation".Translate(),
+                label: "OARO_StationWin_PostponeResignation".Translate(),
                 acceptance: PostponeResignationAcceptance.Value,
                 baseTex: smallButton,
                 downTex: smallButton_Down,
@@ -233,7 +233,7 @@ public partial class Window_OrderHall
                 if (acceptance)
                 {
                     Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-                        text: "OARO_HallWin_PostponeResignationConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+                        text: "OARO_StationWin_PostponeResignationConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
                         ratkinOrder: Record.RatkinOrder,
                         acceptAction: delegate
                         {
@@ -281,7 +281,7 @@ public partial class Window_OrderHall
 
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(inRectX + 260f, inRectY + 164f, 80f, 20f);
-            Widgets.Label(reusedRect, "OARO_HallWin_HonorAcademic".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_HonorAcademic".Translate());
             reusedRect = new(inRectX + 240f, reusedRect.yMax + 8f, 100f, 20f);
 
 
@@ -308,7 +308,7 @@ public partial class Window_OrderHall
             reusedRect = new(inRectX + 255, inRectY + 238f, 142f, 43f);
             if (OARO_WindowUtility.TextButtonImage(
                 butRect: reusedRect,
-                label: "OARO_HallWin_ArrangeAcademic".Translate(),
+                label: "OARO_StationWin_ArrangeAcademic".Translate(),
                 baseTex: academicButton,
                 downTex: academicButton_Down,
                 doMouseoverSound: true))
@@ -320,7 +320,7 @@ public partial class Window_OrderHall
 
             Text.Anchor = TextAnchor.MiddleLeft;
             reusedRect = new(inRectX + 32f, inRectY + 164f, 256f, 20f);
-            Widgets.Label(reusedRect, "OARO_HallWin_GenealAcademic".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_GenealAcademic".Translate());
             Rect academicRect = Rect.MinMaxRect(inRectX + 32f, reusedRect.yMax + 8f, inRectX + (32f + 180f), inRect.yMax - 2f);
             float entryX = academicRect.xMin;
             float entryY = academicRect.yMin;
@@ -499,11 +499,11 @@ public partial class Window_OrderHall
             ResidentPawnsManager.RoleManager.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
             if (roleRecord is null)
             {
-                sb.AppendLine("OARO_HallWin_RoleChangeConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
+                sb.AppendLine("OARO_StationWin_RoleChangeConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
             }
             else
             {
-                sb.AppendLine("OARO_HallWin_RoleChangeConfirm_Replace".Translate(
+                sb.AppendLine("OARO_StationWin_RoleChangeConfirm_Replace".Translate(
                     Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN),
                     roleRecord.Pawn.Named("OTHER"),
                     roleDef.Named("ROLEDEF")));
@@ -525,21 +525,21 @@ public partial class Window_OrderHall
         }
 
 
-        private static readonly Texture2D residentKnightSummary = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_KnightSummary");
-        private static readonly Texture2D residentKnightDetail = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_KnightDetail");
+        private static readonly Texture2D residentKnightSummary = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_KnightSummary");
+        private static readonly Texture2D residentKnightDetail = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_KnightDetail");
 
-        private static readonly Texture2D detailButton = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_DetailButton");
-        private static readonly Texture2D detailButton_Down = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_DetailButton_Down");
+        private static readonly Texture2D detailButton = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_DetailButton");
+        private static readonly Texture2D detailButton_Down = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_DetailButton_Down");
 
-        private static readonly Texture2D smallButton = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_SmallButton");
-        private static readonly Texture2D smallButton_Down = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_SmallButton_Down");
+        private static readonly Texture2D smallButton = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_SmallButton");
+        private static readonly Texture2D smallButton_Down = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_SmallButton_Down");
 
-        private static readonly Texture2D academicButton = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_AcademicButton");
-        private static readonly Texture2D academicButton_Down = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_AcademicButton_Down");
+        private static readonly Texture2D academicButton = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_AcademicButton");
+        private static readonly Texture2D academicButton_Down = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_AcademicButton_Down");
 
-        private static readonly Texture2D rankBackGround_RegularS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_RegularS");
-        private static readonly Texture2D rankBackGround_EliteS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_EliteS");
-        private static readonly Texture2D rankBackGround_HonorS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_HonorS");
-        private static readonly Texture2D rankBackGround_CrownS = ContentFinder<Texture2D>.Get("UI/OrderHall/ResidentKnight/OARO_RankBackground_CrownS");
+        private static readonly Texture2D rankBackGround_RegularS = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_RankBackground_RegularS");
+        private static readonly Texture2D rankBackGround_EliteS = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_RankBackground_EliteS");
+        private static readonly Texture2D rankBackGround_HonorS = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_RankBackground_HonorS");
+        private static readonly Texture2D rankBackGround_CrownS = ContentFinder<Texture2D>.Get("UI/OrderStation/ResidentKnight/OARO_RankBackground_CrownS");
     }
 }

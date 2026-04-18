@@ -27,7 +27,7 @@ internal class DevWindow_GlobalOrderInteractHandler : DevWindowBase
         {
             listing_Rect.Label($"物品 Thing: {OrderStationHandler.Instance.MainOrderCodePedestal}");
             listing_Rect.Label($"地图 Map: {OrderStationHandler.Instance.MainOrderCodePedestal.MapHeld}");
-            listing_Rect.Label($"骑士大厅等级: {OrderStationHandler.Instance.OrderHallLevel}");
+            listing_Rect.Label($"骑士大厅等级: {OrderStationHandler.Instance.OrderStationLevel}");
             if (listing_Rect.ButtonText("JumpTo".Translate(), widthPct: 0.4f))
             {
                 CameraJumper.TryJumpAndSelect(OrderStationHandler.Instance.MainOrderCodePedestal);

@@ -16,9 +16,9 @@ public static class GlobalInteractionUtility
     /// </summary>
     public static AcceptanceReport CanRecruitKnight(Pawn knight, Map map, bool resultOnly)
     {
-        if (OrderStationHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderStationRoom is null)
         {
-            return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
+            return resultOnly ? false : "OARO_NoRatkinOrderStation".Translate();
         }
         if (!KnightPawnsManager.Instance.TryGetKnightRecord(knight, out KnightRecord kRecord))
         {
@@ -134,9 +134,9 @@ public static class GlobalInteractionUtility
             return false;
         }
 
-        if (OrderStationHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderStationRoom is null)
         {
-            return resultOnly ? false : "OARO_NoRatkinOrderHall".Translate();
+            return resultOnly ? false : "OARO_NoRatkinOrderStation".Translate();
         }
 
         if (knightGroup.RatkinOrder.Relationship <= RelationshipKind.Stranger)
@@ -253,9 +253,9 @@ public static class GlobalInteractionUtility
         else if (knights.TravelTicks <= 30000)
             ApplyStepChange(0.1f, "OARO_AroundKnights_TravelTimeShort");
 
-        stepChange = (OrderStationHandler.Instance.OrderHallLevel - 2) * 0.05f;
+        stepChange = (OrderStationHandler.Instance.OrderStationLevel - 2) * 0.05f;
         if (stepChange > 0f)
-            ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderHallLevel");
+            ApplyStepChange(stepChange, "OARO_ChangeOffset_OrderStationLevel");
 
         if (ratkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
         {
@@ -303,7 +303,7 @@ public static class GlobalInteractionUtility
     /// </summary>
     public static int SeasonInvitationLimit()
     {
-        return OrderStationHandler.Instance.OrderHallLevel switch
+        return OrderStationHandler.Instance.OrderStationLevel switch
         {
             < 2 => 0,
             2 => 1,

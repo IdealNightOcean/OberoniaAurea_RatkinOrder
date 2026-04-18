@@ -25,7 +25,7 @@ public class Alert_ResidentKnightWillResignation : Alert_Critical
 
     public Alert_ResidentKnightWillResignation()
     {
-        defaultLabel = "OARO_SomeResidentKnightWillResignation".Translate();
+        defaultLabel = "OARO_Alert_SomeResidentKnightWillResignation".Translate();
     }
 
     public static void ClearStaticCache()
@@ -53,23 +53,23 @@ public class Alert_ResidentKnightWillResignation : Alert_Critical
         {
             return;
         }
-        Window_OrderHall hallWin = new(OrderStationHandler.Instance.MainOrderCodePedestal.Map);
-        Find.WindowStack.Add(hallWin);
+        Window_OrderStation stationWin = new(OrderStationHandler.Instance.MainOrderCodePedestal.Map);
+        Find.WindowStack.Add(stationWin);
     }
 
     public override TaggedString GetExplanation()
     {
-        TaggedString explanation = "OARO_SomeResidentKnightWillResignationDesc".Translate(GenLabel.ThingsLabel(KnightsApproachingResignation).Named(KeyLibrary_FormatArgName.PawnsInfo));
+        TaggedString explanation = "OARO_Alert_SomeResidentKnightWillResignationExp".Translate(GenLabel.ThingsLabel(KnightsApproachingResignation).Named(KeyLibrary_FormatArgName.PawnsInfo));
         if (OrderStationHandler.Instance.MainOrderCodePedestal?.Map is not null)
         {
-            explanation += ("\n\n(" + "OARO_ClickToOpenOrderHallWin".Translate() + ")");
+            explanation += ("\n\n(" + "OARO_ClickToOpenOrderStationWin".Translate() + ")");
         }
         return explanation;
     }
 
     private static void RefreshKnightsApproachingResignation()
     {
-        nextUpdateTick = Find.TickManager.TicksGame + 10000;
+        nextUpdateTick = Find.TickManager.TicksGame + 2500;
         knightsApproachingResignation.Clear();
 
         IReadOnlyList<ResidentKnight> residentKnights = ResidentPawnsManager.Instance.ResidentKnights;

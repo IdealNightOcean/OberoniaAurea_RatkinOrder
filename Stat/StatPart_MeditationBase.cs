@@ -9,7 +9,7 @@ public class StatPart_MeditationBase : StatPart
 {
     public override void TransformValue(StatRequest req, ref float val)
     {
-        if (OrderStationHandler.Instance.OrderHallRoom is not null)
+        if (OrderStationHandler.Instance.OrderStationRoom is not null)
             return;
 
         Pawn pawn = req.Thing as Pawn;
@@ -26,7 +26,7 @@ public class StatPart_MeditationBase : StatPart
 
     public override string ExplanationPart(StatRequest req)
     {
-        if (OrderStationHandler.Instance.OrderHallRoom is not null)
+        if (OrderStationHandler.Instance.OrderStationRoom is not null)
             return null;
 
         Pawn pawn = req.Thing as Pawn;
@@ -38,7 +38,7 @@ public class StatPart_MeditationBase : StatPart
 
         int stepChange;
         StringBuilder sb = new(64);
-        sb.AppendLine("OARO_MeditationBase_OrderHallRoom".Translate(5.ToStringWithSign()));
+        sb.AppendLine("OARO_MeditationBase_OrderStationRoom".Translate(5.ToStringWithSign()));
 
         int academicFurnituresCount = OrderStationHandler.BuildingHandler.AcademicFurnituresCount;
         if (academicFurnituresCount > 0)

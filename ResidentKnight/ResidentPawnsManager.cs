@@ -23,7 +23,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         get
         {
             int ceiling = 1;
-            ceiling += OrderStationHandler.Instance.OrderHallLevel switch
+            ceiling += OrderStationHandler.Instance.OrderStationLevel switch
             {
                 < 3 => 0,
                 < 5 => 3,

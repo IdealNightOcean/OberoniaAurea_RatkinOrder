@@ -60,7 +60,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
 
         Text.Font = GameFont.Small;
         reusedRect = new(innerRectX, innerRectY + 330f, innerRect.width, 20f);
-        Widgets.Label(reusedRect, "OARO_HallWin_UpgradeRankConfirm".Translate());
+        Widgets.Label(reusedRect, "OARO_StationWin_UpgradeRankConfirm".Translate());
 
         reusedRect = new(innerRectX + 150f, innerRectY + 356f, 71f, 22f);
 

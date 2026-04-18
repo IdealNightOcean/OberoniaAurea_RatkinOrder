@@ -65,18 +65,18 @@ public class Building_OrderCodePedestal : Building
 
         if (IsMainPedestal)
         {
-            Command_Action command_OpenOrderHallWin = new()
+            Command_Action command_OpenOrderStationWin = new()
             {
-                defaultLabel = "OARO_CodePedestal_OpenOrderHallWin".Translate(),
-                defaultDesc = "OARO_CodePedestal_OpenOrderHallWinDesc".Translate(),
+                defaultLabel = "OARO_CodePedestal_OpenOrderStationWin".Translate(),
+                defaultDesc = "OARO_CodePedestal_OpenOrderStationWinDesc".Translate(),
                 action = delegate
                 {
                     Find.Selector.Deselect(this);
-                    Window_OrderHall orderHallWin = new(Map);
-                    Find.WindowStack.Add(orderHallWin);
+                    Window_OrderStation stationWin = new(Map);
+                    Find.WindowStack.Add(stationWin);
                 }
             };
-            yield return command_OpenOrderHallWin;
+            yield return command_OpenOrderStationWin;
 
             Command_Action command_UnsetAsMain = new()
             {
@@ -86,13 +86,13 @@ public class Building_OrderCodePedestal : Building
             };
             yield return command_UnsetAsMain;
 
-            Command_Action command_RecheckHallLevel = new()
+            Command_Action command_RecheckStationLevel = new()
             {
-                defaultLabel = "OARO_CodePedestal_RecheckHallLevel".Translate(),
-                defaultDesc = "OARO_CodePedestal_RecheckHallLevelDesc".Translate(),
+                defaultLabel = "OARO_CodePedestal_RecheckStationLevel".Translate(),
+                defaultDesc = "OARO_CodePedestal_RechecStationLevelDesc".Translate(),
                 action = OrderStationHandler.Instance.RefreshCache
             };
-            yield return command_RecheckHallLevel;
+            yield return command_RecheckStationLevel;
         }
         else
         {

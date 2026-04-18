@@ -28,7 +28,7 @@ public static class TalkActionUtility
         }
     }
 
-    public static IntVec3 GetTalkPawnWanderCenterCell(this ITalkAction talkAction, bool nearOrderHall)
+    public static IntVec3 GetTalkPawnWanderCenterCell(this ITalkAction talkAction, bool nearOrderStation)
     {
         IntVec3 result = IntVec3.Invalid;
 
@@ -36,7 +36,7 @@ public static class TalkActionUtility
         if (talkWith is null || !talkWith.Spawned)
             return result;
 
-        if (nearOrderHall)
+        if (nearOrderStation)
         {
             if (OrderStationHandler.Instance.MainOrderCodePedestal?.Map == talkWith.Map)
             {

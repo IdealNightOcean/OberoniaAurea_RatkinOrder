@@ -8,15 +8,15 @@ public class OrderStationBuildingHandler
 {
     private const int BuildingsRecacheInterval = 30000;
 
-    [Unsaved] private int nextHallBuildingCacheTick = -1;
+    [Unsaved] private int nextBuildingCacheTick = -1;
     [Unsaved] private int academicFurnituresCount;
     public int AcademicFurnituresCount
     {
         get
         {
-            if (Find.TickManager.TicksGame > nextHallBuildingCacheTick)
+            if (Find.TickManager.TicksGame > nextBuildingCacheTick)
             {
-                RecacheOrderHallBuildings();
+                RecacheBuildings();
             }
             return academicFurnituresCount;
         }
@@ -27,23 +27,23 @@ public class OrderStationBuildingHandler
     {
         get
         {
-            if (Find.TickManager.TicksGame > nextHallBuildingCacheTick)
+            if (Find.TickManager.TicksGame > nextBuildingCacheTick)
             {
-                RecacheOrderHallBuildings();
+                RecacheBuildings();
             }
             return preferBuildingDefsByKnightPersonality;
         }
     }
 
-    private void RecacheOrderHallBuildings()
+    private void RecacheBuildings()
     {
-        nextHallBuildingCacheTick = Find.TickManager.TicksGame + BuildingsRecacheInterval;
+        nextBuildingCacheTick = Find.TickManager.TicksGame + BuildingsRecacheInterval;
 
         academicFurnituresCount = 0;
         preferBuildingDefsByKnightPersonality.Clear();
         try
         {
-            Room room = OrderStationHandler.Instance.OrderHallRoom;
+            Room room = OrderStationHandler.Instance.OrderStationRoom;
             if (room is null)
             {
                 return;
@@ -90,7 +90,7 @@ public class OrderStationBuildingHandler
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"重新缓存分部大厅建筑",
                 typeName: nameof(OrderStationHandler),
-                methodName: nameof(RecacheOrderHallBuildings),
+                methodName: nameof(RecacheBuildings),
                 needStackTrace: true);
         }
     }
@@ -98,7 +98,7 @@ public class OrderStationBuildingHandler
     public void RefreshCache()
     {
         academicFurnituresCount = 0;
-        nextHallBuildingCacheTick = -1;
+        nextBuildingCacheTick = -1;
         preferBuildingDefsByKnightPersonality.Clear();
     }
 }

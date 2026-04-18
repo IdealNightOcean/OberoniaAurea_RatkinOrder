@@ -124,7 +124,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         rootNode.options.Add(briberyOpt);
 
         DiaOption threatOpt = new("OARO_TalkWithTaxCollector_Threat".Translate());
-        if (OrderStationHandler.Instance.OrderHallRoom is null)
+        if (OrderStationHandler.Instance.OrderStationRoom is null)
         {
             threatOpt.action = delegate
             {
@@ -132,7 +132,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
             };
             threatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
-                text: "OARO_TalkWithTaxCollector_NoOrderHallLeave".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
+                text: "OARO_TalkWithTaxCollector_NoOrderStationLeave".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                 acceptText: "Confirm".Translate());
         }
         else

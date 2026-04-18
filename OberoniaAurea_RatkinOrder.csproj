@@ -111,6 +111,7 @@
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_RecommendationToKnight.cs" />
     <Compile Include="BranchInteraction\TargetlessInteraction\BranchInteractionWorker_RequestCombatReadiness.cs" />
     <Compile Include="BranchInteraction\MapInteraction\BranchInteractionWorker_UnlockSupportAuthority.cs" />
+    <Compile Include="BranchResident\BranchResident_ResidentKnightStudy.cs" />
     <Compile Include="BranchStat\BranchStatPart_BranchPotency.cs" />
     <Compile Include="BranchStat\BranchStatPart_BranchEffectTagFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_BranchEffectTagOffset.cs" />
@@ -140,7 +141,7 @@
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
     <Compile Include="Components\PathedTexture2D.cs" />
     <Compile Include="Components\HediffStageTemplate.cs" />
-    <Compile Include="Components\PlayerPawnsTempRetention.cs" />
+    <Compile Include="Components\PlayerDespawnedPawnsTempRetention.cs" />
     <Compile Include="DataLibrary\KeyLibrary_FormatArgName.cs" />
     <Compile Include="DefModExtension\BranchBuildingTrderSetter_Extension.cs" />
     <Compile Include="DefModExtension\ThingList_Extension.cs" />
@@ -386,8 +387,8 @@
     <Compile Include="Hediff\Hediff_ByResidentKnightBuff.cs" />
     <Compile Include="Letter\ChoiceLetter_RatkinOrder.cs" />
     <Compile Include="Letter\ChoiceLetter_KnightGroupProactiveVisit.cs" />
-    <Compile Include="OrderStation\OrderHallLevelRestriction.cs" />
-    <Compile Include="DefModExtension\OrderHallRestrictionExtension.cs" />
+    <Compile Include="OrderStation\OrderStationLevelRestriction.cs" />
+    <Compile Include="DefModExtension\OrderStationRestrictionExtension.cs" />
     <Compile Include="ResidentKnight\ResidentPawnsManager.cs" />
     <Compile Include="ResidentKnight\ResidentKnightRoleWorker.cs" />
     <Compile Include="Thing\Building_OrderCodePedestal.cs" />
@@ -401,7 +402,7 @@
     <Compile Include="Job\JobDriver_RepairHowitzer.cs" />
     <Compile Include="ModMain.cs" />
     <Compile Include="OrderInteraction\OrderInteractionWorker.cs" />
-    <Compile Include="OrderStation\RoomRoleWorker_RatkinOrderHall.cs" />
+    <Compile Include="OrderStation\RoomRoleWorker_RatkinOrderStation.cs" />
     <Compile Include="GlobalInteraction\GlobalInteractionManager.cs" />
     <Compile Include="Thing\OrderRecommendation.cs" />
     <Compile Include="IncidentWorker\IncidentWorker_RaidNobilityTerritory.cs" />
@@ -459,7 +460,7 @@
     <Compile Include="Window\UICacheComp\BranchBuildingDefSummaryUICache.cs" />
     <Compile Include="Window\UICacheComp\BranchFacilityStageSummaryUICache.cs" />
     <Compile Include="Window\Window_BranchSquad.cs" />
-    <Compile Include="Window\Window_OrderHall.cs" />
+    <Compile Include="Window\Window_OrderStation.cs" />
     <Compile Include="Window\Window_Branch.cs" />
     <Compile Include="Window\Window_BranchTask.cs" />
     <Compile Include="Window\ResidentKnightEntryDrawer.cs" />
@@ -491,7 +492,7 @@
     <Compile Include="Letter\ChoiceLetter_TemporaryEncampment.cs" />
     <Compile Include="Utility\BranchDemandUtility.cs" />
     <Compile Include="Utility\MapUtility.cs" />
-    <Compile Include="Utility\OrderHallUtility.cs" />
+    <Compile Include="Utility\OrderStationUtility.cs" />
     <Compile Include="Utility\TalkActionUtility.cs" />
     <Compile Include="DataLibrary\KeyLibrary_CDRecord.cs" />
     <Compile Include="Utility\RecommendationUtility.cs" />

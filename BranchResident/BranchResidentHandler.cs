@@ -81,7 +81,11 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             }
             return true;
         }
-        return false;
+        else
+        {
+            PlayerDespawnedPawnsTempRetention.Instance.AddPawn(resident.Pawn);
+            return false;
+        }
     }
 
     public void TickDay()

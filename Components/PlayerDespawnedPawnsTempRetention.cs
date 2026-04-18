@@ -42,8 +42,9 @@ public class PlayerDespawnedPawnsTempRetention : IExposable, IPawnRetentionHolde
 
     public void AddPawn(Pawn pawn)
     {
-        if (pawn is null || pawn.DestroyedOrNull() || pawn.Spawned)
+        if (pawn.DestroyedOrNull() || pawn.Spawned)
             return;
+
         if (!pawns.Contains(pawn))
         {
             pawns.TryAddOrTransfer(pawn);

@@ -70,7 +70,7 @@ public static class OARO_ModDefOf
     /// </summary>
     public static MainButtonDef OARO_KnightOrdersOverview;
 
-    public static RoomRoleDef OARO_RatkinOrderHall;
+    public static RoomRoleDef OARO_RatkinOrderStation;
 
     /// <summary>
     /// 建筑商商店
