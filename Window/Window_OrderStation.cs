@@ -551,7 +551,7 @@ public partial class Window_OrderStation : OrderWindowBase
             StringBuilder sb = new(string.Empty);
             HashSet<ThingDef> allPreferredBuildings = OrderStationUtility.GetAllResidentKnightPreferredBuildingDefs(OrderStationHandler.Instance.OrderStationRoom);
 
-            foreach (ThingDef def in OrderDefDataBase.AllResidentPreferredBuildings)
+            foreach (ThingDef def in OrderDefDataBase.AllKnightPreferredBuildings)
             {
                 sb.AppendLine(def.label.Colorize(allPreferredBuildings.Contains(def) ? Color.white : Color.gray));
             }

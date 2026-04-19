@@ -105,6 +105,11 @@ public static class OARO_ModDefOf
 
     public static TraitDef OARO_OrderKnight;
 
+    /// <summary>
+    /// 骑士个性 - 誓言
+    /// </summary>
+    public static KnightChivalryDef OARO_Oath;
+
     static OARO_ModDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ModDefOf));

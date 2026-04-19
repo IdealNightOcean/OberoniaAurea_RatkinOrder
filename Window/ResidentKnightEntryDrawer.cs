@@ -178,9 +178,9 @@ public partial class Window_OrderStation
             Rect reusedRect = new(inRectX + 32f, inRectY + 4f, 128f, 20f);
             Widgets.Label(reusedRect, "OARO_StationWin_AttachToBranch".Translate());
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, "OARO_StationWin_KnightPersonality".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_KnightChivalry".Translate());
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, "OARO_StationWin_KnightResonatePersonalities".Translate());
+            Widgets.Label(reusedRect, "OARO_StationWin_KnightResonateChivalries".Translate());
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, "OARO_StationWin_KnightRank".Translate());
 
@@ -252,7 +252,7 @@ public partial class Window_OrderStation
             reusedRect = new(inRectX + 260f, inRectY + 4f, 128f, 20f);
             Widgets.Label(reusedRect, Record.Branch.NameColored);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, KnightPersonalityExtension.GetLabel(Record.Personality));
+            Widgets.Label(reusedRect, Record.Chivalry.LabelCap);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, ResonatePersonalitiesStr.Value);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
@@ -400,19 +400,20 @@ public partial class Window_OrderStation
         private string RefreshResonatePersonalitiesStr()
         {
             string result = string.Empty;
-            foreach (KnightPersonality personality in KnightPersonalityExtension.GetContainedPersonalities(KnightPersonalityExtension.GetResonatePersonality(Record.Personality)))
+            HashSet<KnightChivalryDef> allHasChivalryDefs = ResidentPawnsManager.Instance.AllHasChivalriesDefs.Value;
+            foreach (KnightChivalryDef chivalry in Record.Chivalry.resonateChivalries)
             {
                 if (!string.IsNullOrEmpty(result))
                 {
                     result += "  ";
                 }
-                if ((ResidentPawnsManager.Instance.AllHasPersonalityTypes.Value & personality) != 0)
+                if (allHasChivalryDefs.Contains(chivalry))
                 {
-                    result += KnightPersonalityExtension.GetLabel(personality);
+                    result += chivalry.LabelCap;
                 }
                 else
                 {
-                    result += KnightPersonalityExtension.GetLabel(personality).Colorize(Color.gray);
+                    result += chivalry.LabelCap.Colorize(Color.gray);
                 }
             }
             return result;
@@ -420,30 +421,32 @@ public partial class Window_OrderStation
 
         private (int, int) RefreshPreferredFurnitureCount()
         {
-            if (!OrderDefDataBase.TryGetAllPreferredBuildingsByPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
+            int allPreferredBuildingsCount = Record.Chivalry?.AllPreferredBuildings?.Count ?? -1;
+            if (allPreferredBuildingsCount < 0)
             {
                 return (0, 0);
             }
-            if (OrderStationHandler.BuildingHandler.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+            if (OrderStationHandler.BuildingHandler.KnightBuildingDefsByChivalry.TryGetValue(Record.Chivalry, out HashSet<ThingDef> curPreferredBuildings))
             {
-                return (joyBuildingDefs.Count, allJoyBuildings.Count);
+                return (curPreferredBuildings.Count, allPreferredBuildingsCount);
             }
-            return (0, allJoyBuildings.Count);
+            return (0, allPreferredBuildingsCount);
         }
 
         private string RefreshFurnitureExplanation()
         {
-            if (!OrderDefDataBase.TryGetAllPreferredBuildingsByPersonality(Record.Personality, out List<ThingDef> allJoyBuildings))
+            List<ThingDef> allPreferredBuildings = Record.Chivalry?.AllPreferredBuildings;
+            if (allPreferredBuildings.NullOrEmpty())
             {
                 return string.Empty;
             }
-            OrderStationHandler.BuildingHandler.KnightBuildingDefsByPersonality.TryGetValue(Record.Personality, out HashSet<ThingDef> joyBuildingDefs);
-            joyBuildingDefs ??= [];
+            OrderStationHandler.BuildingHandler.KnightBuildingDefsByChivalry.TryGetValue(Record.Chivalry, out HashSet<ThingDef> curPreferredBuildings);
+            curPreferredBuildings ??= [];
 
             StringBuilder sb = new();
-            foreach (ThingDef def in allJoyBuildings)
+            foreach (ThingDef def in allPreferredBuildings)
             {
-                if (joyBuildingDefs.Contains(def))
+                if (curPreferredBuildings.Contains(def))
                 {
                     sb.AppendLine(def.label);
                 }

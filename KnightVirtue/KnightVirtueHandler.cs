@@ -163,7 +163,7 @@ public class KnightVirtueHandler : IExposable
             return false;
         }
         float meditationPointsToReduce = record.AcademicHandler.TotalAcademicLevel.Value * 500f;
-        if (virtue.relatedPersonality == record.Personality)
+        if (virtue.chivalry.IsSameDefNonNullable(record.Chivalry))
         {
             meditationPointsToReduce *= 2f;
         }

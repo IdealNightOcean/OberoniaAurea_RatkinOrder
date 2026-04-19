@@ -50,10 +50,9 @@ public class StatPart_MeditationFactor : StatPart
 
         val += ((pawn.GetStatValue(StatDefOf.LearningRateFactor) - 1f) * 0.1f);
 
-        KnightPersonality resonatePersonality = KnightPersonalityExtension.GetResonatePersonality(record.Personality) & ResidentPawnsManager.Instance.AllHasPersonalityTypes.Value;
-        val += KnightPersonalityExtension.GetContainedPersonalities(resonatePersonality).Count() * 0.1f;
+        val += record.Chivalry.resonateChivalries.Count() * 0.1f;
 
-        if (OrderStationHandler.BuildingHandler.KnightBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+        if (OrderStationHandler.BuildingHandler.KnightBuildingDefsByChivalry.TryGetValue(record.Chivalry, out HashSet<ThingDef> joyBuildingDefs))
             val += joyBuildingDefs.Count * 0.1f;
     }
 
@@ -114,15 +113,14 @@ public class StatPart_MeditationFactor : StatPart
         stepChange = ((pawn.GetStatValue(StatDefOf.LearningRateFactor) - 1f) * 0.1f);
         sb.AppendLine(StatDefOf.LearningRateFactor.label + ": " + stepChange.ToStringPercentSigned("0.##"));
 
-        KnightPersonality resonatePersonality = KnightPersonalityExtension.GetResonatePersonality(record.Personality) & ResidentPawnsManager.Instance.AllHasPersonalityTypes.Value;
-        foreach (KnightPersonality rp in KnightPersonalityExtension.GetContainedPersonalities(resonatePersonality))
+        foreach (KnightChivalryDef chivalry in record.Chivalry.resonateChivalries)
         {
-            sb.AppendLine("OARO_ChangeOffset_ResonatePersonality".Translate($"OARO_KnightPersonality_{rp}".Translate(), 0.1f.ToStringPercentSigned("0.##")));
+            sb.AppendLine("OARO_ChangeOffset_ResonateChivalry".Translate(chivalry.LabelCap, 0.1f.ToStringPercentSigned("0.##")));
         }
 
-        if (OrderStationHandler.BuildingHandler.KnightBuildingDefsByPersonality.TryGetValue(record.Personality, out HashSet<ThingDef> joyBuildingDefs))
+        if (OrderStationHandler.BuildingHandler.KnightBuildingDefsByChivalry.TryGetValue(record.Chivalry, out HashSet<ThingDef> preferredBuildings))
         {
-            foreach (ThingDef building in joyBuildingDefs)
+            foreach (ThingDef building in preferredBuildings)
             {
                 sb.AppendLine("OARO_ChangeOffset_KnightJoyBuilding".Translate(building.label, 0.1f.ToStringPercentSigned("0.##")));
             }

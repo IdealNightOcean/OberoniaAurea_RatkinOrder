@@ -12,20 +12,20 @@ public class KnightRecord : IExposable, ILoadReferenceable
     private Pawn pawn;
     private RatkinOrder ratkinOrder;
     private Branch branch;
-    private KnightPersonality personality = KnightPersonality.None;
+    private KnightChivalryDef chivalry;
     private bool isCommander;
     private bool isCombatant;
 
     public Pawn Pawn => pawn;
     public RatkinOrder RatkinOrder => ratkinOrder;
     public Branch Branch => branch;
-    public KnightPersonality Personality => personality;
+    public KnightChivalryDef Chivalry => chivalry;
     public bool IsCommander => isCommander;
     public bool IsCombatant => isCombatant;
     public bool IsFriendly => ratkinOrder.Faction?.HostileTo(Faction.OfPlayer) is not true;
 
     public KnightRecord() { }
-    public KnightRecord(RatkinOrder ratkinOrder, Branch branch = null, KnightPersonality personality = KnightPersonality.None, bool isCombatant = false, bool isCommander = false)
+    public KnightRecord(RatkinOrder ratkinOrder, Branch branch = null, KnightChivalryDef chivalry = null, bool isCombatant = false, bool isCommander = false)
     {
         this.ratkinOrder = ratkinOrder ?? throw new ArgumentNullException(nameof(ratkinOrder));
         if (branch.IsValid() && branch.RatkinOrder != ratkinOrder)
@@ -33,7 +33,7 @@ public class KnightRecord : IExposable, ILoadReferenceable
             throw new ArgumentException();
         }
         this.branch = branch;
-        this.personality = personality == KnightPersonality.None ? KnightPersonalityExtension.GetRandomAvailablePersonality() : personality;
+        this.chivalry = chivalry ?? DefDatabase<KnightChivalryDef>.GetRandom();
         this.isCommander = isCommander;
         this.isCombatant = isCombatant && branch is not null;
 
@@ -57,7 +57,7 @@ public class KnightRecord : IExposable, ILoadReferenceable
         Scribe_References.Look(ref pawn, nameof(pawn));
         Scribe_References.Look(ref ratkinOrder, nameof(ratkinOrder));
         Scribe_References.Look(ref branch, nameof(branch));
-        Scribe_Values.Look(ref personality, nameof(personality), defaultValue: KnightPersonality.None);
+        Scribe_Defs.Look(ref chivalry, nameof(chivalry));
 
         Scribe_Values.Look(ref isCommander, nameof(isCommander), defaultValue: false);
         Scribe_Values.Look(ref isCombatant, nameof(isCombatant), defaultValue: false);

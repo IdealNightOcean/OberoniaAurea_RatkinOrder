@@ -50,7 +50,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     private MentorshipManager mentorshipManager;
     public static MentorshipManager MentorshipManager => Instance?.mentorshipManager;
 
-    public LazyMutable<KnightPersonality> AllHasPersonalityTypes { get; }
+    public LazyMutable<HashSet<KnightChivalryDef>> AllHasChivalriesDefs { get; }
 
     public LazyMutable<int> InstructorKnightsCount { get; }
 
@@ -60,7 +60,21 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
 
-        AllHasPersonalityTypes = new(refreshFunc: () => residentKnights.Aggregate(KnightPersonality.None, (acc, r) => acc | (r?.Personality ?? KnightPersonality.None)));
+        AllHasChivalriesDefs = new(refreshFunc: delegate
+        {
+            HashSet<KnightChivalryDef> knightChivalryDefs = [];
+            if (residentKnights.NullOrEmpty())
+                return knightChivalryDefs;
+
+            foreach (ResidentKnight residentKnight in residentKnights)
+            {
+                if (residentKnight?.Chivalry is not null)
+                {
+                    knightChivalryDefs.Add(residentKnight.Chivalry);
+                }
+            }
+            return knightChivalryDefs;
+        });
 
         InstructorKnightsCount = new(refreshFunc: () => residentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
 
@@ -443,7 +457,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     {
         Alert_ResidentKnightWillResignation.MarkDirty();
 
-        AllHasPersonalityTypes.MarkDirty();
+        AllHasChivalriesDefs.MarkDirty();
         InstructorKnightsCount.MarkDirty();
     }
 }

@@ -18,6 +18,13 @@ public class BranchTraditionDef : Def
     /// </summary>
     public BranchMedalDef medalDef;
 
+
+    private KnightChivalryDef chivalryOverride;
+    /// <summary>
+    /// 对应骑士精神大类
+    /// </summary>
+    public KnightChivalryDef Chivalry => chivalryOverride ?? medalDef?.chivalry;
+
     /// <summary>
     /// 可修行的课业
     /// </summary>

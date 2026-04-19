@@ -21,7 +21,7 @@ public static class AcademicUtility
         };
     }
 
-    public static float GetMeditationPointsNeeded(KnightAcademicDef academicDef, KnightPersonality personality, int targetLevel)
+    public static float GetMeditationPointsNeeded(KnightAcademicDef academicDef, KnightChivalryDef chivalry, int targetLevel)
     {
         if (targetLevel < 1)
         {
@@ -34,7 +34,7 @@ public static class AcademicUtility
 
         float baseUnitCost = academicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
         float neededPoints = baseUnitCost + (targetLevel - 1) * baseUnitCost;
-        if ((academicDef.personality & personality) != 0)
+        if (academicDef.chivalry is not null && academicDef.chivalry == chivalry)
         {
             neededPoints /= 2;
         }
@@ -145,16 +145,16 @@ public static class AcademicUtility
         StringBuilder sb = resultOnly ? null : new(128);
         float curChance = 0.1f;
 
-        // Get student record once and cache personality
+        // Get student record once and cache chivalry
         bool hasStudentRecord = ResidentPawnsManager.Instance.TryGetKnightRecord(student, out ResidentKnight studentRecord);
-        KnightPersonality studentPersonality = hasStudentRecord ? studentRecord.Personality : KnightPersonality.None;
+        KnightChivalryDef studentChivalry = studentRecord?.Chivalry;
 
-        // Apply personality factor
-        if (studentPersonality == KnightPersonality.None)
+        // Apply chivalry factor
+        if (studentChivalry is null)
         {
             ApplyStepChange(0.7f, "");
         }
-        else if (KnightPersonalityExtension.IsResonatePersonality(teacher.Personality, studentPersonality))
+        else if (studentChivalry.ResonateChivalriesSet.Contains(teacher.Chivalry))
         {
             ApplyStepChange(1.5f, "");
         }

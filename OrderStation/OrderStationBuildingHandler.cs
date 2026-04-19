@@ -22,8 +22,8 @@ public class OrderStationBuildingHandler
         }
     }
 
-    [Unsaved] private readonly Dictionary<KnightPersonality, HashSet<ThingDef>> preferBuildingDefsByKnightPersonality = new(KnightPersonalityExtension.AvailablePersonalitiesCount);
-    public IReadOnlyDictionary<KnightPersonality, HashSet<ThingDef>> KnightBuildingDefsByPersonality
+    [Unsaved] private readonly Dictionary<KnightChivalryDef, HashSet<ThingDef>> preferBuildingDefsByChivalry = new(DefDatabase<KnightChivalryDef>.DefCount);
+    public IReadOnlyDictionary<KnightChivalryDef, HashSet<ThingDef>> KnightBuildingDefsByChivalry
     {
         get
         {
@@ -31,7 +31,7 @@ public class OrderStationBuildingHandler
             {
                 RecacheBuildings();
             }
-            return preferBuildingDefsByKnightPersonality;
+            return preferBuildingDefsByChivalry;
         }
     }
 
@@ -40,7 +40,7 @@ public class OrderStationBuildingHandler
         nextBuildingCacheTick = Find.TickManager.TicksGame + BuildingsRecacheInterval;
 
         academicFurnituresCount = 0;
-        preferBuildingDefsByKnightPersonality.Clear();
+        preferBuildingDefsByChivalry.Clear();
         try
         {
             Room room = OrderStationHandler.Instance.OrderStationRoom;
@@ -69,15 +69,16 @@ public class OrderStationBuildingHandler
                         }
                         else if (tag == "OARO_ResidentKnightPrefer")
                         {
-                            if (OrderDefDataBase.TryGetKnightPersonalityByBuilding(thingDef, out KnightPersonality personality))
+                            KnightChivalryDef chivalry = thingDef.GetModExtension<ResidentKnightPreferredBuildingExtension>()?.chivalry;
+                            if (chivalry is not null)
                             {
-                                if (preferBuildingDefsByKnightPersonality.TryGetValue(personality, out HashSet<ThingDef> defsHash))
+                                if (preferBuildingDefsByChivalry.TryGetValue(chivalry, out HashSet<ThingDef> defsHash))
                                 {
                                     defsHash.Add(thingDef);
                                 }
                                 else
                                 {
-                                    preferBuildingDefsByKnightPersonality.Add(personality, [thingDef]);
+                                    preferBuildingDefsByChivalry.Add(chivalry, [thingDef]);
                                 }
                             }
                         }
@@ -99,6 +100,6 @@ public class OrderStationBuildingHandler
     {
         academicFurnituresCount = 0;
         nextBuildingCacheTick = -1;
-        preferBuildingDefsByKnightPersonality.Clear();
+        preferBuildingDefsByChivalry.Clear();
     }
 }

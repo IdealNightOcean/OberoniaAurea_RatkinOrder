@@ -38,15 +38,7 @@ public class InteractionWorker_KnightlyTalk : InteractionWorker
         base.Interacted(initiator, recipient, extraSentencePacks, out letterText, out letterLabel, out letterDef, out lookTargets);
         if (Rand.Chance(0.1f) && KnightPawnsManager.Instance.TryGetKnightRecord(initiator, out KnightRecord record))
         {
-            float severity = 0.5f + record.Personality switch
-            {
-                KnightPersonality.Courage => 0f,
-                KnightPersonality.Tenacity => 1f,
-                KnightPersonality.Compassion => 2f,
-                KnightPersonality.Oath => 3f,
-                KnightPersonality.Justice => 4f,
-                _ => -1f
-            };
+            float severity = 0.5f + record.Chivalry.knightlyTalkOffset;
 
             if (severity > 0f)
             {

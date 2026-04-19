@@ -20,7 +20,7 @@ public class BranchStatPart_BranchPotency : BranchStatPart
         if (factor != 1f)
         {
             explanation.Append("    ");
-            explanation.AppendLine("OARO_ChangeFactor_Tradition".Translate(factor.ToString("0.##").Named(KeyLibrary_FormatArgName.Factor))
+            explanation.AppendLine("OARO_ChangeFactor_BranchTradition".Translate(factor.ToString("0.##").Named(KeyLibrary_FormatArgName.Factor))
                                                                 .Colorize(factor > 1f ? Color.green : ColorLibrary.RedReadable));
         }
         factor = (0.9f + branch.FacilityHandler.TotalFacilityLevel * 0.025f + branch.MedalHandler.TotalMedalCount * 0.005f);

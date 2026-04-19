@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ThoughtWorker_KnightPersonalitySocial : ThoughtWorker
+public class ThoughtWorker_KnightChivalrySocial : ThoughtWorker
 {
     protected override ThoughtState CurrentSocialStateInternal(Pawn p, Pawn otherPawn)
     {
@@ -15,7 +15,7 @@ public class ThoughtWorker_KnightPersonalitySocial : ThoughtWorker
         if (KnightPawnsManager.Instance.TryGetKnightRecord(p, out KnightRecord pRecord)
           && KnightPawnsManager.Instance.TryGetKnightRecord(otherPawn, out KnightRecord otherRecord))
         {
-            if (KnightPersonalityExtension.IsResonatePersonality(pRecord.Personality, otherRecord.Personality))
+            if (pRecord.Chivalry.ResonateChivalriesSet.Contains(otherRecord.Chivalry))
             {
                 return ThoughtState.ActiveAtStage(1);
             }

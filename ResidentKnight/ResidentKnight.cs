@@ -18,7 +18,7 @@ public class ResidentKnight : ResidentPawn
     public KnightRecord KnightRecord => knightRecord;
     public RatkinOrder RatkinOrder => knightRecord.RatkinOrder;
     public Branch Branch => knightRecord.Branch;
-    public KnightPersonality Personality => knightRecord.Personality;
+    public KnightChivalryDef Chivalry => knightRecord.Chivalry;
 
     private ResidentKnightRank curRank;
     public ResidentKnightRank CurRank

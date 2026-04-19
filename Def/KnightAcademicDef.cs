@@ -23,8 +23,7 @@ public class KnightAcademicDef : Def
     }
 
     /// <summary>对应骑士个性</summary>
-    ///<remarks>- 不要使用组合枚举！！！</remarks>
-    public KnightPersonality personality;
+    public KnightChivalryDef chivalry;
 
     /// <summary>
     /// 课业类型

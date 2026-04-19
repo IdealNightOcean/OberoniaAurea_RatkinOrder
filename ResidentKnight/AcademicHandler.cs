@@ -31,7 +31,7 @@ public class AcademicHandler : IExposable
         {
             /*
             KnightAcademicDef initAcademicDef;
-            if (Personality != KnightPersonality.None && OrderDefDataBase.ResidentKnightAcademicGroupByPersonality.TryGetValue(Personality, out List<KnightAcademicDef> potentialAcademics))
+            if (Chivalry != KnightChivalry.None && OrderDefDataBase.ResidentKnightAcademicGroupByChivalry.TryGetValue(Chivalry, out List<KnightAcademicDef> potentialAcademics))
             {
                 initAcademicDef = potentialAcademics.RandomElement();
             }
@@ -85,7 +85,7 @@ public class AcademicHandler : IExposable
 
     public AcceptanceReport CanUpgradeAcademic(
         KnightAcademicDef academicDef,
-        KnightPersonality personality = KnightPersonality.None,
+        KnightChivalryDef chivalry = null,
         bool directly = false,
         bool resultOnly = false)
     {
@@ -100,7 +100,7 @@ public class AcademicHandler : IExposable
 
         if (!directly)
         {
-            float neededPoints = AcademicUtility.GetMeditationPointsNeeded(academicDef, personality, academicLevel + 1);
+            float neededPoints = AcademicUtility.GetMeditationPointsNeeded(academicDef, chivalry, academicLevel + 1);
             if (meditationPoints < neededPoints)
             {
                 return resultOnly ? false : "OARO_Insufficient_MeditationPoints".Translate(neededPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count));
@@ -113,14 +113,14 @@ public class AcademicHandler : IExposable
     public bool UpgradeAcademic(
         KnightAcademicDef academicDef,
         Pawn pawn,
-        KnightPersonality personality = KnightPersonality.None,
+        KnightChivalryDef chivalry,
         bool directly = false)
     {
 
         return SetAcademicLevel(academicDef: academicDef,
                                 pawn: pawn,
                                 targetLevel: GetAcademicLevel(academicDef) + 1,
-                                personality: personality,
+                                chivalry: chivalry,
                                 directly: directly);
     }
 
@@ -128,7 +128,7 @@ public class AcademicHandler : IExposable
         KnightAcademicDef academicDef,
         Pawn pawn,
         int targetLevel,
-        KnightPersonality personality = KnightPersonality.None,
+        KnightChivalryDef chivalry,
         bool directly = false)
     {
         if (targetLevel >= academicDef.MaxStageLevel)
@@ -150,7 +150,7 @@ public class AcademicHandler : IExposable
             float neededPoints = 0f;
             for (int i = curAcademicLevel + 1; i <= targetLevel; i++)
             {
-                neededPoints += AcademicUtility.GetMeditationPointsNeeded(academicDef, personality, targetLevel);
+                neededPoints += AcademicUtility.GetMeditationPointsNeeded(academicDef, chivalry, targetLevel);
             }
 
             MeditationPoints -= neededPoints;

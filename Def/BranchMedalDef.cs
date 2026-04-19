@@ -11,6 +11,11 @@ public class BranchMedalDef : Def
     public BranchTaskType focusedTaskType;
 
     /// <summary>
+    /// 对应骑士精神大类
+    /// </summary>
+    public KnightChivalryDef chivalry;
+
+    /// <summary>
     /// 印记颜色
     /// </summary>
     public Color color;

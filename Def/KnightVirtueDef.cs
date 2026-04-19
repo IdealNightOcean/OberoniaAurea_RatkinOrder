@@ -9,7 +9,10 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class KnightVirtueDef : Def
 {
-    public KnightPersonality relatedPersonality;
+    /// <summary>
+    /// 对应骑士精神大类
+    /// </summary>
+    public KnightChivalryDef chivalry;
 
     public int maxLevel = 3;
 

@@ -24,6 +24,13 @@ public class BranchHonorDef : Def
     /// </summary>
     public BranchMedalDef medalDef;
 
+    private KnightChivalryDef chivalryOverride;
+
+    /// <summary>
+    /// 对应骑士精神大类
+    /// </summary>
+    public KnightChivalryDef Chivalry => chivalryOverride ?? medalDef?.chivalry;
+
     /// <summary>
     /// 荣誉加成的专注任务类型
     /// </summary>

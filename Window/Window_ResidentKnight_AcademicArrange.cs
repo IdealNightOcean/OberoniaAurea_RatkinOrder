@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -177,11 +178,11 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         reusedRect = new(inRect.x, reusedRect.yMax + 10f, inRect.width, 20f);
         Widgets.Label(reusedRect, "OARO_AcademicArrange_UnlockNum".Translate(academicLevel, def.MaxStageLevel));
 
-        if ((def.personality & Record.Personality) != 0)
+        if (def.chivalry.IsSameDefNonNullable(Record.Chivalry))
         {
             reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 4f, 20f, 20f);
             GUI.DrawTexture(reusedRect, IconLibrary.StarWhite);
-            TooltipHandler.TipRegion(inRect, () => "OARO_ResidentAcademic_ResonatePersonality".Translate(), uniqueId: 3256725);
+            TooltipHandler.TipRegion(inRect, () => "OARO_ResidentAcademic_ResonateChivalry".Translate(), uniqueId: 3256725);
         }
         if (SelAcademicDef == def)
         {
@@ -269,10 +270,10 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                  downTex: unlockButton_Down,
                  doMouseoverSound: true))
             {
-                AcceptanceReport acceptance = AcademicHandler.CanUpgradeAcademic(SelAcademicDef, Record.Personality, directly: false, resultOnly: false);
+                AcceptanceReport acceptance = AcademicHandler.CanUpgradeAcademic(SelAcademicDef, Record.Chivalry, directly: false, resultOnly: false);
                 if (acceptance)
                 {
-                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Personality, directly: false);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Chivalry, directly: false);
                     RefreshSelStageLevel();
                     PostArrangeNewAcademic?.Invoke();
                 }
@@ -291,7 +292,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                 reusedRect = new(reusedRect.xMax + 20f, reusedRect.yMax - 20f, 40f, 20f);
                 if (Widgets.ButtonText(reusedRect, "Dev"))
                 {
-                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Personality, directly: true);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Chivalry, directly: true);
                     PostArrangeNewAcademic?.Invoke();
                     RefreshSelStageLevel();
                 }
@@ -407,8 +408,8 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
 
         SelAcademicDef = academicDef;
-        CheckAcademicColor = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.color : SelAcademicDef.personality.GetColor();
-        CheckAcademicColorTex = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.HonorColorTex : SelAcademicDef.personality.GetColorTex();
+        CheckAcademicColor = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.color : SelAcademicDef.chivalry.color;
+        CheckAcademicColorTex = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.HonorColorTex : SelAcademicDef.chivalry.ColorTex;
 
 
         CheckAcademicStage = null;
@@ -429,7 +430,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         if (CheckAcademicStageLevel == SelAcademicStageLevel + 1)
         {
             CheckAcademicStageAcceptance = AcademicHandler.CanUpgradeAcademic(academicDef: SelAcademicDef,
-                                                                            Record.Personality,
+                                                                            Record.Chivalry,
                                                                           directly: false,
                                                                           resultOnly: false);
         }
@@ -448,7 +449,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         SelAcademicStageLevel = AcademicHandler.GetAcademicLevel(SelAcademicDef);
 
-        MeditationPointForSelAcademicUpgrade = AcademicUtility.GetMeditationPointsNeeded(SelAcademicDef, Record.Personality, SelAcademicStageLevel + 1);
+        MeditationPointForSelAcademicUpgrade = AcademicUtility.GetMeditationPointsNeeded(SelAcademicDef, Record.Chivalry, SelAcademicStageLevel + 1);
     }
 
     private void DrawRankBackGround(Rect inRect)

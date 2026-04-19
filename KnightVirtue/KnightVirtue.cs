@@ -8,7 +8,7 @@ public class KnightVirtue : IExposable
 {
     private KnightVirtueDef def;
     public KnightVirtueDef Def => def;
-    public KnightPersonality Personality => def.relatedPersonality;
+    public KnightChivalryDef Chivalry => def.chivalry;
 
     private int level;
     public int Level
