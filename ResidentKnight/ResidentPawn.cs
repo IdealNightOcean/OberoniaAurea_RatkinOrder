@@ -3,6 +3,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 常驻人员
+/// </summary>
 public class ResidentPawn : IExposable, ILoadReferenceable
 {
     public const int PendingRemovalGracePeriodTicks = 5 * 60000;

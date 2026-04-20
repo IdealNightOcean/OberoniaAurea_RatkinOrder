@@ -9,6 +9,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部驻派处理器 - 负责管理分部驻派人员的添加、移除、驻派记录的维护、驻派到期的处理等相关内容
+/// </summary>
 public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHolder
 {
     [Unsaved] private readonly Branch branch;

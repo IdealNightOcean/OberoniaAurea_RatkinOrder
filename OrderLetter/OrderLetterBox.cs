@@ -8,6 +8,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士团信箱 - 负责管理骑士团的信件，包括未读邮件、已读邮件和待发邮件
+/// </summary>
 public class OrderLetterBox : IExposable
 {
     public static OrderLetterBox Instance { get; private set; }

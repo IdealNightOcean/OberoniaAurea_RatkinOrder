@@ -6,6 +6,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部传统处理器 - 负责管理分部传统的添加、升级、移除、Buff效果等相关内容
+/// </summary>
 public class BranchTraditionHandler : IExposable
 {
     protected const int MaxTraditions = 5;

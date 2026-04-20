@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部传统Def
+/// </summary>
 public class BranchTraditionDef : Def
 {
     private static readonly Type DefaultTraditionClass = typeof(BranchTradition);

@@ -7,6 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部人口处理器 - 包含人口数、治安度、平民需求（合约）等相关内容
+/// </summary>
 public class BranchPopulationHandler : IExposable, ITickDay
 {
     [Unsaved] private readonly Branch branch;

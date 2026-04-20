@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -6,11 +6,17 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// （常驻）骑士美德处理器 - 负责管理骑士的美德，包括美德的获取、升级、放弃等，以及与美德相关的buff计算和骑士信条等级检测
+/// </summary>
 public class KnightVirtueHandler : IExposable
 {
     private readonly ResidentKnight knight;
     public Pawn Pawn => knight.Pawn;
 
+    /// <summary>
+    /// 骑士信条等级
+    /// </summary>
     private int curKnightCreedLevel;
     private List<KnightVirtue> virtues = [];
 
@@ -47,6 +53,27 @@ public class KnightVirtueHandler : IExposable
                     return true;
             return false;
         }
+    }
+
+    public bool HasVirtueOfChivalry(KnightChivalryDef chivalry)
+    {
+        foreach (KnightVirtue virtue in virtues)
+        {
+            if (virtue.Chivalry == chivalry)
+                return true;
+        }
+        return false;
+    }
+
+    public int GetVirtueCountOfChivalry(KnightChivalryDef chivalry)
+    {
+        int count = 0;
+        foreach (KnightVirtue virtue in virtues)
+        {
+            if (virtue.Chivalry == chivalry)
+                count++;
+        }
+        return count;
     }
 
     public SimpleValueCache<float> VirtueStatValueCache { get; }
@@ -259,22 +286,23 @@ public class KnightVirtueHandler : IExposable
         float virtueStatvalue = VirtueStatValueCache.GetCachedResult();
         foreach (KnightVirtue virtue in virtues)
         {
-            foreach (KnightVirtueTraitDef virtueTrait in virtue.SelectedTraits)
+            foreach (KnightVirtue.KnightVirtueTrait virtueTrait in virtue.SelectedTraits)
             {
-                BuffStageTemplate.AddOffsets(virtueTrait.statOffsets);
-                BuffStageTemplate.AddOffsets(virtueTrait.statFactors);
+                KnightVirtueTraitDef virtueTraitDef = virtueTrait.def;
+                BuffStageTemplate.AddOffsets(virtueTraitDef.statOffsets);
+                BuffStageTemplate.AddOffsets(virtueTraitDef.statFactors);
 
-                if (virtueTrait.statOffsetsByVirtue is not null)
+                if (virtueTraitDef.statOffsetsByVirtue is not null)
                 {
-                    foreach (StatModifierBySeverity statOffsetByVirtue in virtueTrait.statOffsetsByVirtue)
+                    foreach (StatModifierBySeverity statOffsetByVirtue in virtueTraitDef.statOffsetsByVirtue)
                     {
                         BuffStageTemplate.AddOffset(statOffsetByVirtue.stat, statOffsetByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
                     }
                 }
 
-                if (virtueTrait.statFactorsByVirtue is not null)
+                if (virtueTraitDef.statFactorsByVirtue is not null)
                 {
-                    foreach (StatModifierBySeverity statFactorByVirtue in virtueTrait.statFactorsByVirtue)
+                    foreach (StatModifierBySeverity statFactorByVirtue in virtueTraitDef.statFactorsByVirtue)
                     {
                         BuffStageTemplate.AddFactor(statFactorByVirtue.stat, statFactorByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
                     }

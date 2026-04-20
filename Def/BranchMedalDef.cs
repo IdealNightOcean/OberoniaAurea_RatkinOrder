@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部印记Def
+/// </summary>
 public class BranchMedalDef : Def
 {
     /// <summary>印记专注任务类型</summary>

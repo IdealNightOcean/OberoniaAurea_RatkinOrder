@@ -7,6 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部荣誉Def
+/// </summary>
 public class BranchHonorDef : Def
 {
     /// <summary>

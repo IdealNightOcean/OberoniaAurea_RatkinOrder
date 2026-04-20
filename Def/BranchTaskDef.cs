@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部任务Def
+/// </summary>
 public class BranchTaskDef : Def
 {
     public enum TaskPriority : byte

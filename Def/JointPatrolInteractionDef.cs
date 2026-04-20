@@ -4,6 +4,10 @@ using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部联巡交互Def
+/// </summary>
+/// <remarks>- <see cref="JointPatrolCaravanHelpDef"/> 和 <see cref="JointPatrolIncidentDef"/> 的基类</remarks>
 public abstract class JointPatrolInteractionDef : Def
 {
     /// <summary>

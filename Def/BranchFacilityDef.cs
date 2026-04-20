@@ -2,6 +2,9 @@ using System.Collections.Generic;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部设施Def
+/// </summary>
 public class BranchFacilityDef : BranchConstructionDef
 {
     public BranchFacilityLevelStage poorStage;

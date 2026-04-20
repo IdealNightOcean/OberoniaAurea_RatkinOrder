@@ -41,6 +41,117 @@ public static class AcademicUtility
         return neededPoints;
     }
 
+    /// <summary>
+    /// 获取课业修习的实际花费倍率
+    /// </summary>
+    public static float GetAcademicCostFactor(ResidentKnight knight, KnightAcademicDef academicDef, bool resultOnly, out string explanation)
+    {
+        explanation = string.Empty;
+        if (knight is null || academicDef is null)
+            return 1f;
+
+        StringBuilder sb = resultOnly ? null : new(256);
+        float totalFactor = 1f;
+
+        int learnedAcademicCount = knight.AcademicHandler.TotalAcademicLevel.Value;
+        float learnedFactor = 1f + learnedAcademicCount * 0.01f;
+        if (learnedFactor > 1f)
+        {
+            totalFactor *= learnedFactor;
+            if (!resultOnly)
+                sb.AppendLine("OARO_AcademicCost_LearnedAcademic".Translate(learnedAcademicCount.Named(KeyLibrary_FormatArgName.Count), learnedFactor.ToStringPercent("F0")));
+        }
+
+        if (knight.Chivalry == OARO_ModDefOf.OARO_Oath)
+        {
+            totalFactor *= 0.9f;
+            if (!resultOnly)
+                sb.AppendLine("OARO_AcademicCost_OathChivalry".Translate(0.9f.ToStringPercent("F0")));
+        }
+
+        int academicCeiling = GetNoAdditionalCostAcademicCeiling(knight.CurRank);
+        if (learnedAcademicCount > academicCeiling)
+        {
+            totalFactor *= 3f;
+            if (!resultOnly)
+                sb.AppendLine("OARO_AcademicCost_ExceedCeiling".Translate(academicCeiling.Named(KeyLibrary_FormatArgName.Count), 3f.ToStringPercent("F0")));
+        }
+
+        KnightChivalryDef academicChivalry = academicDef.chivalry;
+        if (academicChivalry is not null)
+        {
+            float traditionReduction = OrderStationHandler.TraditionsManager.GetAcademicCostReduction(academicChivalry);
+            if (traditionReduction > 0f)
+            {
+                float traditionFactor = 1f - traditionReduction;
+                totalFactor *= traditionFactor;
+                if (!resultOnly)
+                    sb.AppendLine("OARO_AcademicCost_StationTradition".Translate(traditionFactor.ToStringPercent("F0")));
+            }
+
+            if (knight.Chivalry == academicChivalry && knight.Chivalry != OARO_ModDefOf.OARO_Oath)
+            {
+                totalFactor *= 0.75f;
+                if (!resultOnly)
+                    sb.AppendLine("OARO_AcademicCost_SameChivalry".Translate(0.75f.ToStringPercent("F0")));
+            }
+
+            Branch branch = knight.Branch;
+            if (branch?.HonorDef?.Chivalry == academicChivalry && academicChivalry != OARO_ModDefOf.OARO_Oath)
+            {
+                totalFactor *= 0.9f;
+                if (!resultOnly)
+                    sb.AppendLine("OARO_AcademicCost_HonorChivalry".Translate(0.9f.ToStringPercent("F0")));
+            }
+
+            int virtueCount = knight.KnightVirtueHandler.GetVirtueCountOfChivalry(academicChivalry);
+            if (virtueCount > 0)
+            {
+                float virtueFactor = 1f - virtueCount * 0.1f;
+                totalFactor *= virtueFactor;
+                if (!resultOnly)
+                    sb.AppendLine("OARO_AcademicCost_VirtueCount".Translate(virtueCount.Named(KeyLibrary_FormatArgName.Count), virtueFactor.ToStringPercent("F0")));
+            }
+        }
+
+        if (!resultOnly)
+        {
+            sb.AppendLine();
+            sb.AppendLine("OARO_AcademicCost_TotalFactor".Translate(totalFactor.ToStringPercent("F0")));
+            explanation = sb.ToString();
+        }
+
+        return totalFactor;
+    }
+
+    /// <summary>
+    /// 获取课业修习的实际花费
+    /// </summary>
+    public static float GetActualMeditationPointsNeeded(ResidentKnight knight, KnightAcademicDef academicDef, int targetLevel, bool resultOnly, out string explanation)
+    {
+        explanation = string.Empty;
+        if (knight is null || academicDef is null)
+            return 0f;
+
+        float baseCost = GetMeditationPointsNeeded(academicDef, knight.Chivalry, targetLevel);
+        float costFactor = GetAcademicCostFactor(knight, academicDef, resultOnly, out string factorExplanation);
+
+        float actualCost = baseCost * costFactor;
+
+        if (!resultOnly)
+        {
+            StringBuilder sb = new(256);
+            sb.AppendLine("OARO_AcademicCost_BaseCost".Translate(baseCost.ToString("F0")));
+            sb.AppendLine();
+            sb.AppendLine(factorExplanation);
+            sb.AppendLine();
+            sb.AppendLine("OARO_AcademicCost_ActualCost".Translate(actualCost.ToString("F0")));
+            explanation = sb.ToString();
+        }
+
+        return actualCost;
+    }
+
     public static AcceptanceReport CanActivateAcademicBySelf(Pawn pawn, KnightAcademicDef academic, bool resultOnly)
     {
         if (pawn is null || academic is null)
@@ -145,11 +256,9 @@ public static class AcademicUtility
         StringBuilder sb = resultOnly ? null : new(128);
         float curChance = 0.1f;
 
-        // Get student record once and cache chivalry
         bool hasStudentRecord = ResidentPawnsManager.Instance.TryGetKnightRecord(student, out ResidentKnight studentRecord);
         KnightChivalryDef studentChivalry = studentRecord?.Chivalry;
 
-        // Apply chivalry factor
         if (studentChivalry is null)
         {
             ApplyStepChange(0.7f, "");
@@ -159,11 +268,9 @@ public static class AcademicUtility
             ApplyStepChange(1.5f, "");
         }
 
-        // Teacher experience factor
         int teacherUnlockedCount = teacher.AcademicHandler.TotalAcademicLevel.Value;
         ApplyStepChange(1f + teacherUnlockedCount * 0.01f, "");
 
-        // Student academic level factors
         if (hasStudentRecord)
         {
             int studentUnlockedCount = studentRecord.AcademicHandler.TotalAcademicLevel.Value;
@@ -179,12 +286,10 @@ public static class AcademicUtility
             if (studentUnlockedCount >= 50)
                 ApplyStepChange(Mathf.Max(0.5f, studentAcademicFactor), "");
 
-            // Opinion factor
             float opinionFactor = 1f + teacher.Pawn.relations.OpinionOf(student) * 0.01f;
             ApplyStepChange(Mathf.Max(0.01f, Mathf.Max(1f + opinionFactor, studentAcademicFactor)), "");
         }
 
-        // Teacher rank factor
         float teacherRankFactor = teacher.CurRank switch
         {
             ResidentKnightRank.Elite => 1.1f,
@@ -194,7 +299,6 @@ public static class AcademicUtility
         };
         ApplyStepChange(teacherRankFactor, "");
 
-        // Learning rate factor
         float learningRate = student.GetStatValue(StatDefOf.LearningRateFactor);
         curChance *= 0.9f + 0.1f * learningRate;
 

@@ -1,11 +1,32 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士美德
+/// </summary>
 public class KnightVirtue : IExposable
 {
+    public struct KnightVirtueTrait : IExposable
+    {
+        public KnightVirtueTraitDef def;
+        public int level;
+
+        public KnightVirtueTrait(KnightVirtueTraitDef def, int level)
+        {
+            this.def = def ?? throw new System.ArgumentNullException(nameof(def));
+            this.level = level;
+        }
+
+        public void ExposeData()
+        {
+            Scribe_Defs.Look(ref def, nameof(def));
+            Scribe_Values.Look(ref level, nameof(level), 0);
+        }
+    }
+
     private KnightVirtueDef def;
     public KnightVirtueDef Def => def;
     public KnightChivalryDef Chivalry => def.chivalry;
@@ -14,68 +35,125 @@ public class KnightVirtue : IExposable
     public int Level
     {
         get => level;
-        set => level = Mathf.Clamp(value, 0, 3);
+        set
+        {
+            level = Mathf.Clamp(value, 0, def.maxLevel);
+        }
     }
 
-    private List<KnightVirtueTraitDef> selectedTraits = [];
-    public IReadOnlyList<KnightVirtueTraitDef> SelectedTraits => selectedTraits;
+    private List<KnightVirtueTrait> selectedTraits = [];
+    public IReadOnlyList<KnightVirtueTrait> SelectedTraits => selectedTraits;
     public int SelectedTraitMaxLevel => selectedTraits.Count;
     public bool HasUnusedTraitSlot => selectedTraits.Count < level;
 
     public KnightVirtue() { }
     public KnightVirtue(KnightVirtueDef def, int level)
     {
-        this.def = def;
-        this.Level = level;
-    }
-
-    public KnightVirtueTraitDef GetTraitOfLevel(int level)
-    {
-        if (level < 0 || level >= selectedTraits.Count)
-        {
-            return null;
-        }
-        return selectedTraits[level];
-    }
-
-    public bool HasTrait(KnightVirtueTraitDef traitDef) => selectedTraits.Contains(traitDef);
-
-    public bool SelectTrait(KnightVirtueTraitDef traitDef, int level, bool replaceCur)
-    {
-        if (level < 0)
-        {
-            Log.Error($"尝试为骑士美德 '{def?.defName ?? "UNKOWN"}' 选择词条 '{traitDef?.defName ?? "UNKOWN"}' 时失败：词条等级 {level} 不能为负数");
-            return false;
-        }
-        if (level == SelectedTraitMaxLevel + 1)
-        {
-            selectedTraits.Add(traitDef);
-            return true;
-        }
-        else if (level > selectedTraits.Count + 1)
-        {
-            Log.Error($"尝试为骑士美德 '{def?.defName ?? "UNKOWN"}' 选择词条 '{traitDef?.defName ?? "UNKOWN"}' 时失败：词条等级 {level} 不能超过 {selectedTraits.Count + 1} (当前最大词条等级+1)");
-            return false;
-        }
-        else
-        {
-            if (replaceCur)
-            {
-                selectedTraits[level - 1] = traitDef;
-                return true;
-            }
-            else
-            {
-                Log.Error($"尝试为骑士美德 '{def?.defName ?? "UNKOWN"}' 选择词条 '{traitDef?.defName ?? "UNKOWN"}' 时失败：无法在不替换的情况下为等级 {level} 选择词条，该等级已存在词条");
-                return false;
-            }
-        }
+        this.def = def ?? throw new System.ArgumentNullException(nameof(def));
+        this.level = Mathf.Clamp(level, 0, def.maxLevel);
     }
 
     public void ExposeData()
     {
         Scribe_Defs.Look(ref def, nameof(def));
         Scribe_Values.Look(ref level, nameof(level), 1);
-        Scribe_Collections.Look(ref selectedTraits, nameof(selectedTraits), LookMode.Def);
+        Scribe_Collections.Look(ref selectedTraits, nameof(selectedTraits), LookMode.Deep);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            selectedTraits.RemoveAll(trait => trait.def is null || trait.level <= 0);
+            selectedTraits.Sort((a, b) => a.level - b.level);
+        }
+    }
+
+    public KnightVirtueTraitDef GetTraitOfLevel(int traitLevel)
+    {
+        int targetIndex = GetTraitOfLevelIndex(traitLevel);
+        if (targetIndex < 0)
+            return null;
+        else
+            return selectedTraits[targetIndex].def;
+    }
+
+    public bool HasTrait(KnightVirtueTraitDef traitDef)
+    {
+        for (int i = 0; i < selectedTraits.Count; i++)
+        {
+            if (selectedTraits[i].def == traitDef)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public bool TrySelectTraitForLevel(KnightVirtueTraitDef traitDef, int traitLevel, bool replaceCur = false)
+    {
+        if (!SelectTraitForLevel(traitDef, traitLevel, replaceCur))
+            return false;
+
+        ResidentPawnsManager.CacheManager?.Notify_KnightVirtuesChanged();
+        return true;
+    }
+
+    private bool SelectTraitForLevel(KnightVirtueTraitDef traitDef, int traitLevel, bool replaceCur = false)
+    {
+        if (traitLevel < 1 || traitLevel > def.maxLevel)
+        {
+            Log.Error($"尝试为骑士美德 '{def?.defName ?? "UNKNOWN"}' 选择词条失败：等级 {traitLevel} 无效");
+            return false;
+        }
+
+        int targetIndex = GetTraitOfLevelIndex(traitLevel);
+        if (targetIndex >= 0)
+        {
+            if (!replaceCur)
+            {
+                Log.Error($"尝试为骑士美德 '{def.defName}' 选择词条失败：等级 {traitLevel} 已存在词条且未允许替换");
+                return false;
+            }
+            else
+            {
+                selectedTraits[targetIndex] = new KnightVirtueTrait(traitDef, traitLevel);
+                return true;
+            }
+        }
+        else
+        {
+            targetIndex = ~targetIndex;
+            selectedTraits.Insert(targetIndex, new KnightVirtueTrait(traitDef, traitLevel));
+            return true;
+        }
+    }
+
+    private int GetTraitOfLevelIndex(int traitLevel)
+    {
+        if (traitLevel < 1 || traitLevel > def.maxLevel)
+        {
+            return -1;
+        }
+        int left = 0;
+        int right = selectedTraits.Count;
+        int mid;
+
+        while (left < right)
+        {
+            mid = left + ((right - left) >> 1);
+            int compare = selectedTraits[mid].level - traitLevel;
+            if (compare == 0)
+            {
+                return mid;
+
+            }
+            else if (compare < 0)
+            {
+                left = mid + 1;
+            }
+            else
+            {
+                right = mid;
+            }
+        }
+
+        return ~left;
     }
 }

@@ -7,6 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部合约
+/// </summary>
 public class BranchContract : IExposable
 {
     public enum ContractState : byte

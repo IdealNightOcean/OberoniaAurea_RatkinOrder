@@ -2,6 +2,9 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部印记记录
+/// </summary>
 public struct BranchMedalRecord : IExposable
 {
     public int Count;

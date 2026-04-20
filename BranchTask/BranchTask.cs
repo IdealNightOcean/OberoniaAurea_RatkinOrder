@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部任务
+/// </summary>
 public class BranchTask : IExposable
 {
     protected BranchTaskDef def;

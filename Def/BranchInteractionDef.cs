@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部交互Def
+/// </summary>
 public class BranchInteractionDef : InteractionDefBase
 {
     public enum InteractionTarget

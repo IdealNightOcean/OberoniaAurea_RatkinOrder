@@ -5,6 +5,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 联合巡逻远行队求助Def
+/// </summary>
 public class JointPatrolCaravanHelpDef : JointPatrolInteractionDef
 {
     public Type workerClass;

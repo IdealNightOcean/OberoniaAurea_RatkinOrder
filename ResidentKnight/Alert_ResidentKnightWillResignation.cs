@@ -7,19 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Alert_ResidentKnightWillResignation : Alert_Critical
 {
-    private static readonly List<Pawn> knightsApproachingResignation = new(4);
-    private static int nextUpdateTick = -1;
-    private static List<Pawn> KnightsApproachingResignation
-    {
-        get
-        {
-            if (Find.TickManager.TicksGame > nextUpdateTick)
-            {
-                RefreshKnightsApproachingResignation();
-            }
-            return knightsApproachingResignation;
-        }
-    }
+    private List<Pawn> KnightsApproachingResignation => ResidentPawnsManager.CacheManager?.KnightsApproachingResignation.Value;
 
     protected override Color BGColor => KnightsApproachingResignation.Count > 0 ? BGColor : Color.clear;
 
@@ -28,20 +16,12 @@ public class Alert_ResidentKnightWillResignation : Alert_Critical
         defaultLabel = "OARO_Alert_SomeResidentKnightWillResignation".Translate();
     }
 
-    public static void ClearStaticCache()
-    {
-        knightsApproachingResignation.Clear();
-        nextUpdateTick = -1;
-    }
-
-    public static void MarkDirty() => nextUpdateTick = -1;
-
     public override AlertReport GetReport()
     {
         AlertReport alertReport = new()
         {
-            active = KnightsApproachingResignation.Count > 0,
-            culpritsPawns = KnightsApproachingResignation
+            active = !KnightsApproachingResignation.NullOrEmpty(),
+            culpritsPawns = !KnightsApproachingResignation.NullOrEmpty() ? [.. KnightsApproachingResignation] : null
         };
 
         return alertReport;
@@ -65,28 +45,5 @@ public class Alert_ResidentKnightWillResignation : Alert_Critical
             explanation += ("\n\n(" + "OARO_ClickToOpenOrderStationWin".Translate() + ")");
         }
         return explanation;
-    }
-
-    private static void RefreshKnightsApproachingResignation()
-    {
-        nextUpdateTick = Find.TickManager.TicksGame + 2500;
-        knightsApproachingResignation.Clear();
-
-        IReadOnlyList<ResidentKnight> residentKnights = ResidentPawnsManager.Instance.ResidentKnights;
-        if (residentKnights.Count <= 0)
-            return;
-
-        int ticksGame = Find.TickManager.TicksGame;
-        foreach (ResidentKnight record in residentKnights)
-        {
-            if (record.ResignationTick > 0)
-            {
-                float resignationDays = Mathf.Max(0f, (record.ResignationTick - ticksGame) / 60000f);
-                if (resignationDays < 15f)
-                {
-                    knightsApproachingResignation.Add(record.Pawn);
-                }
-            }
-        }
     }
 }

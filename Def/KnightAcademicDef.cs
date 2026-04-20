@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士课业Def
+/// </summary>
 public class KnightAcademicDef : Def
 {
     public enum AcademicType

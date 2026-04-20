@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部建筑Def
+/// </summary>
 public class BranchBuildingDef : BranchConstructionDef
 {
     private static readonly Type defaultType = typeof(BranchBuilding);

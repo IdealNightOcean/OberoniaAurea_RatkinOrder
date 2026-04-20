@@ -3,6 +3,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 交互基础Def - 包含交互的基本属性和配置错误检查
+/// </summary>
 public abstract class InteractionDefBase : Def
 {
     /// <summary>

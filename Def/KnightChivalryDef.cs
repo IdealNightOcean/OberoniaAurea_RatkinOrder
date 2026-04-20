@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士精神Def
+/// </summary>
 public class KnightChivalryDef : Def
 {
     /// <summary>

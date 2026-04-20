@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部合约Def
+/// </summary>
 public class BranchContractDef : Def
 {
     private static readonly Type defaultRewardClass = typeof(BranchContractRewardWorker);

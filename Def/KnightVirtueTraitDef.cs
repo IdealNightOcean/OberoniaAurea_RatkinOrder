@@ -13,7 +13,13 @@ public class KnightVirtueTraitDef : Def
 
     public List<StatModifier> statFactors;
 
+    /// <summary>
+    /// 根据美德属性值调整的属性Offset
+    /// </summary>
     public List<StatModifierBySeverity> statOffsetsByVirtue;
 
+    /// <summary>
+    /// 根据美德属性值调整的属性Factor
+    /// </summary>  
     public List<StatModifierBySeverity> statFactorsByVirtue;
 }

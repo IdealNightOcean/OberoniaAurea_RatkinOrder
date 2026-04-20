@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -6,6 +6,9 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class KnightVirtueUtility
 {
+    public const float MentorshipVirtueChance_Base = 0.04f;
+    public const float MentorshipVirtueChance_Resonate = 0.10f;
+
     public static bool CanAcquireVirtue(this ResidentKnight knight, KnightVirtueDef virtueDef)
     {
         if (knight is null || virtueDef is null)
@@ -60,6 +63,21 @@ public static class KnightVirtueUtility
         return GetAllAvailableVirtues(knight).RandomElementWithFallback(null);
     }
 
+    /// <summary>
+    /// 获取授导骑士可以传授给学生的美德列表
+    /// </summary>
+    public static IEnumerable<KnightVirtueDef> GetTeachableVirtues(ResidentKnight teacher, ResidentKnight student)
+    {
+        if (teacher is null || student is null)
+            yield break;
+
+        foreach (KnightVirtue virtue in teacher.KnightVirtueHandler.Virtues)
+        {
+            if (student.CanAcquireVirtue(virtue.Def))
+                yield return virtue.Def;
+        }
+    }
+
     public static int GetRandomNewVirtueLevel_Daily(ResidentKnight knight)
     {
         float virtueStatValue = knight.KnightVirtueHandler.VirtueStatValueCache.GetCachedResult();
@@ -81,6 +99,25 @@ public static class KnightVirtueUtility
                 (1, 30f),
                 (2, 20f + virtueStatValue * 2f),
                 (3, virtueStatValue * 3f)
+            ];
+
+        return weightSelector.RandomElementByWeight(p => p.Item2).Item1;
+    }
+
+    /// <summary>
+    /// 获取骑士授导获取美德的等级权重
+    /// </summary>
+    /// <param name="isResonate">是否精神共鸣</param>
+    public static int GetRandomNewVirtueLevel_Mentorship(ResidentKnight teacher, bool isResonate)
+    {
+        float teacherVirtueStat = teacher?.KnightVirtueHandler?.VirtueStatValueCache.GetCachedResult() ?? 0f;
+        int resonateBonus = isResonate ? 1 : 0;
+
+        (int, float)[] weightSelector =
+            [
+                (1,  20f),
+                (2, 20f + teacherVirtueStat * 2f + resonateBonus * 10f),
+                (3, teacherVirtueStat * 4f + resonateBonus * 20f),
             ];
 
         return weightSelector.RandomElementByWeight(p => p.Item2).Item1;

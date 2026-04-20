@@ -5,14 +5,24 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士单位管理器 - 负责管理所有被注册为骑士的单位及其对应的骑士记录
+/// </summary>
 public class KnightPawnsManager : IExposable
 {
     public static KnightPawnsManager Instance { get; private set; }
 
-    private Dictionary<Pawn, KnightRecord> knights = new(32);
-    public IReadOnlyDictionary<Pawn, KnightRecord> AllKnights => knights;
+    private List<KnightRecord> knights = new(32);
+    private Dictionary<Pawn, KnightRecord> knightsDict;
+    public IReadOnlyList<KnightRecord> AllKnights => knights;
 
+    /// <summary>
+    /// 骑士团 - 骑士记录的反向索引，方便根据骑士团快速获取对应的骑士列表
+    /// </summary>
     private readonly Dictionary<RatkinOrder, List<KnightRecord>> orderToKnights = [];
+    /// <summary>
+    /// 骑士分部 - 骑士记录的反向索引，方便根据分部快速获取对应的骑士列表
+    /// </summary>
     private readonly Dictionary<Branch, List<KnightRecord>> branchToKnights = [];
 
     public KnightPawnsManager()
@@ -24,16 +34,19 @@ public class KnightPawnsManager : IExposable
 
     public void ExposeData()
     {
-        Scribe_Collections.Look(ref knights, nameof(knights), LookMode.Reference, LookMode.Deep, ref knightKeys, ref knightValues);
+        Scribe_Collections.Look(ref knights, nameof(knights), LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (knights.RemoveAll(kv => kv.Value is null || kv.Value.Pawn.DestroyedOrNull() || !kv.Value.RatkinOrder.IsValid()) > 0)
+            if (knights.RemoveAll(k => k is null || k.Pawn.DestroyedOrNull() || !k.RatkinOrder.IsValid()) > 0)
             {
                 Log.Error($"[OARO] {nameof(KnightPawnsManager)} 的部分骑士记录在加载后无效，已被移除。");
             }
 
-            foreach (KnightRecord knightRecord in knights.Values)
+            knightsDict = new(knights.Count);
+
+            foreach (KnightRecord knightRecord in knights)
             {
+                knightsDict.Add(knightRecord.Pawn, knightRecord);
                 AddKnightToLookupDicts(knightRecord);
             }
         }
@@ -49,9 +62,14 @@ public class KnightPawnsManager : IExposable
             Log.Error($"[OARO] 将单位 ({pawn}) 注册到 KnightPawnsManager 失败：该单位不能成为骑士。");
             return false;
         }
-
+        if (knightsDict.ContainsKey(pawn))
+        {
+            Log.Error($"[OARO] 将单位 ({pawn}) 注册到 KnightPawnsManager 失败：该单位已经是骑士了。");
+            return false;
+        }
         knightRecord.BindPawn(pawn);
-        knights[knightRecord.Pawn] = knightRecord;
+        knightsDict.Add(pawn, knightRecord);
+        knights.Add(knightRecord);
         AddKnightToLookupDicts(knightRecord);
 
         return true;
@@ -59,10 +77,11 @@ public class KnightPawnsManager : IExposable
 
     public bool DeregisterKnight(Pawn pawn)
     {
-        if (!knights.TryGetValue(pawn, out KnightRecord record))
+        if (!knightsDict.TryGetValue(pawn, out KnightRecord record))
             return false;
 
-        knights.Remove(pawn);
+        knightsDict.Remove(pawn);
+        knights.Remove(record);
         if (record.RatkinOrder is not null && orderToKnights.TryGetValue(record.RatkinOrder, out List<KnightRecord> orderKnights))
         {
             orderKnights?.Remove(record);
@@ -76,11 +95,11 @@ public class KnightPawnsManager : IExposable
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsKnight(Pawn pawn) => pawn.CanBeKnight() && knights.ContainsKey(pawn);
+    public bool IsKnight(Pawn pawn) => pawn.CanBeKnight() && knightsDict.ContainsKey(pawn);
 
     public KnightRecord GetKnightRecord(Pawn pawn)
     {
-        if (knights.TryGetValue(pawn, out KnightRecord record))
+        if (knightsDict.TryGetValue(pawn, out KnightRecord record))
         {
             return record;
         }
@@ -91,7 +110,7 @@ public class KnightPawnsManager : IExposable
     public bool TryGetKnightRecord(Pawn pawn, out KnightRecord record)
     {
         record = null;
-        return pawn.CanBeKnight() && knights.TryGetValue(pawn, out record);
+        return pawn.CanBeKnight() && knightsDict.TryGetValue(pawn, out record);
     }
 
     private void AddKnightToLookupDicts(KnightRecord knightRecord)
@@ -119,7 +138,4 @@ public class KnightPawnsManager : IExposable
             }
         }
     }
-
-    private List<Pawn> knightKeys;
-    private List<KnightRecord> knightValues;
 }

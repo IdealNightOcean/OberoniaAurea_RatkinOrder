@@ -11,6 +11,9 @@ using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士团分部
+/// </summary>
 public class Branch : IExposable, ILoadReferenceable
 {
     [Flags]

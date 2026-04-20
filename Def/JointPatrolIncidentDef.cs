@@ -6,6 +6,9 @@ using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部联巡小事件Def
+/// </summary>
 public class JointPatrolIncidentDef : JointPatrolInteractionDef
 {
     public enum IncidentType

@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士团交互Def
+/// </summary>
 public class OrderInteractionDef : InteractionDefBase
 {
     public Type workerClass;

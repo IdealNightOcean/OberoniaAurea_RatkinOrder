@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士团信件Def
+/// </summary>
 public class OrderLetterDef : Def
 {
     private static readonly Type defaultLetterClass = typeof(OrderLetter);

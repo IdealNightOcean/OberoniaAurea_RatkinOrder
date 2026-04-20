@@ -7,6 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部印记处理器 - 包含印记的记录、主要印记、印记带来的属性加成等相关内容
+/// </summary>
 public class BranchMedalHandler : IExposable
 {
     private Dictionary<BranchMedalDef, BranchMedalRecord> medalRecords = new(4);

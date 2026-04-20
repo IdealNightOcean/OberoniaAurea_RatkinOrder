@@ -3,6 +3,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部传统
+/// </summary>
 public class BranchTradition : IExposable
 {
 

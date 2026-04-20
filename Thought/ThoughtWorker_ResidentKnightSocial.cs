@@ -7,7 +7,7 @@ public class ThoughtWorker_KnightChivalrySocial : ThoughtWorker
 {
     protected override ThoughtState CurrentSocialStateInternal(Pawn p, Pawn otherPawn)
     {
-        if (!p.Faction.IsPlayerSafe() || otherPawn.Faction.IsPlayerSafe())
+        if (!p.Faction.IsPlayerSafe() || !otherPawn.Faction.IsPlayerSafe())
         {
             return ThoughtState.Inactive;
         }
@@ -15,7 +15,7 @@ public class ThoughtWorker_KnightChivalrySocial : ThoughtWorker
         if (KnightPawnsManager.Instance.TryGetKnightRecord(p, out KnightRecord pRecord)
           && KnightPawnsManager.Instance.TryGetKnightRecord(otherPawn, out KnightRecord otherRecord))
         {
-            if (pRecord.Chivalry.ResonateChivalriesSet.Contains(otherRecord.Chivalry))
+            if (pRecord.IsChivalryResonate(otherRecord))
             {
                 return ThoughtState.ActiveAtStage(1);
             }

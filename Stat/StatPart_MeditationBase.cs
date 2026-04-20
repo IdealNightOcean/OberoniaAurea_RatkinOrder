@@ -21,7 +21,7 @@ public class StatPart_MeditationBase : StatPart
 
         val += 5f;
         val += Mathf.Min(OrderStationHandler.BuildingHandler.AcademicFurnituresCount * 2f, 30f);
-        val += ResidentPawnsManager.Instance.InstructorKnightsCount.Value * 5f;
+        val += ResidentPawnsManager.CacheManager.InstructorKnightsCount.Value * 5f;
     }
 
     public override string ExplanationPart(StatRequest req)
@@ -47,7 +47,7 @@ public class StatPart_MeditationBase : StatPart
             sb.AppendLine("OARO_ChangeOffset_AcademicFurnituresCount".Translate(academicFurnituresCount.ToString(), stepChange.ToStringWithSign()));
         }
 
-        int instructorKnightsCount = ResidentPawnsManager.Instance.InstructorKnightsCount.Value;
+        int instructorKnightsCount = ResidentPawnsManager.CacheManager.InstructorKnightsCount.Value;
         if (instructorKnightsCount > 0)
         {
             stepChange = instructorKnightsCount * 5;

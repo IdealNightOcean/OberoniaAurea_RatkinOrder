@@ -5,6 +5,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 常驻骑士职位的功能类，必须实现一个只接受 <see cref="ResidentKnightRoleDef"/> 参数的构造函数
+/// </summary>
 public class ResidentKnightRoleWorker(ResidentKnightRoleDef def)
 {
     public readonly ResidentKnightRoleDef Def = def;

@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,6 +8,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 美德培养
+/// </summary>
 public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_ResidentKnightStudy
 {
     private KnightVirtueDef virtueDef;
@@ -22,7 +26,39 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight residentKnight))
             return;
 
+        if (virtueDef is null)
+            return;
 
+        float successChance = GetTrainSuccessChance(branch, residentKnight, resultOnly: true, out _);
+        if (Rand.Chance(successChance))
+        {
+            SuccessOutcome(branch, residentKnight);
+        }
+        else
+        {
+            Messages.Message(
+                text: "OARO_Message_VirtueTrainFailed".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
+                lookTargets: pawn,
+                def: MessageTypeDefOf.NegativeEvent);
+        }
+    }
+
+    private void SuccessOutcome(Branch branch, ResidentKnight residentKnight)
+    {
+        int level = GetTrainOutcomeLevel(branch, residentKnight, resultOnly: true, out _);
+        string reason = "OARO_KnightVirtueGainReason_VirtueTrain".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
+        residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef, level, reason);
+        OrderLetterUtility.ReceiveLetter(
+            label: "OARO_LetterLabel_VirtueTrainSuccess".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
+            text: "OARO_LetterText_VirtueTrainSuccess".Translate(
+                pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                level.Named(KeyLibrary_FormatArgName.Level)),
+            def: OrderLetterDefOf.OARO_OfficialLetter,
+            relatedOrder: branch.RatkinOrder,
+            relatedBranch: branch,
+            sender: branch.NameColored,
+            relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 
     private float GetTrainSuccessChance(Branch branch, ResidentKnight residentKnight, bool resultOnly, out string explanation)

@@ -3,6 +3,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 特殊游戏信件Def基类
+/// </summary>
+/// <remarks>- <see cref="DailyOrderLetterDef"/>、<see cref="SpecialGameLetterDef"/> 和 <see cref="CertainDateLetterDef"/> 的基类</remarks>
 public abstract class SpecialLetterDefBase : Def
 {
     [MustTranslate]

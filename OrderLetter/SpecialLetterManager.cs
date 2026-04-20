@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 特殊信件管理器 - 负责管理骑士团的特殊信件，包括特定游戏事件触发的信件和特定日期触发的信件
+/// </summary>
 public class SpecialLetterManager : IExposable
 {
     protected HashSet<SpecialGameLetterDef> recievedSpecialLetters = [];

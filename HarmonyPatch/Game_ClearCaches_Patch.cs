@@ -12,9 +12,9 @@ internal static class Game_ClearCaches_Patch
     {
         GameComponent_RatkinOrder.ClearStaticCache();
 
-        Alert_ResidentKnightWillResignation.ClearStaticCache();
 
         Thought_VisitingKnight.ClearStaticCache();
+        Thought_Situational_OrderStationTraditions.ClearStaticCache();
         ThoughtWorker_BranchChurch.ClearStaticCache();
     }
 }

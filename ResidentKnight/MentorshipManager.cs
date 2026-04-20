@@ -5,6 +5,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 教导关系管理器 - 负责管理骑士与其授导对象之间的关系，包括添加、移除、查询等功能，并处理相关数据的保存和加载
+/// </summary>
 public class MentorshipManager : IExposable
 {
     private ResidentPawnsManager Parent { get; }
@@ -164,7 +167,50 @@ public class MentorshipManager : IExposable
 
     public void TickDay()
     {
+        CheckMentorshipVirtueAcquisition();
+    }
 
+    /// <summary>
+    /// 每日检测授导美德获取
+    /// </summary>
+    private void CheckMentorshipVirtueAcquisition()
+    {
+        foreach (KeyValuePair<ResidentKnight, HashSet<ResidentPawn>> kv in teachersToStudents)
+        {
+            ResidentKnight teacher = kv.Key;
+            if (teacher is null || teacher.KnightVirtueHandler.TotalVirtueCount <= 0)
+                continue;
+
+            foreach (ResidentPawn student in kv.Value)
+            {
+                if (student is not ResidentKnight studentKnight)
+                    continue;
+
+                TryAcquireVirtueFromMentorship(teacher, studentKnight);
+            }
+        }
+    }
+
+    /// <summary>
+    /// 尝试通过授导获取美德
+    /// </summary>
+    private void TryAcquireVirtueFromMentorship(ResidentKnight teacher, ResidentKnight student)
+    {
+        if (teacher is null || student is null)
+            return;
+
+        bool isResonate = teacher.IsChivalryResonate(student);
+        float virtueChance = isResonate ? 0.1f : 0.04f;
+        if (!Rand.Chance(virtueChance))
+            return;
+
+        KnightVirtueDef virtueToTeach = KnightVirtueUtility.GetTeachableVirtues(teacher, student).RandomElementWithFallback(null);
+        if (virtueToTeach is null)
+            return;
+
+        int level = KnightVirtueUtility.GetRandomNewVirtueLevel_Mentorship(teacher, isResonate);
+        string reason = "OARO_VirtueReason_Mentorship".Translate(teacher.Pawn.Named(KeyLibrary_FormatArgName.PAWN));
+        student.KnightVirtueHandler.TryAddVirtue(virtueToTeach, level, reason);
     }
 
     private void PrepareForSaving()

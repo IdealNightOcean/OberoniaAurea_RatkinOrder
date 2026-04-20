@@ -6,6 +6,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 常驻骑士职位Def
+/// </summary>
 public class ResidentKnightRoleDef : Def
 {
     private static readonly Type DefaultRoleWorkerClass = typeof(ResidentKnightRoleDef);

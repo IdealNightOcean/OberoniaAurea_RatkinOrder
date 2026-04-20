@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士驻地处理器 - 负责管理骑士驻地相关的全局状态和缓存，包括主 <see cref="Building_OrderCodePedestal"/> 的引用、驻地所在房间、驻地等级、驻地建筑等信息的缓存和更新
+/// </summary>
 public class OrderStationHandler : IExposable
 {
     private const int StationRoomRecacheInterval = 250;

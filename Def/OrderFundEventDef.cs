@@ -3,6 +3,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士团资金事件Def
+/// </summary>
 public class OrderFundEventDef : Def
 {
     /// <summary>

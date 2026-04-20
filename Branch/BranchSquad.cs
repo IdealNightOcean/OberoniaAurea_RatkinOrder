@@ -6,6 +6,9 @@ using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部小队
+/// </summary>
 public class BranchSquad : IExposable, ITickHourOfDay
 {
     protected const int StatUpdateHour = 5;

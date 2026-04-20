@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 特定日期信件Def
+/// </summary>
 public class CertainDateLetterDef : SpecialLetterDefBase
 {
     private static readonly int curYear = DateTime.Now.Year;

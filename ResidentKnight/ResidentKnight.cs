@@ -98,7 +98,7 @@ public class ResidentKnight : ResidentPawn
     {
         ResignationTick += (postponeDays * 60000);
 
-        Alert_ResidentKnightWillResignation.MarkDirty();
+        ResidentPawnsManager.CacheManager?.KnightsApproachingResignation?.MarkDirty();
     }
 
     public void ChangeRole(ResidentKnightRoleDef newRole)

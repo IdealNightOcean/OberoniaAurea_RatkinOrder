@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部属性Def
+/// </summary>
 public class BranchStatDef : Def
 {
     public enum StatType : byte

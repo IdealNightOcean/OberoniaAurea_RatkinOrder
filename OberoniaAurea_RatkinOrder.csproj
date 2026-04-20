@@ -165,6 +165,7 @@
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
     <Compile Include="Def\KnightVirtueDef.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
+    <Compile Include="Def\OrderStationTraditionDef.cs" />
     <Compile Include="HarmonyPatch\TryDoMentalBreak_Patch.cs" />
     <Compile Include="KnightVirtue\Alert_AnyResiHasUnused.cs" />
     <Compile Include="KnightVirtue\KnightVirtue.cs" />
@@ -230,13 +231,17 @@
     <Compile Include="Quest\Quest_Root_ResidentKnightBackPlayer.cs" />
     <Compile Include="Quest\BranchDemand\Quest_GiveBranchMedal_CriticalDemand.cs" />
     <Compile Include="ResidentKnight\AcademicHandler.cs" />
+    <Compile Include="ResidentKnight\ResidentPawnsCacheManager.cs" />
     <Compile Include="ResidentKnight\ResidentPawnState.cs" />
     <Compile Include="ResidentKnight\ResidentRoleManager.cs" />
     <Compile Include="Stat\StatWorker_PawnVirtue.cs" />
+    <Compile Include="Thought\Thought_Situational_OrderStationTraditions.cs" />
     <Compile Include="Thought\ThoughtWorker_Situational_Virtue.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Thought\Thought_Situational_Virtue.cs" />
     <Compile Include="Utility\AcademicUtility.cs" />
+    <Compile Include="Utility\KnightChivalryUtility.cs" />
+    <Compile Include="Utility\KnightDiaryUtility.cs" />
     <Compile Include="Utility\KnightVirtueUtility.cs" />
     <Compile Include="Window\BranchTaskEntryDrawer.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />

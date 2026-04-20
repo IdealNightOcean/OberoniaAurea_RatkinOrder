@@ -6,19 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Alert_AnyResidentKnightHasUnusedTraitSlot : Alert
 {
-    private static readonly List<Pawn> knightsHasUnusedTraitSlot = new(4);
-    private static int nextUpdateTick = -1;
-    private static List<Pawn> KnightsHasUnusedTraitSlot
-    {
-        get
-        {
-            if (Find.TickManager.TicksGame > nextUpdateTick)
-            {
-                RefreshKnightsApproachingResignation();
-            }
-            return knightsHasUnusedTraitSlot;
-        }
-    }
+    private List<Pawn> KnightsHasUnusedTraitSlot => ResidentPawnsManager.CacheManager?.KnightsHasUnusedTraitSlot.Value;
 
     public Alert_AnyResidentKnightHasUnusedTraitSlot()
     {
@@ -29,8 +17,8 @@ public class Alert_AnyResidentKnightHasUnusedTraitSlot : Alert
     {
         AlertReport alertReport = new()
         {
-            active = KnightsHasUnusedTraitSlot.Count > 0,
-            culpritsPawns = KnightsHasUnusedTraitSlot
+            active = !KnightsHasUnusedTraitSlot.NullOrEmpty(),
+            culpritsPawns = !KnightsHasUnusedTraitSlot.NullOrEmpty() ? [.. KnightsHasUnusedTraitSlot] : null
         };
 
         return alertReport;
@@ -42,21 +30,5 @@ public class Alert_AnyResidentKnightHasUnusedTraitSlot : Alert
         return explanation;
     }
 
-    private static void RefreshKnightsApproachingResignation()
-    {
-        nextUpdateTick = Find.TickManager.TicksGame + 2500;
-        knightsHasUnusedTraitSlot.Clear();
 
-        IReadOnlyList<ResidentKnight> residentKnights = ResidentPawnsManager.Instance.ResidentKnights;
-        if (residentKnights.Count <= 0)
-            return;
-
-        foreach (ResidentKnight record in residentKnights)
-        {
-            if (record.KnightVirtueHandler.HasUnusedTraitSlot)
-            {
-                knightsHasUnusedTraitSlot.Add(record.Pawn);
-            }
-        }
-    }
 }

@@ -1,4 +1,3 @@
-using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -10,7 +9,7 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
-/// 常驻人员管理器
+/// 常驻人员管理器 - 负责管理常驻骑士和常驻殖民者的记录、注册、注销和每日检测等功能
 /// </summary>
 public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 {
@@ -43,16 +42,14 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     public IReadOnlyList<ResidentPawn> ResidentColonists => residentColonists;
     private Dictionary<Pawn, ResidentPawn> residentColonistsDict = [];
 
-
     private ResidentRoleManager roleManager;
     public static ResidentRoleManager RoleManager => Instance?.roleManager;
 
     private MentorshipManager mentorshipManager;
     public static MentorshipManager MentorshipManager => Instance?.mentorshipManager;
 
-    public LazyMutable<HashSet<KnightChivalryDef>> AllHasChivalriesDefs { get; }
-
-    public LazyMutable<int> InstructorKnightsCount { get; }
+    private ResidentPawnsCacheManager cacheManager;
+    public static ResidentPawnsCacheManager CacheManager => Instance?.cacheManager;
 
     internal ResidentPawnsManager(bool initCtor)
     {
@@ -60,28 +57,12 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
 
-        AllHasChivalriesDefs = new(refreshFunc: delegate
-        {
-            HashSet<KnightChivalryDef> knightChivalryDefs = [];
-            if (residentKnights.NullOrEmpty())
-                return knightChivalryDefs;
-
-            foreach (ResidentKnight residentKnight in residentKnights)
-            {
-                if (residentKnight?.Chivalry is not null)
-                {
-                    knightChivalryDefs.Add(residentKnight.Chivalry);
-                }
-            }
-            return knightChivalryDefs;
-        });
-
-        InstructorKnightsCount = new(refreshFunc: () => residentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
-
         if (initCtor)
         {
             EnsureComponentsInit();
         }
+
+        cacheManager ??= new(this);
     }
 
     public static void ClearStaticCache() => Instance = null;
@@ -90,6 +71,8 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     {
         roleManager ??= new ResidentRoleManager(this);
         mentorshipManager ??= new MentorshipManager(this);
+
+        cacheManager ??= new(this);
     }
 
     public void ExposeData()
@@ -222,13 +205,18 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     {
         if (TickUtility.IsHashIntervalTick(tickHashOffset, 2500))
         {
-            if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
+            bool dailyCheck = TickUtility.IsHashIntervalTick(tickHashOffset, 60000);
+            if (dailyCheck)
             {
                 DailyKnightsCheck();
                 DailyColonistsCheck();
+            }
 
+            cacheManager.TickHour();
+
+            if (dailyCheck)
+            {
                 DailyKnightsVirtueCheck();
-
                 mentorshipManager.TickDay();
             }
         }
@@ -455,9 +443,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
     private void OnKnightsChanged()
     {
-        Alert_ResidentKnightWillResignation.MarkDirty();
-
-        AllHasChivalriesDefs.MarkDirty();
-        InstructorKnightsCount.MarkDirty();
+        cacheManager.OnKnightsChanged();
     }
 }

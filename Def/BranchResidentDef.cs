@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部驻派部署Def
+/// </summary>
 public class BranchResidentDef : Def
 {
     /// <summary>

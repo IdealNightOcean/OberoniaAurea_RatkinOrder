@@ -7,6 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士团Def
+/// </summary>
 public class RatkinOrderDef : Def
 {
     /// <summary>

@@ -8,6 +8,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部建设储备处理器 - 包含建设储备项目的记录、主要储备项目、储备带来的建材成本减免等相关内容
+/// </summary>
 public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
 {
     /// <summary>

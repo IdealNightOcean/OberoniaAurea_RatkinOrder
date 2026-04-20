@@ -3,6 +3,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 建设中项目记录 - 包含目标定义、剩余建设时间、完成时刻等相关内容
+/// </summary>
 public class UnderConstructionRecord<T> : IExposable where T : BranchConstructionDef, new()
 {
     private T targetDef;

@@ -1,5 +1,8 @@
 ﻿namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 骑士美德类型
+/// </summary>
 public enum KnightVirtueType
 {
     /// <summary>

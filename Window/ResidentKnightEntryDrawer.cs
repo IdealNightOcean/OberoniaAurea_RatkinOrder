@@ -400,7 +400,7 @@ public partial class Window_OrderStation
         private string RefreshResonatePersonalitiesStr()
         {
             string result = string.Empty;
-            HashSet<KnightChivalryDef> allHasChivalryDefs = ResidentPawnsManager.Instance.AllHasChivalriesDefs.Value;
+            HashSet<KnightChivalryDef> allHasChivalryDefs = ResidentPawnsManager.CacheManager.AllHasChivalriesDefs.Value;
             foreach (KnightChivalryDef chivalry in Record.Chivalry.resonateChivalries)
             {
                 if (!string.IsNullOrEmpty(result))

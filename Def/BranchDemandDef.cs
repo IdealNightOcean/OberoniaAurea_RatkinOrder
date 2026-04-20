@@ -7,6 +7,9 @@ using static OberoniaAurea.RatkinOrder.BranchDemand;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部需求Def
+/// </summary>
 public class BranchDemandDef : Def
 {
     private static readonly Type defaultWeighterClass = typeof(BranchDemandWeighter);

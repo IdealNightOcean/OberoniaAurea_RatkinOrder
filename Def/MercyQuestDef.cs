@@ -7,21 +7,51 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 善行任务Def
+/// </summary>
 public class MercyQuestDef : Def
 {
+    /// <summary>
+    /// 是否需要前置任务
+    /// </summary>
     public bool needPreQuest = true;
+    /// <summary>
+    /// 前置任务Def（可选）
+    /// </summary>
     public QuestScriptDef preQuestDef;
 
+    /// <summary>
+    /// 善行任务对应的主任务Def
+    /// </summary>
     public QuestScriptDef mainQuestDef;
 
+    /// <summary>
+    /// 子派系Def
+    /// </summary>
     public FactionDef subFactionDef;
+    /// <summary>
+    /// 求助者的 PawnKindDef 类型。
+    /// </summary>
     public PawnKindDef helpSeekerPawnKind;
 
+    /// <summary>
+    /// 是否有父派系
+    /// </summary>
     public bool hasParentFaction;
 
+    /// <summary>
+    /// 父派系验证参数（可选）
+    /// </summary>
     public FactionValidationParams? parentFactionValidationParams;
+    /// <summary>
+    /// 父派系固定Def（可选）
+    /// </summary>
     protected FactionDef fixedParentFactionDef;
 
+    /// <summary>
+    /// 父派系寻找器类（可选，需继承自 <see cref="MercyQuestParentFactionFinder"/>）
+    /// </summary>
     public Type parentFactionFinderClass;
     private MercyQuestParentFactionFinder parentFactionFinder;
     public MercyQuestParentFactionFinder ParentFactionFinder
@@ -37,9 +67,15 @@ public class MercyQuestDef : Def
         }
     }
 
+    /// <summary>
+    /// 求助原因
+    /// </summary>
     [MayTranslate]
     public string reasonForHelp;
 
+    /// <summary>
+    /// 随机选择权重
+    /// </summary>
     public float selectWeight = 1f;
 
     public override IEnumerable<string> ConfigErrors()

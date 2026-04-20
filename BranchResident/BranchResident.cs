@@ -4,6 +4,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部驻派记录 - 包含驻派Def、相关Pawn、驻派总天数、剩余天数等内容
+/// </summary>
 public abstract class BranchResident : IExposable
 {
     protected BranchResidentDef def;

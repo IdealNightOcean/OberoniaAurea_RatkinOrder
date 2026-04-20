@@ -7,6 +7,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 常驻骑士职位管理器 - 负责管理常驻骑士的职位分配和相关Buff阶段的计算
+/// </summary>
 public class ResidentRoleManager : IExposable
 {
     private ResidentPawnsManager Parent { get; }

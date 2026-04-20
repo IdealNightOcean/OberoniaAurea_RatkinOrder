@@ -6,6 +6,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+/// <summary>
+/// 分部任务处理器 - 负责管理分部当前任务、当前的专注任务、自动开始新任务的尝试、任务切换的条件判断等相关内容
+/// </summary>
 public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 {
     public enum RadicalismDegree
