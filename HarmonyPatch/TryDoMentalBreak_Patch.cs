@@ -9,7 +9,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class TryDoMentalBreak_Patch
 {
     [HarmonyPostfix]
-    public static void Postfix(bool __result, Pawn ___pawn)
+    public static void Postfix(bool __result, Pawn ___pawn, string reason, MentalBreakDef breakDef)
     {
         if (!__result || !Rand.Chance(0.1f))
             return;
@@ -25,6 +25,6 @@ public class TryDoMentalBreak_Patch
 
         residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef: newVirtueDef,
                                                         level: newVirtueLevel,
-                                                        reason: "OARO_KnightVirtueGainReason_MentalBreak".Translate());
+                                                        reason: breakDef.LabelCap);
     }
 }

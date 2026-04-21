@@ -2,6 +2,8 @@
 
 public static class KeyLibrary_FormatArgName
 {
+    public const string DEF = "DEF";
+
     public const string CARAVANHELPDEF = "CARAVANHELPDEF";
     public const string HONORDEF = "HONORDEF";
     public const string VIRTUEDEF = "VIRTUEDEF";
@@ -39,6 +41,7 @@ public static class KeyLibrary_FormatArgName
     public const string CliqueName = "CliqueName";
     public const string OrderName = "OrderName";
     public const string BranchName = "BranchName";
+    public const string QuestName = "QuestName";
     public const string ThingsInfo = "ThingsInfo";
     public const string PawnsInfo = "PawnsInfo";
     public const string Quality = "Quality";

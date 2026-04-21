@@ -99,7 +99,7 @@ public class RatkinOrderSettings : ModSettings
     /// <summary>
     /// API密钥
     /// </summary>
-    public static string APIKey = "";
+    public static string APIKey = string.Empty;
 
     /// <summary>
     /// IncidentConcernLetter 生成概率 (0f~1f)
@@ -142,7 +142,7 @@ public class RatkinOrderSettings : ModSettings
         Scribe_Values.Look(ref EnableAIContent, nameof(EnableAIContent), defaultValue: false);
         Scribe_Values.Look(ref AIServiceUrl, nameof(AIServiceUrl), "https://api.openai.com/v1/chat/completions");
         Scribe_Values.Look(ref AIModelName, nameof(AIModelName), "gpt-3.5-turbo");
-        Scribe_Values.Look(ref APIKey, nameof(APIKey), "");
+        Scribe_Values.Look(ref APIKey, nameof(APIKey), string.Empty);
 
         Scribe_Values.Look(ref AIIncidentConcernLetterChance, nameof(AIIncidentConcernLetterChance), 0.3f);
 

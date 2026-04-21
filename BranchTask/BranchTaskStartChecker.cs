@@ -4,13 +4,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchTaskStartChecker
 {
-    public virtual AcceptanceReport CanStartNow(Branch branch, bool resultOnly)
-    {
-        return true;
-    }
+    public virtual AcceptanceReport CanStartNow(Branch branch, bool resultOnly) => true;
 
-    public virtual float RandomlyChosenWeight(Branch branch)
-    {
-        return 1f;
-    }
+    public virtual float RandomlyChosenWeight(Branch branch) => 1f;
 }

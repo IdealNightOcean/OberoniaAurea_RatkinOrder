@@ -91,7 +91,7 @@ public class KnightVirtue : IExposable
         if (!SelectTraitForLevel(traitDef, traitLevel, replaceCur))
             return false;
 
-        ResidentPawnsManager.CacheManager?.Notify_KnightVirtuesChanged();
+        ResidentPawnsManager.CacheManager?.KnightsHasUnusedTraitSlot?.MarkDirty();
         return true;
     }
 

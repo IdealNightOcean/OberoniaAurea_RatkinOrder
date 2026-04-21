@@ -115,10 +115,12 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         IEnumerable<ResidentKnight> targetKnights = ResidentPawnsManager.Instance.ResidentKnights.Where(r => r.KnightVirtueHandler.HasUpgradableVirtue)
                                                                                                  .TakeRandomElements(knight);
 
+        string reason = "OARO_VirtueUpgradeReason_BranchDemandCompleted".Translate(quest.name.Named(KeyLibrary_FormatArgName.QuestName));
         foreach (ResidentKnight residentKnight in targetKnights)
         {
             KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(residentKnight);
-            residentKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue);
+
+            residentKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, reason: reason);
         }
     }
 

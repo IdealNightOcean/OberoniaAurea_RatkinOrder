@@ -66,7 +66,7 @@ public class MercyQuestHandler : IExposable
             return;
 
         ResidentPawnsManager.Instance.AllKnightsGainMeditation(200f, directly: false);
-        KnightsVirtuesReward();
+        KnightsVirtuesReward(quest);
         ThanksLetter(quest, mercyQuestDef);
     }
 
@@ -241,13 +241,14 @@ public class MercyQuestHandler : IExposable
         }
     }
 
-    private static void KnightsVirtuesReward()
+    private static void KnightsVirtuesReward(Quest quest)
     {
         ResidentKnight targetKnight = ResidentPawnsManager.Instance.ResidentKnights.Where(r => r.KnightVirtueHandler.HasUpgradableVirtue)
                                                                                    .RandomElementWithFallback(null);
 
         KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(targetKnight);
-        targetKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue);
+        string reason = "OARO_VirtueUpgradeReason_MercyQuestCompleted".Translate(quest.name.Named(KeyLibrary_FormatArgName.QuestName));
+        targetKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, reason: reason);
     }
 
     private float GetMercyQuestChance()

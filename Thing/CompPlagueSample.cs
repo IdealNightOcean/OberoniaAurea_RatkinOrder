@@ -49,8 +49,6 @@ public class CompPlagueSample : CompInteractWithThing
 
     public override void InteractionResult(Pawn pawn)
     {
-        QuestUtility.SendQuestTargetSignals(parent.questTags, "");
-
         int medicineSkillLevel = pawn.GetSkillLevel(SkillDefOf.Medicine);
         if (quest is not null && plagueVillage is not null)
         {

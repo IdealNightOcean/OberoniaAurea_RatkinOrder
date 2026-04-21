@@ -30,6 +30,9 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
     [Unsaved] private readonly Branch branch;
 
     private BranchTaskType focusedTaskType;
+    /// <summary>
+    /// 专注任务类型
+    /// </summary>
     public BranchTaskType FocusedTaskType
     {
         get { return focusedTaskType; }
@@ -43,6 +46,9 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
     private RadicalismDegree curRadicalismDegree;
+    /// <summary>
+    /// 分部的激进程度
+    /// </summary>
     public RadicalismDegree CurRadicalismDegree
     {
         get { return curRadicalismDegree; }

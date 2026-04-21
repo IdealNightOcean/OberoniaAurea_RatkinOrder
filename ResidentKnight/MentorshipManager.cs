@@ -209,7 +209,7 @@ public class MentorshipManager : IExposable
             return;
 
         int level = KnightVirtueUtility.GetRandomNewVirtueLevel_Mentorship(teacher, isResonate);
-        string reason = "OARO_VirtueReason_Mentorship".Translate(teacher.Pawn.Named(KeyLibrary_FormatArgName.PAWN));
+        string reason = "OARO_KnightVirtueGainReason_Mentorship".Translate(teacher.Pawn.Named(KeyLibrary_FormatArgName.PAWN));
         student.KnightVirtueHandler.TryAddVirtue(virtueToTeach, level, reason);
     }
 

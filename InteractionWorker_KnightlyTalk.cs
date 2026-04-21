@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using Verse;
 
@@ -36,21 +37,43 @@ public class InteractionWorker_KnightlyTalk : InteractionWorker
     public override void Interacted(Pawn initiator, Pawn recipient, List<RulePackDef> extraSentencePacks, out string letterText, out string letterLabel, out LetterDef letterDef, out LookTargets lookTargets)
     {
         base.Interacted(initiator, recipient, extraSentencePacks, out letterText, out letterLabel, out letterDef, out lookTargets);
-        if (Rand.Chance(0.1f) && KnightPawnsManager.Instance.TryGetKnightRecord(initiator, out KnightRecord record))
-        {
-            float severity = 0.5f + record.Chivalry.knightlyTalkOffset;
+        if (!KnightPawnsManager.Instance.TryGetKnightRecord(initiator, out KnightRecord initiatorKnight))
+            return;
 
-            if (severity > 0f)
-            {
-                Hediff hediff = recipient.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_KnightlyTalk);
-                hediff.Severity = severity;
-                HediffComp_Disappears disappearsComp = hediff.TryGetComp<HediffComp_Disappears>();
-                if (disappearsComp is null)
-                {
-                    disappearsComp.disappearsAfterTicks = 5 * 60000;
-                    disappearsComp.ticksToDisappear = 5 * 60000;
-                }
-            }
+        GiveKnightlyTalkHediff(initiatorKnight, recipient);
+
+    }
+
+    private void GiveKnightlyTalkHediff(KnightRecord initiatorKnight, Pawn recipient)
+    {
+        if (!Rand.Chance(0.1f))
+            return;
+        HediffDef knightlyTalkHediff = initiatorKnight.Chivalry?.knightlyTalkHediff;
+        if (knightlyTalkHediff is null)
+            return;
+
+        Hediff hediff = recipient.health.GetOrAddHediff(knightlyTalkHediff);
+        HediffComp_Disappears disappearsComp = hediff.TryGetComp<HediffComp_Disappears>();
+        if (disappearsComp is not null)
+        {
+            disappearsComp.disappearsAfterTicks = 5 * 60000;
+            disappearsComp.ticksToDisappear = 5 * 60000;
         }
+    }
+
+    private void KnightVirtueUpgrade(KnightRecord initiatorKnight, Pawn recipient)
+    {
+        if (!Rand.Chance(0.01f))
+            return;
+        if (!ResidentPawnsManager.Instance.TryGetKnightRecord(recipient, out ResidentKnight recipientKnight))
+            return;
+
+        KnightChivalryDef initiatorChivalry = initiatorKnight.Chivalry;
+        KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(recipientKnight, v => initiatorChivalry.IsSameDefNonNullable(v.chivalry));
+        if (targetVirtue is null)
+            return;
+
+        string reason = "OARO_VirtueUpgradeReason_KnightlyTalk".Translate(initiatorKnight.Pawn.Named(KeyLibrary_FormatArgName.PAWN));
+        recipientKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, reason: reason);
     }
 }

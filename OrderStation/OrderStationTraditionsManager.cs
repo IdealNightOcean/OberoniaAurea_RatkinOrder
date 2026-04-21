@@ -20,10 +20,7 @@ public class OrderStationTraditionWorker
         return worker;
     }
 
-    public virtual bool ShouldActiveNow()
-    {
-        return HasRequiredChivalryKnights();
-    }
+    public virtual bool ShouldActiveNow() => HasRequiredChivalryKnights();
 
     public virtual void PostActive() { }
 
@@ -33,7 +30,7 @@ public class OrderStationTraditionWorker
     {
         if (Def.Chivalry is null)
             return true;
-        Dictionary<KnightChivalryDef, int> knightsWithChivalryCount = ResidentPawnsManager.CacheManager?.KnightsWithChivalryCount.Value;
+        IReadOnlyDictionary<KnightChivalryDef, int> knightsWithChivalryCount = ResidentPawnsManager.CacheManager?.KnightsWithChivalryCount;
         if (knightsWithChivalryCount is null)
             return false;
         if (knightsWithChivalryCount.TryGetValue(Def.Chivalry, out int count))
@@ -128,16 +125,16 @@ public class OrderStationTraditionsManager : IExposable
     private static void SendTraditionActivatedLetter(OrderStationTraditionDef traditionDef)
     {
         Find.LetterStack.ReceiveLetter(
-            label: "OARO_LetterLabel_TraditionEstablished".Translate(traditionDef.Named(KeyLibrary_FormatArgName.TRADITIONDEF)),
-            text: "OARO_LetterText_TraditionEstablished".Translate(traditionDef.Named(KeyLibrary_FormatArgName.TRADITIONDEF)),
+            label: "OARO_LetterLabel_TraditionActivated".Translate(traditionDef.Named(KeyLibrary_FormatArgName.DEF)),
+            text: "OARO_LetterText_TraditionActivated".Translate(traditionDef.Named(KeyLibrary_FormatArgName.DEF)),
             textLetterDef: LetterDefOf.PositiveEvent);
     }
 
     private static void SendTraditionDeactivatedLetter(OrderStationTraditionDef traditionDef)
     {
         Find.LetterStack.ReceiveLetter(
-            label: "OARO_LetterLabel_TraditionLost".Translate(traditionDef.Named(KeyLibrary_FormatArgName.TRADITIONDEF)),
-            text: "OARO_LetterText_TraditionLost".Translate(traditionDef.Named(KeyLibrary_FormatArgName.TRADITIONDEF)),
+            label: "OARO_LetterLabel_TraditionDeactivated".Translate(traditionDef.Named(KeyLibrary_FormatArgName.DEF)),
+            text: "OARO_LetterText_TraditionDeactivated".Translate(traditionDef.Named(KeyLibrary_FormatArgName.DEF)),
             textLetterDef: LetterDefOf.NegativeEvent);
     }
 }

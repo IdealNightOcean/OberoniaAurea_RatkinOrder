@@ -1,6 +1,7 @@
 ﻿using NightOcean;
 using RimWorld;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -27,7 +28,7 @@ public partial class Window_OrderStation
         private float MeditationFactor { get; }
         public bool ShowDetail { get; set; }
         public LazyMutable<string> RoleExplanationStr { get; }
-        public LazyMutable<string> ResonatePersonalitiesStr { get; }
+        public LazyMutable<string> ResonateChivalriesStr { get; }
 
         public LazyMutable<AcceptanceReport> RankUpgradeAcceptance { get; }
         public LazyMutable<AcceptanceReport> PostponeResignationAcceptance { get; }
@@ -46,7 +47,7 @@ public partial class Window_OrderStation
             MeditationFactor = record.Pawn.GetStatValue(OARO_ModDefOf.OARO_Stat_MeditationFactor);
 
             RoleExplanationStr = new(refreshFunc: () => Record?.CurRole?.GetRoleDetailDesc() ?? string.Empty);
-            ResonatePersonalitiesStr = new(refreshFunc: RefreshResonatePersonalitiesStr);
+            ResonateChivalriesStr = new(refreshFunc: RefreshResonateChivalriesStr);
             RankUpgradeAcceptance = new(refreshFunc: () => GlobalInteractionUtility.CanUpgradeResidentKnightRank(Record, Map, resultOnly: false));
             PostponeResignationAcceptance = new(refreshFunc: () => GlobalInteractionUtility.CanPostponeResidentKnightkResignation(Record, Map, resultOnly: false));
             PreferredFurnitureCount = new(refreshFunc: RefreshPreferredFurnitureCount);
@@ -63,7 +64,7 @@ public partial class Window_OrderStation
             ShowDetail = false;
 
             RoleExplanationStr.Reset();
-            ResonatePersonalitiesStr.Reset();
+            ResonateChivalriesStr.Reset();
             RankUpgradeAcceptance.Reset();
             PostponeResignationAcceptance.Reset();
             PreferredFurnitureCount.Reset();
@@ -254,7 +255,7 @@ public partial class Window_OrderStation
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, Record.Chivalry.LabelCap);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
-            Widgets.Label(reusedRect, ResonatePersonalitiesStr.Value);
+            Widgets.Label(reusedRect, ResonateChivalriesStr.Value);
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{Record.CurRank}Knight".Translate().Colorize(Record.CurRank.GetColor()));
 
@@ -397,26 +398,29 @@ public partial class Window_OrderStation
             }
         }
 
-        private string RefreshResonatePersonalitiesStr()
+        private string RefreshResonateChivalriesStr()
         {
-            string result = string.Empty;
-            HashSet<KnightChivalryDef> allHasChivalryDefs = ResidentPawnsManager.CacheManager.AllHasChivalriesDefs.Value;
+            IReadOnlyCollection<KnightChivalryDef> allHasChivalryDefs = ResidentPawnsManager.CacheManager?.AllHasChivalriesDefs;
+            if (allHasChivalryDefs is null)
+                return string.Empty;
+
+            StringBuilder resultSB = new(32);
             foreach (KnightChivalryDef chivalry in Record.Chivalry.resonateChivalries)
             {
-                if (!string.IsNullOrEmpty(result))
+                if (resultSB.Length > 0)
                 {
-                    result += "  ";
+                    resultSB.Append("  ");
                 }
                 if (allHasChivalryDefs.Contains(chivalry))
                 {
-                    result += chivalry.LabelCap;
+                    resultSB.Append(chivalry.LabelCap);
                 }
                 else
                 {
-                    result += chivalry.LabelCap.Colorize(Color.gray);
+                    resultSB.Append(chivalry.LabelCap.Colorize(Color.gray));
                 }
             }
-            return result;
+            return resultSB.ToString();
         }
 
         private (int, int) RefreshPreferredFurnitureCount()

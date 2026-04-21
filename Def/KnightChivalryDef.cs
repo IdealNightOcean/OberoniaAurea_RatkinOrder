@@ -9,16 +9,17 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class KnightChivalryDef : Def
 {
-    /// <summary>
-    /// 交流行为 - 骑士激励概率Offset
-    /// </summary>
-    public float knightlyTalkOffset;
 
     public Color color;
 
     public List<KnightChivalryDef> resonateChivalries = [];
 
     public HashSet<KnightChivalryDef> ResonateChivalriesSet { get; private set; }
+
+    /// <summary>
+    /// 骑士激励提供的激励buff
+    /// </summary>
+    public HediffDef knightlyTalkHediff;
 
     private Texture2D colorTex;
     public Texture2D ColorTex

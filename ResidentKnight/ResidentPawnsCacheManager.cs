@@ -11,38 +11,61 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class ResidentPawnsCacheManager
 {
+    /// <summary>
+    /// 所属的常驻人员管理器
+    /// </summary>
     public ResidentPawnsManager Parent { get; }
     private IReadOnlyList<ResidentKnight> ResidentKnights => Parent.ResidentKnights;
+    private bool AnyResidentKnights => ResidentKnights is not null && ResidentKnights.Count > 0;
 
-    public LazyMutable<HashSet<KnightChivalryDef>> AllHasChivalriesDefs { get; }
+    private bool chivalriesCacheDirty = false;
+
+    private readonly HashSet<KnightChivalryDef> allHasChivalriesDefs = [];
+    private readonly Dictionary<KnightChivalryDef, int> knightsWithChivalryCount = [];
+
+    /// <summary>
+    /// 全部常驻骑士持有的所有骑士精神
+    /// </summary>
+    public IReadOnlyCollection<KnightChivalryDef> AllHasChivalriesDefs
+    {
+        get
+        {
+            if (chivalriesCacheDirty)
+                RefreshChivalriesCache();
+            return allHasChivalriesDefs;
+        }
+    }
+    /// <summary>
+    /// 各骑士精神对应的持有骑士数量
+    /// </summary>
+    public IReadOnlyDictionary<KnightChivalryDef, int> KnightsWithChivalryCount
+    {
+        get
+        {
+            if (chivalriesCacheDirty)
+                RefreshChivalriesCache();
+            return knightsWithChivalryCount;
+        }
+    }
+
+    /// <summary>
+    /// 律令骑士数量
+    /// </summary>
     public LazyMutable<int> InstructorKnightsCount { get; }
 
-    public LazyMutableCollection<Dictionary<KnightChivalryDef, int>, KeyValuePair<KnightChivalryDef, int>> KnightsWithChivalryCount { get; }
+    /// <summary>
+    /// 拥有未使用美德词条槽位的常驻骑士
+    /// </summary>
     public LazyMutableCollection<List<Pawn>, Pawn> KnightsHasUnusedTraitSlot { get; }
+    /// <summary>
+    /// 即将离职职的常驻骑士
+    /// </summary>
     public LazyMutableCollection<List<Pawn>, Pawn> KnightsApproachingResignation { get; }
 
-    private bool AnyResidentKnights => ResidentKnights is not null && ResidentKnights.Count > 0;
     public ResidentPawnsCacheManager(ResidentPawnsManager parent)
     {
         Parent = parent;
-        AllHasChivalriesDefs = new(refreshFunc: delegate
-        {
-            HashSet<KnightChivalryDef> knightChivalryDefs = [];
-            if (AnyResidentKnights)
-                return knightChivalryDefs;
-
-            foreach (ResidentKnight residentKnight in ResidentKnights)
-            {
-                if (residentKnight?.Chivalry is not null)
-                {
-                    knightChivalryDefs.Add(residentKnight.Chivalry);
-                }
-            }
-            return knightChivalryDefs;
-        });
-
         InstructorKnightsCount = new(refreshFunc: () => ResidentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_Instructor).Count());
-        KnightsWithChivalryCount = new(refreshFunc: RefreshKnightsWithChivalryCount);
         KnightsHasUnusedTraitSlot = new(refreshFunc: RefreshKnightsHasUnusedTraitSlot);
         KnightsApproachingResignation = new(refreshFunc: RefreshKnightsApproachingResignation);
     }
@@ -54,35 +77,42 @@ public class ResidentPawnsCacheManager
 
     public void OnKnightsChanged()
     {
-        AllHasChivalriesDefs.MarkDirty();
+        chivalriesCacheDirty = true;
         InstructorKnightsCount.MarkDirty();
-        KnightsWithChivalryCount.MarkDirty();
+
         KnightsHasUnusedTraitSlot.MarkDirty();
         KnightsApproachingResignation.MarkDirty();
     }
 
-    public void OnPawnsChanged()
-    {
+    public void OnPawnsChanged() { }
 
-    }
-
-    public void Notify_KnightVirtuesChanged()
+    private void RefreshChivalriesCache()
     {
-        KnightsHasUnusedTraitSlot.MarkDirty();
-    }
+        allHasChivalriesDefs.Clear();
+        knightsWithChivalryCount.Clear();
 
-    private IEnumerable<KeyValuePair<KnightChivalryDef, int>> RefreshKnightsWithChivalryCount()
-    {
         if (!AnyResidentKnights)
-            yield break;
-
-        foreach (IGrouping<KnightChivalryDef, ResidentKnight> group in ResidentKnights.GroupBy(k => k.Chivalry))
         {
-            if (group.Key is not null)
-            {
-                yield return new KeyValuePair<KnightChivalryDef, int>(group.Key, group.Count());
-            }
+            chivalriesCacheDirty = false;
+            return;
         }
+
+        foreach (ResidentKnight knight in ResidentKnights)
+        {
+            KnightChivalryDef chivalry = knight.Chivalry;
+            if (chivalry is null)
+                continue;
+
+            allHasChivalriesDefs.Add(chivalry);
+
+            if (!knightsWithChivalryCount.TryGetValue(chivalry, out int count))
+                count = 0;
+
+            knightsWithChivalryCount[chivalry] = count + 1;
+
+        }
+
+        chivalriesCacheDirty = false;
     }
 
     private IEnumerable<Pawn> RefreshKnightsHasUnusedTraitSlot()

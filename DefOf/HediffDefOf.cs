@@ -42,10 +42,6 @@ public static class OARO_HediffDefOf
     /// </summary>
     public static HediffDef OARO_Hediff_RecruitKnight;
 
-    /// <summary>
-    /// 骑士激励
-    /// </summary>
-    public static HediffDef OARO_Hediff_KnightlyTalk;
 
     /// <summary>
     /// 落难骑士

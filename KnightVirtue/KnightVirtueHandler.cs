@@ -123,7 +123,7 @@ public class KnightVirtueHandler : IExposable
         return false;
     }
 
-    public bool TryAddVirtue(KnightVirtueDef virtueDef, int level, string reason = null)
+    public bool TryAddVirtue(KnightVirtueDef virtueDef, int level, string reason)
     {
         if (virtues.Count >= CurVirtueCountLimit)
             return false;
@@ -135,17 +135,17 @@ public class KnightVirtueHandler : IExposable
 
         Find.LetterStack.ReceiveLetter(
             label: "OARO_LetterLabel_VirtueGained".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN)),
-            text: "OARO_LetterText_VirtueUpgraded".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                                                             virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
-                                                             level.Named(KeyLibrary_FormatArgName.Level),
-                                                             reason.Named(KeyLibrary_FormatArgName.Reason)),
+            text: "OARO_LetterText_VirtueGained".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                                           virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                                           level.Named(KeyLibrary_FormatArgName.Level),
+                                                           reason.Named(KeyLibrary_FormatArgName.Reason)),
             textLetterDef: LetterDefOf.PositiveEvent,
             lookTargets: Pawn);
 
         return true;
     }
 
-    public bool UpgradeVirtue(KnightVirtueDef virtueDef)
+    public bool UpgradeVirtue(KnightVirtueDef virtueDef, string reason)
     {
         if (virtueDef is null)
             return false;
@@ -153,7 +153,7 @@ public class KnightVirtueHandler : IExposable
         KnightVirtue virtue = GetVirtue(virtueDef);
         if (virtue is null)
         {
-            Log.Error("");
+            Log.Error($"[OARO] 尝试升级骑士美德失败：未找到指定的美德 - {virtueDef}");
             return false;
         }
 
@@ -164,7 +164,8 @@ public class KnightVirtueHandler : IExposable
         Messages.Message(
             text: "OARO_Message_VirtueUpgraded".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
                                                           virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
-                                                          newLevel.Named(KeyLibrary_FormatArgName.Level)),
+                                                          newLevel.Named(KeyLibrary_FormatArgName.Level),
+                                                          reason.Named(KeyLibrary_FormatArgName.Reason)),
             lookTargets: Pawn,
             def: MessageTypeDefOf.PositiveEvent);
 
