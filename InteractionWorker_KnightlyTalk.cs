@@ -74,6 +74,6 @@ public class InteractionWorker_KnightlyTalk : InteractionWorker
             return;
 
         string reason = "OARO_VirtueUpgradeReason_KnightlyTalk".Translate(initiatorKnight.Pawn.Named(KeyLibrary_FormatArgName.PAWN));
-        recipientKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, reason: reason);
+        recipientKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, upgrade: 1, reason: reason);
     }
 }

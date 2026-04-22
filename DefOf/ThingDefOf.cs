@@ -63,6 +63,11 @@ public static class OARO_ThingDefOf
     /// </summary>
     public static ThingDef OARO_DesignDrawing;
 
+    /// <summary>
+    /// 骑士日记
+    /// </summary>
+    public static ThingDef OARO_KnightDiary;
+
     static OARO_ThingDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ThingDefOf));

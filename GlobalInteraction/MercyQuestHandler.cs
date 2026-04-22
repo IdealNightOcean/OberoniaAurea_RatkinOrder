@@ -248,7 +248,7 @@ public class MercyQuestHandler : IExposable
 
         KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(targetKnight);
         string reason = "OARO_VirtueUpgradeReason_MercyQuestCompleted".Translate(quest.name.Named(KeyLibrary_FormatArgName.QuestName));
-        targetKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, reason: reason);
+        targetKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, upgrade: 1, reason: reason);
     }
 
     private float GetMercyQuestChance()

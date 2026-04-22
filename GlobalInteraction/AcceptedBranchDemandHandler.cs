@@ -120,7 +120,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
         {
             KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(residentKnight);
 
-            residentKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, reason: reason);
+            residentKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, upgrade: 1, reason: reason);
         }
     }
 

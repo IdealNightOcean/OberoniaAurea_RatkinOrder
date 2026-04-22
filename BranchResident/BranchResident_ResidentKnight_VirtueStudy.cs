@@ -29,10 +29,26 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
         if (virtueDef is null)
             return;
 
-        float successChance = GetTrainSuccessChance(branch, residentKnight, resultOnly: true, out _);
+        StringBuilder extraTextSB = new(64);
+        if (Rand.Chance(KnightDiaryUtility.DiaryGenerationChance))
+        {
+            Book diary = KnightDiaryUtility.GenerateKnightDiary(this, residentKnight);
+            if (diary is not null)
+            {
+                extraTextSB.AppendLine("OARO_ResidentKnightStudy_DiaryGain".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)));
+                pawn.inventory.TryAddAndUnforbid(diary);
+            }
+        }
+
+        float successChance = GetTrainSuccessChance(branch: branch,
+                                                    residentKnight: residentKnight,
+                                                    targetVirtue: virtueDef,
+                                                    medalsCost: medalsCost,
+                                                    resultOnly: true,
+                                                    explanation: out _);
         if (Rand.Chance(successChance))
         {
-            SuccessOutcome(branch, residentKnight);
+            SuccessOutcome(branch, residentKnight, extraTextSB.ToString());
         }
         else
         {
@@ -41,19 +57,41 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
                 lookTargets: pawn,
                 def: MessageTypeDefOf.NegativeEvent);
         }
+
+
     }
 
-    private void SuccessOutcome(Branch branch, ResidentKnight residentKnight)
+    private void SuccessOutcome(Branch branch, ResidentKnight residentKnight, string extraText)
     {
-        int level = GetTrainOutcomeLevel(branch, residentKnight, resultOnly: true, out _);
+
+        int level = GetTrainOutcomeLevel(branch: branch,
+                                         targetVirtue: virtueDef,
+                                         medalsCost: medalsCost,
+                                         resultOnly: true,
+                                         explanation: out _);
         string reason = "OARO_KnightVirtueGainReason_VirtueTrain".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
-        residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef, level, reason);
+
+        var virtueHandler = residentKnight.KnightVirtueHandler;
+        if (virtueHandler.HasVirtue(virtueDef))
+        {
+            virtueHandler.UpgradeVirtueTo(virtueDef, level, reason);
+        }
+        else
+        {
+            virtueHandler.TryAddVirtue(virtueDef, level, reason);
+        }
+
+
+        StringBuilder letterTextSB = new("OARO_LetterText_VirtueTrainSuccess".Translate(
+                                            pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                            virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                            level.Named(KeyLibrary_FormatArgName.Level)));
+        letterTextSB.AppendLine();
+        letterTextSB.AppendLine(extraText);
+
         OrderLetterUtility.ReceiveLetter(
             label: "OARO_LetterLabel_VirtueTrainSuccess".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
-            text: "OARO_LetterText_VirtueTrainSuccess".Translate(
-                pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
-                level.Named(KeyLibrary_FormatArgName.Level)),
+            text: letterTextSB.ToTaggedString(),
             def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: branch.RatkinOrder,
             relatedBranch: branch,
@@ -61,12 +99,22 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 
-    private float GetTrainSuccessChance(Branch branch, ResidentKnight residentKnight, bool resultOnly, out string explanation)
+    private void FailureOutcome(Branch branch, ResidentKnight residentKnight, string extraText)
+    {
+        //目前先不设计失败的具体后果，后续可以考虑增加一些负面效果
+    }
+
+    public static float GetTrainSuccessChance(Branch branch,
+                                              ResidentKnight residentKnight,
+                                              KnightVirtueDef targetVirtue,
+                                              IReadOnlyDictionary<BranchMedalDef, int> medalsCost,
+                                              bool resultOnly,
+                                              out string explanation)
     {
         explanation = string.Empty;
         StringBuilder expSB = resultOnly ? null : new(64);
 
-        KnightChivalryDef virtueChivalry = virtueDef.chivalry;
+        KnightChivalryDef virtueChivalry = targetVirtue.chivalry;
         float successChance = 0f;
 
         float curStepChange = 0.2f;
@@ -151,11 +199,14 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
         return successChance;
     }
 
-
-    private int GetTrainOutcomeLevel(Branch branch, ResidentKnight residentKnight, bool resultOnly, out string explanation)
+    public static int GetTrainOutcomeLevel(Branch branch,
+                                           KnightVirtueDef targetVirtue,
+                                           IReadOnlyDictionary<BranchMedalDef, int> medalsCost,
+                                           bool resultOnly,
+                                           out string explanation)
     {
         explanation = string.Empty;
-        KnightChivalryDef virtueChivalry = virtueDef.chivalry;
+        KnightChivalryDef virtueChivalry = targetVirtue.chivalry;
 
         int totalMedalsCost = medalsCost.Values.Sum();
         bool sameChivalryWithHonor = virtueChivalry.IsSameDefNonNullable(branch.HonorDef?.Chivalry);
@@ -239,4 +290,5 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
 
         return levelWeightPair.RandomElementByWeight(pair => pair.Item2).Item1;
     }
+
 }

@@ -167,6 +167,7 @@
     <Compile Include="Def\OrderLetterDef.cs" />
     <Compile Include="Def\OrderStationTraditionDef.cs" />
     <Compile Include="HarmonyPatch\TryDoMentalBreak_Patch.cs" />
+    <Compile Include="ReadingOutcomeDoer_KnightDiary.cs" />
     <Compile Include="KnightVirtue\Alert_AnyResiHasUnused.cs" />
     <Compile Include="KnightVirtue\KnightVirtue.cs" />
     <Compile Include="KnightVirtue\KnightVirtueHandler.cs" />

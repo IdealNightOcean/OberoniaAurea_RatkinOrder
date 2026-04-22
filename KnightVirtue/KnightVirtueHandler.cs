@@ -145,9 +145,12 @@ public class KnightVirtueHandler : IExposable
         return true;
     }
 
-    public bool UpgradeVirtue(KnightVirtueDef virtueDef, string reason)
+    /// <summary>
+    /// 将指定美德升级到目标等级（如果当前等级已经高于或等于目标等级则升级失败），成功升级后会发送提示信息
+    /// </summary>
+    public bool UpgradeVirtueTo(KnightVirtueDef virtueDef, int targetLevel, string reason)
     {
-        if (virtueDef is null)
+        if (virtueDef is null || targetLevel <= 0)
             return false;
 
         KnightVirtue virtue = GetVirtue(virtueDef);
@@ -157,7 +160,45 @@ public class KnightVirtueHandler : IExposable
             return false;
         }
 
-        int newLevel = UpgradeVirtue(virtue);
+        int upgradeAmount = targetLevel - virtue.Level;
+        if (upgradeAmount <= 0)
+        {
+            Log.Error($"[OARO] 尝试升级骑士美德失败：目标等级必须高于当前等级 - {virtueDef} 当前等级: {virtue.Level} 目标等级: {targetLevel}");
+            return false;
+        }
+
+        int newLevel = UpgradeVirtue(virtue, upgradeAmount);
+        if (newLevel < 0)
+            return false;
+
+        Messages.Message(
+            text: "OARO_Message_VirtueUpgraded".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                                          virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                                          newLevel.Named(KeyLibrary_FormatArgName.Level),
+                                                          reason.Named(KeyLibrary_FormatArgName.Reason)),
+            lookTargets: Pawn,
+            def: MessageTypeDefOf.PositiveEvent);
+
+        return true;
+    }
+
+
+    /// <summary>
+    /// 升级指定美德
+    /// </summary>
+    public bool UpgradeVirtue(KnightVirtueDef virtueDef, int upgrade, string reason)
+    {
+        if (virtueDef is null || upgrade <= 0)
+            return false;
+
+        KnightVirtue virtue = GetVirtue(virtueDef);
+        if (virtue is null)
+        {
+            Log.Error($"[OARO] 尝试升级骑士美德失败：未找到指定的美德 - {virtueDef}");
+            return false;
+        }
+
+        int newLevel = UpgradeVirtue(virtue, upgrade);
         if (newLevel < 0)
             return false;
 
@@ -238,13 +279,13 @@ public class KnightVirtueHandler : IExposable
     }
 
     /// <returns>升级后的新等级，返回 -1 表示升级失败</returns>
-    private int UpgradeVirtue(KnightVirtue virtue)
+    private int UpgradeVirtue(KnightVirtue virtue, int upgrade)
     {
         if (virtue.Level >= virtue.Def.maxLevel)
         {
             return -1;
         }
-        virtue.Level++;
+        virtue.Level += upgrade;
         VirtuesChanged();
         return virtue.Level;
     }

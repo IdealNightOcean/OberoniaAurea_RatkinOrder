@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Verse;
@@ -14,15 +15,46 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight residentKnight))
             return;
 
-        float meditationGain = GetMeditationGain(branch, resultOnly: false, out string explanation);
+        float meditationGain = GetMeditationGain(branch: branch,
+                                                 medalsCost: medalsCost,
+                                                 resultOnly: false,
+                                                 explanation: out string explanation);
         residentKnight.MeditationPoints += meditationGain;
+        StringBuilder letterTextSB = new("OARO_MeditationStudyComplete_Meditation".Translate(
+                                            pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                            meditationGain.ToString("F0").Named(KeyLibrary_FormatArgName.Count),
+                                            explanation.Named(KeyLibrary_FormatArgName.Reason)));
+
+        letterTextSB.AppendLine();
+
+        float virtueGainChance = medalsCost.Values.Sum() * 0.02f;
+        if (Rand.Chance(virtueGainChance))
+        {
+            KnightVirtueDef newVirtueDef = KnightVirtueUtility.GetRandomAvailableVirtue(residentKnight);
+            if (newVirtueDef is not null)
+            {
+                letterTextSB.AppendLine("OARO_MeditationStudyComplete_VirtueGain".Translate(
+                                            pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                            newVirtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF)));
+                residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef: newVirtueDef,
+                                                                level: 1,
+                                                                reason: "OARO_KnightVirtueGainReason_MeditationStudy".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)));
+            }
+        }
+
+        if (Rand.Chance(KnightDiaryUtility.DiaryGenerationChance))
+        {
+            Book diary = KnightDiaryUtility.GenerateKnightDiary(this, residentKnight);
+            if (diary is not null)
+            {
+                letterTextSB.AppendLine("OARO_ResidentKnightStudy_DiaryGain".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)));
+                pawn.inventory.TryAddAndUnforbid(diary);
+            }
+        }
 
         OrderLetterUtility.ReceiveLetter(
             label: "OARO_LetterLabel_MeditationStudyComplete".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN)),
-            text: "OARO_LetterText_MeditationStudyComplete".Translate(
-                pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                meditationGain.ToString("F0").Named(KeyLibrary_FormatArgName.Count),
-                explanation.Named(KeyLibrary_FormatArgName.Reason)),
+            text: letterTextSB.ToTaggedString(),
             def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: branch.RatkinOrder,
             relatedBranch: branch,
@@ -30,7 +62,10 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 
-    private float GetMeditationGain(Branch branch, bool resultOnly, out string explanation)
+    public static float GetMeditationGain(Branch branch,
+                                          IReadOnlyDictionary<BranchMedalDef, int> medalsCost,
+                                          bool resultOnly,
+                                          out string explanation)
     {
         explanation = string.Empty;
         StringBuilder expSB = resultOnly ? null : new(64);

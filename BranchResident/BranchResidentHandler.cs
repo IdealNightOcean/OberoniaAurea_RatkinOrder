@@ -171,10 +171,10 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
                 caravan.AddPawn(pawn, addCarriedPawnToWorldPawnsIfAny: true);
             }
             Find.LetterStack.ReceiveLetter(label: "OARO_ResidencyFinished_Label".Translate(),
-                               text: "OARO_ResidencyFinishedText_JoinCaravan".Translate(
-                                   caravan.Named(KeyLibrary_FormatArgName.Caravan),
-                                   GenLabel.ThingsLabel(pawns.Cast<Thing>()).Named(KeyLibrary_FormatArgName.PawnsInfo)),
-                               textLetterDef: LetterDefOf.PositiveEvent, lookTargets: caravan);
+                                           text: "OARO_ResidencyFinishedText_JoinCaravan".Translate(
+                                                       caravan.Named(KeyLibrary_FormatArgName.Caravan),
+                                                       GenLabel.ThingsLabel(pawns.Cast<Thing>()).Named(KeyLibrary_FormatArgName.PawnsInfo)),
+                                           textLetterDef: LetterDefOf.PositiveEvent, lookTargets: caravan);
             return;
         }
 

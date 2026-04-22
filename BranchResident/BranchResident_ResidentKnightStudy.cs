@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using System.Collections.Generic;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -7,11 +8,20 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class BranchResident_ResidentKnightStudy : BranchResident
 {
     protected Dictionary<BranchMedalDef, int> medalsCost = [];
+    public IReadOnlyDictionary<BranchMedalDef, int> MedalsCost => medalsCost;
 
     public override void StartResidency(Branch branch)
     {
         base.StartResidency(branch);
         OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+    }
+
+    public void MedalsCostAdd(BranchMedalDef medal, int cost)
+    {
+        if (!medalsCost.TryGetValue(medal, out int count))
+            count = 0;
+
+        medalsCost[medal] = count + cost;
     }
 
     public override void ExposeData()
@@ -20,6 +30,14 @@ public abstract class BranchResident_ResidentKnightStudy : BranchResident
         Scribe_Collections.Look(ref medalsCost, nameof(medalsCost), LookMode.Def, LookMode.Value);
     }
 
+    public static int GetDeployDays(Map map, Branch branch)
+    {
+        if (map is null || branch is null)
+            return 10;
+
+        float distance = branch.DistanceTo(map.Tile);
+        return 5 + 5 + Mathf.RoundToInt(distance / 30f);
+    }
 
     public static int RecommendationLetterCost(ResidentKnight knight, Branch targetBranch)
     {
