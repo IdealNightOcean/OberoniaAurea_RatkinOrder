@@ -160,7 +160,6 @@ public static class AcademicUtility
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
             return false;
 
-
         return CanActivateAcademicBySelf(record, academic, resultOnly);
     }
 

@@ -6,7 +6,7 @@ public class BranchInteractionWorker_RequestCombatReadiness(BranchInteractionDef
 {
     protected override AcceptanceReport BranchValidate(BranchInteractionParms parms, bool resultOnly)
     {
-        AcceptanceReport acceptance = parms.Branch.TaskHandler.CanSwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, resultOnly: false);
+        AcceptanceReport acceptance = parms.Branch.TaskHandler.CanStartTask(BranchTaskDefOf.OARO_CombatReadiness, resultOnly: false);
         if (!acceptance)
         {
             return acceptance;
@@ -21,7 +21,7 @@ public class BranchInteractionWorker_RequestCombatReadiness(BranchInteractionDef
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
-        bool succeeded = parms.Branch.TaskHandler.TrySwitchToTask(BranchTaskDefOf.OARO_CombatReadiness, endCurIfCantSwitch: false);
+        bool succeeded = parms.Branch.TaskHandler.TryStartTask(BranchTaskDefOf.OARO_CombatReadiness, endCurIfCantSwitch: false);
         return (succeeded, true);
     }
 }

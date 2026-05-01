@@ -5,6 +5,22 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+public class BranchTaskStartChecker_JurisdictionDuty : BranchTaskStartChecker
+{
+    public override AcceptanceReport CanStartNow(Branch branch, bool resultOnly = false)
+    {
+        if (branch.Squad.MemberPercentage < 0.75f)
+        {
+            return resultOnly ? false : "OARO_Insufficient_MemberPercentage".Translate("75%");
+        }
+        if (branch.Supply < 0.8f)
+        {
+            return resultOnly ? false : "OARO_Insufficient_SquadSupply".Translate("80%"); ;
+        }
+        return true;
+    }
+}
+
 public class BranchTask_JurisdictionDuty : BranchTask
 {
     protected override void PostTaskEnd()

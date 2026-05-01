@@ -95,11 +95,4 @@ public class BranchTaskDef : Def
     /// </summary>
     public float restDays;
 
-    /// <summary>
-    /// 下一个任务，可为 <see langword="null"/>
-    /// </summary>
-    /// <remarks>
-    /// <para>- 当前任务结束后将会尝试开始</para>
-    /// </remarks>
-    public BranchTaskDef nextTask;
 }

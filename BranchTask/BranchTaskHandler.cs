@@ -142,7 +142,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             curTask.TickHour();
             if (curTask.DurationLeft <= 0)
             {
-                FinishCurTask();
+                EndCurTask(startRest: true);
             }
         }
     }
@@ -155,8 +155,11 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         }
     }
 
-    public AcceptanceReport CanSwitchToTask(BranchTaskDef newTaskDef, bool ignorePriority = false, bool resultOnly = false)
+    public AcceptanceReport CanStartTask(BranchTaskDef newTaskDef, bool ignorePriority = false, bool resultOnly = false)
     {
+        if (newTaskDef is null)
+            return false;
+
         if (branch.IsOnJointPatrol())
         {
             return resultOnly ? false : "OARO_BranchOnJointPatrolNow".Translate();
@@ -170,86 +173,79 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
                                         + "WaitTime".Translate(beAttackedCooling.ToStringTicksToPeriod());
         }
 
-        if (!HasTask)
+        if (HasTask)
+        {
+            BranchTaskDef curTaskDef = curTask.Def;
+            if (newTaskDef == curTaskDef)
+            {
+                return resultOnly ? false : "OARO_AlreadyDoingSameTask".Translate();
+            }
+
+            if (curTask.IsOngoing && !curTaskDef.canInterrupted)
+            {
+                return resultOnly ? false : "OARO_TaskCannotBeInterrupted".Translate();
+            }
+
+            if (!ignorePriority && curTaskDef.priority >= newTaskDef.priority)
+            {
+                return resultOnly ? false : "OARO_TaskPriorityHigherOrEqual".Translate();
+            }
+        }
+        else
         {
             if (!newTaskDef.ignoreRest && IsRestNow)
             {
                 return resultOnly ? false : "OARO_SquadIsRestNow".Translate();
             }
-
-            return newTaskDef?.StartChecker.CanStartNow(branch, resultOnly) ?? true;
-        }
-
-        if (newTaskDef is null)
-        {
-            if (curTask.IsOngoing && !curTask.Def.canInterrupted)
-            {
-                return resultOnly ? false : "OARO_TaskCannotBeInterrupted".Translate();
-            }
-
-            return true;
-        }
-
-        BranchTaskDef curTaskDef = curTask.Def;
-
-        if (newTaskDef == curTaskDef)
-        {
-            return resultOnly ? false : "OARO_AlreadyDoingSameTask".Translate();
-        }
-
-        if (curTask.IsOngoing && !curTaskDef.canInterrupted)
-        {
-            return resultOnly ? false : "OARO_TaskCannotBeInterrupted".Translate();
-        }
-
-        if (newTaskDef == curTaskDef.nextTask)
-        {
-            return newTaskDef.StartChecker.CanStartNow(branch, resultOnly);
-        }
-
-        if (!ignorePriority && curTaskDef.priority >= newTaskDef.priority)
-        {
-            return resultOnly ? false : "OARO_TaskPriorityHigherOrEqual".Translate();
         }
 
         return newTaskDef.StartChecker.CanStartNow(branch, resultOnly);
     }
 
-    public bool TrySwitchToTask(BranchTaskDef newTaskDef, bool forced = false, bool endCurIfCantSwitch = false)
+    public bool TryStartTask(BranchTaskDef newTaskDef, bool forced = false)
     {
-        if (forced || CanSwitchToTask(newTaskDef, resultOnly: true))
-        {
-            if (newTaskDef is null)
-            {
-                EndCurTask(startRest: true);
-                return true;
-            }
-            else
-            {
-                EndCurTask(startRest: false);
-                return StartTask(newTaskDef);
-            }
-        }
+        if (newTaskDef is null)
+            return false;
 
-        if (endCurIfCantSwitch)
+        if (forced || CanStartTask(newTaskDef, resultOnly: true))
         {
-            EndCurTask(startRest: true);
+            return StartTask(newTaskDef);
         }
 
         return false;
+    }
+
+    public void EndCurTask(bool startRest)
+    {
+        if (!HasTask)
+            return;
+
+        branch.EffectTags.DecrementTagsValue(curTask.Def.effectFlags);
+        curTask.EndTask();
+        if (startRest)
+        {
+            restEndTick = Find.TickManager.TicksGame + curTask.BranchRestTick();
+        }
+
+        curTask = null;
+        branch.MarkWorkStateDirty();
     }
 
     private bool StartTask(BranchTaskDef newTaskDef)
     {
         try
         {
+            if (curTask is not null)
+            {
+                EndCurTask(startRest: false);
+            }
             curTask = BranchTask.GenerateTask(newTaskDef, branch);
             curTask.StartTask();
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"为分部 {branch} 切换到任务 {newTaskDef} ",
+                errorDesc: $"为分部 {branch} 开始任务 {newTaskDef} ",
                 typeName: nameof(BranchTaskHandler),
                 methodName: nameof(StartTask),
                 needStackTrace: true);
@@ -266,48 +262,6 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
         branch.MarkWorkStateDirty();
         return true;
-    }
-
-    private void FinishCurTask()
-    {
-        if (!HasTask)
-        {
-            return;
-        }
-
-        if (curTask.Def.nextTask is null)
-        {
-            EndCurTask(startRest: true);
-        }
-        else
-        {
-            TrySwitchToTask(curTask.Def.nextTask, endCurIfCantSwitch: true);
-        }
-    }
-
-    public void EndCurTask(bool startRest)
-    {
-        if (!HasTask)
-        {
-            return;
-        }
-
-        branch.EffectTags.DecrementTagsValue(curTask.Def.effectFlags);
-        curTask.EndTask();
-        if (startRest)
-        {
-            restEndTick = Find.TickManager.TicksGame + curTask.BranchRestTick();
-        }
-
-        curTask = null;
-        branch.MarkWorkStateDirty();
-    }
-
-    private void ClearAutoTargetTask()
-    {
-        autoTargetTask = null;
-        autoStartFailCount = 0;
-        autoStartTaskChance = BaseAutoStartTaskChance(branch);
     }
 
     private string GetTaskAutoStartDesc()
@@ -352,7 +306,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (Rand.Chance(usedChance) && autoTargetTask is not null)
         {
-            if (TrySwitchToTask(autoTargetTask))
+            if (TryStartTask(autoTargetTask))
             {
                 ClearAutoTargetTask();
             }
@@ -361,6 +315,13 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
                 autoStartFailCount++;
             }
         }
+    }
+
+    private void ClearAutoTargetTask()
+    {
+        autoTargetTask = null;
+        autoStartFailCount = 0;
+        autoStartTaskChance = BaseAutoStartTaskChance(branch);
     }
 
     internal void PostLoadInit()

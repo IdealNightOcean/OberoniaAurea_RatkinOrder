@@ -24,7 +24,7 @@ public static class OARO_MapUtility
     /// </summary>
     /// <param name="forQuest">为任务获取</param>
     /// <param name="canBeSpace">能否位于太空</param>
-    /// <returns>得到的地图，无符合条件则返回null</returns>
+    /// <returns>得到的地图，无符合条件则返回<see langword="null"/></returns>
     public static Map GetRationalPlayerHomeMap(bool forQuest, bool canBeSpace = false)
     {
         Map map = Find.CurrentMap;

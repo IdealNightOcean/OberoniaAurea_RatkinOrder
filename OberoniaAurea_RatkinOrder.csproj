@@ -550,7 +550,6 @@
     <Compile Include="Utility\BranchSupportUtility.cs" />
     <Compile Include="Def\BranchTaskDef.cs" />
     <Compile Include="BranchTask\BranchTaskHandler.cs" />
-    <Compile Include="BranchTask\BranchTask_JurisdictionDutyPrep.cs" />
     <Compile Include="Lord\LordJob_AssaultColony_NeverFleeOrder.cs" />
     <Compile Include="Components\TagStrToValue\TagStrToBoolCountable.cs" />
     <Compile Include="Branch\BranchSquad.cs" />

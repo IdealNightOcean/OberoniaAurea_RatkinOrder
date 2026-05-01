@@ -98,7 +98,6 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
 
     public void Notify_BranchDestroyed(Branch branch) => records.RemoveAll(r => r is null || !r.Branch.IsValid() || r.Branch == branch);
 
-
     private static void KnightsVirtuesReward(BranchDemand demand, Quest quest)
     {
         if (demand.DemandTypeValue != BranchDemand.DemandType.Critical)

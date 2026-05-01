@@ -27,16 +27,7 @@ public static class KnightChivalryUtility
         KnightChivalryDef knightChivalry = knight.Chivalry;
         KnightChivalryDef otherChivalry = other.Chivalry;
 
-        if (knightChivalry is null || otherChivalry is null)
-            return false;
-
-        if (knightChivalry == otherChivalry)
-            return true;
-
-        if (knightChivalry.ResonateChivalriesSet.Contains(otherChivalry))
-            return true;
-
-        return false;
+        return IsChivalryResonate(knightChivalry, otherChivalry);
     }
 
     /// <summary>
@@ -50,15 +41,6 @@ public static class KnightChivalryUtility
         KnightChivalryDef knightChivalry = knight.Chivalry;
         KnightChivalryDef otherChivalry = other.Chivalry;
 
-        if (knightChivalry is null || otherChivalry is null)
-            return false;
-
-        if (knightChivalry == otherChivalry)
-            return true;
-
-        if (knightChivalry.ResonateChivalriesSet.Contains(otherChivalry))
-            return true;
-
-        return false;
+        return IsChivalryResonate(knightChivalry, otherChivalry);
     }
 }
