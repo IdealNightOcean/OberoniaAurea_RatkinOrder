@@ -58,6 +58,10 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             {
                 curRadicalismDegree = value;
                 branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.RadicalismDegreeChanged, cdTicks: 5 * 60000, removeWhenExpired: true);
+                if (IsRestNow)
+                {
+                    ResetRestTick();
+                }
             }
         }
     }
@@ -84,6 +88,21 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
     {
         this.branch = branch ?? throw new ArgumentNullException(nameof(branch));
         autoStartTaskChance = BaseAutoStartTaskChance(branch);
+    }
+
+    public void ResetRestTick()
+    {
+        restEndTick = Find.TickManager.TicksGame + BranchRestTickByDegree(curRadicalismDegree);
+    }
+
+    public static int BranchRestTickByDegree(RadicalismDegree degree)
+    {
+        return degree switch
+        {
+            RadicalismDegree.StabilityFocused => 45 * 60000,
+            RadicalismDegree.Aggressive => 15 * 60000,
+            _ => 30 * 60000
+        };
     }
 
     public void ExposeData()

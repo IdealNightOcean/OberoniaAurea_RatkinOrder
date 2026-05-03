@@ -1,4 +1,9 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
 
 public enum BranchTaskType : byte
 {
@@ -22,4 +27,32 @@ public enum BranchTaskType : byte
     /// 监察丨行政问责
     /// </summary>
     Supervision
+}
+
+public static class BranchTaskTypeExtension
+{
+    public static readonly BranchTaskType[] EnumArr = Enum.GetValues(typeof(BranchTaskType)) as BranchTaskType[];
+
+    private static Dictionary<BranchTaskType, List<BranchMedalDef>> medalDefsByTaskType;
+
+    public static List<BranchMedalDef> GetMedalDefsByTaskType(BranchTaskType taskType)
+    {
+        if (medalDefsByTaskType is null)
+        {
+            InitMedalDefsByTaskType();
+        }
+
+        if (medalDefsByTaskType.TryGetValue(taskType, out List<BranchMedalDef> medalDefs))
+        {
+            return medalDefs;
+        }
+
+        return [];
+    }
+
+    private static void InitMedalDefsByTaskType()
+    {
+        medalDefsByTaskType = DefDatabase<BranchMedalDef>.AllDefsListForReading.GroupBy(m => m.focusedTaskType)
+                                                                               .ToDictionary(g => g.Key, g => g.ToList());
+    }
 }

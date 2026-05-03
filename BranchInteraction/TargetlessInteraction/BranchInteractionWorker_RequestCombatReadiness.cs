@@ -1,4 +1,4 @@
-﻿using Verse;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -21,7 +21,11 @@ public class BranchInteractionWorker_RequestCombatReadiness(BranchInteractionDef
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
-        bool succeeded = parms.Branch.TaskHandler.TryStartTask(BranchTaskDefOf.OARO_CombatReadiness, endCurIfCantSwitch: false);
+        bool succeeded = parms.Branch.TaskHandler.TryStartTask(BranchTaskDefOf.OARO_CombatReadiness);
+        if (succeeded && parms.Branch.TaskHandler.IsRestNow)
+        {
+            parms.Branch.TaskHandler.ResetRestTick();
+        }
         return (succeeded, true);
     }
 }

@@ -120,6 +120,15 @@
     <Compile Include="BranchStat\BranchStatPart_BranchTypeFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_OrderReformationFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_OrderReformationOffset.cs" />
+    <Compile Include="BranchTask\AssistanceRequest.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_AcademicRequired.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_AttributeRequired.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_BasicWork.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_SkillRequired.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_VirtueRequired.cs" />
+    <Compile Include="BranchTask\CompletedObjective.cs" />
+    <Compile Include="BranchTask\JurisdictionDutyData.cs" />
     <Compile Include="BranchTradition\BranchTradition.cs" />
     <Compile Include="BranchTradition\BranchTraditionHandler.cs" />
     <Compile Include="BranchTradition\BranchTraditionStage.cs" />
@@ -576,6 +585,7 @@
     <Compile Include="WorldObject\WorldObject_BranchSite.cs" />
     <Compile Include="WorldObject\WorldObject_CriticalBranchDemand.cs" />
     <Compile Include="WorldObject\WorldObject_JointPatrolCaravanHelpSite.cs" />
+    <Compile Include="WorldObject\WorldObject_JurisdictionDutySite.cs" />
     <Compile Include="WorldObject\WorldObject_OrderRelationshipUpgrade.cs" />
     <Compile Include="WorldObject\Demand\WorldObject_SupplyDepotConstruction.cs" />
     <Compile Include="WorldObject\Demand\WorldObject_FieldSurvey.cs" />
