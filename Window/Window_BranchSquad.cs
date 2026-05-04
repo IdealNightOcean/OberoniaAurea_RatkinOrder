@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -234,13 +235,13 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.x, 240f, areaRect.height - 5f);
         if (selIsHonor)
         {
-            BranchMedalDef honorMedal = honorDef.medalDef;
-            if (honorMedal is not null)
+            KnightChivalryDef honorChivalry = honorDef.chivalry;
+            if (honorChivalry?.medal is not null)
             {
-                GUI.DrawTexture(reusedRect, honorMedal.honorBackgroundTexture.Texture);
+                GUI.DrawTexture(reusedRect, honorChivalry.medal.honorBackgroundTexture.Texture);
 
                 reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
-                GUI.DrawTexture(reusedRect, honorMedal.honorDecorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(reusedRect, honorChivalry.medal.honorDecorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
             }
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 170f, 96f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
@@ -690,9 +691,7 @@ public class Window_BranchSquad : OrderWindowBase
     private void DrawMedalRect(Rect inRect)
     {
         if (!SelBranch.IsValid())
-        {
             return;
-        }
 
         BranchMedalHandler medalHandler = SelBranch.MedalHandler;
         if (medalHandler.PrimaryMedal is not null)
@@ -723,16 +722,16 @@ public class Window_BranchSquad : OrderWindowBase
         Rect entryRect;
 
         Rect medalViewRect = medalOutRect;
-        List<BranchMedalDef> allMedalDefs = DefDatabase<BranchMedalDef>.AllDefsListForReading;
-        medalViewRect.height = (allMedalDefs.Count / 2f + 1) * (entryHeight + entryYInterval) - entryYInterval;
+        List<KnightChivalryDef> allMedalChivalries = OrderDefDatabase.MedalChivalries;
+        medalViewRect.height = (allMedalChivalries.Count / 2f + 1) * (entryHeight + entryYInterval) - entryYInterval;
 
         Widgets.BeginScrollView(medalOutRect, ref scrollPosition_Medals, medalViewRect, showScrollbars: false);
 
-        BranchMedalDef primaryMedal = SelBranch.MedalHandler.PrimaryMedal;
+        KnightChivalryDef primaryMedalChivalry = SelBranch.MedalHandler.PrimaryChivalry;
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
-        foreach (BranchMedalDef medalDef in allMedalDefs)
+        foreach (KnightChivalryDef medalChivalry in allMedalChivalries)
         {
             entryRect = new(entryX, entryY, entryWidth, entryHeight);
             column++;
@@ -747,23 +746,23 @@ public class Window_BranchSquad : OrderWindowBase
                 entryX += (entryWidth + entryXInterval);
             }
 
-            int medalCount = medalHandler.GetMedalCount(medalDef);
+            int medalCount = medalHandler.GetMedalCount(medalChivalry);
             if (medalCount > 0)
             {
                 Rect iconText = entryRect;
                 iconText.width = 55f;
-                if (medalDef == primaryMedal)
+                if (medalChivalry.IsSameDefNonNullable(primaryMedalChivalry))
                 {
-                    GUI.DrawTexture(iconText, medalDef.primaryIconTexture.Texture, ScaleMode.ScaleToFit);
+                    GUI.DrawTexture(iconText, medalChivalry.primaryIcon.Texture, ScaleMode.ScaleToFit);
                 }
                 else
                 {
-                    GUI.DrawTexture(iconText.ContractedBy(6f), medalDef.iconTexture.Texture, ScaleMode.ScaleToFit);
+                    GUI.DrawTexture(iconText.ContractedBy(6f), medalChivalry.icon.Texture, ScaleMode.ScaleToFit);
                 }
                 Widgets.Label(entryRect, $"× {medalCount}");
-                if (!string.IsNullOrEmpty(medalDef.effectDescription))
+                if (!string.IsNullOrEmpty(medalChivalry.medal.effectDescription))
                 {
-                    TooltipHandler.TipRegion(entryRect, () => medalDef.effectDescription, uniqueId: 4131582);
+                    TooltipHandler.TipRegion(entryRect, () => medalChivalry.medal.effectDescription, uniqueId: 4131582);
                 }
             }
         }

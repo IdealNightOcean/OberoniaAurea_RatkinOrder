@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class CriticalDemand_Extension : DefModExtension
 {
-    public List<BranchMedalDef> potentialMedals = [];
+    public List<KnightChivalryDef> potentialMedals = [];
     public List<QuestEffectTag> fixedTags;
     public List<QuestEffectTag> randomTags;
     public IntRange randomTagsSelectCount = IntRange.One;

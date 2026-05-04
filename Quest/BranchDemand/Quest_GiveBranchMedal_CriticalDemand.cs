@@ -13,7 +13,7 @@ public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
     public SlateRef<string> inSignal;
 
     public SlateRef<Branch> branch;
-    public SlateRef<IEnumerable<BranchMedalDef>> potentialDefs;
+    public SlateRef<IEnumerable<KnightChivalryDef>> potentialDefs;
     public SlateRef<int> count;
 
     public SlateRef<int> baseRewardMedalTypeCount = 2;
@@ -42,7 +42,7 @@ public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
             ExtraMedalPotencyBoundary = extraMedalPotencyBoundary.GetValue(slate),
             PotentialMedalDefs = [],
         };
-        IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<BranchMedalDef>>(KeyLibrary_SlateStoreAs.preSetPotentialMedals);
+        IEnumerable<KnightChivalryDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<KnightChivalryDef>>(KeyLibrary_SlateStoreAs.preSetPotentialMedals);
         if (potentialDefs is not null)
         {
             questPart_GiveBranchMedal_CriticalDemand.PotentialMedalDefs.AddRangeUnique(potentialDefs);
@@ -89,7 +89,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
 {
     public string InSignalTrigger;
     public Branch Branch;
-    public List<BranchMedalDef> PotentialMedalDefs;
+    public List<KnightChivalryDef> PotentialMedalDefs;
     public int Count;
 
     public int BaseRewardMedalTypeCount;
@@ -143,7 +143,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
         cliquesManager.TotalPotency.MarkDirty();
         float totalPotency = cliquesManager.TotalPotency.Value;
 
-        Dictionary<BranchMedalDef, int> gainMedals = [];
+        Dictionary<KnightChivalryDef, int> gainMedals = [];
         foreach (QuestClique clique in cliquesManager.AllCliques)
         {
             if (!clique.IsBranchClique)
@@ -154,19 +154,14 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
             Branch branch = clique.RelatedBranch;
             BranchMedalHandler medalHandler = branch.MedalHandler;
 
-            BranchMedalDef medalDef;
+            KnightChivalryDef medalChivalry;
             int gainMedalCount;
 
-            if (clique.FocusedTaskType != BranchTaskType.General)
+            if (clique.FocusedTaskChivalry?.medal is not null)
             {
-                IReadOnlyList<BranchMedalDef> potentialMedalDefs = OrderDefDataBase.TryGetAllBranchMedalDefsByTaskType(clique.FocusedTaskType);
-                if (potentialMedalDefs is not null && potentialMedalDefs.Count > 0)
-                {
-                    medalDef = potentialMedalDefs.RandomElement();
-                    gainMedalCount = 1;
-                    medalHandler.AdjustMedal(medalDef, gainMedalCount);
-                    gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
-                }
+                gainMedalCount = 1;
+                medalHandler.AdjustMedal(clique.FocusedTaskChivalry, gainMedalCount);
+                gainMedals[clique.FocusedTaskChivalry] = gainMedals.TryGetValue(clique.FocusedTaskChivalry, fallback: 0) + gainMedalCount;
             }
 
             if (!PotentialMedalDefs.NullOrEmpty())
@@ -176,9 +171,9 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
                     gainMedalCount = Mathf.CeilToInt(totalPotency / 0.5f);
                     if (gainMedalCount > 0)
                     {
-                        medalDef = PotentialMedalDefs.RandomElement();
-                        medalHandler.AdjustMedal(medalDef, gainMedalCount);
-                        gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
+                        medalChivalry = PotentialMedalDefs.RandomElement();
+                        medalHandler.AdjustMedal(medalChivalry, gainMedalCount);
+                        gainMedals[medalChivalry] = gainMedals.TryGetValue(medalChivalry, fallback: 0) + gainMedalCount;
                     }
                 }
                 else
@@ -186,9 +181,9 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
                     gainMedalCount = Mathf.CeilToInt(totalPotency / 1f);
                     if (gainMedalCount > 0)
                     {
-                        medalDef = PotentialMedalDefs.RandomElement();
-                        medalHandler.AdjustMedal(medalDef, gainMedalCount);
-                        gainMedals[medalDef] = gainMedals.TryGetValue(medalDef, fallback: 0) + gainMedalCount;
+                        medalChivalry = PotentialMedalDefs.RandomElement();
+                        medalHandler.AdjustMedal(medalChivalry, gainMedalCount);
+                        gainMedals[medalChivalry] = gainMedals.TryGetValue(medalChivalry, fallback: 0) + gainMedalCount;
                     }
                 }
             }
@@ -196,7 +191,7 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
             if (gainMedals.Count > 0)
             {
                 medalRewardSB.AppendLine(branch.NameColored);
-                foreach (KeyValuePair<BranchMedalDef, int> kv in gainMedals)
+                foreach (KeyValuePair<KnightChivalryDef, int> kv in gainMedals)
                 {
                     medalRewardSB.AppendWithSeparator($"{kv.Key.LabelCap} × {kv.Value}".Colorize(kv.Key.color), ", ");
                 }

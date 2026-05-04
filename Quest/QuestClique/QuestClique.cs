@@ -34,11 +34,11 @@ public class QuestClique : IExposable
             }
 
             float finalPotency = potency;
-            if (focusedTaskType == relatedBranch.TaskHandler.FocusedTaskType)
+            if (focusedTaskChivalry.IsSameDefNonNullable(relatedBranch.TaskHandler.FocusedTaskChivalry))
             {
                 finalPotency *= 1.1f;
             }
-            if (focusedTaskType == relatedBranch.HonorDef?.focusedTaskType)
+            if (focusedTaskChivalry.IsSameDefNonNullable(relatedBranch.HonorDef?.chivalry))
             {
                 finalPotency *= 1.1f;
             }
@@ -65,11 +65,11 @@ public class QuestClique : IExposable
     public RatkinOrder RelatedRatkinOrder => relatedBranch?.RatkinOrder;
     public bool IsBranchClique => relatedBranch is not null;
     public bool IsFriendlyBranchClique => relatedBranch is not null && relatedBranch.IsBranchOfType(Branch.BranchType.Friendly);
-    private BranchTaskType focusedTaskType = BranchTaskType.General;
-    public BranchTaskType FocusedTaskType
+    private KnightChivalryDef focusedTaskChivalry;
+    public KnightChivalryDef FocusedTaskChivalry
     {
-        get => IsBranchClique ? focusedTaskType : BranchTaskType.General;
-        set => focusedTaskType = IsBranchClique ? value : BranchTaskType.General;
+        get => IsBranchClique ? focusedTaskChivalry : null;
+        set => focusedTaskChivalry = value;
     }
 
     public QuestClique() { }
@@ -363,7 +363,7 @@ public class QuestClique : IExposable
         Scribe_Values.Look(ref BriberyCost, nameof(BriberyCost), -1);
 
         Scribe_References.Look(ref relatedBranch, nameof(relatedBranch));
-        Scribe_Values.Look(ref focusedTaskType, nameof(focusedTaskType), BranchTaskType.General);
+        Scribe_Defs.Look(ref focusedTaskChivalry, nameof(focusedTaskChivalry));
     }
 
     /// <summary>

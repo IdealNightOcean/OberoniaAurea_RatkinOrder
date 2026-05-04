@@ -31,7 +31,7 @@ public class AcademicHandler : IExposable
         {
             /*
             KnightAcademicDef initAcademicDef;
-            if (Chivalry != KnightChivalry.None && OrderDefDataBase.ResidentKnightAcademicGroupByChivalry.TryGetValue(Chivalry, out List<KnightAcademicDef> potentialAcademics))
+            if (Chivalry != KnightChivalry.None && OrderDefDatabase.ResidentKnightAcademicGroupByChivalry.TryGetValue(Chivalry, out List<KnightAcademicDef> potentialAcademics))
             {
                 initAcademicDef = potentialAcademics.RandomElement();
             }

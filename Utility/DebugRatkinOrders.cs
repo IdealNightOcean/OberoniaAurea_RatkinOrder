@@ -227,17 +227,17 @@ public static class DebugRatkinOrders
         void SelectMedal(Branch branch)
         {
             List<DebugMenuOption> medalTypeOptions = [];
-            foreach (BranchMedalDef medalDef in DefDatabase<BranchMedalDef>.AllDefs)
+            foreach (KnightChivalryDef medalChivalry in OrderDefDatabase.MedalChivalries)
             {
-                DebugMenuOption medalTypeOption = new(label: medalDef.LabelCap,
+                DebugMenuOption medalTypeOption = new(label: medalChivalry.medal.MedalLabelCap,
                                                       mode: DebugMenuOptionMode.Action,
-                                                      method: () => SelectCount(branch, medalDef));
+                                                      method: () => SelectCount(branch, medalChivalry));
                 medalTypeOptions.Add(medalTypeOption);
             }
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(medalTypeOptions));
         }
 
-        void SelectCount(Branch branch, BranchMedalDef medalDef)
+        void SelectCount(Branch branch, KnightChivalryDef medalChivalry)
         {
             int[] countArr = [1, 3, 5, 10];
             List<DebugMenuOption> medalCountOptions = [];
@@ -245,7 +245,7 @@ public static class DebugRatkinOrders
             {
                 DebugMenuOption medalCountOption = new(label: $"× {count}",
                                                       mode: DebugMenuOptionMode.Action,
-                                                      method: () => branch.MedalHandler.AdjustMedal(medalDef, count));
+                                                      method: () => branch.MedalHandler.AdjustMedal(medalChivalry, count));
                 medalCountOptions.Add(medalCountOption);
             }
             Find.WindowStack.Add(new Dialog_DebugOptionListLister(medalCountOptions));

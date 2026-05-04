@@ -105,6 +105,7 @@ public class Branch : IExposable, ILoadReferenceable
     }
 
     public BranchHonorDef HonorDef { get; protected set; }
+    public KnightChivalryDef HonorChivalry => HonorDef?.chivalry;
 
     [Unsaved] private SimpleValueCache<float> supplyCeilingCache;
     private float supply;
@@ -552,7 +553,7 @@ public class Branch : IExposable, ILoadReferenceable
 
         residentHandler.PostBranchGenerated();
 
-        taskHandler.FocusedTaskType = medalHandler.ProtogenicTaskType;
+        taskHandler.FocusedTaskChivalry = medalHandler.PrimaryChivalry;
         supply = Rand.Range(0.4f, 0.8f);
     }
 

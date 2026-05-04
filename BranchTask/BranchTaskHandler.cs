@@ -1,5 +1,6 @@
 using RimWorld;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using Verse;
@@ -29,22 +30,23 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     [Unsaved] private readonly Branch branch;
 
-    private BranchTaskType focusedTaskType;
+    private KnightChivalryDef focusedTaskChivalry;
     /// <summary>
     /// 专注任务类型
     /// </summary>
-    public BranchTaskType FocusedTaskType
+    public KnightChivalryDef FocusedTaskChivalry
     {
-        get { return focusedTaskType; }
+        get { return focusedTaskChivalry; }
         set
         {
-            if (value != focusedTaskType)
+            if (value != focusedTaskChivalry)
             {
-                focusedTaskType = value;
+                focusedTaskChivalry = value;
                 branch.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.FocusedTaskTypeChanged, cdTicks: 5 * 60000, removeWhenExpired: true);
             }
         }
     }
+
     private RadicalismDegree curRadicalismDegree;
     /// <summary>
     /// 分部的激进程度
@@ -107,8 +109,8 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref focusedTaskType, nameof(focusedTaskType), BranchTaskType.General);
         Scribe_Values.Look(ref curRadicalismDegree, nameof(curRadicalismDegree), RadicalismDegree.Standard);
+        Scribe_Defs.Look(ref focusedTaskChivalry, nameof(focusedTaskChivalry));
 
         Scribe_Deep.Look(ref curTask, nameof(curTask));
         Scribe_Values.Look(ref restEndTick, nameof(restEndTick), -1);
@@ -120,7 +122,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
     public void DrawDevWindow(Listing_Standard listing_Rect)
     {
-        listing_Rect.Label($"专注任务类型: {FocusedTaskType}");
+        listing_Rect.Label($"专注任务类型: {FocusedTaskChivalry}");
         if (HasTask)
         {
             listing_Rect.Label($"当前任务: {curTask.Label}");
@@ -319,8 +321,25 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
 
         if (autoStartFailCount >= 10 || autoTargetTask is null)
         {
-            autoTargetTask = DefDatabase<BranchTaskDef>.AllDefs.Where(t => t.canBeRandomlyChosen && FocusedTaskType == t.taskType)
-                                                               .RandomElementByWeightWithFallback((d) => d.StartChecker?.RandomlyChosenWeight(branch) ?? 0f, BranchTaskDefOf.OARO_JurisdictionDutyPrep);
+            IEnumerable<BranchTaskDef> potentialTasks = FocusedTaskChivalry.AllBranchTasks;
+            if (!potentialTasks.Any())
+            {
+                potentialTasks = DefDatabase<BranchTaskDef>.AllDefsListForReading.TakeRandom(20);
+            }
+            List<(BranchTaskDef task, float weight)> potentialTasksWeighter = [];
+            foreach (BranchTaskDef task in potentialTasks)
+            {
+                if (!task.canBeRandomlyChosen)
+                    continue;
+                float weight = task.StartChecker?.RandomlyChosenWeight(branch) ?? -1f;
+                if (weight > 0)
+                {
+                    potentialTasksWeighter.Add((task, weight));
+                }
+            }
+
+            autoTargetTask = potentialTasksWeighter.RandomElementByWeightWithFallback(pair => pair.weight).task;
+            autoTargetTask ??= BranchTaskDefOf.OARO_JurisdictionDuty;
         }
 
         if (Rand.Chance(usedChance) && autoTargetTask is not null)

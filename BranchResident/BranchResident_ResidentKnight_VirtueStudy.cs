@@ -107,7 +107,7 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
     public static float GetTrainSuccessChance(Branch branch,
                                               ResidentKnight residentKnight,
                                               KnightVirtueDef targetVirtue,
-                                              IReadOnlyDictionary<BranchMedalDef, int> medalsCost,
+                                              IReadOnlyDictionary<KnightChivalryDef, int> medalsCost,
                                               bool resultOnly,
                                               out string explanation)
     {
@@ -124,7 +124,7 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
             expSB.AppendLine("OARO_BranchResident_VirtueTrain_Base".Translate(curStepChange.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Chance)));
         }
 
-        if (virtueChivalry.IsSameDefNonNullable(branch.HonorDef?.Chivalry))
+        if (virtueChivalry.IsSameDefNonNullable(branch.HonorDef?.chivalry))
         {
             curStepChange = 0.2f;
             successChance += curStepChange;
@@ -136,7 +136,7 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
 
         foreach (BranchTradition tradition in branch.TraditionHandler.Traditions)
         {
-            if (!virtueChivalry.IsSameDefNonNullable(tradition.Def.Chivalry))
+            if (!virtueChivalry.IsSameDefNonNullable(tradition.Def.chivalry))
                 continue;
 
             curStepChange = (tradition.Level * 0.05f);
@@ -150,18 +150,15 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
             }
         }
 
-        foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> kv in branch.MedalHandler.MedalRecords)
+        if (branch.MedalHandler.MedalRecords.TryGetValue(virtueChivalry, out BranchMedalRecord medalRecord))
         {
-            if (!virtueChivalry.IsSameDefNonNullable(kv.Key.chivalry))
-                continue;
-
-            curStepChange = (kv.Value.Count * 0.02f);
+            curStepChange = (medalRecord.Count * 0.02f);
             successChance += curStepChange;
             if (!resultOnly)
             {
                 expSB.AppendLine("OARO_BranchResident_VirtueTrain_SameChivalryWithMedal".Translate(
-                    kv.Key.Named(KeyLibrary_FormatArgName.MEDALDEF),
-                    kv.Value.Count.Named(KeyLibrary_FormatArgName.Count),
+                    virtueChivalry.Named(KeyLibrary_FormatArgName.DEF),
+                    medalRecord.Count.Named(KeyLibrary_FormatArgName.Count),
                     curStepChange.ToStringWithSign("F0").Named(KeyLibrary_FormatArgName.Offset)));
             }
         }
@@ -201,7 +198,7 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
 
     public static int GetTrainOutcomeLevel(Branch branch,
                                            KnightVirtueDef targetVirtue,
-                                           IReadOnlyDictionary<BranchMedalDef, int> medalsCost,
+                                           IReadOnlyDictionary<KnightChivalryDef, int> medalsCost,
                                            bool resultOnly,
                                            out string explanation)
     {
@@ -209,21 +206,15 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
         KnightChivalryDef virtueChivalry = targetVirtue.chivalry;
 
         int totalMedalsCost = medalsCost.Values.Sum();
-        bool sameChivalryWithHonor = virtueChivalry.IsSameDefNonNullable(branch.HonorDef?.Chivalry);
+        bool sameChivalryWithHonor = virtueChivalry.IsSameDefNonNullable(branch.HonorDef?.chivalry);
         bool isOathVirtue = virtueChivalry.IsSameDefNonNullable(OARO_ModDefOf.OARO_Oath);
 
-        int medalsHasSameChivalry = 0;
-        foreach (KeyValuePair<BranchMedalDef, int> kv in medalsCost)
-        {
-            if (!virtueChivalry.IsSameDefNonNullable(kv.Key.chivalry))
-                continue;
-            medalsHasSameChivalry += kv.Value;
-        }
+        medalsCost.TryGetValue(virtueChivalry, out int medalsHasSameChivalry);
 
         int branchTraditionLevelHasSameChivalry = 0;
         foreach (BranchTradition tradition in branch.TraditionHandler.Traditions)
         {
-            if (!virtueChivalry.IsSameDefNonNullable(tradition.Def.Chivalry))
+            if (!virtueChivalry.IsSameDefNonNullable(tradition.Def.chivalry))
                 continue;
 
             branchTraditionLevelHasSameChivalry += tradition.Level;

@@ -1,3 +1,4 @@
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -12,15 +13,15 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class BranchMedalHandler : IExposable
 {
-    private Dictionary<BranchMedalDef, BranchMedalRecord> medalRecords = new(4);
+    private Dictionary<KnightChivalryDef, BranchMedalRecord> medalRecords = new(4);
 
-    private BranchMedalDef primaryMedal;
-    public BranchMedalDef PrimaryMedal => primaryMedal ??= medalRecords?.FirstOrFallback().Key;
+    private KnightChivalryDef primaryChivalry;
+    public KnightChivalryDef PrimaryChivalry => primaryChivalry ??= medalRecords?.FirstOrFallback().Key;
 
-    public BranchTaskType ProtogenicTaskType => PrimaryMedal?.focusedTaskType ?? BranchTaskType.General;
+    public MedalProperties PrimaryMedal => PrimaryChivalry?.medal;
 
     public int MedalTypeCount => medalRecords.Count;
-    public IReadOnlyDictionary<BranchMedalDef, BranchMedalRecord> MedalRecords => medalRecords;
+    public IReadOnlyDictionary<KnightChivalryDef, BranchMedalRecord> MedalRecords => medalRecords;
 
 
     [Unsaved] private int totalMedalCount = -1;
@@ -42,7 +43,7 @@ public class BranchMedalHandler : IExposable
 
     public void ExposeData()
     {
-        Scribe_Defs.Look(ref primaryMedal, nameof(primaryMedal));
+        Scribe_Defs.Look(ref primaryChivalry, nameof(primaryChivalry));
         Scribe_Collections.Look(ref medalRecords, nameof(medalRecords), LookMode.Def, LookMode.Deep);
     }
 
@@ -50,36 +51,44 @@ public class BranchMedalHandler : IExposable
     {
         listing_Rect.Label($"主印记: {PrimaryMedal}");
         listing_Rect.Label("所有印记:");
-        foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> kv in medalRecords)
+        foreach (KeyValuePair<KnightChivalryDef, BranchMedalRecord> kv in medalRecords)
         {
-            listing_Rect.SubLabel($"({kv.Key.label} - {kv.Value})", 0.8f);
+            KnightChivalryDef chivalry = kv.Key;
+            if (chivalry.medal is null)
+            {
+                listing_Rect.SubLabel($"({chivalry.label}(×) - {kv.Value})", 0.8f);
+            }
+            else
+            {
+                listing_Rect.SubLabel($"({chivalry.medal.medalLabel} - {kv.Value})", 0.8f);
+            }
         }
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool HasMedal(BranchMedalDef medal) => medalRecords.ContainsKey(medal);
+    public bool HasMedal(KnightChivalryDef chivalry) => medalRecords.ContainsKey(chivalry);
 
-    public int GetMedalCount(BranchMedalDef medal)
+    public int GetMedalCount(KnightChivalryDef chivalry)
     {
-        if (medal is null || !HasMedal(medal))
+        if (chivalry is null || !HasMedal(chivalry))
         {
             return 0;
         }
-        if (medalRecords.TryGetValue(medal, out BranchMedalRecord record))
+        if (medalRecords.TryGetValue(chivalry, out BranchMedalRecord record))
         {
             return record.Count;
         }
         return 0;
     }
 
-    public void AdjustMedal(BranchMedalDef medal, int count)
+    public void AdjustMedal(KnightChivalryDef chivalry, int count)
     {
-        if (medal is null || count == 0)
+        if (chivalry is null || count == 0)
         {
             return;
         }
 
-        if (medalRecords.TryGetValue(medal, out BranchMedalRecord record))
+        if (medalRecords.TryGetValue(chivalry, out BranchMedalRecord record))
         {
             record.Count += count;
         }
@@ -99,13 +108,13 @@ public class BranchMedalHandler : IExposable
 
         if (record.Count > 0)
         {
-            medalRecords[medal] = record;
+            medalRecords[chivalry] = record;
         }
         else
         {
-            medalRecords.Remove(medal);
+            medalRecords.Remove(chivalry);
             // 如果移除的勋章是主要勋章，则重新指定主要勋章
-            if (primaryMedal == medal)
+            if (primaryChivalry == chivalry)
             {
                 _ = PrimaryMedal;
             }
@@ -120,13 +129,13 @@ public class BranchMedalHandler : IExposable
     /// </summary>
     internal void PostBranchGenerated()
     {
-        primaryMedal = DefDatabase<BranchMedalDef>.AllDefsListForReading.RandomElement();
-        AdjustMedal(primaryMedal, 1);
+        primaryChivalry = OrderDefDatabase.MedalChivalries.RandomElement();
+        AdjustMedal(primaryChivalry, 1);
     }
 
     internal void PostLoadInit()
     {
-        if (medalRecords.RemoveAll(kv => kv.Value.Count <= 0) > 0)
+        if (medalRecords.RemoveAll(kv => kv.Key.medal is null || kv.Value.Count <= 0) > 0)
         {
             Log.Error($"[OARO] 部分勋章记录在加载后为null或无效，已被移除。");
         }
@@ -153,19 +162,21 @@ public class BranchMedalHandler : IExposable
         StringBuilder medalLabels = new(32);
         Dictionary<StatDef, float> statOffsetValues = [];
         Dictionary<StatDef, float> statFactorValues = [];
-        foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> kv in medalRecords)
+        foreach (KeyValuePair<KnightChivalryDef, BranchMedalRecord> kv in medalRecords)
         {
-            if (kv.Value.Count <= 0)
+            if (kv.Key.medal is null || kv.Value.Count <= 0)
             {
                 continue;
             }
             try
             {
-                BranchMedalDef medalDef = kv.Key;
-                bool isPrimaryMedal = primaryMedal == medalDef;
-                if (!medalDef.statOffsetsByCount.NullOrEmpty())
+                KnightChivalryDef chivalry = kv.Key;
+                MedalProperties medalProp = chivalry.medal;
+                bool isPrimaryMedal = primaryChivalry.IsSameDefNonNullable(chivalry);
+
+                if (!medalProp.statOffsetsByCount.NullOrEmpty())
                 {
-                    foreach (StatModifierBySeverity modifier in medalDef.statOffsetsByCount)
+                    foreach (StatModifierBySeverity modifier in medalProp.statOffsetsByCount)
                     {
                         float value = modifier.valueBySeverity.Evaluate(kv.Value.Count);
                         if (statOffsetValues.TryGetValue(modifier.stat, out float oldValue))
@@ -180,9 +191,9 @@ public class BranchMedalHandler : IExposable
                     }
                 }
 
-                if (!medalDef.statFactorsByCount.NullOrEmpty())
+                if (!medalProp.statFactorsByCount.NullOrEmpty())
                 {
-                    foreach (StatModifierBySeverity modifier in medalDef.statFactorsByCount)
+                    foreach (StatModifierBySeverity modifier in medalProp.statFactorsByCount)
                     {
                         float value = modifier.valueBySeverity.Evaluate(kv.Value.Count);
                         if (statFactorValues.TryGetValue(modifier.stat, out float oldValue))
@@ -199,11 +210,11 @@ public class BranchMedalHandler : IExposable
 
                 if (isPrimaryMedal)
                 {
-                    medalLabels.AppendLine($"{medalDef.LabelCap} (★)".Colorize(medalDef.color));
+                    medalLabels.AppendLine($"{medalProp.MedalLabelCap} (★)".Colorize(chivalry.color));
                 }
                 else
                 {
-                    medalLabels.AppendLine(medalDef.LabelCap.Colorize(medalDef.color));
+                    medalLabels.AppendLine(medalProp.MedalLabelCap.Colorize(chivalry.color));
                 }
             }
             catch (Exception ex)

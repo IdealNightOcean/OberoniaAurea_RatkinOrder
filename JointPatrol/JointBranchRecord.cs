@@ -37,7 +37,7 @@ public class JointBranchRecord : IExposable
         set => potencyOffset = value;
     }
 
-    public BranchTaskType FocusedTaskType => Branch.TaskHandler.FocusedTaskType;
+    public KnightChivalryDef FocusedTaskChivalry => Branch.TaskHandler.FocusedTaskChivalry;
 
     public PatrolInteractionType CurInteractions;
 

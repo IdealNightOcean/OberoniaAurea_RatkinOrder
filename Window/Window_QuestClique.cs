@@ -143,11 +143,11 @@ public class Window_QuestClique : OrderWindowBase
             float medalEntryHeight = 40f;
             float medalEntryXInterval = 15f;
             Widgets.BeginScrollView(medalOutRect, ref scrollPosition_Medals, medalViewRect, showScrollbars: false);
-            foreach (BranchMedalDef medal in criticalDemand.PotentialMedals)
+            foreach (KnightChivalryDef medalChivalry in criticalDemand.PotentialMedals)
             {
                 Rect medalEntryRect = new(medalEntryX, medalEntryY, medalEntryWidth, medalEntryHeight);
                 medalEntryX += (medalEntryWidth + medalEntryXInterval);
-                GUI.DrawTexture(medalEntryRect, medal.iconTexture.Texture);
+                GUI.DrawTexture(medalEntryRect, medalChivalry.icon.Texture);
             }
             Widgets.EndScrollView();
         }

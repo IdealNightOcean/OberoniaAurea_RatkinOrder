@@ -11,7 +11,7 @@ public class Reward_BranchMedals : Reward
 {
     public int Amount;
     public Branch Branch;
-    public List<BranchMedalDef> PotentialDefs;
+    public List<KnightChivalryDef> PotentialDefs;
 
     public override IEnumerable<GenUI.AnonymousStackElement> StackElements
     {

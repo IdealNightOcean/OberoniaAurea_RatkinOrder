@@ -9,7 +9,6 @@ using System.Text;
 using UnityEngine;
 using Verse;
 using Verse.AI.Group;
-using Verse.Grammar;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -58,7 +57,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
     private List<JointInteractionRecord> interactionRecords = [];
     public IReadOnlyList<JointInteractionRecord> InteractionRecords => interactionRecords;
 
-    public LazyMutable<IReadOnlyDictionary<BranchTaskType, float>> TaskPotencys { get; }
+    public LazyMutable<IReadOnlyDictionary<KnightChivalryDef, float>> TaskPotencys { get; }
 
     private int sacrificeCount;
     public int SacrificeCount => sacrificeCount;
@@ -131,9 +130,9 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         {
             if (curState == PatrolState.Ongoing || curState == PatrolState.Settlement)
             {
-                return participants.GroupBy(p => p.FocusedTaskType).ToDictionary(g => g.Key, g => g.Sum(gp => gp.TaskPotency.Value));
+                return participants.GroupBy(p => p.FocusedTaskChivalry).ToDictionary(g => g.Key, g => g.Sum(gp => gp.TaskPotency.Value));
             }
-            return new Dictionary<BranchTaskType, float>();
+            return new Dictionary<KnightChivalryDef, float>();
         });
 
         innerContainer = new ThingOwner<Pawn>(this)
@@ -677,182 +676,25 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
                 record.TaskPotency.MarkDirty();
             }
 
-            float fundGain = 0f;
-            float reformationGain = 0f;
-            int populationGain = 0;
-            float publicSecurityGain = 0f;
-            float participantPublicSecurityGain = 0f;
+            JointPatrolRewardData rewardData = new(ratkinOrder);
 
             float neededTaskPotency = NeededTaskPotency;
             TaskPotencys.MarkDirty();
-            IReadOnlyDictionary<BranchTaskType, float> endTaskPotencys = TaskPotencys.Value;
-            IReadOnlyDictionary<BranchTaskType, List<Branch>> taskTypeBranches = participants.GroupBy(p => p.FocusedTaskType)
-                                                                                             .ToDictionary(g => g.Key, g => g.Select(p => p.Branch).ToList());
-            List<Branch> taskBranches = [];
-            List<BranchTaskType> succeedTaksTypes = [];
-            List<BranchTaskType> failedTaksTypes = [];
-            try
+            IReadOnlyDictionary<KnightChivalryDef, float> endTaskPotencys = TaskPotencys.Value;
+
+            foreach (KnightChivalryDef chivalry in OrderDefDatabase.JointPatrolChivalries)
             {
-                if (CompletedTaskOfType(BranchTaskType.CrimeFighting))
+                if (endTaskPotencys is null || !endTaskPotencys.TryGetValue(chivalry, out float chivalryPotency) || chivalryPotency < neededTaskPotency)
                 {
-                    participantPublicSecurityGain += Rand.Range(0.05f, 0.15f);
-                    fundGain += 0.05f;
-                    TaskOfTypeSuccess(BranchTaskType.CrimeFighting, BranchMedalDefOf.OARO_Courage);
+                    chivalry.jointPatrol?.Worker?.OnJointPatrolTaskFailed(chivalry, rewardData);
                 }
                 else
                 {
-                    TaskOfTypeFail(BranchTaskType.CrimeFighting);
-                }
-
-                if (CompletedTaskOfType(BranchTaskType.StabilityMaintenance))
-                {
-                    populationGain += Rand.Range(50, 150);
-                    fundGain += 0.05f;
-                    TaskOfTypeSuccess(BranchTaskType.StabilityMaintenance, BranchMedalDefOf.OARO_Tenacity);
-                }
-                else
-                {
-                    TaskOfTypeFail(BranchTaskType.StabilityMaintenance);
-                }
-
-                if (CompletedTaskOfType(BranchTaskType.Assistance))
-                {
-                    populationGain += Rand.Range(50, 150);
-                    reformationGain += 10f;
-                    TaskOfTypeSuccess(BranchTaskType.Assistance, BranchMedalDefOf.OARO_Rescue);
-                }
-                else
-                {
-                    TaskOfTypeFail(BranchTaskType.Assistance);
-                }
-
-                if (CompletedTaskOfType(BranchTaskType.Supervision))
-                {
-                    participantPublicSecurityGain += Rand.Range(0.05f, 0.15f);
-                    reformationGain += 10f;
-                    TaskOfTypeSuccess(BranchTaskType.Supervision, BranchMedalDefOf.OARO_Justice);
-                }
-                else
-                {
-                    TaskOfTypeFail(BranchTaskType.Supervision);
-                }
-
-                bool CompletedTaskOfType(BranchTaskType taskType)
-                {
-                    if (endTaskPotencys?.TryGetValue(taskType, out float taskPotency) ?? false)
-                    {
-                        return taskPotency >= neededTaskPotency;
-                    }
-                    return false;
-                }
-
-                void TaskOfTypeSuccess(BranchTaskType taskType, BranchMedalDef medalDef)
-                {
-                    succeedTaksTypes.Add(taskType);
-                    if (taskTypeBranches?.TryGetValue(taskType, out taskBranches) ?? false)
-                    {
-                        foreach (Branch branch in taskBranches)
-                        {
-                            branch?.MedalHandler.AdjustMedal(medalDef, 1);
-                        }
-                    }
-                }
-
-                void TaskOfTypeFail(BranchTaskType taskType)
-                {
-                    fundGain -= 0.03f;
-                    publicSecurityGain -= 0.025f;
-                    failedTaksTypes.Add(taskType);
+                    chivalry.jointPatrol?.Worker?.OnJointPatrolTaskCompleted(chivalry, rewardData);
                 }
             }
-            catch (Exception subEx1)
-            {
-                ModUtility.LogExceptionError(subEx1, "计算联巡任务结果", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
-            }
 
-            switch (patrolLevel)
-            {
-                case PatrolLevel.Kingdom:
-                    fundGain *= 2f;
-                    reformationGain *= 2f;
-                    break;
-                case PatrolLevel.Border:
-                    fundGain *= 3f;
-                    reformationGain *= 3f;
-                    break;
-                default:
-                    break;
-            }
-
-            int publicSecurityUpCount = 0;
-            int publicSecurityDownCount = 0;
-            try
-            {
-                ratkinOrder.FundHandler.AdjustFundsImmediately(fundGain, "OARO_Fund_JointPatrolCompletion".Translate());
-                ratkinOrder.ReformationManager.ReformProgress += reformationGain;
-
-                foreach (Branch branch in ratkinOrder.BranchManager.AllBranches)
-                {
-                    float publicSecurityChange = participantsDict.ContainsKey(branch) ? participantPublicSecurityGain + publicSecurityGain : publicSecurityGain;
-                    branch.PopulationHandler.AdjustPublicSecurity(publicSecurityChange);
-                    if (publicSecurityChange > 0f)
-                    {
-                        publicSecurityUpCount++;
-                    }
-                    else if (publicSecurityChange < 0f)
-                    {
-                        publicSecurityDownCount++;
-                    }
-                }
-
-                foreach (KeyValuePair<Branch, JointBranchRecord> kv in participantsDict)
-                {
-                    kv.Key.PopulationHandler.Population += populationGain;
-                    if (kv.Value.HasInteraction(PatrolInteractionType.Diplomacy))
-                    {
-                        BranchMedalDef medalDef = DefDatabase<BranchMedalDef>.GetRandom();
-                        kv.Key.MedalHandler.AdjustMedal(medalDef, 1);
-                    }
-                }
-            }
-            catch (Exception subEx2)
-            {
-                ModUtility.LogExceptionError(subEx2, "应用联巡结果", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
-            }
-
-            try
-            {
-                GrammarRequest grammarRequest = new()
-                {
-                    Includes = { OARO_RulePackDefOf.OARO_JointPatrolCompletion }
-                };
-                grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, ratkinOrder));
-                grammarRequest.Rules.Add(new Rule_String("patrolLevel", $"OARO_JointPatrolLevel_{patrolLevel}".Translate()));
-                grammarRequest.Rules.Add(new Rule_String("participantsCount", participants.Count.ToString()));
-
-                grammarRequest.Constants.Add("sacrificeCount", sacrificeCount.ToString());
-                grammarRequest.Rules.Add(new Rule_String("sacrificeCount", sacrificeCount.ToString()));
-
-                grammarRequest.Rules.Add(new Rule_String("fundGain", fundGain.ToStringPercentSigned("0.##").Colorize(fundGain > 0f ? Color.green : ColorLibrary.RedReadable)));
-                grammarRequest.Rules.Add(new Rule_String("reformationGain", reformationGain.ToStringWithSign("0.##").Colorize(reformationGain > 0f ? Color.green : ColorLibrary.RedReadable)));
-                grammarRequest.Rules.Add(new Rule_String("publicSecurityUpCount", publicSecurityUpCount.ToString()));
-                grammarRequest.Rules.Add(new Rule_String("publicSecurityDownCount", publicSecurityDownCount.ToString()));
-                grammarRequest.Rules.Add(new Rule_String("totalPopulationGain", (populationGain * participants.Count).ToString()));
-
-                grammarRequest.Constants.Add("succeedTaksTypeCount", succeedTaksTypes.Count.ToString());
-                grammarRequest.Constants.Add("failedTaksTypeCount", failedTaksTypes.Count.ToString());
-                grammarRequest.Rules.Add(new Rule_String("succeedTaksTypeCount", succeedTaksTypes.Count.ToString()));
-                grammarRequest.Rules.Add(new Rule_String("failedTaksTypeCount", failedTaksTypes.Count.ToString()));
-
-                grammarRequest.Rules.Add(new Rule_String("succeedTaksTypeNames", string.Join(", ", succeedTaksTypes.Select(t => $"OARO_JointPatrolTaskType_{t}".Translate()))));
-                grammarRequest.Rules.Add(new Rule_String("failedTaksTypeNames", string.Join(", ", failedTaksTypes.Select(t => $"OARO_JointPatrolTaskType_{t}".Translate()))));
-                completionSummary = GrammarResolver.Resolve("r_text", grammarRequest);
-            }
-            catch (Exception subEx3)
-            {
-                ModUtility.LogExceptionError(subEx3, "生成联巡完成摘要", nameof(JointPatrolManager), nameof(EndJointPatrol), needStackTrace: true);
-                completionSummary = "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
-            }
+            completionSummary = rewardData.ApplyReward(patrolLevel, participantsDict, generateSummary: true);
 
             OrderLetterUtility.ReceiveLetter(
                 label: "OARO_JointPatrolCompletionSummary".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
@@ -948,7 +790,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         try
         {
             IncidentType selIncidentType = JointPatrolIncidentDef.GetPotentialIncidentType(record);
-            if (!OrderDefDataBase.TryGetAllJointPatrolIncidentsByType(selIncidentType, out List<JointPatrolIncidentDef> potentialIncidentsOfType))
+            if (!OrderDefDatabase.TryGetAllJointPatrolIncidentsByType(selIncidentType, out List<JointPatrolIncidentDef> potentialIncidentsOfType))
             {
                 return;
             }

@@ -41,9 +41,9 @@ public class BranchTaskDef : Def
     public TaskPriority priority;
 
     /// <summary>
-    /// 任务对应专注类型
+    /// 任务对应骑士精神
     /// </summary>
-    public BranchTaskType taskType;
+    public KnightChivalryDef chivalry;
 
     /// <summary>
     /// 是否为户外任务

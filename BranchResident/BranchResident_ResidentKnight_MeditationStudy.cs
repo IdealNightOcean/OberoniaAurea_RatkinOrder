@@ -63,7 +63,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
     }
 
     public static float GetMeditationGain(Branch branch,
-                                          IReadOnlyDictionary<BranchMedalDef, int> medalsCost,
+                                          IReadOnlyDictionary<KnightChivalryDef, int> medalsCost,
                                           bool resultOnly,
                                           out string explanation)
     {
@@ -79,7 +79,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
             expSB.AppendLine("OARO_BranchResident_MeditationStudy_BaseMedal".Translate(curStepChange.ToStringWithSign("F0").Named(KeyLibrary_FormatArgName.Change)));
         }
 
-        if (branch.HonorDef is not null && medalsCost.TryGetValue(branch.HonorDef.medalDef, out int honorMedalCount))
+        if (branch.HonorDef is not null && medalsCost.TryGetValue(branch.HonorDef.chivalry, out int honorMedalCount))
         {
             curStepChange = honorMedalCount * 100f;
             meditationGain += curStepChange;
@@ -93,7 +93,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
 
         foreach (BranchTradition tradition in branch.TraditionHandler.Traditions)
         {
-            if (tradition.Def.medalDef is null || !medalsCost.TryGetValue(tradition.Def.medalDef, out int traditionMedalCount))
+            if (tradition.Def.chivalry is null || !medalsCost.TryGetValue(tradition.Def.chivalry, out int traditionMedalCount))
                 continue;
 
             curStepChange = tradition.Level * traditionMedalCount * 25f;

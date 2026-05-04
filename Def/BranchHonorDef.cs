@@ -7,6 +7,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+
 /// <summary>
 /// 分部荣誉Def
 /// </summary>
@@ -23,21 +24,9 @@ public class BranchHonorDef : Def
     public KnightAcademicDef academicDef;
 
     /// <summary>
-    /// 核心印记Def（<see cref="BranchMedalDef"/>）
+    /// 对应骑士精神大类（<see cref="KnightChivalryDef"/>）
     /// </summary>
-    public BranchMedalDef medalDef;
-
-    private KnightChivalryDef chivalryOverride;
-
-    /// <summary>
-    /// 对应骑士精神大类
-    /// </summary>
-    public KnightChivalryDef Chivalry => chivalryOverride ?? medalDef?.chivalry;
-
-    /// <summary>
-    /// 荣誉加成的专注任务类型
-    /// </summary>
-    public BranchTaskType focusedTaskType;
+    public KnightChivalryDef chivalry;
 
     /// <summary>
     /// 荣誉分部特殊的人物生成组

@@ -4,7 +4,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchBuildingCompProperties_Memorial : BranchBuildingCompProperties
 {
-    public BranchMedalDef medalDef;
+    public KnightChivalryDef medalChivalry;
     public int medalCount = 1;
 
     public BranchBuildingCompProperties_Memorial()
@@ -34,14 +34,14 @@ public class BranchBuildingComp_Memorial : BranchBuildingComp
                 relatedLetterType: OrderLetter.RelatedLetterType.Positive);
         }
 
-        if (Props.medalDef is not null)
+        if (Props.medalChivalry?.medal is not null)
         {
             BranchMedalHandler medalHandler = parent.Branch.MedalHandler;
 
-            int count = Props.medalCount - medalHandler.GetMedalCount(Props.medalDef);
+            int count = Props.medalCount - medalHandler.GetMedalCount(Props.medalChivalry);
             if (count > 0)
             {
-                medalHandler.AdjustMedal(Props.medalDef, count);
+                medalHandler.AdjustMedal(Props.medalChivalry, count);
             }
         }
     }

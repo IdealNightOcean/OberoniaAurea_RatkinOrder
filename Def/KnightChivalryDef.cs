@@ -9,11 +9,18 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class KnightChivalryDef : Def
 {
+    /// <summary>
+    /// 对应任务类型名称
+    /// </summary>
+    [MustTranslate]
+    public string taskTypeLabel = string.Empty;
 
     public Color color;
 
-    public List<KnightChivalryDef> resonateChivalries = [];
+    public MedalProperties medal;
+    public JointPatrolProperties jointPatrol;
 
+    public List<KnightChivalryDef> resonateChivalries = [];
     public HashSet<KnightChivalryDef> ResonateChivalriesSet { get; private set; }
 
     /// <summary>
@@ -31,8 +38,18 @@ public class KnightChivalryDef : Def
         }
     }
 
+    /// <summary>
+    /// 图标
+    /// </summary>
+    public PathedTexture2D icon;
+    /// <summary>
+    /// 主要印记图标
+    /// </summary>
+    public PathedTexture2D primaryIcon;
+
     private List<ThingDef> allPreferredBuildingsCached;
     private List<KnightAcademicDef> allAcademicsCached;
+    private List<BranchTaskDef> allBranchTasksCached;
 
     public List<ThingDef> AllPreferredBuildings
     {
@@ -71,6 +88,25 @@ public class KnightChivalryDef : Def
                 }
             }
             return allAcademicsCached;
+        }
+    }
+
+    public List<BranchTaskDef> AllBranchTasks
+    {
+        get
+        {
+            if (allBranchTasksCached is null)
+            {
+                allBranchTasksCached = [];
+                foreach (BranchTaskDef def in DefDatabase<BranchTaskDef>.AllDefs)
+                {
+                    if (def.chivalry == this)
+                    {
+                        allBranchTasksCached.Add(def);
+                    }
+                }
+            }
+            return allBranchTasksCached;
         }
     }
 

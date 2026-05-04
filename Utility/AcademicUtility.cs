@@ -1,3 +1,4 @@
+using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -97,7 +98,7 @@ public static class AcademicUtility
             }
 
             Branch branch = knight.Branch;
-            if (branch?.HonorDef?.Chivalry == academicChivalry && academicChivalry != OARO_ModDefOf.OARO_Oath)
+            if (academicChivalry.IsSameDefNonNullable(branch?.HonorDef?.chivalry) && academicChivalry.IsSameDefNonNullable(OARO_ModDefOf.OARO_Oath))
             {
                 totalFactor *= 0.9f;
                 if (!resultOnly)

@@ -612,7 +612,7 @@ public class Window_Branch : OrderWindowBase
         if (buildingDef.isSpecial)
         {
             GUI.DrawTexture(innerRect, specialBuildingLace, ScaleMode.ScaleToFit);
-            Texture2D honorRibbonTexture = buildingDef.honorDef?.medalDef?.honorRibbonTexture.Texture;
+            Texture2D honorRibbonTexture = buildingDef.honorDef?.chivalry?.medal?.honorRibbonTexture.Texture;
             if (honorRibbonTexture is not null)
             {
                 Rect ribbonRect = new(inRect.xMin, inRect.yMin - 2f, inRect.width, 55f);

@@ -39,7 +39,7 @@ public class BranchTradition : IExposable
         {
             return false;
         }
-        if (def.medalDef is not null && branch.MedalHandler.GetMedalCount(def.medalDef) < def.upgradeMedalCost)
+        if (def.chivalry?.medal is not null && branch.MedalHandler.GetMedalCount(def.chivalry) < def.upgradeMedalCost)
         {
             return false;
         }
@@ -84,10 +84,10 @@ public class BranchTradition : IExposable
 
     public virtual int GetEstablishMedalCost(Branch branch)
     {
-        if (def.medalDef is null)
+        if (def.chivalry?.medal is null)
             return 0;
 
-        if (def.medalDef == branch.HonorDef?.medalDef)
+        if (def.chivalry.IsChivalryResonate(branch.HonorDef?.chivalry))
             return 5;
 
         return 10;

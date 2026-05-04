@@ -7,8 +7,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public abstract class BranchResident_ResidentKnightStudy : BranchResident
 {
-    protected Dictionary<BranchMedalDef, int> medalsCost = [];
-    public IReadOnlyDictionary<BranchMedalDef, int> MedalsCost => medalsCost;
+    protected Dictionary<KnightChivalryDef, int> medalsCost = [];
+    public IReadOnlyDictionary<KnightChivalryDef, int> MedalsCost => medalsCost;
 
     public override void StartResidency(Branch branch)
     {
@@ -16,12 +16,12 @@ public abstract class BranchResident_ResidentKnightStudy : BranchResident
         OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
     }
 
-    public void MedalsCostAdd(BranchMedalDef medal, int cost)
+    public void MedalsCostAdd(KnightChivalryDef chivalry, int cost)
     {
-        if (!medalsCost.TryGetValue(medal, out int count))
+        if (!medalsCost.TryGetValue(chivalry, out int count))
             count = 0;
 
-        medalsCost[medal] = count + cost;
+        medalsCost[chivalry] = count + cost;
     }
 
     public override void ExposeData()

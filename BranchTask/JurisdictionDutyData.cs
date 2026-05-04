@@ -50,10 +50,11 @@ public class JurisdictionDutyData : IExposable
     private int hourCounter;
 
     public JurisdictionDutyData() { }
-    public JurisdictionDutyData(Branch branch) { Initialize(branch); }
+    public JurisdictionDutyData(BranchTask task) { Initialize(task); }
 
-    public void Initialize(Branch branch)
+    public void Initialize(BranchTask task)
     {
+        Branch branch = task.Branch;
         float postureMultiplier = branch.TaskHandler.CurRadicalismDegree switch
         {
             BranchTaskHandler.RadicalismDegree.StabilityFocused => 0.75f,
@@ -68,24 +69,24 @@ public class JurisdictionDutyData : IExposable
 
         dutyRisk = CalculateDutyRisk(branch);
 
-        GenerateDutyAcademics(branch);
+        GenerateDutyAcademics(task);
         nextObjectiveCheckProgress = 50;
         nextRequestThresholdIndex = 0;
         hourCounter = 0;
     }
 
-    public void TickHour(Branch branch)
+    public void TickHour(BranchTask task)
     {
         hourCounter++;
         if (hourCounter >= 2)
         {
             hourCounter = 0;
             float increment = dailyProgress / 12f;
-            AddProgress(increment, branch);
+            AddProgress(increment, task);
         }
     }
 
-    public void AddProgress(float amount, Branch branch)
+    public void AddProgress(float amount, BranchTask task)
     {
         if (progressCeiling <= 0) return;
 
@@ -95,11 +96,11 @@ public class JurisdictionDutyData : IExposable
             curProgress = progressCeiling;
         }
 
-        CheckObjectiveGeneration(branch);
-        CheckAssistanceRequestGeneration(branch);
+        CheckObjectiveGeneration(task);
+        CheckAssistanceRequestGeneration(task);
     }
 
-    public void CheckObjectiveGeneration(Branch branch)
+    public void CheckObjectiveGeneration(BranchTask task)
     {
         while (curProgress >= nextObjectiveCheckProgress)
         {
@@ -107,25 +108,25 @@ public class JurisdictionDutyData : IExposable
             float passRate = Mathf.Clamp01(1f - completedObjectives.Count * 0.05f);
             if (Rand.Chance(passRate))
             {
-                BranchMedalDef medal = PickMedalDef(branch);
-                completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Normal, medal));
+                KnightChivalryDef medalChivalry = PickMedalDef(task);
+                completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Normal, medalChivalry));
             }
 
             if (Rand.Chance(dutyRisk))
             {
                 int memberLoss = Rand.RangeInclusive(1, 4);
-                branch.Squad.AdjustCrew(member: -memberLoss, commander: 0f);
+                task.Branch.Squad.AdjustCrew(member: -memberLoss, commander: 0f);
             }
         }
     }
 
-    public void CheckAssistanceRequestGeneration(Branch branch)
+    public void CheckAssistanceRequestGeneration(BranchTask task)
     {
         while (nextRequestThresholdIndex < AssistanceRequestThresholds.Length
             && curProgress >= AssistanceRequestThresholds[nextRequestThresholdIndex]
             && assistanceRequests.Count < 6)
         {
-            GenerateAssistanceRequest(branch);
+            GenerateAssistanceRequest(task);
             nextRequestThresholdIndex++;
         }
     }
@@ -160,11 +161,11 @@ public class JurisdictionDutyData : IExposable
     private void OnAssistanceRequestCompleted(AssistanceRequest request)
     {
         int medalCount = Mathf.CeilToInt(request.ProgressCeiling / 100f) + 1;
-        BranchMedalDef medal = PickMedalDef(null);
-        completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Assistance, medal, medalCount));
+        KnightChivalryDef medalChivalry = PickMedalDef(null);
+        completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Assistance, medalChivalry, medalCount));
     }
 
-    private void GenerateAssistanceRequest(Branch branch)
+    private void GenerateAssistanceRequest(BranchTask task)
     {
         AssistanceRequest.RequestType type = (AssistanceRequest.RequestType)Rand.RangeInclusive(0, 4);
         AssistanceRequestWorker worker = GetWorker(type);
@@ -175,8 +176,8 @@ public class JurisdictionDutyData : IExposable
         int adjustedCeiling = Mathf.Min(rawCeiling, 300) + Mathf.Max(0, rawCeiling - 300) / 2;
         int finalCeiling = Mathf.Clamp(adjustedCeiling, 100, 500);
 
-        float traditionValue = GetTraditionValueForTaskType(branch);
-        float baseDaily = 20f + 0.3f * branch.Squad.AllCrewCount + traditionValue * 30f;
+        float traditionValue = GetTraditionValueForTaskType(task.Branch);
+        float baseDaily = 20f + 0.3f * traditionValue * 30f;
         float requestDaily = baseDaily * 0.3f;
 
         request.Initialize(
@@ -196,11 +197,10 @@ public class JurisdictionDutyData : IExposable
         assistanceRequests.Add(request);
     }
 
-    private void GenerateDutyAcademics(Branch branch)
+    private void GenerateDutyAcademics(BranchTask task)
     {
         dutyAcademics.Clear();
-        BranchTaskType taskType = branch.TaskHandler.FocusedTaskType;
-        KnightChivalryDef chivalry = GetChivalryForTaskType(taskType);
+        KnightChivalryDef chivalry = task.Branch.TaskHandler.FocusedTaskChivalry;
 
         if (chivalry is not null)
         {
@@ -255,28 +255,16 @@ public class JurisdictionDutyData : IExposable
         }
     }
 
-    private static KnightChivalryDef GetChivalryForTaskType(BranchTaskType taskType)
-    {
-        return taskType switch
-        {
-            BranchTaskType.CrimeFighting => BranchMedalDefOf.OARO_Courage?.chivalry,
-            BranchTaskType.StabilityMaintenance => BranchMedalDefOf.OARO_Rescue?.chivalry,
-            BranchTaskType.Assistance => BranchMedalDefOf.OARO_Tenacity?.chivalry,
-            BranchTaskType.Supervision => BranchMedalDefOf.OARO_Justice?.chivalry,
-            _ => null
-        };
-    }
-
     private static float GetTraditionValueForTaskType(Branch branch)
     {
-        KnightChivalryDef chivalry = GetChivalryForTaskType(branch.TaskHandler.FocusedTaskType);
+        KnightChivalryDef chivalry = branch.TaskHandler.FocusedTaskChivalry;
         if (chivalry is null) return 0f;
 
         int count = 0;
         IReadOnlyList<BranchTradition> traditions = branch.TraditionHandler.Traditions;
         for (int i = 0; i < traditions.Count; i++)
         {
-            if (traditions[i].Def?.Chivalry == chivalry)
+            if (chivalry.IsSameDefNonNullable(traditions[i].Def?.chivalry))
             {
                 count++;
             }
@@ -311,30 +299,33 @@ public class JurisdictionDutyData : IExposable
         return baseRisk * (1f + Mathf.Max(0f, 1f - publicSecurity));
     }
 
-    private static BranchMedalDef PickMedalDef(Branch branch)
+    private static KnightChivalryDef PickMedalDef(BranchTask task)
     {
-        BranchTaskType focusedType = branch?.TaskHandler.FocusedTaskType ?? BranchTaskType.General;
-
-        List<(BranchTaskType taskType, float weight)> taskTypeWeighters = new(BranchTaskTypeExtension.EnumArr.Length);
-        foreach (BranchTaskType taskType in BranchTaskTypeExtension.EnumArr)
+        KnightChivalryDef taskChivalry = task?.TaskChivalry;
+        if (taskChivalry is null)
         {
-            if (taskType != focusedType)
-            {
-                taskTypeWeighters.Add((taskType, 10f));
-            }
+            return OrderDefDatabase.MedalChivalries.RandomElement();
         }
-        taskTypeWeighters.Add((focusedType, taskTypeWeighters.Count * 10f));
 
-        BranchTaskType rewardTaskType = taskTypeWeighters.RandomElementByWeight(pair => pair.weight).taskType;
-
-        List<BranchMedalDef> rewardMedalDefs = BranchTaskTypeExtension.GetMedalDefsByTaskType(rewardTaskType);
-        if (!rewardMedalDefs.NullOrEmpty())
+        List<(KnightChivalryDef chivalry, float weight)> taskTypeWeighters = new(DefDatabase<KnightChivalryDef>.DefCount);
+        foreach (KnightChivalryDef chivalry in DefDatabase<KnightChivalryDef>.AllDefsListForReading)
         {
-            return rewardMedalDefs.RandomElement();
+            if (chivalry.medal is null)
+                continue;
+            if (chivalry != taskChivalry)
+                taskTypeWeighters.Add((chivalry, 10f));
+        }
+
+        if (taskChivalry.medal is not null)
+            taskTypeWeighters.Add((taskChivalry, taskTypeWeighters.Count * 10f));
+
+        if (taskTypeWeighters.NullOrEmpty())
+        {
+            return OrderDefDatabase.MedalChivalries.RandomElement();
         }
         else
         {
-            return DefDatabase<BranchMedalDef>.GetRandom();
+            return taskTypeWeighters.RandomElementByWeight(pair => pair.weight).chivalry;
         }
     }
 

@@ -11,7 +11,7 @@ public class QuestNode_GiveBranchMedal : QuestNode
     public SlateRef<string> inSignal;
 
     public SlateRef<Branch> branch;
-    public SlateRef<IEnumerable<BranchMedalDef>> potentialDefs;
+    public SlateRef<IEnumerable<KnightChivalryDef>> potentialDefs;
     public SlateRef<int> count;
 
     public SlateRef<bool> isReward;
@@ -36,7 +36,7 @@ public class QuestNode_GiveBranchMedal : QuestNode
             Count = count.GetValue(slate),
             PotentialDefs = [],
         };
-        IEnumerable<BranchMedalDef> potentialDefs = this.potentialDefs.GetValue(slate);
+        IEnumerable<KnightChivalryDef> potentialDefs = this.potentialDefs.GetValue(slate);
         if (potentialDefs is not null)
         {
             questPart_GiveBranchMedal.PotentialDefs.AddRangeUnique(potentialDefs);
@@ -84,7 +84,7 @@ public class QuestPart_GiveBranchMedal : QuestPart
 {
     public string InSignalTrigger;
     public Branch Branch;
-    public List<BranchMedalDef> PotentialDefs;
+    public List<KnightChivalryDef> PotentialDefs;
     public int Count;
 
     public override void Cleanup()
@@ -109,10 +109,14 @@ public class QuestPart_GiveBranchMedal : QuestPart
     {
         if (Count > 0 && Branch.IsValid() && signal.tag == InSignalTrigger)
         {
-            BranchMedalDef medalType = PotentialDefs?.RandomElementWithFallback(null);
-            if (medalType is not null)
+            if (PotentialDefs.NullOrEmpty())
+                return;
+
+            PotentialDefs.RemoveAll(c => c.medal is null);
+            KnightChivalryDef medalChivalry = PotentialDefs.RandomElementWithFallback(null);
+            if (medalChivalry is not null)
             {
-                Branch.MedalHandler.AdjustMedal(medalType, Count);
+                Branch.MedalHandler.AdjustMedal(medalChivalry, Count);
             }
         }
     }

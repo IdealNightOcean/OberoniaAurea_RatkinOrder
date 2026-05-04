@@ -12,16 +12,16 @@ public static class HotReloadDefs_Patch
     {
         LongEventHandler.QueueLongEvent(delegate
         {
-            DeepProfiler.Start($"{nameof(OrderDefDataBase)}.{nameof(OrderDefDataBase.ClearStaticCache)}()");
+            DeepProfiler.Start($"{nameof(OrderDefDatabase)}.{nameof(OrderDefDatabase.ClearStaticCache)}()");
             try
             {
-                OrderDefDataBase.ClearStaticCache();
+                OrderDefDatabase.ClearStaticCache();
             }
             finally
             {
                 DeepProfiler.End();
             }
 
-        }, $"Clear {nameof(OberoniaAurea.RatkinOrder)}.{nameof(OrderDefDataBase)}", doAsynchronously: false, null);
+        }, $"Clear {nameof(OberoniaAurea.RatkinOrder)}.{nameof(OrderDefDatabase)}", doAsynchronously: false, null);
     }
 }

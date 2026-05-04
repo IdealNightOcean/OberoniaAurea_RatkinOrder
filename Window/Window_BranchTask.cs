@@ -366,24 +366,17 @@ public partial class Window_BranchTask : OrderWindowBase
         float entryWidth = 510f;
         float entryHeight = 140f;
 
-        foreach (BranchTaskType taskType in EnumArraryLibrary.JointPatrolTaskTypeArr)
+        foreach (KnightChivalryDef taskChivalry in OrderDefDatabase.JointPatrolChivalries)
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
-            DrawJointPatrolTarget_ByType(entryRect, taskType);
+            DrawJointPatrolTarget_ByType(entryRect, taskChivalry);
         }
     }
 
-    private void DrawJointPatrolTarget_ByType(Rect inRect, BranchTaskType taskType)
+    private void DrawJointPatrolTarget_ByType(Rect inRect, KnightChivalryDef taskChivalry)
     {
-        Texture2D backgroundTex = taskType switch
-        {
-            BranchTaskType.CrimeFighting => jointPatrolTargetBackground_CrimeFighting,
-            BranchTaskType.StabilityMaintenance => jointPatrolTargetBackground_StabilityMaintenance,
-            BranchTaskType.Assistance => jointPatrolTargetBackground_Assistance,
-            BranchTaskType.Supervision => jointPatrolTargetBackground_Supervision,
-            _ => BaseContent.BadTex
-        };
+        Texture2D backgroundTex = taskChivalry.jointPatrol?.targetBackground?.Texture ?? BaseContent.BadTex;
         GUI.DrawTexture(inRect, backgroundTex);
         Rect innerRect = inRect.ContractedBy(2f);
         float innerRectX = innerRect.xMin;
@@ -392,7 +385,7 @@ public partial class Window_BranchTask : OrderWindowBase
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleLeft;
         Rect reusedRect = new(innerRectX + 55f, innerRectY + 12f, 100f, 32f);
-        Widgets.Label(reusedRect, $"OARO_JointPatrolTaskType_{taskType}".Translate());
+        Widgets.Label(reusedRect, $"OARO_JointPatrolTaskType_{taskChivalry}".Translate());
 
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(innerRect.xMax - 124f, innerRectY + 7f, 124f, 28f);
@@ -401,7 +394,7 @@ public partial class Window_BranchTask : OrderWindowBase
         reusedRect.yMax += 28f;
         reusedRect.yMin = reusedRect.yMax - 28f;
         float potencyValue = 0f;
-        if (JointPatrolManager.CurState != PatrolState.Ongoing || !JointPatrolManager.TaskPotencys.Value.TryGetValue(taskType, out potencyValue))
+        if (JointPatrolManager.CurState != PatrolState.Ongoing || !JointPatrolManager.TaskPotencys.Value.TryGetValue(taskChivalry, out potencyValue))
         {
             potencyValue = 0f;
         }

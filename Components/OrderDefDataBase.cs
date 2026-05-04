@@ -5,8 +5,27 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public static class OrderDefDataBase
+public static class OrderDefDatabase
 {
+    private static List<KnightChivalryDef> medalChivalries = [];
+    public static List<KnightChivalryDef> MedalChivalries
+    {
+        get
+        {
+            medalChivalries ??= DefDatabase<KnightChivalryDef>.AllDefsListForReading.Where(c => c.medal is not null).ToList();
+            return medalChivalries;
+        }
+    }
+
+    private static List<KnightChivalryDef> jointPatrolChivalries =
+        [
+            KnightChivalryDefOf.OARO_Courage,
+            KnightChivalryDefOf.OARO_Tenacity,
+            KnightChivalryDefOf.OARO_Rescue,
+            KnightChivalryDefOf.OARO_Justice,
+        ];
+    public static IReadOnlyList<KnightChivalryDef> JointPatrolChivalries => jointPatrolChivalries;
+
     private static Dictionary<JointPatrolIncidentDef.IncidentType, List<JointPatrolIncidentDef>> jointPatrolIncidentGruopByType;
     public static Dictionary<JointPatrolIncidentDef.IncidentType, List<JointPatrolIncidentDef>> JointPatrolIncidentGruopByType
     {
@@ -17,8 +36,6 @@ public static class OrderDefDataBase
                     .ToDictionary(g => g.Key, g => g.ToList());
         }
     }
-
-    private static readonly Dictionary<BranchTaskType, List<BranchMedalDef>> branchMedalDefGruopByTaskType = [];
 
     private static List<ThingDef> allKnightPreferredBuildingsCached;
     public static List<ThingDef> AllKnightPreferredBuildings
@@ -44,28 +61,8 @@ public static class OrderDefDataBase
     {
         jointPatrolIncidentGruopByType = null;
         allKnightPreferredBuildingsCached = null;
-
-        branchMedalDefGruopByTaskType.Clear();
     }
 
-    public static IReadOnlyList<BranchMedalDef> TryGetAllBranchMedalDefsByTaskType(BranchTaskType taskType)
-    {
-        if (branchMedalDefGruopByTaskType.TryGetValue(taskType, out List<BranchMedalDef> defs))
-        {
-            return defs;
-        }
-
-        List<BranchMedalDef> medalDefs = [];
-        foreach (BranchMedalDef def in DefDatabase<BranchMedalDef>.AllDefsListForReading)
-        {
-            if (def.focusedTaskType == taskType)
-            {
-                medalDefs.Add(def);
-            }
-        }
-        branchMedalDefGruopByTaskType.Add(taskType, medalDefs);
-        return medalDefs;
-    }
 
     public static bool TryGetAllJointPatrolIncidentsByType(JointPatrolIncidentDef.IncidentType incidentType, out List<JointPatrolIncidentDef> incidents)
     {

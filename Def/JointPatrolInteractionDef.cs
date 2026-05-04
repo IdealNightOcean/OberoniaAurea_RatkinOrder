@@ -11,9 +11,9 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class JointPatrolInteractionDef : Def
 {
     /// <summary>
-    /// 专注任务限制
+    /// 专注任务骑士精神限制
     /// </summary>
-    public BranchTaskType? restrictTaskType;
+    public KnightChivalryDef restrictChivalry;
 
     /// <summary>
     /// 分部类型限制
@@ -38,7 +38,7 @@ public abstract class JointPatrolInteractionDef : Def
 
     public virtual bool CanApplyOn(Branch branch, PatrolLevel patrolLevel)
     {
-        if (restrictTaskType.HasValue && branch.TaskHandler.FocusedTaskType != restrictTaskType.Value)
+        if (restrictChivalry is not null && restrictChivalry != branch.TaskHandler.FocusedTaskChivalry)
         {
             return false;
         }

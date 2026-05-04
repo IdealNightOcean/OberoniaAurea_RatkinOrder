@@ -13,10 +13,10 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
         {
             return true;
         }
-        if (constructParam.Branch.MedalHandler.GetMedalCount(memorialComp.medalDef) < memorialComp.medalCount)
+        if (constructParam.Branch.MedalHandler.GetMedalCount(memorialComp.medalChivalry) < memorialComp.medalCount)
         {
             return resultOnly ? false : "OARO_Insufficient_SquadMedalOf".Translate(
-                memorialComp.medalDef.Named("MEDAL"),
+                memorialComp.medalChivalry.Named(KeyLibrary_FormatArgName.DEF),
                 memorialComp.medalCount.Named(KeyLibrary_FormatArgName.Count));
         }
         return true;

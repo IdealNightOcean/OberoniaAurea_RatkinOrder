@@ -162,7 +162,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         Rect reusedRect = new(inRect.x, inRect.y + 14f, inRect.width, 20f);
         if (def.academicType == AcademicType.Honor)
         {
-            Texture2D honorDecorationTexture = BranchHonor?.medalDef?.honorDecorationTexture.Texture;
+            Texture2D honorDecorationTexture = BranchHonor?.chivalry?.medal?.honorDecorationTexture?.Texture;
             if (honorDecorationTexture is not null)
             {
                 GUI.DrawTexture(inRect.ContractedBy(3f), honorDecorationTexture, ScaleMode.ScaleToFit);

@@ -763,11 +763,11 @@ public class Window_BranchDemand : OrderWindowBase
             medalViewRect.width = entryWidth * demand.PotentialMedals.Count;
 
             Widgets.BeginScrollView(medalOutRect, ref scrollPosition_Medals, medalViewRect, showScrollbars: false);
-            foreach (BranchMedalDef medalDef in demand.PotentialMedals)
+            foreach (KnightChivalryDef medalChivalry in demand.PotentialMedals)
             {
                 Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryX += entryWidth;
-                GUI.DrawTexture(entryRect.ContractedBy(4f), medalDef.iconTexture.Texture, ScaleMode.ScaleToFit);
+                OARO_WindowUtility.DrawKnightChivalryIcon(entryRect.ContractedBy(4f), medalChivalry, primary: false);
             }
             Widgets.EndScrollView();
 

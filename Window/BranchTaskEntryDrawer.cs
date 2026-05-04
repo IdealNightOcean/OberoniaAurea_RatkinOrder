@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -32,7 +33,7 @@ public partial class Window_BranchTask
         private Window_BranchTask Parent { get; }
         public Branch Branch { get; }
         private Map Map { get; }
-        private BranchTaskType ProtogenicTaskType { get; }
+        private KnightChivalryDef ProtogenicChivalry { get; }
         private bool ShowDetail { get; set; }
 
         private JointPatrolManager JointPatrolManager => Branch.RatkinOrder.JointPatrolManager;
@@ -55,7 +56,7 @@ public partial class Window_BranchTask
             Parent = parent;
             Branch = branch;
             Map = map;
-            ProtogenicTaskType = Branch.MedalHandler.ProtogenicTaskType;
+            ProtogenicChivalry = Branch.MedalHandler.PrimaryChivalry;
 
             JointBranchRecord = new(refreshFunc: RefreshJointBranchRecord);
 
@@ -201,7 +202,7 @@ public partial class Window_BranchTask
             }
 
             reusedRect = new(inRectX + 495f, inRectY + 24f, 25f, 20f);
-            OARO_WindowUtility.DrawBranchTaskTypeIcon(reusedRect, Branch.TaskHandler.FocusedTaskType, primary: Branch.TaskHandler.FocusedTaskType == ProtogenicTaskType);
+            OARO_WindowUtility.DrawKnightChivalryIcon(reusedRect, Branch.TaskHandler.FocusedTaskChivalry, primary: Branch.TaskHandler.FocusedTaskChivalry == ProtogenicChivalry);
         }
 
         private void DrawJointPatrol(Rect inRect)
@@ -209,8 +210,13 @@ public partial class Window_BranchTask
             float inRectX = inRect.xMin;
 
             Rect reusedRect = new(inRectX + 285f, inRect.y - 2f, 348f, 50f);
-            GUI.DrawTexture(reusedRect, Branch.MedalHandler.PrimaryMedal.jointPatrolEntryBackgroundTexture.Texture);
-            GUI.DrawTexture(reusedRect, Branch.MedalHandler.PrimaryMedal.jointPatrolEntryShadeTexture.Texture);
+            JointPatrolProperties jointPatrolProp = Branch.MedalHandler.PrimaryChivalry?.jointPatrol;
+            if (jointPatrolProp is not null)
+            {
+                GUI.DrawTexture(reusedRect, jointPatrolProp.entryBackgroundTexture.Texture);
+                GUI.DrawTexture(reusedRect, jointPatrolProp.entryShadeTexture.Texture);
+            }
+
 
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.MiddleCenter;
@@ -284,10 +290,10 @@ public partial class Window_BranchTask
             int column = 0;
             Rect entryRect;
 
-            BranchTaskType focusedTaskType = Branch.TaskHandler.FocusedTaskType;
+            KnightChivalryDef focusedTaskChivalry = Branch.TaskHandler.FocusedTaskChivalry;
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleCenter;
-            foreach (BranchTaskType taskType in EnumArraryLibrary.JointPatrolTaskTypeArr)
+            foreach (KnightChivalryDef taskChivalry in OrderDefDatabase.JointPatrolChivalries)
             {
                 entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 if ((++column) >= 2)
@@ -300,20 +306,14 @@ public partial class Window_BranchTask
                 {
                     entryX += entryWidth;
                 }
-
-                if (OARO_WindowUtility.TextButtonImageDisableable(
-                    butRect: entryRect,
-                    label: $"OARO_JointPatrolTaskType_{taskType}".Translate(),
-                    acceptance: focusedTaskType == taskType ? false : ChangeFocusedTaskTypeAcceptance.Value,
-                    baseTex: GetTaskTypeButtonTex(taskType, downed: false, disable: taskType != focusedTaskType),
-                    downTex: GetTaskTypeButtonTex(taskType, downed: true, disable: taskType != focusedTaskType),
-                    doMouseoverSound: true,
-                    tooltip: "OARO_JointPatrolTaskTypeTip".Translate()))
+                bool isActive = focusedTaskChivalry.IsSameDefNonNullable(taskChivalry);
+                AcceptanceReport acceptance = isActive ? false : ChangeFocusedTaskTypeAcceptance.Value;
+                if (DrawTaskTypeButton(entryRect, taskChivalry, isActive: isActive, acceptance: acceptance))
                 {
-                    Branch.TaskHandler.FocusedTaskType = taskType;
+                    Branch.TaskHandler.FocusedTaskChivalry = taskChivalry;
                     ChangeFocusedTaskTypeAcceptance.MarkDirty();
                 }
-                if (focusedTaskType == taskType)
+                if (isActive)
                 {
                     Widgets.DrawBox(entryRect, lineTexture: Branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
                 }
@@ -474,16 +474,19 @@ public partial class Window_BranchTask
             Widgets.BeginScrollView(medalsOutRect, ref scrollPosition_Medals, medalsViewRect, showScrollbars: false);
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleCenter;
-            BranchMedalDef primaryMedal = Branch.MedalHandler.PrimaryMedal;
-            foreach (KeyValuePair<BranchMedalDef, BranchMedalRecord> medalRecord in Branch.MedalHandler.MedalRecords)
+            KnightChivalryDef primaryMedal = Branch.MedalHandler.PrimaryChivalry;
+            foreach (KeyValuePair<KnightChivalryDef, BranchMedalRecord> medalRecord in Branch.MedalHandler.MedalRecords)
             {
+                KnightChivalryDef medalChivalry = medalRecord.Key;
+                if (medalChivalry.medal is null)
+                    continue;
                 Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
-                BranchMedalDef medalDef = medalRecord.Key;
-                TooltipHandler.TipRegion(entryRect, () => medalDef.effectDescription ?? string.Empty, uniqueId: 21194707);
+
+                TooltipHandler.TipRegion(entryRect, () => medalChivalry.medal.effectDescription ?? string.Empty, uniqueId: 21194707);
                 Rect reusedRect = OARO_WindowUtility.CenterRectOnY(entryRect, entryX + 5f, 32f, 28f);
                 GUI.DrawTexture(
                     position: reusedRect,
-                    image: medalDef == primaryMedal ? medalDef.primaryIconTexture.Texture : medalDef.iconTexture.Texture,
+                    image: primaryMedal.IsSameDefNonNullable(medalChivalry) ? medalChivalry.primaryIcon.Texture : medalChivalry.icon.Texture,
                     scaleMode: ScaleMode.ScaleToFit);
 
                 reusedRect = OARO_WindowUtility.CenterRectOnY(entryRect, entryX + 45f, 40f, 20f);
@@ -637,56 +640,29 @@ public partial class Window_BranchTask
         }
 
 
-        private static Texture2D GetTaskTypeButtonTex(BranchTaskType taskType, bool downed, bool disable)
+        private static bool DrawTaskTypeButton(Rect inRect, KnightChivalryDef taskChivalry, bool isActive, AcceptanceReport acceptance)
         {
-            switch (taskType)
+
+            bool result = OARO_WindowUtility.TextButtonImageDisableable(
+                butRect: inRect,
+                label: taskChivalry.jointPatrol.TaskLabelCap,
+                acceptance: acceptance,
+                baseTex: taskTypeButton_General,
+                downTex: taskTypeButton_General_Down,
+                doMouseoverSound: true,
+                tooltip: "OARO_JointPatrolTaskTypeTip".Translate());
+
+            Rect iconRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 30f, 24f);
+            GUI.DrawTexture(iconRect, isActive ? null : null);
+            if (isActive)
             {
-                case BranchTaskType.CrimeFighting:
-                    {
-                        if (downed)
-                        {
-                            return disable ? taskTypeButton_CrimeFightingD_Down : taskTypeButton_CrimeFighting_Down;
-                        }
-                        else
-                        {
-                            return disable ? taskTypeButton_CrimeFightingD : taskTypeButton_CrimeFighting;
-                        }
-                    }
-                case BranchTaskType.StabilityMaintenance:
-                    {
-                        if (downed)
-                        {
-                            return disable ? taskTypeButton_StabilityMaintenanceD_Down : taskTypeButton_StabilityMaintenance_Down;
-                        }
-                        else
-                        {
-                            return disable ? taskTypeButton_StabilityMaintenanceD : taskTypeButton_StabilityMaintenance;
-                        }
-                    }
-                case BranchTaskType.Assistance:
-                    {
-                        if (downed)
-                        {
-                            return disable ? taskTypeButton_AssistanceD_Down : taskTypeButton_Assistance_Down;
-                        }
-                        else
-                        {
-                            return disable ? taskTypeButton_AssistanceD : taskTypeButton_Assistance;
-                        }
-                    }
-                case BranchTaskType.Supervision:
-                    {
-                        if (downed)
-                        {
-                            return disable ? taskTypeButton_SupervisionD_Down : taskTypeButton_Supervision_Down;
-                        }
-                        else
-                        {
-                            return disable ? taskTypeButton_SupervisionD : taskTypeButton_Supervision;
-                        }
-                    }
-                default: return downed ? taskTypeButton_General_Down : taskTypeButton_General;
+                GUI.DrawTexture(iconRect, taskChivalry.icon.Texture);
             }
+            else
+            {
+                GenUI.DrawTextureWithMaterial(iconRect, taskChivalry.icon.Texture, OARO_WindowUtility.BlackWhiteMat);
+            }
+            return result;
         }
 
         private static readonly Texture2D taskEntryUpBackground = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskEntryUpBackground");
@@ -714,24 +690,5 @@ public partial class Window_BranchTask
         private static readonly Texture2D taskTypeButton_General = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_General");
         private static readonly Texture2D taskTypeButton_General_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_General_Down");
 
-        private static readonly Texture2D taskTypeButton_CrimeFighting = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_CrimeFighting");
-        private static readonly Texture2D taskTypeButton_CrimeFighting_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_CrimeFighting_Down");
-        private static readonly Texture2D taskTypeButton_CrimeFightingD = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_CrimeFightingD");
-        private static readonly Texture2D taskTypeButton_CrimeFightingD_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_CrimeFightingD_Down");
-
-        private static readonly Texture2D taskTypeButton_StabilityMaintenance = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_StabilityMaintenance");
-        private static readonly Texture2D taskTypeButton_StabilityMaintenance_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_StabilityMaintenance_Down");
-        private static readonly Texture2D taskTypeButton_StabilityMaintenanceD = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_StabilityMaintenanceD");
-        private static readonly Texture2D taskTypeButton_StabilityMaintenanceD_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_StabilityMaintenanceD_Down");
-
-        private static readonly Texture2D taskTypeButton_Assistance = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_Assistance");
-        private static readonly Texture2D taskTypeButton_Assistance_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_Assistance_Down");
-        private static readonly Texture2D taskTypeButton_AssistanceD = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_AssistanceD");
-        private static readonly Texture2D taskTypeButton_AssistanceD_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_AssistanceD_Down");
-
-        private static readonly Texture2D taskTypeButton_Supervision = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_Supervision");
-        private static readonly Texture2D taskTypeButton_Supervision_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_Supervision_Down");
-        private static readonly Texture2D taskTypeButton_SupervisionD = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_SupervisionD");
-        private static readonly Texture2D taskTypeButton_SupervisionD_Down = ContentFinder<Texture2D>.Get("UI/BranchTask/OARO_TaskTypeButton_SupervisionD_Down");
     }
 }

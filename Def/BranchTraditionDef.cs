@@ -17,16 +17,9 @@ public class BranchTraditionDef : Def
     public Type traditionClass = typeof(BranchTradition);
 
     /// <summary>
-    /// 基础设立消耗（印记类型）
-    /// </summary>
-    public BranchMedalDef medalDef;
-
-
-    private KnightChivalryDef chivalryOverride;
-    /// <summary>
     /// 对应骑士精神大类
     /// </summary>
-    public KnightChivalryDef Chivalry => chivalryOverride ?? medalDef?.chivalry;
+    public KnightChivalryDef chivalry;
 
     /// <summary>
     /// 可修行的课业

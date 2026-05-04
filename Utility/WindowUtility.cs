@@ -10,6 +10,22 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class OARO_WindowUtility
 {
+
+    public static Material BlackWhiteMat
+    {
+        get
+        {
+            MaterialRequest req = new()
+            {
+                shader = ShaderDatabase.GrayscaleGUI,
+                color = Color.white,
+                maskTex = Texture2D.redTexture
+            };
+
+            return MaterialPool.MatFrom(req);
+        }
+    }
+
     /// <summary>
     /// Rect居中对应最小坐标
     /// </summary>
@@ -196,10 +212,10 @@ public static class OARO_WindowUtility
         if (isHonorBranch)
         {
             reusedRect = leftRect.ContractedBy(10f);
-            GUI.DrawTexture(reusedRect, honorDef.medalDef.honorDecorationTexture.Texture, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, honorDef.chivalry.medal.honorDecorationTexture.Texture, ScaleMode.ScaleToFit);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            GUI.DrawTexture(reusedRect, honorDef.medalDef.honorBackgroundTexture.Texture);
+            GUI.DrawTexture(reusedRect, honorDef.chivalry.medal.honorBackgroundTexture.Texture);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
@@ -325,23 +341,11 @@ public static class OARO_WindowUtility
         }
     }
 
-    public static void DrawBranchTaskTypeIcon(Rect inRect, BranchTaskType taskType, bool primary)
+    public static void DrawKnightChivalryIcon(Rect inRect, KnightChivalryDef taskChivalry, bool primary)
     {
-        switch (taskType)
+        if (taskChivalry is not null)
         {
-            case BranchTaskType.CrimeFighting:
-                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Courage.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Courage.iconTexture.Texture, ScaleMode.ScaleToFit);
-                return;
-            case BranchTaskType.StabilityMaintenance:
-                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Tenacity.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Tenacity.iconTexture.Texture, ScaleMode.ScaleToFit);
-                return;
-            case BranchTaskType.Assistance:
-                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Rescue.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Rescue.iconTexture.Texture, ScaleMode.ScaleToFit);
-                return;
-            case BranchTaskType.Supervision:
-                GUI.DrawTexture(inRect, primary ? BranchMedalDefOf.OARO_Justice.primaryIconTexture.Texture : BranchMedalDefOf.OARO_Justice.iconTexture.Texture, ScaleMode.ScaleToFit);
-                return;
-            default: return;
+            GUI.DrawTexture(inRect, primary ? taskChivalry.primaryIcon.Texture : taskChivalry.icon.Texture, ScaleMode.ScaleToFit);
         }
     }
 

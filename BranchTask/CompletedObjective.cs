@@ -13,8 +13,8 @@ public class CompletedObjective : IExposable
     private ObjectiveType objectiveType;
     public ObjectiveType Type => objectiveType;
 
-    private BranchMedalDef medalType;
-    public BranchMedalDef MedalType => medalType;
+    private KnightChivalryDef medalType;
+    public KnightChivalryDef MedalType => medalType;
 
     private int assistanceCount;
     public int AssistanceCount => assistanceCount;
@@ -23,7 +23,7 @@ public class CompletedObjective : IExposable
 
     public CompletedObjective() { }
 
-    public CompletedObjective(ObjectiveType type, BranchMedalDef medalType, int assistanceCount = 0)
+    public CompletedObjective(ObjectiveType type, KnightChivalryDef medalType, int assistanceCount = 0)
     {
         objectiveType = type;
         this.medalType = medalType;

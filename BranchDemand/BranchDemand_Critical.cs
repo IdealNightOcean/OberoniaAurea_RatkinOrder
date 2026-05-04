@@ -6,8 +6,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchDemand_Critical : BranchDemand
 {
-    private IReadOnlyList<BranchMedalDef> potentialMedals;
-    public IReadOnlyList<BranchMedalDef> PotentialMedals => potentialMedals ??= (Def.GetModExtension<CriticalDemand_Extension>()?.potentialMedals ?? []);
+    private IReadOnlyList<KnightChivalryDef> potentialMedals;
+    public IReadOnlyList<KnightChivalryDef> PotentialMedals => potentialMedals ??= (Def.GetModExtension<CriticalDemand_Extension>()?.potentialMedals ?? []);
 
     private List<QuestEffectTag> questEffectTags;
     public IReadOnlyList<QuestEffectTag> QuestEffectTags => questEffectTags;

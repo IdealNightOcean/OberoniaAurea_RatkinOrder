@@ -45,7 +45,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
 
     protected override void PostTaskStart()
     {
-        dutyData = new JurisdictionDutyData(branch);
+        dutyData = new JurisdictionDutyData(this);
         GenerateDutySite();
         Notify_DutyStarted();
     }
@@ -59,7 +59,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
 
     public override void TickHour()
     {
-        dutyData?.TickHour(branch);
+        dutyData?.TickHour(this);
     }
 
     public void Notify_CaravanStartedWork() => playerParticipated = true;
@@ -156,9 +156,10 @@ public class BranchTask_JurisdictionDuty : BranchTask
             BranchTaskHandler.RadicalismDegree.Aggressive => 1.33f,
             _ => 1f
         };
-        float focusMultiplier = TaskType == branch.TaskHandler.FocusedTaskType ? 1.15f : 1f;
+        float focusMultiplier = TaskChivalry.IsSameDefNonNullable(branch.TaskHandler.FocusedTaskChivalry) ? 1.15f : 1f;
 
-        switch (TaskType)
+        /*
+        switch (TaskChivalry)
         {
             case BranchTaskType.CrimeFighting or BranchTaskType.StabilityMaintenance:
                 {
@@ -179,6 +180,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
                     break;
                 }
         }
+        */
     }
 
     private void SettlementPublicSecurity(StringBuilder sb)

@@ -12,7 +12,7 @@ public class BranchTask : IExposable
     protected BranchTaskDef def;
     public BranchTaskDef Def => def;
     public string Label => def.label;
-    public BranchTaskType TaskType => def.taskType;
+    public KnightChivalryDef TaskChivalry => def.chivalry;
 
     protected Branch branch;
     public Branch Branch => branch;
