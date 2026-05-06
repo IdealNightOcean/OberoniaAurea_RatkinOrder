@@ -54,7 +54,7 @@
       <HintPath>..\..\SimpleAIClient\bin\Debug\netstandard2.1\NightOcean.SimpleAIClient.dll</HintPath>
     </Reference>
     <Reference Include="OberoniaAurea_Frame">
-      <HintPath>..\OberoniaAurea_Frame\Release\OberoniaAurea_Frame.dll</HintPath>
+      <HintPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Oberonia Aurea Framework\1.6\Assemblies\OberoniaAurea_Frame.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -177,8 +177,8 @@
     <Compile Include="Def\OrderStationTraditionDef.cs" />
     <Compile Include="HarmonyPatch\TryDoMentalBreak_Patch.cs" />
     <Compile Include="KnightChivalry\JointPatrolProperties.cs" />
-    <Compile Include="KnightChivalry\JointPatrolPropWorker.cs" />
-    <Compile Include="KnightChivalry\JointPatrolRewardData.cs" />
+    <Compile Include="JointPatrol\JointPatrolPropWorker.cs" />
+    <Compile Include="JointPatrol\JointPatrolRewardData.cs" />
     <Compile Include="KnightChivalry\MedalProperties.cs" />
     <Compile Include="ReadingOutcomeDoer_KnightDiary.cs" />
     <Compile Include="KnightVirtue\Alert_AnyResiHasUnused.cs" />

@@ -55,7 +55,7 @@ public class JointPatrolPropWorker_Tenacity : JointPatrolPropWorker_Base
     }
 }
 
-public class JointPatrolPropWorker_Rescue : JointPatrolPropWorker_Base
+public class JointPatrolPropWorker_Compassion : JointPatrolPropWorker_Base
 {
     public override void OnJointPatrolTaskCompleted(KnightChivalryDef def, JointPatrolRewardData rewardData)
     {

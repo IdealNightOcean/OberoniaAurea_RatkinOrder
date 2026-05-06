@@ -10,6 +10,17 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class OARO_WindowUtility
 {
+    public static Material GetTintMaterial(Color color, Texture2D maskTex)
+    {
+        MaterialRequest req = new()
+        {
+            shader = ShaderDatabase.GrayscaleGUI,
+            color = color,
+            maskTex = maskTex ?? Texture2D.redTexture
+        };
+
+        return MaterialPool.MatFrom(req);
+    }
 
     public static Material BlackWhiteMat
     {
@@ -215,7 +226,8 @@ public static class OARO_WindowUtility
             GUI.DrawTexture(reusedRect, honorDef.chivalry.medal.honorDecorationTexture.Texture, ScaleMode.ScaleToFit);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            GUI.DrawTexture(reusedRect, honorDef.chivalry.medal.honorBackgroundTexture.Texture);
+            Material tintMat = OARO_WindowUtility.GetTintMaterial(honorDef.color, Texture2D.redTexture);
+            GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.HonorBackgroundTex, tintMat);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);

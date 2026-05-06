@@ -38,14 +38,4 @@ public class MedalProperties
     /// </summary>
     public PathedTexture2DWithExpanded honorDecorationTexture;
 
-    /// <summary>
-    /// 荣誉绶带图标
-    /// </summary>
-    public PathedTexture2D honorRibbonTexture;
-
-    /// <summary>
-    /// 荣誉背景图标
-    /// </summary>
-    public PathedTexture2D honorBackgroundTexture;
-
 }

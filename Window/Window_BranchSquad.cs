@@ -238,7 +238,8 @@ public class Window_BranchSquad : OrderWindowBase
             KnightChivalryDef honorChivalry = honorDef.chivalry;
             if (honorChivalry?.medal is not null)
             {
-                GUI.DrawTexture(reusedRect, honorChivalry.medal.honorBackgroundTexture.Texture);
+                Material tintMat = OARO_WindowUtility.GetTintMaterial(honorDef.color, Texture2D.redTexture);
+                GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.HonorBackgroundTex, tintMat);
 
                 reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
                 GUI.DrawTexture(reusedRect, honorChivalry.medal.honorDecorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);

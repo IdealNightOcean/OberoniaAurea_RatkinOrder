@@ -10,10 +10,6 @@ public static class OARO_ThingDefOf
     /// 鼠族
     /// </summary>
     public static ThingDef Ratkin;
-    /// <summary>
-    /// 鼠族实验体
-    /// </summary>
-    public static ThingDef Ratkin_Su;
 
     /// <summary>
     /// 推荐信

@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public static class OARO_PawnUtility
 {
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static bool IsRatkin(this Pawn pawn) => pawn.def == OARO_ThingDefOf.Ratkin || pawn.def == OARO_ThingDefOf.Ratkin_Su;
+    public static bool IsRatkin(this Pawn pawn) => pawn.def == OARO_ThingDefOf.Ratkin;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool CanBeKnight(this Pawn pawn) => pawn is not null && pawn.RaceProps.Humanlike;

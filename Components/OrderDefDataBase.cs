@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 [StaticConstructorOnStartup]
 public static class OrderDefDatabase
 {
-    private static List<KnightChivalryDef> medalChivalries = [];
+    private static List<KnightChivalryDef> medalChivalries;
     public static List<KnightChivalryDef> MedalChivalries
     {
         get
@@ -17,14 +17,16 @@ public static class OrderDefDatabase
         }
     }
 
-    private static List<KnightChivalryDef> jointPatrolChivalries =
-        [
-            KnightChivalryDefOf.OARO_Courage,
-            KnightChivalryDefOf.OARO_Tenacity,
-            KnightChivalryDefOf.OARO_Rescue,
-            KnightChivalryDefOf.OARO_Justice,
-        ];
-    public static IReadOnlyList<KnightChivalryDef> JointPatrolChivalries => jointPatrolChivalries;
+    private static List<KnightChivalryDef> jointPatrolChivalries;
+
+    public static List<KnightChivalryDef> JointPatrolChivalries
+    {
+        get
+        {
+            jointPatrolChivalries ??= DefDatabase<KnightChivalryDef>.AllDefsListForReading.Where(c => c.jointPatrol is not null).ToList();
+            return jointPatrolChivalries;
+        }
+    }
 
     private static Dictionary<JointPatrolIncidentDef.IncidentType, List<JointPatrolIncidentDef>> jointPatrolIncidentGruopByType;
     public static Dictionary<JointPatrolIncidentDef.IncidentType, List<JointPatrolIncidentDef>> JointPatrolIncidentGruopByType
@@ -59,6 +61,8 @@ public static class OrderDefDatabase
 
     public static void ClearStaticCache()
     {
+        medalChivalries = null;
+        jointPatrolChivalries = null;
         jointPatrolIncidentGruopByType = null;
         allKnightPreferredBuildingsCached = null;
     }

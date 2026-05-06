@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using RimWorld;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -93,10 +94,10 @@ public class Window_BranchList : OrderWindowBase
 
         Rect reusedRect = new(innerX, innerY, 224f, 86f);
         Branch branch = branchSummary.Branch;
-        Texture2D honorBackgroundTexture = branch.HonorChivalry?.medal.honorBackgroundTexture.Texture;
-        if (honorBackgroundTexture is not null)
+        if (branch.HonorDef is not null)
         {
-            GUI.DrawTexture(reusedRect, honorBackgroundTexture);
+            Material tintMat = OARO_WindowUtility.GetTintMaterial(branch.HonorDef.color, Texture2D.redTexture);
+            GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.HonorBackgroundTex, tintMat);
         }
 
         reusedRect.xMin += 12f;

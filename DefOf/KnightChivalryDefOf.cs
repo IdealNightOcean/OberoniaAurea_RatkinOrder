@@ -16,7 +16,7 @@ public static class KnightChivalryDefOf
     /// <summary>
     /// 援护
     /// </summary>
-    public static KnightChivalryDef OARO_Rescue;
+    public static KnightChivalryDef OARO_Compassion;
     /// <summary>
     /// 公义
     /// </summary>

@@ -210,13 +210,14 @@ public partial class Window_BranchTask
             float inRectX = inRect.xMin;
 
             Rect reusedRect = new(inRectX + 285f, inRect.y - 2f, 348f, 50f);
-            JointPatrolProperties jointPatrolProp = Branch.MedalHandler.PrimaryChivalry?.jointPatrol;
+            KnightChivalryDef primaryChivalry = Branch.MedalHandler.PrimaryChivalry;
+            JointPatrolProperties jointPatrolProp = primaryChivalry?.jointPatrol;
             if (jointPatrolProp is not null)
             {
                 GUI.DrawTexture(reusedRect, jointPatrolProp.entryBackgroundTexture.Texture);
-                GUI.DrawTexture(reusedRect, jointPatrolProp.entryShadeTexture.Texture);
+                Material tintMat = OARO_WindowUtility.GetTintMaterial(primaryChivalry.color, IconLibrary.JointPatrolEntryShadeMask);
+                GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.JointPatrolEntryShadeTex, tintMat);
             }
-
 
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.MiddleCenter;

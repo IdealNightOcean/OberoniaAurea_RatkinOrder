@@ -16,7 +16,6 @@ public class JointPatrolProperties
 
     public PathedTexture2D entryBackgroundTexture;
 
-    public PathedTexture2D entryShadeTexture;
-
     public PathedTexture2D targetBackground;
+
 }

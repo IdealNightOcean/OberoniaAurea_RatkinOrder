@@ -7,7 +7,7 @@ public class WorkGiver_FillFermentingBarrel_Order : WorkGiver_FillFermentingBarr
 {
     public override bool ShouldSkip(Pawn pawn, bool forced = false)
     {
-        if (pawn.story is not null && (pawn.def == OARO_ThingDefOf.Ratkin || pawn.def == OARO_ThingDefOf.Ratkin_Su))
+        if (pawn.story is not null && pawn.IsRatkin())
         {
             BackstoryDef adultHood = pawn.story.Adulthood;
             if (adultHood == OARO_ModDefOf.Ratkin_Knight || adultHood == OARO_ModDefOf.Ratkin_KnightCommander)

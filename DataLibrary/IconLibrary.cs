@@ -48,4 +48,26 @@ public static class IconLibrary
 
     public static readonly Texture2D TransTex = SolidColorMaterials.NewSolidColorTexture(new Color(0f, 0f, 0f, 0f));
 
+    /// <summary>
+    /// 联巡条目背景绑带+渐变
+    /// </summary>
+    public static readonly Texture2D JointPatrolEntryShadeTex = ContentFinder<Texture2D>.Get("UI/KnightChivalry/JointPatrol/OARO_EntryShade");
+    /// <summary>
+    ///联巡条目背景绑带+渐变（遮罩）
+    /// </summary>
+    public static readonly Texture2D JointPatrolEntryShadeMask = ContentFinder<Texture2D>.Get("UI/KnightChivalry/JointPatrol/OARO_EntryShade_M");
+
+    /// <summary>
+    /// 荣誉背景渐变
+    /// </summary>
+    public static readonly Texture2D HonorBackgroundTex = ContentFinder<Texture2D>.Get("UI/BranchHonor/OARO_Background");
+
+    /// <summary>
+    /// 荣誉绑带
+    /// </summary>
+    public static readonly Texture2D HonorRibbonTex = ContentFinder<Texture2D>.Get("UI/BranchHonor/OARO_Ribbon");
+    /// <summary>
+    /// 荣誉绑带（遮罩）
+    /// </summary>
+    public static readonly Texture2D HonorRibbonMask = ContentFinder<Texture2D>.Get("UI/BranchHonor/OARO_Ribbon_Mask");
 }

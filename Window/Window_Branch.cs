@@ -612,11 +612,11 @@ public class Window_Branch : OrderWindowBase
         if (buildingDef.isSpecial)
         {
             GUI.DrawTexture(innerRect, specialBuildingLace, ScaleMode.ScaleToFit);
-            Texture2D honorRibbonTexture = buildingDef.honorDef?.chivalry?.medal?.honorRibbonTexture.Texture;
-            if (honorRibbonTexture is not null)
+            if (buildingDef.honorDef is not null)
             {
                 Rect ribbonRect = new(inRect.xMin, inRect.yMin - 2f, inRect.width, 55f);
-                GUI.DrawTexture(ribbonRect, honorRibbonTexture, ScaleMode.StretchToFill);
+                Material tintMat = OARO_WindowUtility.GetTintMaterial(buildingDef.honorDef.color, IconLibrary.HonorRibbonMask);
+                GenUI.DrawTextureWithMaterial(ribbonRect, IconLibrary.HonorRibbonTex, tintMat);
             }
         }
         else if (building.HasUpgraded)

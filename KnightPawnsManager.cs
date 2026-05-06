@@ -13,7 +13,7 @@ public class KnightPawnsManager : IExposable
     public static KnightPawnsManager Instance { get; private set; }
 
     private List<KnightRecord> knights = new(32);
-    private Dictionary<Pawn, KnightRecord> knightsDict;
+    private Dictionary<Pawn, KnightRecord> knightsDict = [];
     public IReadOnlyList<KnightRecord> AllKnights => knights;
 
     /// <summary>
