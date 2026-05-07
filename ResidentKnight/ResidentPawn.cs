@@ -87,7 +87,7 @@ public class ResidentPawn : IExposable, ILoadReferenceable
     {
         this.pawn = pawn ?? throw new System.ArgumentNullException(nameof(pawn));
 
-        academicHandler = new AcademicHandler();
+        academicHandler = new AcademicHandler(this);
 
         loadID = UniqueIDManager.GetUniqueID(nameof(ResidentPawn));
     }
@@ -95,7 +95,7 @@ public class ResidentPawn : IExposable, ILoadReferenceable
     public ResidentPawn(ResidentKnight residentKnight)
     {
         this.pawn = residentKnight.Pawn ?? throw new System.ArgumentNullException(nameof(residentKnight.Pawn));
-        this.academicHandler = residentKnight.AcademicHandler ?? new();
+        this.academicHandler = residentKnight.AcademicHandler ?? new(this);
         loadID = UniqueIDManager.GetUniqueID(nameof(ResidentPawn));
     }
 
@@ -104,7 +104,7 @@ public class ResidentPawn : IExposable, ILoadReferenceable
         Scribe_Values.Look(ref loadID, nameof(loadID), -1);
         Scribe_References.Look(ref pawn, nameof(pawn));
 
-        Scribe_Deep.Look(ref academicHandler, nameof(academicHandler));
+        Scribe_Deep.Look(ref academicHandler, nameof(academicHandler), ctorArgs: this);
 
         Scribe_Values.Look(ref removalTick, nameof(removalTick), -1);
     }

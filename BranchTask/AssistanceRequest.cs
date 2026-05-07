@@ -1,4 +1,5 @@
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -9,29 +10,30 @@ public class AssistanceRequest : IExposable
     {
         BasicWork,
         SkillRequired,
-        AttributeRequired,
-        VirtueRequired,
+        StatValueRequired,
+        KnightVirtueRequired,
         AcademicRequired
     }
 
     private RequestType requestType;
     public RequestType Type => requestType;
 
-    private string title;
-    public string Title => title;
+    private string label;
+    public string Title => label;
 
     private string requirementDesc;
     public string RequirementDesc => requirementDesc;
 
     private int progressCeiling;
-    public int ProgressCeiling => progressCeiling;
+    public int ProgressCeiling
+    {
+        get => progressCeiling;
+        set => progressCeiling = value;
+    }
 
     private int curProgress;
     public int CurProgress => curProgress;
     public float ProgressRatio => progressCeiling > 0 ? (float)curProgress / progressCeiling : 0f;
-
-    private float dailyProgress;
-    public float DailyProgress => dailyProgress;
 
     private bool participating;
     public bool Participating
@@ -44,48 +46,54 @@ public class AssistanceRequest : IExposable
     public bool Completed => completed;
 
     private KnightAcademicDef relatedAcademic;
-    public KnightAcademicDef RelatedAcademic => relatedAcademic;
+    public KnightAcademicDef RelatedAcademic
+    {
+        get => relatedAcademic;
+        set => relatedAcademic = value;
+    }
 
     private SkillDef relatedSkill;
-    public SkillDef RelatedSkill => relatedSkill;
+    public SkillDef RelatedSkill
+    {
+        get => relatedSkill;
+        set => relatedSkill = value;
+    }
 
-    private int skillLevelRequired;
-    public int SkillLevelRequired => skillLevelRequired;
+    private float skillLevelRequired;
+    public float SkillLevelRequired
+    {
+        get => skillLevelRequired;
+        set => skillLevelRequired = Mathf.Max(0, value);
+    }
 
     private StatDef relatedStat;
-    public StatDef RelatedStat => relatedStat;
+    public StatDef RelatedStat
+    {
+        get => relatedStat;
+        set => relatedStat = value;
+    }
 
     private float statValueRequired;
-    public float StatValueRequired => statValueRequired;
+    public float StatValueRequired
+    {
+        get => statValueRequired;
+        set => statValueRequired = value;
+    }
 
     private KnightVirtueDef relatedVirtue;
-    public KnightVirtueDef RelatedVirtue => relatedVirtue;
+    public KnightVirtueDef RelatedVirtue
+    {
+        get => relatedVirtue;
+        set => relatedVirtue = value;
+    }
 
     public AssistanceRequest() { }
+    public AssistanceRequest(RequestType type) { requestType = type; }
 
-    public void Initialize(RequestType type,
-                           string title,
-                           string reqDesc,
-                           int ceiling,
-                           float daily,
-                           KnightAcademicDef academic = null,
-                           SkillDef skill = null,
-                           int skillLvl = 0,
-                           StatDef stat = null,
-                           float statVal = 0f,
-                           KnightVirtueDef virtue = null)
+    public void Initialize(string label, string reqDesc)
     {
-        requestType = type;
-        this.title = title;
-        requirementDesc = reqDesc;
-        progressCeiling = ceiling;
-        dailyProgress = daily;
-        relatedAcademic = academic;
-        relatedSkill = skill;
-        skillLevelRequired = skillLvl;
-        relatedStat = stat;
-        statValueRequired = statVal;
-        relatedVirtue = virtue;
+        this.label = label;
+        this.requirementDesc = reqDesc;
     }
 
     public void AddProgress(float amount)
@@ -102,11 +110,10 @@ public class AssistanceRequest : IExposable
     public void ExposeData()
     {
         Scribe_Values.Look(ref requestType, nameof(requestType));
-        Scribe_Values.Look(ref title, nameof(title));
+        Scribe_Values.Look(ref label, nameof(label));
         Scribe_Values.Look(ref requirementDesc, nameof(requirementDesc));
         Scribe_Values.Look(ref progressCeiling, nameof(progressCeiling), 0);
         Scribe_Values.Look(ref curProgress, nameof(curProgress), 0);
-        Scribe_Values.Look(ref dailyProgress, nameof(dailyProgress), 0f);
         Scribe_Values.Look(ref participating, nameof(participating), false);
         Scribe_Values.Look(ref completed, nameof(completed), false);
         Scribe_Defs.Look(ref relatedAcademic, nameof(relatedAcademic));

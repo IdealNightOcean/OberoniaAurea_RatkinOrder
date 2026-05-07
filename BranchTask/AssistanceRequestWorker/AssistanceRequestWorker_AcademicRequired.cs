@@ -7,25 +7,17 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class AssistanceRequestWorker_AcademicRequired : AssistanceRequestWorker
 {
-    public override AssistanceRequest.RequestType RequestType => AssistanceRequest.RequestType.AcademicRequired;
 
     public override void Initialize(AssistanceRequest request, List<KnightAcademicDef> dutyAcademics)
     {
         KnightAcademicDef academic = dutyAcademics?.RandomElementWithFallback(null)
-                                     ?? DefDatabase<KnightAcademicDef>.AllDefsListForReading.RandomElementWithFallback(null);
+                                     ?? DefDatabase<KnightAcademicDef>.AllDefsListForReading.RandomElement();
         request.Initialize(
-            type: RequestType,
-            title: "OARO_DutyAssistance_AcademicRequired".Translate(academic?.LabelCap ?? ""),
-            reqDesc: "OARO_DutyAssistance_AcademicRequiredDesc".Translate(academic?.LabelCap ?? ""),
-            ceiling: 100,
-            daily: 0f,
-            academic: academic
+            label: "OARO_DutyAssistance_AcademicRequired".Translate(academic.Named(KeyLibrary_FormatArgName.DEF)),
+            reqDesc: "OARO_DutyAssistance_AcademicRequiredDesc".Translate(academic.Named(KeyLibrary_FormatArgName.DEF))
         );
-    }
 
-    public override string GenerateRequirementDesc(AssistanceRequest request)
-    {
-        return "OARO_DutyAssistance_AcademicRequiredDesc".Translate(request.RelatedAcademic?.LabelCap ?? "");
+        request.RelatedAcademic = academic;
     }
 
     public override float CalculateDailyProgress(FixedCaravan fixedCaravan, AssistanceRequest request)
@@ -40,7 +32,7 @@ public class AssistanceRequestWorker_AcademicRequired : AssistanceRequestWorker
             {
                 bool hasAcademic = false;
                 bool hasCompleted = false;
-                IReadOnlyList<KnightVirtue> virtues = knight.KnightVirtueHandler.Virtues;
+                IReadOnlyList<KnightVirtue> virtues = knight.VirtueHandler.Virtues;
                 for (int i = 0; i < virtues.Count; i++)
                 {
                     if (virtues[i].Def.relatedAcademicDef == request.RelatedAcademic)
@@ -62,7 +54,7 @@ public class AssistanceRequestWorker_AcademicRequired : AssistanceRequestWorker
                 }
             }
         }
-        progress += virtueStat * 1f;
+        progress += virtueStat;
         return progress;
     }
 }

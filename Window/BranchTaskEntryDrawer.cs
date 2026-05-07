@@ -653,15 +653,15 @@ public partial class Window_BranchTask
                 doMouseoverSound: true,
                 tooltip: "OARO_JointPatrolTaskTypeTip".Translate());
 
-            Rect iconRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 30f, 24f);
+            Rect iconRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 20f, 20f);
             GUI.DrawTexture(iconRect, isActive ? null : null);
             if (isActive)
             {
-                GUI.DrawTexture(iconRect, taskChivalry.icon.Texture);
+                GUI.DrawTexture(iconRect, taskChivalry.icon.Texture, ScaleMode.ScaleToFit);
             }
             else
             {
-                GenUI.DrawTextureWithMaterial(iconRect, taskChivalry.icon.Texture, OARO_WindowUtility.BlackWhiteMat);
+                OARO_WindowUtility.DrawTextureWithMaterial(iconRect, taskChivalry.icon.Texture, OARO_WindowUtility.BlackWhiteMat, ScaleMode.ScaleToFit);
             }
             return result;
         }

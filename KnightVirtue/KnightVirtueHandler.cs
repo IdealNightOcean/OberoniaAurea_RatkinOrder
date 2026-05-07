@@ -194,8 +194,7 @@ public class KnightVirtueHandler : IExposable
         KnightVirtue virtue = GetVirtue(virtueDef);
         if (virtue is null)
         {
-            Log.Error($"[OARO] 尝试升级骑士美德失败：未找到指定的美德 - {virtueDef}");
-            return false;
+            return TryAddVirtue(virtueDef, 1, reason);
         }
 
         int newLevel = UpgradeVirtue(virtue, upgrade);

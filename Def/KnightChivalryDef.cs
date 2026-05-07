@@ -50,6 +50,7 @@ public class KnightChivalryDef : Def
     private List<ThingDef> allPreferredBuildingsCached;
     private List<KnightAcademicDef> allAcademicsCached;
     private List<BranchTaskDef> allBranchTasksCached;
+    private List<KnightVirtueDef> allKnightVirtuesCached;
 
     public List<ThingDef> AllPreferredBuildings
     {
@@ -107,6 +108,25 @@ public class KnightChivalryDef : Def
                 }
             }
             return allBranchTasksCached;
+        }
+    }
+
+    public List<KnightVirtueDef> AllKnightVirtues
+    {
+        get
+        {
+            if (allKnightVirtuesCached is null)
+            {
+                allKnightVirtuesCached = [];
+                foreach (KnightVirtueDef def in DefDatabase<KnightVirtueDef>.AllDefs)
+                {
+                    if (def.chivalry == this)
+                    {
+                        allKnightVirtuesCached.Add(def);
+                    }
+                }
+            }
+            return allKnightVirtuesCached;
         }
     }
 

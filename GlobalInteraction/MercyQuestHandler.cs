@@ -243,12 +243,12 @@ public class MercyQuestHandler : IExposable
 
     private static void KnightsVirtuesReward(Quest quest)
     {
-        ResidentKnight targetKnight = ResidentPawnsManager.Instance.ResidentKnights.Where(r => r.KnightVirtueHandler.HasUpgradableVirtue)
+        ResidentKnight targetKnight = ResidentPawnsManager.Instance.ResidentKnights.Where(r => r.VirtueHandler.HasUpgradableVirtue)
                                                                                    .RandomElementWithFallback(null);
 
         KnightVirtueDef targetVirtue = KnightVirtueUtility.GetRandomUpgradableVirtue(targetKnight);
         string reason = "OARO_VirtueUpgradeReason_MercyQuestCompleted".Translate(quest.name.Named(KeyLibrary_FormatArgName.QuestName));
-        targetKnight.KnightVirtueHandler.UpgradeVirtue(targetVirtue, upgrade: 1, reason: reason);
+        targetKnight.VirtueHandler.UpgradeVirtue(targetVirtue, upgrade: 1, reason: reason);
     }
 
     private float GetMercyQuestChance()

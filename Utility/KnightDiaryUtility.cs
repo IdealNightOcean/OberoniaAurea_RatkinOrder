@@ -34,7 +34,7 @@ public static class KnightDiaryUtility
     public static QualityCategory DetermineDiaryQuality(ResidentKnight knight, int medalsCost, bool resultOnly, out string explanation)
     {
         explanation = string.Empty;
-        float virtueStat = knight.KnightVirtueHandler?.VirtueStatValueCache.GetCachedResult() ?? 0f;
+        float virtueStat = knight.VirtueHandler?.VirtueStatValueCache.GetCachedResult() ?? 0f;
 
         List<(QualityCategory quality, float weight)> qualityWeights = new(7);
 

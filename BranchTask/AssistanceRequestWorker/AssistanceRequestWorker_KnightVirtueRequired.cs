@@ -5,54 +5,34 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class AssistanceRequestWorker_VirtueRequired : AssistanceRequestWorker
+public class AssistanceRequestWorker_KnightVirtueRequired : AssistanceRequestWorker
 {
-    public override AssistanceRequest.RequestType RequestType => AssistanceRequest.RequestType.VirtueRequired;
-
     public override void Initialize(AssistanceRequest request, List<KnightAcademicDef> dutyAcademics)
     {
         KnightVirtueDef virtue = null;
+
         if (dutyAcademics is not null)
         {
+            List<KnightVirtueDef> potentialVirtues = new(dutyAcademics.Count);
             for (int i = 0; i < dutyAcademics.Count; i++)
             {
-                KnightAcademicDef academic = dutyAcademics[i];
-                if (academic?.chivalry is not null)
+                KnightChivalryDef academicChivalry = dutyAcademics[i].chivalry;
+                if (academicChivalry is not null && !academicChivalry.AllKnightVirtues.NullOrEmpty())
                 {
-                    List<KnightVirtueDef> allVirtues = DefDatabase<KnightVirtueDef>.AllDefsListForReading;
-                    for (int j = 0; j < allVirtues.Count; j++)
-                    {
-                        if (allVirtues[j].chivalry == academic.chivalry)
-                        {
-                            virtue = allVirtues[j];
-                            break;
-                        }
-                    }
-                    if (virtue is not null) break;
+                    potentialVirtues.Add(academicChivalry.AllKnightVirtues.RandomElementWithFallback());
                 }
             }
-        }
-        if (virtue is null)
-        {
-            List<KnightVirtueDef> allVirtues = DefDatabase<KnightVirtueDef>.AllDefsListForReading;
-            if (allVirtues.Count > 0)
-            {
-                virtue = allVirtues[Rand.Range(0, allVirtues.Count)];
-            }
-        }
-        request.Initialize(
-            type: RequestType,
-            title: "OARO_DutyAssistance_VirtueRequired".Translate(virtue?.LabelCap ?? ""),
-            reqDesc: "OARO_DutyAssistance_VirtueRequiredDesc".Translate(virtue?.LabelCap ?? ""),
-            ceiling: 100,
-            daily: 0f,
-            virtue: virtue
-        );
-    }
 
-    public override string GenerateRequirementDesc(AssistanceRequest request)
-    {
-        return "OARO_DutyAssistance_VirtueRequiredDesc".Translate(request.RelatedVirtue?.LabelCap ?? "");
+            virtue = potentialVirtues.RandomElementWithFallback();
+        }
+
+        virtue ??= DefDatabase<KnightVirtueDef>.GetRandom();
+
+        request.Initialize(
+            label: "OARO_DutyAssistance_VirtueRequired".Translate(virtue.Named(KeyLibrary_FormatArgName.DEF)),
+            reqDesc: "OARO_DutyAssistance_VirtueRequiredDesc".Translate(virtue.Named(KeyLibrary_FormatArgName.DEF))
+        );
+        request.RelatedVirtue = virtue;
     }
 
     public override float CalculateDailyProgress(FixedCaravan caravan, AssistanceRequest request)
@@ -66,7 +46,7 @@ public class AssistanceRequestWorker_VirtueRequired : AssistanceRequestWorker
             if (request.RelatedVirtue is not null && ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight knight))
             {
                 KnightVirtue virtue = null;
-                IReadOnlyList<KnightVirtue> virtues = knight.KnightVirtueHandler.Virtues;
+                IReadOnlyList<KnightVirtue> virtues = knight.VirtueHandler.Virtues;
                 for (int i = 0; i < virtues.Count; i++)
                 {
                     if (virtues[i].Def == request.RelatedVirtue)

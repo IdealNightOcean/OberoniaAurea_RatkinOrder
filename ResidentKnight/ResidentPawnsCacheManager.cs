@@ -122,7 +122,7 @@ public class ResidentPawnsCacheManager
 
         foreach (ResidentKnight record in ResidentKnights)
         {
-            if (record.KnightVirtueHandler.HasUnusedTraitSlot)
+            if (record.VirtueHandler.HasUnusedTraitSlot)
             {
                 yield return record.Pawn;
             }

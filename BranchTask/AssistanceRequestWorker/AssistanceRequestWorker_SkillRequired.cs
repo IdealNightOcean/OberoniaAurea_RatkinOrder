@@ -7,27 +7,17 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class AssistanceRequestWorker_SkillRequired : AssistanceRequestWorker
 {
-    public override AssistanceRequest.RequestType RequestType => AssistanceRequest.RequestType.SkillRequired;
-
     public override void Initialize(AssistanceRequest request, List<KnightAcademicDef> dutyAcademics)
     {
         SkillDef skill = DefDatabase<SkillDef>.AllDefsListForReading.RandomElement();
         int levelRequired = Rand.RangeInclusive(12, 20);
         request.Initialize(
-            type: RequestType,
-            title: "OARO_DutyAssistance_SkillRequired".Translate(skill.LabelCap),
-            reqDesc: "OARO_DutyAssistance_SkillRequiredDesc".Translate(skill.LabelCap, levelRequired),
-            ceiling: 100,
-            daily: 0f,
-            skill: skill,
-            skillLvl: levelRequired
+            label: "OARO_DutyAssistance_SkillRequired".Translate(skill.Named(KeyLibrary_FormatArgName.SKILL)),
+            reqDesc: "OARO_DutyAssistance_SkillRequiredDesc".Translate(skill.Named(KeyLibrary_FormatArgName.SKILL), levelRequired.Named(KeyLibrary_FormatArgName.Level))
         );
-    }
 
-    public override string GenerateRequirementDesc(AssistanceRequest request)
-    {
-        return "OARO_DutyAssistance_SkillRequiredDesc".Translate(request.RelatedSkill.Named(KeyLibrary_FormatArgName.SKILL),
-            request.SkillLevelRequired.Named(KeyLibrary_FormatArgName.Level));
+        request.RelatedSkill = skill;
+        request.SkillLevelRequired = levelRequired;
     }
 
     public override float CalculateDailyProgress(FixedCaravan caravan, AssistanceRequest request)
@@ -51,7 +41,7 @@ public class AssistanceRequestWorker_SkillRequired : AssistanceRequestWorker
                 }
             }
         }
-        progress += virtueStat * 1f;
+        progress += virtueStat;
         return progress;
     }
 }

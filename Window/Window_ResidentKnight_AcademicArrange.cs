@@ -270,10 +270,10 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                  downTex: unlockButton_Down,
                  doMouseoverSound: true))
             {
-                AcceptanceReport acceptance = AcademicHandler.CanUpgradeAcademic(SelAcademicDef, Record.Chivalry, directly: false, resultOnly: false);
+                AcceptanceReport acceptance = AcademicHandler.CanUpgradeAcademic(SelAcademicDef, directly: false, resultOnly: false);
                 if (acceptance)
                 {
-                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Chivalry, directly: false);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef);
                     RefreshSelStageLevel();
                     PostArrangeNewAcademic?.Invoke();
                 }
@@ -292,7 +292,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                 reusedRect = new(reusedRect.xMax + 20f, reusedRect.yMax - 20f, 40f, 20f);
                 if (Widgets.ButtonText(reusedRect, "Dev"))
                 {
-                    AcademicHandler.UpgradeAcademic(SelAcademicDef, Record.Pawn, Record.Chivalry, directly: true);
+                    AcademicHandler.UpgradeAcademic(SelAcademicDef, directly: true);
                     PostArrangeNewAcademic?.Invoke();
                     RefreshSelStageLevel();
                 }
@@ -429,10 +429,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         CheckAcademicStageLevel = stageIndex + 1;
         if (CheckAcademicStageLevel == SelAcademicStageLevel + 1)
         {
-            CheckAcademicStageAcceptance = AcademicHandler.CanUpgradeAcademic(academicDef: SelAcademicDef,
-                                                                            Record.Chivalry,
-                                                                          directly: false,
-                                                                          resultOnly: false);
+            CheckAcademicStageAcceptance = AcademicHandler.CanUpgradeAcademic(academicDef: SelAcademicDef, directly: false, resultOnly: false);
         }
         else
         {

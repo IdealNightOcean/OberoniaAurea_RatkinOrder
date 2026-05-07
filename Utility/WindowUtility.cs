@@ -4,12 +4,14 @@ using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
-using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder;
 
+using static OberoniaAurea.RatkinOrder.Branch;
+
 public static class OARO_WindowUtility
 {
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Material GetTintMaterial(Color color, Texture2D maskTex)
     {
         MaterialRequest req = new()
@@ -367,5 +369,72 @@ public static class OARO_WindowUtility
         Text.WordWrap = true;
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
+    }
+
+    public static void DrawTextureWithMaterial(Rect rect, Texture texture, Material material, ScaleMode scaleMode = ScaleMode.StretchToFill)
+    {
+        if (material == null)
+        {
+            GUI.DrawTexture(rect, texture, scaleMode);
+        }
+        else if (Event.current.type == EventType.Repaint)
+        {
+            Color color = material.shader.SupportsMaskTex() ? GUI.color : new Color(GUI.color.r * 0.5f, GUI.color.g * 0.5f, GUI.color.b * 0.5f, GUI.color.a);
+            Rect screenRect = default;
+            Rect sorceRect = default;
+            float imageAspect = (float)texture.width / (float)texture.height;
+            CalculateScaledTextureRects(rect, scaleMode, imageAspect, ref screenRect, ref sorceRect);
+            Graphics.DrawTexture(screenRect, texture, sorceRect, 0, 0, 0, 0, color, material);
+        }
+    }
+
+    /// <summary>
+    /// UnityEngine.GUI.CalculateScaledTextureRects的实现
+    /// </summary>
+    private static bool CalculateScaledTextureRects(Rect position, ScaleMode scaleMode, float imageAspect, ref Rect outScreenRect, ref Rect outSourceRect)
+    {
+        float positionAspect = position.width / position.height;
+        bool result = false;
+        switch (scaleMode)
+        {
+            case ScaleMode.StretchToFill:
+                outScreenRect = position;
+                outSourceRect = new Rect(0f, 0f, 1f, 1f);
+                result = true;
+                break;
+            case ScaleMode.ScaleAndCrop:
+                if (positionAspect > imageAspect)
+                {
+                    float scaleFactor = imageAspect / positionAspect;
+                    outScreenRect = position;
+                    outSourceRect = new Rect(0f, (1f - scaleFactor) * 0.5f, 1f, scaleFactor);
+                    result = true;
+                }
+                else
+                {
+                    float scaleFactor = positionAspect / imageAspect;
+                    outScreenRect = position;
+                    outSourceRect = new Rect(0.5f - scaleFactor * 0.5f, 0f, scaleFactor, 1f);
+                    result = true;
+                }
+                break;
+            case ScaleMode.ScaleToFit:
+                if (positionAspect > imageAspect)
+                {
+                    float scaleFactor = imageAspect / positionAspect;
+                    outScreenRect = new Rect(position.xMin + position.width * (1f - scaleFactor) * 0.5f, position.yMin, scaleFactor * position.width, position.height);
+                    outSourceRect = new Rect(0f, 0f, 1f, 1f);
+                    result = true;
+                }
+                else
+                {
+                    float scaleFactor = positionAspect / imageAspect;
+                    outScreenRect = new Rect(position.xMin, position.yMin + position.height * (1f - scaleFactor) * 0.5f, position.width, scaleFactor * position.height);
+                    outSourceRect = new Rect(0f, 0f, 1f, 1f);
+                    result = true;
+                }
+                break;
+        }
+        return result;
     }
 }

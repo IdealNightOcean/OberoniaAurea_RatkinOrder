@@ -5,30 +5,18 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class AssistanceRequestWorker_AttributeRequired : AssistanceRequestWorker
+public class AssistanceRequestWorker_StatValueRequired : AssistanceRequestWorker
 {
-    public override AssistanceRequest.RequestType RequestType => AssistanceRequest.RequestType.AttributeRequired;
-
     public override void Initialize(AssistanceRequest request, List<KnightAcademicDef> dutyAcademics)
     {
         StatDef stat = new List<StatDef> { StatDefOf.MeleeDPS, StatDefOf.ShootingAccuracyPawn, StatDefOf.MoveSpeed, StatDefOf.WorkSpeedGlobal, StatDefOf.MentalBreakThreshold }.RandomElement();
         float valueRequired = Rand.Range(1.0f, 1.5f);
         request.Initialize(
-            type: RequestType,
-            title: "OARO_DutyAssistance_AttributeRequired".Translate(stat.LabelCap),
-            reqDesc: "OARO_DutyAssistance_AttributeRequiredDesc".Translate(stat.LabelCap, valueRequired.ToStringPercent()),
-            ceiling: 100,
-            daily: 0f,
-            stat: stat,
-            statVal: valueRequired
+            label: "OARO_DutyAssistance_StatValueRequired".Translate(stat.Named(KeyLibrary_FormatArgName.DEF)),
+            reqDesc: "OARO_DutyAssistance_StatValueRequiredDesc".Translate(stat.Named(KeyLibrary_FormatArgName.DEF), stat.ValueToString(valueRequired).Named(KeyLibrary_FormatArgName.Value))
         );
-    }
-
-    public override string GenerateRequirementDesc(AssistanceRequest request)
-    {
-        return "OARO_DutyAssistance_AttributeRequiredDesc".Translate(
-            request.RelatedStat.Named(KeyLibrary_FormatArgName.DEF),
-            request.StatValueRequired.ToStringPercent().Named(KeyLibrary_FormatArgName.Value));
+        request.RelatedStat = stat;
+        request.StatValueRequired = valueRequired;
     }
 
     public override float CalculateDailyProgress(FixedCaravan caravan, AssistanceRequest request)
@@ -52,7 +40,7 @@ public class AssistanceRequestWorker_AttributeRequired : AssistanceRequestWorker
                 }
             }
         }
-        progress += virtueStat * 1f;
+        progress += virtueStat;
         return progress;
     }
 }

@@ -22,24 +22,30 @@ public static class AcademicUtility
         };
     }
 
-    public static float GetMeditationPointsNeeded(KnightAcademicDef academicDef, KnightChivalryDef chivalry, int targetLevel)
+    public static float GetMeditationPointsNeeded(KnightAcademicDef academicDef, KnightChivalryDef chivalry, int oldLevel, int newLevel)
     {
-        if (targetLevel < 1)
+        if (newLevel < 1 || newLevel <= oldLevel)
         {
             return 0f;
         }
-        if (targetLevel > academicDef.MaxStageLevel)
+        if (newLevel > academicDef.MaxStageLevel)
         {
             return float.MaxValue;
         }
 
         float baseUnitCost = academicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
-        float neededPoints = baseUnitCost + (targetLevel - 1) * baseUnitCost;
-        if (academicDef.chivalry is not null && academicDef.chivalry == chivalry)
+        int levelDiff = newLevel - oldLevel;
+        float neededPoints = levelDiff * baseUnitCost + (oldLevel + newLevel - 1) * levelDiff / 2 * baseUnitCost;
+        if (chivalry is not null && academicDef.chivalry == chivalry)
         {
             neededPoints /= 2;
         }
         return neededPoints;
+    }
+
+    public static float GetMeditationPointsNeeded(KnightAcademicDef academicDef, KnightChivalryDef chivalry, int targetLevel)
+    {
+        return GetMeditationPointsNeeded(academicDef, chivalry, targetLevel - 1, targetLevel);
     }
 
     /// <summary>
@@ -105,7 +111,7 @@ public static class AcademicUtility
                     sb.AppendLine("OARO_AcademicCost_HonorChivalry".Translate(0.9f.ToStringPercent("F0")));
             }
 
-            int virtueCount = knight.KnightVirtueHandler.GetVirtueCountOfChivalry(academicChivalry);
+            int virtueCount = knight.VirtueHandler.GetVirtueCountOfChivalry(academicChivalry);
             if (virtueCount > 0)
             {
                 float virtueFactor = 1f - virtueCount * 0.1f;
@@ -221,7 +227,7 @@ public static class AcademicUtility
         foreach (BranchTradition tradition in record.Branch.TraditionHandler.Traditions)
         {
             if (tradition.Def.academicDef is not null && traditionAcademics.Add(tradition.Def.academicDef))
-                yield return record.Branch.HonorDef.academicDef;
+                yield return tradition.Def.academicDef;
         }
     }
 
@@ -243,7 +249,7 @@ public static class AcademicUtility
         foreach (BranchTradition tradition in recod.Branch.TraditionHandler.Traditions)
         {
             if (tradition.Def.academicDef is not null && traditionAcademics.Add(tradition.Def.academicDef))
-                yield return recod.Branch.HonorDef.academicDef;
+                yield return tradition.Def.academicDef;
         }
     }
 

@@ -71,7 +71,7 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
                                          explanation: out _);
         string reason = "OARO_KnightVirtueGainReason_VirtueTrain".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
 
-        var virtueHandler = residentKnight.KnightVirtueHandler;
+        var virtueHandler = residentKnight.VirtueHandler;
         if (virtueHandler.HasVirtue(virtueDef))
         {
             virtueHandler.UpgradeVirtueTo(virtueDef, level, reason);

@@ -25,7 +25,7 @@ public class KnightAcademicDef : Def
         Traditional
     }
 
-    /// <summary>对应骑士个性</summary>
+    /// <summary>对应骑士精神</summary>
     public KnightChivalryDef chivalry;
 
     /// <summary>
@@ -53,11 +53,11 @@ public class KnightAcademicDef : Def
     /// <summary>
     /// 只执行一次，在升级时执行
     /// </summary>
-    public void OnAcademicLevelUpgrade(Pawn pawn, int targetLevel)
+    public void OnAcademicLevelUpgrade(Pawn pawn, int oldLevel, int newLevel)
     {
-        if (targetLevel < 1 || targetLevel > MaxStageLevel)
+        if (newLevel < 1 || newLevel > MaxStageLevel)
         {
-            throw new ArgumentOutOfRangeException(nameof(targetLevel));
+            throw new ArgumentOutOfRangeException(nameof(newLevel));
         }
 
         if (buffHediffDef is null)
@@ -65,8 +65,8 @@ public class KnightAcademicDef : Def
             return;
         }
         Hediff_ResidentAcademicBuff hediff = pawn.health.GetOrAddHediff(buffHediffDef) as Hediff_ResidentAcademicBuff;
-        hediff.Notify_AcademicStageChanged(targetLevel);
+        hediff.Notify_AcademicStageChanged(newLevel);
 
-        academicStages[targetLevel - 1].OnAcademicLevelUpgrade(pawn);
+        academicStages[newLevel - 1].OnAcademicLevelUpgrade(pawn);
     }
 }

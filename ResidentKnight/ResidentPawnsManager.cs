@@ -341,7 +341,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
                 continue;
 
             int newVirtueLevel = KnightVirtueUtility.GetRandomNewVirtueLevel_Daily(residentKnight);
-            residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef: virtueDef,
+            residentKnight.VirtueHandler.TryAddVirtue(virtueDef: virtueDef,
                                                             level: newVirtueLevel,
                                                             reason: "OARO_KnightVirtueGainReason_Daily".Translate());
         }

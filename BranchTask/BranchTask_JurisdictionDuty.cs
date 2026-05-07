@@ -26,35 +26,31 @@ public class BranchTask_JurisdictionDuty : BranchTask
         base.ExposeData();
         Scribe_Deep.Look(ref dutyData, nameof(dutyData));
         Scribe_References.Look(ref dutySite, nameof(dutySite));
-        Scribe_Values.Look(ref playerParticipated, nameof(playerParticipated), false);
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        Scribe_Values.Look(ref playerParticipated, nameof(playerParticipated), defaultValue: false);
+        if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
         {
-            dutySite?.InitDutySite(branch, this);
+            dutySite?.InitDutySite(this);
         }
-    }
-
-    public override int BranchRestTick()
-    {
-        return branch.TaskHandler.CurRadicalismDegree switch
-        {
-            BranchTaskHandler.RadicalismDegree.StabilityFocused => 45 * 60000,
-            BranchTaskHandler.RadicalismDegree.Aggressive => 15 * 60000,
-            _ => 30 * 60000
-        };
     }
 
     protected override void PostTaskStart()
     {
         dutyData = new JurisdictionDutyData(this);
         GenerateDutySite();
-        Notify_DutyStarted();
+        base.PostTaskStart();
     }
 
     protected override void PostTaskEnd()
     {
         SettlementDuty();
         DestroyDutySite();
-        Notify_DutyEnded();
+
+        if (playerParticipated)
+        {
+            Messages.Message(
+                text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
+                def: MessageTypeDefOf.NeutralEvent);
+        }
     }
 
     public override void TickHour()
@@ -63,15 +59,6 @@ public class BranchTask_JurisdictionDuty : BranchTask
     }
 
     public void Notify_CaravanStartedWork() => playerParticipated = true;
-
-
-    public void Notify_CaravanInterruptedWork(FixedCaravan fixedCaravan) { }
-
-    public void Notify_CaravanFinishedWorkCycle(FixedCaravan fixedCaravan)
-    {
-        if (dutyData is null || fixedCaravan is null) return;
-        dutyData.OnWorkCycleCompleted(fixedCaravan);
-    }
 
     private void GenerateDutySite()
     {
@@ -85,7 +72,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
 
         WorldObject_JurisdictionDutySite site = (WorldObject_JurisdictionDutySite)WorldObjectMaker.MakeWorldObject(siteDef);
         site.Tile = tile;
-        site.InitDutySite(branch, this);
+        site.InitDutySite(this);
         Find.WorldObjects.Add(site);
         dutySite = site;
     }
@@ -135,21 +122,36 @@ public class BranchTask_JurisdictionDuty : BranchTask
         if (dutyData is null) return;
 
         RatkinOrder ratkinOrder = branch.RatkinOrder;
-        BranchTaskHandler.RadicalismDegree degree = branch.TaskHandler.CurRadicalismDegree;
+
         float progressRatio = dutyData.ProgressRatio;
 
         StringBuilder endSB = new();
 
-        SettlementFundAndReformation(ratkinOrder, degree, progressRatio, endSB);
-        SettlementPublicSecurity(endSB);
-        SettlementObjectives(endSB);
-        SettlementAssistanceRewards(ratkinOrder, endSB);
+        SettlementOrderReward(progressRatio, endSB);
+        SettlementPlayerRewards(endSB);
 
-        SendSettlementLetter(endSB);
+        TaggedString label = "OARO_DutySettlement_Label".Translate(branch.Name);
+        TaggedString text = endSB.ToString();
+        OrderLetterUtility.ReceiveLetter(
+            label: label,
+            text: text,
+            def: OrderLetterDefOf.OARO_OfficialLetter,
+            relatedOrder: branch.RatkinOrder,
+            relatedBranch: branch
+        );
     }
 
-    private void SettlementFundAndReformation(RatkinOrder ratkinOrder, BranchTaskHandler.RadicalismDegree degree, float progressRatio, StringBuilder sb)
+    private void SettlementOrderReward(float progressRatio, StringBuilder endSB)
     {
+        float securityGain = Rand.Range(0.08f, 0.16f) * dutyData.ProgressRatio;
+        if (branch.BuildingHandler.HasBuilding(BranchBuildingDefOf.OARO_LargeWarningTower))
+        {
+            securityGain *= 1.5f;
+        }
+        branch.PopulationHandler.AdjustPublicSecurity(securityGain);
+        endSB.AppendLine("OARO_Jurisdiction_OrderReward_PublicSecGain".Translate(securityGain.ToStringPercentSigned("0.##").Named(KeyLibrary_FormatArgName.Value)));
+
+        BranchTaskHandler.RadicalismDegree degree = branch.TaskHandler.CurRadicalismDegree;
         float degreeMultiplier = degree switch
         {
             BranchTaskHandler.RadicalismDegree.StabilityFocused => 0.75f,
@@ -167,7 +169,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
                                    + branch.Potency * 0.0001f;
                     fundGain *= degreeMultiplier * focusMultiplier * progressRatio;
                     ratkinOrder.FundHandler.AdjustFundsImmediately(fundGain, "OARO_FundChange_BranchTask".Translate());
-                    sb.AppendLine("OARO_Jurisdiction_FundGain".Translate(fundGain.ToStringPercentSigned("0.##")));
+                    endSB.AppendLine("OARO_Jurisdiction_FundGain".Translate(fundGain.ToStringPercentSigned("0.##")));
                     break;
                 }
             case BranchTaskType.Assistance or BranchTaskType.Supervision:
@@ -176,60 +178,49 @@ public class BranchTask_JurisdictionDuty : BranchTask
                                       + branch.Potency * 0.0001f;
                     processGain *= degreeMultiplier * focusMultiplier * progressRatio;
                     ratkinOrder.ReformationManager.ReformProgress += processGain;
-                    sb.AppendLine("OARO_Jurisdiction_ReformProgressGain".Translate(processGain.ToStringPercentSigned("0.##")));
+                    endSB.AppendLine("OARO_Jurisdiction_ReformProgressGain".Translate(processGain.ToStringPercentSigned("0.##")));
                     break;
                 }
         }
         */
+
+        SettlementOrderReward_Objectives(endSB);
     }
 
-    private void SettlementPublicSecurity(StringBuilder sb)
-    {
-        float securityGain = Rand.Range(0.08f, 0.16f) * dutyData.ProgressRatio;
-        if (branch.BuildingHandler.HasBuilding(BranchBuildingDefOf.OARO_LargeWarningTower))
-        {
-            securityGain *= 1.5f;
-        }
-        branch.PopulationHandler.AdjustPublicSecurity(securityGain);
-        sb.AppendLine("OARO_Jurisdiction_PublicSecGain".Translate(securityGain.ToStringPercentSigned("0.##")));
-
-        List<Branch> nearbyBranches = BranchUtility.GetAllAffectedBranch(branch.Tile);
-        if (!nearbyBranches.NullOrEmpty())
-        {
-            float otherSecurityGain = 0.02f;
-            BranchBuilding largeWarningTower = branch.BuildingHandler.GetBuilding(BranchBuildingDefOf.OARO_LargeWarningTower);
-            if (largeWarningTower is not null && largeWarningTower.HasUpgraded)
-            {
-                otherSecurityGain *= 5f;
-            }
-            sb.AppendLine("OARO_Jurisdiction_OtherPublicSecGain".Translate(otherSecurityGain.ToStringPercentSigned("0.##")));
-            for (int i = 0; i < nearbyBranches.Count; i++)
-            {
-                nearbyBranches[i].PopulationHandler.AdjustPublicSecurity(otherSecurityGain);
-            }
-        }
-    }
-
-    private void SettlementObjectives(StringBuilder sb)
+    public void SettlementOrderReward_Objectives(StringBuilder endSB)
     {
         IReadOnlyList<CompletedObjective> objectives = dutyData.CompletedObjectives;
-        if (objectives.Count <= 0) return;
+        if (objectives is null || objectives.Count <= 0)
+            return;
 
+
+        endSB.AppendLine("OARO_Jurisdiction_ObjectivesCompleted".Translate(objectives.Count.Named(KeyLibrary_FormatArgName.Count)));
+        Dictionary<KnightChivalryDef, int> medalRewards = [];
         for (int i = 0; i < objectives.Count; i++)
         {
             CompletedObjective objective = objectives[i];
-            branch.MedalHandler.AdjustMedal(objective.MedalType, 1);
+            if (objective.MedalType is null)
+                continue;
+
+            medalRewards[objective.MedalType] = medalRewards.TryGetValue(objective.MedalType, fallback: 0) + 1;
 
             if (objective.IsAssistance)
             {
-                branch.MedalHandler.AdjustMedal(objective.MedalType, objective.AssistanceCount);
+                medalRewards[objective.MedalType] = medalRewards.TryGetValue(objective.MedalType, fallback: 0) + objective.AssistanceCount;
             }
         }
 
-        sb.AppendLine("OARO_Jurisdiction_ObjectivesCompleted".Translate(objectives.Count));
+        foreach ((KnightChivalryDef medalType, int medalCount) in medalRewards)
+        {
+            branch.MedalHandler.AdjustMedal(medalType, medalCount);
+            endSB.AppendLine("OARO_Jurisdiction_OrderReward_Medal".Translate(
+                medalType.Named(KeyLibrary_FormatArgName.DEF),
+                medalCount.Named(KeyLibrary_FormatArgName.Count)));
+        }
+
     }
 
-    private void SettlementAssistanceRewards(RatkinOrder ratkinOrder, StringBuilder sb)
+    private void SettlementPlayerRewards(StringBuilder endSB)
     {
         IReadOnlyList<AssistanceRequest> requests = dutyData.AssistanceRequests;
         int completedCount = 0;
@@ -242,6 +233,8 @@ public class BranchTask_JurisdictionDuty : BranchTask
         }
 
         if (completedCount <= 0) return;
+
+        endSB.AppendLine("OARO_Jurisdiction_AssistanceRequestCompleted".Translate(completedCount.Named(KeyLibrary_FormatArgName.Count)));
 
         float meditationPoints = 0f;
         float virtueChance = 0f;
@@ -268,117 +261,145 @@ public class BranchTask_JurisdictionDuty : BranchTask
 
         FixedCaravan fixedCaravan = dutySite?.AssociatedFixedCaravan;
         List<Pawn> caravanPawns = fixedCaravan?.PawnsListForReading;
-        if (caravanPawns is not null && caravanPawns.Count > 0)
+        if (!caravanPawns.NullOrEmpty())
         {
             int pawnCount = caravanPawns.Count;
-            float perPawn = meditationPoints / pawnCount;
             List<ResidentKnight> caravanKnights = [];
             for (int i = 0; i < caravanPawns.Count; i++)
             {
                 Pawn pawn = caravanPawns[i];
                 if (ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight knight))
                 {
-                    knight.MeditationPoints += perPawn * 1.1f;
+                    knight.MeditationPoints += meditationPoints;
+                    endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_Meditation".Translate(
+                                        pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                        meditationPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Value)));
                     caravanKnights.Add(knight);
                 }
                 else
                 {
                     SkillDef randomSkill = DefDatabase<SkillDef>.AllDefsListForReading.RandomElement();
-                    pawn.skills.GetSkill(randomSkill).Learn(perPawn * 0.01f);
+                    pawn.skills.GetSkill(randomSkill).Learn(meditationPoints);
+                    endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_Skill".Translate(
+                                       pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                       randomSkill.Named(KeyLibrary_FormatArgName.SKILL),
+                                       meditationPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Value)));
                 }
             }
 
-            while (virtueChance >= 1f)
-            {
-                virtueChance -= 1f;
-                ResidentKnight knight = caravanKnights.RandomElementWithFallback(null);
-                if (knight is not null)
-                {
-                    KnightVirtueUtility.GetRandomNewVirtueLevel_Daily(knight);
-                }
-            }
-            if (Rand.Chance(virtueChance))
-            {
-                ResidentKnight knight = caravanKnights.RandomElementWithFallback(null);
-                if (knight is not null)
-                {
-                    KnightVirtueUtility.GetRandomNewVirtueLevel_Daily(knight);
-                }
-            }
+            endSB.AppendLine();
+            endSB.AppendLine();
+            KnightVirtueReward(caravanKnights, virtueChance, endSB);
 
-            while (academicChance >= 1f)
+            endSB.AppendLine();
+            endSB.AppendLine();
+            AcademicReward(caravanKnights, academicChance, endSB);
+
+            endSB.AppendLine();
+            endSB.AppendLine();
+
+            IReadOnlyList<ResidentKnight> allKnights = ResidentPawnsManager.Instance.ResidentKnights;
+            float meditationPointsOther = meditationPoints * 0.1f;
+            for (int i = 0; i < allKnights.Count; i++)
             {
-                academicChance -= 1f;
-                ResidentKnight knight = caravanKnights.RandomElementWithFallback(null);
-                if (knight is not null)
-                {
-                    IReadOnlyDictionary<KnightAcademicDef, int> academics = knight.AcademicHandler.Academics;
-                    if (academics.Count > 0)
-                    {
-                        List<KnightAcademicDef> academicDefs = new(academics.Keys);
-                        KnightAcademicDef academicDef = academicDefs[Rand.Range(0, academicDefs.Count)];
-                        knight.AcademicHandler.UpgradeAcademic(academicDef, knight.Pawn, knight.Chivalry, directly: true);
-                    }
-                }
+                allKnights[i].MeditationPoints += meditationPointsOther;
             }
-        }
+            endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_MeditationOther".Translate(meditationPointsOther.ToString("f0").Named(KeyLibrary_FormatArgName.Value)));
 
-        IReadOnlyList<ResidentKnight> allKnights = ResidentPawnsManager.Instance.ResidentKnights;
-        for (int i = 0; i < allKnights.Count; i++)
-        {
-            if (allKnights[i].Branch == branch)
+            RatkinOrder ratkinOrder = branch.RatkinOrder;
+            if (ratkinOrder.Faction is not null)
             {
-                allKnights[i].MeditationPoints += meditationPoints * 0.1f;
+                ratkinOrder.Faction.TryAffectGoodwillWith(Faction.OfPlayer, completedCount, canSendMessage: true);
+                endSB.AppendLine();
+                endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_FactionGoodwill".Translate(
+                                    ratkinOrder.Faction.Named(KeyLibrary_FormatArgName.FACTION),
+                                    completedCount.Named(KeyLibrary_FormatArgName.Change)));
             }
-        }
-
-        ratkinOrder.Faction?.TryAffectGoodwillWith(Faction.OfPlayer, completedCount, canSendMessage: true);
-        sb.AppendLine("OARO_Jurisdiction_AssistanceRewards".Translate(completedCount, meditationPoints.ToString("0")));
-    }
-
-    private void Notify_DutyStarted()
-    {
-        List<Branch> nearbyBranches = BranchUtility.GetAllAffectedBranch(branch.Tile);
-        if (!nearbyBranches.NullOrEmpty())
-        {
-            TaggedString label = "OARO_DutyStarted_NearbyLabel".Translate(branch.Name);
-            TaggedString text = "OARO_DutyStarted_NearbyText".Translate(branch.Name);
-            OrderLetterUtility.ReceiveLetter(
-                label: label,
-                text: text,
-                def: OrderLetterDefOf.OARO_OfficialLetter,
-                relatedOrder: branch.RatkinOrder,
-                relatedBranch: branch
-            );
         }
     }
 
-    private void Notify_DutyEnded()
+    private void KnightVirtueReward(List<ResidentKnight> caravanKnights, float virtueChance, StringBuilder endSB)
     {
-        if (playerParticipated)
+        if (dutyData.DutyAcademics is null || dutyData.DutyAcademics.Count <= 0)
+            return;
+
+        List<KnightVirtueDef> potentialVirtues = [];
+        foreach (KnightAcademicDef academicDef in dutyData.DutyAcademics)
         {
-            TaggedString label = "OARO_DutyEnded_Label".Translate(branch.Name);
-            TaggedString text = "OARO_DutyEnded_Text".Translate(branch.Name);
-            OrderLetterUtility.ReceiveLetter(
-                label: label,
-                text: text,
-                def: OrderLetterDefOf.OARO_OfficialLetter,
-                relatedOrder: branch.RatkinOrder,
-                relatedBranch: branch
-            );
+            if (academicDef.chivalry?.AllKnightVirtues is null)
+                continue;
+
+            potentialVirtues.AddRange(academicDef.chivalry.AllKnightVirtues);
+        }
+
+
+        while (virtueChance >= 1f)
+        {
+            virtueChance -= 1f;
+            ResidentKnight knight = caravanKnights.RandomElementWithFallback(null);
+            if (knight is not null)
+            {
+                KnightVirtueDef randomVirtue = potentialVirtues.RandomElementWithFallback();
+                if (randomVirtue is not null && knight.VirtueHandler.UpgradeVirtue(randomVirtue, upgrade: 1, reason: "OARO_VirtueUpgradeReason_AssistanceReward".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName))))
+                {
+                    endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_KnightVirtue".Translate(
+                                 knight.Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                 randomVirtue.Named(KeyLibrary_FormatArgName.DEF)));
+                }
+            }
+        }
+        if (Rand.Chance(virtueChance))
+        {
+            ResidentKnight knight = caravanKnights.RandomElementWithFallback(null);
+            if (knight is not null)
+            {
+                KnightVirtueDef randomVirtue = potentialVirtues.RandomElementWithFallback();
+                if (randomVirtue is not null && knight.VirtueHandler.UpgradeVirtue(randomVirtue, upgrade: 1, reason: "OARO_VirtueUpgradeReason_AssistanceReward".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName))))
+                {
+                    endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_KnightVirtue".Translate(
+                                 knight.Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                 randomVirtue.Named(KeyLibrary_FormatArgName.DEF)));
+                }
+            }
         }
     }
 
-    private void SendSettlementLetter(StringBuilder sb)
+    private void AcademicReward(List<ResidentKnight> caravanKnights, float academicChance, StringBuilder endSB)
     {
-        TaggedString label = "OARO_DutySettlement_Label".Translate(branch.Name);
-        TaggedString text = sb.ToString();
-        OrderLetterUtility.ReceiveLetter(
-            label: label,
-            text: text,
-            def: OrderLetterDefOf.OARO_OfficialLetter,
-            relatedOrder: branch.RatkinOrder,
-            relatedBranch: branch
-        );
+        if (dutyData.DutyAcademics is null || dutyData.DutyAcademics.Count <= 0)
+            return;
+
+        while (academicChance >= 1f)
+        {
+            academicChance -= 1f;
+            ResidentKnight knight = caravanKnights.RandomElementWithFallback(null);
+            if (knight is null)
+                break;
+
+            KnightAcademicDef randomAcademic = dutyData.DutyAcademics?.RandomElementWithFallback();
+            if (randomAcademic is not null)
+            {
+                knight.AcademicHandler.UpgradeAcademic(randomAcademic);
+                endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_Academic".Translate(
+                                 knight.Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                 randomAcademic.Named(KeyLibrary_FormatArgName.DEF)));
+            }
+        }
+
+        if (Rand.Chance(academicChance))
+        {
+            ResidentKnight knight = caravanKnights.RandomElementWithFallback(null);
+            if (knight is not null)
+            {
+                KnightAcademicDef randomAcademic = dutyData.DutyAcademics?.RandomElementWithFallback();
+                if (randomAcademic is not null)
+                {
+                    knight.AcademicHandler.UpgradeAcademic(randomAcademic);
+                    endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_Academic".Translate(
+                                     knight.Pawn.Named(KeyLibrary_FormatArgName.PAWN),
+                                     randomAcademic.Named(KeyLibrary_FormatArgName.DEF)));
+                }
+            }
+        }
     }
 }

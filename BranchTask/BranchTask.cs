@@ -1,4 +1,5 @@
-﻿using System;
+﻿using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -46,7 +47,18 @@ public class BranchTask : IExposable
         PostTaskStart();
     }
 
-    protected virtual void PostTaskStart() { }
+    protected virtual void PostTaskStart()
+    {
+        Map orderStationMap = OrderStationHandler.Instance?.OrderStationMap;
+        if (!branch.IsBranchOfType(Branch.BranchType.Friendly) && (orderStationMap is null || !branch.IsInAffectedRange(orderStationMap.Tile)))
+        {
+            return;
+        }
+
+        Messages.Message(
+            text: "OARO_Message_BranchTaskStarted".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
+            def: MessageTypeDefOf.NeutralEvent);
+    }
 
     public void EndTask()
     {
@@ -54,11 +66,20 @@ public class BranchTask : IExposable
         PostTaskEnd();
     }
 
-    protected virtual void PostTaskEnd() { }
+    protected virtual void PostTaskEnd()
+    {
+        Map orderStationMap = OrderStationHandler.Instance?.OrderStationMap;
+        if (!branch.IsBranchOfType(Branch.BranchType.Friendly) && (orderStationMap is null || !branch.IsInAffectedRange(orderStationMap.Tile)))
+        {
+            return;
+        }
+
+        Messages.Message(
+            text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
+            def: MessageTypeDefOf.NeutralEvent);
+    }
 
     protected virtual int TaskDurationTick() => (int)(def.durationDays * 60000f);
-
-    public virtual int BranchRestTick() => def.restDays > 0f ? (int)(def.restDays * 60000f) : 0;
 
     public virtual void TickHour() { }
 

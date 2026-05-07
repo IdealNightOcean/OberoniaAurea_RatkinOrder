@@ -36,7 +36,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
                 letterTextSB.AppendLine("OARO_MeditationStudyComplete_VirtueGain".Translate(
                                             pawn.Named(KeyLibrary_FormatArgName.PAWN),
                                             newVirtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF)));
-                residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef: newVirtueDef,
+                residentKnight.VirtueHandler.TryAddVirtue(virtueDef: newVirtueDef,
                                                                 level: 1,
                                                                 reason: "OARO_KnightVirtueGainReason_MeditationStudy".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)));
             }

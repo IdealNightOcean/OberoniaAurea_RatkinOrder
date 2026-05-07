@@ -1,5 +1,7 @@
 using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using Verse;
 
@@ -16,8 +18,8 @@ public class JurisdictionDutyData : IExposable
     [
         new AssistanceRequestWorker_BasicWork(),
         new AssistanceRequestWorker_SkillRequired(),
-        new AssistanceRequestWorker_AttributeRequired(),
-        new AssistanceRequestWorker_VirtueRequired(),
+        new AssistanceRequestWorker_StatValueRequired(),
+        new AssistanceRequestWorker_KnightVirtueRequired(),
         new AssistanceRequestWorker_AcademicRequired()
     ];
 
@@ -50,9 +52,9 @@ public class JurisdictionDutyData : IExposable
     private int hourCounter;
 
     public JurisdictionDutyData() { }
-    public JurisdictionDutyData(BranchTask task) { Initialize(task); }
+    public JurisdictionDutyData(BranchTask_JurisdictionDuty task) { Initialize(task); }
 
-    public void Initialize(BranchTask task)
+    public void Initialize(BranchTask_JurisdictionDuty task)
     {
         Branch branch = task.Branch;
         float postureMultiplier = branch.TaskHandler.CurRadicalismDegree switch
@@ -75,7 +77,7 @@ public class JurisdictionDutyData : IExposable
         hourCounter = 0;
     }
 
-    public void TickHour(BranchTask task)
+    public void TickHour(BranchTask_JurisdictionDuty task)
     {
         hourCounter++;
         if (hourCounter >= 2)
@@ -86,7 +88,7 @@ public class JurisdictionDutyData : IExposable
         }
     }
 
-    public void AddProgress(float amount, BranchTask task)
+    public void AddProgress(float amount, BranchTask_JurisdictionDuty task)
     {
         if (progressCeiling <= 0) return;
 
@@ -96,11 +98,13 @@ public class JurisdictionDutyData : IExposable
             curProgress = progressCeiling;
         }
 
+        OnWorkCycleCompleted(task);
+
         CheckObjectiveGeneration(task);
         CheckAssistanceRequestGeneration(task);
     }
 
-    public void CheckObjectiveGeneration(BranchTask task)
+    public void CheckObjectiveGeneration(BranchTask_JurisdictionDuty task)
     {
         while (curProgress >= nextObjectiveCheckProgress)
         {
@@ -108,7 +112,7 @@ public class JurisdictionDutyData : IExposable
             float passRate = Mathf.Clamp01(1f - completedObjectives.Count * 0.05f);
             if (Rand.Chance(passRate))
             {
-                KnightChivalryDef medalChivalry = PickMedalDef(task);
+                KnightChivalryDef medalChivalry = PickMedalDef(task.TaskChivalry);
                 completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Normal, medalChivalry));
             }
 
@@ -120,7 +124,7 @@ public class JurisdictionDutyData : IExposable
         }
     }
 
-    public void CheckAssistanceRequestGeneration(BranchTask task)
+    public void CheckAssistanceRequestGeneration(BranchTask_JurisdictionDuty task)
     {
         while (nextRequestThresholdIndex < AssistanceRequestThresholds.Length
             && curProgress >= AssistanceRequestThresholds[nextRequestThresholdIndex]
@@ -131,8 +135,11 @@ public class JurisdictionDutyData : IExposable
         }
     }
 
-    public void OnWorkCycleCompleted(FixedCaravan fixedCaravan)
+    public void OnWorkCycleCompleted(BranchTask_JurisdictionDuty task)
     {
+        FixedCaravan fixedCaravan = task?.DutySite?.AssociatedFixedCaravan;
+        if (fixedCaravan is null) return;
+
         List<AssistanceRequest> activeRequests = [];
         for (int i = 0; i < assistanceRequests.Count; i++)
         {
@@ -153,105 +160,73 @@ public class JurisdictionDutyData : IExposable
             request.AddProgress(progress);
             if (request.Completed)
             {
-                OnAssistanceRequestCompleted(request);
+                OnAssistanceRequestCompleted(request, task.TaskChivalry);
             }
         }
     }
 
-    private void OnAssistanceRequestCompleted(AssistanceRequest request)
+    private void OnAssistanceRequestCompleted(AssistanceRequest request, KnightChivalryDef taskChivalry)
     {
         int medalCount = Mathf.CeilToInt(request.ProgressCeiling / 100f) + 1;
-        KnightChivalryDef medalChivalry = PickMedalDef(null);
+        KnightChivalryDef medalChivalry = PickMedalDef(taskChivalry);
         completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Assistance, medalChivalry, medalCount));
     }
 
-    private void GenerateAssistanceRequest(BranchTask task)
+    private void GenerateAssistanceRequest(BranchTask_JurisdictionDuty task)
     {
         AssistanceRequest.RequestType type = (AssistanceRequest.RequestType)Rand.RangeInclusive(0, 4);
         AssistanceRequestWorker worker = GetWorker(type);
-        AssistanceRequest request = new();
+        AssistanceRequest request = new(type);
         worker.Initialize(request, dutyAcademics);
 
         int rawCeiling = Mathf.RoundToInt(curProgress * Rand.Range(0.25f, 0.50f));
         int adjustedCeiling = Mathf.Min(rawCeiling, 300) + Mathf.Max(0, rawCeiling - 300) / 2;
         int finalCeiling = Mathf.Clamp(adjustedCeiling, 100, 500);
 
-        float traditionValue = GetTraditionValueForTaskType(task.Branch);
-        float baseDaily = 20f + 0.3f * traditionValue * 30f;
-        float requestDaily = baseDaily * 0.3f;
+        request.ProgressCeiling = finalCeiling;
 
-        request.Initialize(
-            type: type,
-            title: request.Title,
-            reqDesc: worker.GenerateRequirementDesc(request),
-            ceiling: finalCeiling,
-            daily: requestDaily,
-            academic: request.RelatedAcademic,
-            skill: request.RelatedSkill,
-            skillLvl: request.SkillLevelRequired,
-            stat: request.RelatedStat,
-            statVal: request.StatValueRequired,
-            virtue: request.RelatedVirtue
-        );
+        if (task.PlayerParticipated)
+        {
+            Messages.Message(
+                text: "OARO_Message_NewDutyAssistanceRequest".Translate(task.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), request.Title.Named("Title")),
+                def: MessageTypeDefOf.NeutralEvent);
+        }
 
         assistanceRequests.Add(request);
     }
 
-    private void GenerateDutyAcademics(BranchTask task)
+    private void GenerateDutyAcademics(BranchTask_JurisdictionDuty task)
     {
         dutyAcademics.Clear();
         KnightChivalryDef chivalry = task.Branch.TaskHandler.FocusedTaskChivalry;
 
-        if (chivalry is not null)
+        if (chivalry is not null && !chivalry.AllAcademics.NullOrEmpty())
         {
-            List<KnightAcademicDef> allAcademicDefs = DefDatabase<KnightAcademicDef>.AllDefsListForReading;
-            KnightAcademicDef generalAcademic = null;
-            KnightAcademicDef honorOrTraditional = null;
+            List<KnightAcademicDef> chivalryAcademics = chivalry.AllAcademics;
+            KnightAcademicDef generalAcademic = chivalryAcademics.Where(a => a.academicType == KnightAcademicDef.AcademicType.Geneal)
+                                                                 .RandomElementWithFallback();
+            KnightAcademicDef honorOrTraditional = chivalryAcademics.Where(a => a.academicType == KnightAcademicDef.AcademicType.Honor || a.academicType == KnightAcademicDef.AcademicType.Traditional)
+                                                                    .RandomElementWithFallback();
 
-
-            for (int i = 0; i < allAcademicDefs.Count; i++)
-            {
-                KnightAcademicDef a = allAcademicDefs[i];
-                if (a.chivalry == chivalry)
-                {
-                    if (a.academicType == KnightAcademicDef.AcademicType.Geneal && generalAcademic is null)
-                    {
-                        generalAcademic = a;
-                    }
-                    else if (a.academicType != KnightAcademicDef.AcademicType.Geneal && honorOrTraditional is null)
-                    {
-                        honorOrTraditional = a;
-                    }
-                }
-            }
+            //同骑士精神通识（General）课业
             if (generalAcademic is not null)
             {
                 dutyAcademics.Add(generalAcademic);
             }
-
+            //同骑士精神荣誉（General）或传统（Tradition）课业
             if (honorOrTraditional is not null)
             {
                 dutyAcademics.Add(honorOrTraditional);
             }
         }
 
-        KnightAcademicDef randomAcademic = null;
-        List<KnightAcademicDef> allAcademics = DefDatabase<KnightAcademicDef>.AllDefsListForReading;
-        List<KnightAcademicDef> nonGeneral = [];
-        for (int i = 0; i < allAcademics.Count; i++)
+        //随机非通识（General）课业
+        List<KnightAcademicDef> nonGeneralAcademics = DefDatabase<KnightAcademicDef>.AllDefsListForReading.Where(a => a.academicType != KnightAcademicDef.AcademicType.Geneal)
+                                                                                                          .ToList();
+
+        if (nonGeneralAcademics.Count > 0)
         {
-            if (allAcademics[i].academicType != KnightAcademicDef.AcademicType.Geneal)
-            {
-                nonGeneral.Add(allAcademics[i]);
-            }
-        }
-        if (nonGeneral.Count > 0)
-        {
-            randomAcademic = nonGeneral[Rand.Range(0, nonGeneral.Count)];
-        }
-        if (randomAcademic is not null)
-        {
-            dutyAcademics.Add(randomAcademic);
+            dutyAcademics.Add(nonGeneralAcademics.RandomElement());
         }
     }
 
@@ -299,9 +274,8 @@ public class JurisdictionDutyData : IExposable
         return baseRisk * (1f + Mathf.Max(0f, 1f - publicSecurity));
     }
 
-    private static KnightChivalryDef PickMedalDef(BranchTask task)
+    private static KnightChivalryDef PickMedalDef(KnightChivalryDef taskChivalry)
     {
-        KnightChivalryDef taskChivalry = task?.TaskChivalry;
         if (taskChivalry is null)
         {
             return OrderDefDatabase.MedalChivalries.RandomElement();

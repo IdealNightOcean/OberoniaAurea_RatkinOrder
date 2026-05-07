@@ -23,7 +23,7 @@ public class TryDoMentalBreak_Patch
 
         int newVirtueLevel = KnightVirtueUtility.GetRandomNewVirtueLevel_MentalBreak(residentKnight);
 
-        residentKnight.KnightVirtueHandler.TryAddVirtue(virtueDef: newVirtueDef,
+        residentKnight.VirtueHandler.TryAddVirtue(virtueDef: newVirtueDef,
                                                         level: newVirtueLevel,
                                                         reason: breakDef.LabelCap);
     }

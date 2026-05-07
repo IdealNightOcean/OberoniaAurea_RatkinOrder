@@ -32,6 +32,7 @@ public class OrderStationHandler : IExposable
             return orderStationRoom;
         }
     }
+    public Map OrderStationMap => OrderStationRoom?.Map;
 
     [Unsaved]
     private SimpleValueCache<int> orderStationLevelCache;

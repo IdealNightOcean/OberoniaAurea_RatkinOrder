@@ -123,10 +123,10 @@
     <Compile Include="BranchTask\AssistanceRequest.cs" />
     <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker.cs" />
     <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_AcademicRequired.cs" />
-    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_AttributeRequired.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_StatValueRequired.cs" />
     <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_BasicWork.cs" />
     <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_SkillRequired.cs" />
-    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_VirtueRequired.cs" />
+    <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_KnightVirtueRequired.cs" />
     <Compile Include="BranchTask\CompletedObjective.cs" />
     <Compile Include="BranchTask\JurisdictionDutyData.cs" />
     <Compile Include="BranchTradition\BranchTradition.cs" />

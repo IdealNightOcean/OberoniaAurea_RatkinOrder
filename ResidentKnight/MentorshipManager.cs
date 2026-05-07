@@ -178,7 +178,7 @@ public class MentorshipManager : IExposable
         foreach (KeyValuePair<ResidentKnight, HashSet<ResidentPawn>> kv in teachersToStudents)
         {
             ResidentKnight teacher = kv.Key;
-            if (teacher is null || teacher.KnightVirtueHandler.TotalVirtueCount <= 0)
+            if (teacher is null || teacher.VirtueHandler.TotalVirtueCount <= 0)
                 continue;
 
             foreach (ResidentPawn student in kv.Value)
@@ -210,7 +210,7 @@ public class MentorshipManager : IExposable
 
         int level = KnightVirtueUtility.GetRandomNewVirtueLevel_Mentorship(teacher, isResonate);
         string reason = "OARO_KnightVirtueGainReason_Mentorship".Translate(teacher.Pawn.Named(KeyLibrary_FormatArgName.PAWN));
-        student.KnightVirtueHandler.TryAddVirtue(virtueToTeach, level, reason);
+        student.VirtueHandler.TryAddVirtue(virtueToTeach, level, reason);
     }
 
     private void PrepareForSaving()

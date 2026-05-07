@@ -51,7 +51,7 @@ public class BranchTaskDef : Def
     public bool isAbroadTask;
 
     /// <summary>
-    /// 是否有分险
+    /// 是否有风险
     /// </summary>
     public bool hasRisk;
 

@@ -50,7 +50,7 @@ public class ResidentKnight : ResidentPawn
     public int NextRoleChangeableTick => nextRoleChangeableTick;
 
     private KnightVirtueHandler knightVirtueHandler;
-    public KnightVirtueHandler KnightVirtueHandler => knightVirtueHandler;
+    public KnightVirtueHandler VirtueHandler => knightVirtueHandler;
 
     public override void ExposeData()
     {

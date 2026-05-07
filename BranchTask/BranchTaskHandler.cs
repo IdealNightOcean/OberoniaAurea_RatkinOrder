@@ -241,11 +241,20 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         if (!HasTask)
             return;
 
-        branch.EffectTags.DecrementTagsValue(curTask.Def.effectFlags);
+        BranchTaskDef curTaskDef = curTask.Def;
+        branch.EffectTags.DecrementTagsValue(curTaskDef.effectFlags);
         curTask.EndTask();
-        if (startRest)
+        if (startRest && curTaskDef.restDays > 0f)
         {
-            restEndTick = Find.TickManager.TicksGame + curTask.BranchRestTick();
+            float restDurationFactor = curRadicalismDegree switch
+            {
+                RadicalismDegree.StabilityFocused => 0.5f,
+                RadicalismDegree.Standard => 1f,
+                RadicalismDegree.Aggressive => 1.5f,
+                _ => 1f
+            };
+            int restTicks = Mathf.RoundToInt(curTaskDef.restDays * 60000f * restDurationFactor);
+            restEndTick = Find.TickManager.TicksGame + restTicks;
         }
 
         curTask = null;
@@ -368,6 +377,18 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         {
             branch.EffectTags.IncrementTagsValue(curTask.Def.effectFlags, addIfMiss: true);
         }
+    }
+
+    private static int GetDefaultRestTicks(RadicalismDegree curRadicalismDegree)
+    {
+        float restDurationFactor = curRadicalismDegree switch
+        {
+            RadicalismDegree.StabilityFocused => 0.5f,
+            RadicalismDegree.Standard => 1f,
+            RadicalismDegree.Aggressive => 1.5f,
+            _ => 1f
+        };
+        return Mathf.RoundToInt(30f * 60000f * restDurationFactor);
     }
 
     private static float BaseAutoStartTaskChance(Branch branch) => branch.IsBranchOfType(Branch.BranchType.Mobile) ? 0.05f : 0.02f;

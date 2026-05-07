@@ -4,10 +4,11 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 using Verse.Grammar;
-using static OberoniaAurea.RatkinOrder.JointBranchRecord;
-using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 namespace OberoniaAurea.RatkinOrder;
+
+using static OberoniaAurea.RatkinOrder.JointBranchRecord;
+using static OberoniaAurea.RatkinOrder.JointPatrolManager;
 
 public class JointPatrolRewardData
 {

@@ -14,7 +14,7 @@ public static class KnightVirtueUtility
         if (knight is null || virtueDef is null)
             return false;
 
-        KnightVirtueHandler virtueHandler = knight.KnightVirtueHandler;
+        KnightVirtueHandler virtueHandler = knight.VirtueHandler;
 
         if (virtueHandler.TotalVirtueCount >= virtueHandler.CurVirtueCountLimit)
             return false;
@@ -48,7 +48,7 @@ public static class KnightVirtueUtility
 
     public static IEnumerable<KnightVirtueDef> GetAllAvailableVirtues(ResidentKnight knight)
     {
-        if (knight.KnightVirtueHandler.TotalVirtueCount >= knight.KnightVirtueHandler.CurVirtueCountLimit)
+        if (knight.VirtueHandler.TotalVirtueCount >= knight.VirtueHandler.CurVirtueCountLimit)
             yield break;
 
         foreach (KnightVirtueDef virtueDef in DefDatabase<KnightVirtueDef>.AllDefsListForReading)
@@ -71,7 +71,7 @@ public static class KnightVirtueUtility
         if (teacher is null || student is null)
             yield break;
 
-        foreach (KnightVirtue virtue in teacher.KnightVirtueHandler.Virtues)
+        foreach (KnightVirtue virtue in teacher.VirtueHandler.Virtues)
         {
             if (student.CanAcquireVirtue(virtue.Def))
                 yield return virtue.Def;
@@ -80,7 +80,7 @@ public static class KnightVirtueUtility
 
     public static int GetRandomNewVirtueLevel_Daily(ResidentKnight knight)
     {
-        float virtueStatValue = knight.KnightVirtueHandler.VirtueStatValueCache.GetCachedResult();
+        float virtueStatValue = knight.VirtueHandler.VirtueStatValueCache.GetCachedResult();
         (int, float)[] weightSelector =
             [
                 (1, 60f),
@@ -93,7 +93,7 @@ public static class KnightVirtueUtility
 
     public static int GetRandomNewVirtueLevel_MentalBreak(ResidentKnight knight)
     {
-        float virtueStatValue = knight.KnightVirtueHandler.VirtueStatValueCache.GetCachedResult();
+        float virtueStatValue = knight.VirtueHandler.VirtueStatValueCache.GetCachedResult();
         (int, float)[] weightSelector =
             [
                 (1, 30f),
@@ -110,7 +110,7 @@ public static class KnightVirtueUtility
     /// <param name="isResonate">是否精神共鸣</param>
     public static int GetRandomNewVirtueLevel_Mentorship(ResidentKnight teacher, bool isResonate)
     {
-        float teacherVirtueStat = teacher?.KnightVirtueHandler?.VirtueStatValueCache.GetCachedResult() ?? 0f;
+        float teacherVirtueStat = teacher?.VirtueHandler?.VirtueStatValueCache.GetCachedResult() ?? 0f;
         int resonateBonus = isResonate ? 1 : 0;
 
         (int, float)[] weightSelector =
@@ -128,7 +128,7 @@ public static class KnightVirtueUtility
         if (knight is null)
             yield break;
 
-        KnightVirtueHandler virtueHandler = knight.KnightVirtueHandler;
+        KnightVirtueHandler virtueHandler = knight.VirtueHandler;
 
         if (predicate is null)
         {
