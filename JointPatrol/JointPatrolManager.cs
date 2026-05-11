@@ -519,7 +519,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             {
                 if (branch.TaskHandler.HasTask)
                 {
-                    branch.TaskHandler.EndCurTask(startRest: false);
+                    branch.TaskHandler.EndCurTask(interrupt: true, startRest: false);
                 }
             }
             catch

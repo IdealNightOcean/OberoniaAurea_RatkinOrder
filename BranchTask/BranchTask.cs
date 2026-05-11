@@ -47,6 +47,27 @@ public class BranchTask : IExposable
         PostTaskStart();
     }
 
+    public void SetProgress(float progress)
+    {
+        progress = Mathf.Clamp01(progress);
+        int elapsed = Find.TickManager.TicksGame - startTick;
+
+        if (progress < 0.001f)
+        {
+            durationTick = int.MaxValue;
+            return;
+        }
+
+        durationTick = Mathf.RoundToInt(elapsed / progress);
+    }
+
+    public void SetDurationTickLeft(int durationTickLeft)
+    {
+        durationTickLeft = Mathf.Max(0, durationTickLeft);
+        int elapsed = Find.TickManager.TicksGame - startTick;
+        durationTick = elapsed + durationTickLeft;
+    }
+
     protected virtual void PostTaskStart()
     {
         Map orderStationMap = OrderStationHandler.Instance?.OrderStationMap;
@@ -60,13 +81,13 @@ public class BranchTask : IExposable
             def: MessageTypeDefOf.NeutralEvent);
     }
 
-    public void EndTask()
+    public void EndTask(bool interrupt)
     {
         isOngoing = false;
-        PostTaskEnd();
+        PostTaskEnd(interrupt);
     }
 
-    protected virtual void PostTaskEnd()
+    protected virtual void PostTaskEnd(bool interrupt)
     {
         Map orderStationMap = OrderStationHandler.Instance?.OrderStationMap;
         if (!branch.IsBranchOfType(Branch.BranchType.Friendly) && (orderStationMap is null || !branch.IsInAffectedRange(orderStationMap.Tile)))

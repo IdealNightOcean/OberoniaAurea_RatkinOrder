@@ -40,9 +40,12 @@ public class BranchTask_JurisdictionDuty : BranchTask
         base.PostTaskStart();
     }
 
-    protected override void PostTaskEnd()
+    protected override void PostTaskEnd(bool interrupt)
     {
-        SettlementDuty();
+        if (!interrupt)
+        {
+            SettlementDuty();
+        }
         DestroyDutySite();
 
         if (playerParticipated)

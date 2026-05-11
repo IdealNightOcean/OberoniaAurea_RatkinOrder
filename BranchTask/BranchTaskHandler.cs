@@ -163,7 +163,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
             curTask.TickHour();
             if (curTask.DurationLeft <= 0)
             {
-                EndCurTask(startRest: true);
+                EndCurTask(interrupt: false, startRest: true);
             }
         }
     }
@@ -236,14 +236,14 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         return false;
     }
 
-    public void EndCurTask(bool startRest)
+    public void EndCurTask(bool interrupt, bool startRest)
     {
         if (!HasTask)
             return;
 
         BranchTaskDef curTaskDef = curTask.Def;
         branch.EffectTags.DecrementTagsValue(curTaskDef.effectFlags);
-        curTask.EndTask();
+        curTask.EndTask(interrupt);
         if (startRest && curTaskDef.restDays > 0f)
         {
             float restDurationFactor = curRadicalismDegree switch
@@ -267,7 +267,7 @@ public class BranchTaskHandler : IExposable, ITickHourOfDay, ITickDay
         {
             if (curTask is not null)
             {
-                EndCurTask(startRest: false);
+                EndCurTask(interrupt: true, startRest: false);
             }
             curTask = BranchTask.GenerateTask(newTaskDef, branch);
             curTask.StartTask();

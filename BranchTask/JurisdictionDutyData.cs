@@ -36,7 +36,6 @@ public class JurisdictionDutyData : IExposable
     public IReadOnlyList<CompletedObjective> CompletedObjectives => completedObjectives;
 
     private float dutyRisk;
-    public float DutyRisk => dutyRisk;
 
     private List<KnightAcademicDef> dutyAcademics = [];
     public IReadOnlyList<KnightAcademicDef> DutyAcademics => dutyAcademics;
@@ -85,6 +84,11 @@ public class JurisdictionDutyData : IExposable
             hourCounter = 0;
             float increment = dailyProgress / 12f;
             AddProgress(increment, task);
+            OnWorkCycleCompleted(task);
+        }
+        if (curProgress >= progressCeiling)
+        {
+            task.SetProgress(1f);
         }
     }
 
@@ -98,8 +102,6 @@ public class JurisdictionDutyData : IExposable
             curProgress = progressCeiling;
         }
 
-        OnWorkCycleCompleted(task);
-
         CheckObjectiveGeneration(task);
         CheckAssistanceRequestGeneration(task);
     }
@@ -110,16 +112,20 @@ public class JurisdictionDutyData : IExposable
         {
             nextObjectiveCheckProgress += 50;
             float passRate = Mathf.Clamp01(1f - completedObjectives.Count * 0.05f);
-            if (Rand.Chance(passRate))
-            {
-                KnightChivalryDef medalChivalry = PickMedalDef(task.TaskChivalry);
-                completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Normal, medalChivalry));
-            }
+            if (!Rand.Chance(passRate))
+                continue;
 
+            KnightChivalryDef medalChivalry = PickMedalDef(task.TaskChivalry);
+            completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Normal, medalChivalry));
             if (Rand.Chance(dutyRisk))
             {
                 int memberLoss = Rand.RangeInclusive(1, 4);
                 task.Branch.Squad.AdjustCrew(member: -memberLoss, commander: 0f);
+                Messages.Message(
+                text: "OARO_Message_JurisdictionDuty_MemberLoss".Translate(
+                            task.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                            memberLoss.Named(KeyLibrary_FormatArgName.Count)),
+                def: MessageTypeDefOf.NegativeEvent);
             }
         }
     }
@@ -160,16 +166,19 @@ public class JurisdictionDutyData : IExposable
             request.AddProgress(progress);
             if (request.Completed)
             {
-                OnAssistanceRequestCompleted(request, task.TaskChivalry);
+                OnAssistanceRequestCompleted(request, task);
             }
         }
     }
 
-    private void OnAssistanceRequestCompleted(AssistanceRequest request, KnightChivalryDef taskChivalry)
+    private void OnAssistanceRequestCompleted(AssistanceRequest request, BranchTask_JurisdictionDuty task)
     {
         int medalCount = Mathf.CeilToInt(request.ProgressCeiling / 100f) + 1;
-        KnightChivalryDef medalChivalry = PickMedalDef(taskChivalry);
+        KnightChivalryDef medalChivalry = PickMedalDef(task.TaskChivalry);
         completedObjectives.Add(new CompletedObjective(CompletedObjective.ObjectiveType.Assistance, medalChivalry, medalCount));
+
+        float taskProgessGain = Mathf.CeilToInt(request.ProgressCeiling / 100f) * 25f + 25f;
+        AddProgress(taskProgessGain, task);
     }
 
     private void GenerateAssistanceRequest(BranchTask_JurisdictionDuty task)
