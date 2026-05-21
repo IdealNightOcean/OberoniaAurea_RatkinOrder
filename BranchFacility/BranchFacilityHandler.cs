@@ -151,7 +151,7 @@ public class BranchFacilityHandler : IExposable
         if (byPlayer && map is not null)
         {
             int silverCost = branch.GetFacilitySilverCost(facilityDef, targetLevel, resultOnly: true, out _);
-            map.DestoryThingsOfDef(ThingDefOf.Silver, silverCost);
+            map.DestroyThingsOfDef(ThingDefOf.Silver, silverCost);
         }
 
         branch.StoresReserveHandler.Notify_BranchConstructStarted(facilityDef);

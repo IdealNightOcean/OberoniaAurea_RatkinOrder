@@ -674,7 +674,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
             {
                 continue;
             }
-            map.DestoryThingsOfDef(thingDefCount.thingDef, thingDefCount.count);
+            map.DestroyThingsOfDef(thingDefCount.thingDef, thingDefCount.count);
         }
         requestThingDefCounts.Clear();
         Find.SignalManager.SendSignal(new Signal(OutSignalGive));

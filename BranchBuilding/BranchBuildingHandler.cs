@@ -287,7 +287,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         if (constructParam.ByPlayer && constructParam.Map is not null)
         {
             int silverCost = branch.GetBuildingSilverCost(buildingDef, resultOnly: false, out _);
-            constructParam.Map.DestoryThingsOfDef(ThingDefOf.Silver, silverCost);
+            constructParam.Map.DestroyThingsOfDef(ThingDefOf.Silver, silverCost);
         }
         branch.StoresReserveHandler.Notify_BranchConstructStarted(buildingDef);
         try

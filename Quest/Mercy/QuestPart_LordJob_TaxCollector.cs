@@ -113,7 +113,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         {
             briberyOpt.action = delegate
             {
-                talkWith.MapHeld.DestoryThingsOfDef(ThingDefOf.Silver, 1000);
+                talkWith.MapHeld?.DestroyThingsOfDef(ThingDefOf.Silver, 1000);
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 DeregisterTalkAction(clearTalkWith: true);
             };

@@ -330,7 +330,7 @@ public class QuestClique : IExposable
 
     public void Bribery(Map map)
     {
-        map.DestoryThingsOfDef(ThingDefOf.Silver, BriberyCost);
+        map.DestroyThingsOfDef(ThingDefOf.Silver, BriberyCost);
         AdjustCliqueWillingness(1f - Willingness + 0.1f);
 
         Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName))));

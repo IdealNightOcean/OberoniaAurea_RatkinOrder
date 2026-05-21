@@ -102,7 +102,7 @@ public class JointBranchRecord : IExposable
             };
             if (neededSilver > 0)
             {
-                map.DestoryThingsOfDef(ThingDefOf.Silver, neededSilver);
+                map.DestroyThingsOfDef(ThingDefOf.Silver, neededSilver);
             }
         }
 

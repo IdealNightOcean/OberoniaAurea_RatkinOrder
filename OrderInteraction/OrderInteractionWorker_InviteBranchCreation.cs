@@ -72,7 +72,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)
     {
-        map.DestoryThingsOfDef(ThingDefOf.Silver, ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
+        map.DestroyThingsOfDef(ThingDefOf.Silver, ratkinOrder.BranchManager.SilverNeededForNextBranchCreation);
         ratkinOrder.BranchManager.Notify_NewBranchInviteCreated();
         return (true, true);
     }

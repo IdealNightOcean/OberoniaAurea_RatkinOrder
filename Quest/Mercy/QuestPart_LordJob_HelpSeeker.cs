@@ -100,7 +100,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             {
                 DeregisterTalkAction(clearTalkWith: true);
                 Find.SignalManager.SendSignal(new Signal(OutSignalTransferWithHelp, talkWith.Named(KeyLibrary_FormatArgName.SUBJECT), MercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)));
-                talkWith.MapHeld?.DestoryThingsOfDef(ThingDefOf.Silver, 200);
+                talkWith.MapHeld?.DestroyThingsOfDef(ThingDefOf.Silver, 200);
             },
             resolveTree = true
         };

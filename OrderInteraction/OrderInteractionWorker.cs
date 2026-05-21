@@ -83,7 +83,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         }
         if (Def.needSilver > 0)
         {
-            map.DestoryThingsOfDef(ThingDefOf.Silver, Def.needSilver);
+            map.DestroyThingsOfDef(ThingDefOf.Silver, Def.needSilver);
         }
     }
 

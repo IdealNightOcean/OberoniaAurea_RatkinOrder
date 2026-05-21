@@ -43,7 +43,7 @@ public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : Bra
         Dialog_BranchTrade_SingleUse branchTrade = new(negotiator, trader);
         branchTrade.InitForInteraction(parms);
         branchTrade.PostApplyBranchInteraction += PostApplyInteraction;
-        branchTrade.PostApplyBranchInteraction += (arg1, arg2) => trader?.Destory();
+        branchTrade.PostApplyBranchInteraction += (arg1, arg2) => trader?.Destroy();
 
         Find.WindowStack.Add(branchTrade);
 

@@ -41,7 +41,7 @@ public abstract class BranchInteractionWorker_MapOnly(BranchInteractionDef def) 
         }
         if (Def.needSilver > 0)
         {
-            parms.Map.DestoryThingsOfDef(ThingDefOf.Silver, Def.needSilver);
+            parms.Map?.DestroyThingsOfDef(ThingDefOf.Silver, Def.needSilver);
         }
     }
 

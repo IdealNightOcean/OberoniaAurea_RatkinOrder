@@ -594,7 +594,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
 
     public override void Destroy()
     {
-        innerTrader?.Destory();
+        innerTrader?.Destroy();
         QuestUtility.SendQuestTargetSignals(questTags, "PopulationSettled", this.Named(KeyLibrary_FormatArgName.SUBJECT), population.Named("POPULATION"));
         base.Destroy();
     }
