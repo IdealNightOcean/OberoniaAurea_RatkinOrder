@@ -79,7 +79,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
 
         if (Def.needRecommendation > 0)
         {
-            RecommendationUtility.UseRecommendationOfMap(map, Def.needRecommendation);
+            RecommendationUtility.UseRecommendationOfPlayer(map, Def.needRecommendation);
         }
         if (Def.needSilver > 0)
         {
@@ -136,7 +136,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
     {
         try
         {
-            ratkinOrder.PostApplyOrderInteraction?.Invoke(Def, ratkinOrder, map, succeeded);
+            ratkinOrder.OnPostApplyOrderInteraction(Def, ratkinOrder, map, succeeded);
         }
         catch (Exception ex)
         {

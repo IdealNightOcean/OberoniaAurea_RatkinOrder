@@ -154,7 +154,7 @@ public static class RelationshipUtility
             int recommendationNeed = RecommendationUtility.RecommendationNeed_OrderRelationUpgrade(targetRelation);
             if (recommendationNeed > 0)
             {
-                RecommendationUtility.UseRecommendationOfMap(map, recommendationNeed);
+                RecommendationUtility.UseRecommendationOfPlayer(map, recommendationNeed);
             }
             return true;
         }

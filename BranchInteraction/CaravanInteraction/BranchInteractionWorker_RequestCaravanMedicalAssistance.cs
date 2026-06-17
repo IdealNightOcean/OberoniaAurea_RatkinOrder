@@ -9,7 +9,7 @@ public class BranchInteractionWorker_RequestCaravanMedicalAssistance(BranchInter
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
         List<FloatMenuOption> options = [];
-        Caravan caravan = parms.Caravan;
+        Caravan caravan = parms.TargetCaravan;
         foreach (Pawn p in caravan.PawnsListForReading)
         {
             options.Add(new FloatMenuOption(p.LabelShort, () => ApplyMedicalAssistance(parms, p)));
@@ -28,6 +28,6 @@ public class BranchInteractionWorker_RequestCaravanMedicalAssistance(BranchInter
 
         bool result = parms.Branch.ResidentHandler.AddResident(resident);
 
-        PostApplyInteraction(parms, succeeded: result);
+        PostApplyEffect(parms, succeeded: result);
     }
 }

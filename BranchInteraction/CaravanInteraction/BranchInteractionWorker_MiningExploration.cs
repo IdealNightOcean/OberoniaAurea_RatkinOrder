@@ -18,9 +18,9 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
         return base.TargetValidate(parms, resultOnly);
     }
 
-    protected override void ApplyInteraction(BranchInteractionParms parms)
+    protected override void ApplyEffect(BranchInteractionParms parms)
     {
-        int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
+        int caravanSilver = parms.TargetCaravan.GetCountOfThingDef(ThingDefOf.Silver);
         DiaNode rootNode = new("OARO_MiningExploration_Root".Translate());
         if (caravanSilver < 4000)
         {
@@ -73,7 +73,7 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
         orderLetter.AddAttachment(thing);
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, delayDays: Rand.Range(8, 12));
 
-        base.ApplyInteraction(parms);
+        base.ApplyEffect(parms);
     }
 
     private static bool IsMetallic(ThingDef t)

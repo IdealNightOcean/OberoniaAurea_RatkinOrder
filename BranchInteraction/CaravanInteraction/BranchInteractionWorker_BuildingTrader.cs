@@ -17,7 +17,7 @@ public class BranchInteractionWorker_BuildingTrader(BranchInteractionDef def) : 
     }
 
     /// <returns>
-    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="BranchInteractionWorker.ApplyInteraction"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyInteraction"/></para>
+    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="BranchInteractionWorker.ApplyEffect"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyEffect"/></para>
     /// </returns>
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
@@ -29,7 +29,7 @@ public class BranchInteractionWorker_BuildingTrader(BranchInteractionDef def) : 
         }
 
         SiteTrader trader = traderContainer.Trader;
-        Pawn negotiator = BestCaravanPawnUtility.FindBestNegotiator(parms.Caravan, trader.Faction, trader.TraderKind);
+        Pawn negotiator = BestCaravanPawnUtility.FindBestNegotiator(parms.TargetCaravan, trader.Faction, trader.TraderKind);
         if (negotiator is null || negotiator.skills.GetSkill(SkillDefOf.Social).TotallyDisabled)
         {
             Messages.Message("OAFrame_MessageNoTrader".Translate(), MessageTypeDefOf.RejectInput, historical: false);
@@ -38,10 +38,10 @@ public class BranchInteractionWorker_BuildingTrader(BranchInteractionDef def) : 
 
         Dialog_BranchTrade branchTrade = new(negotiator, trader);
         branchTrade.InitForInteraction(parms);
-        branchTrade.PostApplyBranchInteraction += PostApplyInteraction;
+        branchTrade.PostApplyBranchInteraction += PostApplyEffect;
 
         Find.WindowStack.Add(branchTrade);
 
-        return (true, false);
+        return (succeeded: true, doPostApply: false);
     }
 }

@@ -22,4 +22,5 @@ public class KnightVirtueTraitDef : Def
     /// 根据美德属性值调整的属性Factor
     /// </summary>  
     public List<StatModifierBySeverity> statFactorsByVirtue;
+
 }

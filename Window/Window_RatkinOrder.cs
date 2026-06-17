@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -50,13 +50,13 @@ public class Window_RatkinOrder : MainTabWindow
 
     private int TotalKnightsCount => SelectedOrder.BranchManager.TotalKnightsCount.Value;
 
-    private int TotalPopulation { get; set; }
-    private float AverageSupply { get; set; }
-    private int NotIdleBranchCount { get; set; }
-    private int ConstructionBusyBarnchesCount { get; set; }
-    private (int frienly, int honor) branchesTypeCache;
-    private (int urgency, int supplementary, int acceptable) normalDemandsCache;
-    private (int friendly, int acceptable) criticalDemandsCache;
+    private LazyMutable<int> TotalPopulation { get; }
+    private LazyMutable<float> AverageSupply { get; }
+    private LazyMutable<int> NotIdleBranchCount { get; }
+    private LazyMutable<int> ConstructionBusyBarnchesCount { get; }
+    private LazyMutable<(int frienly, int honor)> BranchesTypeCache { get; }
+    private LazyMutable<(int urgency, int supplementary, int acceptable)> NormalDemandsCache { get; }
+    private LazyMutable<(int friendly, int acceptable)> CriticalDemandsCache { get; }
 
     private LazyMutable<string> AutoUpgradeRelationshipDesc { get; }
     private LazyMutable<List<Branch>> FollowedBranches { get; }
@@ -97,6 +97,14 @@ public class Window_RatkinOrder : MainTabWindow
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
 
+        TotalPopulation = new(refreshFunc: RefreshTotalPopulation);
+        AverageSupply = new(refreshFunc: RefreshAverageSupply);
+        NotIdleBranchCount = new(refreshFunc: RefreshNotIdleBranchCount);
+        ConstructionBusyBarnchesCount = new(refreshFunc: RefreshConstructionBusyBranchesCount);
+        BranchesTypeCache = new(refreshFunc: RefreshBranchesTypeCache);
+        NormalDemandsCache = new(refreshFunc: RefreshNormalDemandsCache);
+        CriticalDemandsCache = new(refreshFunc: RefreshCriticalDemandsCache);
+
         AutoUpgradeRelationshipDesc = new(refreshFunc: RefreshAutoUpgradeRelationshipDesc);
         FollowedBranches = new(refreshFunc: RefreshFollowerBranches);
     }
@@ -132,6 +140,14 @@ public class Window_RatkinOrder : MainTabWindow
         MapRecommendationCount = new(refreshFunc: () => RecommendationUtility.CurRecommendationCount(Map));
         FundChangeDetail = new(refreshFunc: () => SelectedOrder?.FundHandler.GetFundChangeDetail() ?? string.Empty);
 
+        TotalPopulation = new(refreshFunc: RefreshTotalPopulation);
+        AverageSupply = new(refreshFunc: RefreshAverageSupply);
+        NotIdleBranchCount = new(refreshFunc: RefreshNotIdleBranchCount);
+        ConstructionBusyBarnchesCount = new(refreshFunc: RefreshConstructionBusyBranchesCount);
+        BranchesTypeCache = new(refreshFunc: RefreshBranchesTypeCache);
+        NormalDemandsCache = new(refreshFunc: RefreshNormalDemandsCache);
+        CriticalDemandsCache = new(refreshFunc: RefreshCriticalDemandsCache);
+
         AutoUpgradeRelationshipDesc = new(refreshFunc: RefreshAutoUpgradeRelationshipDesc);
         FollowedBranches = new(refreshFunc: RefreshFollowerBranches);
     }
@@ -145,9 +161,22 @@ public class Window_RatkinOrder : MainTabWindow
     {
         base.PostClose();
         ClearRatkinOrderCache();
-        foreach (RatkinOrder order in RatkinOrderManager.Instance.AllRatkinOrders)
+        UnbindCallbacks();
+    }
+
+    private void BindCallbacks()
+    {
+        if (SelectedOrder is not null)
         {
-            order.PostApplyOrderInteraction -= RefreshRatkinInteractionCache;
+            SelectedOrder.PostApplyOrderInteraction += RefreshRatkinInteractionCache;
+        }
+    }
+
+    private void UnbindCallbacks()
+    {
+        if (SelectedOrder is not null)
+        {
+            SelectedOrder.PostApplyOrderInteraction -= RefreshRatkinInteractionCache;
         }
     }
 
@@ -376,7 +405,7 @@ public class Window_RatkinOrder : MainTabWindow
         Widgets.Label(reusedRect, TotalKnightsCount.ToString());
 
         reusedRect = new(inRectX + (420f - 110f), inRectY + 770f, 100f, 18f);
-        Widgets.Label(reusedRect, TotalPopulation.ToString());
+        Widgets.Label(reusedRect, TotalPopulation.Value.ToString());
 
         reusedRect = new(inRectX + 63f, inRectY + 796f, 373f, 75f);
         DrawNormalInteraction(reusedRect);
@@ -456,11 +485,11 @@ public class Window_RatkinOrder : MainTabWindow
 
         reusedRect.xMax += 80f;
         reusedRect.xMin += 80f;
-        Widgets.Label(reusedRect, branchesTypeCache.honor.ToString());
+        Widgets.Label(reusedRect, BranchesTypeCache.Value.honor.ToString());
 
         reusedRect.xMax += 80f;
         reusedRect.xMin += 80f;
-        Widgets.Label(reusedRect, branchesTypeCache.frienly.ToString());
+        Widgets.Label(reusedRect, BranchesTypeCache.Value.frienly.ToString());
 
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 385f, 346f, 25f);
@@ -481,7 +510,7 @@ public class Window_RatkinOrder : MainTabWindow
         }
 
         reusedRect = new(inRectX, inRectY + 440f, inRectWidth, 20f);
-        Widgets.Label(reusedRect, "OARO_OrderWin_AverageSupply".Translate(AverageSupply.ToStringPercent()));
+        Widgets.Label(reusedRect, "OARO_OrderWin_AverageSupply".Translate(AverageSupply.Value.ToStringPercent()));
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 470f, 346f, 140f);
         DrawFollowedBranchList(reusedRect);
@@ -519,11 +548,11 @@ public class Window_RatkinOrder : MainTabWindow
 
         reusedRect.yMax += 26f;
         reusedRect.yMin += 26f;
-        Widgets.Label(reusedRect, "OARO_OrderWin_NormalDemandsInfo".Translate(normalDemandsCache.urgency.ToString(), normalDemandsCache.supplementary.ToString(), normalDemandsCache.acceptable.ToString()));
+        Widgets.Label(reusedRect, "OARO_OrderWin_NormalDemandsInfo".Translate(NormalDemandsCache.Value.urgency.ToString(), NormalDemandsCache.Value.supplementary.ToString(), NormalDemandsCache.Value.acceptable.ToString()));
 
         reusedRect.yMax += 26f;
         reusedRect.yMin += 26f;
-        Widgets.Label(reusedRect, "OARO_OrderWin_CriticalDemandsInfo".Translate(criticalDemandsCache.friendly.ToString(), criticalDemandsCache.acceptable.ToString()));
+        Widgets.Label(reusedRect, "OARO_OrderWin_CriticalDemandsInfo".Translate(CriticalDemandsCache.Value.friendly.ToString(), CriticalDemandsCache.Value.acceptable.ToString()));
 
         Text.Anchor = TextAnchor.MiddleLeft;
         reusedRect = new(inRectX + 35f, inRectY + 801f, inRectWidth - 35f, 20f);
@@ -549,7 +578,7 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Font = GameFont.Small;
         reusedRect = new(inRectX, inRectY + 35f, inRectWidth, 20f);
-        Widgets.Label(reusedRect, "OARO_OrderWin_OrderTaskInfo".Translate(NotIdleBranchCount.ToString()));
+        Widgets.Label(reusedRect, "OARO_OrderWin_OrderTaskInfo".Translate(NotIdleBranchCount.Value.ToString()));
 
         reusedRect = new(inRectX + 246f, inRectY + 80f, 134f, 25f);
         if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_OrderWin_OpenTaskWindow".Translate(), windowButton, windowButton_Down, doMouseoverSound: true))
@@ -734,7 +763,7 @@ public class Window_RatkinOrder : MainTabWindow
 
         Text.Font = GameFont.Small;
         reusedRect = new(inRectX, inRectY + 133f, inRectWidth, 18f);
-        Widgets.Label(reusedRect, "OARO_OrderWin_ConstructionBusyBarnchesCount".Translate(ConstructionBusyBarnchesCount.ToString()));
+        Widgets.Label(reusedRect, "OARO_OrderWin_ConstructionBusyBarnchesCount".Translate(ConstructionBusyBarnchesCount.Value.ToString()));
 
         /*
         reusedRect = new(inRectX + 269f, inRectY + 178f, 134f, 25f);
@@ -924,29 +953,93 @@ public class Window_RatkinOrder : MainTabWindow
         }
 
         esteemTexture = new CachedTexture($"UI/RatkinOrder/OARO_EsteemTexture_{EsteemUtility.GetIndex(SelectedOrder.Esteem)}");
-        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
-        foreach (Branch branch in allBranches)
-        {
-            TotalPopulation += branch.PopulationHandler.Population;
-            AverageSupply += branch.Supply;
-            if (branch.CurWorkState != Branch.WorkStateType.Idle)
-            {
-                NotIdleBranchCount++;
-            }
-            if (branch.IsConstructionBusy)
-            {
-                ConstructionBusyBarnchesCount++;
-            }
 
+        UnderConstructionFacility = SelectedOrder.BranchManager.AllBranches.Where(b => b.FacilityHandler.IsBusy).Select(b => (b, b.FacilityHandler.UnderConstructionFacilities.Values.RandomElement())).FirstOrFallback();
+        UnderConstructionBuilding = SelectedOrder.BranchManager.AllBranches.Where(b => b.BuildingHandler.IsBusy).Select(b => (b, b.BuildingHandler.UnderConstructionBuildings.RandomElement())).FirstOrFallback();
+        ReserveRecordShow = SelectedOrder.BranchManager.AllPrimaryReserves.Take(2).ToList();
+
+        RefreshRatkinInteractionCache(null, SelectedOrder, Map, succeeded: false);
+
+        UnbindCallbacks();
+        BindCallbacks();
+    }
+
+    private int RefreshTotalPopulation()
+    {
+        int total = 0;
+        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
+        for (int i = 0; i < allBranches.Count; i++)
+        {
+            total += allBranches[i].PopulationHandler.Population;
+        }
+        return total;
+    }
+
+    private float RefreshAverageSupply()
+    {
+        float total = 0f;
+        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
+        for (int i = 0; i < allBranches.Count; i++)
+        {
+            total += allBranches[i].Supply;
+        }
+        return allBranches.Count > 0 ? total / allBranches.Count : 0f;
+    }
+
+    private int RefreshNotIdleBranchCount()
+    {
+        int count = 0;
+        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
+        for (int i = 0; i < allBranches.Count; i++)
+        {
+            if (allBranches[i].CurWorkState != Branch.WorkStateType.Idle)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private int RefreshConstructionBusyBranchesCount()
+    {
+        int count = 0;
+        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
+        for (int i = 0; i < allBranches.Count; i++)
+        {
+            if (allBranches[i].IsConstructionBusy)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    private (int frienly, int honor) RefreshBranchesTypeCache()
+    {
+        int frienly = 0, honor = 0;
+        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
+        for (int i = 0; i < allBranches.Count; i++)
+        {
+            Branch branch = allBranches[i];
             if (branch.IsBranchOfType(Branch.BranchType.Friendly))
             {
-                branchesTypeCache.frienly++;
+                frienly++;
             }
             if (branch.IsBranchOfType(Branch.BranchType.Honor))
             {
-                branchesTypeCache.honor++;
+                honor++;
             }
+        }
+        return (frienly, honor);
+    }
 
+    private (int urgency, int supplementary, int acceptable) RefreshNormalDemandsCache()
+    {
+        int urgency = 0, supplementary = 0, acceptable = 0;
+        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
+        for (int i = 0; i < allBranches.Count; i++)
+        {
+            Branch branch = allBranches[i];
             try
             {
                 BranchDemand demand = branch.DemandHandler.NormalDemand;
@@ -954,48 +1047,59 @@ public class Window_RatkinOrder : MainTabWindow
                 {
                     switch (demand.DemandTypeValue)
                     {
-                        case BranchDemand.DemandType.Urgency: normalDemandsCache.urgency++; break;
-                        case BranchDemand.DemandType.Supplementary: normalDemandsCache.supplementary++; break;
-                        default: break;
+                        case BranchDemand.DemandType.Urgency: urgency++; break;
+                        case BranchDemand.DemandType.Supplementary: supplementary++; break;
                     }
                     if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: false, resultOnly: true))
                     {
-                        normalDemandsCache.acceptable++;
-                    }
-                }
-                demand = branch.DemandHandler.CriticalDemand;
-                if (demand is not null)
-                {
-                    if (branch.IsBranchOfType(Branch.BranchType.Friendly))
-                    {
-                        criticalDemandsCache.friendly++;
-                    }
-                    if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: true, resultOnly: true))
-                    {
-                        criticalDemandsCache.acceptable++;
+                        acceptable++;
                     }
                 }
             }
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
-                    errorDesc: "refresh order demands cache",
+                    errorDesc: "refresh normal demands cache",
                     typeName: nameof(Window_RatkinOrder),
-                    methodName: nameof(RefreshRatkinOrderCache),
+                    methodName: nameof(RefreshNormalDemandsCache),
                     needStackTrace: true);
             }
         }
+        return (urgency, supplementary, acceptable);
+    }
 
-        AverageSupply /= allBranches.Count;
-
-        UnderConstructionFacility = allBranches.Where(b => b.FacilityHandler.IsBusy).Select(b => (b, b.FacilityHandler.UnderConstructionFacilities.Values.RandomElement())).FirstOrFallback();
-        UnderConstructionBuilding = allBranches.Where(b => b.BuildingHandler.IsBusy).Select(b => (b, b.BuildingHandler.UnderConstructionBuildings.RandomElement())).FirstOrFallback();
-        ReserveRecordShow = SelectedOrder.BranchManager.AllPrimaryReserves.Take(2).ToList();
-
-        RefreshRatkinInteractionCache(null, SelectedOrder, Map, succeeded: false);
-
-        SelectedOrder.PostApplyOrderInteraction -= RefreshRatkinInteractionCache;
-        SelectedOrder.PostApplyOrderInteraction += RefreshRatkinInteractionCache;
+    private (int friendly, int acceptable) RefreshCriticalDemandsCache()
+    {
+        int friendly = 0, acceptable = 0;
+        IReadOnlyList<Branch> allBranches = SelectedOrder.BranchManager.AllBranches;
+        for (int i = 0; i < allBranches.Count; i++)
+        {
+            Branch branch = allBranches[i];
+            try
+            {
+                BranchDemand demand = branch.DemandHandler.CriticalDemand;
+                if (demand is not null)
+                {
+                    if (branch.IsBranchOfType(Branch.BranchType.Friendly))
+                    {
+                        friendly++;
+                    }
+                    if (BranchDemandUtility.CanAcceptDemand(branch, isCritical: true, resultOnly: true))
+                    {
+                        acceptable++;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                ModUtility.LogExceptionError(ex,
+                    errorDesc: "refresh critical demands cache",
+                    typeName: nameof(Window_RatkinOrder),
+                    methodName: nameof(RefreshCriticalDemandsCache),
+                    needStackTrace: true);
+            }
+        }
+        return (friendly, acceptable);
     }
 
     private string RefreshAutoUpgradeRelationshipDesc()
@@ -1028,6 +1132,19 @@ public class Window_RatkinOrder : MainTabWindow
         {
             return;
         }
+
+        // 交互可能影响分部统计数据，标记所有统计缓存脏
+        TotalPopulation.MarkDirty();
+        AverageSupply.MarkDirty();
+        NotIdleBranchCount.MarkDirty();
+        ConstructionBusyBarnchesCount.MarkDirty();
+        BranchesTypeCache.MarkDirty();
+        NormalDemandsCache.MarkDirty();
+        CriticalDemandsCache.MarkDirty();
+        MapRecommendationCount.MarkDirty();
+        FundChangeDetail.MarkDirty();
+        FollowedBranches.MarkDirty();
+        AutoUpgradeRelationshipDesc.MarkDirty();
 
         foreach (OrderInteractionDef def in DefDatabase<OrderInteractionDef>.AllDefsListForReading)
         {
@@ -1066,23 +1183,19 @@ public class Window_RatkinOrder : MainTabWindow
 
     private void ClearRatkinOrderCache()
     {
-        if (SelectedOrder is not null)
-        {
-            SelectedOrder.PostApplyOrderInteraction -= RefreshRatkinInteractionCache;
-        }
+        UnbindCallbacks();
 
         MapRecommendationCount.MarkDirty();
         FundChangeDetail.MarkDirty();
         esteemTexture = new CachedTexture("UI/RatkinOrder/OARO_EsteemTexture_0");
 
-        TotalPopulation = 0;
-        AverageSupply = 0f;
-        NotIdleBranchCount = 0;
-        ConstructionBusyBarnchesCount = 0;
-
-        branchesTypeCache = default;
-        normalDemandsCache = default;
-        criticalDemandsCache = default;
+        TotalPopulation.MarkDirty();
+        AverageSupply.MarkDirty();
+        NotIdleBranchCount.MarkDirty();
+        ConstructionBusyBarnchesCount.MarkDirty();
+        BranchesTypeCache.MarkDirty();
+        NormalDemandsCache.MarkDirty();
+        CriticalDemandsCache.MarkDirty();
 
         FollowedBranches.MarkDirty();
         SpecialInteractionAcceptances.Clear();

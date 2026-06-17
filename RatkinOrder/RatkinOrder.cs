@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using UnityEngine;
@@ -37,7 +37,18 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     public CooldownRecordManager CooldownManager => cooldownManager;
     public TagStrToBoolCountable EffectTags { get; } = new();
     public BranchStatTransformerHandler TransformerHandler { get; } = new();
-    public Action<OrderInteractionDef, RatkinOrder, Map, bool> PostApplyOrderInteraction { get; set; }
+    /// <summary>
+    /// 骑士团交互应用后触发，供 UI 窗口订阅以刷新缓存
+    /// </summary>
+    public event Action<OrderInteractionDef, RatkinOrder, Map, bool> PostApplyOrderInteraction;
+
+    /// <summary>
+    /// 触发 PostApplyOrderInteraction 事件，仅供交互 Worker 调用
+    /// </summary>
+    public void OnPostApplyOrderInteraction(OrderInteractionDef def, RatkinOrder ratkinOrder, Map map, bool succeeded)
+    {
+        PostApplyOrderInteraction?.Invoke(def, ratkinOrder, map, succeeded);
+    }
 
 
     private EsteemHandler esteemHandler;

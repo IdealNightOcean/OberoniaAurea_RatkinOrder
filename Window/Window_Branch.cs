@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
@@ -55,8 +55,8 @@ public class Window_Branch : OrderWindowBase
     private BranchFacilityStageSummaryUICache NextFacilityStageCache { get; set; }
     private LazyMutable<AcceptanceReport> FacilityConstructionAcceptance { get; }
 
-    private Lazy<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
-    private Lazy<int> OptionalSpecialBuildingCount { get; }
+    private LazyMutable<Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache>> OptionalBuildingDefs { get; }
+    private LazyMutable<int> OptionalSpecialBuildingCount { get; }
 
     private Vector2 scrollPosition_GreetingDesc;
 
@@ -153,7 +153,7 @@ public class Window_Branch : OrderWindowBase
             }
         });
 
-        OptionalBuildingDefs = new(valueFactory: delegate
+        OptionalBuildingDefs = new(refreshFunc: delegate
         {
             Dictionary<BranchBuildingDef, BranchBuildingDefSummaryUICache> options = new(DefDatabase<BranchBuildingDef>.DefCount - BuildingHandler.AllBuildingsCount);
 
@@ -170,13 +170,9 @@ public class Window_Branch : OrderWindowBase
             return options;
         });
 
-        OptionalSpecialBuildingCount = new(valueFactory: delegate
+        OptionalSpecialBuildingCount = new(refreshFunc: delegate
         {
-            if (this.OptionalBuildingDefs.IsValueCreated)
-            {
-                return this.OptionalBuildingDefs.Value.Values.Count(cache => cache.BuildingDef.isSpecial);
-            }
-            return 0;
+            return OptionalBuildingDefs.Value.Values.Count(cache => cache.BuildingDef.isSpecial);
         });
 
         ContractAcceptances = new(refreshFunc: delegate
@@ -206,23 +202,31 @@ public class Window_Branch : OrderWindowBase
     public override void PreOpen()
     {
         base.PreOpen();
-        BuildingHandler.PostConstructionChanged += PostConstructionChanged_Building;
-        Branch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+        BindCallbacks();
     }
 
     public override void PostClose()
     {
         base.PostClose();
-        BuildingHandler.PostConstructionChanged -= PostConstructionChanged_Building;
-        Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+        UnbindCallbacks();
         ContractAcceptances.Reset();
         ClearInteractionCache();
         ClearConstructCache();
-        if (OptionalBuildingDefs.IsValueCreated)
-        {
-            OptionalBuildingDefs.Value.Clear();
-        }
+        OptionalBuildingDefs.MarkDirty();
+        OptionalSpecialBuildingCount.MarkDirty();
         CurTab = TabType.Construction;
+    }
+
+    private void BindCallbacks()
+    {
+        BuildingHandler.PostConstructionChanged += PostConstructionChanged_Building;
+        Branch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+    }
+
+    private void UnbindCallbacks()
+    {
+        BuildingHandler.PostConstructionChanged -= PostConstructionChanged_Building;
+        Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -1056,8 +1060,14 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleRight;
         Text.Font = GameFont.Medium;
         reusedRect = new(inRect.xMax - (12f + 100f), reusedRect.yMax + 2f, 100f, 24f);
-        Widgets.Label(reusedRect, "OARO_NumberRangePeople".Translate(CachedBranchInfo.DailyPopulationGrowth_Bottom.ToString(), CachedBranchInfo.DailyPopulationGrowth_Ceiling.ToString())
-                                                          .Colorize(CachedBranchInfo.DailyPopulationGrowth_Bottom > 0 ? Color.green : ColorLibrary.RedReadable));
+        int growthBottom = CachedBranchInfo.DailyPopulationGrowth_Bottom.Value;
+        int growthCeiling = CachedBranchInfo.DailyPopulationGrowth_Ceiling.Value;
+        if (growthBottom > growthCeiling)
+        {
+            (growthBottom, growthCeiling) = (growthCeiling, growthBottom);
+        }
+        Widgets.Label(reusedRect, "OARO_NumberRangePeople".Translate(growthBottom.ToString(), growthCeiling.ToString())
+                                                          .Colorize(growthBottom > 0 ? Color.green : ColorLibrary.RedReadable));
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -1702,21 +1712,15 @@ public class Window_Branch : OrderWindowBase
             default: return;
         }
 
-        if (!OptionalBuildingDefs.IsValueCreated)
-        {
-            return;
-        }
-        if (added)
-        {
-            OptionalBuildingDefs.Value.Remove(buildingDef);
-        }
-        else
-        {
-            OptionalBuildingDefs.Value[buildingDef] = new BranchBuildingDefSummaryUICache(buildingDef, Branch);
-        }
+        OptionalBuildingDefs.MarkDirty();
+        OptionalSpecialBuildingCount.MarkDirty();
     }
 
-    private void PostApplyBranchInteraction(BranchInteractionDef interactionDef, BranchInteractionParms parms, bool succeeded) => InteractionAcceptanceDirty = true;
+    private void PostApplyBranchInteraction(BranchInteractionDef interactionDef, BranchInteractionParms parms, bool succeeded)
+    {
+        InteractionAcceptanceDirty = true;
+        CachedBranchInfo.MarkDirty();
+    }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/Branch/OARO_MainBackground");
 

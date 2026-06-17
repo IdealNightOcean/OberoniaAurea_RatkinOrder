@@ -21,7 +21,7 @@ public class BranchInteractionWorker_SupplyAllocation(BranchInteractionDef def) 
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
-        float gainCount = parms.Caravan.PawnsListForReading.Count * 50f + parms.RatkinOrder.Esteem * 0.01f * 100f;
+        float gainCount = parms.TargetCaravan.PawnsListForReading.Count * 50f + parms.RatkinOrder.Esteem * 0.01f * 100f;
         if (parms.Branch.FacilityHandler.GetFacilityLevel(OARO_ModDefOf.OARO_SupportFacility) >= BranchFacilityLevel.Good)
         {
             gainCount *= 2f;
@@ -31,7 +31,7 @@ public class BranchInteractionWorker_SupplyAllocation(BranchInteractionDef def) 
         int gainCountInt = Mathf.Max(1, (int)gainCount);
         pemmican.stackCount = gainCountInt;
 
-        CaravanInventoryUtility.GiveThing(parms.Caravan, pemmican);
+        CaravanInventoryUtility.GiveThing(parms.TargetCaravan, pemmican);
 
         Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
         (

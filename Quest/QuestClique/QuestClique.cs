@@ -259,7 +259,7 @@ public class QuestClique : IExposable
                 //邀请友好分部派别参与消耗1推荐信
                 if (RelatedBranch.IsBranchOfType(Branch.BranchType.Friendly))
                 {
-                    RecommendationUtility.UseRecommendationOfMap(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
+                    RecommendationUtility.UseRecommendationOfPlayer(OARO_MapUtility.GetRationalPlayerHomeMap(forQuest: false, canBeSpace: true), 1);
                 }
             }
             Active();

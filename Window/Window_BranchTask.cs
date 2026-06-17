@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -65,7 +65,11 @@ public partial class Window_BranchTask : OrderWindowBase
     public override void PostClose()
     {
         base.PostClose();
-        ShowDetailDrawer?.ClearCache();
+        for (int i = 0; i < BranchTaskEntryDrawers.Count; i++)
+        {
+            BranchTaskEntryDrawers[i].ClearCache();
+        }
+        ShowDetailDrawer = null;
     }
 
     public override void DoWindowContents(Rect inRect)

@@ -49,7 +49,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
     {
         base.DoInteractionCost(ratkinOrder, map);
         int recommendationNeed = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
-        RecommendationUtility.UseRecommendationOfMap(map, recommendationNeed);
+        RecommendationUtility.UseRecommendationOfPlayer(map, recommendationNeed);
     }
 
     protected override (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map)

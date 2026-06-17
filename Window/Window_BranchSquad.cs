@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -1082,8 +1082,8 @@ public class Window_BranchSquad : OrderWindowBase
             RefreshBranchStatCache();
             RefreshBranchAcceptance();
 
-            SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
-            SelBranch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+            UnbindBranchCallback();
+            BindBranchCallback();
 
             return;
         }
@@ -1101,10 +1101,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void DeselectSquad()
     {
-        if (SelBranch.IsValid())
-        {
-            SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
-        }
+        UnbindBranchCallback();
 
         RefreshBranchStatCache();
         RefreshBranchAcceptance();
@@ -1137,8 +1134,30 @@ public class Window_BranchSquad : OrderWindowBase
 
     private void PostApplyBranchInteraction(BranchInteractionDef def, BranchInteractionParms parms, bool succeeded)
     {
+        RefreshBranchStatCache();
         RefreshBranchAcceptance();
         MapRecommendationCount.MarkDirty();
+        // 交互可能影响分部核心数据，重建缓存
+        if (SelBranch.IsValid())
+        {
+            SelSquadInfo = new(SelBranch, Map);
+        }
+    }
+
+    private void BindBranchCallback()
+    {
+        if (SelBranch.IsValid())
+        {
+            SelBranch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+        }
+    }
+
+    private void UnbindBranchCallback()
+    {
+        if (SelBranch.IsValid())
+        {
+            SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+        }
     }
 
     protected override void SetInitialSizeAndPosition()

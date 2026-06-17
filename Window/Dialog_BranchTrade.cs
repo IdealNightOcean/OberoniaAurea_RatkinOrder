@@ -1,4 +1,4 @@
-﻿using RimWorld;
+using RimWorld;
 using System;
 using Verse;
 
@@ -34,7 +34,7 @@ public class Dialog_BranchTrade(Pawn playerNegotiator, ITrader trader, bool gift
 {
     protected BranchInteractionParms Parms { get; set; }
 
-    public Action<BranchInteractionParms, bool> PostApplyBranchInteraction { get; set; }
+    public event Action<BranchInteractionParms, bool> PostApplyBranchInteraction;
 
     public void InitForInteraction(BranchInteractionParms parms)
     {

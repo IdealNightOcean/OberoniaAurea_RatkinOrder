@@ -129,7 +129,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
             supplyButton_Down,
             doMouseoverSound: true))
         {
-            RecommendationUtility.UseRecommendationOfMap(Map, supply.needRecommendation);
+            RecommendationUtility.UseRecommendationOfPlayer(Map, supply.needRecommendation);
             MapRecommendationCount -= supply.needRecommendation;
 
             Thing thing = ThingMaker.MakeThing(supply.thing, supply.stuff);

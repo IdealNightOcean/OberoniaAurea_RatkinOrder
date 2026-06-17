@@ -51,7 +51,7 @@ public static class GlobalInteractionUtility
 
         int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(kRecord.RatkinOrder);
 
-        RecommendationUtility.UseRecommendationOfMap(map, needRecommendation);
+        RecommendationUtility.UseRecommendationOfPlayer(map, needRecommendation);
         OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
         pawn.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_RecruitKnight);
         ResidentPawnsManager.Instance.TryRegisterKnight(pawn, kRecord);
@@ -119,7 +119,7 @@ public static class GlobalInteractionUtility
 
     public static void PostponeResidentKnightkResignation(ResidentKnight record, Map map)
     {
-        RecommendationUtility.UseRecommendationOfMap(map, 1);
+        RecommendationUtility.UseRecommendationOfPlayer(map, 1);
         record.PostponeResignation(120);
     }
 
@@ -183,7 +183,7 @@ public static class GlobalInteractionUtility
             {
                 if (AroundKnightGroupsManager.Instance.SeasonInvitationUsed > SeasonInvitationLimit())
                 {
-                    RecommendationUtility.UseRecommendationOfMap(map, 1);
+                    RecommendationUtility.UseRecommendationOfPlayer(map, 1);
                 }
                 AroundKnightGroupsManager.Instance.SeasonInvitationUsed++;
 

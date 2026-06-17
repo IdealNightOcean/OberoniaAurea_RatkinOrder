@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -8,18 +8,18 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
-    protected override void DoBranchCost(BranchInteractionParms parms)
+    protected override void ApplyCost(BranchInteractionParms parms)
     {
-        base.DoBranchCost(parms);
+        base.ApplyCost(parms);
         parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: 600, removeWhenExpired: true);
     }
 
     /// <returns>
-    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="ApplyInteraction"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyInteraction"/></para>
+    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="ApplyInteraction"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyEffect"/></para>
     /// </returns>
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {
-        Pawn negotiator = BestCaravanPawnUtility.FindBestNegotiator(parms.Caravan);
+        Pawn negotiator = BestCaravanPawnUtility.FindBestNegotiator(parms.TargetCaravan);
         if (negotiator is null || negotiator.skills.GetSkill(SkillDefOf.Social).TotallyDisabled)
         {
             Messages.Message("OAFrame_MessageNoTrader".Translate(), MessageTypeDefOf.RejectInput, historical: false);
@@ -42,12 +42,17 @@ public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : Bra
 
         Dialog_BranchTrade_SingleUse branchTrade = new(negotiator, trader);
         branchTrade.InitForInteraction(parms);
-        branchTrade.PostApplyBranchInteraction += PostApplyInteraction;
-        branchTrade.PostApplyBranchInteraction += (arg1, arg2) => trader?.Destroy();
+        branchTrade.PostApplyBranchInteraction += PostApplyEffect;
+        branchTrade.PostApplyBranchInteraction += OnDestroyTrader;
 
         Find.WindowStack.Add(branchTrade);
 
         return (true, false);
+
+        void OnDestroyTrader(BranchInteractionParms _, bool __)
+        {
+            trader?.Destroy();
+        }
 
         static bool HasTrader(Faction argFaction)
         {

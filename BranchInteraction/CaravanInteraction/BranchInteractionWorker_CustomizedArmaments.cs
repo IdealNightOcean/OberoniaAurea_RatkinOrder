@@ -65,7 +65,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
 
     private DiaNode QualityNode(BranchInteractionParms parms, ThingDef thingDef, ThingDef stuffDef)
     {
-        int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
+        int caravanSilver = parms.TargetCaravan.GetCountOfThingDef(ThingDefOf.Silver);
         DiaNode rootNode = new("OARO_CustomizedArmaments_Quality".Translate());
 
         foreach (QualityCategory quality in QualityUtility.AllQualityCategories)
@@ -141,15 +141,15 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         orderLetter.AddAttachment(thing);
         OrderLetterBox.Instance.ReceiveLetter(orderLetter, coolingDays);
 
-        parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, GetPrice(thingDef, stuffDef, quality));
+        parms.TargetCaravan.RemoveThingsOfDef(ThingDefOf.Silver, GetPrice(thingDef, stuffDef, quality));
         branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: coolingDays * 60000);
 
-        PostApplyInteraction(parms, succeeded: true);
+        PostApplyEffect(parms, succeeded: true);
 
     }
 
     /// <returns>
-    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="BranchInteractionWorker.ApplyInteraction"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyInteraction"/></para>
+    /// <para>- doPostApply：始终返回 <see langword="false"/> 以阻止 <see cref="BranchInteractionWorker.ApplyEffect"/> 执行回调方法 <see cref="BranchInteractionWorker.PostApplyEffect"/></para>
     /// </returns>
     protected override (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms)
     {

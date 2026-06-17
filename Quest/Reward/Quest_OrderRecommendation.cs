@@ -117,7 +117,7 @@ public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
         {
             if (GiveToCaravan && GetCaravan(signal, out Caravan caravan))
             {
-                RecommendationUtility.GiveRecommendationsToCaravan(caravan, Count);
+                RecommendationUtility.GiveRecommendationsToPlayer(caravan, Count);
             }
             else
             {

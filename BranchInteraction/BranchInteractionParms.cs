@@ -1,36 +1,24 @@
-﻿using RimWorld;
-using RimWorld.Planet;
+﻿using RimWorld.Planet;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public readonly struct BranchInteractionParms
+public class BranchInteractionParms
 {
-    public readonly Branch Branch;
-    public readonly Caravan Caravan;
-    public readonly Map Map;
-    public readonly BranchBuilding Building;
+    public Branch Branch { get; }
+    public RatkinOrder RatkinOrder => Branch?.RatkinOrder;
 
-    public BranchInteractionParms(Branch branch, BranchBuilding building = null)
+    public BranchBuilding Building { get; }
+
+    public IThingHolder Target { get; }
+    public Caravan TargetCaravan => Target as Caravan;
+    public Map TargetMap => Target as Map;
+
+
+    public BranchInteractionParms(Branch branch, IThingHolder target = null, BranchBuilding building = null)
     {
         Branch = branch;
+        Target = target;
         Building = building;
     }
-    public BranchInteractionParms(Branch branch, Caravan caravan, BranchBuilding building = null)
-    {
-        Branch = branch;
-        Caravan = caravan;
-        Building = building;
-    }
-
-    public BranchInteractionParms(Branch branch, Map map, BranchBuilding building = null)
-    {
-        Branch = branch;
-        Map = map;
-        Building = building;
-    }
-
-    public readonly WorldObject BaseSite => Branch?.BaseSite;
-    public readonly RatkinOrder RatkinOrder => Branch?.RatkinOrder;
-    public readonly Faction Faction => RatkinOrder?.Faction;
 }

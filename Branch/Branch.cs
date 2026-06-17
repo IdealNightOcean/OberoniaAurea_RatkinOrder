@@ -176,7 +176,18 @@ public class Branch : IExposable, ILoadReferenceable
     public TagStrToBoolCountable EffectTags { get; } = new();
     public BranchStatTransformerHandler TransformerHandler { get; } = new();
     public List<IPostCombatantGenerate> IPostCombatantGenerate { get; } = [];
-    public Action<BranchInteractionDef, BranchInteractionParms, bool> PostApplyBranchInteraction { get; set; }
+    /// <summary>
+    /// 分部交互应用后触发，供 UI 窗口订阅以刷新缓存
+    /// </summary>
+    public event Action<BranchInteractionDef, BranchInteractionParms, bool> PostApplyBranchInteraction;
+
+    /// <summary>
+    /// 触发 PostApplyBranchInteraction 事件，仅供交互 Worker 调用
+    /// </summary>
+    public void OnPostApplyBranchInteraction(BranchInteractionDef def, BranchInteractionParms parms, bool succeeded)
+    {
+        PostApplyBranchInteraction?.Invoke(def, parms, succeeded);
+    }
 
 
     private CooldownRecordManager cooldownManager;

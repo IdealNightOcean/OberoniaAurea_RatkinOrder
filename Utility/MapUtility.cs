@@ -1,5 +1,4 @@
-﻿using RimWorld;
-using RimWorld.QuestGen;
+﻿using RimWorld.QuestGen;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Verse;
@@ -59,18 +58,6 @@ public static class OARO_MapUtility
                         return maps[i];
                     }
                 }
-
-                if (ModsConfig.OdysseyActive)
-                {
-                    for (int j = 0; j < maps.Count; j++)
-                    {
-                        if (!maps[j].Tile.LayerDef.isSpace && GravshipUtility.PlayerHasGravEngine(maps[j]))
-                        {
-                            return maps[j];
-                        }
-                    }
-                }
-
                 return null;
             }
         }

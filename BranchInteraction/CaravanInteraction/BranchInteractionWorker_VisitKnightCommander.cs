@@ -25,7 +25,7 @@ public class BranchInteractionWorker_VisitKnightCommander(BranchInteractionDef d
         ThingDef privateBrewDef = DefDatabase<ThingDef>.GetNamedSilentFail("OARO_CommanderPrivateBrew");
         Thing privateBrew = ThingMaker.MakeThing(privateBrewDef);
         privateBrew.stackCount = 5;
-        CaravanInventoryUtility.GiveThing(parms.Caravan, privateBrew);
+        CaravanInventoryUtility.GiveThing(parms.TargetCaravan, privateBrew);
 
         Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_VisitKnightCommander_Reply".Translate(

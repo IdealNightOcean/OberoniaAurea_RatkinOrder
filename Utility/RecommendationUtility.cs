@@ -1,11 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
-using RimWorld.Planet;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -25,65 +20,44 @@ public static class RecommendationUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static int CurRecommendationCount(this Map map)
     {
-        return map?.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation)?.Sum(t => t.stackCount) ?? 0;
+        if (map is null)
+            return 0;
+
+        int totalCount = 0;
+        foreach (Thing t in map.listerThings.ThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation))
+            totalCount += t.stackCount;
+
+        return totalCount;
     }
 
-    public static bool HasEnoughRecommendation(this Map map, int count)
-    {
-        return map.HasEnoughThingsOfDef(OARO_ThingDefOf.OARO_OrderRecommendation, count);
-    }
+    public static bool HasEnoughRecommendation(IThingHolder thingHolder, int count) => OAFrame_ThingUtility.HasEnoughThingsOfDef(thingHolder, OARO_ThingDefOf.OARO_OrderRecommendation, count);
 
-    public static bool HasEnoughRecommendation(this Caravan caravan, int count)
+    public static bool GiveRecommendationsToPlayer(IThingHolder thingHolder, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null)
     {
-        if (caravan is null) return false;
-        return CaravanInventoryUtility.HasThings(caravan, OARO_ThingDefOf.OARO_OrderRecommendation, count);
-    }
-
-    public static void GiveRecommendationsToPlayer(int count, Action<Thing> giveAction)
-    {
-        if (count <= 0 || giveAction is null)
-        {
-            return;
-        }
+        if (count <= 0 || thingHolder is null)
+            return false;
 
         OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
-        giveAction.Invoke(recommendations);
-    }
 
-    public static void GiveRecommendationsToCaravan(Caravan caravan, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null)
-    {
-        if (caravan is null || count <= 0)
-        {
-            return;
-        }
-        OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
-        CaravanInventoryUtility.GiveThing(caravan, recommendations);
+        if (!OAFrame_ThingUtility.GiveThingToPlayer(recommendations, thingHolder))
+            return false;
+
         if (sendStandLetter)
         {
-            SendStandardGetRecommendationLetter(count, ratkinOrder, caravan);
+            if (thingHolder is Map)
+                SendStandardGetRecommendationLetter(count, ratkinOrder, recommendations);
+
+            else if (thingHolder is LookTargets lookTargets)
+                SendStandardGetRecommendationLetter(count, ratkinOrder, lookTargets);
         }
+        return true;
     }
 
-    public static void GiveRecommendationsToFixedCaravan(FixedCaravan fixedCaravan, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null)
-    {
-        if (fixedCaravan is null || count <= 0)
-        {
-            return;
-        }
-        OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
-        OAFrame_FixedCaravanUtility.GiveThing(fixedCaravan, recommendations);
-        if (sendStandLetter)
-        {
-            SendStandardGetRecommendationLetter(count, ratkinOrder, fixedCaravan);
-        }
-    }
-
-    public static void GiveRecommendationsToPlayerMap(Map map, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null, IntVec3? spawnCell = null, bool dropPod = false)
+    public static bool GiveRecommendationsToPlayerMap(Map map, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null, IntVec3? spawnCell = null, bool dropPod = false)
     {
         if (map is null || count <= 0)
-        {
-            return;
-        }
+            return false;
+
         OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
 
         Faction faction = ratkinOrder?.Faction;
@@ -98,7 +72,7 @@ public static class RecommendationUtility
             if (!spawnCell.HasValue)
             {
                 CellFinder.TryRandomClosewalkCellNear(map.Center, map, 100, out IntVec3 cell);
-                spawnCell = cell;
+                spawnCell = cell.IsValid ? cell : map.Center;
             }
             GenPlace.TryPlaceThing(recommendations, spawnCell.Value, map, ThingPlaceMode.Near);
         }
@@ -107,63 +81,11 @@ public static class RecommendationUtility
         {
             SendStandardGetRecommendationLetter(count, ratkinOrder, new LookTargets(spawnCell.Value, map));
         }
+        return true;
     }
 
     /// <returns>实际使用数</returns>
-    public static int UseRecommendationOfMap(Map map, int useCount)
-    {
-        if (useCount <= 0 || map is null)
-        {
-            return Mathf.Max(useCount, 0);
-        }
-
-        List<Thing> recommendations = OAFrame_MapUtility.TakeThingsOfDef(
-            map: map,
-            thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
-            count: useCount,
-            actualTakeCount: out int actualTakeCount);
-
-        if (recommendations.NullOrEmpty())
-        {
-            return useCount;
-        }
-
-        for (int i = recommendations.Count - 1; i >= 0; i--)
-        {
-            recommendations[i].Destroy();
-        }
-
-        return actualTakeCount;
-    }
-
-    /// <returns>实际使用数</returns>
-    public static int UseRecommendationOfCaravan(Caravan caravan, int useCount)
-    {
-        if (useCount <= 0 || caravan is null)
-        {
-            return Mathf.Max(useCount, 0);
-        }
-
-        return OAFrame_CaravanUtility.RemoveThingsOfDef(caravan: caravan,
-                                                        thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
-                                                        count: useCount);
-
-    }
-
-    /// <returns>实际使用数</returns>
-    public static int UseRecommendationOfFixedCaravan(FixedCaravan fixedCaravan, int useCount)
-    {
-        if (useCount <= 0 || fixedCaravan is null)
-        {
-            return Mathf.Max(useCount, 0);
-        }
-
-        return OAFrame_FixedCaravanUtility.RemoveThingsOfDef(fixedCaravan: fixedCaravan,
-                                                            thingDef: OARO_ThingDefOf.OARO_OrderRecommendation,
-                                                            count: useCount);
-    }
-
-
+    public static int UseRecommendationOfPlayer(IThingHolder thingHolder, int useCount) => OAFrame_ThingUtility.RemoveThingsOfDef(thingHolder, OARO_ThingDefOf.OARO_OrderRecommendation, useCount);
 
     /// <summary>
     /// 提升到新等级需要的推荐信数量

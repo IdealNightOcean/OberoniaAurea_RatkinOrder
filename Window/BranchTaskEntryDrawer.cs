@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -638,6 +638,12 @@ public partial class Window_BranchTask
         {
             Parent.MapRecommendationCount.MarkDirty();
             InteractionAcceptances.MarkDirty();
+            JointBranchRecord.MarkDirty();
+            ExpectedTaskRevenue.MarkDirty();
+            BackTeamKnightsLabels.MarkDirty();
+            ChangeRadicalismDegreeAcceptance.MarkDirty();
+            ChangeFocusedTaskTypeAcceptance.MarkDirty();
+            PatrolInteractionAcceptances.MarkDirty();
         }
 
 

@@ -1,3 +1,4 @@
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using Verse;
@@ -11,6 +12,37 @@ namespace OberoniaAurea.RatkinOrder;
 public abstract class BranchInteractionWorker(BranchInteractionDef def)
 {
     public readonly BranchInteractionDef Def = def ?? throw new ArgumentNullException(nameof(def));
+
+    public AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly)
+    {
+        AcceptanceReport acceptance = ParmsValidate(parms, resultOnly);
+        if (!acceptance)
+            return acceptance;
+
+        acceptance = BranchValidate(parms, resultOnly);
+        if (!acceptance)
+            return acceptance;
+
+        if (Def.target != BranchInteractionDef.InteractionTarget.None)
+        {
+            acceptance = TargetValidate(parms, resultOnly);
+            if (!acceptance)
+                return acceptance;
+        }
+
+        return true;
+    }
+
+    public void TryApplyInteraction(BranchInteractionParms parms)
+    {
+        if (!ParmsValidate(parms, resultOnly: true))
+        {
+            Log.Error($"[OARO] 尝试应用 BranchInteraction 时使用了无效的 {nameof(BranchInteractionParms)}。");
+            return;
+        }
+
+        ApplyEffect(parms);
+    }
 
     protected virtual AcceptanceReport ParmsValidate(BranchInteractionParms parms, bool resultOnly)
     {
@@ -71,49 +103,20 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         return true;
     }
 
-    protected abstract AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly);
-
-    public AcceptanceReport CanUseInteraction(BranchInteractionParms parms, bool resultOnly)
+    protected virtual AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
     {
-        AcceptanceReport acceptance = ParmsValidate(parms, resultOnly);
-        if (!acceptance)
+        if (Def.needRecommendation > 0 && RecommendationUtility.HasEnoughRecommendation(parms.Target, Def.needRecommendation))
         {
-            return acceptance;
+            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation.Named(KeyLibrary_FormatArgName.Count));
         }
-
-        acceptance = BranchValidate(parms, resultOnly);
-        if (!acceptance)
+        if (Def.needSilver > 0 && !OAFrame_ThingUtility.HasEnoughThingsOfDef(parms.Target, ThingDefOf.Silver, Def.needSilver))
         {
-            return acceptance;
+            return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, Def.needSilver);
         }
-
-        acceptance = TargetValidate(parms, resultOnly);
-        if (!acceptance)
-        {
-            return acceptance;
-        }
-
         return true;
     }
 
-    public void TryApplyInteraction(BranchInteractionParms parms)
-    {
-        if (!ParmsValidate(parms, resultOnly: true))
-        {
-            Log.Error($"[OARO] 尝试应用 BranchInteraction 时使用了无效的 {nameof(BranchInteractionParms)}。");
-            return;
-        }
-
-        ApplyInteraction(parms);
-    }
-
-    protected void DoInteractionCost(BranchInteractionParms parms)
-    {
-        DoBranchCost(parms);
-        DoTargetCost(parms);
-    }
-
-    protected virtual void DoBranchCost(BranchInteractionParms parms)
+    protected virtual void ApplyCost(BranchInteractionParms parms)
     {
         Branch branch = parms.Branch;
         if (Def.useDefaultCD && Def.defaultCdDays > 0)
@@ -124,17 +127,27 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             branch.Supply -= Def.needSupply;
         }
-    }
 
-    protected abstract void DoTargetCost(BranchInteractionParms parms);
+        if (Def.target != BranchInteractionDef.InteractionTarget.None)
+        {
+            if (Def.needRecommendation > 0)
+            {
+                RecommendationUtility.UseRecommendationOfPlayer(parms.Target, Def.needRecommendation);
+            }
+            if (Def.needSilver > 0)
+            {
+                OAFrame_ThingUtility.RemoveThingsOfDef(parms.Target, ThingDefOf.Silver, Def.needSilver);
+            }
+        }
+    }
 
     /// <returns>
     /// <para>- succeeded：是否成功执行交互逻辑</para>
-    /// <para>- doPostApply：是否需要执行后续回调 <see cref="PostApplyInteraction"/></para>
+    /// <para>- doPostApply：是否需要执行后续回调 <see cref="PostApplyEffect"/></para>
     /// </returns>
     protected virtual (bool succeeded, bool doPostApply) InteractionEffect(BranchInteractionParms parms) => (true, true);
 
-    protected virtual void ApplyInteraction(BranchInteractionParms parms)
+    protected virtual void ApplyEffect(BranchInteractionParms parms)
     {
         (bool succeeded, bool doPostApply) = (false, false);
         try
@@ -147,7 +160,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"执行 BranchInteraction[{Def?.defName}] 的交互效果",
                 typeName: nameof(BranchInteractionWorker),
-                methodName: nameof(ApplyInteraction),
+                methodName: nameof(ApplyEffect),
                 needStackTrace: true);
         }
 
@@ -155,36 +168,36 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             try
             {
-                DoInteractionCost(parms);
+                ApplyCost(parms);
             }
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
                     errorDesc: $"应用 BranchInteraction[{Def?.defName}] 的交互成本",
                     typeName: nameof(BranchInteractionWorker),
-                    methodName: nameof(ApplyInteraction),
+                    methodName: nameof(ApplyEffect),
                     needStackTrace: true);
             }
         }
 
         if (doPostApply)
         {
-            PostApplyInteraction(parms, succeeded);
+            PostApplyEffect(parms, succeeded);
         }
     }
 
-    protected void PostApplyInteraction(BranchInteractionParms parms, bool succeeded)
+    protected void PostApplyEffect(BranchInteractionParms parms, bool succeeded)
     {
         try
         {
-            parms.Branch?.PostApplyBranchInteraction?.Invoke(Def, parms, succeeded);
+            parms.Branch?.OnPostApplyBranchInteraction(Def, parms, succeeded);
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"回调: {nameof(Branch)}.{nameof(Branch.PostApplyBranchInteraction)}",
                 typeName: nameof(BranchInteractionWorker),
-                methodName: nameof(PostApplyInteraction),
+                methodName: nameof(PostApplyEffect),
                 needStackTrace: true);
         }
     }

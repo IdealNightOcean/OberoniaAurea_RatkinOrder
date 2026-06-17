@@ -12,7 +12,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
     private ThingDef LeatheryFabricStuff { get; set; }
     private QualityCategory Quality { get; set; }
 
-    protected override void ApplyInteraction(BranchInteractionParms parms)
+    protected override void ApplyEffect(BranchInteractionParms parms)
     {
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(MetallicStuffNode(parms), parms.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
@@ -137,7 +137,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
 
     private DiaNode ConfirmNode(BranchInteractionParms parms)
     {
-        int caravanSilver = parms.Caravan.GetCountOfThingDef(ThingDefOf.Silver);
+        int caravanSilver = parms.TargetCaravan.GetCountOfThingDef(ThingDefOf.Silver);
         int price = GetArmamentsPrice();
         DiaNode rootNode = new("OARO_PurchaseKnightlyArmamentsRoot_Confirm".Translate(
             MetallicStuff.Named("MetallicStuff"),
@@ -234,11 +234,11 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
             if (armament is not null)
             {
                 armament.TryGetComp<CompQuality>()?.SetQuality(Quality, ArtGenerationContext.Outsider);
-                CaravanInventoryUtility.GiveThing(parms.Caravan, armament);
+                CaravanInventoryUtility.GiveThing(parms.TargetCaravan, armament);
             }
         }
 
-        parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, price);
+        parms.TargetCaravan.RemoveThingsOfDef(ThingDefOf.Silver, price);
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_PurchaseKnightlyArmamentsRoot_Purchased".Translate(
                 MetallicStuff.Named("MetallicStuff"),
@@ -248,12 +248,13 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
             ratkinOrder: parms.Branch.RatkinOrder);
         Find.WindowStack.Add(nodeTree);
 
-        base.ApplyInteraction(parms);
+        base.ApplyEffect(parms);
     }
 
-    protected override void DoBranchCost(BranchInteractionParms parms)
+
+    protected override void ApplyCost(BranchInteractionParms parms)
     {
-        base.DoBranchCost(parms);
+        base.ApplyCost(parms);
         if (!parms.Branch.EffectTags.HasTag(KeyLibrary_EffectTag.PurchaseKnightlyArmamentsNoCD))
         {
             parms.Branch.CooldownManager.RegisterRecord(Def.defName, cdTicks: Def.defaultCdDays * 60000, removeWhenExpired: true);

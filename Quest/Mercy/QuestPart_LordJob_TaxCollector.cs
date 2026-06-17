@@ -139,7 +139,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         {
             threatOpt.action = delegate
             {
-                RecommendationUtility.UseRecommendationOfMap(talkWith.MapHeld, useCount: 1);
+                RecommendationUtility.UseRecommendationOfPlayer(talkWith.MapHeld, useCount: 1);
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 DeregisterTalkAction(clearTalkWith: true);
             };
@@ -147,7 +147,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                text: "OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                acceptText: "Confirm".Translate());
 
-            if (!map.HasEnoughRecommendation(count: 1))
+            if (!RecommendationUtility.HasEnoughRecommendation(map, count: 1))
             {
                 briberyOpt.Disable("OARO_Insufficient_CurRecommendation".Translate(1.Named(KeyLibrary_FormatArgName.Count)));
             }

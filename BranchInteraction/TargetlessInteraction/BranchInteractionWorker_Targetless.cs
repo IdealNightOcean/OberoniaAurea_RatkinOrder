@@ -12,6 +12,4 @@ public abstract class BranchInteractionWorker_Targetless(BranchInteractionDef de
         }
         return base.ParmsValidate(parms, resultOnly);
     }
-    protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly) => true;
-    protected override void DoTargetCost(BranchInteractionParms parms) { }
 }

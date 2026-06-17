@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
@@ -13,36 +12,10 @@ public abstract class BranchInteractionWorker_CaravanOnly(BranchInteractionDef d
         {
             return resultOnly ? false : "OARO_BranchInteraction_InconsistentTargetType".Translate().Colorize(ColorLibrary.RedReadable);
         }
-        if (parms.Caravan is null)
+        if (parms.Target is not Caravan)
         {
             return resultOnly ? false : "OARO_NeedACaravan".Translate();
         }
         return base.ParmsValidate(parms, resultOnly);
-    }
-
-    protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
-    {
-        RatkinOrder ratkinOrder = parms.RatkinOrder;
-        if (Def.needRecommendation > 0 && !parms.Caravan.HasEnoughRecommendation(count: Def.needRecommendation))
-        {
-            return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation.Named(KeyLibrary_FormatArgName.Count));
-        }
-        if (Def.needSilver > 0 && !CaravanInventoryUtility.HasThings(parms.Caravan, ThingDefOf.Silver, Def.needSilver))
-        {
-            return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, Def.needSilver);
-        }
-        return true;
-    }
-
-    protected override void DoTargetCost(BranchInteractionParms parms)
-    {
-        if (Def.needRecommendation > 0)
-        {
-            RecommendationUtility.UseRecommendationOfCaravan(parms.Caravan, Def.needRecommendation);
-        }
-        if (Def.needSilver > 0)
-        {
-            parms.Caravan.RemoveThingsOfDef(ThingDefOf.Silver, Def.needSilver);
-        }
     }
 }

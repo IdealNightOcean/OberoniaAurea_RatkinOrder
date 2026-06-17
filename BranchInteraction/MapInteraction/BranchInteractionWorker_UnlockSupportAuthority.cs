@@ -18,18 +18,18 @@ public class BranchInteractionWorker_UnlockSupportAuthority(BranchInteractionDef
         return base.BranchValidate(parms, resultOnly);
     }
 
-    protected override void ApplyInteraction(BranchInteractionParms parms)
+    protected override void ApplyEffect(BranchInteractionParms parms)
     {
-        if (BranchUtility.IsInAffectedRange(parms.Branch, parms.Map.Tile))
+        if (BranchUtility.IsInAffectedRange(parms.Branch, parms.TargetMap.Tile))
         {
-            base.ApplyInteraction(parms);
+            base.ApplyEffect(parms);
         }
         else
         {
             Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                 "OARO_UnlockSupportAuthority_OutOfAffectedRange".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
                 parms.RatkinOrder,
-                acceptAction: () => base.ApplyInteraction(parms));
+                acceptAction: () => base.ApplyEffect(parms));
 
             Find.WindowStack.Add(nodeTree);
         }

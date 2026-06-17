@@ -7,28 +7,42 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInfoUICache : BranchSummaryUICache
 {
-    public int PopulationCeiling { get; }
-    public int BuildingCeiling { get; }
+    public int PopulationCeiling { get; private set; }
+    public int BuildingCeiling { get; private set; }
 
-    public int DailyPopulationGrowth_Bottom { get; set; }
-    public int DailyPopulationGrowth_Ceiling { get; set; }
+    public LazyMutable<int> DailyPopulationGrowth_Bottom { get; }
+    public LazyMutable<int> DailyPopulationGrowth_Ceiling { get; }
 
     public LazyMutable<string> DailyPopulationGrowthExplanation { get; }
 
     public BranchInfoUICache(Branch branch, Map map) : base(branch, map)
     {
-        DailyPopulationGrowthExplanation = new(refreshFunc: GetDailyPopulationGrowthExplanation);
-
         PopulationCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling, immediateUpdate: true);
         BuildingCeiling = (int)branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling, immediateUpdate: true);
 
-        float dailyPopulationGrowth = Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth, immediateUpdate: true);
-        DailyPopulationGrowth_Bottom = Mathf.CeilToInt(dailyPopulationGrowth * 0.5f);
-        DailyPopulationGrowth_Ceiling = Mathf.FloorToInt(dailyPopulationGrowth * 1.5f);
-        if (DailyPopulationGrowth_Bottom > DailyPopulationGrowth_Ceiling)
+        DailyPopulationGrowth_Bottom = new(refreshFunc: () =>
         {
-            (DailyPopulationGrowth_Bottom, DailyPopulationGrowth_Ceiling) = (DailyPopulationGrowth_Ceiling, DailyPopulationGrowth_Bottom);
-        }
+            float growth = Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth);
+            return Mathf.CeilToInt(growth * 0.5f);
+        });
+        DailyPopulationGrowth_Ceiling = new(refreshFunc: () =>
+        {
+            float growth = Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth);
+            return Mathf.FloorToInt(growth * 1.5f);
+        });
+        DailyPopulationGrowthExplanation = new(refreshFunc: GetDailyPopulationGrowthExplanation);
+    }
+
+    /// <summary>
+    /// 标记所有可变缓存为脏
+    /// </summary>
+    public void MarkDirty()
+    {
+        PopulationCeiling = (int)Branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling, immediateUpdate: true);
+        BuildingCeiling = (int)Branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling, immediateUpdate: true);
+        DailyPopulationGrowth_Bottom.MarkDirty();
+        DailyPopulationGrowth_Ceiling.MarkDirty();
+        DailyPopulationGrowthExplanation.MarkDirty();
     }
 
     private string GetDailyPopulationGrowthExplanation()
@@ -37,22 +51,21 @@ public class BranchInfoUICache : BranchSummaryUICache
         {
             StringBuilder growthExplanation = BranchStatUtility.GetStatModifyExplanation(Branch, BranchStatDefOf.OARO_DailyPopulationGrowth, showResultValue: false);
 
-            float dailyPopulationGrowth = Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth);
-            DailyPopulationGrowth_Bottom = Mathf.CeilToInt(dailyPopulationGrowth * 0.5f);
-            DailyPopulationGrowth_Ceiling = Mathf.FloorToInt(dailyPopulationGrowth * 1.5f);
-            if (DailyPopulationGrowth_Bottom > DailyPopulationGrowth_Ceiling)
+            int bottom = DailyPopulationGrowth_Bottom.Value;
+            int ceiling = DailyPopulationGrowth_Ceiling.Value;
+            if (bottom > ceiling)
             {
-                (DailyPopulationGrowth_Bottom, DailyPopulationGrowth_Ceiling) = (DailyPopulationGrowth_Ceiling, DailyPopulationGrowth_Bottom);
+                (bottom, ceiling) = (ceiling, bottom);
             }
             growthExplanation.Append("    ");
             growthExplanation.AppendLine("OARO_ExtraPopulationGrowthFloat".Translate());
-            growthExplanation.AppendLine("OARO_FinalPopulationGrowth".Translate(DailyPopulationGrowth_Bottom.ToString(), DailyPopulationGrowth_Ceiling.ToString())
-                                                                     .Colorize(dailyPopulationGrowth > 0f ? Color.green : ColorLibrary.RedReadable));
+            growthExplanation.AppendLine("OARO_FinalPopulationGrowth".Translate(bottom.ToString(), ceiling.ToString())
+                                                                     .Colorize(bottom > 0 ? Color.green : ColorLibrary.RedReadable));
             return growthExplanation.ToString();
         }
         catch
         {
-            return "ERROR (�����`)".Colorize(ColorLibrary.RedReadable);
+            return "ERROR (´;ω;`)".Colorize(ColorLibrary.RedReadable);
         }
     }
 }
