@@ -1,5 +1,6 @@
 using OberoniaAurea_Frame;
 using RimWorld;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -32,9 +33,23 @@ public class RatkinOrderManager : IExposable
 
     public void Tick()
     {
-        for (int i = 0; i < allRatkinOrders.Count; i++)
+        foreach (RatkinOrder ratkinOrder in allRatkinOrders)
         {
-            allRatkinOrders[i].Tick();
+            try
+            {
+                ratkinOrder?.Tick();
+            }
+            catch (Exception ex)
+            {
+                if (Prefs.DevMode)
+                {
+                    Log.Error($"[OARO] 骑士团逻辑帧出现异常 {ratkinOrder.Name}（{ratkinOrder}）: {ex}");
+                }
+                else
+                {
+                    Log.ErrorOnce($"[OARO] 骑士团逻辑帧出现异常 {ratkinOrder.Name}（{ratkinOrder}）。同样的错误不再重复显示。异常： {ex}", ratkinOrder.LoadID ^ 0x15676231);
+                }
+            }
         }
     }
 

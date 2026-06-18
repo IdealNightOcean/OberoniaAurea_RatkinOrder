@@ -1,5 +1,13 @@
 ﻿namespace OberoniaAurea.RatkinOrder;
 
+public interface ITickInterval
+{
+    /// <summary>
+    /// 每tick调用一次
+    /// </summary>
+    void TickInterval(int delta);
+}
+
 public interface ITickHour
 {
     /// <summary>

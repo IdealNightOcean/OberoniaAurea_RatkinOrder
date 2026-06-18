@@ -15,7 +15,7 @@ public class BranchStatPart_ConstructionCostFactor : BranchStatPart
     public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
         float costRateReduce = -Mathf.Clamp(branch.PopulationHandler.Population / 100f * 0.01f, 0f, 0.9f);
-        explanation.Append("    ");
+        explanation.Append(ExplanatCap);
         explanation.AppendLine("OARO_ChangeOffset_BranchPopulation".Translate(costRateReduce.ToStringPercentSigned("0.##"))
                                                                    .Colorize(Color.green));
     }

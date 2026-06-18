@@ -37,19 +37,11 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     public CooldownRecordManager CooldownManager => cooldownManager;
     public TagStrToBoolCountable EffectTags { get; } = new();
     public BranchStatTransformerHandler TransformerHandler { get; } = new();
+
     /// <summary>
     /// 骑士团交互应用后触发，供 UI 窗口订阅以刷新缓存
     /// </summary>
-    public event Action<OrderInteractionDef, RatkinOrder, Map, bool> PostApplyOrderInteraction;
-
-    /// <summary>
-    /// 触发 PostApplyOrderInteraction 事件，仅供交互 Worker 调用
-    /// </summary>
-    public void OnPostApplyOrderInteraction(OrderInteractionDef def, RatkinOrder ratkinOrder, Map map, bool succeeded)
-    {
-        PostApplyOrderInteraction?.Invoke(def, ratkinOrder, map, succeeded);
-    }
-
+    public event Action<OrderInteractionDef, Map, bool> PostApplyOrderInteraction;
 
     private EsteemHandler esteemHandler;
     private FundHandler fundHandler;
@@ -133,6 +125,25 @@ public class RatkinOrder : IExposable, ILoadReferenceable
         HasRemoved = true;
         branchManager.Notify_MyOrderRemoved();
         jointPatrolManager.Notify_MyOrderRemoved();
+    }
+
+    /// <summary>
+    /// 触发 PostApplyOrderInteraction 事件，仅供交互 Worker 调用
+    /// </summary>
+    public void OnPostApplyOrderInteraction(OrderInteractionDef def, Map map, bool succeeded)
+    {
+        try
+        {
+            PostApplyOrderInteraction?.Invoke(def, map, succeeded);
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"触发骑士团交互回调",
+                typeName: nameof(RatkinOrder),
+                methodName: nameof(OnPostApplyOrderInteraction),
+                needStackTrace: true);
+        }
     }
 
     internal void PostGenerated()

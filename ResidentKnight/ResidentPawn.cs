@@ -41,7 +41,7 @@ public class ResidentPawn : IExposable, ILoadReferenceable
                     return ResidentPawnState.PendingRemoval;
                 }
             }
-            if (!IsDisabled)
+            if (IsDisabled)
             {
                 return ResidentPawnState.Disabled;
             }
@@ -55,12 +55,9 @@ public class ResidentPawn : IExposable, ILoadReferenceable
     private int removalTick = -1;
     public int RemovalTick => removalTick;
 
-    protected virtual bool IsDisabled => pawn.DestroyedOrNull() || pawn.Dead || pawn.RaceProps.IsAnomalyEntity;
+    protected virtual bool IsDisabled => pawn.Dead || pawn.RaceProps.IsAnomalyEntity;
 
-    public void SetForceState(ResidentPawnState? state)
-    {
-        forceState = state;
-    }
+    public void SetForceState(ResidentPawnState? state) => forceState = state;
 
     public void CheckPendingRemoval()
     {

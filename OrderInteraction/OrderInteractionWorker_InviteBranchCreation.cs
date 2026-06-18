@@ -28,7 +28,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
         return true;
     }
 
-    protected override void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    protected override void ApplyEffect(RatkinOrder ratkinOrder, Map map)
     {
         CameraJumper.TryJump(CameraJumper.GetWorldTarget(new GlobalTargetInfo(map.Tile)));
         Find.WorldSelector.ClearSelection();
@@ -61,7 +61,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
                 {
                     if (BranchUtility.GenerateBranchOnTile(ratkinOrder, t.Tile))
                     {
-                        base.ApplyInteraction(ratkinOrder, map);
+                        base.ApplyEffect(ratkinOrder, map);
                     }
                 });
 

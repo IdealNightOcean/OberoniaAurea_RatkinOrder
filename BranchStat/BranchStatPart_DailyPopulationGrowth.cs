@@ -30,19 +30,19 @@ public class BranchStatPart_DailyPopulationGrowth : BranchStatPart
         if (branch.RatkinOrder.Funds < 0.5f)
         {
             change = Mathf.Max(0.01f, 1f - (0.5f - branch.RatkinOrder.Funds) * 2f);
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             explanation.AppendLine("OARO_ChangeFactor_Fund".Translate(change.ToString("0.##")).Colorize(ColorLibrary.RedReadable));
         }
         if (branch.PopulationHandler.HasContractBuff)
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             explanation.AppendLine("OARO_ChangeFactor_ContractBuff".Translate(1.25f.ToStringPercent("0.##")).Colorize(Color.green));
         }
         float populationRatio = branch.PopulationHandler.PopulationRatio;
         if (populationRatio > 1f)
         {
             change = -((populationRatio - 1f) * 0.1f * branch.PopulationHandler.Population);
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             explanation.AppendLine("OARO_ChangeOffset_BranchPopulation".Translate(change.ToStringWithSign("0.##")).Colorize(ColorLibrary.RedReadable));
         }
     }

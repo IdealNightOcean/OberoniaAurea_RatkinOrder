@@ -12,7 +12,7 @@ public class BranchStatPart_SquadMemberRecoveryRate : BranchStatPart
     }
     public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
-        explanation.Append("    ");
+        explanation.Append(ExplanatCap);
         explanation.AppendLine("OARO_ChangeOffset_BranchPopulation".Translate((branch.PopulationHandler.Population / 100f * 0.005f).ToStringWithSign("0.##"))
                                                                    .Colorize(Color.green));
     }

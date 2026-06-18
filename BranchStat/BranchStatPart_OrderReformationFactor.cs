@@ -21,7 +21,7 @@ public class BranchStatPart_OrderReformationFactor : BranchStatPart
     {
         if (branch.RatkinOrder.ReformationManager.HasReformation(reformation))
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             if (statDef.statType == BranchStatDef.StatType.Percent)
             {
                 explanation.AppendLine("OARO_ChangeFactor_Reformation".Translate(reformation.label, factor.ToStringPercentSigned("0.##"))

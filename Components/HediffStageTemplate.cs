@@ -26,6 +26,11 @@ public class HediffStageTemplate
     private readonly Dictionary<StatDef, float> offsetDict = [];
     private readonly Dictionary<StatDef, float> factorDict = [];
 
+    public IReadOnlyDictionary<StatDef, float> OffsetDictForReading => offsetDict;
+    public IReadOnlyDictionary<StatDef, float> FactorDictForReading => factorDict;
+
+    public bool HasAnyModifier => offsetDict.Count > 0 || factorDict.Count > 0;
+
     private List<StatModifier> cachedOffsetModifiers;
     private List<StatModifier> cachedFactorModifiers;
 
@@ -86,7 +91,8 @@ public class HediffStageTemplate
         if (modifiers is null) return;
         foreach (StatModifier modifier in modifiers)
         {
-            AddOffset(modifier.stat, modifier.value);
+            if (modifier.stat is null || modifier.value == 0f) continue;
+            offsetDict[modifier.stat] = offsetDict.TryGetValue(modifier.stat, out float current) ? current + modifier.value : modifier.value;
         }
     }
 
@@ -97,7 +103,7 @@ public class HediffStageTemplate
             Log.Error($"{nameof(HediffStageTemplate)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
             return;
         }
-        if (factor == 1f) return;
+        if (stat is null || factor == 1f) return;
         factorDict[stat] = factorDict.TryGetValue(stat, out float current) ? current * factor : factor;
     }
     public void AddFactors(IEnumerable<StatModifier> modifiers)
@@ -110,7 +116,8 @@ public class HediffStageTemplate
         if (modifiers is null) return;
         foreach (StatModifier modifier in modifiers)
         {
-            AddFactor(modifier.stat, modifier.value);
+            if (modifier.stat is null || modifier.value == 1f) continue;
+            factorDict[modifier.stat] = factorDict.TryGetValue(modifier.stat, out float current) ? current * modifier.value : modifier.value;
         }
     }
 

@@ -958,7 +958,7 @@ public class Window_RatkinOrder : MainTabWindow
         UnderConstructionBuilding = SelectedOrder.BranchManager.AllBranches.Where(b => b.BuildingHandler.IsBusy).Select(b => (b, b.BuildingHandler.UnderConstructionBuildings.RandomElement())).FirstOrFallback();
         ReserveRecordShow = SelectedOrder.BranchManager.AllPrimaryReserves.Take(2).ToList();
 
-        RefreshRatkinInteractionCache(null, SelectedOrder, Map, succeeded: false);
+        RefreshRatkinInteractionCache(interactionDef: null, map: Map, succeeded: false);
 
         UnbindCallbacks();
         BindCallbacks();
@@ -1124,7 +1124,7 @@ public class Window_RatkinOrder : MainTabWindow
         return branches;
     }
 
-    private void RefreshRatkinInteractionCache(OrderInteractionDef interactionDef, RatkinOrder ratkinOrder, Map map, bool succeeded)
+    private void RefreshRatkinInteractionCache(OrderInteractionDef interactionDef, Map map, bool succeeded)
     {
         SpecialInteractionAcceptances.Clear();
         NormalInteractionAcceptances.Clear();

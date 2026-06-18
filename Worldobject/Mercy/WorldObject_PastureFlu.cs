@@ -67,7 +67,7 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
                 if (maxAnimalsSkill >= 10)
                 {
                     int herbalCount = Rand.RangeInclusive(90, 150);
-                    List<Thing> rewards = OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.MedicineHerbal, herbalCount);
+                    List<Thing> rewards = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.MedicineHerbal, herbalCount);
                     OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
                     sb.AppendInNewLine("OARO_PastureFlu_Herbal".Translate(maxAnimalsPawn.Named(KeyLibrary_FormatArgName.PAWN), herbalCount.Named(KeyLibrary_FormatArgName.Count)));
                 }

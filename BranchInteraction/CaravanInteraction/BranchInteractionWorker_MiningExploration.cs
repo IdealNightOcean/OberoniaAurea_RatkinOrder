@@ -9,6 +9,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def) : BranchInteractionWorker_CaravanOnly(def)
 {
+    private const int RequiredSilverAmount = 4000;
+
     protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
     {
         if (OARO_ModDefOf.Rakinia_RockRatkin is null || OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_RockRatkin, FactionValidationParams.NonHostileNormalFaction) is null)
@@ -22,9 +24,9 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
     {
         int caravanSilver = parms.TargetCaravan.GetCountOfThingDef(ThingDefOf.Silver);
         DiaNode rootNode = new("OARO_MiningExploration_Root".Translate());
-        if (caravanSilver < 4000)
+        if (caravanSilver < RequiredSilverAmount)
         {
-            DiaOption lackOpt = new("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, 4000.ToString()))
+            DiaOption lackOpt = new("OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, RequiredSilverAmount.ToString()))
             {
                 resolveTree = true
             };
@@ -39,7 +41,10 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
                 DiaOption metallicOpt = new(metallicDef.label)
                 {
                     action = () => MetallicDelivery(parms, metallicDef),
-                    linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode("OARO_MiningExploration_Reply".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), metallicDef.Named(KeyLibrary_FormatArgName.THING)), "Confirm".Translate()),
+                    linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+                        text: "OARO_MiningExploration_Reply".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                                                                       metallicDef.Named(KeyLibrary_FormatArgName.THING)),
+                        acceptText: "Confirm".Translate()),
                     resolveTree = false
                 };
                 rootNode.options.Add(metallicOpt);
@@ -53,7 +58,7 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
 
     private void MetallicDelivery(BranchInteractionParms parms, ThingDef metallicDef)
     {
-        int stackCount = Mathf.CeilToInt(4000f / metallicDef.GetStatValueAbstract(StatDefOf.MarketValue));
+        int stackCount = Mathf.CeilToInt(RequiredSilverAmount / metallicDef.GetStatValueAbstract(StatDefOf.MarketValue));
         Thing thing = ThingMaker.MakeThing(metallicDef);
         thing.stackCount = stackCount;
 

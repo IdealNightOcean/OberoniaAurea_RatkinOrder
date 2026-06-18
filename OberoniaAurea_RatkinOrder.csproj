@@ -176,10 +176,13 @@
     <Compile Include="Def\OrderLetterDef.cs" />
     <Compile Include="Def\OrderStationTraditionDef.cs" />
     <Compile Include="HarmonyPatch\TryDoMentalBreak_Patch.cs" />
+    <Compile Include="Hediff\Hediff_KnightVirtue.cs" />
     <Compile Include="KnightChivalry\JointPatrolProperties.cs" />
     <Compile Include="JointPatrol\JointPatrolPropWorker.cs" />
     <Compile Include="JointPatrol\JointPatrolRewardData.cs" />
     <Compile Include="KnightChivalry\MedalProperties.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueTraitGroups.cs" />
+    <Compile Include="KnightVirtue\KnightVirtue_Tenacity_GeneralII.cs" />
     <Compile Include="ReadingOutcomeDoer_KnightDiary.cs" />
     <Compile Include="KnightVirtue\Alert_AnyResiHasUnused.cs" />
     <Compile Include="KnightVirtue\KnightVirtue.cs" />

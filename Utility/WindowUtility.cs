@@ -382,7 +382,7 @@ public static class OARO_WindowUtility
             Color color = material.shader.SupportsMaskTex() ? GUI.color : new Color(GUI.color.r * 0.5f, GUI.color.g * 0.5f, GUI.color.b * 0.5f, GUI.color.a);
             Rect screenRect = default;
             Rect sorceRect = default;
-            float imageAspect = (float)texture.width / (float)texture.height;
+            float imageAspect = texture.width / (float)texture.height;
             CalculateScaledTextureRects(rect, scaleMode, imageAspect, ref screenRect, ref sorceRect);
             Graphics.DrawTexture(screenRect, texture, sorceRect, 0, 0, 0, 0, color, material);
         }

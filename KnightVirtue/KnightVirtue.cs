@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -17,13 +18,13 @@ public class KnightVirtue : IExposable
         public KnightVirtueTrait(KnightVirtueTraitDef def, int level)
         {
             this.def = def ?? throw new System.ArgumentNullException(nameof(def));
-            this.level = level;
+            this.level = level > 0 ? level : 1;
         }
 
         public void ExposeData()
         {
             Scribe_Defs.Look(ref def, nameof(def));
-            Scribe_Values.Look(ref level, nameof(level), 0);
+            Scribe_Values.Look(ref level, nameof(level), defaultValue: 1);
         }
     }
 
@@ -31,13 +32,16 @@ public class KnightVirtue : IExposable
     public KnightVirtueDef Def => def;
     public KnightChivalryDef Chivalry => def.chivalry;
 
+    public ResidentKnight knight;
+    public Pawn Pawn => knight.Pawn;
+
     private int level;
     public int Level
     {
         get => level;
         set
         {
-            level = Mathf.Clamp(value, 0, def.maxLevel);
+            level = Mathf.Clamp(value, 1, def.maxLevel);
         }
     }
 
@@ -47,20 +51,29 @@ public class KnightVirtue : IExposable
     public bool HasUnusedTraitSlot => selectedTraits.Count < level;
 
     public KnightVirtue() { }
-    public KnightVirtue(KnightVirtueDef def, int level)
+
+    public static KnightVirtue GenerateKnightVirtue(ResidentKnight knight, KnightVirtueDef def, int level)
     {
-        this.def = def ?? throw new System.ArgumentNullException(nameof(def));
-        this.level = Mathf.Clamp(level, 0, def.maxLevel);
+        KnightVirtue virtue = Activator.CreateInstance(def.virtueClass) as KnightVirtue;
+        virtue.knight = knight;
+        virtue.def = def;
+        virtue.level = Mathf.Clamp(level, 1, def.maxLevel);
+        return virtue;
     }
 
     public void ExposeData()
     {
         Scribe_Defs.Look(ref def, nameof(def));
-        Scribe_Values.Look(ref level, nameof(level), 1);
+        Scribe_References.Look(ref knight, nameof(knight));
+
+        Scribe_Values.Look(ref level, nameof(level), defaultValue: 1);
         Scribe_Collections.Look(ref selectedTraits, nameof(selectedTraits), LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            selectedTraits.RemoveAll(trait => trait.def is null || trait.level <= 0);
+            if (selectedTraits.RemoveAll(trait => trait.def is null || trait.level <= 0) > 0)
+            {
+                Log.Error("");
+            }
             selectedTraits.Sort((a, b) => a.level - b.level);
         }
     }
@@ -77,12 +90,9 @@ public class KnightVirtue : IExposable
     public bool HasTrait(KnightVirtueTraitDef traitDef)
     {
         for (int i = 0; i < selectedTraits.Count; i++)
-        {
             if (selectedTraits[i].def == traitDef)
-            {
                 return true;
-            }
-        }
+
         return false;
     }
 
@@ -91,9 +101,17 @@ public class KnightVirtue : IExposable
         if (!SelectTraitForLevel(traitDef, traitLevel, replaceCur))
             return false;
 
-        ResidentPawnsManager.CacheManager?.KnightsHasUnusedTraitSlot?.MarkDirty();
+        ResidentPawnsManager.CacheManager.KnightsHasUnusedTraitSlot?.MarkDirty();
         return true;
     }
+
+    public virtual void SpecialStatModifies(HediffStageTemplate buffStageTemplate) { }
+
+    public virtual void Notify_KilledPawn(Pawn victim, DamageInfo? dinfo) { }
+
+    public virtual void Notify_PawnPostApplyDamage(DamageInfo dinfo, float totalDamageDealt) { }
+
+    public virtual void Notify_Stimulate(Pawn recipient) { }
 
     private bool SelectTraitForLevel(KnightVirtueTraitDef traitDef, int traitLevel, bool replaceCur = false)
     {
@@ -128,9 +146,8 @@ public class KnightVirtue : IExposable
     private int GetTraitOfLevelIndex(int traitLevel)
     {
         if (traitLevel < 1 || traitLevel > def.maxLevel)
-        {
             return -1;
-        }
+
         int left = 0;
         int right = selectedTraits.Count;
         int mid;
@@ -140,18 +157,11 @@ public class KnightVirtue : IExposable
             mid = left + ((right - left) >> 1);
             int compare = selectedTraits[mid].level - traitLevel;
             if (compare == 0)
-            {
                 return mid;
-
-            }
             else if (compare < 0)
-            {
                 left = mid + 1;
-            }
             else
-            {
                 right = mid;
-            }
         }
 
         return ~left;

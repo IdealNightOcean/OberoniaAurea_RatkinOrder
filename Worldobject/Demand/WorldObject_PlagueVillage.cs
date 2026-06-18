@@ -409,7 +409,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             PlagueSpread -= spreadChange;
             caravan.RemoveThingsOfDef(thingDef, 25);
             int silverGain = (int)thingDef.GetStatValueAbstract(StatDefOf.MarketValue) * 25 * 4;
-            List<Thing> silverList = OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, silverGain);
+            List<Thing> silverList = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, silverGain);
             foreach (Thing thing in silverList)
             {
                 CaravanInventoryUtility.GiveThing(caravan, thing);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -8,6 +9,10 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class KnightVirtueDef : Def
 {
+    private static readonly Type DefaultVirtueType = typeof(KnightVirtue);
+
+    public Type virtueClass = DefaultVirtueType;
+
     /// <summary>
     /// 对应骑士精神大类
     /// </summary>
@@ -28,50 +33,32 @@ public class KnightVirtueDef : Def
     /// </summary>
     public KnightAcademicDef relatedAcademicDef;
     /// <summary>
-    /// 对应课业等级（可选），达到该等级后解锁美德
+    /// 对应课业等级（可选），达到该等级后解锁美德；-1表示不受课业等级限制
     /// </summary>
     public int unlockOnAcademicLevel = -1;
 
     /// <summary>
-    /// 1级基础词条
+    /// 基础词条（0级）
     /// </summary>
     public KnightVirtueTraitDef baseTrait;
 
     /// <summary>
-    /// 2级词条选项（3选1）
+    /// 等级词条选项
     /// </summary>
-    public List<KnightVirtueTraitDef> level2TraitOptions = [];
-    /// <summary>
-    /// 3级词条选项（3选1）
-    /// </summary>
-    public List<KnightVirtueTraitDef> level3TraitOptions = [];
-    /// <summary>
-    /// 4级词条选项（3选1）
-    /// </summary>
-    public List<KnightVirtueTraitDef> level4TraitOptions = [];
+    public List<KnightVirtueTraitGroups> traitGroups = [];
 
-    public IEnumerable<KnightVirtueTraitDef> GetTraitOptionsForLevel(int level)
+    public IReadOnlyList<KnightVirtueTraitDef> GetTraitOptionsForLevel(int level)
     {
-        return level switch
+        if (level < 1 || level > maxLevel)
         {
-            1 => baseTrait != null ? [baseTrait] : [],
-            2 => level2TraitOptions,
-            3 => level3TraitOptions,
-            4 => level4TraitOptions,
-            _ => []
-        };
-    }
+            Log.Error($"[OARO] Invalid virtue level: {level}. Valid range is 1 to {maxLevel}.");
+            return [];
+        }
 
-    public int TraitOptionsCountForLevel(int level)
-    {
-        return level switch
-        {
-            1 => baseTrait != null ? 1 : 0,
-            2 => level2TraitOptions.Count,
-            3 => level3TraitOptions.Count,
-            4 => level4TraitOptions.Count,
-            _ => 0
-        };
+        if (level > traitGroups.Count)
+            return [];
+
+        return traitGroups[level - 1].traitOptions;
     }
 
     public override IEnumerable<string> ConfigErrors()
@@ -86,20 +73,7 @@ public class KnightVirtueDef : Def
         }
         if (baseTrait is null)
         {
-            yield return "KnightVirtueDef requires a baseTrait for level 1.";
-        }
-        if (level2TraitOptions.Count != 3)
-        {
-            yield return $"level2TraitOptions should have exactly 3 options, but has {level2TraitOptions.Count}.";
-        }
-        if (level3TraitOptions.Count != 3)
-        {
-            yield return $"level3TraitOptions should have exactly 3 options, but has {level3TraitOptions.Count}.";
-        }
-        if (level4TraitOptions.Count != 3)
-        {
-            yield return $"level4TraitOptions should have exactly 3 options, but has {level4TraitOptions.Count}.";
+            yield return "KnightVirtueDef requires a baseTrait.";
         }
     }
-
 }

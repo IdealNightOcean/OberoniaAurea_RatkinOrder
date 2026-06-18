@@ -220,7 +220,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
                 mentorshipManager.TickDay();
             }
         }
-
     }
 
     public void AllKnightsGainMeditation(float gain, RatkinOrder ratkinOrder = null, bool directly = false)
@@ -366,6 +365,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         ResidentKnight residentKnight = new(knightRecord);
         residentKnightsDict.Add(knightRecord.Pawn, residentKnight);
         residentKnights.Add(residentKnight);
+        residentKnight.PostAdded();
         OnKnightsChanged();
     }
 

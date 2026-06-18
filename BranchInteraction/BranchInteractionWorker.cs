@@ -186,19 +186,6 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         }
     }
 
-    protected void PostApplyEffect(BranchInteractionParms parms, bool succeeded)
-    {
-        try
-        {
-            parms.Branch?.OnPostApplyBranchInteraction(Def, parms, succeeded);
-        }
-        catch (Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"回调: {nameof(Branch)}.{nameof(Branch.PostApplyBranchInteraction)}",
-                typeName: nameof(BranchInteractionWorker),
-                methodName: nameof(PostApplyEffect),
-                needStackTrace: true);
-        }
-    }
+    protected void PostApplyEffect(BranchInteractionParms parms, bool succeeded) => parms.Branch?.OnPostApplyBranchInteraction(Def, parms, succeeded);
+
 }

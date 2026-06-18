@@ -95,7 +95,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         Reward_Items reward_Items = new()
         {
-            items = OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, questParameter.LodgerCount * 280)
+            items = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 280)
         };
 
         Reward_OrderEsteem reward_OrderEsteem = new()
@@ -230,7 +230,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         quest.AddPart(questPart_SetBranchToFriendly_PerfectSuccess);
 
         quest.DropPods(mapParent: questParameter.map.Parent,
-                       contents: OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, questParameter.LodgerCount * 580),
+                       contents: OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 580),
                        useTradeDropSpot: true,
                        inSignal: inSignalPerfectSuccess,
                        faction: questParameter.faction);
@@ -258,7 +258,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
                 quest.AddPart(questPart_OrderRecommendation_NormalSuccess);
 
                 quest.DropPods(mapParent: questParameter.map.Parent,
-                               contents: OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, questParameter.LodgerCount * 280),
+                               contents: OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 280),
                                useTradeDropSpot: true,
                                faction: questParameter.faction);
             },

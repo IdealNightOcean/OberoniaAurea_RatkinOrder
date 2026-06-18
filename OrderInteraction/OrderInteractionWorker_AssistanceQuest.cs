@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : OrderInteractionWorker(def)
 {
-    protected override void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    protected override void ApplyEffect(RatkinOrder ratkinOrder, Map map)
     {
         OrderInteraction_AssistanceQuestExtension modEx_AssistanceQuest = Def.GetModExtension<OrderInteraction_AssistanceQuestExtension>();
         if (modEx_AssistanceQuest is null || modEx_AssistanceQuest.assistanceQuest is null)
@@ -21,7 +21,7 @@ public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : O
                 modEx_AssistanceQuest.assistantPawnkind.Named("PAWNKIND"),
                 modEx_AssistanceQuest.assistantCount.Named(KeyLibrary_FormatArgName.Count)),
             ratkinOrder: ratkinOrder,
-            acceptAction: () => base.ApplyInteraction(ratkinOrder, map));
+            acceptAction: () => base.ApplyEffect(ratkinOrder, map));
         Find.WindowStack.Add(nodeTree);
     }
 

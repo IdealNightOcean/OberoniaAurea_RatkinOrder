@@ -152,4 +152,15 @@ public static class KnightVirtueUtility
     {
         return GetAllUpgradableVirtues(knight, predicate).RandomElementWithFallback(null);
     }
+
+    public static int GetVirtueCountOfChivalry(ResidentKnight knight, KnightChivalryDef chivalry)
+    {
+        int count = 0;
+        foreach (KnightVirtue virtue in knight.VirtueHandler.Virtues)
+        {
+            if (virtue.Chivalry == chivalry)
+                count++;
+        }
+        return count;
+    }
 }

@@ -58,10 +58,10 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
             return;
         }
 
-        ApplyInteraction(ratkinOrder, map);
+        ApplyEffect(ratkinOrder, map);
     }
 
-    protected virtual void DoInteractionCost(RatkinOrder ratkinOrder, Map map)
+    protected virtual void ApplyCost(RatkinOrder ratkinOrder, Map map)
     {
         if (Def.needFund > 0f)
         {
@@ -87,7 +87,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         }
     }
 
-    protected virtual void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    protected virtual void ApplyEffect(RatkinOrder ratkinOrder, Map map)
     {
         (bool succeeded, bool doPostApply) = (false, false);
         try
@@ -100,7 +100,7 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"执行 BranchInteraction [{Def?.defName}] 的交互效果",
                 typeName: nameof(OrderInteractionWorker),
-                methodName: nameof(ApplyInteraction),
+                methodName: nameof(ApplyEffect),
                 needStackTrace: true);
         }
 
@@ -108,14 +108,14 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
         {
             try
             {
-                DoInteractionCost(ratkinOrder, map);
+                ApplyCost(ratkinOrder, map);
             }
             catch (Exception ex)
             {
                 ModUtility.LogExceptionError(ex,
                     errorDesc: $"应用 BranchInteraction [{Def?.defName}] 的交互代价",
                     typeName: nameof(OrderInteractionWorker),
-                    methodName: nameof(ApplyInteraction),
+                    methodName: nameof(ApplyEffect),
                     needStackTrace: true);
             }
         }
@@ -132,19 +132,5 @@ public abstract class OrderInteractionWorker(OrderInteractionDef def)
     /// </returns>
     protected virtual (bool succeeded, bool doPostApply) InteractionEffect(RatkinOrder ratkinOrder, Map map) => (true, true);
 
-    protected void PostApplyInteraction(RatkinOrder ratkinOrder, Map map, bool succeeded)
-    {
-        try
-        {
-            ratkinOrder.OnPostApplyOrderInteraction(Def, ratkinOrder, map, succeeded);
-        }
-        catch (Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"回调: {nameof(RatkinOrder)}.{nameof(RatkinOrder.PostApplyOrderInteraction)}",
-                typeName: nameof(OrderInteractionWorker),
-                methodName: nameof(TryApplyInteraction),
-                needStackTrace: true);
-        }
-    }
+    protected void PostApplyInteraction(RatkinOrder ratkinOrder, Map map, bool succeeded) => ratkinOrder?.OnPostApplyOrderInteraction(Def, map, succeeded);
 }

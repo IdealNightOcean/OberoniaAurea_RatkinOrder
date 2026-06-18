@@ -19,7 +19,7 @@ public class BranchStatPart_BranchPotency : BranchStatPart
         float factor = branch.TraditionHandler.ExtraBranchPotencyFactor.Value;
         if (factor != 1f)
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             explanation.AppendLine("OARO_ChangeFactor_BranchTradition".Translate(factor.ToString("0.##").Named(KeyLibrary_FormatArgName.Factor))
                                                                 .Colorize(factor > 1f ? Color.green : ColorLibrary.RedReadable));
         }
@@ -27,7 +27,7 @@ public class BranchStatPart_BranchPotency : BranchStatPart
         float facilityAdd = branch.FacilityHandler.TotalFacilityLevel * 0.025f;
         float medalAdd = branch.MedalHandler.TotalMedalCount * 0.005f;
 
-        explanation.Append("    ");
+        explanation.Append(ExplanatCap);
         explanation.AppendLine("OARO_ChangeFactor_BranchPotency_FacilityAndMedal".Translate(factor.ToString("0.##").Named(KeyLibrary_FormatArgName.Factor),
                                                                                             facilityAdd.ToStringWithSign("0.##"),
                                                                                             medalAdd.ToStringWithSign("0.##"))

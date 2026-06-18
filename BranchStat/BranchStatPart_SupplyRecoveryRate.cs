@@ -13,7 +13,7 @@ public class BranchStatPart_SupplyRecoveryRate : BranchStatPart
 
     public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
-        explanation.Append("    ");
+        explanation.Append(ExplanatCap);
         explanation.AppendLine("OARO_ChangeOffset_BranchPopulation".Translate((branch.PopulationHandler.Population / 100f * 0.0005f).ToStringPercent("0.##"))
                                                                    .Colorize(Color.green));
     }

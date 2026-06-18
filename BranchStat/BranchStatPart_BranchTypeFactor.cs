@@ -22,7 +22,7 @@ public class BranchStatPart_BranchTypeFactor : BranchStatPart
     {
         if (branch.IsBranchOfType(branchType))
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             if (statDef.statType == BranchStatDef.StatType.Percent)
             {
                 explanation.AppendLine("OARO_ChangeFactor_BranchTypeOf".Translate($"OARO_BranchType_{branchType}".Translate(), factor.ToStringPercentSigned("0.##"))

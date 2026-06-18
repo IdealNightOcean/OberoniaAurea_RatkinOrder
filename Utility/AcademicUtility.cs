@@ -111,7 +111,7 @@ public static class AcademicUtility
                     sb.AppendLine("OARO_AcademicCost_HonorChivalry".Translate(0.9f.ToStringPercent("F0")));
             }
 
-            int virtueCount = knight.VirtueHandler.GetVirtueCountOfChivalry(academicChivalry);
+            int virtueCount = KnightVirtueUtility.GetVirtueCountOfChivalry(knight, academicChivalry);
             if (virtueCount > 0)
             {
                 float virtueFactor = 1f - virtueCount * 0.1f;

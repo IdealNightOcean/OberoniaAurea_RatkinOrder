@@ -13,6 +13,7 @@ public class BranchStatPart_SquadMemberCeiling : BranchStatPart
 
     public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
+        explanation.Append(ExplanatCap);
         explanation.AppendLine("OARO_ChangeOffset_Fund".Translate((branch.RatkinOrder.FundHandler.Funds / 0.08f).ToStringWithSign("0.##"))
                                                        .Colorize(Color.green));
     }

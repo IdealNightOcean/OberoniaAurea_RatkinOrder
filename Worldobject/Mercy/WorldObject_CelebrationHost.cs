@@ -46,7 +46,7 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
             }
 
             int count = associatedFixedCaravan.PawnsListForReading.Count * 10;
-            List<Thing> rewards = OAFrame_MiscUtility.TryGenerateThing(OARO_ThingDefOf.RK_StrawberryBeer, count);
+            List<Thing> rewards = OAFrame_ThingUtility.GenerateThingListSplitByStack(OARO_ThingDefOf.RK_StrawberryBeer, count);
 
             OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
 

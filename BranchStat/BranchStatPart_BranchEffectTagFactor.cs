@@ -24,7 +24,7 @@ public class BranchStatPart_BranchEffectTagFactor : BranchStatPart
     {
         if (branch.EffectTags.HasTag(effectTag))
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             Color color = (factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green;
             string factorArg = statDef.statType == BranchStatDef.StatType.Percent ? factor.ToStringPercentSigned("0.##") : factor.ToStringWithSign("0.##");
 

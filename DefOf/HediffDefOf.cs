@@ -71,6 +71,11 @@ public static class OARO_HediffDefOf
     /// </summary>
     public static HediffDef OARO_Hediff_KnightCreed;
 
+    /// <summary>
+    /// 骑士美德
+    /// </summary>
+    public static HediffDef OARO_Hediff_KnightVirtue;
+
     static OARO_HediffDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_HediffDefOf));

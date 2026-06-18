@@ -25,7 +25,7 @@ public class BranchStatPart_BranchEffectTagOffset : BranchStatPart
     {
         if (branch.EffectTags.HasTag(effectTag))
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             Color color = (offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green;
             string offsetArg = statDef.statType == BranchStatDef.StatType.Percent ? offset.ToStringPercentSigned("0.##") : offset.ToStringWithSign("0.##");
 

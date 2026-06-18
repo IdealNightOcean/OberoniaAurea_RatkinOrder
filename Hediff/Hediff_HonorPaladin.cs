@@ -1,4 +1,4 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -7,10 +7,34 @@ public class Hediff_HonorPaladin : Hediff
 {
     private int ticksToCheck = 600;
 
+    private RangeHediffGiver_AddServity hediffGiver;
+    public RangeHediffGiver_AddServity HediffGiver
+    {
+        get
+        {
+            if (hediffGiver is null)
+                InitRangeHediffGiver();
+
+            return hediffGiver;
+        }
+    }
+
+
     public override void ExposeData()
     {
         base.ExposeData();
-        Scribe_Values.Look(ref ticksToCheck, "ticksToCheck", 600);
+        Scribe_Values.Look(ref ticksToCheck, nameof(ticksToCheck), defaultValue: 600);
+    }
+
+    public void InitRangeHediffGiver()
+    {
+        hediffGiver = new(linkedThing: pawn, hediffToGive: OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate, radius: 3f)
+        {
+            TargetRace = RaceType.Humanlike,
+            TargetRelation = TargetRelationType.NonHostile & ~TargetRelationType.Self,
+            InitSeverity = 1f,
+            AddSeverity = 1f
+        };
     }
 
     public override void TickInterval(int delta)
@@ -21,7 +45,10 @@ public class Hediff_HonorPaladin : Hediff
             ticksToCheck = 600;
             if (pawn.Drafted && pawn.Spawned)
             {
-                AddStimulate(9f, 1f);
+                HediffGiver.Radius = 3f;
+                HediffGiver.InitSeverity = 1f;
+                HediffGiver.AddSeverity = 1f;
+                HediffGiver.GiveHediffToRange();
             }
         }
     }
@@ -31,39 +58,10 @@ public class Hediff_HonorPaladin : Hediff
         base.Notify_PawnKilled();
         if (pawn.MapHeld is not null)
         {
-            AddStimulate(25f, 5f);
-        }
-    }
-
-    private void AddStimulate(float radiusSquared, float addSeverity)
-    {
-        IntVec3 pawnPos = pawn.PositionHeld;
-        Faction faction = pawn.Faction ?? Faction.OfPlayer;
-
-        foreach (Pawn p in pawn.MapHeld.mapPawns.AllPawnsSpawned)
-        {
-            if (!p.RaceProps.Humanlike || p != pawn || p.Position.DistanceToSquared(pawnPos) >= radiusSquared || p.HostileTo(faction))
-            {
-                continue;
-            }
-
-            Hediff hediff = p.health.hediffSet.GetFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate);
-            if (hediff is null)
-            {
-                hediff = HediffMaker.MakeHediff(OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate, pawn);
-                hediff.Severity = addSeverity;
-                p.health.AddHediff(hediff);
-            }
-            else
-            {
-                hediff.Severity += addSeverity;
-            }
-            HediffComp_Link hediffComp_Link = hediff.TryGetComp<HediffComp_Link>();
-            if (hediffComp_Link is not null)
-            {
-                hediffComp_Link.drawConnection = true;
-                hediffComp_Link.other = pawn;
-            }
+            HediffGiver.Radius = 5f;
+            HediffGiver.InitSeverity = 5f;
+            HediffGiver.AddSeverity = 5f;
+            HediffGiver.GiveHediffToRange();
         }
     }
 }

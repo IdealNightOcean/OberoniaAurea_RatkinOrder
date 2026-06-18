@@ -34,9 +34,7 @@ public class BranchStatTransformerHandler
     public void MergeStatTransformer(BranchStatDef statDef, BranchStatTransformer toAdd, bool addIfMiss = true)
     {
         if (!toAdd.IsValid())
-        {
             return;
-        }
 
         if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer oldTransformer))
         {
@@ -132,9 +130,8 @@ public class BranchStatTransformerHandler
     public void UnmergeStatTransformer(BranchStatDef statDef, BranchStatTransformer toRemove, bool doZeroUnmergedProcess = true)
     {
         if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
-        {
             return;
-        }
+
         if (toRemove.factor == 0f)
         {
             zeroFactorUnmergedStats ??= [];

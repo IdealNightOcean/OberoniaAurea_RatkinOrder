@@ -139,7 +139,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
                 RelatedBranch = Branch,
             };
             questPart_OrderLetter.InitLetterTextRequest("[helpThankLetterLabel]", "[helpThankLetterText]", Branch.NameColored);
-            List<Thing> rewards = OAFrame_MiscUtility.TryGenerateThing(ThingDefOf.Silver, 500);
+            List<Thing> rewards = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, 500);
 
             OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
             rewards.Add(recommendation);

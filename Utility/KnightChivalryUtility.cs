@@ -1,4 +1,6 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
 
 public static class KnightChivalryUtility
 {
@@ -42,5 +44,30 @@ public static class KnightChivalryUtility
         KnightChivalryDef otherChivalry = other.Chivalry;
 
         return IsChivalryResonate(knightChivalry, otherChivalry);
+    }
+
+
+    public static void KnightlyTalkStimulate(KnightRecord initiatorKnight, Pawn recipient)
+    {
+        if (!Rand.Chance(0.1f))
+            return;
+
+        HediffDef knightlyTalkHediff = initiatorKnight.Chivalry?.knightlyTalkHediff;
+        if (knightlyTalkHediff is null)
+            return;
+
+        Hediff hediff = recipient.health.GetOrAddHediff(knightlyTalkHediff);
+        HediffComp_Disappears disappearsComp = hediff.TryGetComp<HediffComp_Disappears>();
+        if (disappearsComp is not null)
+        {
+            disappearsComp.disappearsAfterTicks = 5 * 60000;
+            disappearsComp.ticksToDisappear = 5 * 60000;
+        }
+
+        if (ResidentPawnsManager.Instance.TryGetKnightRecord(recipient, out ResidentKnight initiatorResidentKnight))
+            initiatorResidentKnight.Notify_Stimulate(recipient);
+
+        if (ResidentPawnsManager.Instance.TryGetKnightRecord(recipient, out ResidentKnight recipientResidentKnight))
+            recipientResidentKnight.Notify_StimulatedBy(initiatorKnight);
     }
 }

@@ -17,14 +17,14 @@ public class BranchStatPart_BuildingCeiling : BranchStatPart
         int offset = Mathf.FloorToInt(branch.FacilityHandler.TotalFacilityLevel / 8f);
         if (offset > 0)
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             explanation.AppendLine("OARO_ChangeOffset_FacilityLevel".Translate(offset.ToStringWithSign())
                                                                     .Colorize(Color.green));
         }
         offset = Mathf.Min(branch.PopulationHandler.Population / 2000, 2);
         if (offset > 0)
         {
-            explanation.Append("    ");
+            explanation.Append(ExplanatCap);
             explanation.AppendLine("OARO_ChangeOffset_BranchPopulation".Translate(offset.ToStringWithSign())
                                                                        .Colorize(Color.green));
         }

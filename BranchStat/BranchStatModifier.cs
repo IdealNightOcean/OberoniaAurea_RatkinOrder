@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using OberoniaAurea_Frame;
+using System.Xml;
 using UnityEngine;
 using Verse;
 
@@ -25,11 +26,11 @@ public class BranchStatModifier
         }
         if (statDef.statType == BranchStatDef.StatType.Percent)
         {
-            return statDef.label + ": " + value.ToStringPercentSigned("0.##").Colorize((statDef.reverse ^ value < 0f) ? ColorLibrary.RedReadable : Color.green);
+            return statDef.label + ": " + OAFrame_TextUtility.ColoredPercentString(value, includeSign: true, reverse: statDef.reverse);
         }
         else
         {
-            return statDef.label + ": " + value.ToStringWithSign("0.##").Colorize((statDef.reverse ^ value < 0f) ? ColorLibrary.RedReadable : Color.green);
+            return statDef.label + ": " + OAFrame_TextUtility.ColoredFloatString(value, includeSign: true, reverse: statDef.reverse);
         }
     }
 
@@ -51,7 +52,7 @@ public class BranchStatModifier
 
     public void LoadDataFromXmlCustom(XmlNode xmlRoot)
     {
-        DirectXmlCrossRefLoader.RegisterObjectWantsCrossRef(this, "statDef", xmlRoot);
+        DirectXmlCrossRefLoader.RegisterObjectWantsCrossRef(this, nameof(statDef), xmlRoot);
         value = ParseHelper.FromString<float>(xmlRoot.FirstChild.Value);
     }
 

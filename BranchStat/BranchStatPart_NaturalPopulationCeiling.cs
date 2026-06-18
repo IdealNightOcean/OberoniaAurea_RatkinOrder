@@ -13,7 +13,7 @@ public class BranchStatPart_NaturalPopulationCeiling : BranchStatPart
 
     public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
     {
-        explanation.Append("    ");
+        explanation.Append(ExplanatCap);
         explanation.AppendLine("OARO_ChangeOffset_FacilityLevel".Translate((branch.FacilityHandler.TotalFacilityLevel * 200).ToStringWithSign())
                                                                 .Colorize(Color.green));
     }

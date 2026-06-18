@@ -2,6 +2,7 @@ using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -14,6 +15,9 @@ public class KnightVirtueHandler : IExposable
     private readonly ResidentKnight knight;
     public Pawn Pawn => knight.Pawn;
 
+    private Hediff buffHediff;
+    public Hediff BuffHediff => buffHediff ??= Pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_KnightVirtue);
+
     /// <summary>
     /// 骑士信条等级
     /// </summary>
@@ -21,6 +25,9 @@ public class KnightVirtueHandler : IExposable
     private List<KnightVirtue> virtues = [];
 
     public IReadOnlyList<KnightVirtue> Virtues => virtues;
+
+    public List<ITickInterval> tickIntervalVirtues = [];
+
     public int TotalVirtueCount => virtues.Count;
 
     public int TotalVirtueLevel
@@ -48,32 +55,12 @@ public class KnightVirtueHandler : IExposable
     {
         get
         {
-            foreach (KnightVirtue virtue in virtues)
-                if (virtue.HasUnusedTraitSlot)
+            for (int i = 0; i < virtues.Count; i++)
+                if (virtues[i].HasUnusedTraitSlot)
                     return true;
+
             return false;
         }
-    }
-
-    public bool HasVirtueOfChivalry(KnightChivalryDef chivalry)
-    {
-        foreach (KnightVirtue virtue in virtues)
-        {
-            if (virtue.Chivalry == chivalry)
-                return true;
-        }
-        return false;
-    }
-
-    public int GetVirtueCountOfChivalry(KnightChivalryDef chivalry)
-    {
-        int count = 0;
-        foreach (KnightVirtue virtue in virtues)
-        {
-            if (virtue.Chivalry == chivalry)
-                count++;
-        }
-        return count;
     }
 
     public SimpleValueCache<float> VirtueStatValueCache { get; }
@@ -92,6 +79,24 @@ public class KnightVirtueHandler : IExposable
     }
 
     private HediffStageTemplate BuffStageTemplate { get; } = new();
+    private string BuffDetailExplanation { get; set; }
+
+    public void TickInterval(int delta)
+    {
+        if (knight.CurState != ResidentPawnState.Normal)
+            return;
+
+        if (tickIntervalVirtues.Count > 0)
+        {
+            foreach (ITickInterval virtue in tickIntervalVirtues)
+            {
+                virtue.TickInterval(delta);
+            }
+        }
+
+        if (knight.Pawn.IsHashIntervalTick(2500))
+            CheckKnightCreed();
+    }
 
     public KnightVirtueHandler(ResidentKnight knight)
     {
@@ -104,22 +109,42 @@ public class KnightVirtueHandler : IExposable
     public void ExposeData()
     {
         Scribe_Collections.Look(ref virtues, nameof(virtues), LookMode.Deep);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            if (virtues.RemoveAll(v => v?.Def is null) > 0)
+            {
+                Log.Warning("[OARO] 在加载存档时发现并移除了无效的骑士美德。");
+            }
+
+            foreach (KnightVirtue virtue in virtues)
+            {
+                if (virtue is ITickInterval tickIntervalVirtue)
+                {
+                    tickIntervalVirtues.Add(tickIntervalVirtue);
+                }
+                if (virtue is IPawnPreApplyDamage damageProcessor)
+                {
+                    Pawn.RegisterPawnPreApplyDamageHandler(damageProcessor);
+                }
+            }
+        }
     }
 
-    public void TickHour()
+    public KnightVirtue GetVirtue(KnightVirtueDef virtue)
     {
-        CheckKnightCreed();
+        for (int i = 0; i < virtues.Count; i++)
+            if (virtue == virtues[i].Def)
+                return virtues[i];
+
+        return null;
     }
 
     public bool HasVirtue(KnightVirtueDef virtueDef)
     {
         for (int i = 0; i < virtues.Count; i++)
-        {
             if (virtueDef == virtues[i].Def)
-            {
                 return true;
-            }
-        }
+
         return false;
     }
 
@@ -182,7 +207,6 @@ public class KnightVirtueHandler : IExposable
         return true;
     }
 
-
     /// <summary>
     /// 升级指定美德
     /// </summary>
@@ -193,9 +217,7 @@ public class KnightVirtueHandler : IExposable
 
         KnightVirtue virtue = GetVirtue(virtueDef);
         if (virtue is null)
-        {
             return TryAddVirtue(virtueDef, 1, reason);
-        }
 
         int newLevel = UpgradeVirtue(virtue, upgrade);
         if (newLevel < 0)
@@ -212,33 +234,53 @@ public class KnightVirtueHandler : IExposable
         return true;
     }
 
-    public KnightVirtue GetVirtue(KnightVirtueDef virtue)
-    {
-        for (int i = 0; i < virtues.Count; i++)
-        {
-            if (virtue == virtues[i].Def)
-            {
-                return virtues[i];
-            }
-        }
-        return null;
-    }
-
-    public bool AbandonVirtue(ResidentKnight record, KnightVirtueDef virtue)
+    public bool AbandonVirtue(KnightVirtueDef virtue)
     {
         if (!RemoveVirtue(virtue))
-        {
             return false;
-        }
-        float meditationPointsToReduce = record.AcademicHandler.TotalAcademicLevel.Value * 500f;
-        if (virtue.chivalry.IsSameDefNonNullable(record.Chivalry))
+
+        float meditationPointsToReduce = knight.AcademicHandler.TotalAcademicLevel.Value * 500f;
+        if (virtue.chivalry.IsSameDefNonNullable(knight.Chivalry))
         {
             meditationPointsToReduce *= 2f;
         }
 
-        record.MeditationPoints -= meditationPointsToReduce;
+        knight.MeditationPoints -= meditationPointsToReduce;
 
         return true;
+    }
+
+    public void Notify_KilledPawn(Pawn victim, DamageInfo? dinfo)
+    {
+        if (knight.CurState != ResidentPawnState.Normal)
+            return;
+
+        for (int i = 0; i < virtues.Count; i++)
+        {
+            virtues[i].Notify_KilledPawn(victim, dinfo);
+        }
+    }
+
+    public void Notify_PawnPostApplyDamage(DamageInfo dinfo, float totalDamageDealt)
+    {
+        if (knight.CurState != ResidentPawnState.Normal)
+            return;
+
+        for (int i = 0; i < virtues.Count; i++)
+        {
+            virtues[i].Notify_PawnPostApplyDamage(dinfo, totalDamageDealt);
+        }
+    }
+
+    public void Notify_Stimulate(Pawn recipient)
+    {
+        if (knight.CurState != ResidentPawnState.Normal)
+            return;
+
+        for (int i = 0; i < virtues.Count; i++)
+        {
+            virtues[i].Notify_Stimulate(recipient);
+        }
     }
 
     public HediffStage GetNewBuffStage()
@@ -257,7 +299,17 @@ public class KnightVirtueHandler : IExposable
         {
             return false;
         }
-        virtues.Add(new KnightVirtue(virtueDef, level));
+        KnightVirtue virtue = KnightVirtue.GenerateKnightVirtue(knight, virtueDef, level);
+        virtues.Add(virtue);
+        if (virtue is ITickInterval tickIntervalVirtue)
+        {
+            tickIntervalVirtues.Add(tickIntervalVirtue);
+        }
+        if (virtue is IPawnPreApplyDamage damageProcessor)
+        {
+            Pawn.RegisterPawnPreApplyDamageHandler(damageProcessor);
+        }
+
         VirtuesChanged();
         return true;
     }
@@ -269,6 +321,14 @@ public class KnightVirtueHandler : IExposable
             if (virtue == virtues[i].Def)
             {
                 virtues.RemoveAt(i);
+                if (virtue is ITickInterval tickIntervalVirtue)
+                {
+                    tickIntervalVirtues.Remove(tickIntervalVirtue);
+                }
+                if (virtue is IPawnPreApplyDamage damageProcessor)
+                {
+                    Pawn.DeregisterPawnPreApplyDamageHandler(damageProcessor);
+                }
                 VirtuesChanged();
                 return true;
             }
@@ -322,36 +382,62 @@ public class KnightVirtueHandler : IExposable
     private void RefreshBuffStage()
     {
         BuffStageTemplate.ResetTemplate();
+        HediffStageTemplate tempTemplate = new();
 
         VirtueStatValueCache.Reset();
         float virtueStatvalue = VirtueStatValueCache.GetCachedResult();
+        StringBuilder buffDetailExplanationBuilder = new(128);
+
         foreach (KnightVirtue virtue in virtues)
         {
+            tempTemplate.ResetTemplate();
+            ApplyTraitStatModifiers(virtue.Def.baseTrait);
+
             foreach (KnightVirtue.KnightVirtueTrait virtueTrait in virtue.SelectedTraits)
+                ApplyTraitStatModifiers(virtueTrait.def);
+
+            virtue.SpecialStatModifies(tempTemplate);
+
+            if (!tempTemplate.HasAnyModifier)
+                continue;
+
+            buffDetailExplanationBuilder.AppendLine(virtue.Def.LabelCap);
+            foreach ((StatDef stat, float value) in tempTemplate.OffsetDictForReading)
             {
-                KnightVirtueTraitDef virtueTraitDef = virtueTrait.def;
-                BuffStageTemplate.AddOffsets(virtueTraitDef.statOffsets);
-                BuffStageTemplate.AddOffsets(virtueTraitDef.statFactors);
+                BuffStageTemplate.AddOffset(stat, value);
+                buffDetailExplanationBuilder.AppendLine($"    {stat.LabelCap}: {stat.Worker.ValueToString(value, finalized: false)}");
+            }
 
-                if (virtueTraitDef.statOffsetsByVirtue is not null)
-                {
-                    foreach (StatModifierBySeverity statOffsetByVirtue in virtueTraitDef.statOffsetsByVirtue)
-                    {
-                        BuffStageTemplate.AddOffset(statOffsetByVirtue.stat, statOffsetByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
-                    }
-                }
-
-                if (virtueTraitDef.statFactorsByVirtue is not null)
-                {
-                    foreach (StatModifierBySeverity statFactorByVirtue in virtueTraitDef.statFactorsByVirtue)
-                    {
-                        BuffStageTemplate.AddFactor(statFactorByVirtue.stat, statFactorByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
-                    }
-                }
+            foreach ((StatDef stat, float value) in tempTemplate.OffsetDictForReading)
+            {
+                BuffStageTemplate.AddFactor(stat, value);
+                buffDetailExplanationBuilder.AppendLine($"    {stat.LabelCap}: {stat.Worker.ValueToString(value, finalized: false)}");
             }
         }
 
+        BuffDetailExplanation = buffDetailExplanationBuilder.ToString();
         BuffStageTemplate.FinalizeTemplate();
+
+        void ApplyTraitStatModifiers(KnightVirtueTraitDef virtueTraitDef)
+        {
+            if (virtueTraitDef is null)
+                return;
+
+            tempTemplate.AddOffsets(virtueTraitDef.statOffsets);
+            tempTemplate.AddOffsets(virtueTraitDef.statFactors);
+
+            if (virtueTraitDef.statOffsetsByVirtue is not null)
+            {
+                foreach (StatModifierBySeverity statOffsetByVirtue in virtueTraitDef.statOffsetsByVirtue)
+                    tempTemplate.AddOffset(statOffsetByVirtue.stat, statOffsetByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
+            }
+
+            if (virtueTraitDef.statFactorsByVirtue is not null)
+            {
+                foreach (StatModifierBySeverity statFactorByVirtue in virtueTraitDef.statFactorsByVirtue)
+                    tempTemplate.AddFactor(statFactorByVirtue.stat, statFactorByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
+            }
+        }
     }
 
 }

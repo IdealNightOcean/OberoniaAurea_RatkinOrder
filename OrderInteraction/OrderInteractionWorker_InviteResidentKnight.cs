@@ -5,7 +5,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def) : OrderInteractionWorker(def)
 {
-
     public override AcceptanceReport CanUseInteraction(RatkinOrder ratkinOrder, Map map, bool resultOnly)
     {
         if (OrderStationHandler.Instance.OrderStationRoom is null)
@@ -34,20 +33,20 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
         return true;
     }
 
-    protected override void ApplyInteraction(RatkinOrder ratkinOrder, Map map)
+    protected override void ApplyEffect(RatkinOrder ratkinOrder, Map map)
     {
         int recommendationNeed = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_InviteResidentKnight_Confirm".Translate(recommendationNeed.Named(KeyLibrary_FormatArgName.Count)),
             ratkinOrder: ratkinOrder,
-            acceptAction: () => base.ApplyInteraction(ratkinOrder, map));
+            acceptAction: () => base.ApplyEffect(ratkinOrder, map));
 
         Find.WindowStack.Add(nodeTree);
     }
 
-    protected override void DoInteractionCost(RatkinOrder ratkinOrder, Map map)
+    protected override void ApplyCost(RatkinOrder ratkinOrder, Map map)
     {
-        base.DoInteractionCost(ratkinOrder, map);
+        base.ApplyCost(ratkinOrder, map);
         int recommendationNeed = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
         RecommendationUtility.UseRecommendationOfPlayer(map, recommendationNeed);
     }
