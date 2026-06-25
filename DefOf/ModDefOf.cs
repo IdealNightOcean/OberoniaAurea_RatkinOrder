@@ -110,6 +110,11 @@ public static class OARO_ModDefOf
     /// </summary>
     public static KnightChivalryDef OARO_Oath;
 
+    /// <summary>
+    /// 骑士美德特种 - 空基础
+    /// </summary>
+    public static KnightVirtueTraitDef OARO_Empty_Base;
+
     static OARO_ModDefOf()
     {
         DefOfHelper.EnsureInitializedInCtor(typeof(OARO_ModDefOf));

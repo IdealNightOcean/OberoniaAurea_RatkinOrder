@@ -53,6 +53,9 @@ public class ResidentKnight : ResidentPawn
     private KnightVirtueHandler knightVirtueHandler;
     public KnightVirtueHandler VirtueHandler => knightVirtueHandler;
 
+    private TagStrToInt effectTags = new(defaultValue: 0, removeWhenDefault: true);
+    public TagStrToInt EffectTags => effectTags;
+
     public override void ExposeData()
     {
         base.ExposeData();

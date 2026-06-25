@@ -17,7 +17,7 @@ public class ResidentRoleManager : IExposable
     private Dictionary<ResidentKnightRoleDef, ResidentKnight> rolesToKnights = [];
     public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnight> RolesToKnights => rolesToKnights;
 
-    private HediffStageTemplate BuffStageTemplate { get; } = new();
+    private HediffStageModifierBuilder BuffStageTemplate { get; } = new();
     private int nextBuffStageForceRefreshTick;
 
     public ResidentRoleManager(ResidentPawnsManager parent)
@@ -57,7 +57,7 @@ public class ResidentRoleManager : IExposable
             RefreshRoleBuffStageTemplate();
         }
 
-        return BuffStageTemplate.GetNewHediffStage();
+        return BuffStageTemplate.BuildNewHediffStage();
     }
 
     public void TickDay()

@@ -7,8 +7,8 @@ public class Hediff_HonorPaladin : Hediff
 {
     private int ticksToCheck = 600;
 
-    private RangeHediffGiver_AddServity hediffGiver;
-    public RangeHediffGiver_AddServity HediffGiver
+    private RangeHediffGiver hediffGiver;
+    public RangeHediffGiver HediffGiver
     {
         get
         {
@@ -19,7 +19,6 @@ public class Hediff_HonorPaladin : Hediff
         }
     }
 
-
     public override void ExposeData()
     {
         base.ExposeData();
@@ -28,13 +27,14 @@ public class Hediff_HonorPaladin : Hediff
 
     public void InitRangeHediffGiver()
     {
-        hediffGiver = new(linkedThing: pawn, hediffToGive: OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate, radius: 3f)
+        RangeHediffGiveParams giveParms = new(OARO_HediffDefOf.OARO_Hediff_HonorPaladin_Stimulate, 3f)
         {
             TargetRace = RaceType.Humanlike,
             TargetRelation = TargetRelationType.NonHostile & ~TargetRelationType.Self,
             InitSeverity = 1f,
-            AddSeverity = 1f
+            AddSeverityIfExist = 1f
         };
+        hediffGiver = new(linkedThing: pawn, giveParms);
     }
 
     public override void TickInterval(int delta)
@@ -45,9 +45,9 @@ public class Hediff_HonorPaladin : Hediff
             ticksToCheck = 600;
             if (pawn.Drafted && pawn.Spawned)
             {
-                HediffGiver.Radius = 3f;
-                HediffGiver.InitSeverity = 1f;
-                HediffGiver.AddSeverity = 1f;
+                HediffGiver.Parms.Radius = 3f;
+                HediffGiver.Parms.InitSeverity = 1f;
+                HediffGiver.Parms.AddSeverityIfExist = 1f;
                 HediffGiver.GiveHediffToRange();
             }
         }
@@ -58,9 +58,9 @@ public class Hediff_HonorPaladin : Hediff
         base.Notify_PawnKilled();
         if (pawn.MapHeld is not null)
         {
-            HediffGiver.Radius = 5f;
-            HediffGiver.InitSeverity = 5f;
-            HediffGiver.AddSeverity = 5f;
+            HediffGiver.Parms.Radius = 5f;
+            HediffGiver.Parms.InitSeverity = 5f;
+            HediffGiver.Parms.AddSeverityIfExist = 5f;
             HediffGiver.GiveHediffToRange();
         }
     }

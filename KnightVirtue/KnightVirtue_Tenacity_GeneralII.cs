@@ -3,6 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
+
 public class KnightVirtue_Tenacity_GeneralII : KnightVirtue, IPawnPreApplyDamage
 {
     public int Priority => 50;

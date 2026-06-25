@@ -78,7 +78,7 @@ public class KnightVirtueHandler : IExposable
         }
     }
 
-    private HediffStageTemplate BuffStageTemplate { get; } = new();
+    private HediffStageModifierBuilder BuffStageTemplate { get; } = new();
     private string BuffDetailExplanation { get; set; }
 
     public void TickInterval(int delta)
@@ -118,14 +118,7 @@ public class KnightVirtueHandler : IExposable
 
             foreach (KnightVirtue virtue in virtues)
             {
-                if (virtue is ITickInterval tickIntervalVirtue)
-                {
-                    tickIntervalVirtues.Add(tickIntervalVirtue);
-                }
-                if (virtue is IPawnPreApplyDamage damageProcessor)
-                {
-                    Pawn.RegisterPawnPreApplyDamageHandler(damageProcessor);
-                }
+                ActiveVirtue(virtue);
             }
         }
     }
@@ -290,7 +283,7 @@ public class KnightVirtueHandler : IExposable
             RefreshBuffStage();
         }
 
-        return BuffStageTemplate.GetNewHediffStage();
+        return BuffStageTemplate.BuildNewHediffStage();
     }
 
     private bool AddVirtue(KnightVirtueDef virtueDef, int level)
@@ -301,6 +294,14 @@ public class KnightVirtueHandler : IExposable
         }
         KnightVirtue virtue = KnightVirtue.GenerateKnightVirtue(knight, virtueDef, level);
         virtues.Add(virtue);
+        virtue.PostAdded();
+        ActiveVirtue(virtue);
+        VirtuesChanged();
+        return true;
+    }
+
+    private void ActiveVirtue(KnightVirtue virtue)
+    {
         if (virtue is ITickInterval tickIntervalVirtue)
         {
             tickIntervalVirtues.Add(tickIntervalVirtue);
@@ -309,18 +310,29 @@ public class KnightVirtueHandler : IExposable
         {
             Pawn.RegisterPawnPreApplyDamageHandler(damageProcessor);
         }
+        if (!virtue.Def.pawnEffectTags.NullOrEmpty())
+        {
+            foreach (string tag in virtue.Def.pawnEffectTags)
+                knight.EffectTags.OffsetTagValueBy(tag: tag, offset: 1, addIfMiss: true);
+        }
+        if (!virtue.Def.globalEffectTags.NullOrEmpty())
+        {
+            foreach (string tag in virtue.Def.pawnEffectTags)
+                ResidentPawnsManager.EffectTags.OffsetTagValueBy(tag: tag, offset: 1, addIfMiss: true);
+        }
 
-        VirtuesChanged();
-        return true;
+        virtue.PostActived();
     }
 
-    private bool RemoveVirtue(KnightVirtueDef virtue)
+    private bool RemoveVirtue(KnightVirtueDef virtueDef)
     {
         for (int i = 0; i < virtues.Count; i++)
         {
-            if (virtue == virtues[i].Def)
+            if (virtueDef == virtues[i].Def)
             {
+                KnightVirtue virtue = virtues[i];
                 virtues.RemoveAt(i);
+
                 if (virtue is ITickInterval tickIntervalVirtue)
                 {
                     tickIntervalVirtues.Remove(tickIntervalVirtue);
@@ -329,6 +341,17 @@ public class KnightVirtueHandler : IExposable
                 {
                     Pawn.DeregisterPawnPreApplyDamageHandler(damageProcessor);
                 }
+                if (!virtueDef.pawnEffectTags.NullOrEmpty())
+                {
+                    foreach (string tag in virtue.Def.pawnEffectTags)
+                        knight.EffectTags.OffsetTagValueBy(tag: tag, offset: -1, addIfMiss: false);
+                }
+                if (!virtueDef.globalEffectTags.NullOrEmpty())
+                {
+                    foreach (string tag in virtue.Def.pawnEffectTags)
+                        ResidentPawnsManager.EffectTags.OffsetTagValueBy(tag: tag, offset: -1, addIfMiss: false);
+                }
+
                 VirtuesChanged();
                 return true;
             }
@@ -382,7 +405,7 @@ public class KnightVirtueHandler : IExposable
     private void RefreshBuffStage()
     {
         BuffStageTemplate.ResetTemplate();
-        HediffStageTemplate tempTemplate = new();
+        HediffStageModifierBuilder tempTemplate = new();
 
         VirtueStatValueCache.Reset();
         float virtueStatvalue = VirtueStatValueCache.GetCachedResult();

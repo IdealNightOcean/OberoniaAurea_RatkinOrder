@@ -105,7 +105,18 @@ public class KnightVirtue : IExposable
         return true;
     }
 
-    public virtual void SpecialStatModifies(HediffStageTemplate buffStageTemplate) { }
+    /// <summary>
+    /// 仅在添加美德时生效
+    /// </summary>
+    public virtual void PostAdded() { }
+    /// <summary>
+    /// 在添加美德和重新载入存档时生效，添加美德时调用顺序在<see cref="PostAdded"/>之后
+    /// </summary>
+    public virtual void PostActived() { }
+
+    public virtual void PostRemoved() { }
+
+    public virtual void SpecialStatModifies(HediffStageModifierBuilder buffStageTemplate) { }
 
     public virtual void Notify_KilledPawn(Pawn victim, DamageInfo? dinfo) { }
 

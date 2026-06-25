@@ -5,13 +5,13 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
-/// <see cref="HediffStageTemplate"/> 是一个用于构建 <see cref="HediffStage"/> 的模板类，允许在准备阶段累积统计偏移和因子，并在最终化后生成新的 <see cref="HediffStage"/> 实例。
+/// <see cref="HediffStageModifierBuilder"/> 是一个用于构建 <see cref="HediffStage"/> 的模板类，允许在准备阶段累积统计偏移和因子，并在最终化后生成新的 <see cref="HediffStage"/> 实例。
 /// </summary>
 /// <remarks>
 /// <para> - 修改模版前需要调用 <see cref="ResetTemplate"/> 方法将模板重置为可修改状态。</para>
 /// <para> - 使用模版前需要调用 <see cref="FinalizeTemplate"/> 方法以确保模板准备就绪。</para>
 /// </remarks>
-public class HediffStageTemplate
+public class HediffStageModifierBuilder
 {
     private enum TemplateState
     {
@@ -74,7 +74,7 @@ public class HediffStageTemplate
     {
         if (state != TemplateState.Modifying)
         {
-            Log.Error($"{nameof(HediffStageTemplate)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
+            Log.Error($"{nameof(HediffStageModifierBuilder)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
             return;
         }
         if (stat is null || offset == 0f) return;
@@ -85,7 +85,7 @@ public class HediffStageTemplate
     {
         if (state != TemplateState.Modifying)
         {
-            Log.Error($"{nameof(HediffStageTemplate)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
+            Log.Error($"{nameof(HediffStageModifierBuilder)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
             return;
         }
         if (modifiers is null) return;
@@ -100,7 +100,7 @@ public class HediffStageTemplate
     {
         if (state != TemplateState.Modifying)
         {
-            Log.Error($"{nameof(HediffStageTemplate)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
+            Log.Error($"{nameof(HediffStageModifierBuilder)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
             return;
         }
         if (stat is null || factor == 1f) return;
@@ -110,7 +110,7 @@ public class HediffStageTemplate
     {
         if (state != TemplateState.Modifying)
         {
-            Log.Error($"{nameof(HediffStageTemplate)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
+            Log.Error($"{nameof(HediffStageModifierBuilder)} cannot be modified as it is not marked for {nameof(TemplateState.Modifying)}.");
             return;
         }
         if (modifiers is null) return;
@@ -121,11 +121,11 @@ public class HediffStageTemplate
         }
     }
 
-    public HediffStage GetNewHediffStage()
+    public HediffStage BuildNewHediffStage()
     {
         if (state != TemplateState.Ready)
         {
-            Log.Error($"{nameof(HediffStageTemplate)} is not ready. Call {nameof(FinalizeTemplate)} before getting a new HediffStage.");
+            Log.Error($"{nameof(HediffStageModifierBuilder)} is not ready. Call {nameof(FinalizeTemplate)} before getting a new HediffStage.");
             return null;
         }
 

@@ -47,6 +47,10 @@ public class KnightVirtueDef : Def
     /// </summary>
     public List<KnightVirtueTraitGroups> traitGroups = [];
 
+    public List<string> pawnEffectTags;
+
+    public List<string> globalEffectTags;
+
     public IReadOnlyList<KnightVirtueTraitDef> GetTraitOptionsForLevel(int level)
     {
         if (level < 1 || level > maxLevel)
@@ -59,6 +63,11 @@ public class KnightVirtueDef : Def
             return [];
 
         return traitGroups[level - 1].traitOptions;
+    }
+
+    public override void ResolveReferences()
+    {
+        baseTrait ??= OARO_ModDefOf.OARO_Empty_Base;
     }
 
     public override IEnumerable<string> ConfigErrors()

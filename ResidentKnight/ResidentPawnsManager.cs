@@ -48,8 +48,11 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     private MentorshipManager mentorshipManager;
     public static MentorshipManager MentorshipManager => Instance?.mentorshipManager;
 
-    private ResidentPawnsCacheManager cacheManager;
+    private readonly ResidentPawnsCacheManager cacheManager;
     public static ResidentPawnsCacheManager CacheManager => Instance?.cacheManager;
+
+    private readonly TagStrToInt effectTags;
+    public static TagStrToInt EffectTags => Instance?.effectTags;
 
     internal ResidentPawnsManager(bool initCtor)
     {
@@ -57,12 +60,13 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
 
+        cacheManager = new(this);
+        effectTags = new(defaultValue: 0, removeWhenDefault: true);
+
         if (initCtor)
         {
             EnsureComponentsInit();
         }
-
-        cacheManager ??= new(this);
     }
 
     public static void ClearStaticCache() => Instance = null;
@@ -71,8 +75,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     {
         roleManager ??= new ResidentRoleManager(this);
         mentorshipManager ??= new MentorshipManager(this);
-
-        cacheManager ??= new(this);
     }
 
     public void ExposeData()
