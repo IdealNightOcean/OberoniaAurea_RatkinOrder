@@ -1,3 +1,4 @@
+using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
@@ -38,18 +39,26 @@ public class KnightVirtueDef : Def
     public int unlockOnAcademicLevel = -1;
 
     /// <summary>
-    /// 基础词条（0级）
-    /// </summary>
-    public KnightVirtueTraitDef baseTrait;
-
-    /// <summary>
     /// 等级词条选项
     /// </summary>
     public List<KnightVirtueTraitGroups> traitGroups = [];
 
-    public List<string> pawnEffectTags;
 
-    public List<string> globalEffectTags;
+    public List<StatModifier> statOffsets;
+
+    public List<StatModifier> statFactors;
+
+    /// <summary>
+    /// 根据美德属性值调整的属性Offset
+    /// </summary>
+    public List<StatModifierBySeverity> statOffsetsByVirtue;
+
+    /// <summary>
+    /// 根据美德属性值调整的属性Factor
+    /// </summary>  
+    public List<StatModifierBySeverity> statFactorsByVirtue;
+
+    public List<KnightVirtueCompProperties> comps;
 
     public IReadOnlyList<KnightVirtueTraitDef> GetTraitOptionsForLevel(int level)
     {
@@ -65,10 +74,6 @@ public class KnightVirtueDef : Def
         return traitGroups[level - 1].traitOptions;
     }
 
-    public override void ResolveReferences()
-    {
-        baseTrait ??= OARO_ModDefOf.OARO_Empty_Base;
-    }
 
     public override IEnumerable<string> ConfigErrors()
     {
@@ -79,10 +84,6 @@ public class KnightVirtueDef : Def
         if (virtueType == KnightVirtueType.Academic && relatedAcademicDef is null)
         {
             yield return "Academic virtue type requires a related academic definition.";
-        }
-        if (baseTrait is null)
-        {
-            yield return "KnightVirtueDef requires a baseTrait.";
         }
     }
 }

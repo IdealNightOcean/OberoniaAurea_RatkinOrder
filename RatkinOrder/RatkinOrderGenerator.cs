@@ -20,9 +20,8 @@ public static class RatkinOrderGenerator
                 {
                     RatkinOrderDef ratkinOrderDef = faction.def.GetModExtension<RatkinOrderFactionExtension>()?.ratkinOrderDef;
                     if (ratkinOrderDef is null)
-                    {
                         continue;
-                    }
+
                     GenerateRatkinOrderForFaction(faction, ratkinOrderDef);
                 }
             }

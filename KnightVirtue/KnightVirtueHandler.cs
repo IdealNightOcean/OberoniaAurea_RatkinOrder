@@ -294,7 +294,7 @@ public class KnightVirtueHandler : IExposable
         }
         KnightVirtue virtue = KnightVirtue.GenerateKnightVirtue(knight, virtueDef, level);
         virtues.Add(virtue);
-        virtue.PostAdded();
+        virtue.PostAdd();
         ActiveVirtue(virtue);
         VirtuesChanged();
         return true;
@@ -302,26 +302,12 @@ public class KnightVirtueHandler : IExposable
 
     private void ActiveVirtue(KnightVirtue virtue)
     {
-        if (virtue is ITickInterval tickIntervalVirtue)
+        if (virtue is ITickInterval tickIntervalProcessor)
         {
-            tickIntervalVirtues.Add(tickIntervalVirtue);
-        }
-        if (virtue is IPawnPreApplyDamage damageProcessor)
-        {
-            Pawn.RegisterPawnPreApplyDamageHandler(damageProcessor);
-        }
-        if (!virtue.Def.pawnEffectTags.NullOrEmpty())
-        {
-            foreach (string tag in virtue.Def.pawnEffectTags)
-                knight.EffectTags.OffsetTagValueBy(tag: tag, offset: 1, addIfMiss: true);
-        }
-        if (!virtue.Def.globalEffectTags.NullOrEmpty())
-        {
-            foreach (string tag in virtue.Def.pawnEffectTags)
-                ResidentPawnsManager.EffectTags.OffsetTagValueBy(tag: tag, offset: 1, addIfMiss: true);
+            RegisterTickIntervalProcessor(tickIntervalProcessor);
         }
 
-        virtue.PostActived();
+        virtue.PostActive();
     }
 
     private bool RemoveVirtue(KnightVirtueDef virtueDef)
@@ -333,23 +319,9 @@ public class KnightVirtueHandler : IExposable
                 KnightVirtue virtue = virtues[i];
                 virtues.RemoveAt(i);
 
-                if (virtue is ITickInterval tickIntervalVirtue)
+                if (virtue is ITickInterval tickIntervalProcessor)
                 {
-                    tickIntervalVirtues.Remove(tickIntervalVirtue);
-                }
-                if (virtue is IPawnPreApplyDamage damageProcessor)
-                {
-                    Pawn.DeregisterPawnPreApplyDamageHandler(damageProcessor);
-                }
-                if (!virtueDef.pawnEffectTags.NullOrEmpty())
-                {
-                    foreach (string tag in virtue.Def.pawnEffectTags)
-                        knight.EffectTags.OffsetTagValueBy(tag: tag, offset: -1, addIfMiss: false);
-                }
-                if (!virtueDef.globalEffectTags.NullOrEmpty())
-                {
-                    foreach (string tag in virtue.Def.pawnEffectTags)
-                        ResidentPawnsManager.EffectTags.OffsetTagValueBy(tag: tag, offset: -1, addIfMiss: false);
+                    DeregisterTickIntervalProcessor(tickIntervalProcessor);
                 }
 
                 VirtuesChanged();
@@ -359,6 +331,10 @@ public class KnightVirtueHandler : IExposable
 
         return false;
     }
+
+    public void RegisterTickIntervalProcessor(ITickInterval tickIntervalProcessor) => tickIntervalVirtues.AddDistinct(tickIntervalProcessor);
+
+    public void DeregisterTickIntervalProcessor(ITickInterval tickIntervalProcessor) => tickIntervalVirtues.Remove(tickIntervalProcessor);
 
     /// <returns>升级后的新等级，返回 -1 表示升级失败</returns>
     private int UpgradeVirtue(KnightVirtue virtue, int upgrade)
@@ -414,12 +390,26 @@ public class KnightVirtueHandler : IExposable
         foreach (KnightVirtue virtue in virtues)
         {
             tempTemplate.ResetTemplate();
-            ApplyTraitStatModifiers(virtue.Def.baseTrait);
+            KnightVirtueDef virtueDef = virtue.Def;
+            tempTemplate.AddOffsets(virtueDef.statOffsets);
+            tempTemplate.AddFactors(virtueDef.statFactors);
+            if (virtueDef.statOffsetsByVirtue is not null)
+            {
+                foreach (StatModifierBySeverity statOffsetByVirtue in virtueDef.statOffsetsByVirtue)
+                    tempTemplate.AddOffset(statOffsetByVirtue.stat, statOffsetByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
+            }
+
+            if (virtueDef.statFactorsByVirtue is not null)
+            {
+                foreach (StatModifierBySeverity statFactorByVirtue in virtueDef.statFactorsByVirtue)
+                    tempTemplate.AddFactor(statFactorByVirtue.stat, statFactorByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
+            }
+
 
             foreach (KnightVirtue.KnightVirtueTrait virtueTrait in virtue.SelectedTraits)
                 ApplyTraitStatModifiers(virtueTrait.def);
 
-            virtue.SpecialStatModifies(tempTemplate);
+            virtue.OnRefreshBuffStage(tempTemplate);
 
             if (!tempTemplate.HasAnyModifier)
                 continue;
@@ -447,7 +437,7 @@ public class KnightVirtueHandler : IExposable
                 return;
 
             tempTemplate.AddOffsets(virtueTraitDef.statOffsets);
-            tempTemplate.AddOffsets(virtueTraitDef.statFactors);
+            tempTemplate.AddFactors(virtueTraitDef.statFactors);
 
             if (virtueTraitDef.statOffsetsByVirtue is not null)
             {

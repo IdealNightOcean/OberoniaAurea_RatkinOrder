@@ -1,0 +1,10 @@
+﻿using OberoniaAurea_Frame;
+using System;
+
+namespace OberoniaAurea.RatkinOrder;
+
+public class KnightVirtueCompProperties_GiveHediffInRange : KnightVirtueCompProperties
+{
+    public Type giverClass = typeof(RangeHediffGiver);
+    public RangeHediffGiveParams giveParams;
+}

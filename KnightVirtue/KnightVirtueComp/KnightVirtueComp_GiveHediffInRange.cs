@@ -4,12 +4,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-
-
-
-
-
-public abstract class KnightVirtue_GiveHediffInRange : KnightVirtue
+public abstract class KnightVirtueComp_GiveHediffInRange : KnightVirtueComp
 {
     public abstract bool HasExtraPawnValiator { get; }
     protected virtual bool ExtraPawnValiator(Pawn target) => true;
@@ -26,7 +21,7 @@ public abstract class KnightVirtue_GiveHediffInRange : KnightVirtue
                     return null;
                 RangeHediffGiver giver = (RangeHediffGiver)Activator.CreateInstance(rangeHediffGiveEx.giverClass);
 
-                giver.LinkedThing = knight.Pawn;
+                giver.LinkedThing = this.Pawn;
                 giver.SetGiveParams(rangeHediffGiveEx.giveParams.ShallowCopy());
                 if (HasExtraPawnValiator)
                     giver.ExtraTargetValiator = ExtraPawnValiator;
@@ -37,5 +32,4 @@ public abstract class KnightVirtue_GiveHediffInRange : KnightVirtue
             return hediffGiver;
         }
     }
-
 }

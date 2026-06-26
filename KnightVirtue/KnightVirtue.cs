@@ -61,7 +61,7 @@ public class KnightVirtue : IExposable
         return virtue;
     }
 
-    public void ExposeData()
+    public virtual void ExposeData()
     {
         Scribe_Defs.Look(ref def, nameof(def));
         Scribe_References.Look(ref knight, nameof(knight));
@@ -106,17 +106,17 @@ public class KnightVirtue : IExposable
     }
 
     /// <summary>
-    /// 仅在添加美德时生效
+    /// 仅在添加美德时生效，添加美德时调用顺序在<see cref="PostActive"/>之前
     /// </summary>
-    public virtual void PostAdded() { }
+    public virtual void PostAdd() { }
     /// <summary>
-    /// 在添加美德和重新载入存档时生效，添加美德时调用顺序在<see cref="PostAdded"/>之后
+    /// 在添加美德和重新载入存档时生效，添加美德时调用顺序在<see cref="PostAdd"/>之后
     /// </summary>
-    public virtual void PostActived() { }
+    public virtual void PostActive() { }
 
-    public virtual void PostRemoved() { }
+    public virtual void PostRemove() { }
 
-    public virtual void SpecialStatModifies(HediffStageModifierBuilder buffStageTemplate) { }
+    public virtual void OnRefreshBuffStage(HediffStageModifierBuilder buffStageBuilder) { }
 
     public virtual void Notify_KilledPawn(Pawn victim, DamageInfo? dinfo) { }
 
