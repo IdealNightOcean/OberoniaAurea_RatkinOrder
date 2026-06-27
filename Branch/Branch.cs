@@ -179,7 +179,7 @@ public class Branch : IExposable, ILoadReferenceable
     /// <summary>
     /// 分部交互应用后触发，供 UI 窗口订阅以刷新缓存
     /// </summary>
-    public event Action<BranchInteractionDef, BranchInteractionParms, bool> PostApplyBranchInteraction;
+    public EventDispatcher<Action<BranchInteractionDef, BranchInteractionParms, bool>> PostApplyBranchInteraction { get; } = new();
 
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
@@ -399,25 +399,6 @@ public class Branch : IExposable, ILoadReferenceable
         baseSite?.GetComponent<WorldObjectComp_BranchSite>()?.Notify_BranchDestroyed(this);
     }
 
-    /// <summary>
-    /// 触发 PostApplyBranchInteraction 事件，仅供交互 Worker 调用
-    /// </summary>
-    public void OnPostApplyBranchInteraction(BranchInteractionDef def, BranchInteractionParms parms, bool succeeded)
-    {
-        try
-        {
-            PostApplyBranchInteraction?.Invoke(def, parms, succeeded);
-        }
-        catch (Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"触发分部交互回调",
-                typeName: nameof(Branch),
-                methodName: nameof(OnPostApplyBranchInteraction),
-                needStackTrace: true);
-        }
-    }
-
     public void PostCombatantGenerate(Pawn p, KnightRecord record)
     {
         if (IPostCombatantGenerate is null || IPostCombatantGenerate.Count == 0)
@@ -441,6 +422,14 @@ public class Branch : IExposable, ILoadReferenceable
                     needStackTrace: true);
             }
         }
+    }
+
+    /// <summary>
+    /// 触发 PostApplyBranchInteraction 事件，仅供交互 Worker 调用
+    /// </summary>
+    public void OnPostApplyBranchInteraction(BranchInteractionDef def, BranchInteractionParms parms, bool succeeded)
+    {
+        PostApplyBranchInteraction.Raise(handler => handler(def, parms, succeeded));
     }
 
     private void TickHour()

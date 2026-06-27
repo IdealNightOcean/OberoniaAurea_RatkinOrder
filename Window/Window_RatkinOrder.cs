@@ -166,18 +166,12 @@ public class Window_RatkinOrder : MainTabWindow
 
     private void BindCallbacks()
     {
-        if (SelectedOrder is not null)
-        {
-            SelectedOrder.PostApplyOrderInteraction += RefreshRatkinInteractionCache;
-        }
+        SelectedOrder?.PostApplyOrderInteraction.Register(RefreshRatkinInteractionCache);
     }
 
     private void UnbindCallbacks()
     {
-        if (SelectedOrder is not null)
-        {
-            SelectedOrder.PostApplyOrderInteraction -= RefreshRatkinInteractionCache;
-        }
+        SelectedOrder?.PostApplyOrderInteraction.Deregister(RefreshRatkinInteractionCache);
     }
 
     public override void DoWindowContents(Rect inRect)

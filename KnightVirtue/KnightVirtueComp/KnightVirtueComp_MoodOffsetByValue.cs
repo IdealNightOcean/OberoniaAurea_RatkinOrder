@@ -19,9 +19,9 @@ public abstract class KnightVirtueComp_MoodOffsetByValue : KnightVirtueComp
         if (thought is null)
         {
             thought = (Thought_Memory)ThoughtMaker.MakeThought(Props.thoughtDef);
+            thought.permanent = true;
             memories.TryGainMemory(thought);
         }
-
 
         int moodOffset = Mathf.RoundToInt(Props.offsetsByValue.Evaluate(GetValueForStat()));
         thought.moodOffset = moodOffset;

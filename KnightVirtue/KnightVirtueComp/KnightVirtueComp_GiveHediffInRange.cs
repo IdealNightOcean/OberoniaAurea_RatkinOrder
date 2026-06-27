@@ -6,6 +6,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 public abstract class KnightVirtueComp_GiveHediffInRange : KnightVirtueComp
 {
+    public KnightVirtueCompProperties_GiveHediffInRange Props => (KnightVirtueCompProperties_GiveHediffInRange)props;
+
     public abstract bool HasExtraPawnValiator { get; }
     protected virtual bool ExtraPawnValiator(Pawn target) => true;
 
@@ -16,13 +18,10 @@ public abstract class KnightVirtueComp_GiveHediffInRange : KnightVirtueComp
         {
             if (hediffGiver is null)
             {
-                ModExtension_RangeHediffGive rangeHediffGiveEx = Def.GetModExtension<ModExtension_RangeHediffGive>();
-                if (rangeHediffGiveEx is null)
-                    return null;
-                RangeHediffGiver giver = (RangeHediffGiver)Activator.CreateInstance(rangeHediffGiveEx.giverClass);
+                RangeHediffGiver giver = (RangeHediffGiver)Activator.CreateInstance(Props.giverClass);
 
                 giver.LinkedThing = this.Pawn;
-                giver.SetGiveParams(rangeHediffGiveEx.giveParams.ShallowCopy());
+                giver.SetGiveParams(Props.giveParams.ShallowCopy());
                 if (HasExtraPawnValiator)
                     giver.ExtraTargetValiator = ExtraPawnValiator;
 

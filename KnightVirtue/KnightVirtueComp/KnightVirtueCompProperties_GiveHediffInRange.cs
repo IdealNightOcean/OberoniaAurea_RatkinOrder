@@ -7,4 +7,5 @@ public class KnightVirtueCompProperties_GiveHediffInRange : KnightVirtueCompProp
 {
     public Type giverClass = typeof(RangeHediffGiver);
     public RangeHediffGiveParams giveParams;
+    public int checkInterval = 60;
 }

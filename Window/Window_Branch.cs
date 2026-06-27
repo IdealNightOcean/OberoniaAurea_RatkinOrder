@@ -220,13 +220,13 @@ public class Window_Branch : OrderWindowBase
     private void BindCallbacks()
     {
         BuildingHandler.PostConstructionChanged += PostConstructionChanged_Building;
-        Branch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+        Branch.PostApplyBranchInteraction.Register(PostApplyBranchInteraction);
     }
 
     private void UnbindCallbacks()
     {
         BuildingHandler.PostConstructionChanged -= PostConstructionChanged_Building;
-        Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+        Branch.PostApplyBranchInteraction.Deregister(PostApplyBranchInteraction);
     }
 
     public override void DoWindowContents(Rect inRect)

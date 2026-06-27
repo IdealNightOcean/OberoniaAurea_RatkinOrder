@@ -22,11 +22,14 @@ public class MercyQuestHandler : IExposable
     private float lastMercyQuestTriggerChange;
     private float mercyQuestBaseChance;
 
+    public EventDispatcher<Action<Quest, MercyQuestDef>> PostMercyQuestSucceed { get; } = new();
+
     public MercyQuestHandler()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(MercyQuestHandler));
         Instance = this;
     }
+
     public static void ClearStaticCache() => Instance = null;
 
     public void ExposeData()
@@ -76,6 +79,14 @@ public class MercyQuestHandler : IExposable
         {
             mercyQuestBaseChance = Mathf.Max(mercyQuestBaseChance + 0.05f, 0.8f);
         }
+    }
+
+    /// <summary>
+    /// 触发 OnPostMercyQuestSucceed 事件，仅供交互 Worker 调用
+    /// </summary>
+    private void OnPostMercyQuestSucceed(Quest quest, MercyQuestDef mercyQuestDef)
+    {
+        PostMercyQuestSucceed.Raise(handler => handler(quest, mercyQuestDef));
     }
 
     private bool TryPeriodicTriggerMercyQuest()

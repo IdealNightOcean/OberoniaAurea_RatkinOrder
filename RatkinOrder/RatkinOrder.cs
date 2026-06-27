@@ -41,7 +41,8 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     /// <summary>
     /// 骑士团交互应用后触发，供 UI 窗口订阅以刷新缓存
     /// </summary>
-    public event Action<OrderInteractionDef, Map, bool> PostApplyOrderInteraction;
+    /// 
+    public EventDispatcher<Action<OrderInteractionDef, Map, bool>> PostApplyOrderInteraction { get; } = new();
 
     private EsteemHandler esteemHandler;
     private FundHandler fundHandler;
@@ -132,18 +133,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     /// </summary>
     public void OnPostApplyOrderInteraction(OrderInteractionDef def, Map map, bool succeeded)
     {
-        try
-        {
-            PostApplyOrderInteraction?.Invoke(def, map, succeeded);
-        }
-        catch (Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"触发骑士团交互回调",
-                typeName: nameof(RatkinOrder),
-                methodName: nameof(OnPostApplyOrderInteraction),
-                needStackTrace: true);
-        }
+        PostApplyOrderInteraction.Raise(handler => handler(def, map, succeeded));
     }
 
     internal void PostGenerated()

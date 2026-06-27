@@ -76,7 +76,7 @@ public partial class Window_BranchTask
         public void ClearCache()
         {
             ShowDetail = false;
-            Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+            Branch.PostApplyBranchInteraction.Deregister(PostApplyBranchInteraction);
 
             JointBranchRecord.Reset();
 
@@ -94,8 +94,7 @@ public partial class Window_BranchTask
             ShowDetail = !ShowDetail;
             if (ShowDetail)
             {
-                Branch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
-                Branch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+                Branch.PostApplyBranchInteraction.Register(PostApplyBranchInteraction);
             }
             else
             {

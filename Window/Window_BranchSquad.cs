@@ -1148,7 +1148,7 @@ public class Window_BranchSquad : OrderWindowBase
     {
         if (SelBranch.IsValid())
         {
-            SelBranch.PostApplyBranchInteraction += PostApplyBranchInteraction;
+            SelBranch.PostApplyBranchInteraction.Register(PostApplyBranchInteraction);
         }
     }
 
@@ -1156,7 +1156,7 @@ public class Window_BranchSquad : OrderWindowBase
     {
         if (SelBranch.IsValid())
         {
-            SelBranch.PostApplyBranchInteraction -= PostApplyBranchInteraction;
+            SelBranch.PostApplyBranchInteraction.Deregister(PostApplyBranchInteraction);
         }
     }
 

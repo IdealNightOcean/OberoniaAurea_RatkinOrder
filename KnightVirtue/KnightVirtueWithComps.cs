@@ -6,7 +6,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class KnightVirtueWithComps : KnightVirtue
 {
-    public List<KnightVirtueComp> comps = new List<KnightVirtueComp>();
+    public List<KnightVirtueComp> comps;
 
     public override void PostAdd()
     {
