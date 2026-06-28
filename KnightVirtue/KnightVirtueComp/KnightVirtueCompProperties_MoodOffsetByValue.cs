@@ -1,10 +1,8 @@
-﻿using RimWorld;
-using Verse;
+﻿using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class KnightVirtueCompProperties_MoodOffsetByValue : KnightVirtueCompProperties
+public class KnightVirtueCompProperties_MoodOffsetByValue : KnightVirtueCompProperties_ThoughtSetter
 {
-    public ThoughtDef thoughtDef;
     public SimpleCurve offsetsByValue;
 }

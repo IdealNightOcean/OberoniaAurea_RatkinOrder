@@ -122,6 +122,8 @@ public class KnightVirtue : IExposable
 
     public virtual void Notify_PawnPostApplyDamage(DamageInfo dinfo, float totalDamageDealt) { }
 
+    public virtual void Notify_StimulatedBy(KnightRecord initiatorKnight) { }
+
     public virtual void Notify_Stimulate(Pawn recipient) { }
 
     private bool SelectTraitForLevel(KnightVirtueTraitDef traitDef, int traitLevel, bool replaceCur = false)

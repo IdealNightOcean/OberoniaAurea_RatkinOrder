@@ -39,6 +39,8 @@ public class KnightVirtueComp
 
     public virtual void Notify_PawnPostApplyDamage(DamageInfo dinfo, float totalDamageDealt) { }
 
+    public virtual void Notify_StimulatedBy(KnightRecord initiatorKnight) { }
+
     public virtual void Notify_Stimulate(Pawn recipient) { }
 
     public virtual void CompExposeData() { }

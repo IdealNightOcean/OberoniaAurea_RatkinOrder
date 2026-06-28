@@ -80,6 +80,18 @@ public class KnightVirtueWithComps : KnightVirtue
         }
     }
 
+    public override void Notify_StimulatedBy(KnightRecord initiatorKnight)
+    {
+        base.Notify_StimulatedBy(initiatorKnight);
+        if (comps is not null)
+        {
+            for (int i = 0; i < comps.Count; i++)
+            {
+                comps[i].Notify_StimulatedBy(initiatorKnight);
+            }
+        }
+    }
+
     public override void Notify_Stimulate(Pawn recipient)
     {
         base.Notify_Stimulate(recipient);

@@ -185,6 +185,13 @@
     <Compile Include="DefModExtension\ModExtension_GiveHediff.cs" />
     <Compile Include="DefModExtension\ModExtension_RangeHediffGive.cs" />
     <Compile Include="DefModExtension\ModExtension_StatModifiersByValue.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueCompProperties_HediffGiver.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_StimulateRecipient.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveSelfHediff.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveSelfHediff_Active.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveSelfHediff_MercyQuestSucceed.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_ThoughtSetter_MercyQuestSucceed.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_ThoughtSetter.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediffInRange_ApplyDamage.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediffInRange_Draft.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediffInRange_KillHostile.cs" />
@@ -203,8 +210,10 @@
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_MoodOffsetBy_ResidentKnight.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_PawnEffectTags.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_WealthBuildings.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_ThoughtSetter_Drafted.cs" />
     <Compile Include="KnightVirtue\KnightVirtueTraitGroups.cs" />
     <Compile Include="KnightVirtue\KnightVirtueWithComps.cs" />
+    <Compile Include="KnightVirtue\KnightVirtue_Compassion_GeneralII.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Compassion_Guard.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Courage_Wariness.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_GiveHediffInRange.cs" />
@@ -215,6 +224,7 @@
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_ResidentKnight.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_TotalAcademicLevel.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_Wealth.cs" />
+    <Compile Include="KnightVirtue\KnightVirtue_Tenacity_BorderDefense.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Tenacity_GeneralII.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Courage_Hunt.cs" />
     <Compile Include="ReadingOutcomeDoer_KnightDiary.cs" />

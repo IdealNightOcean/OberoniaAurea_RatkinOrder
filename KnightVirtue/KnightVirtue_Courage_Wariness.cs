@@ -1,12 +1,12 @@
-﻿using OberoniaAurea_Frame;
-using Verse;
+﻿using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class KnightVirtue_Courage_Wariness : KnightVirtue
+/// <summary>
+/// 勇气·戒心
+/// </summary>
+public class KnightVirtue_Courage_Wariness : KnightVirtueWithComps
 {
-    protected HediffGiveParams giveParams;
-
     public override void Notify_KilledPawn(Pawn victim, DamageInfo? dinfo)
     {
         base.Notify_KilledPawn(victim, dinfo);
@@ -17,12 +17,5 @@ public class KnightVirtue_Courage_Wariness : KnightVirtue
         {
             KnightChivalryUtility.KnightlyTalkStimulate(knight.KnightRecord, p);
         }
-    }
-
-    public override void Notify_Stimulate(Pawn recipient)
-    {
-        base.Notify_Stimulate(recipient);
-        giveParams ??= Def.GetModExtension<ModExtension_GiveHediff>()?.giveParams;
-        OAFrame_PawnUtility.GetOrAddHediffToPawn(recipient, giveParams);
     }
 }

@@ -15,7 +15,7 @@ public class KnightVirtue_Compassion_Guard : KnightVirtue, ITickInterval
         if (knight.Pawn.IsHashIntervalTick(delta, 120))
         {
             giveParams ??= Def.GetModExtension<ModExtension_GiveHediff>()?.giveParams;
-            OAFrame_PawnUtility.GetOrAddHediffToPawn(knight.Pawn, giveParams);
+            knight.Pawn.GetOrAddHediff(giveParams);
         }
     }
 }

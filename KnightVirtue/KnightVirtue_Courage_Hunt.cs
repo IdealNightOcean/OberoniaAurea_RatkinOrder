@@ -14,6 +14,6 @@ public class KnightVirtue_Courage_Hunt : KnightVirtue
             return;
 
         giveParams ??= Def.GetModExtension<ModExtension_GiveHediff>()?.giveParams;
-        OAFrame_PawnUtility.GetOrAddHediffToPawn(this.Pawn, giveParams);
+        this.Pawn.GetOrAddHediff(giveParams);
     }
 }

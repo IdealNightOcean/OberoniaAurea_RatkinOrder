@@ -265,6 +265,17 @@ public class KnightVirtueHandler : IExposable
         }
     }
 
+    public void Notify_StimulatedBy(KnightRecord initiatorKnight)
+    {
+        if (knight.CurState != ResidentPawnState.Normal)
+            return;
+
+        for (int i = 0; i < virtues.Count; i++)
+        {
+            virtues[i].Notify_StimulatedBy(initiatorKnight);
+        }
+    }
+
     public void Notify_Stimulate(Pawn recipient)
     {
         if (knight.CurState != ResidentPawnState.Normal)

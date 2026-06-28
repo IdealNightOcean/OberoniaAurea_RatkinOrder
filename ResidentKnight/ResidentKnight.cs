@@ -159,6 +159,8 @@ public class ResidentKnight : ResidentPawn
                 VirtueHandler.UpgradeVirtue(targetVirtue, upgrade: 1, reason: reason);
             }
         }
+
+        VirtueHandler.Notify_StimulatedBy(initiatorKnight);
     }
 
     public void Notify_Stimulate(Pawn recipient)
