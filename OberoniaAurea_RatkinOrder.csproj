@@ -154,6 +154,7 @@
     <Compile Include="Components\PathedTexture2D.cs" />
     <Compile Include="Components\HediffStageModifierBuilder.cs" />
     <Compile Include="Components\PlayerDespawnedPawnsTempRetention.cs" />
+    <Compile Include="Components\ValueCacheManager.cs" />
     <Compile Include="DataLibrary\KeyLibrary_FormatArgName.cs" />
     <Compile Include="DefModExtension\BranchBuildingTrderSetter_Extension.cs" />
     <Compile Include="DefModExtension\ThingList_Extension.cs" />
@@ -186,10 +187,11 @@
     <Compile Include="DefModExtension\ModExtension_RangeHediffGive.cs" />
     <Compile Include="DefModExtension\ModExtension_StatModifiersByValue.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueCompProperties_HediffGiver.cs" />
-    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_StimulateRecipient.cs" />
-    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveSelfHediff.cs" />
-    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveSelfHediff_Active.cs" />
-    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveSelfHediff_MercyQuestSucceed.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_Self_KillHostile.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_Recipient_Stimulate.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_Self_Active.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_Self_Draft.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_Self_MercyQuestSucceed.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_ThoughtSetter_MercyQuestSucceed.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_ThoughtSetter.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediffInRange_ApplyDamage.cs" />
@@ -211,12 +213,12 @@
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_PawnEffectTags.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_WealthBuildings.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_ThoughtSetter_Drafted.cs" />
+    <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_ThoughtSetter_StimulateRecipient.cs" />
     <Compile Include="KnightVirtue\KnightVirtueTraitGroups.cs" />
     <Compile Include="KnightVirtue\KnightVirtueWithComps.cs" />
+    <Compile Include="KnightVirtue\KnightVirtue_Compassion_BaseIII.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Compassion_GeneralII.cs" />
-    <Compile Include="KnightVirtue\KnightVirtue_Compassion_Guard.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Courage_Wariness.cs" />
-    <Compile Include="KnightVirtue\KnightVirtue_GiveHediffInRange.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesByValue.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_IdeoCount.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_MercyQuestSucceed.cs" />
@@ -226,7 +228,6 @@
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_StatModifiesBy_Wealth.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Tenacity_BorderDefense.cs" />
     <Compile Include="KnightVirtue\KnightVirtue_Tenacity_GeneralII.cs" />
-    <Compile Include="KnightVirtue\KnightVirtue_Courage_Hunt.cs" />
     <Compile Include="ReadingOutcomeDoer_KnightDiary.cs" />
     <Compile Include="KnightVirtue\Alert_AnyResiHasUnused.cs" />
     <Compile Include="KnightVirtue\KnightVirtue.cs" />

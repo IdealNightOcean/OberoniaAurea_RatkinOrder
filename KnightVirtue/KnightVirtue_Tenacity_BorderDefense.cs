@@ -14,7 +14,7 @@ public class KnightVirtue_Tenacity_BorderDefense : KnightVirtueWithComps, ITickI
 
         foreach (ResidentPawn student in ResidentPawnsManager.MentorshipManager.GetStudentsOfTeacher(knight))
         {
-            KnightChivalryUtility.KnightlyTalkStimulate(knight.KnightRecord, student.Pawn);
+            KnightChivalryUtility.KnightStimulate(knight.KnightRecord, student.Pawn);
         }
     }
 }

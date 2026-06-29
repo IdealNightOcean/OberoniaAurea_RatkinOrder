@@ -1,15 +1,20 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using Verse;
+
+namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
 /// 援护·通识II
 /// </summary>
 public class KnightVirtue_Compassion_GeneralII : KnightVirtueWithComps
 {
+    private int nextAvailableTick = -1;
+
     public override void Notify_StimulatedBy(KnightRecord initiatorKnight)
     {
-        if (initiatorKnight != knight.KnightRecord)
+        if (initiatorKnight != knight.KnightRecord && Find.TickManager.TicksGame > nextAvailableTick)
         {
-            KnightChivalryUtility.KnightlyTalkStimulate(knight.KnightRecord, initiatorKnight.Pawn);
+            nextAvailableTick = Find.TickManager.TicksGame + 60;
+            KnightChivalryUtility.KnightStimulate(knight.KnightRecord, initiatorKnight.Pawn);
         }
     }
 }

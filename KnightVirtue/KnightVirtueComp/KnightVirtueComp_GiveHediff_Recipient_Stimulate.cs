@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class KnightVirtueComp_GiveHediff_StimulateRecipient : KnightVirtueComp
+public class KnightVirtueComp_GiveHediff_Recipient_Stimulate : KnightVirtueComp
 {
     public KnightVirtueCompProperties_HediffGiver Props => (KnightVirtueCompProperties_HediffGiver)props;
 

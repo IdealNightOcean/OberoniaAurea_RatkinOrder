@@ -15,6 +15,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
     private CooldownRecordManager cooldownManager;
     public static CooldownRecordManager CooldownManager => Instance.cooldownManager;
+
     private PlayerDespawnedPawnsTempRetention playerDespawnedPawnsTempRetention;
 
     private RatkinOrderManager ratkinOrderManager;
@@ -24,9 +25,9 @@ public class GameComponent_RatkinOrder : GameComponent
 
     private GlobalInteractionManager globalInteractionManager;
 
-    private OrderLetterBox orderLetterBox;
-    private SpecialLetterManager specialLetterManager;
     private AIInteractionHandler aiInteractionHandler;
+
+    [Unsaved] private ValueCacheManager valueCacheManager;
 
 
     /// <summary>
@@ -36,7 +37,7 @@ public class GameComponent_RatkinOrder : GameComponent
     public Dictionary<Pawn, ITalkAction> TalkActionHandler { get; } = [];
 
     /// <summary>
-    /// GameComp比较特殊，没有找到合适的时机清理GameComp实例，所以不再检测直接替换实例
+    /// <see cref="GameComponent"/>比较特殊，没有找到合适的时机清理<see cref="GameComponent"/>实例，所以不再检测直接替换实例
     /// </summary>
     /// <param name="game"></param>
     public GameComponent_RatkinOrder(Game game)
@@ -62,8 +63,9 @@ public class GameComponent_RatkinOrder : GameComponent
 
         GlobalInteractionManager.ClearStaticCache();
 
-        OrderLetterBox.ClearStaticCache();
         AIInteractionHandler.ClearStaticCache();
+
+        ValueCacheManager.ClearStaticCache();
     }
 
     public override void ExposeData()
@@ -82,9 +84,6 @@ public class GameComponent_RatkinOrder : GameComponent
         Scribe_Deep.Look(ref orderStationHandler, nameof(orderStationHandler), ctorArgs: false);
 
         Scribe_Deep.Look(ref globalInteractionManager, nameof(globalInteractionManager));
-
-        Scribe_Deep.Look(ref orderLetterBox, nameof(orderLetterBox));
-        Scribe_Deep.Look(ref specialLetterManager, nameof(specialLetterManager), ctorArgs: false);
     }
 
     public override void StartedNewGame()
@@ -93,7 +92,7 @@ public class GameComponent_RatkinOrder : GameComponent
         globalInteractionManager.EnsureComponentsInit();
 
         RatkinOrderGenerator.StartNewGame();
-        specialLetterManager.Notify_GameStart();
+        globalInteractionManager.Notify_GameStart();
     }
 
 
@@ -104,8 +103,7 @@ public class GameComponent_RatkinOrder : GameComponent
     {
         EnsureComponentsInit();
         globalInteractionManager.EnsureComponentsInit();
-
-        specialLetterManager.Notify_GameStart();
+        globalInteractionManager.Notify_GameStart();
     }
 
     public override void GameComponentTick()
@@ -113,7 +111,6 @@ public class GameComponent_RatkinOrder : GameComponent
         ratkinOrderManager.Tick();
         residentPawnsManager.Tick();
         globalInteractionManager.Tick();
-        orderLetterBox.Tick();
     }
 
     /// <summary>
@@ -232,23 +229,6 @@ public class GameComponent_RatkinOrder : GameComponent
 
         try
         {
-            orderLetterBox ??= new OrderLetterBox();
-        }
-        catch (System.Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"初始化骑士信箱 ({nameof(OrderLetterBox)})",
-                typeName: nameof(GameComponent_RatkinOrder),
-                methodName: nameof(EnsureComponentsInit),
-                needStackTrace: true);
-            OrderLetterBox.ClearStaticCache();
-            orderLetterBox = new OrderLetterBox();
-        }
-
-        specialLetterManager ??= new(initCtor: true);
-
-        try
-        {
             aiInteractionHandler ??= new AIInteractionHandler();
         }
         catch (System.Exception ex)
@@ -260,6 +240,21 @@ public class GameComponent_RatkinOrder : GameComponent
                 needStackTrace: true);
             AIInteractionHandler.ClearStaticCache();
             aiInteractionHandler = new AIInteractionHandler();
+        }
+
+        try
+        {
+            valueCacheManager ??= new ValueCacheManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"初始化值缓存管理器 ({nameof(ValueCacheManager)})",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            ValueCacheManager.ClearStaticCache();
+            valueCacheManager = new ValueCacheManager();
         }
     }
 }

@@ -1,5 +1,3 @@
-using OberoniaAurea_Frame;
-using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using Verse;
@@ -11,12 +9,7 @@ public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestroyed
     public List<Branch> BranchesInRadius { get; set; }
     private int NextCacheTick { get; set; } = -1;
 
-    public SimpleValueCache<float> NonPrimaryIdeoColonistsCount { get; }
-
-    public MapComponent_RatkinOrder(Map map) : base(map)
-    {
-        NonPrimaryIdeoColonistsCount = new(cacheInterval: 30000, checker: GetNonPrimaryIdeoColonistsCount);
-    }
+    public MapComponent_RatkinOrder(Map map) : base(map) { }
 
     public override void ExposeData() { }
 
@@ -52,23 +45,6 @@ public class MapComponent_RatkinOrder : MapComponent, IOnBranchDestroyed
                 maps[i].GetComponent<MapComponent_RatkinOrder>()?.Notify_RatkinOrderRemoved(order);
             }
         }
-    }
-
-    private float GetNonPrimaryIdeoColonistsCount()
-    {
-        if (!ModsConfig.IdeologyActive)
-            return 0f;
-        Ideo primaryIdeo = Faction.OfPlayer.ideos?.PrimaryIdeo;
-        if (primaryIdeo is null)
-            return 0f;
-
-        int count = 0;
-        foreach (Pawn p in map.mapPawns.AllHumanlikeSpawned)
-        {
-            if (p.IsColonist && primaryIdeo != p.ideo?.Ideo)
-                count++;
-        }
-        return count;
     }
 
     public static void OnBranchDestroyed(Branch branch)

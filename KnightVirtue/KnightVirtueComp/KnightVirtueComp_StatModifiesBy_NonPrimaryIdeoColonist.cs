@@ -9,6 +9,6 @@ public class KnightVirtueComp_StatModifiesBy_NonPrimaryIdeoColonist : KnightVirt
         if (!ModsConfig.IdeologyActive || !this.Pawn.Spawned)
             return 0f;
 
-        return this.Pawn.Map.GetComponent<MapComponent_RatkinOrder>()?.NonPrimaryIdeoColonistsCount.GetCachedResult() ?? 0f;
+        return ValueCacheManager.Instance.NonPrimaryIdeoColonistsCount.GetCachedResult(this.Pawn.Map);
     }
 }

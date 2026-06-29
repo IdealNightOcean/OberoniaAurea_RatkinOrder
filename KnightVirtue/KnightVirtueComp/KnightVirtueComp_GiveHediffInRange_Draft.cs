@@ -12,8 +12,7 @@ public class KnightVirtueComp_GiveHediffInRange_Draft : KnightVirtueComp_GiveHed
 
     public void TickInterval(int delta)
     {
-        if (this.Pawn.IsHashIntervalTick(Props.checkInterval, delta))
-            if (this.Pawn.Drafted)
-                hediffGiver.GiveHediffToRange();
+        if (this.Pawn.Drafted && this.Pawn.IsHashIntervalTick(Props.checkInterval, delta))
+            hediffGiver.GiveHediffToRange();
     }
 }

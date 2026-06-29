@@ -21,13 +21,11 @@ public class InteractionWorker_KnightlyTalk : InteractionWorker
     public override float RandomSelectionWeight(Pawn initiator, Pawn recipient)
     {
         if (!initiator.CanBeKnight() || initiator.Inhumanized())
-        {
             return 0f;
-        }
+
         if (!KnightPawnsManager.Instance.IsKnight(initiator))
-        {
             return 0f;
-        }
+
         return BaseSelectionWeight
             * CompatibilityFactorCurve.Evaluate(initiator.relations.CompatibilityWith(recipient))
             * (initiator.Faction.IsPlayerSafe() ? 1f : 5f);
@@ -36,15 +34,7 @@ public class InteractionWorker_KnightlyTalk : InteractionWorker
     public override void Interacted(Pawn initiator, Pawn recipient, List<RulePackDef> extraSentencePacks, out string letterText, out string letterLabel, out LetterDef letterDef, out LookTargets lookTargets)
     {
         base.Interacted(initiator, recipient, extraSentencePacks, out letterText, out letterLabel, out letterDef, out lookTargets);
-        if (!KnightPawnsManager.Instance.TryGetKnightRecord(initiator, out KnightRecord initiatorKnight))
-            return;
-
-        KnightChivalryUtility.KnightlyTalkStimulate(initiatorKnight, recipient);
-
-    }
-
-    private void KnightVirtueUpgrade(KnightRecord initiatorKnight, Pawn recipient)
-    {
-
+        if (Rand.Chance(0.1f) && KnightPawnsManager.Instance.TryGetKnightRecord(initiator, out KnightRecord initiatorKnight))
+            KnightChivalryUtility.KnightStimulate(initiatorKnight, recipient);
     }
 }

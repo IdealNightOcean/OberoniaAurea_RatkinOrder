@@ -20,6 +20,9 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
     private AroundKnightGroupsManager aroundKnightGroupsManager;
     private MercyQuestHandler mercyQuestHandler;
 
+    private OrderLetterBox orderLetterBox;
+    private SpecialLetterManager specialLetterManager;
+
     public GlobalInteractionManager()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
@@ -76,6 +79,23 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
             MercyQuestHandler.ClearStaticCache();
             mercyQuestHandler = new MercyQuestHandler();
         }
+
+        try
+        {
+            orderLetterBox ??= new OrderLetterBox();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"初始化骑士信箱 ({nameof(OrderLetterBox)})",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            OrderLetterBox.ClearStaticCache();
+            orderLetterBox = new OrderLetterBox();
+        }
+
+        specialLetterManager ??= new(initCtor: true);
     }
 
     public static void ClearStaticCache()
@@ -86,6 +106,8 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
         AroundKnightGroupsManager.ClearStaticCache();
         MercyQuestHandler.ClearStaticCache();
+
+        OrderLetterBox.ClearStaticCache();
     }
 
     public void ExposeData()
@@ -94,6 +116,14 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
         Scribe_Deep.Look(ref acceptedBranchDemandHandler, nameof(acceptedBranchDemandHandler));
         Scribe_Deep.Look(ref aroundKnightGroupsManager, nameof(aroundKnightGroupsManager));
         Scribe_Deep.Look(ref mercyQuestHandler, nameof(mercyQuestHandler));
+
+        Scribe_Deep.Look(ref orderLetterBox, nameof(orderLetterBox));
+        Scribe_Deep.Look(ref specialLetterManager, nameof(specialLetterManager), ctorArgs: false);
+    }
+
+    public void Notify_GameStart()
+    {
+        specialLetterManager.Notify_GameStart();
     }
 
     public void Tick()
@@ -103,6 +133,8 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
             aroundKnightGroupsManager.TickDay();
             mercyQuestHandler.PeriodicTriggerMercyQuest();
         }
+
+        orderLetterBox.Tick();
     }
 
     public void Notify_RatkinOrderRemoved(RatkinOrder order)

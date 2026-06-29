@@ -15,7 +15,7 @@ public class KnightVirtue_Courage_Wariness : KnightVirtueWithComps
 
         foreach (Pawn p in this.Pawn.Map.mapPawns.FreeColonistsSpawned)
         {
-            KnightChivalryUtility.KnightlyTalkStimulate(knight.KnightRecord, p);
+            KnightChivalryUtility.KnightStimulate(knight.KnightRecord, p);
         }
     }
 }

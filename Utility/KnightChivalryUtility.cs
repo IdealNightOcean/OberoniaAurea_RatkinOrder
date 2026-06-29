@@ -46,10 +46,9 @@ public static class KnightChivalryUtility
         return IsChivalryResonate(knightChivalry, otherChivalry);
     }
 
-
-    public static void KnightlyTalkStimulate(KnightRecord initiatorKnight, Pawn recipient)
+    public static void KnightStimulate(KnightRecord initiatorKnight, Pawn recipient)
     {
-        if (!Rand.Chance(0.1f))
+        if (recipient.DestroyedOrNull())
             return;
 
         HediffDef knightlyTalkHediff = initiatorKnight.Chivalry?.knightlyTalkHediff;
