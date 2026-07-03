@@ -15,12 +15,11 @@ public class BranchResident_Deployment : BranchResident
         Scribe_Defs.Look(ref Skill, "Skill");
     }
 
-    public override void EndResidency(Branch branch)
+    public override void EndResidency()
     {
         if (pawn is null)
-        {
             return;
-        }
+
         float deployDays = Mathf.Max(0f, (totalDeployDays - DeployDaysLeft));
 
         if (Skill is not null && pawn.skills is not null)

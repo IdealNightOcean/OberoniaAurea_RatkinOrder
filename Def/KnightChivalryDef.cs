@@ -26,7 +26,7 @@ public class KnightChivalryDef : Def
     /// <summary>
     /// 骑士激励提供的激励buff
     /// </summary>
-    public HediffDef knightlyTalkHediff;
+    public HediffDef stimulateHediff;
 
     private Texture2D colorTex;
     public Texture2D ColorTex

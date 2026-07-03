@@ -1,6 +1,5 @@
 using OberoniaAurea_Frame;
 using RimWorld;
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -21,7 +20,7 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
         Scribe_Defs.Look(ref virtueDef, nameof(virtueDef));
     }
 
-    public override void EndResidency(Branch branch)
+    public override void EndResidency()
     {
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight residentKnight))
             return;
@@ -40,15 +39,12 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
             }
         }
 
-        float successChance = GetTrainSuccessChance(branch: branch,
-                                                    residentKnight: residentKnight,
-                                                    targetVirtue: virtueDef,
-                                                    medalsCost: medalsCost,
+        float successChance = GetTrainSuccessChance(residentKnight: residentKnight,
                                                     resultOnly: true,
                                                     explanation: out _);
         if (Rand.Chance(successChance))
         {
-            SuccessOutcome(branch, residentKnight, extraTextSB.ToString());
+            SuccessOutcome(residentKnight, extraTextSB.ToString());
         }
         else
         {
@@ -61,17 +57,13 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
 
     }
 
-    private void SuccessOutcome(Branch branch, ResidentKnight residentKnight, string extraText)
+    private void SuccessOutcome(ResidentKnight residentKnight, string extraText)
     {
 
-        int level = GetTrainOutcomeLevel(branch: branch,
-                                         targetVirtue: virtueDef,
-                                         medalsCost: medalsCost,
-                                         resultOnly: true,
-                                         explanation: out _);
+        int level = GetTrainOutcomeLevel(resultOnly: true, explanation: out _);
         string reason = "OARO_KnightVirtueGainReason_VirtueTrain".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
 
-        var virtueHandler = residentKnight.VirtueHandler;
+        KnightVirtueHandler virtueHandler = residentKnight.VirtueHandler;
         if (virtueHandler.HasVirtue(virtueDef))
         {
             virtueHandler.UpgradeVirtueTo(virtueDef, level, reason);
@@ -99,22 +91,17 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 
-    private void FailureOutcome(Branch branch, ResidentKnight residentKnight, string extraText)
+    private void FailureOutcome(ResidentKnight residentKnight, string extraText)
     {
         //目前先不设计失败的具体后果，后续可以考虑增加一些负面效果
     }
 
-    public static float GetTrainSuccessChance(Branch branch,
-                                              ResidentKnight residentKnight,
-                                              KnightVirtueDef targetVirtue,
-                                              IReadOnlyDictionary<KnightChivalryDef, int> medalsCost,
-                                              bool resultOnly,
-                                              out string explanation)
+    public float GetTrainSuccessChance(ResidentKnight residentKnight, bool resultOnly, out string explanation)
     {
         explanation = string.Empty;
         StringBuilder expSB = resultOnly ? null : new(64);
 
-        KnightChivalryDef virtueChivalry = targetVirtue.chivalry;
+        KnightChivalryDef virtueChivalry = virtueDef.chivalry;
         float successChance = 0f;
 
         float curStepChange = 0.2f;
@@ -186,6 +173,18 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
             }
         }
 
+        if (residentKnight.EffectTags.HasTag(KeyLibrary_EffectTag.StudyElite))
+        {
+            curStepChange = 2f;
+            successChance *= curStepChange;
+            if (!resultOnly)
+            {
+                expSB.AppendLine("OARO_ChangeFactor_PawnEffectTag".Translate(
+                    KeyLibrary_EffectTag.StudyElite.Named(KeyLibrary_FormatArgName.EffectTag),
+                    curStepChange.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Factor)));
+            }
+        }
+
         successChance = Mathf.Clamp01(successChance);
         if (!resultOnly)
         {
@@ -196,14 +195,10 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
         return successChance;
     }
 
-    public static int GetTrainOutcomeLevel(Branch branch,
-                                           KnightVirtueDef targetVirtue,
-                                           IReadOnlyDictionary<KnightChivalryDef, int> medalsCost,
-                                           bool resultOnly,
-                                           out string explanation)
+    public int GetTrainOutcomeLevel(bool resultOnly, out string explanation)
     {
         explanation = string.Empty;
-        KnightChivalryDef virtueChivalry = targetVirtue.chivalry;
+        KnightChivalryDef virtueChivalry = virtueDef.chivalry;
 
         int totalMedalsCost = medalsCost.Values.Sum();
         bool sameChivalryWithHonor = virtueChivalry.IsSameDefNonNullable(branch.HonorDef?.chivalry);

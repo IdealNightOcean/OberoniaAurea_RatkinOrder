@@ -6,5 +6,5 @@ public class KnightVirtueComp_GiveHediffInRange_ApplyDamage : KnightVirtueComp_G
 {
     public override bool HasExtraPawnValiator => false;
 
-    public override void Notify_PawnPostApplyDamage(DamageInfo dinfo, float totalDamageDealt) => HediffGiver.GiveHediffToRange();
+    public override void Notify_PawnPostApplyDamage(DamageInfo dinfo, float totalDamageDealt) => GiveHediffInRange();
 }

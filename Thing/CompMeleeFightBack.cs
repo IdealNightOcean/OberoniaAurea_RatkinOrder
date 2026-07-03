@@ -48,7 +48,7 @@ public class CompMeleeFightBack : ThingComp, IPawnPreApplyDamage
         if (parentPawn is null
             || dinfo.Def.isRanged
             || dinfo.Def.isExplosive
-            || (Find.TickManager.TicksGame < lastFightBackTick + Props.fightBackCooldown)
+            || (Props.fightBackCooldown > 0 && (Find.TickManager.TicksGame < lastFightBackTick + Props.fightBackCooldown))
             || dinfo.Instigator is not Pawn instigator
            )
         {
@@ -82,10 +82,10 @@ public class CompMeleeFightBack : ThingComp, IPawnPreApplyDamage
     {
         if (parentPawn is not null && parentPawn != pawn)
         {
-            parentPawn?.GetComp<CompPawnPreApplyDamageHandler>()?.DeregisterDamageProcessor(this);
+            parentPawn.DeregisterPawnPreApplyDamageHandler(this);
         }
 
-        if (pawn.GetComp<CompPawnPreApplyDamageHandler>()?.RegisterDamageProcessor(this) ?? false)
+        if (pawn.RegisterPawnPreApplyDamageHandler(this))
         {
             needRegisteredAfterLoad = true;
             parentPawn = pawn;
@@ -96,9 +96,9 @@ public class CompMeleeFightBack : ThingComp, IPawnPreApplyDamage
     {
         if (parentPawn != pawn)
         {
-            parentPawn?.GetComp<CompPawnPreApplyDamageHandler>()?.DeregisterDamageProcessor(this);
+            parentPawn.DeregisterPawnPreApplyDamageHandler(this);
         }
-        pawn.GetComp<CompPawnPreApplyDamageHandler>()?.DeregisterDamageProcessor(this);
+        pawn.DeregisterPawnPreApplyDamageHandler(this);
         needRegisteredAfterLoad = false;
         parentPawn = null;
     }
@@ -139,8 +139,8 @@ public class CompMeleeFightBack : ThingComp, IPawnPreApplyDamage
 
     public override void PostExposeData()
     {
-        Scribe_Values.Look(ref needRegisteredAfterLoad, "needRegisteredAfterLoad", defaultValue: false);
-        Scribe_References.Look(ref parentPawn, "parentPawn");
+        Scribe_Values.Look(ref needRegisteredAfterLoad, nameof(needRegisteredAfterLoad), defaultValue: false);
+        Scribe_References.Look(ref parentPawn, nameof(parentPawn));
 
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {

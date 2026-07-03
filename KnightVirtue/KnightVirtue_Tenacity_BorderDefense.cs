@@ -1,4 +1,5 @@
-﻿using Verse;
+﻿using System.Collections.Generic;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -12,9 +13,12 @@ public class KnightVirtue_Tenacity_BorderDefense : KnightVirtueWithComps, ITickI
         if (!this.Pawn.IsHashIntervalTick(60000, delta))
             return;
 
-        foreach (ResidentPawn student in ResidentPawnsManager.MentorshipManager.GetStudentsOfTeacher(knight))
+        if (ResidentPawnsManager.MentorshipManager.TryGetStudentsOfTeacher(knight, out HashSet<ResidentPawn> students))
         {
-            KnightChivalryUtility.KnightStimulate(knight.KnightRecord, student.Pawn);
+            foreach (ResidentPawn student in students)
+            {
+                KnightChivalryUtility.KnightStimulate(knight.KnightRecord, student.Pawn);
+            }
         }
     }
 }

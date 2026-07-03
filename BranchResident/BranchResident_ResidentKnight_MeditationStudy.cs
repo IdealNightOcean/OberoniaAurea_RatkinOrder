@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Verse;
@@ -10,14 +9,12 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_ResidentKnightStudy
 {
-    public override void EndResidency(Branch branch)
+    public override void EndResidency()
     {
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight residentKnight))
             return;
 
-        float meditationGain = GetMeditationGain(branch: branch,
-                                                 medalsCost: medalsCost,
-                                                 resultOnly: false,
+        float meditationGain = GetMeditationGain(resultOnly: false,
                                                  explanation: out string explanation);
         residentKnight.MeditationPoints += meditationGain;
         StringBuilder letterTextSB = new("OARO_MeditationStudyComplete_Meditation".Translate(
@@ -42,7 +39,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
             }
         }
 
-        if (Rand.Chance(KnightDiaryUtility.DiaryGenerationChance))
+        if (Rand.Chance(KnightDiaryUtility.DiaryGenerationChance) || residentKnight.EffectTags.HasTag(KeyLibrary_EffectTag.StudyElite))
         {
             Book diary = KnightDiaryUtility.GenerateKnightDiary(this, residentKnight);
             if (diary is not null)
@@ -62,10 +59,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
             relatedLetterType: OrderLetter.RelatedLetterType.Positive);
     }
 
-    public static float GetMeditationGain(Branch branch,
-                                          IReadOnlyDictionary<KnightChivalryDef, int> medalsCost,
-                                          bool resultOnly,
-                                          out string explanation)
+    public float GetMeditationGain(bool resultOnly, out string explanation)
     {
         explanation = string.Empty;
         StringBuilder expSB = resultOnly ? null : new(64);
@@ -114,6 +108,20 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
             if (!resultOnly)
             {
                 expSB.AppendLine("OARO_ChangeFactor_Esteem".Translate(esteemFactor.ToStringPercent("F0")));
+            }
+        }
+
+        if (ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight residentKnight))
+        {
+            if (residentKnight.EffectTags.HasTag(KeyLibrary_EffectTag.StudyElite))
+            {
+                meditationGain *= 2f;
+                if (!resultOnly)
+                {
+                    expSB.AppendLine("OARO_ChangeFactor_PawnEffectTag".Translate(
+                        KeyLibrary_EffectTag.StudyElite.Named(KeyLibrary_FormatArgName.EffectTag),
+                        2f.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Factor)));
+                }
             }
         }
 

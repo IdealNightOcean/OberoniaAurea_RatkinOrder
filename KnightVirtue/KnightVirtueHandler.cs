@@ -15,8 +15,21 @@ public class KnightVirtueHandler : IExposable
     private readonly ResidentKnight knight;
     public Pawn Pawn => knight.Pawn;
 
-    private Hediff buffHediff;
-    public Hediff BuffHediff => buffHediff ??= Pawn.health.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_KnightVirtue);
+    private Hediff_KnightVirtue buffHediff;
+    public Hediff_KnightVirtue BuffHediff
+    {
+        get
+        {
+            if (buffHediff is null)
+            {
+                buffHediff = (Hediff_KnightVirtue)this.Pawn.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_KnightVirtue);
+                buffHediff.InitVirtueHandler(this, force: true);
+                RefreshBuffStage();
+            }
+
+            return buffHediff;
+        }
+    }
 
     /// <summary>
     /// 骑士信条等级
@@ -391,10 +404,13 @@ public class KnightVirtueHandler : IExposable
 
     private void RefreshBuffStage()
     {
+        if (BuffHediff is null)
+            return;
+
         BuffStageTemplate.ResetTemplate();
         HediffStageModifierBuilder tempTemplate = new();
-
         VirtueStatValueCache.Reset();
+
         float virtueStatvalue = VirtueStatValueCache.GetCachedResult();
         StringBuilder buffDetailExplanationBuilder = new(128);
 
@@ -415,7 +431,6 @@ public class KnightVirtueHandler : IExposable
                 foreach (StatModifierBySeverity statFactorByVirtue in virtueDef.statFactorsByVirtue)
                     tempTemplate.AddFactor(statFactorByVirtue.stat, statFactorByVirtue.valueBySeverity.Evaluate(virtueStatvalue));
             }
-
 
             foreach (KnightVirtue.KnightVirtueTrait virtueTrait in virtue.SelectedTraits)
                 ApplyTraitStatModifiers(virtueTrait.def);
@@ -441,6 +456,8 @@ public class KnightVirtueHandler : IExposable
 
         BuffDetailExplanation = buffDetailExplanationBuilder.ToString();
         BuffStageTemplate.FinalizeTemplate();
+
+        BuffHediff.UpdateBuffStage(BuffStageTemplate.BuildNewHediffStage());
 
         void ApplyTraitStatModifiers(KnightVirtueTraitDef virtueTraitDef)
         {

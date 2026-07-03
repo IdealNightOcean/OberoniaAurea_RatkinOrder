@@ -11,6 +11,6 @@ public class KnightVirtueComp_GiveHediffInRange_KillHostile : KnightVirtueComp_G
     {
         base.Notify_KilledPawn(victim, dinfo);
         if (victim.HostileTo(this.Pawn))
-            HediffGiver.GiveHediffToRange();
+            GiveHediffInRange();
     }
 }

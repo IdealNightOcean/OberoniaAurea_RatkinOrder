@@ -14,7 +14,6 @@ public static class KnightDiaryUtility
 {
     public const float DiaryGenerationChance = 0.2f;
 
-
     public static Book GenerateKnightDiary(BranchResident_ResidentKnightStudy record, ResidentKnight residentKnight)
     {
         if (record is null || residentKnight?.Pawn is null)

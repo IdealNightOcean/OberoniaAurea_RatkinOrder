@@ -2,7 +2,7 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class KnightVirtueCompProperties_HediffGiver : KnightVirtueCompProperties
+public class KnightVirtueCompProperties_HediffGiver : KnightVirtueCompProperties
 {
     public HediffGiveParams giveParams;
     public int checkInterval = 60;

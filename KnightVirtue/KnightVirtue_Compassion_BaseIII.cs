@@ -18,7 +18,7 @@ public class KnightVirtue_Compassion_BaseIII : KnightVirtueWithComps, ITickInter
             List<Pawn> potentialPawns = this.Pawn.Map.mapPawns.FreeColonistsSpawned;
             potentialPawns.Remove(this.Pawn);
 
-            if (ValueCacheManager.Instance.InjuredColonistsCount.GetCachedResult(this.Pawn.Map) > 0)
+            if (ValueCacheManager.Instance.UnhealthyColonistsCount.GetCachedResult(this.Pawn.Map) > 0)
             {
                 TempInjuredColonists.Clear();
                 for (int i = potentialPawns.Count - 1; i >= 0; i--)

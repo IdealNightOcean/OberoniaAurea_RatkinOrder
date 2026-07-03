@@ -8,12 +8,12 @@ public class ValueCacheManager
 {
     public static ValueCacheManager Instance { get; private set; }
 
-    public SimpleMapCahce<int> InjuredColonistsCount { get; } = new(cacheInterval: 15000, onlyPlayerHome: false, checker: GetInjuredColonistsCount);
+    public SimpleMapCahce<int> UnhealthyColonistsCount { get; } = new(cacheInterval: 15000, onlyPlayerHome: false, checker: GetUnhealthyColonistsCountColonistsCount);
 
 
 
 
-    public SimpleMapCahce<int> NonPrimaryIdeoColonistsCount { get; } = new(cacheInterval: 15000, onlyPlayerHome: false, checker: GetInjuredColonistsCount);
+    public SimpleMapCahce<int> NonPrimaryIdeoColonistsCount { get; } = new(cacheInterval: 15000, onlyPlayerHome: false, checker: GetUnhealthyColonistsCountColonistsCount);
 
 
     public ValueCacheManager()
@@ -24,7 +24,7 @@ public class ValueCacheManager
 
     public static void ClearStaticCache() => Instance = null;
 
-    private static int GetInjuredColonistsCount(Map map)
+    private static int GetUnhealthyColonistsCountColonistsCount(Map map)
     {
         int count = 0;
         foreach (Pawn p in map.mapPawns.FreeColonistsSpawned)

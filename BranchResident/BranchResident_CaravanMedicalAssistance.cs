@@ -19,5 +19,5 @@ public class BranchResident_CaravanMedicalAssistance : BranchResident
         }
     }
 
-    public override void EndResidency(Branch branch) { }
+    public override void EndResidency() { }
 }

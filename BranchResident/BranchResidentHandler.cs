@@ -134,7 +134,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         {
             try
             {
-                resident.EndResidency(branch);
+                resident.EndResidency();
             }
             catch (Exception ex)
             {

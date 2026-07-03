@@ -51,7 +51,7 @@ public static class KnightChivalryUtility
         if (recipient.DestroyedOrNull())
             return;
 
-        HediffDef knightlyTalkHediff = initiatorKnight.Chivalry?.knightlyTalkHediff;
+        HediffDef knightlyTalkHediff = initiatorKnight.Chivalry?.stimulateHediff;
         if (knightlyTalkHediff is null)
             return;
 

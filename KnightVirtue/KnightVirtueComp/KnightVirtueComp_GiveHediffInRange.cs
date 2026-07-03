@@ -31,4 +31,17 @@ public abstract class KnightVirtueComp_GiveHediffInRange : KnightVirtueComp
             return hediffGiver;
         }
     }
+
+    public void GiveHediffInRange()
+    {
+        if (Props.giverExcludeInterval < 0 || string.IsNullOrEmpty(Props.giverUniqueTag))
+        {
+            HediffGiver.GiveHediffToRange();
+        }
+        else if (!GameComponent_RatkinOrder.CooldownManager.IsInCooldown(Props.giverUniqueTag))
+        {
+            GameComponent_RatkinOrder.CooldownManager.RegisterRecord(Props.giverUniqueTag, Props.giverExcludeInterval, removeWhenExpired: true);
+            HediffGiver.GiveHediffToRange();
+        }
+    }
 }

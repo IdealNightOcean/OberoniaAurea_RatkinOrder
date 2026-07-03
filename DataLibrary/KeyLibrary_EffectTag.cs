@@ -49,4 +49,14 @@ public static class KeyLibrary_EffectTag
     /// </summary>
     public const string DangerWarning = "DangerWarning";
 
+    /// <summary>
+    /// 骑士美德：修行精英（分队研习获得的修行点与美德升级概率翻倍，必然带回骑士日记）
+    /// </summary>
+    public const string StudyElite = "StudyElite";
+
+    /// <summary>
+    /// 骑士美德：精英教师（自身课业授导成功率翻倍）
+    /// </summary>
+    public const string ProminentTeacher = "ProminentTeacher";
+
 }

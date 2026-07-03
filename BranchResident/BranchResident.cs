@@ -12,6 +12,9 @@ public abstract class BranchResident : IExposable
     protected BranchResidentDef def;
     public BranchResidentDef Def => def;
 
+    protected Branch branch;
+    public Branch Branch => branch;
+
     protected Pawn pawn;
     public Pawn Pawn => pawn;
 
@@ -34,12 +37,17 @@ public abstract class BranchResident : IExposable
     public virtual void ExposeData()
     {
         Scribe_Defs.Look(ref def, nameof(def));
+        Scribe_References.Look(ref branch, nameof(branch));
         Scribe_References.Look(ref pawn, nameof(pawn));
         Scribe_Values.Look(ref totalDeployDays, nameof(totalDeployDays), 0);
         Scribe_Values.Look(ref DeployDaysLeft, nameof(DeployDaysLeft), 0);
     }
 
-    public virtual void StartResidency(Branch branch) => DeployDaysLeft = totalDeployDays;
+    public virtual void StartResidency(Branch branch)
+    {
+        this.branch = branch;
+        DeployDaysLeft = totalDeployDays;
+    }
 
-    public abstract void EndResidency(Branch branch);
+    public abstract void EndResidency();
 }

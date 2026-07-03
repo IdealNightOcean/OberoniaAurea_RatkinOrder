@@ -2,9 +2,15 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-internal class Hediff_KnightVirtue : HediffWithComps
+public class Hediff_KnightVirtue : HediffWithComps
 {
     private KnightVirtueHandler virtueHandler;
+
+    private HediffStage buffStage;
+
+    public override HediffStage CurStage => buffStage;
+
+    public override int CurStageIndex => 0;
 
     public void InitVirtueHandler(KnightVirtueHandler virtueHandler, bool force = false)
     {
@@ -24,6 +30,8 @@ internal class Hediff_KnightVirtue : HediffWithComps
 
         this.virtueHandler = virtueHandler;
     }
+
+    public void UpdateBuffStage(HediffStage buffStage) => this.buffStage = buffStage;
 
     public override void TickInterval(int delta)
     {

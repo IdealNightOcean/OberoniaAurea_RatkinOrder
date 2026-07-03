@@ -2,7 +2,7 @@
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class KnightVirtueComp_GiveHediffInRange_Draft : KnightVirtueComp_GiveHediffInRange, ITickInterval
+public class KnightVirtueComp_GiveHediffInRange_Cyclicity : KnightVirtueComp_GiveHediffInRange, ITickInterval
 {
     public override bool HasExtraPawnValiator => false;
 
@@ -10,9 +10,10 @@ public class KnightVirtueComp_GiveHediffInRange_Draft : KnightVirtueComp_GiveHed
 
     public override void PostRemove() => this.Knight.VirtueHandler.DeregisterTickIntervalProcessor(this);
 
-    public void TickInterval(int delta)
+    public virtual void TickInterval(int delta)
     {
-        if (this.Pawn.Drafted && this.Pawn.IsHashIntervalTick(Props.checkInterval, delta))
+        if (this.Pawn.IsHashIntervalTick(Props.checkInterval, delta))
             GiveHediffInRange();
     }
+
 }

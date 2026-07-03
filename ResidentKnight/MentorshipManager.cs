@@ -137,20 +137,14 @@ public class MentorshipManager : IExposable
         return studentsToTeachers.Remove(student);
     }
 
-    public IReadOnlyCollection<ResidentKnight> GetTeachersOfStudent(ResidentPawn student)
+    public bool TryGetTeachersOfStudent(ResidentPawn student, out HashSet<ResidentKnight> teachers)
     {
-        if (studentsToTeachers.TryGetValue(student, out HashSet<ResidentKnight> teachers))
-            return teachers;
-        else
-            return [];
+        return studentsToTeachers.TryGetValue(student, out teachers);
     }
 
-    public IReadOnlyCollection<ResidentPawn> GetStudentsOfTeacher(ResidentKnight teacher)
+    public bool TryGetStudentsOfTeacher(ResidentKnight teacher, out HashSet<ResidentPawn> students)
     {
-        if (teachersToStudents.TryGetValue(teacher, out HashSet<ResidentPawn> students))
-            return students;
-        else
-            return [];
+        return teachersToStudents.TryGetValue(teacher, out students);
     }
 
     public bool IsStudentOfKnight(ResidentPawn student, ResidentKnight residentKnight)
@@ -201,6 +195,8 @@ public class MentorshipManager : IExposable
 
         bool isResonate = teacher.IsChivalryResonate(student);
         float virtueChance = isResonate ? 0.1f : 0.04f;
+        if (teacher.EffectTags.HasTag(KeyLibrary_EffectTag.ProminentTeacher))
+            virtueChance *= 2f;
         if (!Rand.Chance(virtueChance))
             return;
 
