@@ -4,34 +4,36 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Hediff_KnightVirtue : HediffWithComps
 {
+    private ResidentKnight knight;
     private KnightVirtueHandler virtueHandler;
 
     private HediffStage buffStage;
 
-    public override HediffStage CurStage => buffStage;
+    public override HediffStage CurStage => buffStage ??= virtueHandler?.GetNewBuffStage();
 
     public override int CurStageIndex => 0;
 
-    public void InitVirtueHandler(KnightVirtueHandler virtueHandler, bool force = false)
+    public void InitVirtueHandler(ResidentKnight knight, bool force = false)
     {
-        if (virtueHandler is null)
+        if (knight is null)
         {
             Log.Error($"[OARO] 尝试使用空的{nameof(KnightVirtueHandler)}对{nameof(Hediff_KnightVirtue)}进行初始化。");
             pawn.health.RemoveHediff(this);
             return;
         }
-        if (this.virtueHandler is not null)
+        if (this.knight is not null)
         {
-            if (!force && this.virtueHandler != virtueHandler)
+            if (!force && this.knight != knight)
             {
                 Log.Error("[OARO] ");
             }
         }
 
-        this.virtueHandler = virtueHandler;
+        this.knight = knight;
+        this.virtueHandler = knight.VirtueHandler;
     }
 
-    public void UpdateBuffStage(HediffStage buffStage) => this.buffStage = buffStage;
+    public void ClearBuffStage() => buffStage = null;
 
     public override void TickInterval(int delta)
     {
@@ -49,5 +51,21 @@ public class Hediff_KnightVirtue : HediffWithComps
     {
         base.Notify_PawnPostApplyDamage(dinfo, totalDamageDealt);
         virtueHandler?.Notify_PawnPostApplyDamage(dinfo, totalDamageDealt);
+    }
+
+    public override void ExposeData()
+    {
+        base.ExposeData();
+        Scribe_References.Look(ref knight, nameof(knight));
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            if (knight is null)
+            {
+                Log.Error($"[OARO] 在加载后初始化阶段，{nameof(Hediff_KnightVirtue)}的{nameof(knight)}为null。");
+                pawn.health.RemoveHediff(this);
+                return;
+            }
+            virtueHandler = knight.VirtueHandler;
+        }
     }
 }

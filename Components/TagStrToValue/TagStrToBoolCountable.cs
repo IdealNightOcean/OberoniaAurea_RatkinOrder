@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using Verse;
@@ -105,7 +106,7 @@ public class TagStrToBoolCountable : IExposable
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
             tagStrCount ??= [];
-            tagStrCount.RemoveAll(kv => string.IsNullOrEmpty(kv.Key) || kv.Value == 0);
+            tagStrCount.RemoveAll(kv => String.IsNullOrEmpty(kv.Key) || kv.Value == 0);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using RimWorld.QuestGen;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -10,7 +11,7 @@ public class QuestNode_AddBranchClique : QuestNode_AddGeneralClique
     protected override string GetCliqueKey()
     {
         string cliqueKey = this.cliqueKey.GetValue(QuestGen.slate);
-        if (!string.IsNullOrEmpty(cliqueKey))
+        if (!String.IsNullOrEmpty(cliqueKey))
         {
             return cliqueKey;
         }

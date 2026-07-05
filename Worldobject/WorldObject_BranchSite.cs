@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.Planet;
+using System;
 
 namespace OberoniaAurea.RatkinOrder;
 
@@ -10,7 +11,7 @@ public class WorldObject_BranchSite : WorldObject, INameableWorldObject
     {
         get
         {
-            if (string.IsNullOrEmpty(name))
+            if (String.IsNullOrEmpty(name))
             {
                 name = BranchSiteComp.Branch.Name;
             }

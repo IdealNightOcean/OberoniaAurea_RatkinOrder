@@ -2,6 +2,7 @@ using NightOcean;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -68,7 +69,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             if (allCliques is not null)
             {
-                allCliques.RemoveAll(c => c is null || string.IsNullOrEmpty(c.Key));
+                allCliques.RemoveAll(c => c is null || String.IsNullOrEmpty(c.Key));
                 allCliquesDict = new(allCliques.Count);
                 foreach (QuestClique clique in allCliques)
                 {

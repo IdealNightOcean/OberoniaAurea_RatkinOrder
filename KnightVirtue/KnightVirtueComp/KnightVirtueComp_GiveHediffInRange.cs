@@ -34,7 +34,7 @@ public abstract class KnightVirtueComp_GiveHediffInRange : KnightVirtueComp
 
     public void GiveHediffInRange()
     {
-        if (Props.giverExcludeInterval < 0 || string.IsNullOrEmpty(Props.giverUniqueTag))
+        if (Props.giverExcludeInterval < 0 || String.IsNullOrEmpty(Props.giverUniqueTag))
         {
             HediffGiver.GiveHediffToRange();
         }

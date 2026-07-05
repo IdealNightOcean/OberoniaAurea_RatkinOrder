@@ -761,7 +761,7 @@ public class Window_BranchSquad : OrderWindowBase
                     GUI.DrawTexture(iconText.ContractedBy(6f), medalChivalry.icon.Texture, ScaleMode.ScaleToFit);
                 }
                 Widgets.Label(entryRect, $"× {medalCount}");
-                if (!string.IsNullOrEmpty(medalChivalry.medal.effectDescription))
+                if (!String.IsNullOrEmpty(medalChivalry.medal.effectDescription))
                 {
                     TooltipHandler.TipRegion(entryRect, () => medalChivalry.medal.effectDescription, uniqueId: 4131582);
                 }

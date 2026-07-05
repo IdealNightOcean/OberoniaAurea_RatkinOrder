@@ -473,7 +473,7 @@ public partial class Window_OrderStation : OrderWindowBase
                 GlobalInteractionUtility.InvitationAcceptanceChance(group, resultOnly: false, out aroundGroupTipCache);
                 AroundGroupTipCache = aroundGroupTipCache;
             }
-            if (!string.IsNullOrEmpty(AroundGroupTipCache))
+            if (!String.IsNullOrEmpty(AroundGroupTipCache))
             {
                 TooltipHandler.TipRegion(reusedRect, () => AroundGroupTipCache, 21345447);
             }

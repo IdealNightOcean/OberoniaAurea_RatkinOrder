@@ -1,4 +1,5 @@
 ﻿using RimWorld.QuestGen;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -38,7 +39,7 @@ public class QuestNode_HasQuestEffectTag : QuestNode
 
     protected override void RunInt()
     {
-        if (string.IsNullOrEmpty(tag.GetValue(QuestGen.slate)) || !QuestGen.quest.TryGetEffectTagsPart(addPartIfMiss: false, out QuestPart_EffectTags questPart_EffectTags))
+        if (String.IsNullOrEmpty(tag.GetValue(QuestGen.slate)) || !QuestGen.quest.TryGetEffectTagsPart(addPartIfMiss: false, out QuestPart_EffectTags questPart_EffectTags))
         {
             noMatchNode?.Run();
             return;

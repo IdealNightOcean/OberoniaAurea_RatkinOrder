@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -79,20 +80,20 @@ public class QuestClique : IExposable
     {
         relatedBranch = branch;
 
-        if (string.IsNullOrEmpty(key))
+        if (String.IsNullOrEmpty(key))
         {
             key = GetBranchCliqueKey(branch);
         }
-        if (string.IsNullOrEmpty(Name))
+        if (String.IsNullOrEmpty(Name))
         {
             Name = branch.Name;
         }
 
-        if (string.IsNullOrEmpty(ActiveDesc))
+        if (String.IsNullOrEmpty(ActiveDesc))
         {
             ActiveDesc = "OARO_QuestClique_DefaultBranchActive".Translate(relatedBranch.Name.Named(KeyLibrary_FormatArgName.BranchName));
         }
-        if (string.IsNullOrEmpty(InactiveDesc))
+        if (String.IsNullOrEmpty(InactiveDesc))
         {
             InactiveDesc = "OARO_QuestClique_DefaultBranchInactive".Translate(relatedBranch.Name.Named(KeyLibrary_FormatArgName.BranchName));
         }

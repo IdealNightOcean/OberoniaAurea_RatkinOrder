@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
+using System;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
@@ -269,7 +270,7 @@ public static class RelationshipUtility
         }
 
         sb.AppendLine();
-        if (!string.IsNullOrEmpty(ratkinOrder.EsteemHandler.LastRelationshipChangeReason))
+        if (!String.IsNullOrEmpty(ratkinOrder.EsteemHandler.LastRelationshipChangeReason))
         {
             sb.AppendLine("OARO_LastRelationshipChangeReason".Translate(ratkinOrder.EsteemHandler.LastRelationshipChangeReason.Named(KeyLibrary_FormatArgName.Reason)));
             sb.AppendLine();

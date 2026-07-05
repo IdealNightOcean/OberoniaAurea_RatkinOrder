@@ -132,7 +132,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
 
     private TaggedString GetTalkText()
     {
-        if (!string.IsNullOrEmpty(RawTalkText))
+        if (!String.IsNullOrEmpty(RawTalkText))
         {
             try
             {
@@ -144,7 +144,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
             }
         }
 
-        if (MercyQuestDef is null || string.IsNullOrEmpty(MercyQuestDef.reasonForHelp))
+        if (MercyQuestDef is null || String.IsNullOrEmpty(MercyQuestDef.reasonForHelp))
         {
             return "OARK_RatkinMercyQuest_HelpSeekDefault".Translate(TextNamedArguments());
         }
@@ -157,7 +157,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
     public void SetRawTalkText(string talkText)
     {
         RawTalkText = talkText;
-        if (quest.State == QuestState.Ongoing && !string.IsNullOrEmpty(OutSignalTalkTextReset))
+        if (quest.State == QuestState.Ongoing && !String.IsNullOrEmpty(OutSignalTalkTextReset))
         {
             Find.SignalManager.SendSignal(new Signal(OutSignalTalkTextReset));
         }

@@ -131,7 +131,7 @@ public static class ModUtility
 
     public static IEnumerable<Rule> RulesForRatkinOrder(string prefix, RatkinOrder ratkinOrder)
     {
-        if (!string.IsNullOrEmpty(prefix))
+        if (!String.IsNullOrEmpty(prefix))
         {
             prefix += "_";
         }
@@ -145,7 +145,7 @@ public static class ModUtility
 
     public static IEnumerable<Rule> RulesForBranch(string prefix, Branch branch, bool alsoAddOrderRule)
     {
-        if (!string.IsNullOrEmpty(prefix))
+        if (!String.IsNullOrEmpty(prefix))
         {
             prefix += "_";
         }

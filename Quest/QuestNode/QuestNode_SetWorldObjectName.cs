@@ -1,6 +1,7 @@
 ﻿using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -28,7 +29,7 @@ public class QuestNode_SetWorldObjectName : QuestNode
         }
 
         string fixedName = this.fixedName.GetValue(slate);
-        if (!string.IsNullOrEmpty(fixedName))
+        if (!String.IsNullOrEmpty(fixedName))
         {
             nameableWorldObject.Name = fixedName;
             return;

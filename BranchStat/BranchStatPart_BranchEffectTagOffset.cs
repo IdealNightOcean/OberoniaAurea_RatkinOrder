@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -29,7 +30,7 @@ public class BranchStatPart_BranchEffectTagOffset : BranchStatPart
             Color color = (offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green;
             string offsetArg = statDef.statType == BranchStatDef.StatType.Percent ? offset.ToStringPercentSigned("0.##") : offset.ToStringWithSign("0.##");
 
-            if (string.IsNullOrEmpty(reasonOverride))
+            if (String.IsNullOrEmpty(reasonOverride))
             {
                 explanation.AppendLine("OARO_ChangeOffset_BranchEffectTag".Translate(effectTag.Named(KeyLibrary_FormatArgName.EffectTag), offsetArg.Named(KeyLibrary_FormatArgName.Offset))
                                                                           .Colorize(color));

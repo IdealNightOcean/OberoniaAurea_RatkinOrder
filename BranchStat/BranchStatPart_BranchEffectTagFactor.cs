@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System;
+using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -28,7 +29,7 @@ public class BranchStatPart_BranchEffectTagFactor : BranchStatPart
             Color color = (factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green;
             string factorArg = statDef.statType == BranchStatDef.StatType.Percent ? factor.ToStringPercentSigned("0.##") : factor.ToStringWithSign("0.##");
 
-            if (string.IsNullOrEmpty(reasonOverride))
+            if (String.IsNullOrEmpty(reasonOverride))
             {
                 explanation.AppendLine("OARO_ChangeFactor_BranchEffectTag".Translate(effectTag.Named(KeyLibrary_FormatArgName.EffectTag), factorArg.Named(KeyLibrary_FormatArgName.Factor))
                                                                           .Colorize(color));

@@ -1,4 +1,5 @@
 ﻿using RimWorld;
+using System;
 using UnityEngine;
 using Verse;
 
@@ -82,7 +83,7 @@ public class CompDisappears : ThingComp
     public override void PostDestroy(DestroyMode mode, Map previousMap)
     {
         base.PostDestroy(mode, previousMap);
-        if (!string.IsNullOrEmpty(Props.messageOnDisappear))
+        if (!String.IsNullOrEmpty(Props.messageOnDisappear))
         {
             Messages.Message(Props.messageOnDisappear.Formatted(parent.Named(KeyLibrary_FormatArgName.THING)), Props.disappearMessageType ?? MessageTypeDefOf.NeutralEvent);
         }

@@ -1,4 +1,5 @@
-﻿using System.Xml;
+﻿using System;
+using System.Xml;
 using UnityEngine;
 using Verse;
 
@@ -17,7 +18,7 @@ public class PathedTexture2D
         {
             if (texture is null)
             {
-                if (string.IsNullOrEmpty(path))
+                if (String.IsNullOrEmpty(path))
                 {
                     texture = BaseContent.BadTex;
                 }
@@ -48,7 +49,7 @@ public class PathedTexture2DWithExpanded : PathedTexture2D
         {
             if (expandedTexture is null)
             {
-                if (string.IsNullOrEmpty(path))
+                if (String.IsNullOrEmpty(path))
                 {
                     expandedTexture = BaseContent.BadTex;
                 }

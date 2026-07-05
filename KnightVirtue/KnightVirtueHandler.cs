@@ -23,8 +23,7 @@ public class KnightVirtueHandler : IExposable
             if (buffHediff is null)
             {
                 buffHediff = (Hediff_KnightVirtue)this.Pawn.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_KnightVirtue);
-                buffHediff.InitVirtueHandler(this, force: true);
-                RefreshBuffStage();
+                buffHediff.InitVirtueHandler(knight, force: true);
             }
 
             return buffHediff;
@@ -121,17 +120,34 @@ public class KnightVirtueHandler : IExposable
 
     public void ExposeData()
     {
+        Scribe_References.Look(ref buffHediff, nameof(buffHediff));
         Scribe_Collections.Look(ref virtues, nameof(virtues), LookMode.Deep);
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            if (virtues.RemoveAll(v => v?.Def is null) > 0)
+            if (virtues.RemoveAll(v => v is null || v.Def is null) > 0)
             {
-                Log.Warning("[OARO] 在加载存档时发现并移除了无效的骑士美德。");
+                Log.Error($"[OARO] 在加载骑士美德处理器时发现无效的美德数据，已将其移除。骑士: {knight?.Pawn?.ToString() ?? "UNKNOWN"}");
+            }
+
+            if (buffHediff is null)
+            {
+                _ = BuffHediff;
             }
 
             foreach (KnightVirtue virtue in virtues)
             {
-                ActiveVirtue(virtue);
+                try
+                {
+                    ActiveVirtue(virtue);
+                }
+                catch (Exception ex)
+                {
+                    ModUtility.LogExceptionError(ex: ex,
+                                                 errorDesc: $"在加载骑士美德处理器时激活美德 {virtue?.Def?.LabelCap ?? "UNKNOWN"} 失败",
+                                                 typeName: nameof(KnightVirtueHandler),
+                                                 methodName: nameof(ExposeData),
+                                                 needStackTrace: true);
+                }
             }
         }
     }
@@ -375,6 +391,7 @@ public class KnightVirtueHandler : IExposable
     private void VirtuesChanged()
     {
         BuffStageTemplate.MarkInvalid();
+        BuffHediff?.ClearBuffStage();
     }
 
     private void CheckKnightCreed()
@@ -404,13 +421,17 @@ public class KnightVirtueHandler : IExposable
 
     private void RefreshBuffStage()
     {
-        if (BuffHediff is null)
-            return;
-
         BuffStageTemplate.ResetTemplate();
-        HediffStageModifierBuilder tempTemplate = new();
         VirtueStatValueCache.Reset();
 
+        if (BuffHediff is null)
+        {
+            BuffDetailExplanation = string.Empty;
+            BuffStageTemplate.FinalizeTemplate();
+            return;
+        }
+
+        HediffStageModifierBuilder tempTemplate = new();
         float virtueStatvalue = VirtueStatValueCache.GetCachedResult();
         StringBuilder buffDetailExplanationBuilder = new(128);
 
@@ -456,8 +477,6 @@ public class KnightVirtueHandler : IExposable
 
         BuffDetailExplanation = buffDetailExplanationBuilder.ToString();
         BuffStageTemplate.FinalizeTemplate();
-
-        BuffHediff.UpdateBuffStage(BuffStageTemplate.BuildNewHediffStage());
 
         void ApplyTraitStatModifiers(KnightVirtueTraitDef virtueTraitDef)
         {

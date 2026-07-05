@@ -1,6 +1,7 @@
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
+using System;
 using System.Text;
 using Verse;
 
@@ -39,7 +40,7 @@ public class WorldObject_JointPatrolCaravanHelpSite_FixedCaravan : WorldObject_I
     {
         StringBuilder sb = new(base.GetInspectString());
         string caravanIncidentStr = IncidentWorker?.RequestHelpReason(branch);
-        if (!string.IsNullOrEmpty(caravanIncidentStr))
+        if (!String.IsNullOrEmpty(caravanIncidentStr))
         {
             sb.AppendInNewLine(caravanIncidentStr);
         }

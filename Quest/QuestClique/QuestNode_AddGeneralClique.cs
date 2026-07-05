@@ -1,4 +1,5 @@
 ﻿using RimWorld.QuestGen;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -36,15 +37,11 @@ public class QuestNode_AddGeneralClique : QuestNode
     {
         Slate slate = QuestGen.slate;
         string cliqueKey = GetCliqueKey();
-        if (string.IsNullOrEmpty(cliqueKey))
-        {
+        if (String.IsNullOrEmpty(cliqueKey))
             return;
-        }
 
         if (!QuestGen.quest.TryGetCliquesManager(addPartIfMiss: true, out QuestPart_CliquesManager questPart_CliquesManager))
-        {
             return;
-        }
 
         QuestClique questClique = GenerateClique(cliqueKey);
         if (questClique is not null)

@@ -30,7 +30,7 @@ public class KnightVirtueComp_GiveHediffInRange_Cyclicity_NonPrimaryIdeoColonist
             base.PostRemove();
     }
 }
-    public class KnightVirtueComp_GiveHediffInRange_Cyclicity_LeaderOrMoralist : KnightVirtueComp_GiveHediffInRange_Cyclicity
+public class KnightVirtueComp_GiveHediffInRange_Cyclicity_LeaderOrMoralist : KnightVirtueComp_GiveHediffInRange_Cyclicity
 {
     public override bool HasExtraPawnValiator => false;
 

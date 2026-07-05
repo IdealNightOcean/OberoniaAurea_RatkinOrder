@@ -98,7 +98,7 @@ public static class OARO_WindowUtility
             GUI.DrawTexture(butRect, baseTex);
         }
 
-        if (!string.IsNullOrEmpty(tooltip))
+        if (!String.IsNullOrEmpty(tooltip))
         {
             TooltipHandler.TipRegion(butRect, tooltip);
         }
@@ -138,11 +138,11 @@ public static class OARO_WindowUtility
         else
         {
             GUI.DrawTexture(butRect, downTex);
-            if (!string.IsNullOrEmpty(acceptance.Reason))
+            if (!String.IsNullOrEmpty(acceptance.Reason))
             {
                 TooltipHandler.TipRegion(butRect, acceptance.Reason);
             }
-            if (!string.IsNullOrEmpty(tooltip))
+            if (!String.IsNullOrEmpty(tooltip))
             {
                 TooltipHandler.TipRegion(butRect, tooltip);
             }
@@ -249,7 +249,7 @@ public static class OARO_WindowUtility
         else
         {
             Widgets.LabelEllipses(squadNameRect, squadName);
-            if (!string.IsNullOrEmpty(squadName) && Mouse.IsOver(squadNameRect))
+            if (!String.IsNullOrEmpty(squadName) && Mouse.IsOver(squadNameRect))
             {
                 TooltipHandler.TipRegion(squadNameRect, () => squadName, 6844867);
             }
@@ -283,7 +283,7 @@ public static class OARO_WindowUtility
         else
         {
             Widgets.LabelEllipses(reusedRect, workState);
-            if (!string.IsNullOrEmpty(workState) && Mouse.IsOver(reusedRect))
+            if (!String.IsNullOrEmpty(workState) && Mouse.IsOver(reusedRect))
             {
                 TooltipHandler.TipRegion(reusedRect, () => workState, 3548681);
             }

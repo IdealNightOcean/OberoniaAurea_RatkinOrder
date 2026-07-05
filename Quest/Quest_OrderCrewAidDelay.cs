@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.QuestGen;
+using System;
 using System.Collections.Generic;
 using Verse;
 
@@ -48,7 +49,7 @@ public class QuestNode_OrderCrewAidDelay : QuestNode_Delay
             QuestGenUtility.RunInnerNode(node, questPart_OrderCrewAidDelay);
         }
 
-        if (!string.IsNullOrEmpty(outSignalComplete.GetValue(slate)))
+        if (!String.IsNullOrEmpty(outSignalComplete.GetValue(slate)))
         {
             questPart_OrderCrewAidDelay.outSignalsCompleted.Add(QuestGenUtility.HardcodedSignalWithQuestID(outSignalComplete.GetValue(slate)));
         }

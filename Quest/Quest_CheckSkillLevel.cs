@@ -1,5 +1,6 @@
 ﻿using RimWorld;
 using RimWorld.QuestGen;
+using System;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -76,12 +77,12 @@ public class QuestPart_CheckSkillLevel : QuestPart
             {
                 if (Pawn.skills is null || Pawn.skills.GetSkill(Skill).GetLevel() < MinLevel)
                 {
-                    if (!string.IsNullOrEmpty(OutSignalFail))
+                    if (!String.IsNullOrEmpty(OutSignalFail))
                     {
                         Find.SignalManager.SendSignal(new Signal(OutSignalFail));
                     }
                 }
-                else if (!string.IsNullOrEmpty(OutSignalSuccess))
+                else if (!String.IsNullOrEmpty(OutSignalSuccess))
                 {
                     Find.SignalManager.SendSignal(new Signal(OutSignalSuccess));
                 }

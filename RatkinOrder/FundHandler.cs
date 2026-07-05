@@ -104,7 +104,7 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
     {
         funds = Mathf.Clamp01(funds + change);
         immediatelyChange += change;
-        if (string.IsNullOrEmpty(reason))
+        if (String.IsNullOrEmpty(reason))
         {
             reason = "OARO_Fund_Misc".Translate();
         }
@@ -122,7 +122,7 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
     private void AdjustFundsExpected(float change, string reason = null)
     {
         expectedChange += change;
-        if (string.IsNullOrEmpty(reason))
+        if (String.IsNullOrEmpty(reason))
         {
             reason = "OARO_Fund_Misc".Translate();
         }

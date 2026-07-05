@@ -317,7 +317,7 @@ public class Window_Branch : OrderWindowBase
                     Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
                     reserves.Target.Named("TARGET"),
                     reserves.CostRateReduce.ToStringPercent("0.##").Named("Reduce"));
-                if (!string.IsNullOrEmpty(reservesDesc))
+                if (!String.IsNullOrEmpty(reservesDesc))
                 {
                     TooltipHandler.TipRegion(iconRect, () => reservesDesc, uniqueId: 8310234);
                 }
@@ -338,7 +338,7 @@ public class Window_Branch : OrderWindowBase
             }
             else
             {
-                if (!string.IsNullOrEmpty(acceptance.Reason))
+                if (!String.IsNullOrEmpty(acceptance.Reason))
                 {
                     TooltipHandler.TipRegion(entryRect, () => acceptance.Reason, uniqueId: 24500513);
                 }
@@ -1074,7 +1074,7 @@ public class Window_Branch : OrderWindowBase
         if (Mouse.IsOver(reusedRect))
         {
             string tipStr = CachedBranchInfo.DailyPopulationGrowthExplanation.Value;
-            if (!string.IsNullOrEmpty(tipStr))
+            if (!String.IsNullOrEmpty(tipStr))
             {
                 TooltipHandler.TipRegion(reusedRect, () => tipStr, 36746149);
             }

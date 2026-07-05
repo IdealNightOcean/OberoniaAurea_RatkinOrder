@@ -153,7 +153,7 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
         }
 
         TaggedString failedThankText;
-        if (string.IsNullOrEmpty(modEx_SkillHelp.failedThankText))
+        if (String.IsNullOrEmpty(modEx_SkillHelp.failedThankText))
         {
             failedThankText = "OARO_JointPatrolCaravanIncident_ThankText_Fail".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF));
         }

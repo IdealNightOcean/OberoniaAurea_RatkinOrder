@@ -1,5 +1,6 @@
 ﻿using NightOcean.SimpleAIClient;
 using RimWorld;
+using System;
 using System.Collections.Generic;
 using System.Text;
 using Verse;
@@ -82,7 +83,7 @@ public static class DecoratePromptUtility
         yield return new ClientMessage(ClientMessageRole.system, promptBuilder.ToString());
 
 
-        string example = string.IsNullOrEmpty(mercyQuestDef.reasonForHelp) ? "OARO_Setting_MercyQuestPrompt_DefaultExample".Translate()
+        string example = String.IsNullOrEmpty(mercyQuestDef.reasonForHelp) ? "OARO_Setting_MercyQuestPrompt_DefaultExample".Translate()
                                                                            : mercyQuestDef.reasonForHelp;
 
         yield return new ClientMessage(ClientMessageRole.user, "OARO_Setting_MercyQuestPrompt_User".Translate(mercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST), example.Named("Example")));
@@ -147,7 +148,7 @@ public static class DecoratePromptUtility
 
     private static NamedArgument GenerateNamedArgument(string argument, string name)
     {
-        if (string.IsNullOrEmpty(argument))
+        if (String.IsNullOrEmpty(argument))
         {
             return "OARO_Prompt_NotAvailable".Translate().Named(name);
         }

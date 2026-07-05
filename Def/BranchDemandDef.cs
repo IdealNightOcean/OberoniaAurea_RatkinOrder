@@ -75,7 +75,7 @@ public class BranchDemandDef : Def
         {
             if (backgroundTexture is null)
             {
-                if (string.IsNullOrEmpty(backgroundPath))
+                if (String.IsNullOrEmpty(backgroundPath))
                 {
                     return null;
                 }

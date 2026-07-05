@@ -13,7 +13,7 @@ public static class OARO_QuestUtility
 {
     public static void SendSignalSafeSilent(this SignalManager signalManager, Signal signal)
     {
-        if (string.IsNullOrEmpty(signal.tag))
+        if (String.IsNullOrEmpty(signal.tag))
         {
             return;
         }

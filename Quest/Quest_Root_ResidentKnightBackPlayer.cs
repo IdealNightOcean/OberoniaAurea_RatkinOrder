@@ -2,6 +2,7 @@
 using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -167,7 +168,7 @@ internal sealed class QuestPart_ResidentKnightBackPlayer : QuestPartActivable
             if (signal.args.TryGetArg(KeyLibrary_FormatArgName.SUBJECT, out Pawn p) && pawns.Remove(p))
             {
                 string partResult = ResidentKnightAcademic(p);
-                if (!string.IsNullOrEmpty(partResult))
+                if (!String.IsNullOrEmpty(partResult))
                 {
                     resultSummarySB ??= new(64);
                     resultSummarySB.AppendLine(partResult);

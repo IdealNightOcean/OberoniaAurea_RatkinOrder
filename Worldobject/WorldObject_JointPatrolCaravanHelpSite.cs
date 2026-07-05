@@ -1,4 +1,5 @@
 using RimWorld.Planet;
+using System;
 using System.Text;
 using Verse;
 
@@ -30,7 +31,7 @@ public class WorldObject_JointPatrolCaravanHelpSite : WorldObject_Interactive_Na
     {
         StringBuilder sb = new(base.GetInspectString());
         string caravanIncidentStr = caravanIncidentDef?.Worker?.RequestHelpReason(branch);
-        if (!string.IsNullOrEmpty(caravanIncidentStr))
+        if (!String.IsNullOrEmpty(caravanIncidentStr))
         {
             sb.AppendInNewLine(caravanIncidentStr);
         }

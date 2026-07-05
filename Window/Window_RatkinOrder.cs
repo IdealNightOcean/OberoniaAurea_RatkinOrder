@@ -266,11 +266,11 @@ public class Window_RatkinOrder : MainTabWindow
         if (Mouse.IsOver(reusedRect))
         {
             string relationChangeReason = SelectedOrder.EsteemHandler.LastRelationshipChangeReason;
-            if (!string.IsNullOrEmpty(relationChangeReason))
+            if (!String.IsNullOrEmpty(relationChangeReason))
             {
                 TooltipHandler.TipRegion(reusedRect, relationChangeReason);
             }
-            if (!string.IsNullOrEmpty(AutoUpgradeRelationshipDesc.Value))
+            if (!String.IsNullOrEmpty(AutoUpgradeRelationshipDesc.Value))
             {
                 TooltipHandler.TipRegion(reusedRect, AutoUpgradeRelationshipDesc.Value);
             }
@@ -314,7 +314,7 @@ public class Window_RatkinOrder : MainTabWindow
         if (Mouse.IsOver(reusedRect))
         {
             string fundChangeDetailStr = FundChangeDetail.Value;
-            if (!string.IsNullOrEmpty(fundChangeDetailStr))
+            if (!String.IsNullOrEmpty(fundChangeDetailStr))
             {
                 TooltipHandler.TipRegion(reusedRect, () => fundChangeDetailStr, uniqueId: 19754361);
             }
@@ -380,7 +380,7 @@ public class Window_RatkinOrder : MainTabWindow
         if (Mouse.IsOver(reusedRect))
         {
             string lastEsteemChangeTip = $"{SelectedOrder.EsteemHandler.LastEsteemChangeReason} ({SelectedOrder.EsteemHandler.LastEsteemChange.ToStringWithSign()})";
-            if (string.IsNullOrEmpty(lastEsteemChangeTip))
+            if (String.IsNullOrEmpty(lastEsteemChangeTip))
             {
                 TooltipHandler.TipRegion(reusedRect, () => lastEsteemChangeTip, uniqueId: 47525641);
             }
