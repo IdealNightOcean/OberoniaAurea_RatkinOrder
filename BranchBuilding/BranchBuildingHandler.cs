@@ -397,10 +397,10 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         building.PostDeactive();
     }
 
-    public bool GetBranchStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
+    public bool GetBranchStatTransformer(BranchStatDef statDef, out StatTransformer transformer)
     {
         transformer = new();
-        BranchStatTransformer tempTransformer;
+        StatTransformer tempTransformer;
         bool hasTransformer = false;
 
         for (int i = 0; i < allBuildings.Count; i++)

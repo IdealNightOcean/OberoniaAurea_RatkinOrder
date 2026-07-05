@@ -29,12 +29,12 @@ public class BuildingAdvancedProperties
     /// <summary>
     /// 属性修正列表（Offset）
     /// </summary>
-    public List<BranchStatModifier> branchStatOffsets;
+    public List<StatModifier<BranchStatDef>> branchStatOffsets;
 
     /// <summary>
     /// 属性修正列表（Factor）
     /// </summary>
-    public List<BranchStatModifier> branchStatFactors;
+    public List<StatModifier<BranchStatDef>> branchStatFactors;
 
     /// <summary>
     /// 分部界面问候段落 - 建筑部分

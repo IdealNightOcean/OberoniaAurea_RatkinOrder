@@ -174,7 +174,7 @@ public class Branch : IExposable, ILoadReferenceable
     }
 
     public TagStrToBoolCountable EffectTags { get; } = new();
-    public BranchStatTransformerHandler TransformerHandler { get; } = new();
+    public StatTransformerHandler<BranchStatDef> TransformerHandler { get; } = new();
     public List<IPostCombatantGenerate> IPostCombatantGenerate { get; } = [];
     /// <summary>
     /// 分部交互应用后触发，供 UI 窗口订阅以刷新缓存

@@ -214,15 +214,15 @@ public static class BranchUtility
     }
 
     /// <summary>
-    /// 重新获取该分部某个 <see cref="BranchStatDef"/> 的对应 <see cref="BranchStatTransformer"/>
+    /// 重新获取该分部某个 <see cref="BranchStatDef"/> 的对应 <see cref="StatTransformer"/>
     /// </summary>
     public static void RecacheBranchStat(this Branch branch, BranchStatDef statDef)
     {
         if (branch.TransformerHandler.RemoveStatTransformer(statDef))
         {
             bool hasTransformer = false;
-            BranchStatTransformer transformer = new();
-            BranchStatTransformer tempTransformer;
+            StatTransformer transformer = new();
+            StatTransformer tempTransformer;
             if (branch.FacilityHandler.GetBranchStatTransformer(statDef, out tempTransformer))
             {
                 hasTransformer = true;

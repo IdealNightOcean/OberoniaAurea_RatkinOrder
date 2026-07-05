@@ -5,14 +5,14 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchStatModifier
+public class StatModifier<T> where T : OAROStatDefBase
 {
-    public BranchStatDef statDef;
+    public T statDef;
     public float value;
 
-    public BranchStatModifier() { }
+    public StatModifier() { }
 
-    public BranchStatModifier(BranchStatDef statDef, float value)
+    public StatModifier(T statDef, float value)
     {
         this.statDef = statDef;
         this.value = value;

@@ -42,10 +42,10 @@ public class OrderReformationDef : Def
     /// <summary>
     /// 属性修正列表（Offset）
     /// </summary>
-    public List<BranchStatModifier> branchStatOffsets;
+    public List<StatModifier<BranchStatDef>> branchStatOffsets;
 
     /// <summary>
     /// 属性修正列表（Factor）
     /// </summary>
-    public List<BranchStatModifier> branchStatFactors;
+    public List<StatModifier<BranchStatDef>> branchStatFactors;
 }

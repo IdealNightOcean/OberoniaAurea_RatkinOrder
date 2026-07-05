@@ -95,12 +95,12 @@ public class BranchBuilding : IExposable
     /// </summary>
     public virtual void PostUpgraded() { }
 
-    public bool TryGetStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
+    public bool TryGetStatTransformer(BranchStatDef statDef, out StatTransformer transformer)
     {
         transformer = new();
         bool hasTransformer = false;
 
-        List<BranchStatModifier> branchStatModifies;
+        List<StatModifier<BranchStatDef>> branchStatModifies;
         if (def.branchStatOffsets is not null)
         {
             branchStatModifies = def.branchStatOffsets;

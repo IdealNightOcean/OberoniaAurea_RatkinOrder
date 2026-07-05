@@ -1,4 +1,3 @@
-using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
@@ -44,9 +43,9 @@ public class KnightVirtueDef : Def
     public List<KnightVirtueTraitGroups> traitGroups = [];
 
 
-    public List<StatModifier> statOffsets;
+    public List<RimWorld.StatModifier> statOffsets;
 
-    public List<StatModifier> statFactors;
+    public List<RimWorld.StatModifier> statFactors;
 
     /// <summary>
     /// 根据美德属性值调整的属性Offset

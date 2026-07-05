@@ -49,12 +49,12 @@ public class ResidentKnightRoleDef : Def
     /// Stat偏移修正
     /// 修正是针对全体殖民者的，而非担任该职位的<see cref="Pawn"/>
     /// </summary>
-    public List<StatModifier> statOffsets;
+    public List<RimWorld.StatModifier> statOffsets;
     /// <summary>
     /// Stat系数修正
     /// 修正是针对全体殖民者的，而非担任该职位的<see cref="Pawn"/>
     /// </summary>
-    public List<StatModifier> statFactors;
+    public List<RimWorld.StatModifier> statFactors;
 
     public string GetRoleDetailDesc()
     {

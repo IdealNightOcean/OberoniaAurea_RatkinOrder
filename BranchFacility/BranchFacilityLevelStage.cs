@@ -24,12 +24,12 @@ public class BranchFacilityLevelStage
     /// <summary>
     /// 属性修正列表（Offset）
     /// </summary>
-    public List<BranchStatModifier> branchStatOffsets;
+    public List<StatModifier<BranchStatDef>> branchStatOffsets;
 
     /// <summary>
     /// 属性修正列表（Factor）
     /// </summary>
-    public List<BranchStatModifier> branchStatFactors;
+    public List<StatModifier<BranchStatDef>> branchStatFactors;
 
     /// <summary>额外自定义的效果描述</summary>
     /// <remarks>- 显示在修正效果之后</remarks>
@@ -48,7 +48,7 @@ public class BranchFacilityLevelStage
 
         if (branchStatOffsets is not null)
         {
-            foreach (BranchStatModifier modifier in branchStatOffsets)
+            foreach (StatModifier<BranchStatDef> modifier in branchStatOffsets)
             {
                 yield return modifier.ToStringOffset();
             }
@@ -56,7 +56,7 @@ public class BranchFacilityLevelStage
 
         if (branchStatFactors is not null)
         {
-            foreach (BranchStatModifier modifier in branchStatFactors)
+            foreach (StatModifier<BranchStatDef> modifier in branchStatFactors)
             {
                 yield return modifier.ToStringFactor();
             }

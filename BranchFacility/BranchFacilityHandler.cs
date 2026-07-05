@@ -255,7 +255,7 @@ public class BranchFacilityHandler : IExposable
         }
     }
 
-    public bool GetBranchStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
+    public bool GetBranchStatTransformer(BranchStatDef statDef, out StatTransformer transformer)
     {
         transformer = new();
         bool hasTransformer = false;
@@ -273,7 +273,7 @@ public class BranchFacilityHandler : IExposable
                 continue;
             }
 
-            List<BranchStatModifier> statModifiers;
+            List<OberoniaAurea.RatkinOrder.StatModifier<BranchStatDef>> statModifiers;
             if (stage.branchStatOffsets is not null)
             {
                 statModifiers = stage.branchStatOffsets;

@@ -229,11 +229,11 @@ public class BranchMedalHandler : IExposable
 
         foreach (KeyValuePair<StatDef, float> kv in statOffsetValues)
         {
-            stage.statOffsets.Add(new StatModifier() { stat = kv.Key, value = kv.Value });
+            stage.statOffsets.Add(new RimWorld.StatModifier() { stat = kv.Key, value = kv.Value });
         }
         foreach (KeyValuePair<StatDef, float> kv in statFactorValues)
         {
-            stage.statFactors.Add(new StatModifier() { stat = kv.Key, value = kv.Value });
+            stage.statFactors.Add(new RimWorld.StatModifier() { stat = kv.Key, value = kv.Value });
         }
         if (medalLabels.Length > 0)
         {

@@ -31,8 +31,8 @@ public class HediffStageModifierBuilder
 
     public bool HasAnyModifier => offsetDict.Count > 0 || factorDict.Count > 0;
 
-    private List<StatModifier> cachedOffsetModifiers;
-    private List<StatModifier> cachedFactorModifiers;
+    private List<RimWorld.StatModifier> cachedOffsetModifiers;
+    private List<RimWorld.StatModifier> cachedFactorModifiers;
 
     public void MarkInvalid()
     {
@@ -56,13 +56,13 @@ public class HediffStageModifierBuilder
         cachedOffsetModifiers = new(offsetDict.Count);
         foreach (KeyValuePair<StatDef, float> kv in offsetDict)
         {
-            cachedOffsetModifiers.Add(new StatModifier { stat = kv.Key, value = kv.Value });
+            cachedOffsetModifiers.Add(new RimWorld.StatModifier { stat = kv.Key, value = kv.Value });
         }
 
         cachedFactorModifiers = new(factorDict.Count);
         foreach (KeyValuePair<StatDef, float> kv in factorDict)
         {
-            cachedFactorModifiers.Add(new StatModifier { stat = kv.Key, value = kv.Value });
+            cachedFactorModifiers.Add(new RimWorld.StatModifier { stat = kv.Key, value = kv.Value });
         }
 
         offsetDict.Clear();
@@ -81,7 +81,7 @@ public class HediffStageModifierBuilder
         offsetDict[stat] = offsetDict.TryGetValue(stat, out float current) ? current + offset : offset;
     }
 
-    public void AddOffsets(IEnumerable<StatModifier> modifiers)
+    public void AddOffsets(IEnumerable<RimWorld.StatModifier> modifiers)
     {
         if (state != TemplateState.Modifying)
         {
@@ -89,7 +89,7 @@ public class HediffStageModifierBuilder
             return;
         }
         if (modifiers is null) return;
-        foreach (StatModifier modifier in modifiers)
+        foreach (RimWorld.StatModifier modifier in modifiers)
         {
             if (modifier.stat is null || modifier.value == 0f) continue;
             offsetDict[modifier.stat] = offsetDict.TryGetValue(modifier.stat, out float current) ? current + modifier.value : modifier.value;
@@ -106,7 +106,7 @@ public class HediffStageModifierBuilder
         if (stat is null || factor == 1f) return;
         factorDict[stat] = factorDict.TryGetValue(stat, out float current) ? current * factor : factor;
     }
-    public void AddFactors(IEnumerable<StatModifier> modifiers)
+    public void AddFactors(IEnumerable<RimWorld.StatModifier> modifiers)
     {
         if (state != TemplateState.Modifying)
         {
@@ -114,7 +114,7 @@ public class HediffStageModifierBuilder
             return;
         }
         if (modifiers is null) return;
-        foreach (StatModifier modifier in modifiers)
+        foreach (RimWorld.StatModifier modifier in modifiers)
         {
             if (modifier.stat is null || modifier.value == 1f) continue;
             factorDict[modifier.stat] = factorDict.TryGetValue(modifier.stat, out float current) ? current * modifier.value : modifier.value;

@@ -8,10 +8,10 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ResidentKnightRoleWorker_Sentry(ResidentKnightRoleDef def) : ResidentKnightRoleWorker(def)
 {
-    public override IEnumerable<StatModifier> RoleStatOffsets(Pawn pawn)
+    public override IEnumerable<RimWorld.StatModifier> RoleStatOffsets(Pawn pawn)
     {
         float offest = 0.05f + pawn.GetSkillLevel(SkillDefOf.Shooting) * 0.01f + pawn.GetSkillLevel(SkillDefOf.Intellectual) * 0.01f;
-        yield return new StatModifier()
+        yield return new RimWorld.StatModifier()
         {
             stat = StatDefOf.MoveSpeed,
             value = Mathf.Min(offest, 0.35f)

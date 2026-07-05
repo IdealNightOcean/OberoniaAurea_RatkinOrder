@@ -5,13 +5,13 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class BranchStatTransformerHandler
+public class StatTransformerHandler<T> where T : OAROStatDefBase
 {
-    public readonly Dictionary<BranchStatDef, BranchStatTransformer> branchStatTransformers = [];
-    public Action<IEnumerable<BranchStatDef>> OnZeroFactorUnmerged;
-    private HashSet<BranchStatDef> zeroFactorUnmergedStats;
+    public readonly Dictionary<T, StatTransformer> branchStatTransformers = [];
+    public Action<IEnumerable<T>> OnZeroFactorUnmerged;
+    private HashSet<T> zeroFactorUnmergedStats;
 
-    public bool TryGetStatTransformer(BranchStatDef statDef, out BranchStatTransformer transformer)
+    public bool TryGetStatTransformer(T statDef, out StatTransformer transformer)
     {
         if (statDef is null)
         {
@@ -22,21 +22,21 @@ public class BranchStatTransformerHandler
         return branchStatTransformers.TryGetValue(statDef, out transformer);
     }
 
-    public void AddStatTransformer(BranchStatDef statDef, BranchStatTransformer transformer, bool replaceCur = false)
+    public void AddStatTransformer(T statDef, StatTransformer transformer, bool replaceCur = false)
     {
         if (replaceCur || !branchStatTransformers.ContainsKey(statDef))
         {
             branchStatTransformers[statDef] = transformer;
         }
     }
-    public bool RemoveStatTransformer(BranchStatDef statDef) => branchStatTransformers.Remove(statDef);
+    public bool RemoveStatTransformer(T statDef) => branchStatTransformers.Remove(statDef);
 
-    public void MergeStatTransformer(BranchStatDef statDef, BranchStatTransformer toAdd, bool addIfMiss = true)
+    public void MergeStatTransformer(T statDef, StatTransformer toAdd, bool addIfMiss = true)
     {
         if (!toAdd.IsValid())
             return;
 
-        if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer oldTransformer))
+        if (branchStatTransformers.TryGetValue(statDef, out StatTransformer oldTransformer))
         {
             toAdd.MergeWith(oldTransformer);
             branchStatTransformers[statDef] = toAdd;
@@ -46,25 +46,25 @@ public class BranchStatTransformerHandler
             branchStatTransformers.Add(statDef, toAdd);
         }
     }
-    public void MergeStatTransformers(IEnumerable<KeyValuePair<BranchStatDef, BranchStatTransformer>> toAdds, bool addIfMiss = true)
+    public void MergeStatTransformers(IEnumerable<KeyValuePair<T, StatTransformer>> toAdds, bool addIfMiss = true)
     {
         if (toAdds is not null)
         {
-            foreach (KeyValuePair<BranchStatDef, BranchStatTransformer> toAdd in toAdds)
+            foreach (KeyValuePair<T, StatTransformer> toAdd in toAdds)
             {
                 MergeStatTransformer(toAdd.Key, toAdd.Value, addIfMiss);
             }
         }
     }
 
-    public void MergeStatOffset(BranchStatModifier modifier, bool addIfMiss = true)
+    public void MergeStatOffset(StatModifier<T> modifier, bool addIfMiss = true)
     {
         MergeStatOffset(modifier.statDef, modifier.value, addIfMiss);
     }
 
-    public void MergeStatOffset(BranchStatDef statDef, float toAdd, bool addIfMiss = true)
+    public void MergeStatOffset(T statDef, float toAdd, bool addIfMiss = true)
     {
-        if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        if (branchStatTransformers.TryGetValue(statDef, out StatTransformer transformer))
         {
             transformer.MergeOffset(toAdd);
             if (transformer.IsValid())
@@ -78,28 +78,28 @@ public class BranchStatTransformerHandler
         }
         else if (addIfMiss && toAdd != 0f)
         {
-            branchStatTransformers.Add(statDef, new BranchStatTransformer() { offset = toAdd });
+            branchStatTransformers.Add(statDef, new StatTransformer() { offset = toAdd });
         }
     }
 
-    public void MergeStatOffsets(IEnumerable<BranchStatModifier> modifiers, bool addIfMiss = true)
+    public void MergeStatOffsets(IEnumerable<StatModifier<T>> modifiers, bool addIfMiss = true)
     {
         if (modifiers is not null)
         {
-            foreach (BranchStatModifier modifier in modifiers)
+            foreach (StatModifier<T> modifier in modifiers)
             {
                 MergeStatOffset(modifier.statDef, modifier.value, addIfMiss);
             }
         }
     }
 
-    public void MergeStatFactor(BranchStatModifier modifier, bool addIfMiss = true)
+    public void MergeStatFactor(StatModifier<T> modifier, bool addIfMiss = true)
     {
         MergeStatFactor(modifier.statDef, modifier.value, addIfMiss);
     }
-    public void MergeStatFactor(BranchStatDef statDef, float toAdd, bool addIfMiss = true)
+    public void MergeStatFactor(T statDef, float toAdd, bool addIfMiss = true)
     {
-        if (branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        if (branchStatTransformers.TryGetValue(statDef, out StatTransformer transformer))
         {
             transformer.MergeFactor(toAdd);
             if (transformer.IsValid())
@@ -113,23 +113,23 @@ public class BranchStatTransformerHandler
         }
         else if (addIfMiss && toAdd != 1f)
         {
-            branchStatTransformers.Add(statDef, new BranchStatTransformer() { factor = toAdd });
+            branchStatTransformers.Add(statDef, new StatTransformer() { factor = toAdd });
         }
     }
-    public void MergeStatFactors(IEnumerable<BranchStatModifier> modifiers, bool addIfMiss = true)
+    public void MergeStatFactors(IEnumerable<StatModifier<T>> modifiers, bool addIfMiss = true)
     {
         if (modifiers is not null)
         {
-            foreach (BranchStatModifier modifier in modifiers)
+            foreach (StatModifier<T> modifier in modifiers)
             {
                 MergeStatFactor(modifier.statDef, modifier.value, addIfMiss);
             }
         }
     }
 
-    public void UnmergeStatTransformer(BranchStatDef statDef, BranchStatTransformer toRemove, bool doZeroUnmergedProcess = true)
+    public void UnmergeStatTransformer(T statDef, StatTransformer toRemove, bool doZeroUnmergedProcess = true)
     {
-        if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        if (!branchStatTransformers.TryGetValue(statDef, out StatTransformer transformer))
             return;
 
         if (toRemove.factor == 0f)
@@ -153,11 +153,11 @@ public class BranchStatTransformerHandler
             branchStatTransformers.Remove(statDef);
         }
     }
-    public void UnmergeStatTransformers(IEnumerable<KeyValuePair<BranchStatDef, BranchStatTransformer>> toRemoves, bool doZeroUnmergedProcess = true)
+    public void UnmergeStatTransformers(IEnumerable<KeyValuePair<T, StatTransformer>> toRemoves, bool doZeroUnmergedProcess = true)
     {
         if (toRemoves is not null)
         {
-            foreach (KeyValuePair<BranchStatDef, BranchStatTransformer> toRemove in toRemoves)
+            foreach (KeyValuePair<T, StatTransformer> toRemove in toRemoves)
             {
                 UnmergeStatTransformer(toRemove.Key, toRemove.Value, doZeroUnmergedProcess: false);
             }
@@ -168,13 +168,13 @@ public class BranchStatTransformerHandler
         }
     }
 
-    public void UnmergeStatOffset(BranchStatModifier modifier)
+    public void UnmergeStatOffset(StatModifier<T> modifier)
     {
         UnmergeStatFactor(modifier.statDef, modifier.value);
     }
-    public void UnmergeStatOffset(BranchStatDef statDef, float toRemove)
+    public void UnmergeStatOffset(T statDef, float toRemove)
     {
-        if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        if (!branchStatTransformers.TryGetValue(statDef, out StatTransformer transformer))
         {
             return;
         }
@@ -188,24 +188,24 @@ public class BranchStatTransformerHandler
             branchStatTransformers.Remove(statDef);
         }
     }
-    public void UnmergeStatsOffset(IEnumerable<BranchStatModifier> modifiers)
+    public void UnmergeStatsOffset(IEnumerable<StatModifier<T>> modifiers)
     {
         if (modifiers is not null)
         {
-            foreach (BranchStatModifier modifier in modifiers)
+            foreach (StatModifier<T> modifier in modifiers)
             {
                 UnmergeStatOffset(modifier.statDef, modifier.value);
             }
         }
     }
 
-    public void UnmergeStatFactor(BranchStatModifier modifier, bool doZeroUnmergedProcess = true)
+    public void UnmergeStatFactor(StatModifier<T> modifier, bool doZeroUnmergedProcess = true)
     {
         UnmergeStatFactor(modifier.statDef, modifier.value, doZeroUnmergedProcess);
     }
-    public void UnmergeStatFactor(BranchStatDef statDef, float toRemove, bool doZeroUnmergedProcess = true)
+    public void UnmergeStatFactor(T statDef, float toRemove, bool doZeroUnmergedProcess = true)
     {
-        if (!branchStatTransformers.TryGetValue(statDef, out BranchStatTransformer transformer))
+        if (!branchStatTransformers.TryGetValue(statDef, out StatTransformer transformer))
         {
             return;
         }
@@ -230,11 +230,11 @@ public class BranchStatTransformerHandler
             branchStatTransformers.Remove(statDef);
         }
     }
-    public void UnmergeStatsFactor(IEnumerable<BranchStatModifier> modifiers, bool doZeroUnmergedProcess = true)
+    public void UnmergeStatsFactor(IEnumerable<StatModifier<T>> modifiers, bool doZeroUnmergedProcess = true)
     {
         if (modifiers is not null)
         {
-            foreach (BranchStatModifier modifier in modifiers)
+            foreach (StatModifier<T> modifier in modifiers)
             {
                 UnmergeStatFactor(modifier.statDef, modifier.value, doZeroUnmergedProcess: false);
             }
@@ -252,7 +252,7 @@ public class BranchStatTransformerHandler
             return "None";
         }
         StringBuilder sb = new();
-        foreach (KeyValuePair<BranchStatDef, BranchStatTransformer> kv in branchStatTransformers)
+        foreach (KeyValuePair<T, StatTransformer> kv in branchStatTransformers)
         {
             sb.AppendInNewLine(kv.Key.label);
             sb.Append(":");

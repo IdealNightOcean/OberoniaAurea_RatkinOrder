@@ -1,5 +1,4 @@
-﻿using RimWorld;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -9,9 +8,9 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class KnightVirtueTraitDef : Def
 {
-    public List<StatModifier> statOffsets;
+    public List<RimWorld.StatModifier> statOffsets;
 
-    public List<StatModifier> statFactors;
+    public List<RimWorld.StatModifier> statFactors;
 
     /// <summary>
     /// 根据美德属性值调整的属性Offset

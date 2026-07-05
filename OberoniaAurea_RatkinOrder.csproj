@@ -151,6 +151,7 @@
     <Compile Include="Branch\BranchMedalHandler.cs" />
     <Compile Include="Branch\BranchPopulationHandler.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
+    <Compile Include="Components\CacheEnty.cs" />
     <Compile Include="Components\EventDispatcher.cs" />
     <Compile Include="Components\PathedTexture2D.cs" />
     <Compile Include="Components\HediffStageModifierBuilder.cs" />
@@ -175,7 +176,9 @@
     <Compile Include="Def\JointPatrolCaravanHelpDef.cs" />
     <Compile Include="Def\JointPatrolIncidentDef.cs" />
     <Compile Include="Def\JointPatrolInteractionDef.cs" />
+    <Compile Include="Def\ResidentKnightStatDef.cs" />
     <Compile Include="Def\KnightVirtueDef.cs" />
+    <Compile Include="Def\OAROStatDefBase.cs" />
     <Compile Include="Def\OrderLetterDef.cs" />
     <Compile Include="Def\OrderStationTraditionDef.cs" />
     <Compile Include="HarmonyPatch\TryDoMentalBreak_Patch.cs" />
@@ -187,6 +190,12 @@
     <Compile Include="DefModExtension\ModExtension_GiveHediff.cs" />
     <Compile Include="DefModExtension\ModExtension_RangeHediffGive.cs" />
     <Compile Include="DefModExtension\ModExtension_StatModifiersByValue.cs" />
+    <Compile Include="ResidentKnightStat\ResidentKnightStatWorker_AcademicPointsCostFactor.cs" />
+    <Compile Include="ResidentKnightStat\ResidentKnightStatWorker_AcademicPointsCost.cs" />
+    <Compile Include="ResidentKnightStat\ResidentKnightStatRequestData.cs" />
+    <Compile Include="ResidentKnightStat\ResidentKnightStatRequestData_Academic.cs" />
+    <Compile Include="ResidentKnightStat\ResidentKnightStatWorker.cs" />
+    <Compile Include="ResidentKnightStat\ResidentKnightStatPart.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediffInRange_Cyclicity.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediff_Justice_Instructor.cs" />
     <Compile Include="KnightVirtue\KnightVirtueComp\KnightVirtueComp_GiveHediffInRange_Cyclicity_LeaderOrMoralist.cs" />
@@ -308,6 +317,7 @@
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Thought\Thought_Situational_Virtue.cs" />
     <Compile Include="Utility\AcademicUtility.cs" />
+    <Compile Include="Utility\ResidentKnightStatUtility.cs" />
     <Compile Include="Utility\KnightChivalryUtility.cs" />
     <Compile Include="Utility\KnightDiaryUtility.cs" />
     <Compile Include="Utility\KnightVirtueUtility.cs" />
@@ -397,7 +407,7 @@
     <Compile Include="BranchDemand\BranchDemandWeighter_PostWarConvalescence.cs" />
     <Compile Include="BranchDemand\BranchDemandWeighter_SuperHeavyHowitzerRepair.cs" />
     <Compile Include="BranchDemand\BranchDemandWeighter_SupplyDepotCotr.cs" />
-    <Compile Include="BranchStat\BranchStatModifier.cs" />
+    <Compile Include="BranchStat\StatModifier.cs" />
     <Compile Include="BranchStat\BranchStatPart.cs" />
     <Compile Include="BranchStat\BranchStatPart_BuildingCeiling.cs" />
     <Compile Include="BranchBuilding\BranchBuildingConstructParms.cs" />
@@ -596,9 +606,9 @@
     <Compile Include="Quest\QuestPart\QuestPart_InvolvedRatkinOrders.cs" />
     <Compile Include="Quest\Quest_OrderCrewAidDelay.cs" />
     <Compile Include="DefModExtension\RatkinOrderFactionExtension.cs" />
-    <Compile Include="BranchStat\BranchStatTransformerHandler.cs" />
+    <Compile Include="BranchStat\StatTransformerHandler.cs" />
     <Compile Include="Def\BranchStatDef.cs" />
-    <Compile Include="BranchStat\BranchStatTransformer.cs" />
+    <Compile Include="BranchStat\StatTransformer.cs" />
     <Compile Include="DefOf\BranchBuildingDefOf.cs" />
     <Compile Include="HarmonyPatch\Faction_RelationKindChanged_Patch.cs" />
     <Compile Include="Def\OrderReformationDef.cs" />

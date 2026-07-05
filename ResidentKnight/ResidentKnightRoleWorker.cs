@@ -17,8 +17,8 @@ public class ResidentKnightRoleWorker(ResidentKnightRoleDef def)
     /// 修正是针对殖民者的，而非担任该职位的<see cref="Pawn"/>
     /// </summary>
     /// <param name="rolePawn">担任该职位的Pawn</param>
-    public virtual IEnumerable<StatModifier> RoleStatOffsets(Pawn rolePawn) { return null; }
-    public virtual IEnumerable<StatModifier> RoleStatFactors(Pawn rolePawn) { return null; }
+    public virtual IEnumerable<RimWorld.StatModifier> RoleStatOffsets(Pawn rolePawn) { return null; }
+    public virtual IEnumerable<RimWorld.StatModifier> RoleStatFactors(Pawn rolePawn) { return null; }
 
     public virtual void PostActiveRole(Pawn rolePawn)
     {

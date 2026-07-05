@@ -25,13 +25,10 @@ public static class AcademicUtility
     public static float GetMeditationPointsNeeded(KnightAcademicDef academicDef, KnightChivalryDef chivalry, int oldLevel, int newLevel)
     {
         if (newLevel < 1 || newLevel <= oldLevel)
-        {
             return 0f;
-        }
+
         if (newLevel > academicDef.MaxStageLevel)
-        {
             return float.MaxValue;
-        }
 
         float baseUnitCost = academicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
         int levelDiff = newLevel - oldLevel;

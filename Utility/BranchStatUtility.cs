@@ -38,10 +38,10 @@ public static class BranchStatUtility
                 default: break;
             }
 
-            BranchStatTransformer transformer = new();
+            StatTransformer transformer = new();
             bool hasTrans = false;
 
-            if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
+            if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out StatTransformer tempTransformer))
             {
                 hasTrans = true;
                 explanation.AppendLine("OARO_StatExplain_OrderReformation".Translate());
@@ -144,9 +144,9 @@ public static class BranchStatUtility
         float result;
         try
         {
-            BranchStatTransformer transformer = new();
+            StatTransformer transformer = new();
             bool hasTransformer = false;
-            if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out BranchStatTransformer tempTransformer))
+            if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out StatTransformer tempTransformer))
             {
                 transformer.MergeWith(tempTransformer);
                 hasTransformer = true;
@@ -191,7 +191,7 @@ public static class BranchStatUtility
         return result;
     }
 
-    public static float GetNewStatValueFormTrans(this Branch branch, BranchStatDef statDef, BranchStatTransformer transformer, float? baseValueOverride = null)
+    public static float GetNewStatValueFormTrans(this Branch branch, BranchStatDef statDef, StatTransformer transformer, float? baseValueOverride = null)
     {
         float result;
         try

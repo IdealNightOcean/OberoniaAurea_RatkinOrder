@@ -75,12 +75,12 @@ public class BranchBuildingDef : BranchConstructionDef
     /// <summary>
     /// 属性修正列表（Offset）
     /// </summary>
-    public List<BranchStatModifier> branchStatOffsets;
+    public List<StatModifier<BranchStatDef>> branchStatOffsets;
 
     /// <summary>
     /// 属性修正列表（Factor）
     /// </summary>
-    public List<BranchStatModifier> branchStatFactors;
+    public List<StatModifier<BranchStatDef>> branchStatFactors;
 
     /// <summary>
     /// 分部界面问候段落 - 建筑部分
@@ -129,7 +129,7 @@ public class BranchBuildingDef : BranchConstructionDef
 
         if (branchStatOffsets is not null)
         {
-            foreach (BranchStatModifier modifier in branchStatOffsets)
+            foreach (StatModifier<BranchStatDef> modifier in branchStatOffsets)
             {
                 yield return modifier.ToStringOffset();
             }
@@ -137,7 +137,7 @@ public class BranchBuildingDef : BranchConstructionDef
 
         if (branchStatFactors is not null)
         {
-            foreach (BranchStatModifier modifier in branchStatFactors)
+            foreach (StatModifier<BranchStatDef> modifier in branchStatFactors)
             {
                 yield return modifier.ToStringFactor();
             }
@@ -163,7 +163,7 @@ public class BranchBuildingDef : BranchConstructionDef
 
         if (advancedProperties.branchStatOffsets is not null)
         {
-            foreach (BranchStatModifier modifier in advancedProperties.branchStatOffsets)
+            foreach (StatModifier<BranchStatDef> modifier in advancedProperties.branchStatOffsets)
             {
                 yield return modifier.ToStringOffset();
             }
@@ -171,7 +171,7 @@ public class BranchBuildingDef : BranchConstructionDef
 
         if (advancedProperties.branchStatFactors is not null)
         {
-            foreach (BranchStatModifier modifier in advancedProperties.branchStatFactors)
+            foreach (StatModifier<BranchStatDef> modifier in advancedProperties.branchStatFactors)
             {
                 yield return modifier.ToStringFactor();
             }

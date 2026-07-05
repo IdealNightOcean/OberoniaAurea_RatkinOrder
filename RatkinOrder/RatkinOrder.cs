@@ -36,7 +36,7 @@ public class RatkinOrder : IExposable, ILoadReferenceable
     private CooldownRecordManager cooldownManager;
     public CooldownRecordManager CooldownManager => cooldownManager;
     public TagStrToBoolCountable EffectTags { get; } = new();
-    public BranchStatTransformerHandler TransformerHandler { get; } = new();
+    public StatTransformerHandler<BranchStatDef> TransformerHandler { get; } = new();
 
     /// <summary>
     /// 骑士团交互应用后触发，供 UI 窗口订阅以刷新缓存

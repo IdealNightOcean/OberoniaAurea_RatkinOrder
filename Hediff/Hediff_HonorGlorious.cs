@@ -64,22 +64,22 @@ public class Hediff_HonorGlorious : Hediff
             statFactors = [],
             statOffsets = []
         };
-        curStage.statFactors.Add(new StatModifier()
+        curStage.statFactors.Add(new RimWorld.StatModifier()
         {
             stat = StatDefOf.MeleeDamageFactor,
             value = curMeleeDamageFactor
         });
-        curStage.statFactors.Add(new StatModifier()
+        curStage.statFactors.Add(new RimWorld.StatModifier()
         {
             stat = StatDefOf.IncomingDamageFactor,
             value = 0.9f
         });
-        curStage.statOffsets.Add(new StatModifier()
+        curStage.statOffsets.Add(new RimWorld.StatModifier()
         {
             stat = StatDefOf.ShootingAccuracyPawn,
             value = 2.0f
         });
-        curStage.statOffsets.Add(new StatModifier()
+        curStage.statOffsets.Add(new RimWorld.StatModifier()
         {
             stat = StatDefOf.MeleeHitChance,
             value = 2.0f

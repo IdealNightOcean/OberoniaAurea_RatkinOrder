@@ -40,6 +40,8 @@ public class StatWorker_MeditationPointDailyGain : StatWorker_MeditationPointBas
                 sb.AppendLine("StatsReport_MeditationPointDailyGain_Factor".Translate(pointFactor.ToString("0.##")));
                 float pointGain = pointBase * pointFactor;
                 sb.AppendLine("StatsReport_MeditationPointDailyGain".Translate(pointGain.ToString("0.##")));
+
+                return sb.ToString();
             }
         }
 
