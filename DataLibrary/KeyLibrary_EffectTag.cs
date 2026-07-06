@@ -59,4 +59,14 @@ public static class KeyLibrary_EffectTag
     /// </summary>
     public const string ProminentTeacher = "ProminentTeacher";
 
+    /// <summary>
+    /// 骑士美德：美德精英（所有大类课业花费-10%）
+    /// </summary>
+    public const string VirtueElite = "VirtueElite";
+
+    /// <summary>
+    /// 骑士美德：美德誓言（超越阶位上限时课业惩罚由+300%→+150%；移除美德固定消耗10000修行点）
+    /// </summary>
+    public const string VirtueOath = "VirtueOath";
+
 }

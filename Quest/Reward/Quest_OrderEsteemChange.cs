@@ -32,8 +32,8 @@ public class QuestNode_OrderEsteemChange : QuestNode
 
         QuestPart_OrderEsteemChange questPart_OrderEsteemChange = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(OARO_KeyLibrary_SlateStoreAs.ratkinOrder),
             Change = change.GetValue(slate),
             ShowPlayerChangeMessage = showPlayerChangeMessage.GetValue(slate),
             Reason = reason.GetValue(slate)

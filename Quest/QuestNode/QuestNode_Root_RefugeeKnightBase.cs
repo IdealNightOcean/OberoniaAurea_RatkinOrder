@@ -27,7 +27,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
         Slate slate = QuestGen.slate;
         if (initBranch)
         {
-            Branch = QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
+            Branch = QuestGen.slate.Get<Branch>(OARO_KeyLibrary_SlateStoreAs.branch);
             if (!Branch.IsValid())
                 return false;
 
@@ -42,7 +42,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
             quest.AddPart(questPart_CriticalBranch);
         }
 
-        RatkinOrder = QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder) ?? Branch?.RatkinOrder;
+        RatkinOrder = QuestGen.slate.Get<RatkinOrder>(OARO_KeyLibrary_SlateStoreAs.ratkinOrder) ?? Branch?.RatkinOrder;
         if (!RatkinOrder.IsValid())
             return false;
 
@@ -68,7 +68,7 @@ public abstract class QuestNode_Root_RefugeeKnightBase : QuestNode_Root_RefugeeB
     protected override Faction GetOrGenerateFaction()
     {
         QuestGen.slate.Set(IsMainFactionSlate, true);
-        return QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.orderFaction);
+        return QuestGen.slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.orderFaction);
     }
 
     protected override List<Pawn> GeneratePawns(string lodgerRecruitedSignal = null)

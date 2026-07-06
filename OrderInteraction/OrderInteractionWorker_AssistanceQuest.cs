@@ -17,7 +17,7 @@ public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : O
         }
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_OrderInteraction_AssistanceQuest_Confirm".Translate(
-                ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                 modEx_AssistanceQuest.assistantPawnkind.Named("PAWNKIND"),
                 modEx_AssistanceQuest.assistantCount.Named(KeyLibrary_FormatArgName.Count)),
             ratkinOrder: ratkinOrder,

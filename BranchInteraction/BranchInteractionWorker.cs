@@ -89,7 +89,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
             }
             if (Def.honorDef is not null && branch.HonorDef != Def.honorDef)
             {
-                return resultOnly ? false : "OARO_NotHonorBranchOf".Translate(Def.honorDef.Named(KeyLibrary_FormatArgName.HONORDEF));
+                return resultOnly ? false : "OARO_NotHonorBranchOf".Translate(Def.honorDef.Named(OARO_KeyLibrary_FormatArgName.HONORDEF));
             }
         }
         if (Def.hasCoolDown)

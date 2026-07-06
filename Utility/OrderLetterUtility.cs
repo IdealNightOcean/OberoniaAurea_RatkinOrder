@@ -96,11 +96,11 @@ public static class OrderLetterUtility
     {
         List<NamedArgument> args =
         [
-            ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+            ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
         ];
         if (branch is not null)
         {
-            args.Add(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
+            args.Add(branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName));
         }
         NamedArgument[] argsArr = args.ToArray();
 

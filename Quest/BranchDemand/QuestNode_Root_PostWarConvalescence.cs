@@ -41,7 +41,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
             return false;
         }
 
-        DemandType = slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType);
+        DemandType = slate.Get<DemandType>(OARO_KeyLibrary_SlateStoreAs.demandType);
         if (DemandType == DemandType.Supplementary)
         {
             questParameter.LodgerCount = 1;
@@ -53,7 +53,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         QuestPart_BranchDemandWatcher questPart_BranchDemandWatcher = new()
         {
             Branch = Branch,
-            DemandDef = slate.Get<BranchDemandDef>(KeyLibrary_SlateStoreAs.demandDef),
+            DemandDef = slate.Get<BranchDemandDef>(OARO_KeyLibrary_SlateStoreAs.demandDef),
             DemandType = DemandType
         };
         QuestGen.quest.AddPart(questPart_BranchDemandWatcher);
@@ -139,7 +139,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         QuestPart_AvaerageMood questPart_AvaerageMood = new()
         {
-            inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            inSignalEnable = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
             InSignal = inSigalTimeToLeave,
             InSignalRemovePawn = inSignalRemovePawn,
 
@@ -242,7 +242,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
             {
                 QuestPart_OrderEsteemChange questPart_OrderEsteemChange_NormalSuccess = new()
                 {
-                    InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                    InSignalTrigger = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                     RatkinOrder = Branch.RatkinOrder,
                     Change = 1,
                     Reason = "OARO_PostWarConvalescence_Success".Translate()
@@ -251,7 +251,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
                 QuestPart_OrderRecommendation questPart_OrderRecommendation_NormalSuccess = new()
                 {
-                    InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                    InSignalTrigger = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                     RatkinOrder = Branch.RatkinOrder,
                     Count = 1
                 };

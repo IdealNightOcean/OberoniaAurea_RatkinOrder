@@ -715,14 +715,14 @@ public class Window_RatkinOrder : MainTabWindow
         if (branch.CurWorkState == Branch.WorkStateType.Idle)
         {
             reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 12f, inRect.height - 2f, inRect.height - 2f);
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
         }
         reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 12f, inRect.height - 2f, inRect.height - 2f);
         if (OARO_WindowUtility.TextButtonImage(
             reusedRect,
             string.Empty,
-            IconLibrary.ellipsisButton,
-            IconLibrary.ellipsisButton_Down,
+            OARO_IconLibrary.ellipsisButton,
+            OARO_IconLibrary.ellipsisButton_Down,
             doMouseoverSound: true))
         {
             Window_Branch branchWin = new(branch, map: Map);

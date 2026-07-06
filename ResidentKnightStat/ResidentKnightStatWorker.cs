@@ -1,8 +1,8 @@
-﻿using System;
+﻿using OberoniaAurea_Frame;
+using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -13,92 +13,30 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef)
 
     private readonly Dictionary<ResidentKnight, CacheEnty> temporaryStatCache = statDef.cacheable ? new(8) : null;
 
-    public virtual float PrepareInitialBaseValue(ResidentKnightStatRequestData requestData, float? baseValueOverride = null)
-    {
-        return baseValueOverride ?? StatDef.baseValue;
-    }
-
-    public virtual float PrepareInitialBaseValeExplanation(StringBuilder explanation, ResidentKnightStatRequestData requestData, float? baseValueOverride = null)
+    public virtual void PrepareInitialBaseValue(ResidentKnightStatRequestData requestData,
+                                                float? baseValueOverride = null,
+                                                bool resultOnly = true,
+                                                StringBuilder explanation = null)
     {
         float baseValue = baseValueOverride ?? StatDef.baseValue;
-        switch (StatDef.statType)
+        requestData.BaseValue = baseValue;
+        if (!resultOnly)
         {
-            case BranchStatDef.StatType.Int:
-                explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()));
-                break;
-            case BranchStatDef.StatType.Float:
-                explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign("0.##")));
-                break;
-            case BranchStatDef.StatType.Percent:
-                explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent("0.##")));
-                break;
-            default: break;
-        }
-        return baseValue;
-    }
-
-    public virtual void PostTransModify(ResidentKnightStatRequestData requestData, ref float curValue)
-    {
-        List<ResidentKnightStatPart> statParts = StatDef.statParts;
-        if (statParts is not null)
-        {
-            for (int i = 0; i < statParts.Count; i++)
-            {
-                statParts[i].PostTransModify(requestData, ref curValue);
-            }
-        }
-
-        curValue = Mathf.Clamp(curValue, statDef.minValue, statDef.maxValue);
-        if (statDef.statType == BranchStatDef.StatType.Int)
-        {
-            curValue = Mathf.Round(curValue);
+            explanation.AppendLine(GetBaseValueExplanation(baseValue));
         }
     }
 
-    public virtual void PostTransModifyExplanation(ResidentKnightStatRequestData requestData,
-                                                    ResidentKnightStatDef statDef,
-                                                    float baseValue,
-                                                    float curValue,
-                                                    StringBuilder explanation,
-                                                    bool showResultValue = true)
-    {
-        List<ResidentKnightStatPart> statParts = statDef.statParts;
-        if (statParts is not null)
-        {
-            explanation.AppendLine("OARO_StatExplain_StatParts".Translate());
-            if (showResultValue)
-            {
-                for (int i = 0; i < statParts.Count; i++)
-                {
-                    statParts[i].PostTransModify(requestData, ref curValue);
-                    statParts[i].PostTransModifyExplanation(requestData, statDef, explanation);
-                }
-            }
-            else
-            {
-                for (int i = 0; i < statParts.Count; i++)
-                {
-                    statParts[i].PostTransModifyExplanation(requestData, statDef, explanation);
-                }
-            }
-        }
 
-        if (showResultValue)
-        {
-            float result = Mathf.Clamp(curValue, statDef.minValue, statDef.maxValue);
-            if (statDef.statType == BranchStatDef.StatType.Int)
-            {
-                result = Mathf.Round(result);
-            }
-            statDef.Worker.UpdateStatCache(requestData.Knight, result);
-            ResidentKnightStatUtility.AppendStatResultExplanation(explanation, statDef, result, baseValue);
-        }
-    }
+    public virtual void PostTransModify(ResidentKnightStatRequestData requestData,
+                                        ref float curValue,
+                                        bool resultOnly = true,
+                                        StringBuilder explanation = null)
+    { }
 
     public float GetValue(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool immediateUpdate = false)
     {
         if (!StatDef.cacheable)
-            return ResidentKnightStatUtility.GetNewStatValue(requestData, StatDef, baseValueOverride);
+            return ResidentKnightStatUtility.GetNewStatValue(requestData, baseValueOverride);
 
         int ticksGame = Find.TickManager.TicksGame;
         ResidentKnight knight = requestData.Knight;
@@ -106,7 +44,7 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef)
         {
             if (immediateUpdate || cacheEnty.ExpiredTick < ticksGame)
             {
-                CacheEnty newEnty = BuildNewCacheEnty(StatDef, requestData, baseValueOverride, ticksGame);
+                CacheEnty newEnty = BuildNewCacheEnty(requestData, baseValueOverride, ticksGame);
                 temporaryStatCache[knight] = newEnty;
                 return newEnty.CacheValue;
             }
@@ -117,7 +55,7 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef)
         }
         else
         {
-            CacheEnty newEnty = BuildNewCacheEnty(StatDef, requestData, baseValueOverride, ticksGame);
+            CacheEnty newEnty = BuildNewCacheEnty(requestData, baseValueOverride, ticksGame);
             temporaryStatCache.Add(knight, newEnty);
             return newEnty.CacheValue;
         }
@@ -133,10 +71,21 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef)
 
     public void DeleteStatCache() => temporaryStatCache.Clear();
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    private static CacheEnty BuildNewCacheEnty(ResidentKnightStatDef statDef, ResidentKnightStatRequestData requestData, float? baseValueOverride, int ticksGame)
+    protected string GetBaseValueExplanation(float baseValue)
     {
-        float result = ResidentKnightStatUtility.GetNewStatValue(requestData, statDef, baseValueOverride);
-        return new CacheEnty(result, ticksGame + statDef.cacheDuration);
+        return StatDef.statType switch
+        {
+            BranchStatDef.StatType.Int => (string)"OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()),
+            BranchStatDef.StatType.Float => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign("0.##")),
+            BranchStatDef.StatType.Percent => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent("0.##")),
+            _ => KeyLibrary_Misc.ErrorTipWithColor,
+        };
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    private static CacheEnty BuildNewCacheEnty(ResidentKnightStatRequestData requestData, float? baseValueOverride, int ticksGame)
+    {
+        float result = ResidentKnightStatUtility.GetNewStatValue(requestData, baseValueOverride);
+        return new CacheEnty(result, ticksGame + requestData.StatDef.cacheDuration);
     }
 }

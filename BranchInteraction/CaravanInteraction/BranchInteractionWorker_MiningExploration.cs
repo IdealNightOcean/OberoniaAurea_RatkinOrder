@@ -42,7 +42,7 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
                 {
                     action = () => MetallicDelivery(parms, metallicDef),
                     linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
-                        text: "OARO_MiningExploration_Reply".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                        text: "OARO_MiningExploration_Reply".Translate(parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                                        metallicDef.Named(KeyLibrary_FormatArgName.THING)),
                         acceptText: "Confirm".Translate()),
                     resolveTree = false
@@ -64,10 +64,10 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
 
         Branch branch = parms.Branch;
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-            label: "OARO_MiningExploration_Label".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+            label: "OARO_MiningExploration_Label".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
             text: "OARO_MiningExploration_Text".Translate(
                 Faction.OfPlayer.Named("playerFaction"),
-                branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                 metallicDef.Named(KeyLibrary_FormatArgName.THING)),
             def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,

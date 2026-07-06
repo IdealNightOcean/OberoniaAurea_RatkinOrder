@@ -51,7 +51,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
         if (playerParticipated)
         {
             Messages.Message(
-                text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
+                text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
                 def: MessageTypeDefOf.NeutralEvent);
         }
     }
@@ -343,7 +343,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
             if (knight is not null)
             {
                 KnightVirtueDef randomVirtue = potentialVirtues.RandomElementWithFallback();
-                if (randomVirtue is not null && knight.VirtueHandler.UpgradeVirtue(randomVirtue, upgrade: 1, reason: "OARO_VirtueUpgradeReason_AssistanceReward".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName))))
+                if (randomVirtue is not null && knight.VirtueHandler.UpgradeVirtue(randomVirtue, upgrade: 1, reason: "OARO_VirtueUpgradeReason_AssistanceReward".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName))))
                 {
                     endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_KnightVirtue".Translate(
                                  knight.Pawn.Named(KeyLibrary_FormatArgName.PAWN),
@@ -357,7 +357,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
             if (knight is not null)
             {
                 KnightVirtueDef randomVirtue = potentialVirtues.RandomElementWithFallback();
-                if (randomVirtue is not null && knight.VirtueHandler.UpgradeVirtue(randomVirtue, upgrade: 1, reason: "OARO_VirtueUpgradeReason_AssistanceReward".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName))))
+                if (randomVirtue is not null && knight.VirtueHandler.UpgradeVirtue(randomVirtue, upgrade: 1, reason: "OARO_VirtueUpgradeReason_AssistanceReward".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName))))
                 {
                     endSB.AppendLine("OARO_Jurisdiction_AssistanceRewards_KnightVirtue".Translate(
                                  knight.Pawn.Named(KeyLibrary_FormatArgName.PAWN),

@@ -140,7 +140,7 @@ public static class RecommendationUtility
         ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
             label: "OARO_LetterLabel_GetRecommendation".Translate(),
             text: ratkinOrder is null ? "OARO_Letter_GetRecommendation".Translate(count.Named(KeyLibrary_FormatArgName.Count))
-                                      : "OARO_Letter_GetRecommendation_HasOrder".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), count.Named(KeyLibrary_FormatArgName.Count)),
+                                      : "OARO_Letter_GetRecommendation_HasOrder".Translate(ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName), count.Named(KeyLibrary_FormatArgName.Count)),
             def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
             lookTargets: lookTargets,
             relatedFaction: ratkinOrder?.Faction);

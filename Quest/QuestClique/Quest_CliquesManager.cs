@@ -23,9 +23,9 @@ public class QuestNode_CliquesManager : QuestNode
     {
         QuestPart_CliquesManager questPart_CliquesManager = new()
         {
-            inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            inSignalEnable = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
         };
-        questPart_CliquesManager.SetOrderBranch(branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch));
+        questPart_CliquesManager.SetOrderBranch(branch.GetValue(QuestGen.slate) ?? QuestGen.slate.Get<Branch>(OARO_KeyLibrary_SlateStoreAs.branch));
         QuestGen.quest.AddPart(questPart_CliquesManager);
     }
 }
@@ -105,7 +105,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
             return;
         }
 
-        StringBuilder branchCliqueInfoSB = new("OARO_BranchCliquesInfoText_Header".Translate(branch.RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)));
+        StringBuilder branchCliqueInfoSB = new("OARO_BranchCliquesInfoText_Header".Translate(branch.RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName)));
         branchCliqueInfoSB.AppendLine();
         foreach (Branch cliqueBranch in allCliques.Where(c => c.IsBranchClique).Select(c => c.RelatedBranch).OrderBy(b => b?.RatkinOrder.LoadID ?? int.MinValue))
         {
@@ -163,7 +163,7 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
         {
             return clique.Name;
         }
-        return KeyLibrary_FormatArgName.UNKOWN;
+        return KeyLibrary_Misc.ErrorTip;
     }
 
     public bool TryAddClique(QuestClique clique, bool replaceCur = false, bool defaultActive = false)

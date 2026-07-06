@@ -14,10 +14,10 @@ public class JointPatrolCaravanHelpWorker_ThingHelp : JointPatrolCaravanHelpWork
             return base.RequestHelpReason(branch);
         }
 
-        return modEx_ThingHelp.requestHelpReason.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+        return modEx_ThingHelp.requestHelpReason.Formatted(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                            modEx_ThingHelp.requireThing.Named(KeyLibrary_FormatArgName.THING),
                                                            modEx_ThingHelp.requireCount.Named(KeyLibrary_FormatArgName.Count),
-                                                           Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF));
+                                                           Def.Named(OARO_KeyLibrary_FormatArgName.CARAVANHELPDEF));
     }
 
     public override bool Notify_CaravanArrived(Caravan caravan, Branch branch, WorldObject_InteractiveBase incidentSite)
@@ -37,10 +37,10 @@ public class JointPatrolCaravanHelpWorker_ThingHelp : JointPatrolCaravanHelpWork
     {
         JointPatrolCaravanHelp_ThingHelpExtension modEx_ThingHelp = Def.GetModExtension<JointPatrolCaravanHelp_ThingHelpExtension>();
         DiaNode rootNode = new(modEx_ThingHelp.requestHelpReason.Formatted(
-            branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+            branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
             modEx_ThingHelp.requireThing.Named(KeyLibrary_FormatArgName.THING),
             modEx_ThingHelp.requireCount.Named(KeyLibrary_FormatArgName.Count),
-            Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF)));
+            Def.Named(OARO_KeyLibrary_FormatArgName.CARAVANHELPDEF)));
 
         DiaOption giveOpt = new("OARO_GiveRequestThings".Translate())
         {

@@ -137,7 +137,7 @@ public class JointPatrolRewardData
             {
                 Includes = { OARO_RulePackDefOf.OARO_JointPatrolCompletion }
             };
-            grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, RatkinOrder));
+            grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(OARO_KeyLibrary_FormatArgName.ORDER, RatkinOrder));
             grammarRequest.Rules.Add(new Rule_String("patrolLevel", $"OARO_JointPatrolLevel_{patrolLevel}".Translate()));
             grammarRequest.Rules.Add(new Rule_String("participantsCount", participants.Count.ToString()));
 

@@ -22,8 +22,8 @@ public class QuestNode_RatkinOrderRelationshipChange : QuestNode
         Slate slate = QuestGen.slate;
         QuestPart_RatkinOrderRelationshipChange questPart_RatkinOrderRelationshipChange = new()
         {
-            InSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
+            InSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = ratkinOrder.GetValue(slate) ?? slate.Get<RatkinOrder>(OARO_KeyLibrary_SlateStoreAs.ratkinOrder),
             Offset = offset.GetValue(slate),
             SendLetter = sendLetter.GetValue(slate)
         };

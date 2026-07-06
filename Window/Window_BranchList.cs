@@ -97,7 +97,7 @@ public class Window_BranchList : OrderWindowBase
         if (branch.HonorDef is not null)
         {
             Material tintMat = OARO_WindowUtility.GetTintMaterial(branch.HonorDef.color, Texture2D.redTexture);
-            GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.HonorBackgroundTex, tintMat);
+            GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.HonorBackgroundTex, tintMat);
         }
 
         reusedRect.xMin += 12f;
@@ -110,8 +110,8 @@ public class Window_BranchList : OrderWindowBase
         if (OARO_WindowUtility.TextButtonImage(
             butRect: reusedRectII,
             label: string.Empty,
-            baseTex: IconLibrary.ellipsisButton,
-            downTex: IconLibrary.ellipsisButton_Down,
+            baseTex: OARO_IconLibrary.ellipsisButton,
+            downTex: OARO_IconLibrary.ellipsisButton_Down,
             doMouseoverSound: true))
         {
             Window_Branch branchWin = new(branch, map: Map);

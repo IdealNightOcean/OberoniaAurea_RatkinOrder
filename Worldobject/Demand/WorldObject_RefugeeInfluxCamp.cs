@@ -561,7 +561,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             };
             if (!clique.IsActive)
             {
-                townOpt.Disable("OARO_CliqueInactive".Translate(clique.Name.Named(KeyLibrary_FormatArgName.CliqueName)));
+                townOpt.Disable("OARO_CliqueInactive".Translate(clique.Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName)));
             }
             diaNode.options.Add(townOpt);
         }

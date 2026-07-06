@@ -17,15 +17,15 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
     }
     private (Faction parentFaction, Faction subFaction) GetFactions()
     {
-        Faction parentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction);
+        Faction parentFaction = QuestGen.slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.parentFaction);
         parentFaction ??= OAFrame_FactionUtility.FirstAvailableFactionOf(validationParams: FactionValidationParams.NonHostileNormalFaction,
                                                                          predicater: f => f.IsRatkinKindomFaction());
         if (parentFaction is null)
         {
             return (null, null);
         }
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
-        subFaction ??= ModUtility.GenerateSubRatkinFaction(subFactionDef: QuestGen.slate.Get<FactionDef>(KeyLibrary_SlateStoreAs.subFactionDef) ?? OARO_ModDefOf.OARO_SubRakinia_Neutral,
+        Faction subFaction = QuestGen.slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.subFaction);
+        subFaction ??= ModUtility.GenerateSubRatkinFaction(subFactionDef: QuestGen.slate.Get<FactionDef>(OARO_KeyLibrary_SlateStoreAs.subFactionDef) ?? OARO_ModDefOf.OARO_SubRakinia_Neutral,
                                                            parentFactionDef: parentFaction.def,
                                                            parentFaction: parentFaction);
         return (parentFaction, subFaction);
@@ -57,7 +57,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         quest.ReserveFaction(subFaction);
 
         slate.Set("faction", parentFaction);
-        slate.Set(KeyLibrary_SlateStoreAs.subFaction, subFaction);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.subFaction, subFaction);
         slate.Set("map", map);
 
         //人物生成;

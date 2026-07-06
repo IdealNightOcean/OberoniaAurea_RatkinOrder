@@ -171,17 +171,17 @@ public class BranchDemandHandler : ITickDay, IExposable
             if (showMessage)
             {
                 Messages.Message(
-                    text: "OARO_Message_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), demandDef.Named(KeyLibrary_FormatArgName.DEMAND)),
+                    text: "OARO_Message_DemandFriendlyInform".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), demandDef.Named(OARO_KeyLibrary_FormatArgName.DEMAND)),
                     def: MessageTypeDefOf.PositiveEvent);
             }
             if (Rand.Bool && !branch.RatkinOrder.CooldownManager.IsInCooldown(KeyLibrary_CDRecord.DemandFriendlyInform))
             {
                 branch.RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.DemandFriendlyInform, cdTicks: 12 * 60000, removeWhenExpired: true);
 
-                OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                OrderLetterUtility.MakeOrderLetter(label: "OARO_LetterLabel_DemandFriendlyInform".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                                                    text: "OARO_LetterLabel_DemandFriendlyInform".Translate(
-                                                       branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
-                                                       demandDef.Named(KeyLibrary_FormatArgName.DEMAND)),
+                                                       branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
+                                                       demandDef.Named(OARO_KeyLibrary_FormatArgName.DEMAND)),
                                                    def: OrderLetterDefOf.OARO_OfficialLetter,
                                                    relatedOrder: branch.RatkinOrder,
                                                    relatedBranch: branch,

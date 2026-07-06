@@ -77,14 +77,14 @@ public static class OARO_WindowUtility
     public static bool DrawCloseX_Corner(Rect mainRect)
     {
         Rect reusedRect = new(mainRect.xMax - 26f, mainRect.y + 2f, 24f, 24f);
-        return Widgets.ButtonImage(reusedRect, IconLibrary.ColseX, doMouseoverSound: true);
+        return Widgets.ButtonImage(reusedRect, OARO_IconLibrary.ColseX, doMouseoverSound: true);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool DrawBackArrow_Corner(Rect mainRect)
     {
         Rect reusedRect = new(mainRect.xMax - 54f, mainRect.y + 2f, 24f, 24f);
-        return Widgets.ButtonImage(reusedRect, IconLibrary.BackArrow, doMouseoverSound: true);
+        return Widgets.ButtonImage(reusedRect, OARO_IconLibrary.BackArrow, doMouseoverSound: true);
     }
 
     public static bool ButtonImage(Rect butRect, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
@@ -184,7 +184,7 @@ public static class OARO_WindowUtility
             else
             {
                 Messages.Message(
-                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), def.Named("INTERACTION"), acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
+                    text: "OARO_CanApplyBranchInteractionWithReason".Translate(parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), def.Named("INTERACTION"), acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
                     historical: false);
             }
@@ -202,7 +202,7 @@ public static class OARO_WindowUtility
         TextAnchor preAnchor = Text.Anchor;
 
         Rect rect = new(position.x, position.y, 392f, 90f);
-        GUI.DrawTexture(rect, IconLibrary.BranchSummaryBackground);
+        GUI.DrawTexture(rect, OARO_IconLibrary.BranchSummaryBackground);
         Rect inRect = rect.ContractedBy(2f);
 
         Branch branch = entry.Branch;
@@ -229,7 +229,7 @@ public static class OARO_WindowUtility
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
             Material tintMat = OARO_WindowUtility.GetTintMaterial(honorDef.color, Texture2D.redTexture);
-            GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.HonorBackgroundTex, tintMat);
+            GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.HonorBackgroundTex, tintMat);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
@@ -237,7 +237,7 @@ public static class OARO_WindowUtility
         else
         {
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 38f, 34f, 37f);
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
 
         Rect squadNameRect = Rect.MinMaxRect(leftRect.x + 100f, leftRect.y + 4f, leftRect.xMax - 16f, leftRect.y + 4f + 22f);
@@ -259,12 +259,12 @@ public static class OARO_WindowUtility
         string relation;
         if (branch.IsBranchOfType(BranchType.Friendly))
         {
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
         }
         else
         {
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallStrangeIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallStrangeIcon, ScaleMode.ScaleToFit);
             relation = "OARO_Strange".Translate();
         }
 
@@ -312,7 +312,7 @@ public static class OARO_WindowUtility
         Text.Anchor = TextAnchor.MiddleLeft;
 
         Rect reusedRect = new(inRect.x, inRect.y, inRect.height, inRect.height);
-        GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, OARO_IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
 
         reusedRect = Rect.MinMaxRect(reusedRect.xMax + textOffset, inRect.yMin, inRect.xMax, inRect.yMax);
         Widgets.Label(reusedRect, $"× {count}");
@@ -324,7 +324,7 @@ public static class OARO_WindowUtility
     {
         if (branch?.HonorDef is null)
         {
-            GUI.DrawTexture(inRect, expand ? IconLibrary.BigGeneralBranchIcon : IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(inRect, expand ? OARO_IconLibrary.BigGeneralBranchIcon : OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
         else
         {
@@ -338,17 +338,17 @@ public static class OARO_WindowUtility
         {
             case WorkStateType.Idle:
                 {
-                    GUI.DrawTexture(inRect, expand ? IconLibrary.BigIdleIcon : IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+                    GUI.DrawTexture(inRect, expand ? OARO_IconLibrary.BigIdleIcon : OARO_IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
                     return;
                 }
             case WorkStateType.OnBaseTask:
                 {
-                    GUI.DrawTexture(inRect, expand ? IconLibrary.BigOnBaseIcon : IconLibrary.SmallOnBaseIcon, ScaleMode.ScaleToFit);
+                    GUI.DrawTexture(inRect, expand ? OARO_IconLibrary.BigOnBaseIcon : OARO_IconLibrary.SmallOnBaseIcon, ScaleMode.ScaleToFit);
                     return;
                 }
             case WorkStateType.AbroadTask:
                 {
-                    GUI.DrawTexture(inRect, expand ? IconLibrary.BigAbroadIcon : IconLibrary.SmallAbroadIcon, ScaleMode.ScaleToFit);
+                    GUI.DrawTexture(inRect, expand ? OARO_IconLibrary.BigAbroadIcon : OARO_IconLibrary.SmallAbroadIcon, ScaleMode.ScaleToFit);
                     return;
                 }
             default: return;

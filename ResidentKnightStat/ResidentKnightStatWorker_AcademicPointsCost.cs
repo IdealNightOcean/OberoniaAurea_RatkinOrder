@@ -1,22 +1,30 @@
 ﻿using OberoniaAurea_Frame;
+using System.Text;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
 public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef statDef) : ResidentKnightStatWorker(statDef)
 {
-    public override float PrepareInitialBaseValue(ResidentKnightStatRequestData requestData, float? baseValueOverride = null)
+    public override void PostTransModify(ResidentKnightStatRequestData requestData,
+                                         ref float curValue,
+                                         bool resultOnly = true,
+                                         StringBuilder explanation = null)
     {
-        if (requestData is not ResidentKnightStatRequestData_Academic academicRequestData)
-            return 0f;
+        if (requestData is ResidentKnightStatRequestData_Academic academicRequestData)
+        {
+            KnightAcademicDef academicDef = academicRequestData.AcademicDef;
+            if (academicDef.chivalry.IsSameDefNonNullable(academicRequestData.Knight.Chivalry))
+            {
+                curValue /= 2;
+                if (!resultOnly)
+                {
+                    explanation.AppendLine("OARO_CostFactor_SameChivalry".Translate(academicDef.Named(KeyLibrary_FormatArgName.DEF),
+                                                                                    academicDef.chivalry.Named(OARO_KeyLibrary_FormatArgName.CHIVALRY),
+                                                                                    OAFrame_TextUtility.ColoredFloatNamedArgument(0.5f, KeyLibrary_FormatArgName.Factor)));
+                }
+            }
 
-        float baseUnitCost = academicRequestData.AcademicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
-        int levelDiff = academicRequestData.TargetLevel - academicRequestData.CurLevel;
-        float neededPoints = levelDiff * baseUnitCost + (academicRequestData.CurLevel + academicRequestData.TargetLevel - 1) * levelDiff / 2 * baseUnitCost;
-
-        if (academicRequestData.Knight.Chivalry.IsSameDefNonNullable(academicRequestData.AcademicDef.chivalry))
-            neededPoints /= 2;
-
-        return neededPoints;
+        }
     }
 }
-

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Verse;
 using Verse.Grammar;
 
@@ -157,7 +158,7 @@ public static class ModUtility
         RatkinOrder ratkinOrder = branch.RatkinOrder;
         if (alsoAddOrderRule)
         {
-            foreach (Rule orderObjRule in RulesForRatkinOrder(prefix + KeyLibrary_FormatArgName.ORDER, ratkinOrder))
+            foreach (Rule orderObjRule in RulesForRatkinOrder(prefix + OARO_KeyLibrary_FormatArgName.ORDER, ratkinOrder))
             {
                 yield return orderObjRule;
             }
@@ -167,6 +168,12 @@ public static class ModUtility
         {
             yield return worldObjRule;
         }
+    }
+
+    public static void AppendLineWithSeparator(this StringBuilder stringBuilder, string text, string separator)
+    {
+        stringBuilder.Append(separator);
+        stringBuilder.AppendLine(text);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

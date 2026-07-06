@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.Planet;
 using Verse;
 
@@ -29,8 +30,8 @@ public class BranchInteractionWorker_VisitKnightCommander(BranchInteractionDef d
 
         Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_VisitKnightCommander_Reply".Translate(
-                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-                    parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                    parms.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+                    parms.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                     2.Named("Esteem"),
                     100.Named("Meditation"),
                     GenLabel.ThingsLabel([privateBrew]).Named(KeyLibrary_FormatArgName.ThingsInfo)),

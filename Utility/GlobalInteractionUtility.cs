@@ -164,10 +164,10 @@ public static class GlobalInteractionUtility
         float chance = InvitationAcceptanceChance(knightGroup, resultOnly: true, out _);
         int seasonInvitationLimit = SeasonInvitationLimit();
         TaggedString text = AroundKnightGroupsManager.Instance.SeasonInvitationUsed > seasonInvitationLimit ? "OARO_InviteAroundKnightGroup_ConfirmOverLimit".Translate(
-                                                                                                                    knightGroup.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                                                                                                                    knightGroup.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                                                                                     chance.ToStringPercent().Named(KeyLibrary_FormatArgName.Chance))
                                                                                                             : "OARO_InviteAroundKnightGroup_Confirm".Translate(
-                                                                                                                knightGroup.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                                                                                                                knightGroup.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                                                                                 chance.ToStringPercent().Named(KeyLibrary_FormatArgName.Chance));
 
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
@@ -209,8 +209,8 @@ public static class GlobalInteractionUtility
         {
             Includes = { OARO_RulePackDefOf.OARO_Dialog_AroundKnightGroupVisitInvalid }
         };
-        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, branch.RatkinOrder));
-        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(KeyLibrary_FormatArgName.BRANCH, branch, alsoAddOrderRule: false));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(OARO_KeyLibrary_FormatArgName.ORDER, branch.RatkinOrder));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(OARO_KeyLibrary_FormatArgName.BRANCH, branch, alsoAddOrderRule: false));
         grammarRequest.Constants.Add("isProactive", isProactive.ToString());
         TaggedString talkText = GrammarResolver.Resolve("r_text", grammarRequest);
 

@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using UnityEngine;
 using Verse;
@@ -148,14 +149,14 @@ public class EsteemHandler : IExposable, ITickDay
                     if (reason is null)
                     {
                         Messages.Message(
-                            text: "OARO_Message_EsteemIncreaseNoReason".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                            text: "OARO_Message_EsteemIncreaseNoReason".Translate(RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                                                                                   lastEsteemChange.Named(KeyLibrary_FormatArgName.Count)),
                             def: MessageTypeDefOf.PositiveEvent);
                     }
                     else
                     {
                         Messages.Message(
-                            text: "OARO_Message_EsteemIncrease".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                            text: "OARO_Message_EsteemIncrease".Translate(RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                                                                           lastEsteemChange.Named(KeyLibrary_FormatArgName.Count),
                                                                           reason.Named(KeyLibrary_FormatArgName.Reason)),
                             def: MessageTypeDefOf.PositiveEvent);
@@ -167,14 +168,14 @@ public class EsteemHandler : IExposable, ITickDay
                     if (reason is null)
                     {
                         Messages.Message(
-                            text: "OARO_Message_EsteemDecreaseNoReason".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                            text: "OARO_Message_EsteemDecreaseNoReason".Translate(RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                                                                                   lastEsteemChange.Named(KeyLibrary_FormatArgName.Count)),
                             def: MessageTypeDefOf.NegativeEvent);
                     }
                     else
                     {
                         Messages.Message(
-                            text: "OARO_Message_EsteemDecrease".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName),
+                            text: "OARO_Message_EsteemDecrease".Translate(RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                                                                           lastEsteemChange.Named(KeyLibrary_FormatArgName.Count),
                                                                           reason.Named(KeyLibrary_FormatArgName.Reason)),
                             def: MessageTypeDefOf.NegativeEvent);
@@ -216,7 +217,7 @@ public class EsteemHandler : IExposable, ITickDay
         RatkinOrder.CooldownManager.RegisterRecord(KeyLibrary_CDRecord.AutoRelationshipUpgraded, cdTicks: 10 * 60000, removeWhenExpired: true);
         ChoiceLetter_AutoUpgradeRelationship letter = (ChoiceLetter_AutoUpgradeRelationship)LetterMaker.MakeLetter(
             label: "OARO_LetterLabel_AutoUpgradeRelationship".Translate(),
-            text: "OARO_Letter_AutoUpgradeRelationship".Translate(RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+            text: "OARO_Letter_AutoUpgradeRelationship".Translate(RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
             def: OARO_LetterDefOf.OARO_AutoUpgradeRelationshipQuizLetter,
             relatedFaction: RatkinOrder.Faction);
         letter.RelatedOrder = RatkinOrder;

@@ -141,7 +141,7 @@ public static class BranchSupportUtility
             {
                 OrderLetter orderLetter = OrderLetterUtility.MakeOrderLetter(
                     label: "OARO_BranchDemand_SupportTriggerLabel".Translate(),
-                    text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName), demandDef.label.Named("DEMAND")),
+                    text: "OARO_BranchDemand_SupportTriggerText".Translate(branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName), demandDef.label.Named("DEMAND")),
                     def: OrderLetterDefOf.OARO_OfficialLetter,
                     relatedOrder: branch.RatkinOrder,
                     sender: branch.NameColored,
@@ -329,14 +329,14 @@ public static class BranchSupportUtility
             if (parms.Branch is null)
             {
                 textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(
-                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                    parms.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                     parms.CommanderCount.Named("CommanderCount")));
             }
             else
             {
                 textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(
-                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-                    parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                    parms.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+                    parms.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                     parms.CommanderCount.Named("CommanderCount")));
             }
             textSB.AppendLine();
@@ -355,14 +355,14 @@ public static class BranchSupportUtility
             if (parms.Branch is null)
             {
                 textSB.AppendLine("OARO_CombatDeployText_RatkinOrderInfo".Translate(
-                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                    parms.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                     parms.CommanderCount.Named("CommanderCount")));
             }
             else
             {
                 textSB.AppendLine("OARO_CombatDeployText_BranchInfo".Translate(
-                    parms.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-                    parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                    parms.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+                    parms.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                     parms.CommanderCount.Named("CommanderCount")));
             }
             textSB.AppendLine();

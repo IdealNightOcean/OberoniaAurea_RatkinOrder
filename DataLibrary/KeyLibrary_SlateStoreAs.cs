@@ -3,7 +3,7 @@
 namespace OberoniaAurea.RatkinOrder;
 
 [StaticConstructorOnStartup]
-public static class KeyLibrary_SlateStoreAs
+public static class OARO_KeyLibrary_SlateStoreAs
 {
     public const string inSignal = "inSignal";
 

@@ -30,7 +30,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 
         slate.Set("map", map);
 
-        Faction parentFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction);
+        Faction parentFaction = slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.parentFaction);
         if (parentFaction is null)
         {
             FactionValidationParams validationParams = new()
@@ -42,13 +42,13 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
 
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
-            MercyQuestDef = slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
+            MercyQuestDef = slate.Get<MercyQuestDef>(OARO_KeyLibrary_SlateStoreAs.mercyQuestDef),
             ParentFaction = parentFaction
         };
         quest.AddPart(questPart_MercyQuestWatcher);
 
         IntVec3? spawnCell = null;
-        if (slate.TryGet(KeyLibrary_SlateStoreAs.helpSeeker, out Pawn helpSeeker))
+        if (slate.TryGet(OARO_KeyLibrary_SlateStoreAs.helpSeeker, out Pawn helpSeeker))
         {
             spawnCell = helpSeeker.PositionHeld;
         }

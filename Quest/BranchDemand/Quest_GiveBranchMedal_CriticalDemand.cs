@@ -34,15 +34,15 @@ public class QuestNode_GiveBranchMedal_CriticalDemand : QuestNode
         }
         QuestPart_GiveBranchMedal_CriticalDemand questPart_GiveBranchMedal_CriticalDemand = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(OARO_KeyLibrary_SlateStoreAs.branch),
             Count = count.GetValue(slate),
             BaseRewardMedalTypeCount = baseRewardMedalTypeCount.GetValue(slate),
             ExtraRewardMedalTypeCount = extraRewardMedalTypeCount.GetValue(slate),
             ExtraMedalPotencyBoundary = extraMedalPotencyBoundary.GetValue(slate),
             PotentialMedalDefs = [],
         };
-        IEnumerable<KnightChivalryDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<KnightChivalryDef>>(KeyLibrary_SlateStoreAs.preSetPotentialMedals);
+        IEnumerable<KnightChivalryDef> potentialDefs = this.potentialDefs.GetValue(slate) ?? slate.Get<IEnumerable<KnightChivalryDef>>(OARO_KeyLibrary_SlateStoreAs.preSetPotentialMedals);
         if (potentialDefs is not null)
         {
             questPart_GiveBranchMedal_CriticalDemand.PotentialMedalDefs.AddRangeUnique(potentialDefs);
@@ -134,8 +134,8 @@ public class QuestPart_GiveBranchMedal_CriticalDemand : QuestPart
         }
 
         StringBuilder medalRewardSB = new("OARO_CriticalDemand_CliqueBranchMedalGainText".Translate(
-            Branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-            Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+            Branch.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+            Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
             quest.name.Named("QuestName")
             ));
 

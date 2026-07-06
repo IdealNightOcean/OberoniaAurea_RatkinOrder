@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OberoniaAurea_Frame;
+using System;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -31,12 +32,12 @@ public class BranchStatPart_BranchEffectTagFactor : BranchStatPart
 
             if (String.IsNullOrEmpty(reasonOverride))
             {
-                explanation.AppendLine("OARO_ChangeFactor_BranchEffectTag".Translate(effectTag.Named(KeyLibrary_FormatArgName.EffectTag), factorArg.Named(KeyLibrary_FormatArgName.Factor))
+                explanation.AppendLine("OARO_ChangeFactor_BranchEffectTag".Translate(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), factorArg.Named(KeyLibrary_FormatArgName.Factor))
                                                                           .Colorize(color));
             }
             else
             {
-                explanation.AppendLine(reasonOverride.Formatted(effectTag.Named(KeyLibrary_FormatArgName.EffectTag), factorArg.Named(KeyLibrary_FormatArgName.Factor))
+                explanation.AppendLine(reasonOverride.Formatted(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), factorArg.Named(KeyLibrary_FormatArgName.Factor))
                                                      .Colorize(color));
             }
         }

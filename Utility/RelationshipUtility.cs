@@ -240,7 +240,7 @@ public static class RelationshipUtility
     {
         Slate slate = new();
         slate.SetBasicOrderSlateVar(ratkinOrder);
-        slate.Set(KeyLibrary_SlateStoreAs.orderRelationship, ratkinOrder.Relationship);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.orderRelationship, ratkinOrder.Relationship);
         slate.Set("map", map);
 
         return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_OrderRelationshipUpgrade, slate, forced: true);
@@ -257,14 +257,14 @@ public static class RelationshipUtility
         if (upgraded)
         {
             sb.AppendLine("OARO_UpgradedToNewRelation".Translate(
-                ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                 oldRelation.GetLabel().Named("OldRelation"),
                 newRelation.GetLabel().Named("NewRelation")));
         }
         else
         {
             sb.AppendLine("OARO_DowngradedToNewRelation".Translate(
-                ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                 oldRelation.GetLabel().Named("OldRelation"),
                 newRelation.GetLabel().Named("NewRelation")));
         }
@@ -283,7 +283,7 @@ public static class RelationshipUtility
         int newIndex = (int)newRelation;
         if (upgraded)
         {
-            sb.AppendLine("OARO_Relationship_GainPermission".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)));
+            sb.AppendLine("OARO_Relationship_GainPermission".Translate(ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)));
             for (int i = oldIndex + 1; i <= newIndex; i++)
             {
                 sb.AppendLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
@@ -291,7 +291,7 @@ public static class RelationshipUtility
         }
         else
         {
-            sb.AppendLine("OARO_Relationship_LossPermission".Translate(ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)));
+            sb.AppendLine("OARO_Relationship_LossPermission".Translate(ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)));
             for (int i = oldIndex; i > newIndex; i--)
             {
                 sb.AppendLine($"OARO_Relationship_Permission_{(RelationshipKind)i}".Translate());
@@ -299,8 +299,8 @@ public static class RelationshipUtility
         }
 
         OrderLetterUtility.ReceiveLetter(
-            label: upgraded ? "OARO_Order_Relationship_UpgradedLabel".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName))
-                            : "OARO_Order_Relationship_DowngradLabel".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
+            label: upgraded ? "OARO_Order_Relationship_UpgradedLabel".Translate(ratkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName))
+                            : "OARO_Order_Relationship_DowngradLabel".Translate(ratkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
             text: sb.ToTaggedString(),
             def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: ratkinOrder,

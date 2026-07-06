@@ -22,12 +22,12 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
 
     protected override Faction GetOrGenerateFaction()
     {
-        Faction subFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
+        Faction subFaction = QuestGen.slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.subFaction);
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
-            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
+            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(OARO_KeyLibrary_SlateStoreAs.mercyQuestDef),
             SubFaction = subFaction,
-            ParentFaction = QuestGen.slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction)
+            ParentFaction = QuestGen.slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.parentFaction)
         };
         QuestGen.quest.AddPart(questPart_MercyQuestWatcher);
 

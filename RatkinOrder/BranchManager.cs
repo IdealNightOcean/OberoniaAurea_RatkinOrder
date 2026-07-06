@@ -265,10 +265,10 @@ public class BranchManager : IExposable, ITickDay
 
         targetBranch.CommanderVisitable = true;
         ChoiceLetter_RatkinOrder letter = (ChoiceLetter_RatkinOrder)LetterMaker.MakeLetter(
-            label: "OARO_AutoUnlockCommanderVisitLabel".Translate(targetBranch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+            label: "OARO_AutoUnlockCommanderVisitLabel".Translate(targetBranch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
             text: "OARO_AutoUnlockCommanderVisitText".Translate(
-                ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-                targetBranch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
+                ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+                targetBranch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
             def: OARO_LetterDefOf.OARO_Order_PositiveLetter,
             lookTargets: targetBranch.BaseSite,
             relatedFaction: ratkinOrder.Faction);

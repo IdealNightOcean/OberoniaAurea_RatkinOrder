@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using System.Text;
 using UnityEngine;
@@ -32,12 +33,12 @@ public class BranchStatPart_BranchEffectTagOffset : BranchStatPart
 
             if (String.IsNullOrEmpty(reasonOverride))
             {
-                explanation.AppendLine("OARO_ChangeOffset_BranchEffectTag".Translate(effectTag.Named(KeyLibrary_FormatArgName.EffectTag), offsetArg.Named(KeyLibrary_FormatArgName.Offset))
+                explanation.AppendLine("OARO_ChangeOffset_BranchEffectTag".Translate(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), offsetArg.Named(KeyLibrary_FormatArgName.Offset))
                                                                           .Colorize(color));
             }
             else
             {
-                explanation.AppendLine(reasonOverride.Formatted(effectTag.Named(KeyLibrary_FormatArgName.EffectTag), offsetArg.Named(KeyLibrary_FormatArgName.Offset))
+                explanation.AppendLine(reasonOverride.Formatted(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), offsetArg.Named(KeyLibrary_FormatArgName.Offset))
                                                      .Colorize(color));
             }
         }

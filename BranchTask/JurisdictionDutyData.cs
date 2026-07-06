@@ -123,7 +123,7 @@ public class JurisdictionDutyData : IExposable
                 task.Branch.Squad.AdjustCrew(member: -memberLoss, commander: 0f);
                 Messages.Message(
                 text: "OARO_Message_JurisdictionDuty_MemberLoss".Translate(
-                            task.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                            task.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                             memberLoss.Named(KeyLibrary_FormatArgName.Count)),
                 def: MessageTypeDefOf.NegativeEvent);
             }
@@ -197,7 +197,7 @@ public class JurisdictionDutyData : IExposable
         if (task.PlayerParticipated)
         {
             Messages.Message(
-                text: "OARO_Message_NewDutyAssistanceRequest".Translate(task.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), request.Title.Named("Title")),
+                text: "OARO_Message_NewDutyAssistanceRequest".Translate(task.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), request.Title.Named("Title")),
                 def: MessageTypeDefOf.NeutralEvent);
         }
 

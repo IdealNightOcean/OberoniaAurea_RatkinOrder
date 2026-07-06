@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_Root_MercyQuestPre : QuestNode
 {
-    protected override bool TestRunInt(Slate slate) => slate.TryGet(KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef _);
+    protected override bool TestRunInt(Slate slate) => slate.TryGet(OARO_KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef _);
 
     protected override void RunInt()
     {
@@ -20,11 +20,11 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             return;
         }
         slate.Set("map", map);
-        slate.TryGet(KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef mercyQuestDef);
+        slate.TryGet(OARO_KeyLibrary_SlateStoreAs.mercyQuestDef, out MercyQuestDef mercyQuestDef);
 
-        slate.TryGet(KeyLibrary_SlateStoreAs.subFactionDef, out FactionDef subFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.parentFactionDef, out FactionDef parentFactionDef);
-        slate.TryGet(KeyLibrary_SlateStoreAs.parentFaction, out Faction parentFaction);
+        slate.TryGet(OARO_KeyLibrary_SlateStoreAs.subFactionDef, out FactionDef subFactionDef);
+        slate.TryGet(OARO_KeyLibrary_SlateStoreAs.parentFactionDef, out FactionDef parentFactionDef);
+        slate.TryGet(OARO_KeyLibrary_SlateStoreAs.parentFaction, out Faction parentFaction);
 
         Faction subFaction = ModUtility.GenerateSubRatkinFaction(subFactionDef, parentFactionDef, parentFaction, addToManager: true);
         if (subFaction is null)
@@ -35,12 +35,12 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         quest.AddPart(new QuestPart_PreMercyQuestCleaner());
 
-        slate.Set(KeyLibrary_SlateStoreAs.subFaction, subFaction);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.subFaction, subFaction);
 
         string inSignalForceInterrupt = QuestGenUtility.HardcodedSignalWithQuestID("HelpSeeker_ForceInterrupt");
         QuestPart_MercyQuestPre_DangerConfirm questPart_MercyQuestPre_DangerConfirm = new()
         {
-            InSignal = slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            InSignal = slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
             OutSignalForceInterrupt = inSignalForceInterrupt,
 
             Map = map,
@@ -49,9 +49,9 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
         quest.AddPart(questPart_MercyQuestPre_DangerConfirm);
         quest.End(QuestEndOutcome.Unknown, inSignal: inSignalForceInterrupt);
 
-        PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(KeyLibrary_SlateStoreAs.helpSeekerPawnKind);
+        PawnKindDef pawnKindDef = slate.Get<PawnKindDef>(OARO_KeyLibrary_SlateStoreAs.helpSeekerPawnKind);
         Pawn helpSeeker = quest.GeneratePawn(pawnKindDef, subFaction, allowPregnant: false, forceGenerateNewPawn: true);
-        slate.Set(KeyLibrary_SlateStoreAs.helpSeeker, helpSeeker);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.helpSeeker, helpSeeker);
 
         string inSignalMakePawnArrival = QuestGenUtility.HardcodedSignalWithQuestID("MakePawnArrival");
         quest.PawnsArrive(
@@ -187,7 +187,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
             InSignalAccept = acceptSignal,
             InSignalReject = rejectSignal,
 
-            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
+            MercyQuestDef = QuestGen.slate.Get<MercyQuestDef>(OARO_KeyLibrary_SlateStoreAs.mercyQuestDef),
 
             SubFaction = subFaction,
             ParentFaction = parentFaction,

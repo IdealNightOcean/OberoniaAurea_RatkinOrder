@@ -20,7 +20,7 @@ public class QuestNode_GiveToCaravan : QuestNode
     {
         QuestPart_GiveToCaravan questPart_GiveToCaravan = new()
         {
-            inSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignalWithCaravan.GetValue(QuestGen.slate)) ?? QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            inSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignalWithCaravan.GetValue(QuestGen.slate)) ?? QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
             Things = things.GetValue(QuestGen.slate)
         };
         QuestGen.quest.AddPart(questPart_GiveToCaravan);

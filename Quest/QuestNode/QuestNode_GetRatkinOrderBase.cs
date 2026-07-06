@@ -5,7 +5,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public abstract class QuestNode_GetRatkinOrderBase : QuestNode
 {
-    public SlateRef<string> storeAs = KeyLibrary_SlateStoreAs.ratkinOrder;
+    public SlateRef<string> storeAs = OARO_KeyLibrary_SlateStoreAs.ratkinOrder;
 
     public SlateRef<bool> isCritical;
     public SlateRef<bool> endQuestWhenOrderInvalid;

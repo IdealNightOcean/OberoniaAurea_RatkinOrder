@@ -348,7 +348,7 @@ public class Branch : IExposable, ILoadReferenceable
             if (showMessage)
             {
                 Messages.Message(
-                    text: "OARO_Mess_BranchBeFriendly".Translate(name.Named(KeyLibrary_FormatArgName.BranchName), friendlyDaysLeft.Named(KeyLibrary_FormatArgName.Count)),
+                    text: "OARO_Mess_BranchBeFriendly".Translate(name.Named(OARO_KeyLibrary_FormatArgName.BranchName), friendlyDaysLeft.Named(KeyLibrary_FormatArgName.Count)),
                     lookTargets: baseSite,
                     def: MessageTypeDefOf.PositiveEvent);
             }
@@ -521,8 +521,8 @@ public class Branch : IExposable, ILoadReferenceable
             Includes = { OARO_RulePackDefOf.OARO_Maker_BranchGreetingDesc }
         };
 
-        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(KeyLibrary_FormatArgName.ORDER, RatkinOrder));
-        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(KeyLibrary_FormatArgName.BRANCH, this, alsoAddOrderRule: false));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForRatkinOrder(OARO_KeyLibrary_FormatArgName.ORDER, RatkinOrder));
+        grammarRequest.Rules.AddRange(ModUtility.RulesForBranch(OARO_KeyLibrary_FormatArgName.BRANCH, this, alsoAddOrderRule: false));
         grammarRequest.Constants.Add("hourOfDay", GenLocalDate.HourOfDay(baseSite.Tile).ToString());
         grammarRequest.Constants.Add("population", populationHandler.Population.ToString());
         grammarRequest.Constants.Add("populationRatio", populationHandler.PopulationRatio.ToString("F2"));

@@ -16,10 +16,10 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
             return base.RequestHelpReason(branch);
         }
 
-        return modEx_SkillHelp.requestHelpReason.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+        return modEx_SkillHelp.requestHelpReason.Formatted(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                        modEx_SkillHelp.requireSkill.Named(KeyLibrary_FormatArgName.SKILL),
                                                        modEx_SkillHelp.minLevel.Named(KeyLibrary_FormatArgName.Level),
-                                                       Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF));
+                                                       Def.Named(OARO_KeyLibrary_FormatArgName.CARAVANHELPDEF));
     }
 
     public override bool Notify_CaravanArrived(Caravan caravan, Branch branch, WorldObject_InteractiveBase incidentSite)
@@ -155,16 +155,16 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
         TaggedString failedThankText;
         if (String.IsNullOrEmpty(modEx_SkillHelp.failedThankText))
         {
-            failedThankText = "OARO_JointPatrolCaravanIncident_ThankText_Fail".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF));
+            failedThankText = "OARO_JointPatrolCaravanIncident_ThankText_Fail".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(OARO_KeyLibrary_FormatArgName.CARAVANHELPDEF));
         }
         else
         {
-            failedThankText = modEx_SkillHelp.failedThankText.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF));
+            failedThankText = modEx_SkillHelp.failedThankText.Formatted(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(OARO_KeyLibrary_FormatArgName.CARAVANHELPDEF));
         }
         failedThankText += "\n\n" + "OAFrame_AllCarvanMemberGetXP".Translate(modEx_SkillHelp.requireSkill.Named(KeyLibrary_FormatArgName.SKILL), 6000.Named(KeyLibrary_FormatArgName.Count));
 
         OrderLetterUtility.ReceiveLetter(
-            label: "OARO_JointPatrolCaravanIncident_ThankLabel".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+            label: "OARO_JointPatrolCaravanIncident_ThankLabel".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
             text: failedThankText,
             def: OrderLetterDefOf.OARO_OfficialLetter,
             relatedOrder: branch.RatkinOrder,

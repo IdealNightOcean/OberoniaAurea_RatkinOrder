@@ -34,8 +34,8 @@ public class QuestNode_OrderRecommendation : QuestNode
 
         QuestPart_OrderRecommendation questPart_OrderRecommendation = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            RatkinOrder = ratkinOrder ?? slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = ratkinOrder ?? slate.Get<RatkinOrder>(OARO_KeyLibrary_SlateStoreAs.ratkinOrder),
             Count = recommendationCount,
             MapParent = slate.Get<Map>("map")?.Parent,
             WorldObject = worldObject.GetValue(slate),

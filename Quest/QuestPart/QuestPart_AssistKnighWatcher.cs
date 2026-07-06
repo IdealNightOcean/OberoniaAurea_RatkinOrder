@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -87,7 +88,7 @@ public class QuestPart_AssistKnighWatcher : QuestPart_Delay
         if (CanRetain)
         {
             Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.ConfirmDiaNodeTreeWithRatkinOrderInfo(
-                text: "OARO_AssistKnight_RetainInfo".Translate(RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+                text: "OARO_AssistKnight_RetainInfo".Translate(RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
                 ratkinOrder: RatkinOrder,
                 acceptText: "OARO_AssistKnight_Retain".Translate(),
                 acceptAction: DelayLeave,

@@ -239,7 +239,7 @@ public class Window_BranchSquad : OrderWindowBase
             if (honorChivalry?.medal is not null)
             {
                 Material tintMat = OARO_WindowUtility.GetTintMaterial(honorDef.color, Texture2D.redTexture);
-                GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.HonorBackgroundTex, tintMat);
+                GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.HonorBackgroundTex, tintMat);
 
                 reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
                 GUI.DrawTexture(reusedRect, honorChivalry.medal.honorDecorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
@@ -255,7 +255,7 @@ public class Window_BranchSquad : OrderWindowBase
         else
         {
             reusedRect = OARO_WindowUtility.CenterRect(areaRect, 62f, 68f);
-            GUI.DrawTexture(reusedRect, IconLibrary.BigGeneralBranchIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.BigGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
 
         //上部右侧部分
@@ -289,7 +289,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 43f, 51f);
         if (SelBranch?.IsBranchOfType(BranchType.Friendly) ?? false)
         {
-            GUI.DrawTexture(reusedRect, IconLibrary.BigFriendlyIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.BigFriendlyIcon, ScaleMode.ScaleToFit);
 
             relation = "OARO_Friendly".Translate().Colorize(Color.green);
             friendlyProcess = SelSquadInfo.FriendlyProcess;
@@ -297,7 +297,7 @@ public class Window_BranchSquad : OrderWindowBase
         }
         else
         {
-            GUI.DrawTexture(reusedRect, IconLibrary.BigStrangeIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.BigStrangeIcon, ScaleMode.ScaleToFit);
 
             relation = "OARO_Strange".Translate();
             friendlyProcess = 0f;
@@ -309,7 +309,7 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, relation);
 
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
-        Widgets.FillableBar(reusedRect, friendlyProcess, IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
+        Widgets.FillableBar(reusedRect, friendlyProcess, OARO_IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
 
         reusedRect = new(reusedRect.x, reusedRect.yMax + 4f, 120f, 32f);
         Text.Font = GameFont.Small;
@@ -393,7 +393,7 @@ public class Window_BranchSquad : OrderWindowBase
                 InteractionAcceptances.MarkDirty();
                 Messages.Message(
                     text: "OARO_CanApplyBranchInteractionWithReason".Translate(
-                        parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                        parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                         BranchInteractionDefOf.OARO_MapSilverToSupply.Named("INTERACTION"),
                         acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
@@ -457,7 +457,7 @@ public class Window_BranchSquad : OrderWindowBase
                 InteractionAcceptances.MarkDirty();
                 Messages.Message(
                     text: "OARO_CanApplyBranchInteractionWithReason".Translate(
-                        parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                        parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                         BranchInteractionDefOf.OARO_MapRecommendationToKnight.Named("INTERACTION"),
                         acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
@@ -465,7 +465,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
         }
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 50f, 26f, 23f);
-        GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, OARO_IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 6f, 64f, 24f);
         Widgets.Label(reusedRect, BranchInteractionDefOf.OARO_MapRecommendationToKnight.label);
 
@@ -562,7 +562,7 @@ public class Window_BranchSquad : OrderWindowBase
                 InteractionAcceptances.MarkDirty();
                 Messages.Message(
                     text: "OARO_CanApplyBranchInteractionWithReason".Translate(
-                        parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                        parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                         BranchInteractionDefOf.OARO_RequestCombatReadiness.Named("INTERACTION"),
                         acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                     def: MessageTypeDefOf.RejectInput,
@@ -627,7 +627,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
             else
             {
-                Messages.Message("OARO_CanNotDoBombardWithReason".Translate(SelBranch.Name.Named(KeyLibrary_FormatArgName.BranchName), acceptance.Reason.Named(KeyLibrary_FormatArgName.Reason)), MessageTypeDefOf.RejectInput, historical: false);
+                Messages.Message("OARO_CanNotDoBombardWithReason".Translate(SelBranch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), acceptance.Reason.Named(KeyLibrary_FormatArgName.Reason)), MessageTypeDefOf.RejectInput, historical: false);
             }
             RefreshBranchAcceptance();
         }
@@ -673,7 +673,7 @@ public class Window_BranchSquad : OrderWindowBase
                     InteractionAcceptances.MarkDirty();
                     Messages.Message(
                         text: "OARO_CanApplyBranchInteractionWithReason".Translate(
-                            parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                            parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                             BranchInteractionDefOf.OARO_UnlockSupportAuthority.Named("INTERACTION"),
                             acceptanceReport.Reason.Named(KeyLibrary_FormatArgName.Reason)),
                         def: MessageTypeDefOf.RejectInput,
@@ -682,7 +682,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
 
             reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
-            GUI.DrawTexture(reusedRect, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 90f, 24f);
             Widgets.Label(reusedRect, "OARO_SquadWin_RequestUnlockSupport".Translate());
@@ -868,7 +868,7 @@ public class Window_BranchSquad : OrderWindowBase
                 entryRect = new(entryX, entryY, 393f, 91f);
                 entryY += 89f;
 
-                GUI.DrawTexture(entryRect, IconLibrary.BranchSummaryBackground);
+                GUI.DrawTexture(entryRect, OARO_IconLibrary.BranchSummaryBackground);
             }
         }
         Text.Anchor = TextAnchor.UpperLeft;

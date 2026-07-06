@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ public class Reward_OrderRecommendation : Reward
             yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_OrderRecommendation".Translate() + " " + Count.ToStringWithSign(),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
-                                                                            GUI.DrawTexture(r, IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
+                                                                            GUI.DrawTexture(r, OARO_IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
                                                                             GUI.color = Color.white;
                                                                         },
                                                                         tipGetter: () => "OARO_Reward_OrderRecommendationTip".Translate().Resolve());
@@ -39,8 +40,8 @@ public class Reward_OrderRecommendation : Reward
     {
         yield return new QuestPart_OrderRecommendation()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
+            InSignalTrigger = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(OARO_KeyLibrary_SlateStoreAs.ratkinOrder),
             Count = Count,
             MapParent = MapParent,
             GiveToCaravan = GiveToCaravan,

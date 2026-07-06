@@ -74,8 +74,8 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
 
             slate.Set("map", talkWith.MapHeld);
             slate.Set("faction", faction);
-            slate.Set(KeyLibrary_SlateStoreAs.parentFaction, faction);
-            slate.Set(KeyLibrary_SlateStoreAs.subFaction, SubFaction);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.parentFaction, faction);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.subFaction, SubFaction);
 
             List<Pawn> slatePawns = [];
             slatePawns.AddRange(pawns);

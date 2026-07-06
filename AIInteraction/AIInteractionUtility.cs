@@ -58,7 +58,7 @@ public static class AIInteractionUtility
         {
             Log.Message("[OARO] 已使用AI生成来自友好分部的慰问");
             OrderLetterUtility.ReceiveLetter(
-                label: "OARO_LetterLabel_IncidentConcern".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                label: "OARO_LetterLabel_IncidentConcern".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                 text: serverResponse.Content,
                 def: OrderLetterDefOf.OARO_OfficialLetter,
                 relatedOrder: branch.RatkinOrder,
@@ -92,7 +92,7 @@ public static class AIInteractionUtility
         {
             Log.Message("[OARO] 已使用AI生成来自随机分部的善行赞赏");
             OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-                label: "OARO_LetterLabel_MercyQuestAdmire".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                label: "OARO_LetterLabel_MercyQuestAdmire".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                 text: serverResponse.Content,
                 def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
                 relatedOrder: branch.RatkinOrder,

@@ -236,10 +236,10 @@ public class MercyQuestHandler : IExposable
         else
         {
             OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-                label: "OARO_LetterLabel_MercyQuestAdmire".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+                label: "OARO_LetterLabel_MercyQuestAdmire".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                 text: "OARO_Letter_MercyQuestAdmire".Translate(
-                          branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
-                          branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
+                          branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
+                          branch.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                           quest.name.Named("QuestName")),
                 def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
                 relatedOrder: branch.RatkinOrder,

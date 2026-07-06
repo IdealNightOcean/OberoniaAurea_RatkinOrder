@@ -18,13 +18,13 @@ public class Reward_OrderEsteem : Reward
         get
         {
             Color color = RatkinOrder.Color;
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_OrderEsteem".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)).Colorize(color) + " " + Amount.ToStringWithSign().Colorize(color),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_OrderEsteem".Translate(RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName)).Colorize(color) + " " + Amount.ToStringWithSign().Colorize(color),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
                                                                             GUI.DrawTexture(r, null);
                                                                             GUI.color = Color.white;
                                                                         },
-                                                                        tipGetter: () => "OARO_Reward_OrderEsteemTip".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)).Resolve().Colorize(color));
+                                                                        tipGetter: () => "OARO_Reward_OrderEsteemTip".Translate(RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName)).Resolve().Colorize(color));
         }
     }
 
@@ -38,14 +38,14 @@ public class Reward_OrderEsteem : Reward
     {
         yield return new QuestPart_OrderEsteemChange()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(KeyLibrary_SlateStoreAs.ratkinOrder),
+            InSignalTrigger = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            RatkinOrder = RatkinOrder ?? QuestGen.slate.Get<RatkinOrder>(OARO_KeyLibrary_SlateStoreAs.ratkinOrder),
             Change = Amount,
             Reason = Reason,
         };
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_OrderEsteemDesc".Translate(RatkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName), Amount.Named("Amount")).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_OrderEsteemDesc".Translate(RatkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName), Amount.Named("Amount")).Resolve();
 
     public override string ToString() => $"{GetType().Name} (RatkinOrder={RatkinOrder.Name}, amount={Amount})";
 

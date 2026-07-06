@@ -18,7 +18,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
         Slate slate = QuestGen.slate;
         Quest quest = QuestGen.quest;
 
-        Faction subFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.subFaction);
+        Faction subFaction = slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.subFaction);
         QuestPart_InvolvedFactions questPart_InvolvedFactions = new()
         {
             factions = [subFaction]
@@ -28,9 +28,9 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
         {
-            MercyQuestDef = slate.Get<MercyQuestDef>(KeyLibrary_SlateStoreAs.mercyQuestDef),
+            MercyQuestDef = slate.Get<MercyQuestDef>(OARO_KeyLibrary_SlateStoreAs.mercyQuestDef),
             SubFaction = subFaction,
-            ParentFaction = slate.Get<Faction>(KeyLibrary_SlateStoreAs.parentFaction),
+            ParentFaction = slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.parentFaction),
         };
         quest.AddPart(questPart_MercyQuestWatcher);
 
@@ -68,7 +68,7 @@ internal sealed class QuestNode_Root_TaxCollectorTreat : QuestNode_Root_RefugeeB
 
         QuestPart_WorkDisabled questPart_WorkDisabled = new()
         {
-            inSignalEnable = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            inSignalEnable = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
             disabledWorkTags = WorkTags.AllWork,
         };
         questPart_WorkDisabled.pawns ??= new(pawns.Count);

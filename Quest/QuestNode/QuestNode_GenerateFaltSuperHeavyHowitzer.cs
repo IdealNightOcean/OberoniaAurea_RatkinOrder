@@ -25,7 +25,7 @@ internal sealed class QuestNode_GenerateFaltSuperHeavyHowitzer : QuestNode
     protected override void RunInt()
     {
         Slate slate = QuestGen.slate;
-        DemandType demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(KeyLibrary_SlateStoreAs.demandType);
+        DemandType demandType = this.demandType.GetValue(slate) ?? slate.Get<DemandType>(OARO_KeyLibrary_SlateStoreAs.demandType);
         int rewardSilverCount;
         int perfectRewardSilverCount;
         List<Thing> howitzers = [];

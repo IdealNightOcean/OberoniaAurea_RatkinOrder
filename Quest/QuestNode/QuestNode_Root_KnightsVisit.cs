@@ -31,15 +31,15 @@ public class QuestNode_Root_KnightsVisit : QuestNode_Root_RefugeeKnightBase
         Slate slate = QuestGen.slate;
         slate.Set(UniqueLeavingLetterSlate, true);
 
-        if (slate.TryGet(KeyLibrary_SlateStoreAs.visitingKnightsDelay, out int visitDelay))
+        if (slate.TryGet(OARO_KeyLibrary_SlateStoreAs.visitingKnightsDelay, out int visitDelay))
         {
             questParameter.arrivalDelayTicks = visitDelay;
         }
-        if (slate.TryGet(KeyLibrary_SlateStoreAs.visitingKnightsDuration, out int visitDuration))
+        if (slate.TryGet(OARO_KeyLibrary_SlateStoreAs.visitingKnightsDuration, out int visitDuration))
         {
             questParameter.questDurationTicks = visitDuration;
         }
-        if (slate.TryGet(KeyLibrary_SlateStoreAs.visitingKnightsCount, out int visiterCount))
+        if (slate.TryGet(OARO_KeyLibrary_SlateStoreAs.visitingKnightsCount, out int visiterCount))
         {
             questParameter.LodgerCount = visiterCount;
         }

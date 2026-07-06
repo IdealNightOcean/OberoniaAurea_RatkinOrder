@@ -53,7 +53,7 @@ public static class DecoratePromptUtility
         if (branch.HonorDef is not null)
         {
             promptBuilder.Append(Space);
-            promptBuilder.AppendLine("OARO_Prompt_BranchHonor".Translate(branch.HonorDef.Named(KeyLibrary_FormatArgName.HONORDEF)));
+            promptBuilder.AppendLine("OARO_Prompt_BranchHonor".Translate(branch.HonorDef.Named(OARO_KeyLibrary_FormatArgName.HONORDEF)));
         }
 
         if (branch.TaskHandler.HasTask)
@@ -86,7 +86,7 @@ public static class DecoratePromptUtility
         string example = String.IsNullOrEmpty(mercyQuestDef.reasonForHelp) ? "OARO_Setting_MercyQuestPrompt_DefaultExample".Translate()
                                                                            : mercyQuestDef.reasonForHelp;
 
-        yield return new ClientMessage(ClientMessageRole.user, "OARO_Setting_MercyQuestPrompt_User".Translate(mercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST), example.Named("Example")));
+        yield return new ClientMessage(ClientMessageRole.user, "OARO_Setting_MercyQuestPrompt_User".Translate(mercyQuestDef.Named(OARO_KeyLibrary_FormatArgName.MERCYQUEST), example.Named("Example")));
     }
 
     public static IEnumerable<ClientMessage> GetIncidentConcernPrompt(Branch branch, IncidentDef incidentDef, IncidentParms parms, int delayDays)
@@ -141,7 +141,7 @@ public static class DecoratePromptUtility
             delayDays.Named("delayDays"),
             quest.name.Named("questName"),
             quest.description.Named("questDescription"),
-            mercyQuestDef.Named(KeyLibrary_FormatArgName.MERCYQUEST)
+            mercyQuestDef.Named(OARO_KeyLibrary_FormatArgName.MERCYQUEST)
             ));
         yield return new ClientMessage(ClientMessageRole.user, promptBuilder.ToString());
     }

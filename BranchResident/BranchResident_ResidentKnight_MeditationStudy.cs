@@ -1,3 +1,4 @@
+using OberoniaAurea_Frame;
 using System.Linq;
 using System.Text;
 using Verse;
@@ -32,10 +33,10 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
             {
                 letterTextSB.AppendLine("OARO_MeditationStudyComplete_VirtueGain".Translate(
                                             pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                                            newVirtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF)));
+                                            newVirtueDef.Named(OARO_KeyLibrary_FormatArgName.VIRTUEDEF)));
                 residentKnight.VirtueHandler.TryAddVirtue(virtueDef: newVirtueDef,
                                                                 level: 1,
-                                                                reason: "OARO_KnightVirtueGainReason_MeditationStudy".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)));
+                                                                reason: "OARO_KnightVirtueGainReason_MeditationStudy".Translate(branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName)));
             }
         }
 
@@ -95,7 +96,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
             if (!resultOnly)
             {
                 expSB.AppendLine("OARO_ChangeOffset_BranchTraditionDetail".Translate(
-                    tradition.Def.Named(KeyLibrary_FormatArgName.TRADITIONDEF),
+                    tradition.Def.Named(OARO_KeyLibrary_FormatArgName.TRADITIONDEF),
                     tradition.Level.Named(KeyLibrary_FormatArgName.Level),
                     curStepChange.ToStringWithSign("F0").Named(KeyLibrary_FormatArgName.Change)));
             }
@@ -119,7 +120,7 @@ public class BranchResident_ResidentKnight_MeditationStudy : BranchResident_Resi
                 if (!resultOnly)
                 {
                     expSB.AppendLine("OARO_ChangeFactor_PawnEffectTag".Translate(
-                        KeyLibrary_EffectTag.StudyElite.Named(KeyLibrary_FormatArgName.EffectTag),
+                        KeyLibrary_EffectTag.StudyElite.Named(OARO_KeyLibrary_FormatArgName.EffectTag),
                         2f.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Factor)));
                 }
             }

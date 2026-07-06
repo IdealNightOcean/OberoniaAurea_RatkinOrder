@@ -77,9 +77,9 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
         }
 
         Branch = targetBranch;
-        QuestGen.slate.Set(KeyLibrary_SlateStoreAs.branch, Branch);
+        QuestGen.slate.Set(OARO_KeyLibrary_SlateStoreAs.branch, Branch);
         RatkinOrder = targetBranch.RatkinOrder;
-        QuestGen.slate.Set(KeyLibrary_SlateStoreAs.ratkinOrder, RatkinOrder);
+        QuestGen.slate.Set(OARO_KeyLibrary_SlateStoreAs.ratkinOrder, RatkinOrder);
 
         return base.InitRatkinOrder(initBranch);
     }
@@ -99,7 +99,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
         QuestPart_InDistressKnightStartLetter questPart_InDistressKnightStartLetter = new()
         {
-            InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
             RelatedOrder = RatkinOrder,
             RelatedFaction = RatkinOrder.Faction,
             OutSignalAccepted = inSignalHelpAccepted,
@@ -132,7 +132,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
         {
             QuestPart_OrderLetter questPart_OrderLetter = new()
             {
-                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -157,7 +157,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceI = new()
             {
-                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -168,7 +168,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceII = new()
             {
-                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -179,7 +179,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceIII = new()
             {
-                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -190,7 +190,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceIV = new()
             {
-                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -201,7 +201,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceV = new()
             {
-                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -212,7 +212,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
 
             QuestPart_OrderLetter questPart_OrderLetter_GuidanceVI = new()
             {
-                InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                 OrderLetterDef = OrderLetterDefOf.OARO_UrgentLetter,
                 RelatedLetterType = OrderLetter.RelatedLetterType.Positive,
                 RelatedOrder = RatkinOrder,
@@ -246,7 +246,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
             {
                 QuestPart_InDistressKnightLeaveLetter questPart_InDistressKnightLeaveLetter = new()
                 {
-                    InSignal = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+                    InSignal = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
                     InSignalRemovePawn = inSignalRemovePawn,
                     OutSignalMakeLeave = inSignalMakeLeaved,
                     OutSignalRecruit = InSignalRecruited,

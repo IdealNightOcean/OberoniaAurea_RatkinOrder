@@ -67,7 +67,7 @@ public class WorldObject_BranchUnderConstruction : WorldObject
             Find.WorldObjects.Add(branchSite);
             OrderLetterUtility.ReceiveLetter(
                 label: "OARO_NewBranchConstructedLabel".Translate(),
-                text: "OARO_NewBranchConstructedText".Translate(branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName), branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
+                text: "OARO_NewBranchConstructedText".Translate(branch.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName), branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                 def: OrderLetterDefOf.OARO_OfficialLetter,
                 relatedOrder: branch.RatkinOrder,
                 relatedBranch: branch,

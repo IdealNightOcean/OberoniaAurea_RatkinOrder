@@ -58,7 +58,7 @@ public class Window_QuestClique : OrderWindowBase
         }
         DemandWatcher = demandWatcher;
         MainBranch = DemandWatcher.Branch;
-        DemandTexture = DemandDef.BackgroundTexture ?? IconLibrary.TransTex;
+        DemandTexture = DemandDef.BackgroundTexture ?? OARO_IconLibrary.TransTex;
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -198,7 +198,7 @@ public class Window_QuestClique : OrderWindowBase
             entryY += entryHeight;
             if (((++column) & 1) == 0)
             {
-                GUI.DrawTexture(entryRect, IconLibrary.DarkTex);
+                GUI.DrawTexture(entryRect, OARO_IconLibrary.DarkTex);
             }
             DrawActiveClique(entryRect, clique);
         }
@@ -342,7 +342,7 @@ public class Window_QuestClique : OrderWindowBase
         }
         else
         {
-            GUI.DrawTexture(reusedRect, IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
 
         Text.WordWrap = false;
@@ -356,8 +356,8 @@ public class Window_QuestClique : OrderWindowBase
         if (OARO_WindowUtility.TextButtonImage(
             butRect: reusedRect,
             label: string.Empty,
-            baseTex: IconLibrary.ellipsisButton,
-            downTex: IconLibrary.ellipsisButton_Down))
+            baseTex: OARO_IconLibrary.ellipsisButton,
+            downTex: OARO_IconLibrary.ellipsisButton_Down))
         {
 
         }
@@ -381,10 +381,10 @@ public class Window_QuestClique : OrderWindowBase
         float topRectY = inRect.yMin;
         topRect.height = 40f;
         float topRectHeight = topRect.height;
-        GUI.DrawTexture(topRect, IconLibrary.DarkTex);
+        GUI.DrawTexture(topRect, OARO_IconLibrary.DarkTex);
 
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
-        GUI.DrawTexture(reusedRect, IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
+        GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
 
         Text.WordWrap = false;
         Text.Font = GameFont.Small;
@@ -405,11 +405,11 @@ public class Window_QuestClique : OrderWindowBase
         {
             if (MainBranch?.BuildingHandler.HasBuilding(clique.PreferredBuilding) ?? false)
             {
-                GUI.DrawTexture(reusedRect, IconLibrary.StarWhite);
+                GUI.DrawTexture(reusedRect, OARO_IconLibrary.StarWhite);
             }
             else
             {
-                GUI.DrawTexture(reusedRect, IconLibrary.StarBlack);
+                GUI.DrawTexture(reusedRect, OARO_IconLibrary.StarBlack);
             }
         }
 
@@ -443,7 +443,7 @@ public class Window_QuestClique : OrderWindowBase
             tooltip: clique.IsBribable ? "OARO_CliqueWin_BribeTip".Translate(clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)) : null))
         {
             Dialog_NodeTree nodeTree = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
-                text: "OARO_Clique_BriberyConfirm".Translate(clique.Name.Named(KeyLibrary_FormatArgName.CliqueName), clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)),
+                text: "OARO_Clique_BriberyConfirm".Translate(clique.Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName), clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)),
                 acceptAction: () => clique.Bribery(map: Map));
 
             Find.WindowStack.Add(nodeTree);
@@ -473,7 +473,7 @@ public class Window_QuestClique : OrderWindowBase
         topRect.height = 40f;
         float topRectHeight = topRect.height;
 
-        GUI.DrawTexture(topRect, IconLibrary.DarkTex);
+        GUI.DrawTexture(topRect, OARO_IconLibrary.DarkTex);
 
         Rect reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
         OARO_WindowUtility.DrawBranchIcon(reusedRect, clique.RelatedBranch, expand: false);
@@ -488,8 +488,8 @@ public class Window_QuestClique : OrderWindowBase
         if (OARO_WindowUtility.TextButtonImage(
             butRect: reusedRect,
             label: string.Empty,
-            baseTex: IconLibrary.ellipsisButton,
-            downTex: IconLibrary.ellipsisButton_Down))
+            baseTex: OARO_IconLibrary.ellipsisButton,
+            downTex: OARO_IconLibrary.ellipsisButton_Down))
         {
 
         }

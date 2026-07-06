@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -108,7 +109,7 @@ public partial class Window_OrderStation
             }
             else
             {
-                GUI.DrawTexture(reusedRect, IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
             }
             if (Mouse.IsOver(reusedRect))
             {
@@ -234,7 +235,7 @@ public partial class Window_OrderStation
                 if (acceptance)
                 {
                     Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-                        text: "OARO_StationWin_PostponeResignationConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+                        text: "OARO_StationWin_PostponeResignationConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
                         ratkinOrder: Record.RatkinOrder,
                         acceptAction: delegate
                         {
@@ -269,14 +270,14 @@ public partial class Window_OrderStation
                 starCount++;
                 starRect = new(starRectX, starRectY, 18f, 18f);
                 starRectX += 20f;
-                GUI.DrawTexture(starRect, IconLibrary.StarWhite, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(starRect, OARO_IconLibrary.StarWhite, ScaleMode.ScaleToFit);
             }
             while (starCount < 6 && starCount < PreferredFurnitureCount.Value.Item2)
             {
                 starCount++;
                 starRect = new(starRectX, starRectY, 18f, 18f);
                 starRectX += 20f;
-                GUI.DrawTexture(starRect, IconLibrary.StarBlack, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(starRect, OARO_IconLibrary.StarBlack, ScaleMode.ScaleToFit);
             }
             TooltipHandler.TipRegion(reusedRect, () => PreferredFurnitureExplanation.Value, uniqueId: 59748631);
 

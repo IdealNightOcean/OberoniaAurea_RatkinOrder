@@ -29,11 +29,11 @@ public class BranchDemand_Critical : BranchDemand
         Slate slate = base.GenerateQuestSlate(branch);
         if (questEffectTags is not null)
         {
-            slate.Set(KeyLibrary_SlateStoreAs.preSetQuestEffectTags, questEffectTags);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.preSetQuestEffectTags, questEffectTags);
         }
         if (PotentialMedals is not null)
         {
-            slate.Set(KeyLibrary_SlateStoreAs.preSetPotentialMedals, PotentialMedals);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.preSetPotentialMedals, PotentialMedals);
         }
         return slate;
     }

@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.Planet;
 using UnityEngine;
 using Verse;
@@ -36,7 +37,7 @@ public class BranchInteractionWorker_SupplyAllocation(BranchInteractionDef def) 
         Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
         (
             text: "OARO_BranchInteraction_SupplyAllocation".Translate(
-                parms.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                 GenLabel.ThingsLabel([pemmican]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
             ratkinOrder: parms.RatkinOrder
         ));

@@ -35,7 +35,7 @@ public class Reward_AllOrdersEsteem : Reward
 
     public override IEnumerable<QuestPart> GenerateQuestParts(int index, RewardsGeneratorParams parms, string customLetterLabel, string customLetterText, RulePack customLetterLabelRules, RulePack customLetterTextRules)
     {
-        yield return new QuestPart_AllOrdersEsteemChange(inSignalTrigger: QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal), Amount, ShowPlayerChangeMessage, Reason);
+        yield return new QuestPart_AllOrdersEsteemChange(inSignalTrigger: QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal), Amount, ShowPlayerChangeMessage, Reason);
     }
 
     public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_AllOrdersEsteemDesc".Translate(Amount.Named("Amount")).Resolve();

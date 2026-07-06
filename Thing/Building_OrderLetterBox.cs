@@ -18,7 +18,7 @@ public class Building_OrderLetterBox : Building
         {
             defaultLabel = "OARO_Command_OpenLetterBox".Translate(),
             defaultDesc = "OARO_Command_OpenLetterBox".Translate(),
-            icon = IconLibrary.RecommendationIcon,
+            icon = OARO_IconLibrary.RecommendationIcon,
             iconProportions = new Vector2(1.48f, 1f),
             action = OrderLetterUtility.OpenLetterBox
         };

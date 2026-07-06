@@ -18,13 +18,13 @@ public class Reward_FriendlyBranch : Reward
     {
         get
         {
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_FriendlyBranch".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_FriendlyBranch".Translate(Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
-                                                                            GUI.DrawTexture(r, IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
+                                                                            GUI.DrawTexture(r, OARO_IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
                                                                             GUI.color = Color.white;
                                                                         },
-                                                                        tipGetter: () => "OARO_Reward_FriendlyBranchTip".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), DurationDays.Named("DurationDays")).Resolve());
+                                                                        tipGetter: () => "OARO_Reward_FriendlyBranchTip".Translate(Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), DurationDays.Named("DurationDays")).Resolve());
         }
     }
 
@@ -37,13 +37,13 @@ public class Reward_FriendlyBranch : Reward
     {
         yield return new QuestPart_SetBranchToFriendly()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
+            InSignalTrigger = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            Branch = Branch ?? QuestGen.slate.Get<Branch>(OARO_KeyLibrary_SlateStoreAs.branch),
             DurationDays = DurationDays
         };
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_FriendlyBranchDesc".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName), DurationDays.Named("DurationDays")).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_FriendlyBranchDesc".Translate(Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), DurationDays.Named("DurationDays")).Resolve();
 
     public override string ToString() => $"{GetType().Name} (Branch={Branch.Name}, DurationDays={DurationDays})";
 

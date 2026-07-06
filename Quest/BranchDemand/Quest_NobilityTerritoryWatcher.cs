@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using System.Linq;
@@ -31,7 +32,7 @@ internal sealed class QuestNode_NobilityTerritoryWatcher : QuestNode
 
         QuestPart_NobilityTerritoryWatcher questPart_NobilityTerritoryWatcher = new()
         {
-            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
+            Branch = branch.GetValue(slate) ?? slate.Get<Branch>(OARO_KeyLibrary_SlateStoreAs.branch),
             InSignalsResolved = [],
             OutSignalsAllResolved = QuestGenUtility.HardcodedSignalWithQuestID(outSignalsAllResolved.GetValue(slate))
         };

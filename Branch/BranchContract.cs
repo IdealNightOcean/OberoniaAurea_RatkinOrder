@@ -133,15 +133,15 @@ public class BranchContract : IExposable
     {
         if (def.requestReasons.NullOrEmpty())
         {
-            return "OARO_BranchContract_DefaultReason".Translate(branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-                                                                 branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+            return "OARO_BranchContract_DefaultReason".Translate(branch.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+                                                                 branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                                  RequestThingDef.Named("REQUESTDEF"),
                                                                  requestCount.Named("RequestCount"));
         }
 
         return def.requestReasons.RandomElement().Formatted(
-            branch.RatkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName),
-            branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+            branch.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+            branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
             RequestThingDef.Named("REQUESTDEF"),
             requestCount.Named("RequestCount"));
 

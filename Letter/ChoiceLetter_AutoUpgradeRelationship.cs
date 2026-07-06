@@ -47,7 +47,7 @@ public class ChoiceLetter_AutoUpgradeRelationship : ChoiceLetter_RatkinOrder
         if (map is not null && RelationshipUtility.TryTriggerRelationshipQuest(RelatedOrder, map))
         {
             OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
-                text: "OARO_AutoUpgradeRelationship_Triggered".Translate(RelatedOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+                text: "OARO_AutoUpgradeRelationship_Triggered".Translate(RelatedOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
                 ratkinOrder: RelatedOrder);
         }
         else

@@ -122,8 +122,8 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
             Slate slate = new();
             slate.SetBasicBranchSlateVar(knightGroup.Branch, alsoSetOrder: true);
             slate.Set("map", map);
-            slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsCount, knightGroup.MemberCount);
-            slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDelay, knightGroup.TravelTicks);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.visitingKnightsCount, knightGroup.MemberCount);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.visitingKnightsDelay, knightGroup.TravelTicks);
             int duration = knightGroup.CurBusyLevel switch
             {
                 AroundKnightGroup.BusyLevel.Leisure => 3 * 60000,
@@ -131,7 +131,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
                 AroundKnightGroup.BusyLevel.VeryBusy => 1 * 60000,
                 _ => 2 * 60000
             };
-            slate.Set(KeyLibrary_SlateStoreAs.visitingKnightsDuration, duration);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.visitingKnightsDuration, duration);
 
             result = OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
         }
@@ -194,7 +194,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
     {
         ChoiceLetter_KnightGroupProactiveVisit letter = (ChoiceLetter_KnightGroupProactiveVisit)LetterMaker.MakeLetter(
             label: "OARO_AroundKnightGroup_ProactiveVisitQuizLabel".Translate(),
-            text: "OARO_AroundKnightGroup_ProactiveVisitQuizText".Translate(knightGroup.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
+            text: "OARO_AroundKnightGroup_ProactiveVisitQuizText".Translate(knightGroup.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
             def: OARO_LetterDefOf.OARO_KnightGroupProactiveVisitLetter,
             relatedFaction: knightGroup.RatkinOrder.Faction);
         letter.KnightGroup = knightGroup;

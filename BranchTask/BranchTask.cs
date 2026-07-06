@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using UnityEngine;
 using Verse;
@@ -77,7 +78,7 @@ public class BranchTask : IExposable
         }
 
         Messages.Message(
-            text: "OARO_Message_BranchTaskStarted".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
+            text: "OARO_Message_BranchTaskStarted".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
             def: MessageTypeDefOf.NeutralEvent);
     }
 
@@ -96,7 +97,7 @@ public class BranchTask : IExposable
         }
 
         Messages.Message(
-            text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
+            text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
             def: MessageTypeDefOf.NeutralEvent);
     }
 

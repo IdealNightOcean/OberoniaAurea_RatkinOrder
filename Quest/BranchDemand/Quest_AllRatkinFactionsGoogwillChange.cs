@@ -11,7 +11,7 @@ public class QuestNode_AllRatkinFactionsGoogwillChange : QuestNode_AllFactionsGo
         Slate slate = QuestGen.slate;
         QuestPart_AllRatkinFactionsGoodwillChange part = new()
         {
-            inSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            inSignal = QuestGenUtility.HardcodedSignalWithQuestID(inSignal.GetValue(slate)) ?? slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
             goodwillChange = goodwillChange.GetValue(slate),
             historyEvent = historyEvent.GetValue(slate),
 

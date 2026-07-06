@@ -74,13 +74,13 @@ public class QuestPart_TriggerMercyQuest : QuestPart
     {
         Slate slate = new();
 
-        slate.Set(KeyLibrary_SlateStoreAs.helpSeeker, HelpSeeker);
-        slate.Set(KeyLibrary_SlateStoreAs.subFaction, SubFaction);
-        slate.Set(KeyLibrary_SlateStoreAs.mercyQuestDef, MercyQuestDef);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.helpSeeker, HelpSeeker);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.subFaction, SubFaction);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.mercyQuestDef, MercyQuestDef);
 
         if (ParentFaction is not null)
         {
-            slate.Set(KeyLibrary_SlateStoreAs.parentFaction, ParentFaction);
+            slate.Set(OARO_KeyLibrary_SlateStoreAs.parentFaction, ParentFaction);
         }
 
         return slate;

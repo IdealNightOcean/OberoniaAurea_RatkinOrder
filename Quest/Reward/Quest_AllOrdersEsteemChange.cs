@@ -33,7 +33,7 @@ public class QuestNode_AllOrdersEsteemChange : QuestNode
 
         QuestPart_AllOrdersEsteemChange questPart_AllOrdersEsteemChange = new()
         {
-            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
+            InSignalTrigger = inSignal.GetValue(slate) ?? slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
             Change = change.GetValue(slate),
             ShowPlayerChangeMessage = showPlayerChangeMessage.GetValue(slate),
             Reason = reason.GetValue(slate)

@@ -52,7 +52,7 @@ public class BranchInteractionWorker_TravelRatkinTraderGroup(BranchInteractionDe
         Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
             (
                 text: "OARO_BranchInteraction_TravelRatkinTraderGroup".Translate(
-                    parms.Branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                    parms.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                     faction.Named(KeyLibrary_FormatArgName.FACTION),
                     map.Parent.Named("map")),
                 ratkinOrder: parms.RatkinOrder

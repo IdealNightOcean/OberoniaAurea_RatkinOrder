@@ -183,7 +183,7 @@ public class KnightVirtueHandler : IExposable
         Find.LetterStack.ReceiveLetter(
             label: "OARO_LetterLabel_VirtueGained".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN)),
             text: "OARO_LetterText_VirtueGained".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                                                           virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                                           virtueDef.Named(OARO_KeyLibrary_FormatArgName.VIRTUEDEF),
                                                            level.Named(KeyLibrary_FormatArgName.Level),
                                                            reason.Named(KeyLibrary_FormatArgName.Reason)),
             textLetterDef: LetterDefOf.PositiveEvent,
@@ -220,7 +220,7 @@ public class KnightVirtueHandler : IExposable
 
         Messages.Message(
             text: "OARO_Message_VirtueUpgraded".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                                                          virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                                          virtueDef.Named(OARO_KeyLibrary_FormatArgName.VIRTUEDEF),
                                                           newLevel.Named(KeyLibrary_FormatArgName.Level),
                                                           reason.Named(KeyLibrary_FormatArgName.Reason)),
             lookTargets: Pawn,
@@ -247,7 +247,7 @@ public class KnightVirtueHandler : IExposable
 
         Messages.Message(
             text: "OARO_Message_VirtueUpgraded".Translate(Pawn.Named(KeyLibrary_FormatArgName.PAWN),
-                                                          virtueDef.Named(KeyLibrary_FormatArgName.VIRTUEDEF),
+                                                          virtueDef.Named(OARO_KeyLibrary_FormatArgName.VIRTUEDEF),
                                                           newLevel.Named(KeyLibrary_FormatArgName.Level),
                                                           reason.Named(KeyLibrary_FormatArgName.Reason)),
             lookTargets: Pawn,

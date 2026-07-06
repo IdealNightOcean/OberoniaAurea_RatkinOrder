@@ -37,15 +37,15 @@ public class BranchBuilding : IExposable
             {
                 return def.advancedProperties.greetingParagraph.Formatted(
                     Label.Named("BuildingLabel"),
-                    branch.RatkinOrder.Named(KeyLibrary_FormatArgName.OrderName),
-                    branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
+                    branch.RatkinOrder.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+                    branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName));
             }
             else
             {
                 return def.greetingParagraph?.Formatted(
                     Label.Named("BuildingLabel"),
-                    branch.RatkinOrder.Named(KeyLibrary_FormatArgName.OrderName),
-                    branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName));
+                    branch.RatkinOrder.Named(OARO_KeyLibrary_FormatArgName.OrderName),
+                    branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName));
             }
         }
     }

@@ -17,12 +17,12 @@ public abstract class JointPatrolCaravanHelpWorker
 
     public virtual string RequestHelpReason(Branch branch)
     {
-        return Def.requestHelpReason?.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF)) ?? $"{Def.label} ({branch.Name})";
+        return Def.requestHelpReason?.Formatted(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(OARO_KeyLibrary_FormatArgName.CARAVANHELPDEF)) ?? $"{Def.label} ({branch.Name})";
     }
 
     private string GetRewardText(Branch branch)
     {
-        string rewardText = Def.rewardText.Formatted(branch.Name.Named(KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.CARAVANHELPDEF));
+        string rewardText = Def.rewardText.Formatted(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(OARO_KeyLibrary_FormatArgName.CARAVANHELPDEF));
         if (extraRewardText.Length > 0)
         {
             rewardText += ("\n" + extraRewardText.ToString());
@@ -44,7 +44,7 @@ public abstract class JointPatrolCaravanHelpWorker
         }
 
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-            label: "OARO_JointPatrolCaravanIncident_ThankLabel".Translate(branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+            label: "OARO_JointPatrolCaravanIncident_ThankLabel".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
             text: TaggedString.Empty,
             def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,

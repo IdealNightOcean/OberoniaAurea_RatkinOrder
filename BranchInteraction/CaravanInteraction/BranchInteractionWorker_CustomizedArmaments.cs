@@ -13,7 +13,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
     {
         List<ThingDef> customizableThings = Def.GetModExtension<ThingList_Extension>()?.thingList ?? [];
 
-        DiaNode rootNode = new("OARO_CustomizedArmaments_Weapon".Translate(parms.Branch.Named(KeyLibrary_FormatArgName.BranchName)));
+        DiaNode rootNode = new("OARO_CustomizedArmaments_Weapon".Translate(parms.Branch.Named(OARO_KeyLibrary_FormatArgName.BranchName)));
 
         foreach (ThingDef tDef in customizableThings)
         {
@@ -128,9 +128,9 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
         Branch branch = parms.Branch;
 
         OrderLetter_SimpleAttachments orderLetter = (OrderLetter_SimpleAttachments)OrderLetterUtility.MakeOrderLetter(
-            label: "OARO_CustomizedArmaments_CompletedLabel".Translate(branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName)),
+            label: "OARO_CustomizedArmaments_CompletedLabel".Translate(branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
             text: "OARO_CustomizedArmaments_CompletedText".Translate(
-                branch.NameColored.Named(KeyLibrary_FormatArgName.BranchName),
+                branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                 GenLabel.ThingsLabel([thing]).Named(KeyLibrary_FormatArgName.ThingsInfo)),
             def: OrderLetterDefOf.OARO_OfficialLetter_SimpleAttachments,
             relatedOrder: branch.RatkinOrder,

@@ -697,7 +697,7 @@ public class Window_BranchDemand : OrderWindowBase
         {
             if (demand is null)
             {
-                GUI.DrawTexture(inRect, IconLibrary.ShadeTexture);
+                GUI.DrawTexture(inRect, OARO_IconLibrary.ShadeTexture);
                 Text.Font = GameFont.Medium;
                 Text.Anchor = TextAnchor.MiddleCenter;
                 Widgets.Label(inRect, "OARO_DemandWin_NoDemandOfTypeNow".Translate());

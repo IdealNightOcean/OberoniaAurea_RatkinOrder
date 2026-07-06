@@ -214,8 +214,8 @@ public partial class Window_BranchTask
             if (jointPatrolProp is not null)
             {
                 GUI.DrawTexture(reusedRect, jointPatrolProp.entryBackgroundTexture.Texture);
-                Material tintMat = OARO_WindowUtility.GetTintMaterial(primaryChivalry.color, IconLibrary.JointPatrolEntryShadeMask);
-                GenUI.DrawTextureWithMaterial(reusedRect, IconLibrary.JointPatrolEntryShadeTex, tintMat);
+                Material tintMat = OARO_WindowUtility.GetTintMaterial(primaryChivalry.color, OARO_IconLibrary.JointPatrolEntryShadeMask);
+                GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.JointPatrolEntryShadeTex, tintMat);
             }
 
             Text.Font = GameFont.Medium;

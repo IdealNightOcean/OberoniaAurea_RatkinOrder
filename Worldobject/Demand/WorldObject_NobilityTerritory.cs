@@ -340,7 +340,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             };
             if (CliquesManager.GetCliqueWillingness(NobilityCliqueKey) < 0.5f)
             {
-                negotiateOpt.Disable("OARO_Insufficient_CliqueWillingness".Translate(nobilityName.Named(KeyLibrary_FormatArgName.CliqueName),
+                negotiateOpt.Disable("OARO_Insufficient_CliqueWillingness".Translate(nobilityName.Named(OARO_KeyLibrary_FormatArgName.CliqueName),
                                                                                      0.5f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance)));
             }
             rootNode.options.Add(negotiateOpt);

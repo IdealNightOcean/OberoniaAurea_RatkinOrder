@@ -1,4 +1,7 @@
+using OberoniaAurea_Frame;
+using RimWorld;
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
@@ -8,20 +11,26 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class ResidentKnightStatUtility
 {
-    public static string GetStatModifyExplanationStr(ResidentKnightStatRequestData requestData, ResidentKnightStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
+    public static string GetStatModifyExplanationStr(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
     {
-        return GetStatModifyExplanation(requestData, statDef, baseValueOverride, showResultValue).ToString();
+        return GetStatModifyExplanation(requestData, baseValueOverride, showResultValue).ToString();
     }
 
-    public static StringBuilder GetStatModifyExplanation(ResidentKnightStatRequestData requestData, ResidentKnightStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
+    public static StringBuilder GetStatModifyExplanation(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
     {
-        if (requestData is null || statDef is null)
-            return new StringBuilder(string.Empty);
+        if (requestData is null || requestData.StatDef is null)
+            return new StringBuilder(KeyLibrary_Misc.ErrorTipWithColor);
 
         StringBuilder explanation = new(256);
         try
         {
-            float baseValue = statDef.Worker.PrepareInitialBaseValeExplanation(explanation, requestData, baseValueOverride);
+            ResidentKnightStatDef statDef = requestData.StatDef;
+            statDef.Worker.PrepareInitialBaseValue(requestData: requestData,
+                                                   baseValueOverride: baseValueOverride,
+                                                   resultOnly: false,
+                                                   explanation: explanation);
+
+            float curValue = requestData.BaseValue;
 
             StatTransformer transformer = new();
             bool hasTrans = false;
@@ -38,45 +47,66 @@ public static class ResidentKnightStatUtility
                 }
             }
 
-            float curValue = (showResultValue && hasTrans) ? transformer.DoTransform(statDef, baseValue) : baseValue;
+            curValue = (showResultValue && hasTrans) ? transformer.DoTransform(statDef, curValue) : curValue;
 
-            statDef.Worker.PostTransModifyExplanation(requestData: requestData,
-                                                      statDef: statDef,
-                                                      baseValue: baseValue,
-                                                      curValue: curValue,
-                                                      explanation: explanation,
-                                                      showResultValue: showResultValue);
+            explanation.AppendLine("OARO_StatExplain_PostTransModify".Translate().Colorize(Color.cyan));
+
+            statDef.Worker.PostTransModify(requestData: requestData,
+                                          curValue: ref curValue,
+                                          resultOnly: false,
+                                          explanation: explanation);
+
+            List<ResidentKnightStatPart> statParts = statDef.statParts;
+            if (statParts is not null)
+            {
+                for (int i = 0; i < statParts.Count; i++)
+                {
+                    statParts[i].PostTransModify(requestData: requestData,
+                                                 curValue: ref curValue,
+                                                 resultOnly: false,
+                                                 explanation: explanation);
+                }
+            }
+
+            if (showResultValue)
+            {
+                float result = Mathf.Clamp(curValue, statDef.minValue, statDef.maxValue);
+                if (statDef.statType == BranchStatDef.StatType.Int)
+                {
+                    result = Mathf.Round(result);
+                }
+                statDef.Worker.UpdateStatCache(requestData.Knight, result);
+                ResidentKnightStatUtility.AppendStatResultExplanation(explanation, requestData, result);
+            }
         }
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"生成ResidentKnightStat修改说明: [ResidentKnightStat: {statDef?.label}, ResidentKnightId: {requestData.Knight?.GetUniqueLoadID()}]",
+                errorDesc: $"生成ResidentKnightStat修改说明: [ResidentKnightStat: {requestData.StatDef?.label}, ResidentKnightId: {requestData.Knight?.GetUniqueLoadID()}]",
                 typeName: nameof(ResidentKnightStatUtility),
                 methodName: nameof(GetStatModifyExplanation),
                 needStackTrace: true);
-            explanation = new("ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable));
+            explanation = new(KeyLibrary_Misc.ErrorTipWithColor);
         }
 
         return explanation;
     }
 
-    public static void AppendStatResultExplanation(StringBuilder modifyExplain, ResidentKnightStatDef statDef, float finalValue, float? baseValueOverride = null)
+    public static void AppendStatResultExplanation(StringBuilder modifyExplain, ResidentKnightStatRequestData requestData, float finalValue)
     {
         modifyExplain.AppendLine();
-        float baseValue = baseValueOverride ?? statDef.baseValue;
+        ResidentKnightStatDef statDef = requestData.StatDef;
+        float baseValue = requestData.BaseValue;
         switch (statDef.statType)
         {
             case BranchStatDef.StatType.Int:
-                modifyExplain.AppendLine("OARO_StatExplain_ResultInt".Translate(Mathf.Round(finalValue).ToString())
-                                                                     .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+                modifyExplain.AppendLine("OARO_StatExplain_ResultInt".Translate(OAFrame_TextUtility.ColoredFloatString(finalValue, format: "F0", originPoint: baseValue, reverse: statDef.reverse)));
                 break;
             case BranchStatDef.StatType.Float:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToString("0.##"))
-                                                                  .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OAFrame_TextUtility.ColoredFloatString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
                 break;
             case BranchStatDef.StatType.Percent:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToStringPercent("0.##"))
-                                                                  .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
+                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OAFrame_TextUtility.ColoredPercentString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
                 break;
             default: break;
         }
@@ -88,12 +118,15 @@ public static class ResidentKnightStatUtility
         return statDef.Worker.GetValue(new ResidentKnightStatRequestData(knight, statDef), baseValueOverride, immediateUpdate);
     }
 
-    public static float GetNewStatValue(ResidentKnightStatRequestData requestData, ResidentKnightStatDef statDef, float? baseValueOverride = null)
+    public static float GetNewStatValue(ResidentKnightStatRequestData requestData, float? baseValueOverride = null)
     {
         float result;
+
         try
         {
-            result = statDef.Worker.PrepareInitialBaseValue(requestData, baseValueOverride);
+            ResidentKnightStatDef statDef = requestData.StatDef;
+            statDef.Worker.PrepareInitialBaseValue(requestData, baseValueOverride);
+            result = requestData.BaseValue;
 
             StatTransformer transformer = new();
             bool hasTransformer = false;
@@ -109,12 +142,18 @@ public static class ResidentKnightStatUtility
 
             statDef.Worker.PostTransModify(requestData, ref result);
 
+            result = Mathf.Clamp(result, statDef.minValue, statDef.maxValue);
+            if (statDef.statType == BranchStatDef.StatType.Int)
+            {
+                result = Mathf.Round(result);
+            }
+
         }
         catch (Exception ex)
         {
-            result = baseValueOverride ?? statDef?.baseValue ?? 0f;
+            result = baseValueOverride ?? requestData?.StatDef?.baseValue ?? 0f;
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"计算新的ResidentKnightStat值: [ResidentKnightStat: {statDef?.label}, ResidentKnightId: {requestData.Knight?.GetUniqueLoadID()}]",
+                errorDesc: $"计算新的ResidentKnightStat值: [ResidentKnightStat: {requestData?.StatDef?.label}, ResidentKnightId: {requestData.Knight?.GetUniqueLoadID()}]",
                 typeName: nameof(ResidentKnightStatUtility),
                 methodName: nameof(GetNewStatValue),
                 needStackTrace: true);
@@ -123,11 +162,18 @@ public static class ResidentKnightStatUtility
         return result;
     }
 
-    public static float GetNewStatValueFormTrans(ResidentKnightStatRequestData requestData, ResidentKnightStatDef statDef, StatTransformer transformer, float? baseValueOverride = null)
+    public static float GetNewStatValueFormTrans(ResidentKnightStatRequestData requestData, StatTransformer transformer, float? baseValueOverride = null)
     {
+        if (requestData is null || requestData.StatDef is null)
+        {
+            Log.Error("[OARO] 试图获取无效的 ResidentKnightStat 值, ");
+            return 0f;
+        }
+
         float result;
         try
         {
+            ResidentKnightStatDef statDef = requestData.StatDef;
             result = transformer.DoTransform(statDef, baseValueOverride);
             if (statDef.statParts is not null)
             {
@@ -145,9 +191,9 @@ public static class ResidentKnightStatUtility
         }
         catch (Exception ex)
         {
-            result = baseValueOverride ?? statDef?.baseValue ?? 0f;
+            result = baseValueOverride ?? requestData.StatDef.baseValue;
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"计算新的BranchStat值: [BranchStat: {statDef?.label}, BranchId: {requestData.Knight?.GetUniqueLoadID()}]",
+                errorDesc: $"计算新的BranchStat值: [BranchStat: {requestData.StatDef.label}, BranchId: {requestData.Knight?.GetUniqueLoadID()}]",
                 typeName: nameof(BranchStatUtility),
                 methodName: nameof(GetNewStatValueFormTrans),
                 needStackTrace: true);

@@ -181,7 +181,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         if (def.chivalry.IsSameDefNonNullable(Record.Chivalry))
         {
             reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 4f, 20f, 20f);
-            GUI.DrawTexture(reusedRect, IconLibrary.StarWhite);
+            GUI.DrawTexture(reusedRect, OARO_IconLibrary.StarWhite);
             TooltipHandler.TipRegion(inRect, () => "OARO_ResidentAcademic_ResonateChivalry".Translate(), uniqueId: 3256725);
         }
         if (SelAcademicDef == def)

@@ -19,7 +19,7 @@ public class QuestNode_SetBranchForObject : QuestNode
             return;
         }
 
-        Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch);
+        Branch branch = this.branch.GetValue(slate) ?? slate.Get<Branch>(OARO_KeyLibrary_SlateStoreAs.branch);
         if (branch.IsValid())
         {
             branchRelated.SetOrderBranch(branch);

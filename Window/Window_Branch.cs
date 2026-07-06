@@ -254,7 +254,7 @@ public class Window_Branch : OrderWindowBase
         float offsetMainInnerMidX = mainInnerRectX + 824f;
 
         Rect reusedRect = new(mainInnerRectX + 546f, mainInnerRectY + 171f, 562f, 9f);
-        Widgets.FillableBar(reusedRect, Mathf.Clamp01(FacilityHandler.TotalFacilityLevel / (AllFacilityDefCount * 4f)), IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: false);
+        Widgets.FillableBar(reusedRect, Mathf.Clamp01(FacilityHandler.TotalFacilityLevel / (AllFacilityDefCount * 4f)), OARO_IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: false);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;
@@ -303,7 +303,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_BranchWin_StoresReservesConstruction".Translate());
         Text.Anchor = TextAnchor.UpperLeft;
         reusedRect = new(reusedRect.xMin - 13f, reusedRect.y, 13f, 22f);
-        GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
+        GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallExclamation);
         TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_StoresReservesTip".Translate(), uniqueId: 73484661);
 
         void DrawEntry(Rect entryRect, float iconMargin, int index)
@@ -314,7 +314,7 @@ public class Window_Branch : OrderWindowBase
                 BranchStoresReserveHandler.ReserveRecord reserves = storesReserves[index];
                 GUI.DrawTexture(iconRect, reserves.Target.iconTexture.Texture);
                 string reservesDesc = "OARO_StoresReserve_EffectDesc".Translate(
-                    Branch.Name.Named(KeyLibrary_FormatArgName.BranchName),
+                    Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                     reserves.Target.Named("TARGET"),
                     reserves.CostRateReduce.ToStringPercent("0.##").Named("Reduce"));
                 if (!String.IsNullOrEmpty(reservesDesc))
@@ -619,8 +619,8 @@ public class Window_Branch : OrderWindowBase
             if (buildingDef.honorDef is not null)
             {
                 Rect ribbonRect = new(inRect.xMin, inRect.yMin - 2f, inRect.width, 55f);
-                Material tintMat = OARO_WindowUtility.GetTintMaterial(buildingDef.honorDef.color, IconLibrary.HonorRibbonMask);
-                GenUI.DrawTextureWithMaterial(ribbonRect, IconLibrary.HonorRibbonTex, tintMat);
+                Material tintMat = OARO_WindowUtility.GetTintMaterial(buildingDef.honorDef.color, OARO_IconLibrary.HonorRibbonMask);
+                GenUI.DrawTextureWithMaterial(ribbonRect, OARO_IconLibrary.HonorRibbonTex, tintMat);
             }
         }
         else if (building.HasUpgraded)
@@ -885,7 +885,7 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
 
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
-        GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
+        GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallExclamation);
         TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_CommonInteractionTip".Translate(), uniqueId: 58990376);
 
         Rect commonOutRect = commonRect;
@@ -953,7 +953,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
         Widgets.Label(reusedRect, label);
         reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
-        GUI.DrawTexture(reusedRect, IconLibrary.SmallExclamation);
+        GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallExclamation);
         TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_BuildingInteractionTip".Translate(), uniqueId: 98968387);
 
         Rect buildingOutRect = Rect.MinMaxRect(buildingRect.x, buildingRect.yMin + 45f, buildingRect.xMax, buildingRect.yMax);

@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
 using System;
@@ -42,9 +43,9 @@ public static class OARO_QuestUtility
 
     public static void SetBasicOrderSlateVar(this Slate slate, RatkinOrder ratkinOrder)
     {
-        slate.Set(KeyLibrary_SlateStoreAs.ratkinOrder, ratkinOrder);
-        slate.Set(KeyLibrary_SlateStoreAs.orderName, ratkinOrder.Name);
-        slate.Set(KeyLibrary_SlateStoreAs.orderFaction, ratkinOrder.Faction);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.ratkinOrder, ratkinOrder);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.orderName, ratkinOrder.Name);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.orderFaction, ratkinOrder.Faction);
     }
 
     public static void SetBasicBranchSlateVar(this Slate slate, Branch branch, bool alsoSetOrder = true)
@@ -53,9 +54,9 @@ public static class OARO_QuestUtility
         {
             slate.SetBasicOrderSlateVar(branch.RatkinOrder);
         }
-        slate.Set(KeyLibrary_SlateStoreAs.branch, branch);
-        slate.Set(KeyLibrary_SlateStoreAs.branchName, branch.Name);
-        slate.Set(KeyLibrary_SlateStoreAs.branchSite, branch.BaseSite);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.branch, branch);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.branchName, branch.Name);
+        slate.Set(OARO_KeyLibrary_SlateStoreAs.branchSite, branch.BaseSite);
     }
 
     public static void SendWorkResolvedSignal(this WorldObject worldObject, NamedArgument[] args = null)

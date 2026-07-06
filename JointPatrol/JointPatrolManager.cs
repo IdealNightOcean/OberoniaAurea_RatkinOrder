@@ -641,7 +641,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             label: "OARO_LetterLabel_ResidentKnightLeaveFromJointPatrol".Translate(),
             text: "OARO_LetterText_ResidentKnightLeaveFromJointPatrol".Translate(
                 GenLabel.ThingsLabel(participatingPawns.Cast<Thing>()).Named("PawnsInfo"),
-                ratkinOrder.NameColored.Named(KeyLibrary_FormatArgName.OrderName)),
+                ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
             textLetterDef: LetterDefOf.PositiveEvent,
             lookTargets: participatingPawns);
     }
@@ -697,7 +697,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             completionSummary = rewardData.ApplyReward(patrolLevel, participantsDict, generateSummary: true);
 
             OrderLetterUtility.ReceiveLetter(
-                label: "OARO_JointPatrolCompletionSummary".Translate(ratkinOrder.Name.Named(KeyLibrary_FormatArgName.OrderName)),
+                label: "OARO_JointPatrolCompletionSummary".Translate(ratkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
                 text: completionSummary,
                 def: OrderLetterDefOf.OARO_OfficialLetter,
                 relatedOrder: ratkinOrder,
@@ -877,7 +877,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         StringBuilder explainSB = new();
         if (!def.customDescriptions.NullOrEmpty())
         {
-            explainSB.AppendLine(def.customDescriptions.RandomElement().Formatted(record.Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)));
+            explainSB.AppendLine(def.customDescriptions.RandomElement().Formatted(record.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)));
             explainSB.AppendLine();
         }
 

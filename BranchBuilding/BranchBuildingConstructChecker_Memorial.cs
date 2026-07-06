@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using OberoniaAurea_Frame;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -32,7 +33,7 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
             branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam);
             return;
         }
-        StringBuilder textBuilder = new("OARO_ConstructionConfirm_Memorial".Translate(honorDef.Named(KeyLibrary_FormatArgName.HONORDEF)));
+        StringBuilder textBuilder = new("OARO_ConstructionConfirm_Memorial".Translate(honorDef.Named(OARO_KeyLibrary_FormatArgName.HONORDEF)));
         textBuilder.AppendLine();
         textBuilder.AppendLine();
         textBuilder.AppendLine(honorDef.LabelCap);

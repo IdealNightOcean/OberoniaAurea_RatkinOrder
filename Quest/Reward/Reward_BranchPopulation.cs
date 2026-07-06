@@ -17,13 +17,13 @@ public class Reward_BranchPopulation : Reward
     {
         get
         {
-            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_BranchPopulation".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)),
+            yield return QuestPartUtility.GetStandardRewardStackElement(label: "OARO_Reward_BranchPopulation".Translate(Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                                                                         iconDrawer: delegate (Rect r)
                                                                         {
                                                                             GUI.DrawTexture(r, null);
                                                                             GUI.color = Color.white;
                                                                         },
-                                                                        tipGetter: () => "OARO_Reward_BranchPopulationTip".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)).Resolve());
+                                                                        tipGetter: () => "OARO_Reward_BranchPopulationTip".Translate(Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)).Resolve());
         }
     }
 
@@ -36,14 +36,14 @@ public class Reward_BranchPopulation : Reward
     {
         yield return new QuestPart_BranchPopulationChange()
         {
-            InSignalTrigger = QuestGen.slate.Get<string>(KeyLibrary_SlateStoreAs.inSignal),
-            Branch = Branch ?? QuestGen.slate.Get<Branch>(KeyLibrary_SlateStoreAs.branch),
+            InSignalTrigger = QuestGen.slate.Get<string>(OARO_KeyLibrary_SlateStoreAs.inSignal),
+            Branch = Branch ?? QuestGen.slate.Get<Branch>(OARO_KeyLibrary_SlateStoreAs.branch),
             Amount = DefaultAmount,
             ChangeFactor = DefaultChangeFactor
         };
     }
 
-    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_BranchPopulationDesc".Translate(Branch.Name.Named(KeyLibrary_FormatArgName.BranchName)).Resolve();
+    public override string GetDescription(RewardsGeneratorParams parms) => "OARO_Reward_BranchPopulationDesc".Translate(Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)).Resolve();
 
     public override string ToString() => $"{GetType().Name} (Branch={Branch.Name})";
 

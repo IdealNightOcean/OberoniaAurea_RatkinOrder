@@ -91,11 +91,11 @@ public class QuestClique : IExposable
 
         if (String.IsNullOrEmpty(ActiveDesc))
         {
-            ActiveDesc = "OARO_QuestClique_DefaultBranchActive".Translate(relatedBranch.Name.Named(KeyLibrary_FormatArgName.BranchName));
+            ActiveDesc = "OARO_QuestClique_DefaultBranchActive".Translate(relatedBranch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName));
         }
         if (String.IsNullOrEmpty(InactiveDesc))
         {
-            InactiveDesc = "OARO_QuestClique_DefaultBranchInactive".Translate(relatedBranch.Name.Named(KeyLibrary_FormatArgName.BranchName));
+            InactiveDesc = "OARO_QuestClique_DefaultBranchInactive".Translate(relatedBranch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName));
         }
     }
 
@@ -110,7 +110,7 @@ public class QuestClique : IExposable
             {
                 Messages.Message(
                     text: "OARO_CliqueWillingness_Increase".Translate(
-                        Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                        Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName),
                         trueChange.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
                     def: MessageTypeDefOf.PositiveEvent);
             }
@@ -118,7 +118,7 @@ public class QuestClique : IExposable
             {
                 Messages.Message(
                     text: "OARO_CliqueWillingness_Decrease".Translate(
-                        Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                        Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName),
                         (-trueChange).ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Change)),
                     def: MessageTypeDefOf.NegativeEvent);
             }
@@ -148,7 +148,7 @@ public class QuestClique : IExposable
     {
         if (IsActive)
         {
-            return resultOnly ? false : "OARO_Clique_HasActive".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+            return resultOnly ? false : "OARO_Clique_HasActive".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName));
         }
 
         if (directly)
@@ -158,7 +158,7 @@ public class QuestClique : IExposable
 
         if (ticksToInactive > 0)
         {
-            return resultOnly ? false : "OARO_Clique_PrepareActivation".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+            return resultOnly ? false : "OARO_Clique_PrepareActivation".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName));
         }
 
         if (IsBranchClique)
@@ -183,7 +183,7 @@ public class QuestClique : IExposable
                 }
                 if (willingness < 0.6f)
                 {
-                    return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                    return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName),
                                                                                                 0.6f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance));
                 }
 
@@ -194,7 +194,7 @@ public class QuestClique : IExposable
         {
             if (willingness < 0.9f)
             {
-                return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                return resultOnly ? false : "OARO_Insufficient_CliqueWillingness".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName),
                                                                                             0.9f.ToStringPercent("0.##").Named(KeyLibrary_FormatArgName.Chance));
             }
 
@@ -206,11 +206,11 @@ public class QuestClique : IExposable
     {
         if (IsActive)
         {
-            return resultOnly ? false : "OARO_Clique_HasActive".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+            return resultOnly ? false : "OARO_Clique_HasActive".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName));
         }
         if (!IsBribable)
         {
-            return resultOnly ? false : "OARO_Clique_NotBribable".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName));
+            return resultOnly ? false : "OARO_Clique_NotBribable".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName));
         }
 
 
@@ -309,14 +309,14 @@ public class QuestClique : IExposable
         {
             willingnessGain += 0.15f;
             text = "OARO_Clique_CommunicateInfoWithPrefer".Translate(
-                Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName),
                 willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change),
                 PreferredBuilding.Named("BUILDING"));
         }
         else
         {
             text = "OARO_Clique_CommunicateInfo".Translate(
-                Name.Named(KeyLibrary_FormatArgName.CliqueName),
+                Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName),
                 willingnessGain.ToStringPercent().Named(KeyLibrary_FormatArgName.Change));
         }
 
@@ -334,7 +334,7 @@ public class QuestClique : IExposable
         map.DestroyThingsOfDef(ThingDefOf.Silver, BriberyCost);
         AdjustCliqueWillingness(1f - Willingness + 0.1f);
 
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(Name.Named(KeyLibrary_FormatArgName.CliqueName))));
+        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName))));
 
         if (CanActiveNow(directly: false, resultOnly: true))
         {

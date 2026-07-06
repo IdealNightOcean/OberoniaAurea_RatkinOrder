@@ -1,3 +1,4 @@
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -48,7 +49,7 @@ public static class BranchUtility
     {
         if (branch is null || branch.BaseSite is null)
         {
-            return KeyLibrary_FormatArgName.UNKOWN;
+            return KeyLibrary_Misc.ErrorTipWithColor;
         }
 
         if (branch.BaseSite is INameableWorldObject nameSite)
