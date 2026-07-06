@@ -61,8 +61,8 @@ public class Thought_Situational_OrderStationTraditions : Thought_Situational
         nextCacheUpdateTick = Find.TickManager.TicksGame + 10000;
 
         traditionsWithChivalryCountCache.Clear();
-        totalTraditionsCountCache = OrderStationHandler.TraditionsManager.activeTraditions.Count;
-        foreach (OrderStationTraditionDef tradition in OrderStationHandler.TraditionsManager.activeTraditions)
+        totalTraditionsCountCache = OrderStationHandler.TraditionsManager.ActiveTraditionCount;
+        foreach (OrderStationTraditionDef tradition in OrderStationHandler.TraditionsManager.ActiveTraditions)
         {
             if (tradition.Chivalry is not null)
             {

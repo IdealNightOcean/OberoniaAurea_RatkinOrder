@@ -106,8 +106,12 @@ public class AcademicHandler : IExposable
 
         if (!directly)
         {
-            KnightChivalryDef chivalry = (this.ResidentPawn is ResidentKnight knight) ? knight.Chivalry : null;
-            float neededPoints = AcademicUtility.GetMeditationPointsNeeded(academicDef, chivalry, academicLevel + 1);
+            float neededPoints = AcademicUtility.GetMeditationPointsNeeded(residentPawn: this.ResidentPawn,
+                                                                           academicDef: academicDef,
+                                                                           sourceLevel: academicLevel,
+                                                                           targetLevel: academicLevel + 1,
+                                                                           resultOnly: true,
+                                                                           explanation: out _);
             if (meditationPoints < neededPoints)
             {
                 return resultOnly ? false : "OARO_Insufficient_MeditationPoints".Translate(neededPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count));
@@ -132,8 +136,12 @@ public class AcademicHandler : IExposable
 
         if (!directly)
         {
-            KnightChivalryDef chivalry = (this.ResidentPawn is ResidentKnight knight) ? knight.Chivalry : null;
-            float neededPoints = AcademicUtility.GetMeditationPointsNeeded(academicDef, chivalry, curLevel, targetLevel);
+            float neededPoints = AcademicUtility.GetMeditationPointsNeeded(residentPawn: this.ResidentPawn,
+                                                                           academicDef: academicDef,
+                                                                           sourceLevel: curLevel,
+                                                                           targetLevel: targetLevel,
+                                                                           resultOnly: true,
+                                                                           explanation: out _);
 
             MeditationPoints -= neededPoints;
         }

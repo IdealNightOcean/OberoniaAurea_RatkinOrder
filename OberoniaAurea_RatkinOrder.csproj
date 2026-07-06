@@ -164,6 +164,7 @@
     <Compile Include="DefOf\BranchInteractionDefOf.cs" />
     <Compile Include="DefOf\BranchResidentDefOf.cs" />
     <Compile Include="DefOf\KnightChivalryDefOf.cs" />
+    <Compile Include="DefOf\ResidentKnightStatDefOf.cs" />
     <Compile Include="DefOf\WorldObjectDefOf.cs" />
     <Compile Include="DefOf\OrderInteractionDefOf.cs" />
     <Compile Include="DefOf\OrderLetterDefOf.cs" />
@@ -190,7 +191,7 @@
     <Compile Include="DefModExtension\ModExtension_GiveHediff.cs" />
     <Compile Include="DefModExtension\ModExtension_RangeHediffGive.cs" />
     <Compile Include="DefModExtension\ModExtension_StatModifiersByValue.cs" />
-    <Compile Include="ResidentKnightStat\ResidentKnightStatWorker_AcademicPointsCostFactor.cs" />
+    <Compile Include="ResidentKnightStat\ResidentKnightStatPart_KnightChivalryFactor.cs" />
     <Compile Include="ResidentKnightStat\ResidentKnightStatWorker_AcademicPointsCost.cs" />
     <Compile Include="ResidentKnightStat\ResidentKnightStatRequestData.cs" />
     <Compile Include="ResidentKnightStat\ResidentKnightStatRequestData_Academic.cs" />

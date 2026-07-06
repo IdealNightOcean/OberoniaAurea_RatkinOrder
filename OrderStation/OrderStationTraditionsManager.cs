@@ -46,8 +46,9 @@ public class OrderStationTraditionWorker
 /// </summary>
 public class OrderStationTraditionsManager : IExposable
 {
-    public HashSet<OrderStationTraditionDef> activeTraditions = [];
-    private Dictionary<KnightChivalryDef, int> activeTraditionsWithChivalryCountCache = [];
+    private HashSet<OrderStationTraditionDef> activeTraditions = [];
+    public IReadOnlyCollection<OrderStationTraditionDef> ActiveTraditions => activeTraditions;
+
     private bool TraditionsChanged { get; set; } = false;
 
     public int ActiveTraditionCount => activeTraditions.Count;
@@ -75,17 +76,6 @@ public class OrderStationTraditionsManager : IExposable
                 count++;
         }
         return count;
-    }
-
-    public float GetAcademicCostReduction(KnightChivalryDef chivalry)
-    {
-        float reduction = 0f;
-        foreach (OrderStationTraditionDef tradition in activeTraditions)
-        {
-            if (chivalry.IsSameDefNonNullable(tradition.Chivalry))
-                reduction += tradition.academicCostReduction;
-        }
-        return reduction;
     }
 
     public void TickDay()

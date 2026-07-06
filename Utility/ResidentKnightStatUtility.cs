@@ -11,15 +11,26 @@ namespace OberoniaAurea.RatkinOrder;
 
 public static class ResidentKnightStatUtility
 {
+    public static string GetBaseValueExplanation(this ResidentKnightStatDef statDef, float baseValue, string format = "0.##")
+    {
+        return statDef.statType switch
+        {
+            BranchStatDef.StatType.Int => (string)"OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()),
+            BranchStatDef.StatType.Float => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign(format)),
+            BranchStatDef.StatType.Percent => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent(format)),
+            _ => KeyLibrary_Misc.ErrorTipWithColor,
+        };
+    }
+
     public static string GetStatModifyExplanationStr(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
     {
         return GetStatModifyExplanation(requestData, baseValueOverride, showResultValue).ToString();
     }
 
-    public static StringBuilder GetStatModifyExplanation(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
+    public static (StringBuilder, float?) GetStatModifyExplanation(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
     {
         if (requestData is null || requestData.StatDef is null)
-            return new StringBuilder(KeyLibrary_Misc.ErrorTipWithColor);
+            return (new StringBuilder(KeyLibrary_Misc.ErrorTipWithColor), null);
 
         StringBuilder explanation = new(256);
         try
@@ -77,6 +88,7 @@ public static class ResidentKnightStatUtility
                 }
                 statDef.Worker.UpdateStatCache(requestData.Knight, result);
                 ResidentKnightStatUtility.AppendStatResultExplanation(explanation, requestData, result);
+                return (explanation, result);
             }
         }
         catch (Exception ex)
@@ -89,7 +101,7 @@ public static class ResidentKnightStatUtility
             explanation = new(KeyLibrary_Misc.ErrorTipWithColor);
         }
 
-        return explanation;
+        return (explanation, null);
     }
 
     public static void AppendStatResultExplanation(StringBuilder modifyExplain, ResidentKnightStatRequestData requestData, float finalValue)
@@ -116,6 +128,19 @@ public static class ResidentKnightStatUtility
     public static float GetStatValue(this ResidentKnight knight, ResidentKnightStatDef statDef, float? baseValueOverride = null, bool immediateUpdate = false)
     {
         return statDef.Worker.GetValue(new ResidentKnightStatRequestData(knight, statDef), baseValueOverride, immediateUpdate);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float GetStatValue(this ResidentKnightStatDef statDef, ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool immediateUpdate = false)
+    {
+        requestData.StatDef = statDef;
+        return statDef.Worker.GetValue(requestData, baseValueOverride, immediateUpdate);
+    }
+
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float GetStatValue(this ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool immediateUpdate = false)
+    {
+        return requestData.StatDef.Worker.GetValue(requestData, baseValueOverride, immediateUpdate);
     }
 
     public static float GetNewStatValue(ResidentKnightStatRequestData requestData, float? baseValueOverride = null)

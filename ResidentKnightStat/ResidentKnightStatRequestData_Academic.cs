@@ -11,12 +11,14 @@ public class ResidentKnightStatRequestData_Academic : ResidentKnightStatRequestD
     public ResidentKnightStatRequestData_Academic(ResidentKnight knight, ResidentKnightStatDef statDef, KnightAcademicDef academicDef) : base(knight, statDef)
     {
         AcademicDef = academicDef ?? throw new ArgumentNullException(nameof(academicDef));
+        OtherChivalry = academicDef.chivalry;
     }
 
-    public ResidentKnightStatRequestData_Academic(ResidentKnight knight, ResidentKnightStatDef statDef, KnightAcademicDef academicDef, int curLevel, int targetLevel) : base(knight, statDef)
+    public ResidentKnightStatRequestData_Academic(ResidentKnight knight, ResidentKnightStatDef statDef, KnightAcademicDef academicDef, int sourceLevel, int targetLevel) : base(knight, statDef)
     {
         AcademicDef = academicDef ?? throw new ArgumentNullException(nameof(academicDef));
-        CurLevel = curLevel;
+        OtherChivalry = academicDef.chivalry;
+        CurLevel = sourceLevel;
         TargetLevel = targetLevel;
     }
 }

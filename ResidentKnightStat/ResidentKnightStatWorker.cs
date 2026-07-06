@@ -13,7 +13,7 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef)
 
     private readonly Dictionary<ResidentKnight, CacheEnty> temporaryStatCache = statDef.cacheable ? new(8) : null;
 
-    public virtual void PrepareInitialBaseValue(ResidentKnightStatRequestData requestData,
+    public virtual bool PrepareInitialBaseValue(ResidentKnightStatRequestData requestData,
                                                 float? baseValueOverride = null,
                                                 bool resultOnly = true,
                                                 StringBuilder explanation = null)
@@ -22,16 +22,17 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef)
         requestData.BaseValue = baseValue;
         if (!resultOnly)
         {
-            explanation.AppendLine(GetBaseValueExplanation(baseValue));
+            explanation.AppendLine(StatDef.GetBaseValueExplanation(baseValue));
         }
+        return true;
     }
 
 
-    public virtual void PostTransModify(ResidentKnightStatRequestData requestData,
+    public virtual bool PostTransModify(ResidentKnightStatRequestData requestData,
                                         ref float curValue,
                                         bool resultOnly = true,
                                         StringBuilder explanation = null)
-    { }
+    { return true; }
 
     public float GetValue(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool immediateUpdate = false)
     {
@@ -71,15 +72,26 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef)
 
     public void DeleteStatCache() => temporaryStatCache.Clear();
 
-    protected string GetBaseValueExplanation(float baseValue)
+
+
+    protected static bool TryCastRequestData<T>(ResidentKnightStatRequestData requestData,
+                                                out T targetRequestData,
+                                                bool resultOnly = true,
+                                                StringBuilder explanation = null) where T : ResidentKnightStatRequestData
     {
-        return StatDef.statType switch
+        targetRequestData = null;
+        if (requestData is T target)
         {
-            BranchStatDef.StatType.Int => (string)"OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()),
-            BranchStatDef.StatType.Float => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign("0.##")),
-            BranchStatDef.StatType.Percent => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent("0.##")),
-            _ => KeyLibrary_Misc.ErrorTipWithColor,
-        };
+            targetRequestData = target;
+            return true;
+        }
+
+        Log.Error($"RequestData 不是 {nameof(T)} 类型。实际类型：{requestData.GetType().FullName}");
+        if (!resultOnly)
+            explanation.AppendLine(KeyLibrary_Misc.ErrorTipWithColor);
+
+        return false;
+
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]

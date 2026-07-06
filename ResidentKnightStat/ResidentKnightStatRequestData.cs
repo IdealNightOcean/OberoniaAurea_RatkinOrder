@@ -4,11 +4,13 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class ResidentKnightStatRequestData
 {
-    public ResidentKnight Knight { get; }
-    public ResidentKnightStatDef StatDef { get; }
+    public ResidentKnight Knight { get; set; }
+    public ResidentKnightStatDef StatDef { get; set; }
+    public KnightChivalryDef OtherChivalry { get; set; }
 
     public float BaseValue { get; set; }
 
+    public ResidentKnightStatRequestData() { }
     public ResidentKnightStatRequestData(ResidentKnight knight, ResidentKnightStatDef statDef)
     {
         Knight = knight ?? throw new ArgumentNullException(nameof(knight));
