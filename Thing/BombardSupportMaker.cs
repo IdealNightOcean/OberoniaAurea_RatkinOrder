@@ -24,7 +24,7 @@ public class BombardSupportMaker : Thing
 
     public void SetBombardCount(Branch branch)
     {
-        bombardCount = Mathf.FloorToInt(BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_BombardSupportCeiling));
+        bombardCount = Mathf.FloorToInt(branch.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling));
         bombardCount = bombardCount > 0 ? bombardCount : 1;
         bombardCountRemaining = bombardCount;
         ticksToForceDestroy = bombardCount * BombInterval + 5000;

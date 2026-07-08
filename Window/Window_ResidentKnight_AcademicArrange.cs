@@ -404,7 +404,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     {
         if (SelAcademicDef == academicDef)
             return;
-        
+
         SelAcademicDef = academicDef;
         CheckAcademicColor = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.color : SelAcademicDef.chivalry.color;
         CheckAcademicColorTex = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.HonorColorTex : SelAcademicDef.chivalry.ColorTex;

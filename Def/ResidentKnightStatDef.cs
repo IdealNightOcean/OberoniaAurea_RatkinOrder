@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -8,13 +9,19 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class ResidentKnightStatDef : OAROStatDefBase
 {
-    private ResidentKnightStatWorker worker;
-    public ResidentKnightStatWorker Worker => worker ??= new ResidentKnightStatWorker(this);
+    private static readonly Type defaultWorker = typeof(ResidentKnightStatWorker);
 
-    /// <summary>
-    /// 额外Stat修正器列表（<see cref="ResidentKnightStatPart"/>），可为 <see langword="null"/>
-    /// </summary>
+
+    private ResidentKnightStatWorker worker;
+
+    public ResidentKnightStatWorker Worker => worker ??= (ResidentKnightStatWorker)Activator.CreateInstance(workerClass, this);
+
     public List<ResidentKnightStatPart> statParts;
+
+    public ResidentKnightStatDef() : base()
+    {
+        workerClass = defaultWorker;
+    }
 
     public override void PostLoad()
     {

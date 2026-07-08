@@ -88,11 +88,11 @@ public static class AcademicUtility
 
             if (resultOnly)
             {
-                return ResidentKnightStatUtility.GetStatValue(requestData);
+                return requestData.GetStatValue();
             }
             else
             {
-                (StringBuilder explanationBuilder, float? result) = ResidentKnightStatUtility.GetStatModifyExplanation(requestData);
+                (StringBuilder explanationBuilder, float? result) = OARO_StatUtility.GetStatModifyExplanation(requestData);
                 if (result.HasValue)
                 {
                     explanation = explanationBuilder.ToString();

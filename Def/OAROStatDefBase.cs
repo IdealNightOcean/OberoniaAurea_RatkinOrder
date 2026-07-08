@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -12,6 +13,8 @@ public abstract class OAROStatDefBase : Def
         Int,
         Percent
     }
+
+    protected Type workerClass;
 
     /// <summary>
     /// 属性类型，标记应该如何显示属性数值

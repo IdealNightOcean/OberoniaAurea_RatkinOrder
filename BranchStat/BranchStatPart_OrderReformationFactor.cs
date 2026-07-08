@@ -1,5 +1,5 @@
-﻿using System.Text;
-using UnityEngine;
+﻿using OberoniaAurea_Frame;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -9,30 +9,24 @@ public class BranchStatPart_OrderReformationFactor : BranchStatPart
     public OrderReformationDef reformation;
     public float factor;
 
-    public override void PostTransform(Branch branch, ref float curValue)
+    public override bool PostTransModify(BranchStatRequestData requestData, ref float curValue, bool resultOnly = true, StringBuilder explanation = null)
     {
-        if (branch.RatkinOrder.ReformationManager.HasReformation(reformation))
-        {
-            curValue *= factor;
-        }
-    }
+        if (!requestData.Target.RatkinOrder.ReformationManager.HasReformation(reformation))
+            return false;
 
-    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
-    {
-        if (branch.RatkinOrder.ReformationManager.HasReformation(reformation))
-        {
-            explanation.Append(ExplanatCap);
-            if (statDef.statType == BranchStatDef.StatType.Percent)
-            {
-                explanation.AppendLine("OARO_ChangeFactor_Reformation".Translate(reformation.label, factor.ToStringPercentSigned("0.##"))
-                                                                      .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-            }
-            else
-            {
-                explanation.AppendLine("OARO_ChangeFactor_Reformation".Translate(reformation.label, factor.ToStringWithSign("0.##"))
-                                                                      .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-            }
+        curValue *= factor;
 
+        if (!resultOnly)
+        {
+            explanation.AppendLineWithSeparator(
+                text: "OARO_ChangeFactor_Reformation"
+                .Translate(
+                    reformation.Named(KeyLibrary_FormatArgName.DEF),
+                    OARO_StatExplanationUtility.FactorNamedArgument(factor, requestData.StatDef))
+                .ColorizeStrByFactor(factor, reverse: requestData.StatDef.reverse),
+                separator: KeyLibrary_Misc.SpaceCap4);
         }
+
+        return true;
     }
 }

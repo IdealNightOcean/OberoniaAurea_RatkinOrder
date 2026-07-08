@@ -1,7 +1,7 @@
 ﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System;
 using System.Text;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -14,32 +14,39 @@ public class BranchStatPart_BranchEffectTagFactor : BranchStatPart
     public string effectTag;
     public float factor;
 
-    public override void PostTransform(Branch branch, ref float curValue)
+    public override bool PostTransModify(BranchStatRequestData requestData,
+                                         ref float curValue,
+                                         bool resultOnly = true,
+                                         StringBuilder explanation = null)
     {
-        if (branch.EffectTags.HasTag(effectTag))
-        {
-            curValue *= factor;
-        }
-    }
+        if (!requestData.Target.EffectTags.HasTag(effectTag))
+            return false;
 
-    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
-    {
-        if (branch.EffectTags.HasTag(effectTag))
+        curValue *= factor;
+
+        if (!resultOnly)
         {
-            explanation.Append(ExplanatCap);
-            Color color = (factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green;
-            string factorArg = statDef.statType == BranchStatDef.StatType.Percent ? factor.ToStringPercentSigned("0.##") : factor.ToStringWithSign("0.##");
+
+            NamedArgument factorArg = OARO_StatExplanationUtility.FactorNamedArgument(factor, requestData.StatDef);
 
             if (String.IsNullOrEmpty(reasonOverride))
             {
-                explanation.AppendLine("OARO_ChangeFactor_BranchEffectTag".Translate(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), factorArg.Named(KeyLibrary_FormatArgName.Factor))
-                                                                          .Colorize(color));
+                explanation.AppendLineWithSeparator(
+                    text: "OARO_ChangeFactor_BranchEffectTag".Translate(
+                        effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag),
+                        factorArg).ColorizeStrByFactor(factor, reverse: requestData.StatDef.reverse),
+                    separator: KeyLibrary_Misc.SpaceCap4);
             }
             else
             {
-                explanation.AppendLine(reasonOverride.Formatted(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), factorArg.Named(KeyLibrary_FormatArgName.Factor))
-                                                     .Colorize(color));
+                explanation.AppendLineWithSeparator(
+                    text: reasonOverride.Formatted(
+                        effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag),
+                        factorArg).ColorizeStrByFactor(factor, reverse: requestData.StatDef.reverse),
+                    separator: KeyLibrary_Misc.SpaceCap4);
             }
         }
+
+        return true;
     }
 }

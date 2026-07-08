@@ -24,6 +24,8 @@ public struct StatTransformer
         this.factor = factor < 0f ? 0f : factor;
     }
 
+    public static StatTransformer Invalid => new(0f, 1f);
+
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void MergeWith(StatTransformer other)
     {

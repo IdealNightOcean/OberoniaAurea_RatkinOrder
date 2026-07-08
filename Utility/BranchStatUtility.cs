@@ -1,30 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
-using UnityEngine;
-using Verse;
-
 namespace OberoniaAurea.RatkinOrder;
 
+/*
 public static class BranchStatUtility
 {
-    public static string GetStatModifyExplanationStr(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
+    public static string GetStatModifyExplanationStr(BranchStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
     {
-        return GetStatModifyExplanation(branch, statDef, baseValueOverride, showResultValue).ToString();
+        return GetStatModifyExplanation(requestData, baseValueOverride, showResultValue).ToString();
     }
 
-    public static StringBuilder GetStatModifyExplanation(Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool showResultValue = true)
+    public static (StringBuilder, float?) GetStatModifyExplanation(BranchStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
     {
-        if (!branch.IsValid() || statDef is null)
-        {
-            return new StringBuilder(string.Empty);
-        }
+        if (requestData is null || requestData.StatDef is null || !requestData.Branch.IsValid())
+            return (new StringBuilder(KeyLibrary_Misc.ErrorTipWithColor), null);
+
         StringBuilder explanation = new(256);
         try
         {
-            float baseValue = baseValueOverride ?? statDef.baseValue;
-            switch (statDef.statType)
+            float baseValue = baseValueOverride ?? requestData.StatDef.baseValue;
+            switch (requestData.StatDef.statType)
             {
                 case BranchStatDef.StatType.Int:
                     explanation.AppendLine("OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()));
@@ -111,39 +104,24 @@ public static class BranchStatUtility
         return explanation;
     }
 
-    public static void AppendStatResultExplanation(StringBuilder modifyExplain, BranchStatDef statDef, float finalValue, float? baseValueOverride = null)
-    {
-        modifyExplain.AppendLine();
-        float baseValue = baseValueOverride ?? statDef.baseValue;
-        switch (statDef.statType)
-        {
-            case BranchStatDef.StatType.Int:
-                modifyExplain.AppendLine("OARO_StatExplain_ResultInt".Translate(Mathf.Round(finalValue).ToString())
-                                                                     .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-                break;
-            case BranchStatDef.StatType.Float:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToString("0.##"))
-                                                                  .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-                break;
-            case BranchStatDef.StatType.Percent:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(finalValue.ToStringPercent("0.##"))
-                                                                  .Colorize((finalValue < baseValue ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-                break;
-            default: break;
-        }
-    }
-
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float GetStatValue(this Branch branch, BranchStatDef statDef, float? baseValueOverride = null, bool immediateUpdate = false)
     {
-        return statDef.Worker.GetValue(branch, baseValueOverride, immediateUpdate);
+        return statDef.Worker.GetValue(new BranchStatRequestData(branch, statDef), baseValueOverride, immediateUpdate);
     }
 
-    public static float GetNewStatValue(this Branch branch, BranchStatDef statDef, float? baseValueOverride = null)
+    public static float GetNewStatValue(BranchStatRequestData requestData, float? baseValueOverride = null)
     {
         float result;
+
         try
         {
+            BranchStatDef statDef = requestData.StatDef;
+            statDef.Worker.PrepareInitialBaseValue(requestData, baseValueOverride);
+            result = requestData.BaseValue;
+
+            Branch branch = requestData.Branch;
+
             StatTransformer transformer = new();
             bool hasTransformer = false;
             if (branch.RatkinOrder.TransformerHandler.TryGetStatTransformer(statDef, out StatTransformer tempTransformer))
@@ -180,9 +158,9 @@ public static class BranchStatUtility
         }
         catch (Exception ex)
         {
-            result = baseValueOverride ?? statDef?.baseValue ?? 0f;
+            result = baseValueOverride ?? requestData?.StatDef?.baseValue ?? 0f;
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"计算新的BranchStat值: [BranchStat: {statDef?.label}, BranchId: {branch?.GetUniqueLoadID()}]",
+                errorDesc: $"计算新的BranchStat值: [BranchStat: {requestData?.StatDef?.label}, BranchId: {requestData?.Branch?.GetUniqueLoadID()}]",
                 typeName: nameof(BranchStatUtility),
                 methodName: nameof(GetNewStatValue),
                 needStackTrace: true);
@@ -223,3 +201,4 @@ public static class BranchStatUtility
         return result;
     }
 }
+*/

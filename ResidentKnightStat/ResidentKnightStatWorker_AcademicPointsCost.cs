@@ -46,7 +46,7 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
 
         float costFactor = 1f;
 
-        ResidentKnight knight = academicRequestData.Knight;
+        ResidentKnight knight = academicRequestData.Target;
 
         int learnedAcademicCount = knight.AcademicHandler.TotalAcademicLevel.Value;
         float learnedFactor = 1f + learnedAcademicCount * 0.01f;
@@ -90,7 +90,7 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
         if (academicChivalry is null)
             return academicChivalryFactor;
 
-        ResidentKnight knight = academicRequestData.Knight;
+        ResidentKnight knight = academicRequestData.Target;
 
         float traditionReduction = 0f;
         foreach (OrderStationTraditionDef tradition in OrderStationHandler.TraditionsManager.ActiveTraditions)

@@ -129,12 +129,12 @@ public class BranchSquad : IExposable, ITickHourOfDay
         {
             if (commanderCount < CommanderCeiling)
             {
-                AdjustCrew(member: 0f, commander: BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate));
+                AdjustCrew(member: 0f, commander: branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate));
             }
         }
         else if (memberCount < MemberCeiling)
         {
-            AdjustCrew(member: BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate), commander: 0f);
+            AdjustCrew(member: branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate), commander: 0f);
         }
     }
 }

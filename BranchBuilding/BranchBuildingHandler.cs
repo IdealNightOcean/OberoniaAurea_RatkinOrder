@@ -43,7 +43,7 @@ public class BranchBuildingHandler : IExposable, ITickHour, ITickDay
         BuildingCeilingCache = new SimpleValueCache<int>(
             cacheInterval: 2500,
             defaultValue: (int)BranchStatDefOf.OARO_BuildingCeiling.baseValue,
-            checker: () => (int)BranchStatDefOf.OARO_BuildingCeiling.Worker.GetValue(this.branch, immediateUpdate: true));
+            checker: () => (int)this.branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling, immediateUpdate: true));
 
         SpecialBuildingDef = new LazyMutable<BranchBuildingDef>(refreshFunc: delegate
         {

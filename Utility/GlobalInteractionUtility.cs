@@ -261,7 +261,10 @@ public static class GlobalInteractionUtility
         {
             curChance += 0.2f;
             if (!resultOnly)
-                sb.AppendLine("OARO_ChangeOffset_Reformation".Translate().Colorize(Color.green));
+                sb.AppendLine("OARO_ChangeOffset_Reformation".Translate(
+                    OrderReformationDefOf.OARO_ReformationPlaceholder.Named(KeyLibrary_FormatArgName.DEF),
+                    OAFrame_TextUtility.ColoredPercentNamedArgument(0.2f, KeyLibrary_FormatArgName.Offset, includeSign: true)
+                    ).Colorize(Color.green));
         }
 
         if (knights.Branch.IsBranchOfType(Branch.BranchType.Friendly))

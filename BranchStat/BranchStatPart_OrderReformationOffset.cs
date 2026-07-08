@@ -1,5 +1,6 @@
-﻿using System.Text;
-using UnityEngine;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using System.Text;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -9,29 +10,24 @@ public class BranchStatPart_OrderReformationOffset : BranchStatPart
     public OrderReformationDef reformation;
     public float offset;
 
-    public override void PostTransform(Branch branch, ref float curValue)
+    public override bool PostTransModify(BranchStatRequestData requestData, ref float curValue, bool resultOnly = true, StringBuilder explanation = null)
     {
-        if (branch.RatkinOrder.ReformationManager.HasReformation(reformation))
-        {
-            curValue += offset;
-        }
-    }
+        if (!requestData.Target.RatkinOrder.ReformationManager.HasReformation(reformation))
+            return false;
 
-    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
-    {
-        if (branch.RatkinOrder.ReformationManager.HasReformation(reformation))
+        curValue += offset;
+
+        if (!resultOnly)
         {
-            explanation.Append(ExplanatCap);
-            if (statDef.statType == BranchStatDef.StatType.Percent)
-            {
-                explanation.AppendLine("OARO_ChangeOffset_Reformation".Translate(reformation.label, offset.ToStringPercentSigned("0.##"))
-                                                                      .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-            }
-            else
-            {
-                explanation.AppendLine("OARO_ChangeOffset_Reformation".Translate(reformation.label, offset.ToStringWithSign("0.##"))
-                                                                      .Colorize((offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-            }
+            explanation.AppendLineWithSeparator(
+                text: "OARO_ChangeOffset_Reformation"
+                .Translate(
+                    reformation.Named(KeyLibrary_FormatArgName.DEF),
+                    OARO_StatExplanationUtility.OffsetNamedArgument(offset, requestData.StatDef))
+                .ColorizeStrByOffset(offset, reverse: requestData.StatDef.reverse),
+                separator: KeyLibrary_Misc.SpaceCap4);
         }
+
+        return true;
     }
 }

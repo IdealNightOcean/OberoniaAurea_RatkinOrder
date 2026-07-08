@@ -1,27 +1,9 @@
-using OberoniaAurea_Frame;
-using RimWorld;
-using System;
-using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Text;
-using UnityEngine;
-using Verse;
-
 namespace OberoniaAurea.RatkinOrder;
 
+
+/*
 public static class ResidentKnightStatUtility
 {
-    public static string GetBaseValueExplanation(this ResidentKnightStatDef statDef, float baseValue, string format = "0.##")
-    {
-        return statDef.statType switch
-        {
-            BranchStatDef.StatType.Int => (string)"OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()),
-            BranchStatDef.StatType.Float => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign(format)),
-            BranchStatDef.StatType.Percent => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent(format)),
-            _ => KeyLibrary_Misc.ErrorTipWithColor,
-        };
-    }
-
     public static string GetStatModifyExplanationStr(ResidentKnightStatRequestData requestData, float? baseValueOverride = null, bool showResultValue = true)
     {
         return GetStatModifyExplanation(requestData, baseValueOverride, showResultValue).ToString();
@@ -104,25 +86,6 @@ public static class ResidentKnightStatUtility
         return (explanation, null);
     }
 
-    public static void AppendStatResultExplanation(StringBuilder modifyExplain, ResidentKnightStatRequestData requestData, float finalValue)
-    {
-        modifyExplain.AppendLine();
-        ResidentKnightStatDef statDef = requestData.StatDef;
-        float baseValue = requestData.BaseValue;
-        switch (statDef.statType)
-        {
-            case BranchStatDef.StatType.Int:
-                modifyExplain.AppendLine("OARO_StatExplain_ResultInt".Translate(OAFrame_TextUtility.ColoredFloatString(finalValue, format: "F0", originPoint: baseValue, reverse: statDef.reverse)));
-                break;
-            case BranchStatDef.StatType.Float:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OAFrame_TextUtility.ColoredFloatString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
-                break;
-            case BranchStatDef.StatType.Percent:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OAFrame_TextUtility.ColoredPercentString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
-                break;
-            default: break;
-        }
-    }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float GetStatValue(this ResidentKnight knight, ResidentKnightStatDef statDef, float? baseValueOverride = null, bool immediateUpdate = false)
@@ -226,3 +189,4 @@ public static class ResidentKnightStatUtility
         return result;
     }
 }
+*/

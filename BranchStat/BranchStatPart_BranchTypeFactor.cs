@@ -1,5 +1,6 @@
-﻿using System.Text;
-using UnityEngine;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
+using System.Text;
 using Verse;
 using static OberoniaAurea.RatkinOrder.Branch;
 
@@ -10,29 +11,26 @@ public class BranchStatPart_BranchTypeFactor : BranchStatPart
     public BranchType branchType;
     public float factor;
 
-    public override void PostTransform(Branch branch, ref float curValue)
+    public override bool PostTransModify(BranchStatRequestData requestData,
+                                     ref float curValue,
+                                     bool resultOnly = true,
+                                     StringBuilder explanation = null)
     {
-        if (branch.IsBranchOfType(branchType))
-        {
-            curValue *= factor;
-        }
-    }
+        if (!requestData.Target.IsBranchOfType(branchType))
+            return false;
 
-    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
-    {
-        if (branch.IsBranchOfType(branchType))
+        curValue *= factor;
+
+        if (!resultOnly)
         {
-            explanation.Append(ExplanatCap);
-            if (statDef.statType == BranchStatDef.StatType.Percent)
-            {
-                explanation.AppendLine("OARO_ChangeFactor_BranchTypeOf".Translate($"OARO_BranchType_{branchType}".Translate(), factor.ToStringPercentSigned("0.##"))
-                                                                       .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-            }
-            else
-            {
-                explanation.AppendLine("OARO_ChangeFactor_BranchTypeOf".Translate($"OARO_BranchType_{branchType}".Translate(), factor.ToStringWithSign("0.##"))
-                                                                       .Colorize((factor < 1f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green));
-            }
+            explanation.AppendLineWithSeparator(
+                text: "OARO_ChangeFactor_BranchTypeOf"
+                .Translate($"OARO_BranchType_{branchType}".Translate().Named("HonorName"),
+                           OARO_StatExplanationUtility.FactorNamedArgument(factor, requestData.StatDef))
+                .ColorizeStrByFactor(factor, reverse: requestData.StatDef.reverse),
+                separator: KeyLibrary_Misc.SpaceCap4);
         }
+
+        return true;
     }
 }

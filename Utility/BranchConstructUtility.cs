@@ -30,7 +30,7 @@ public static class BranchConstructUtility
                 explanationSB.AppendLine();
                 explanationSB.Append("- ");
                 explanationSB.AppendLine("OARO_BuildSilverCost_CostFactor".Translate(costFactor.ToStringPercent("F1")).Colorize(costFactor < 1f ? Color.green : ColorLibrary.RedReadable));
-                StringBuilder statExplanation = BranchStatUtility.GetStatModifyExplanation(branch, BranchStatDefOf.OARO_ConstructionCostFactor, showResultValue: false);
+                StringBuilder statExplanation = OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(branch, BranchStatDefOf.OARO_ConstructionCostFactor), showResultValue: false).explanationBuilder;
                 explanationSB.Append(statExplanation);
             }
         }
@@ -100,7 +100,7 @@ public static class BranchConstructUtility
                 explanationSB.AppendLine();
                 explanationSB.Append("- ");
                 explanationSB.AppendLine("OARO_BuildSilverCost_CostFactor".Translate(costFactor.ToStringPercent("F1")).Colorize(costFactor < 1f ? Color.green : ColorLibrary.RedReadable));
-                StringBuilder statExplanation = BranchStatUtility.GetStatModifyExplanation(branch, BranchStatDefOf.OARO_ConstructionCostFactor, showResultValue: false);
+                StringBuilder statExplanation = OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(branch, BranchStatDefOf.OARO_ConstructionCostFactor), showResultValue: false).explanationBuilder;
                 explanationSB.Append(statExplanation);
             }
         }

@@ -2,7 +2,6 @@
 using RimWorld;
 using System;
 using System.Text;
-using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -15,32 +14,39 @@ public class BranchStatPart_BranchEffectTagOffset : BranchStatPart
     public string effectTag;
     public float offset;
 
-    public override void PostTransform(Branch branch, ref float curValue)
-    {
-        if (branch.EffectTags.HasTag(effectTag))
-        {
-            curValue += offset;
-        }
-    }
 
-    public override void ModifyExplanation(Branch branch, BranchStatDef statDef, StringBuilder explanation)
+    public override bool PostTransModify(BranchStatRequestData requestData,
+                                     ref float curValue,
+                                     bool resultOnly = true,
+                                     StringBuilder explanation = null)
     {
-        if (branch.EffectTags.HasTag(effectTag))
+        if (!requestData.Target.EffectTags.HasTag(effectTag))
+            return false;
+
+        curValue += offset;
+
+        if (!resultOnly)
         {
-            explanation.Append(ExplanatCap);
-            Color color = (offset < 0f ^ statDef.reverse) ? ColorLibrary.RedReadable : Color.green;
-            string offsetArg = statDef.statType == BranchStatDef.StatType.Percent ? offset.ToStringPercentSigned("0.##") : offset.ToStringWithSign("0.##");
+            NamedArgument offsetArg = OARO_StatExplanationUtility.ColoredOffsetNamedArgument(offset, requestData.StatDef);
 
             if (String.IsNullOrEmpty(reasonOverride))
             {
-                explanation.AppendLine("OARO_ChangeOffset_BranchEffectTag".Translate(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), offsetArg.Named(KeyLibrary_FormatArgName.Offset))
-                                                                          .Colorize(color));
+                explanation.AppendLineWithSeparator(
+                    text: "OARO_ChangeOffset_BranchEffectTag".Translate(
+                        effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag),
+                        offsetArg).ColorizeStrByOffset(offset, reverse: requestData.StatDef.reverse),
+                    separator: KeyLibrary_Misc.SpaceCap4);
             }
             else
             {
-                explanation.AppendLine(reasonOverride.Formatted(effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag), offsetArg.Named(KeyLibrary_FormatArgName.Offset))
-                                                     .Colorize(color));
+                explanation.AppendLineWithSeparator(
+                    text: reasonOverride.Formatted(
+                        effectTag.Named(OARO_KeyLibrary_FormatArgName.EffectTag),
+                        offsetArg).ColorizeStrByOffset(offset, reverse: requestData.StatDef.reverse),
+                    separator: KeyLibrary_Misc.SpaceCap4);
             }
         }
+
+        return true;
     }
 }

@@ -195,8 +195,8 @@ public class Window_Branch : OrderWindowBase
             return pairs;
         });
 
-        NaturalPopulationCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_NaturalPopulationCeiling, showResultValue: true));
-        BuildingCeilingExplanation = new(valueFactory: () => BranchStatUtility.GetStatModifyExplanationStr(Branch, BranchStatDefOf.OARO_BuildingCeiling, showResultValue: true));
+        NaturalPopulationCeilingExplanation = new(valueFactory: () => OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(Branch, BranchStatDefOf.OARO_NaturalPopulationCeiling), showResultValue: true).explanationBuilder.ToString());
+        BuildingCeilingExplanation = new(valueFactory: () => OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(Branch, BranchStatDefOf.OARO_BuildingCeiling), showResultValue: true).explanationBuilder.ToString());
     }
 
     public override void PreOpen()

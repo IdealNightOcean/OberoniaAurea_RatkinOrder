@@ -49,7 +49,7 @@ public class BranchInfoUICache : BranchSummaryUICache
     {
         try
         {
-            StringBuilder growthExplanation = BranchStatUtility.GetStatModifyExplanation(Branch, BranchStatDefOf.OARO_DailyPopulationGrowth, showResultValue: false);
+            StringBuilder growthExplanation = OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(Branch, BranchStatDefOf.OARO_DailyPopulationGrowth), showResultValue: false).explanationBuilder;
 
             int bottom = DailyPopulationGrowth_Bottom.Value;
             int ceiling = DailyPopulationGrowth_Ceiling.Value;

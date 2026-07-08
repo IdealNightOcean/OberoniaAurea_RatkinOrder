@@ -28,7 +28,7 @@ public static class BranchUtility
         {
             return false;
         }
-        return Find.WorldGrid.ApproxDistanceInTiles(branch.BaseSite.Tile, tile) <= BranchStatUtility.GetStatValue(branch, BranchStatDefOf.OARO_AffectRadius);
+        return Find.WorldGrid.ApproxDistanceInTiles(branch.BaseSite.Tile, tile) <= branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
