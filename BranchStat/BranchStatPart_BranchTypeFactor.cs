@@ -12,14 +12,14 @@ public class BranchStatPart_BranchTypeFactor : BranchStatPart
     public float factor;
 
     public override bool PostTransModify(BranchStatRequestData requestData,
-                                     ref float curValue,
-                                     bool resultOnly = true,
-                                     StringBuilder explanation = null)
+                                         ref StatComputeState curValue,
+                                         bool resultOnly = true,
+                                         StringBuilder explanation = null)
     {
         if (!requestData.Target.IsBranchOfType(branchType))
             return false;
 
-        curValue *= factor;
+        curValue.Value *= factor;
 
         if (!resultOnly)
         {

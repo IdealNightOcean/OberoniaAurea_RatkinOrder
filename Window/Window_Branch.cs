@@ -349,13 +349,17 @@ public class Window_Branch : OrderWindowBase
     private void StoresReservesFloatMenu(Branch branch, int index)
     {
         List<FloatMenuOption> options = new(32);
-        foreach (BranchConstructionDef constructionDef in BranchUtility.GetAllStorableConstructionDefs(branch))
+        foreach (BranchFacilityDef facilityDef in BranchUtility.GetAllStorableFacilityDefs(branch))
         {
-            options.Add(new FloatMenuOption(constructionDef.label, () => StoreAction(constructionDef)));
+            options.Add(new FloatMenuOption(facilityDef.label, () => StoreAction(facilityDef)));
+        }
+        foreach (BranchBuildingDef buildingDef in BranchUtility.GetAllStorableBuildingDefs(branch))
+        {
+            options.Add(new FloatMenuOption(buildingDef.label, () => StoreAction(buildingDef)));
         }
         Find.WindowStack.Add(new FloatMenu(options));
 
-        void StoreAction(BranchConstructionDef def)
+        void StoreAction<T>(T def) where T : BranchConstructionDef, new()
         {
             if (index < branch.StoresReserveHandler.StoresReserves.Count)
             {

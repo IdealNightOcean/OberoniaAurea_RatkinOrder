@@ -95,7 +95,7 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         return false;
     }
 
-    public void SetReserve(BranchConstructionDef def, int index)
+    public void SetReserve<T>(T def, int index) where T : BranchConstructionDef, new()
     {
         if (index < 0 || index >= storesReserves.Count)
         {
@@ -123,15 +123,15 @@ public partial class BranchStoresReserveHandler : IExposable, ITickHourOfDay
         }
         else
         {
-            storesReserves[index] = ReserveRecord.GenrateNewRecord(def);
+            storesReserves[index] = new ReserveRecord<T>(def);
         }
     }
 
-    public void AddNewReserve(BranchConstructionDef def)
+    public void AddNewReserve<T>(T def) where T : BranchConstructionDef, new()
     {
         if (!HasReservesOf(def))
         {
-            storesReserves.Add(ReserveRecord.GenrateNewRecord(def));
+            storesReserves.Add(new ReserveRecord<T>(def));
         }
     }
 

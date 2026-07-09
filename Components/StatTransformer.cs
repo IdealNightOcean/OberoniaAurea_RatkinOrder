@@ -87,7 +87,7 @@ public struct StatTransformer
         float result = (baseValueOverride ?? def.baseValue + offset) * factor;
         result = Mathf.Clamp(result, def.minValue, def.maxValue);
 
-        if (def.statType == OAROStatDefBase.StatType.Int)
+        if (def.statType == OAROStatDefBase.StatType.Integer)
         {
             result = Mathf.Round(result);
         }

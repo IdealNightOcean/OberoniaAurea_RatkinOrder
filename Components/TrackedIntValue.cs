@@ -1,28 +1,8 @@
-﻿using OberoniaAurea_Frame;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
-
-public struct SimpleIntChangeRecord : IExposable
-{
-    public int change;
-    public string explain;
-
-    public SimpleIntChangeRecord() { }
-    public SimpleIntChangeRecord(int change, string explain)
-    {
-        this.change = change;
-        this.explain = explain;
-    }
-
-    public void ExposeData()
-    {
-        Scribe_Values.Look(ref change, nameof(change), 0);
-        Scribe_Values.Look(ref explain, nameof(explain), KeyLibrary_Misc.ErrorTip);
-    }
-}
 
 public class TrackedIntValue : IExposable
 {
@@ -54,12 +34,12 @@ public class TrackedIntValue : IExposable
 
     public void ExposeData()
     {
-        Scribe_Values.Look(ref minValue, "minValue", int.MinValue);
-        Scribe_Values.Look(ref maxValue, "maxValue", int.MaxValue);
+        Scribe_Values.Look(ref minValue, nameof(minValue), defaultValue: int.MinValue);
+        Scribe_Values.Look(ref maxValue, nameof(maxValue), defaultValue: int.MaxValue);
 
-        Scribe_Values.Look(ref curValue, "chacurValuenge", 0);
-        Scribe_Values.Look(ref curRecordChange, "curRecordChange", 0);
-        Scribe_Collections.Look(ref trackedChanges, "trackedChanges", LookMode.Deep);
+        Scribe_Values.Look(ref curValue, nameof(curValue), defaultValue: 0);
+        Scribe_Values.Look(ref curRecordChange, nameof(curRecordChange), defaultValue: 0);
+        Scribe_Collections.Look(ref trackedChanges, nameof(trackedChanges), LookMode.Deep);
     }
 
     public void AdjustValue(int change, string explain)

@@ -42,6 +42,8 @@ public class KnightVirtueHandler : IExposable
 
     public int TotalVirtueCount => virtues.Count;
 
+    public StatTransformerHandler<ResidentKnightStatDef> TransformerHandler { get; } = new();
+
     public int TotalVirtueLevel
     {
         get

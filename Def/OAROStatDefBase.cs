@@ -10,7 +10,7 @@ public abstract class OAROStatDefBase : Def
     public enum StatType : byte
     {
         Float,
-        Int,
+        Integer,
         Percent
     }
 
@@ -87,7 +87,7 @@ public abstract class OAROStatDefBase : Def
 
     public override void PostLoad()
     {
-        if (statType == StatType.Int)
+        if (statType == StatType.Integer)
         {
             minValue = Mathf.Floor(minValue);
             maxValue = Mathf.Ceil(maxValue);

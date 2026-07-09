@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Text;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -21,12 +22,12 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef) : StatWorke
     {
         transformer = StatTransformer.Invalid;
 
-        if (requestData.Target.TransformerHandler.TryGetStatTransformer(StatDef, out StatTransformer tempTransformer))
+        if (requestData.Target.VirtueHandler.TransformerHandler.TryGetStatTransformer(StatDef, out StatTransformer tempTransformer))
         {
             transformer.MergeWith(tempTransformer);
             if (!resultOnly)
             {
-                explanation.AppendLine("OARO_StatExplain_BranchInfrastructure".Translate());
+                explanation.AppendLine("OARO_StatExplain_ResidentKnightVirtue".Translate().Colorize(Color.cyan));
                 tempTransformer.AppendTransToExplanation(StatDef, explanation);
             }
 
@@ -34,11 +35,10 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef) : StatWorke
         }
 
         return false;
-
     }
 
     public override bool PartPostTransModify(ResidentKnightStatRequestData requestData,
-                                             ref float curValue,
+                                             ref StatComputeState curValue,
                                              bool resultOnly = true,
                                              StringBuilder explanation = null)
     {

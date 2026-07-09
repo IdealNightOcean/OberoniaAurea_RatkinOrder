@@ -8,9 +8,4 @@ public class ResidentKnightStatRequestData : StatRequestData<ResidentKnightStatD
     public ResidentKnightStatRequestData() { }
     public ResidentKnightStatRequestData(ResidentKnight knight, ResidentKnightStatDef statDef) : base(knight, statDef) { }
 
-    public ResidentKnightStatRequestData(ResidentKnight knight, ResidentKnightStatDef statDef, float baseValue) : this(knight, statDef)
-    {
-        BaseValue = baseValue;
-    }
-
 }

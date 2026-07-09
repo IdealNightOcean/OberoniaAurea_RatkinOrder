@@ -9,7 +9,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchStatWorker_DailyPopulationGrowth(BranchStatDef statDef) : BranchStatWorker(statDef)
 {
     public override bool PostTransModify(BranchStatRequestData requestData,
-                                         ref float curValue,
+                                         ref StatComputeState curValue,
                                          bool resultOnly = true,
                                          StringBuilder explanation = null)
     {
@@ -22,13 +22,13 @@ public class BranchStatWorker_DailyPopulationGrowth(BranchStatDef statDef) : Bra
             if (factor != 1f)
             {
                 hasModified = true;
-                curValue *= factor;
+                curValue.Value *= factor;
                 if (!resultOnly)
                 {
                     explanation.AppendLineWithSeparator(
                         text: "OARO_ChangeFactor_Fund"
-                        .Translate(OARO_StatExplanationUtility.FactorNamedArgument(factor, requestData.StatDef))
-                        .ColorizeStrByFactor(factor, reverse: requestData.StatDef.reverse),
+                        .Translate(OARO_StatExplanationUtility.FactorNamedArgument(factor, StatDef))
+                        .ColorizeStrByFactor(factor, reverse: StatDef.reverse),
                         separator: KeyLibrary_Misc.SpaceCap4);
                 }
             }
@@ -39,11 +39,13 @@ public class BranchStatWorker_DailyPopulationGrowth(BranchStatDef statDef) : Bra
         {
             hasModified = true;
             float factor = 1.25f;
-            curValue *= factor;
+            curValue.Value *= factor;
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(
-                    text: "OARO_ChangeFactor_ContractBuff".Translate(OAFrame_TextUtility.ColoredFloatNamedArgument(factor, KeyLibrary_FormatArgName.Factor, originPoint: 1f, reverse: StatDef.reverse)),
+                    text: "OARO_ChangeFactor_ContractBuff"
+                    .Translate(OARO_StatExplanationUtility.FactorNamedArgument(factor, StatDef))
+                    .ColorizeStrByFactor(factor, reverse: StatDef.reverse),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }
@@ -52,11 +54,13 @@ public class BranchStatWorker_DailyPopulationGrowth(BranchStatDef statDef) : Bra
         if (offset != 0f)
         {
             hasModified = true;
-            curValue += offset;
+            curValue.Value += offset;
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(
-                    text: "OARO_ChangeOffset_BranchPopulation".Translate(OAFrame_TextUtility.ColoredFloatNamedArgument(offset, KeyLibrary_FormatArgName.Offset, includeSign: true, reverse: StatDef.reverse)),
+                    text: "OARO_ChangeOffset_BranchPopulation"
+                    .Translate(OARO_StatExplanationUtility.OffsetNamedArgument(offset, StatDef))
+                    .ColorizeStrByOffset(offset, reverse: StatDef.reverse),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }

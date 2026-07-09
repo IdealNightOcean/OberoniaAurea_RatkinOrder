@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class BranchStatWorker_ConstructionCostFactor(BranchStatDef statDef) : BranchStatWorker(statDef)
 {
     public override bool PostTransModify(BranchStatRequestData requestData,
-                                         ref float curValue,
+                                         ref StatComputeState curValue,
                                          bool resultOnly = true,
                                          StringBuilder explanation = null)
     {
@@ -16,13 +16,13 @@ public class BranchStatWorker_ConstructionCostFactor(BranchStatDef statDef) : Br
         if (offset == 0f)
             return false;
 
-        curValue += offset;
+        curValue.Value += offset;
         if (!resultOnly)
         {
             explanation.AppendLineWithSeparator(
                 text: "OARO_ChangeOffset_BranchPopulation"
-                .Translate(OARO_StatExplanationUtility.OffsetNamedArgument(offset, requestData.StatDef))
-                .ColorizeStrByOffset(offset, reverse: requestData.StatDef.reverse),
+                .Translate(OARO_StatExplanationUtility.OffsetNamedArgument(offset, StatDef))
+                .ColorizeStrByOffset(offset, reverse: StatDef.reverse),
                 separator: KeyLibrary_Misc.SpaceCap4);
         }
         return true;

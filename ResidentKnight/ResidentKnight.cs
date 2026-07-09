@@ -44,8 +44,6 @@ public class ResidentKnight : ResidentPawn
         set => resignationTick = value;
     }
 
-    public StatTransformerHandler<ResidentKnightStatDef> TransformerHandler { get; } = new();
-
     private ResidentKnightRoleDef curRole;
     private int nextRoleChangeableTick = -1;
     public ResidentKnightRoleDef CurRole => curRole;

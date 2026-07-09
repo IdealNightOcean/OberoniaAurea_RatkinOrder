@@ -16,14 +16,14 @@ public class BranchStatPart_BranchEffectTagOffset : BranchStatPart
 
 
     public override bool PostTransModify(BranchStatRequestData requestData,
-                                     ref float curValue,
-                                     bool resultOnly = true,
-                                     StringBuilder explanation = null)
+                                         ref StatComputeState curValue,
+                                         bool resultOnly = true,
+                                         StringBuilder explanation = null)
     {
         if (!requestData.Target.EffectTags.HasTag(effectTag))
             return false;
 
-        curValue += offset;
+        curValue.Value += offset;
 
         if (!resultOnly)
         {

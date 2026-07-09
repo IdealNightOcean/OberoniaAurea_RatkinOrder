@@ -12,15 +12,15 @@ public class Thought_Situational_Virtue : Thought_SituationalSocial
 
     public Thought_Situational_Virtue() : base()
     {
-        cachedVirtue = new(cacheInterval: 30000, defaultValue: 0, checker: () => Mathf.RoundToInt(otherPawn?.GetStatValue(OARO_ModDefOf.OARO_Stat_PawnVirtue) ?? 0f));
+        cachedVirtue = new(cacheInterval: 30000,
+                           defaultValue: 0,
+                           checker: () => Mathf.RoundToInt(otherPawn?.GetStatValue(OARO_ModDefOf.OARO_Stat_PawnVirtue) ?? 0f));
     }
 
     public override float OpinionOffset()
     {
         if (ThoughtUtility.ThoughtNullified(pawn, def))
-        {
             return 0f;
-        }
 
         int offset = cachedVirtue.GetCachedResult() * 5;
         return Math.Max(offset, 0);

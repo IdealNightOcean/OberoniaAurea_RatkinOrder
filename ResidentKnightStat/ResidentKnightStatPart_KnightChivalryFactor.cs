@@ -10,14 +10,14 @@ public class ResidentKnightStatPart_KnightChivalryFactor : ResidentKnightStatPar
     public KnightChivalryDef chivalryDef;
 
     public override bool PostTransModify(ResidentKnightStatRequestData requestData,
-                                         ref float curValue,
+                                         ref StatComputeState curValue,
                                          bool resultOnly = true,
                                          StringBuilder explanation = null)
     {
         if (chivalryDef is null || chivalryDef != requestData.Target.Chivalry)
             return false;
 
-        curValue *= factor;
+        curValue.Value *= factor;
         if (!resultOnly)
         {
             explanation.AppendLineWithSeparator(

@@ -40,6 +40,15 @@ public static class BranchStatDefOf
     public static BranchStatDef OARO_NaturalPopulationCeiling;
 
     /// <summary>
+    /// 分部建筑建设白银花费
+    /// </summary>
+    public static BranchStatDef OARO_BranchBuildingCost;
+    /// <summary>
+    /// 分部设施建设白银花费
+    /// </summary>
+    public static BranchStatDef OARO_BranchFacilityCost;
+
+    /// <summary>
     /// 建设白银花费系数
     /// </summary>
     public static BranchStatDef OARO_ConstructionCostFactor;

@@ -6,74 +6,45 @@ public partial class BranchStoresReserveHandler
 {
     public abstract class ReserveRecord : IExposable
     {
-        public abstract BranchConstructionDef Target { get; }
+        protected float costRateReduce;
 
+        public abstract BranchConstructionDef Target { get; }
         /// <summary>
         /// 花费减免（负数）
         /// </summary>
-        public float CostRateReduce;
-
-        public ReserveRecord() { }
-        public ReserveRecord(float costRateReduce)
+        public float CostRateReduce
         {
-            CostRateReduce = costRateReduce;
+            get => costRateReduce;
+            set => costRateReduce = value;
         }
 
-        public static ReserveRecord GenrateNewRecord(BranchConstructionDef def, float costRateReduce = 0f)
-        {
-            if (def is BranchBuildingDef buildingDef)
-            {
-                return new BuildingReserveRecord(buildingDef, costRateReduce);
-            }
-
-            if (def is BranchFacilityDef facilityDef)
-            {
-                return new FacilityReserveRecord(facilityDef, costRateReduce);
-            }
-
-            Log.Error($"[OARO] 未知的 BranchConstructionDef 类型：{def.GetType().FullName}");
-            return null;
-        }
 
         public virtual void ExposeData()
         {
-            Scribe_Values.Look(ref CostRateReduce, nameof(CostRateReduce), 0f);
+            Scribe_Values.Look(ref costRateReduce, nameof(costRateReduce), defaultValue: 0f);
         }
     }
 
-    public class BuildingReserveRecord : ReserveRecord
+    public class ReserveRecord<T> : ReserveRecord where T : BranchConstructionDef, new()
     {
-        private BranchBuildingDef target;
+        private T target;
         public override BranchConstructionDef Target => target;
 
-        public BuildingReserveRecord() { }
-        public BuildingReserveRecord(BranchBuildingDef def, float costRateReduce) : base(costRateReduce)
+        public ReserveRecord(T target)
         {
-            target = def;
+            this.target = target;
+        }
+
+        public ReserveRecord(T target, float costRateReduce)
+        {
+            this.target = target;
+            this.costRateReduce = costRateReduce;
         }
 
         public override void ExposeData()
         {
             base.ExposeData();
-            Scribe_Defs.Look(ref target, nameof(target));
-        }
-    }
-
-    public class FacilityReserveRecord : ReserveRecord
-    {
-        private BranchFacilityDef target;
-        public override BranchConstructionDef Target => target;
-
-        public FacilityReserveRecord() { }
-        public FacilityReserveRecord(BranchFacilityDef def, float costRateReduce) : base(costRateReduce)
-        {
-            target = def;
-        }
-        public override string ToString() => $"{target.label} - CostRateReduce: {CostRateReduce}";
-        public override void ExposeData()
-        {
-            base.ExposeData();
-            Scribe_Defs.Look(ref target, nameof(target));
+            Scribe_Defs.Look<T>(ref target, nameof(target));
         }
     }
 }

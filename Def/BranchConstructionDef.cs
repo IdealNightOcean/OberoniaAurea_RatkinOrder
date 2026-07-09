@@ -13,4 +13,6 @@ public abstract class BranchConstructionDef : Def
     /// </summary>
     public PathedTexture2DWithExpanded iconTexture;
 
+    public BranchConstructionDef() : base() { }
+
 }

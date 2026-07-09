@@ -6,9 +6,6 @@ public class StatRequestData<TDef, UEntity> where TDef : OAROStatDefBase
 {
     public UEntity Target { get; set; }
     public TDef StatDef { get; set; }
-
-    public float BaseValue { get; set; }
-
     public StatRequestData() { }
 
     public StatRequestData(UEntity target, TDef statDef)

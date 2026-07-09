@@ -13,8 +13,8 @@ public abstract class StatPart<T, TDef, TTarget>
     public int Priority => priority;
 
     public virtual bool PostTransModify(T requestData,
-                                         ref float curValue,
-                                         bool resultOnly = true,
-                                         StringBuilder explanation = null)
+                                        ref StatComputeState curValue,
+                                        bool resultOnly = true,
+                                        StringBuilder explanation = null)
     { return false; }
 }

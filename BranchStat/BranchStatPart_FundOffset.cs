@@ -11,12 +11,12 @@ public class BranchStatPart_FundOffset : BranchStatPart
     public float unitScale;
 
     public override bool PostTransModify(BranchStatRequestData requestData,
-                                         ref float curValue,
+                                         ref StatComputeState curValue,
                                          bool resultOnly = true,
                                          StringBuilder explanation = null)
     {
         float offset = requestData.Target.RatkinOrder.FundHandler.Funds / unitBase * unitScale;
-        curValue += offset;
+        curValue.Value += offset;
         if (!resultOnly)
         {
             explanation.AppendLineWithSeparator(

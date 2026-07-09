@@ -400,19 +400,9 @@ public static class BranchUtility
         }
     }
 
-    public static IEnumerable<BranchConstructionDef> GetAllStorableConstructionDefs(Branch branch)
-    {
-        if (!branch.FacilityHandler.IsFacilityFullyCompleted)
-        {
-            foreach (BranchFacilityDef facilityDef in DefDatabase<BranchFacilityDef>.AllDefsListForReading)
-            {
-                if (CanStoreReserve(branch, facilityDef))
-                {
-                    yield return facilityDef;
-                }
-            }
-        }
 
+    public static IEnumerable<BranchBuildingDef> GetAllStorableBuildingDefs(Branch branch)
+    {
         BranchBuildingHandler buildingHandler = branch.BuildingHandler;
         if (buildingHandler.HasUnusedSlots)
         {
@@ -421,6 +411,20 @@ public static class BranchUtility
                 if (CanStoreReserve(branch, buildingDef))
                 {
                     yield return buildingDef;
+                }
+            }
+        }
+    }
+
+    public static IEnumerable<BranchFacilityDef> GetAllStorableFacilityDefs(Branch branch)
+    {
+        if (!branch.FacilityHandler.IsFacilityFullyCompleted)
+        {
+            foreach (BranchFacilityDef facilityDef in DefDatabase<BranchFacilityDef>.AllDefsListForReading)
+            {
+                if (CanStoreReserve(branch, facilityDef))
+                {
+                    yield return facilityDef;
                 }
             }
         }

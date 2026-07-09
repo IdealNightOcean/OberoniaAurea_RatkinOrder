@@ -5,7 +5,6 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-
 public class PathedTexture2D
 {
     [NoTranslate]

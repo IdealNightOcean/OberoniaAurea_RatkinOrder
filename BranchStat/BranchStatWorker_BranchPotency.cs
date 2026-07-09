@@ -7,7 +7,10 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatWorker_BranchPotency(BranchStatDef statDef) : BranchStatWorker(statDef)
 {
-    public override bool PostTransModify(BranchStatRequestData requestData, ref float curValue, bool resultOnly = true, StringBuilder explanation = null)
+    public override bool PostTransModify(BranchStatRequestData requestData,
+                                         ref StatComputeState curValue,
+                                         bool resultOnly = true,
+                                         StringBuilder explanation = null)
     {
         Branch branch = requestData.Target;
         bool hasModification = false;
@@ -16,13 +19,13 @@ public class BranchStatWorker_BranchPotency(BranchStatDef statDef) : BranchStatW
         if (factor != 1f)
         {
             hasModification = true;
-            curValue *= factor;
+            curValue.Value *= factor;
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(
                     text: "OARO_ChangeFactor_BranchTradition"
-                    .Translate(OARO_StatExplanationUtility.FactorNamedArgument(factor, requestData.StatDef))
-                    .ColorizeStrByFactor(factor, reverse: requestData.StatDef.reverse),
+                    .Translate(OARO_StatExplanationUtility.FactorNamedArgument(factor, StatDef))
+                    .ColorizeStrByFactor(factor, reverse: StatDef.reverse),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
 
@@ -34,7 +37,7 @@ public class BranchStatWorker_BranchPotency(BranchStatDef statDef) : BranchStatW
         if (factor != 1f)
         {
             hasModification = true;
-            curValue *= factor;
+            curValue.Value *= factor;
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(

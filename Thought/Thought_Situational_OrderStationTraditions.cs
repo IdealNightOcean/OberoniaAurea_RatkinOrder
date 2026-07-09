@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using System.Collections.Generic;
 using Verse;
 
@@ -44,7 +43,7 @@ public class Thought_Situational_OrderStationTraditions : Thought_Situational
         if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight knight))
             return moodOffset;
 
-        if (knight.Chivalry.IsSameDefNonNullable(OARO_ModDefOf.OARO_Oath))
+        if (knight.Chivalry == OARO_ModDefOf.OARO_Oath)
         {
             return moodOffset + totalTraditionsCountCache;
         }

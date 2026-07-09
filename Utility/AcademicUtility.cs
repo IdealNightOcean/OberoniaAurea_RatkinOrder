@@ -22,12 +22,27 @@ public static class AcademicUtility
         };
     }
 
-    public static float GetBaseAcademicPointsCost(KnightAcademicDef academicDef,
-                                                  int sourceLevel,
-                                                  int targetLevel,
-                                                  bool resultOnly = true,
-                                                  StringBuilder explanation = null)
+    public static StatComputeState GetBaseAcademicPointsCost(KnightAcademicDef academicDef,
+                                                             int sourceLevel,
+                                                             int targetLevel,
+                                                             bool resultOnly = true,
+                                                             StringBuilder explanation = null)
     {
+        if (targetLevel < 1 || targetLevel <= sourceLevel)
+        {
+            return new StatComputeState(value: 0f, isConverged: true);
+        }
+
+        if (targetLevel > academicDef.MaxStageLevel)
+        {
+            if (!resultOnly)
+            {
+                explanation.AppendLine("OARO_AlreadyAtMaxAcademicLevel".Translate());
+            }
+            return new StatComputeState(value: float.PositiveInfinity, isConverged: true);
+        }
+
+
         float baseUnitCost = academicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
 
         int levelDiff = targetLevel - sourceLevel;
@@ -56,7 +71,7 @@ public static class AcademicUtility
                 separator: KeyLibrary_Misc.SpaceCap4);
         }
 
-        return baseNeededPoints;
+        return new StatComputeState(value: baseNeededPoints, isConverged: false);
     }
 
 
@@ -71,13 +86,6 @@ public static class AcademicUtility
                                                   out string explanation)
     {
         explanation = string.Empty;
-        if (targetLevel < 1 || targetLevel <= sourceLevel)
-            return 0f;
-
-        if (targetLevel > academicDef.MaxStageLevel)
-            return float.PositiveInfinity;
-
-
         if (residentPawn is ResidentKnight knight)
         {
             ResidentKnightStatRequestData_Academic requestData = new(knight: knight,
@@ -112,7 +120,7 @@ public static class AcademicUtility
 
                 return GetBaseAcademicPointsCost(academicDef: academicDef,
                                                  sourceLevel: sourceLevel,
-                                                 targetLevel: targetLevel);
+                                                 targetLevel: targetLevel).Value;
             }
             else
             {
@@ -121,7 +129,7 @@ public static class AcademicUtility
                                                          sourceLevel: sourceLevel,
                                                          targetLevel: targetLevel,
                                                          resultOnly: false,
-                                                         explanation: explanationBuilder);
+                                                         explanation: explanationBuilder).Value;
 
                 explanation = explanationBuilder.ToString();
                 return result;
@@ -301,9 +309,8 @@ public static class AcademicUtility
         }
     }
 
-    public static IEnumerable<(KnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(
-        AcademicHandler a,
-        AcademicHandler b)
+    public static IEnumerable<(KnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(AcademicHandler a,
+                                                                                                AcademicHandler b)
     {
         if (a is null || b is null)
             yield break;

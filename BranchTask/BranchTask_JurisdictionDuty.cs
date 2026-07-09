@@ -29,7 +29,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
         Scribe_Values.Look(ref playerParticipated, nameof(playerParticipated), defaultValue: false);
         if (Scribe.mode == LoadSaveMode.ResolvingCrossRefs)
         {
-            dutySite?.InitDutySite(this);
+            dutySite?.SetDutyWorker(this);
         }
     }
 
@@ -51,7 +51,8 @@ public class BranchTask_JurisdictionDuty : BranchTask
         if (playerParticipated)
         {
             Messages.Message(
-                text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName), Def.Named(KeyLibrary_FormatArgName.DEF)),
+                text: "OARO_Message_BranchTaskEnded".Translate(branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
+                                                               this.Def.Named(KeyLibrary_FormatArgName.DEF)),
                 def: MessageTypeDefOf.NeutralEvent);
         }
     }
@@ -75,7 +76,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
 
         WorldObject_JurisdictionDutySite site = (WorldObject_JurisdictionDutySite)WorldObjectMaker.MakeWorldObject(siteDef);
         site.Tile = tile;
-        site.InitDutySite(this);
+        site.SetDutyWorker(this);
         Find.WorldObjects.Add(site);
         dutySite = site;
     }
@@ -90,9 +91,7 @@ public class BranchTask_JurisdictionDuty : BranchTask
         {
             PlanetTile tile = neighboringTiles[i];
             if (!Find.WorldObjects.AnyWorldObjectAt(tile))
-            {
                 return tile;
-            }
         }
 
         if (TileFinder.TryFindPassableTileWithTraversalDistance(

@@ -115,6 +115,8 @@
     <Compile Include="BranchResident\BranchResident_ResidentKnight_MeditationStudy.cs" />
     <Compile Include="BranchResident\BranchResident_ResidentKnightStudy.cs" />
     <Compile Include="BranchResident\BranchResident_ResidentKnight_VirtueStudy.cs" />
+    <Compile Include="BranchStat\BranchStatRequestData_BranchConstruction.cs" />
+    <Compile Include="BranchStat\BranchStatRequestData_BranchFacility.cs" />
     <Compile Include="BranchStat\BranchStatWorker_BranchPotency.cs" />
     <Compile Include="BranchStat\BranchStatPart_BranchEffectTagFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_BranchEffectTagOffset.cs" />
@@ -122,6 +124,9 @@
     <Compile Include="BranchStat\BranchStatPart_OrderReformationFactor.cs" />
     <Compile Include="BranchStat\BranchStatPart_OrderReformationOffset.cs" />
     <Compile Include="BranchStat\BranchStatRequestData.cs" />
+    <Compile Include="BranchStat\BranchStatWorker_BuildingCost.cs" />
+    <Compile Include="BranchStat\BranchStatWorker_FacilityCost.cs" />
+    <Compile Include="BranchStat\BranchStatWorker_ConstructionCost.cs" />
     <Compile Include="BranchTask\AssistanceRequest.cs" />
     <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker.cs" />
     <Compile Include="BranchTask\AssistanceRequestWorker\AssistanceRequestWorker_AcademicRequired.cs" />
@@ -153,6 +158,8 @@
     <Compile Include="Branch\BranchStoresReserveHandler_SubType.cs" />
     <Compile Include="Components\CacheEnty.cs" />
     <Compile Include="Components\EventDispatcher.cs" />
+    <Compile Include="Components\SimpleIntChangeRecord.cs" />
+    <Compile Include="Components\StatComputeState.cs" />
     <Compile Include="Components\PathedTexture2D.cs" />
     <Compile Include="Components\HediffStageModifierBuilder.cs" />
     <Compile Include="Components\PlayerDespawnedPawnsTempRetention.cs" />
@@ -321,8 +328,8 @@
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Thought\Thought_Situational_Virtue.cs" />
     <Compile Include="Utility\AcademicUtility.cs" />
-    <Compile Include="Utility\OARO_StatUtility.cs" />
-    <Compile Include="Utility\ResidentKnightStatUtility.cs" />
+    <Compile Include="Utility\StatExplanationUtility.cs" />
+    <Compile Include="Utility\StatUtility.cs" />
     <Compile Include="Utility\KnightChivalryUtility.cs" />
     <Compile Include="Utility\KnightDiaryUtility.cs" />
     <Compile Include="Utility\KnightVirtueUtility.cs" />
@@ -528,7 +535,6 @@
     <Compile Include="Quest\Mercy\QuestPart_LordJob_HelpSeeker.cs" />
     <Compile Include="Thing\ShieldAllowShoot.cs" />
     <Compile Include="Thought\ThoughtWorker_WineDisplayShelf.cs" />
-    <Compile Include="Utility\BranchStatUtility.cs" />
     <Compile Include="BranchStat\BranchStatWorker.cs" />
     <Compile Include="BranchStat\BranchStatPart_FundOffset.cs" />
     <Compile Include="Branch\Branch.cs" />

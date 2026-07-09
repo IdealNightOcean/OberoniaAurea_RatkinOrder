@@ -7,6 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef statDef) : ResidentKnightStatWorker(statDef)
 {
     public override bool PrepareInitialBaseValue(ResidentKnightStatRequestData requestData,
+                                                 ref StatComputeState curValue,
                                                  float? baseValueOverride = null,
                                                  bool resultOnly = true,
                                                  StringBuilder explanation = null)
@@ -17,20 +18,22 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
             resultOnly: resultOnly,
             explanation: explanation))
         {
+            curValue.IsConverged = true;
             return false;
         }
 
-        requestData.BaseValue = AcademicUtility.GetBaseAcademicPointsCost(academicDef: academicRequestData.AcademicDef,
-                                                                          sourceLevel: academicRequestData.CurLevel,
-                                                                          targetLevel: academicRequestData.TargetLevel,
-                                                                          resultOnly: resultOnly,
-                                                                          explanation: explanation);
+
+        curValue = AcademicUtility.GetBaseAcademicPointsCost(academicDef: academicRequestData.AcademicDef,
+                                                             sourceLevel: academicRequestData.CurLevel,
+                                                             targetLevel: academicRequestData.TargetLevel,
+                                                             resultOnly: resultOnly,
+                                                             explanation: explanation);
 
         return true;
     }
 
     public override bool PostTransModify(ResidentKnightStatRequestData requestData,
-                                         ref float curValue,
+                                         ref StatComputeState curValue,
                                          bool resultOnly = true,
                                          StringBuilder explanation = null)
     {
@@ -79,7 +82,7 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
 
         costFactor *= AcademicChivalryFactor(academicRequestData, resultOnly, explanation);
 
-        curValue *= costFactor;
+        curValue.Value *= costFactor;
         return true;
     }
 

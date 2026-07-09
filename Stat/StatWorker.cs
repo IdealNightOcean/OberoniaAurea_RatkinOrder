@@ -16,12 +16,13 @@ public abstract class StatWorker<TDef, TTarget, TRequestData>(TDef statDef)
     private readonly Dictionary<TTarget, CacheEnty> temporaryStatCache = statDef.cacheable ? new(8) : null;
 
     public virtual bool PrepareInitialBaseValue(TRequestData requestData,
+                                                ref StatComputeState curValue,
                                                 float? baseValueOverride = null,
                                                 bool resultOnly = true,
                                                 StringBuilder explanation = null)
     {
         float baseValue = baseValueOverride ?? StatDef.baseValue;
-        requestData.BaseValue = baseValue;
+        curValue.Value = baseValue;
         if (!resultOnly)
         {
             explanation.AppendLine(StatDef.GetBaseValueExplanation(baseValue));
@@ -39,15 +40,15 @@ public abstract class StatWorker<TDef, TTarget, TRequestData>(TDef statDef)
     }
 
     public virtual bool PostTransModify(TRequestData requestData,
-                                        ref float curValue,
+                                        ref StatComputeState curValue,
                                         bool resultOnly = true,
                                         StringBuilder explanation = null)
     { return false; }
 
     public virtual bool PartPostTransModify(TRequestData requestData,
-                                        ref float curValue,
-                                        bool resultOnly = true,
-                                        StringBuilder explanation = null)
+                                            ref StatComputeState curValue,
+                                            bool resultOnly = true,
+                                            StringBuilder explanation = null)
     {
         return false;
     }

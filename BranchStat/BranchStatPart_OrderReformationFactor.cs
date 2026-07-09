@@ -9,12 +9,15 @@ public class BranchStatPart_OrderReformationFactor : BranchStatPart
     public OrderReformationDef reformation;
     public float factor;
 
-    public override bool PostTransModify(BranchStatRequestData requestData, ref float curValue, bool resultOnly = true, StringBuilder explanation = null)
+    public override bool PostTransModify(BranchStatRequestData requestData,
+                                         ref StatComputeState curValue,
+                                         bool resultOnly = true,
+                                         StringBuilder explanation = null)
     {
         if (!requestData.Target.RatkinOrder.ReformationManager.HasReformation(reformation))
             return false;
 
-        curValue *= factor;
+        curValue.Value *= factor;
 
         if (!resultOnly)
         {

@@ -15,14 +15,14 @@ public class BranchStatPart_BranchEffectTagFactor : BranchStatPart
     public float factor;
 
     public override bool PostTransModify(BranchStatRequestData requestData,
-                                         ref float curValue,
+                                         ref StatComputeState curValue,
                                          bool resultOnly = true,
                                          StringBuilder explanation = null)
     {
         if (!requestData.Target.EffectTags.HasTag(effectTag))
             return false;
 
-        curValue *= factor;
+        curValue.Value *= factor;
 
         if (!resultOnly)
         {

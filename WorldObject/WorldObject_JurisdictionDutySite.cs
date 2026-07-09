@@ -14,7 +14,7 @@ public class WorldObject_JurisdictionDutySite : WorldObject_InteractWithFixedCar
 
     public override int TicksNeeded => 5000;
 
-    public void InitDutySite(BranchTask_JurisdictionDuty duty)
+    public void SetDutyWorker(BranchTask_JurisdictionDuty duty)
     {
         relatedDuty = duty;
         name = "OARO_DutySiteName".Translate(duty.Branch?.Name);
