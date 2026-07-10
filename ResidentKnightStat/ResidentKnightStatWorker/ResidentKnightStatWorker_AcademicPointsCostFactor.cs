@@ -4,14 +4,14 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef statDef) : ResidentKnightStatWorker(statDef)
+public class ResidentKnightStatWorker_AcademicPointsCostFactor(ResidentKnightStatDef statDef) : ResidentKnightStatWorker(statDef)
 {
-    public override bool PrepareInitialBaseValue(ResidentKnightStatRequestData requestData,
-                                                 ref StatComputeState curValue,
-                                                 float? baseValueOverride = null,
-                                                 bool resultOnly = true,
-                                                 StringBuilder explanation = null)
+    public override bool PostTransModify(ResidentKnightStatRequestData requestData,
+                                        ref StatComputeState curValue,
+                                        bool resultOnly = true,
+                                        StringBuilder explanation = null)
     {
+
         if (!TryCastRequestData<ResidentKnightStatRequestData_Academic>(
             requestData: requestData,
             targetRequestData: out ResidentKnightStatRequestData_Academic academicRequestData,
@@ -19,31 +19,6 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
             explanation: explanation))
         {
             curValue.IsConverged = true;
-            return false;
-        }
-
-
-        curValue = AcademicUtility.GetBaseAcademicPointsCost(academicDef: academicRequestData.AcademicDef,
-                                                             sourceLevel: academicRequestData.CurLevel,
-                                                             targetLevel: academicRequestData.TargetLevel,
-                                                             resultOnly: resultOnly,
-                                                             explanation: explanation);
-
-        return true;
-    }
-
-    public override bool PostTransModify(ResidentKnightStatRequestData requestData,
-                                         ref StatComputeState curValue,
-                                         bool resultOnly = true,
-                                         StringBuilder explanation = null)
-    {
-
-        if (!TryCastRequestData<ResidentKnightStatRequestData_Academic>(
-            requestData: requestData,
-            targetRequestData: out ResidentKnightStatRequestData_Academic academicRequestData,
-            resultOnly: resultOnly,
-            explanation: explanation))
-        {
             return false;
         }
 
@@ -109,21 +84,26 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(
-                    text: "OARO_AcademicCost_StationTradition".Translate(OAFrame_TextUtility.ColoredFloatNamedArgument(traditionFactor, KeyLibrary_FormatArgName.Factor, originPoint: 1f)),
+                    text: "OARO_AcademicCost_StationTradition"
+                    .Translate(OAFrame_TextUtility.FloatNamedArgument(traditionFactor, KeyLibrary_FormatArgName.Factor))
+                    .ColorizeStrByFactor(traditionFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }
 
         if (academicChivalry == knight.Chivalry)
         {
-            academicChivalryFactor *= 0.75f;
+            float knightFactor = 0.75f;
+            academicChivalryFactor *= knightFactor;
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(
-                    text: "OARO_ChangeFactor_KnightHasSameChivalryWithDef".Translate(
+                    text: "OARO_ChangeFactor_KnightHasSameChivalryWithDef"
+                    .Translate(
                         academicRequestData.AcademicDef.Named(KeyLibrary_FormatArgName.DEF),
                         academicChivalry.Named(OARO_KeyLibrary_FormatArgName.CHIVALRY),
-                        OAFrame_TextUtility.ColoredFloatNamedArgument(0.75f, KeyLibrary_FormatArgName.Factor, originPoint: 1f)),
+                        OAFrame_TextUtility.FloatNamedArgument(knightFactor, KeyLibrary_FormatArgName.Factor))
+                    .ColorizeStrByFactor(knightFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }
@@ -131,14 +111,17 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
         Branch branch = knight.Branch;
         if (academicChivalry == branch?.HonorDef?.chivalry)
         {
-            academicChivalryFactor *= 0.9f;
+            float branchHonorFactor = 0.9f;
+            academicChivalryFactor *= branchHonorFactor;
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(
-                    text: "OARO_ChangeFactor_BranchHonorHasSameChivalryWithDef".Translate(
+                    text: "OARO_ChangeFactor_BranchHonorHasSameChivalryWithDef"
+                    .Translate(
                         academicRequestData.AcademicDef.Named(KeyLibrary_FormatArgName.DEF),
                         academicChivalry.Named(OARO_KeyLibrary_FormatArgName.CHIVALRY),
-                        OAFrame_TextUtility.ColoredFloatNamedArgument(0.9f, KeyLibrary_FormatArgName.Factor, originPoint: 1f)),
+                        OAFrame_TextUtility.FloatNamedArgument(branchHonorFactor, KeyLibrary_FormatArgName.Factor))
+                    .ColorizeStrByFactor(branchHonorFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }
@@ -153,7 +136,8 @@ public class ResidentKnightStatWorker_AcademicPointsCost(ResidentKnightStatDef s
                 explanation.AppendLineWithSeparator(
                     text: "OARO_ChangeFactor_SameChivalryWithDef".Translate(
                         virtueCount.Named(KeyLibrary_FormatArgName.Count),
-                        OAFrame_TextUtility.ColoredFloatNamedArgument(virtueFactor, KeyLibrary_FormatArgName.Factor, originPoint: 1f)),
+                        OAFrame_TextUtility.FloatNamedArgument(virtueFactor, KeyLibrary_FormatArgName.Factor))
+                    .ColorizeStrByFactor(academicChivalryFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }

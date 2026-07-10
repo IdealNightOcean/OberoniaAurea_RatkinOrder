@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -564,7 +565,7 @@ public partial class Window_OrderStation : OrderWindowBase
                 typeName: nameof(Window_OrderStation),
                 methodName: nameof(GetPreferredBuildingsStr),
                 needStackTrace: true);
-            return "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
+            return KeyLibrary_Misc.ErrorTipWithColor;
         }
     }
 

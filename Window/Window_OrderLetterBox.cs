@@ -30,7 +30,6 @@ public class Window_OrderLetterBox : OrderWindowBase
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect reusedRect = default;
 
         //主背景
         Rect mainRect = inRect;
@@ -41,7 +40,7 @@ public class Window_OrderLetterBox : OrderWindowBase
         Rect mainInnerRect = mainRect.ContractedBy(3f);
 
         //左上绶带
-        reusedRect = new(mainInnerRect.xMin + 58f, mainInnerRect.yMin + 29f, 391f, 75f);
+        Rect reusedRect = new(mainInnerRect.xMin + 58f, mainInnerRect.yMin + 29f, 391f, 75f);
         GUI.DrawTexture(reusedRect, leftRibbon);
 
         //左侧上部大信封

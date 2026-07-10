@@ -22,26 +22,33 @@ public static class AcademicUtility
         };
     }
 
-    public static StatComputeState GetBaseAcademicPointsCost(KnightAcademicDef academicDef,
-                                                             int sourceLevel,
-                                                             int targetLevel,
-                                                             bool resultOnly = true,
-                                                             StringBuilder explanation = null)
+
+    /// <summary>
+    /// 获取课业修习的花费
+    /// </summary>
+    public static float GetAcademicPointsCost(ResidentPawn residentPawn,
+                                              KnightAcademicDef academicDef,
+                                              int sourceLevel,
+                                              int targetLevel,
+                                              bool resultOnly,
+                                              out string explanation)
     {
+        explanation = string.Empty;
+        StringBuilder explanationBuilder = resultOnly ? null : new(64);
+
         if (targetLevel < 1 || targetLevel <= sourceLevel)
         {
-            return new StatComputeState(value: 0f, isConverged: true);
+            return 0f;
         }
 
         if (targetLevel > academicDef.MaxStageLevel)
         {
             if (!resultOnly)
             {
-                explanation.AppendLine("OARO_AlreadyAtMaxAcademicLevel".Translate());
+                explanationBuilder.AppendLine("OARO_AlreadyAtMaxAcademicLevel".Translate());
             }
-            return new StatComputeState(value: float.PositiveInfinity, isConverged: true);
+            return float.PositiveInfinity;
         }
-
 
         float baseUnitCost = academicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
 
@@ -49,106 +56,48 @@ public static class AcademicUtility
 
         float baseNeededPoints = levelDiff * baseUnitCost + (sourceLevel + targetLevel - 1) * levelDiff / 2 * baseUnitCost;
 
-
         if (!resultOnly)
         {
-            explanation.AppendLine(ResidentKnightStatDefOf.OARO_AcademicPointsCost.GetBaseValueExplanation(baseNeededPoints));
+            explanationBuilder.AppendLine(ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetBaseValueExplanation(baseNeededPoints));
             if (academicDef.academicType == KnightAcademicDef.AcademicType.Honor)
             {
-                explanation.AppendLineWithSeparator(
+                explanationBuilder.AppendLineWithSeparator(
                     text: "OARO_AcademicPointsCost_BaseUnitCost_Honor".Translate(baseUnitCost.ToString("F0").Named(KeyLibrary_FormatArgName.Value)),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
             else
             {
-                explanation.AppendLineWithSeparator(
+                explanationBuilder.AppendLineWithSeparator(
                     text: "OARO_AcademicPointsCost_BaseUnitCost".Translate(baseUnitCost.ToString("F0").Named(KeyLibrary_FormatArgName.Value)),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
 
-            explanation.AppendLineWithSeparator(
+            explanationBuilder.AppendLineWithSeparator(
                 text: "OARO_AcademicPointsCost_LevelDiff".Translate(levelDiff.Named(KeyLibrary_FormatArgName.Value)),
                 separator: KeyLibrary_Misc.SpaceCap4);
         }
 
-        return new StatComputeState(value: baseNeededPoints, isConverged: false);
-    }
-
-
-    /// <summary>
-    /// 获取课业修习的花费
-    /// </summary>
-    public static float GetMeditationPointsNeeded(ResidentPawn residentPawn,
-                                                  KnightAcademicDef academicDef,
-                                                  int sourceLevel,
-                                                  int targetLevel,
-                                                  bool resultOnly,
-                                                  out string explanation)
-    {
-        explanation = string.Empty;
-        if (residentPawn is ResidentKnight knight)
+        if (residentPawn is ResidentKnight residentKnight)
         {
-            ResidentKnightStatRequestData_Academic requestData = new(knight: knight,
-                                                                     statDef: ResidentKnightStatDefOf.OARO_AcademicPointsCost,
-                                                                     academicDef: academicDef,
-                                                                     sourceLevel: sourceLevel,
-                                                                     targetLevel: targetLevel);
-
-            if (resultOnly)
+            ResidentKnightStatRequestData_Academic requestData = new(residentKnight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, academicDef);
+            float costFactor = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatValue(requestData);
+            baseNeededPoints = Mathf.Round(baseNeededPoints * costFactor);
+            if (!resultOnly)
             {
-                return requestData.GetStatValue();
-            }
-            else
-            {
-                (StringBuilder explanationBuilder, float? result) = OARO_StatUtility.GetStatModifyExplanation(requestData);
-                if (result.HasValue)
-                {
-                    explanation = explanationBuilder.ToString();
-                    return result.Value;
-                }
-                else
-                {
-                    explanation = KeyLibrary_Misc.ErrorTipWithColor;
-                    return float.PositiveInfinity;
-                }
+                explanationBuilder.AppendLine($"{ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.LabelCap}: {OAFrame_TextUtility.ColoredFloatString(costFactor, originPoint: 1f, reverse: ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.reverse)}");
             }
         }
-        else
+
+        baseNeededPoints = Mathf.Round(baseNeededPoints);
+        if (!resultOnly)
         {
-            if (resultOnly)
-            {
+            explanationBuilder.AppendLine("OARO_StatExplain_ResultInt".Translate(baseNeededPoints.ToString("F0").Colorize(Color.yellow)));
 
-                return GetBaseAcademicPointsCost(academicDef: academicDef,
-                                                 sourceLevel: sourceLevel,
-                                                 targetLevel: targetLevel).Value;
-            }
-            else
-            {
-                StringBuilder explanationBuilder = new(64);
-                float result = GetBaseAcademicPointsCost(academicDef: academicDef,
-                                                         sourceLevel: sourceLevel,
-                                                         targetLevel: targetLevel,
-                                                         resultOnly: false,
-                                                         explanation: explanationBuilder).Value;
-
-                explanation = explanationBuilder.ToString();
-                return result;
-            }
+            explanation = explanationBuilder.ToString();
         }
-    }
 
-    public static float GetMeditationPointsNeeded(ResidentPawn residentPawn,
-                                                  KnightAcademicDef academicDef,
-                                                  int targetLevel,
-                                                  bool resultOnly,
-                                                  out string explanation)
-    {
-        return GetMeditationPointsNeeded(residentPawn: residentPawn,
-                                         academicDef: academicDef,
-                                         sourceLevel: targetLevel - 1,
-                                         targetLevel: targetLevel,
-                                         resultOnly: resultOnly,
-                                         explanation: out explanation);
+        return baseNeededPoints;
+
     }
 
     public static AcceptanceReport CanActivateAcademicBySelf(Pawn pawn, KnightAcademicDef academic, bool resultOnly)
@@ -309,15 +258,18 @@ public static class AcademicUtility
         }
     }
 
-    public static IEnumerable<(KnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(AcademicHandler a,
-                                                                                                AcademicHandler b)
+    public static IEnumerable<(KnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(ResidentPawn a,
+                                                                                                ResidentPawn b)
     {
         if (a is null || b is null)
             yield break;
 
-        foreach ((KnightAcademicDef def, int aLevel) in a.Academics)
+        AcademicHandler aHandler = a.AcademicHandler;
+        AcademicHandler bHandler = b.AcademicHandler;
+
+        foreach ((KnightAcademicDef def, int aLevel) in aHandler.Academics)
         {
-            int bLevel = b.GetAcademicLevel(def);
+            int bLevel = bHandler.GetAcademicLevel(def);
             if (bLevel == 0 || aLevel > bLevel)
             {
                 yield return (def, bLevel + 1);

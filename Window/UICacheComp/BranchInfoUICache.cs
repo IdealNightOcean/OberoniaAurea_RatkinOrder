@@ -1,4 +1,5 @@
 using NightOcean;
+using OberoniaAurea_Frame;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -49,7 +50,7 @@ public class BranchInfoUICache : BranchSummaryUICache
     {
         try
         {
-            StringBuilder growthExplanation = OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(Branch, BranchStatDefOf.OARO_DailyPopulationGrowth), showResultValue: false).explanationBuilder;
+            StringBuilder growthExplanation = new(BranchStatDefOf.OARO_DailyPopulationGrowth.GetStatModifyExplanation(new BranchStatRequestData(this.Branch)).explanation);
 
             int bottom = DailyPopulationGrowth_Bottom.Value;
             int ceiling = DailyPopulationGrowth_Ceiling.Value;
@@ -65,7 +66,7 @@ public class BranchInfoUICache : BranchSummaryUICache
         }
         catch
         {
-            return "ERROR (´;ω;`)".Colorize(ColorLibrary.RedReadable);
+            return KeyLibrary_Misc.ErrorTipWithColor;
         }
     }
 }

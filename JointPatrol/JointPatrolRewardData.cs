@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OberoniaAurea_Frame;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -162,7 +163,7 @@ public class JointPatrolRewardData
         catch (Exception exception2)
         {
             ModUtility.LogExceptionError(exception2, "生成联巡完成摘要", nameof(JointPatrolRewardData), nameof(ApplyReward), needStackTrace: true);
-            return "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
+            return KeyLibrary_Misc.ErrorTipWithColor;
         }
     }
 }

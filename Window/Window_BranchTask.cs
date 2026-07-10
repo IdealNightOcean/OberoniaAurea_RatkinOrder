@@ -397,7 +397,7 @@ public partial class Window_BranchTask : OrderWindowBase
 
         reusedRect.yMax += 28f;
         reusedRect.yMin = reusedRect.yMax - 28f;
-        float potencyValue = 0f;
+        float potencyValue;
         if (JointPatrolManager.CurState != PatrolState.Ongoing || !JointPatrolManager.TaskPotencys.Value.TryGetValue(taskChivalry, out potencyValue))
         {
             potencyValue = 0f;

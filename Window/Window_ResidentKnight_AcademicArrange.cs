@@ -442,11 +442,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         SelAcademicStageLevel = AcademicHandler.GetAcademicLevel(SelAcademicDef);
 
-        MeditationPointForSelAcademicUpgrade = AcademicUtility.GetMeditationPointsNeeded(residentPawn: Knight,
-                                                                                         academicDef: SelAcademicDef,
-                                                                                         targetLevel: SelAcademicStageLevel + 1,
-                                                                                         resultOnly: true,
-                                                                                         explanation: out _);
+        MeditationPointForSelAcademicUpgrade = AcademicUtility.GetAcademicPointsCost(residentPawn: Knight,
+                                                                                     academicDef: SelAcademicDef,
+                                                                                     targetLevel: SelAcademicStageLevel + 1,
+                                                                                     sourceLevel: SelAcademicStageLevel,
+                                                                                     resultOnly: true,
+                                                                                     explanation: out _);
     }
 
     private void DrawRankBackGround(Rect inRect)

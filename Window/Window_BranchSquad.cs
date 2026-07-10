@@ -61,7 +61,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         SupplyRecoveryRateExplanation = new(refreshFunc: RefreshSupplyRecoveryRateExplanation);
         BombardSupportCeiling = new(refreshFunc: () => (int)(SelBranch?.GetStatValue(BranchStatDefOf.OARO_BombardSupportCeiling, immediateUpdate: true) ?? -1f));
-        BombardSupportCeilingExplanation = new(refreshFunc: () => OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(SelBranch, BranchStatDefOf.OARO_BombardSupportCeiling), showResultValue: true).explanationBuilder.ToString());
+        BombardSupportCeilingExplanation = new(refreshFunc: () => BranchStatDefOf.OARO_BombardSupportCeiling.GetStatModifyExplanation(new BranchStatRequestData(SelBranch)).explanation);
 
         SupportAcceptance = new(refreshFunc: () => BranchSupportUtility.CanCombatKnightSupport(SelBranch, Map, BranchSupportUtility.DeploymentLevel.Quarter, resultOnly: false));
         BombardAcceptance = new(refreshFunc: () => BranchSupportUtility.CanBombard(SelBranch, Map, resultOnly: false));
@@ -1113,7 +1113,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     private string RefreshSupplyRecoveryRateExplanation()
     {
-        StringBuilder sb = OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(SelBranch, BranchStatDefOf.OARO_SupplyRecoveryRate), showResultValue: true).explanationBuilder;
+        StringBuilder sb = new(BranchStatDefOf.OARO_SupplyRecoveryRate.GetStatModifyExplanation(new BranchStatRequestData(SelBranch)).explanation);
         sb.Insert(0, BranchStatDefOf.OARO_SupplyRecoveryRate.LabelCap + ": \n\n", count: 1);
         return sb.ToString();
     }

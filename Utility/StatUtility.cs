@@ -129,37 +129,36 @@ public static class OARO_StatUtility
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (StringBuilder explanationBuilder, float? resultNullable) GetStatModifyExplanation(this BranchStatRequestData requestData,
-                                                                                                                                  float? baseValueOverride = null,
-                                                                                                                                  bool showResultValue = true)
+    public static (string explanation, float? result) GetStatModifyExplanation(this BranchStatDef statDef,
+                                                                                                     BranchStatRequestData requestData,
+                                                                                                     float? baseValueOverride = null)
     {
-        return GetStatModifyExplanation<BranchStatRequestData, BranchStatDef, Branch>(requestData, requestData.StatDef.Worker, baseValueOverride, showResultValue);
+        return GetStatModifyExplanation<BranchStatRequestData, BranchStatDef, Branch>(statDef, requestData, statDef.Worker, baseValueOverride);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static (StringBuilder explanationBuilder, float? resultNullable) GetStatModifyExplanation(this ResidentKnightStatRequestData requestData,
-                                                                                                     float? baseValueOverride = null,
-                                                                                                     bool showResultValue = true)
+    public static (string explanation, float? result) GetStatModifyExplanation(this ResidentKnightStatDef statDef,
+                                                                                                     ResidentKnightStatRequestData requestData,
+                                                                                                     float? baseValueOverride = null)
     {
-        return GetStatModifyExplanation<ResidentKnightStatRequestData, ResidentKnightStatDef, ResidentKnight>(requestData, requestData.StatDef.Worker, baseValueOverride, showResultValue);
+        return GetStatModifyExplanation<ResidentKnightStatRequestData, ResidentKnightStatDef, ResidentKnight>(statDef, requestData, statDef.Worker, baseValueOverride);
     }
-    private static (StringBuilder explanationBuilder, float? resultNullable) GetStatModifyExplanation<TRequestData, TDef, TTarget>(TRequestData requestData,
+    private static (string explanation, float? result) GetStatModifyExplanation<TRequestData, TDef, TTarget>(TDef statDef,
+                                                                                                                                   TRequestData requestData,
                                                                                                                                    StatWorker<TDef, TTarget, TRequestData> statWorker,
-                                                                                                                                   float? baseValueOverride = null,
-                                                                                                                                   bool showResultValue = true)
+                                                                                                                                   float? baseValueOverride = null)
         where TRequestData : StatRequestData<TDef, TTarget>
         where TDef : OAROStatDefBase
 
 
     {
-        if (requestData is null || requestData.StatDef is null)
-            return (new StringBuilder(KeyLibrary_Misc.ErrorTipWithColor), null);
+        if (requestData is null || statDef is null)
+            return (KeyLibrary_Misc.ErrorTipWithColor, null);
 
+        requestData.StatDef = statDef;
         StringBuilder explanationBuilder = new(256);
         try
         {
-            TDef statDef = requestData.StatDef;
-
             StatComputeState curValue = new();
             statWorker.PrepareInitialBaseValue(requestData: requestData,
                                                curValue: ref curValue,
@@ -204,17 +203,15 @@ public static class OARO_StatUtility
                 }
             }
 
-            if (showResultValue)
+            float result = Mathf.Clamp(curValue.Value, statDef.minValue, statDef.maxValue);
+            if (statDef.statType == BranchStatDef.StatType.Integer)
             {
-                float result = Mathf.Clamp(curValue.Value, statDef.minValue, statDef.maxValue);
-                if (statDef.statType == BranchStatDef.StatType.Integer)
-                {
-                    result = Mathf.Round(result);
-                }
-                statWorker.UpdateStatCache(requestData.Target, result);
-                OARO_StatExplanationUtility.AppendStatResultExplanation(explanationBuilder, statDef, baseValue, result);
-                return (explanationBuilder, result);
+                result = Mathf.Round(result);
             }
+            statWorker.UpdateStatCache(requestData.Target, result);
+            OARO_StatExplanationUtility.AppendStatResultExplanation(explanationBuilder, statDef, baseValue, result);
+
+            return (explanationBuilder.ToString(), result);
         }
         catch (Exception ex)
         {
@@ -227,7 +224,7 @@ public static class OARO_StatUtility
             explanationBuilder = new(KeyLibrary_Misc.ErrorTipWithColor);
         }
 
-        return (explanationBuilder, null);
+        return (KeyLibrary_Misc.ErrorTipWithColor, null);
     }
 
 }

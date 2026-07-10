@@ -4,30 +4,32 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class ResidentKnightStatPart_KnightChivalryFactor : ResidentKnightStatPart
+public class ResidentKnightStatPart_Offset_KnightEffectTag : ResidentKnightStatPart
 {
-    public float factor = 1f;
-    public KnightChivalryDef chivalryDef;
+    [NoTranslate]
+    public string effectTag;
+    public float offset;
+
 
     public override bool PostTransModify(ResidentKnightStatRequestData requestData,
                                          ref StatComputeState curValue,
                                          bool resultOnly = true,
                                          StringBuilder explanation = null)
     {
-        if (chivalryDef is null || chivalryDef != requestData.Target.Chivalry)
+        if (!requestData.Target.EffectTags.HasTag(effectTag))
             return false;
 
-        curValue.Value *= factor;
+        curValue.Value += offset;
         if (!resultOnly)
         {
             explanation.AppendLineWithSeparator(
-                text: "OARO_ChangeFactor_KnightHasChivalry".Translate(
-                    chivalryDef.Named(OARO_KeyLibrary_FormatArgName.CHIVALRY),
-                    OAFrame_TextUtility.ColoredFloatNamedArgument(factor, KeyLibrary_FormatArgName.Factor, originPoint: 1f)),
+                text: "OARO_ChangeOffset_PawnEffectTag"
+                .Translate(KeyLibrary_EffectTag.StudyElite.Named(OARO_KeyLibrary_FormatArgName.EffectTag),
+                           OARO_StatExplanationUtility.OffsetNamedArgument(offset, requestData.StatDef))
+                .ColorizeStrByOffset(offset, reverse: requestData.StatDef.reverse),
                 separator: KeyLibrary_Misc.SpaceCap4);
         }
 
         return true;
-
     }
 }

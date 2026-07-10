@@ -82,7 +82,7 @@ public class BranchContract : IExposable
         catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex, "获取合同订单原因", nameof(BranchContract), nameof(PostInit));
-            requestReason = "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable);
+            requestReason = KeyLibrary_Misc.ErrorTipWithColor;
         }
         curState = ContractState.Ongoing;
     }

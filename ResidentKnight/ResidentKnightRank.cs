@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using OberoniaAurea_Frame;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -50,7 +51,7 @@ public static class ResidentKnightRankExtensions
             ResidentKnightRank.Elite => $"OARO_ResidentKnightRank_{ResidentKnightRank.Elite}".Translate().Colorize(new Color(0.3f, 0.51f, 0.9f)),
             ResidentKnightRank.Honor => $"OARO_ResidentKnightRank_{ResidentKnightRank.Honor}".Translate().Colorize(new Color(0.69f, 0.3f, 0.9f)),
             ResidentKnightRank.Crown => $"OARO_ResidentKnightRank_{ResidentKnightRank.Crown}".Translate().Colorize(new Color(1f, 0.65f, 0f)),
-            _ => "ERROR (；′⌒`)".Colorize(ColorLibrary.RedReadable)
+            _ => KeyLibrary_Misc.ErrorTipWithColor
         };
     }
 }

@@ -18,7 +18,7 @@ public static class BranchConstructUtility
                                             out string explanation)
     {
         explanation = string.Empty;
-        float costValue;
+        float? costValue;
 
         BranchStatRequestData_BranchConstruction<BranchBuildingDef> statRequest = new(
             branch: branch,
@@ -31,13 +31,10 @@ public static class BranchConstructUtility
         }
         else
         {
-            (StringBuilder explanationBuilder, float? costValueBox) = statRequest.GetStatModifyExplanation();
-
-            costValue = costValueBox ?? 0f;
-            explanation = explanationBuilder.ToString();
+            (explanation, costValue) = BranchStatDefOf.OARO_BranchBuildingCost.GetStatModifyExplanation(statRequest);
         }
 
-        return Mathf.RoundToInt(costValue);
+        return Mathf.RoundToInt(costValue?? 0f);
     }
 
     public static int GetBuildingTimeCost(this Branch branch, BranchBuildingDef buildingDef)
@@ -59,7 +56,7 @@ public static class BranchConstructUtility
                                             out string explanation)
     {
         explanation = string.Empty;
-        float costValue;
+        float? costValue;
 
         BranchStatRequestData_BranchFacility statRequest = new(
             branch: branch,
@@ -73,13 +70,10 @@ public static class BranchConstructUtility
         }
         else
         {
-            (StringBuilder explanationBuilder, float? costValueBox) = statRequest.GetStatModifyExplanation();
-
-            costValue = costValueBox ?? 0f;
-            explanation = explanationBuilder.ToString();
+            (explanation, costValue) = BranchStatDefOf.OARO_BranchFacilityCost.GetStatModifyExplanation(statRequest);
         }
 
-        return Mathf.RoundToInt(costValue);
+        return Mathf.RoundToInt(costValue ?? 0f);
     }
 
     public static int GetFacilityTimeCost(this Branch branch, BranchFacilityDef facilityDef, BranchFacilityLevel targetLevel)

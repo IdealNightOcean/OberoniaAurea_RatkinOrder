@@ -23,7 +23,7 @@ public class SquadInfoUICache : BranchSummaryUICache
 
     public SquadInfoUICache(Branch branch, Map map) : base(branch, map)
     {
-        MemberRecoveryRateExplanation = new(refreshFunc: () => OARO_StatUtility.GetStatModifyExplanation(new BranchStatRequestData(branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate), showResultValue: true).explanationBuilder.ToString());
+        MemberRecoveryRateExplanation = new(refreshFunc: () => BranchStatDefOf.OARO_SquadMemberRecoveryRate.GetStatModifyExplanation(new BranchStatRequestData(branch)).explanation);
 
         if (branch.IsBranchOfType(BranchType.Friendly))
         {

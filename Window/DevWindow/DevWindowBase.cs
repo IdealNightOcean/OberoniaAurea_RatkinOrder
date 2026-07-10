@@ -1,9 +1,8 @@
 ﻿using UnityEngine;
-using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class DevWindowBase : Window
+public abstract class DevWindowBase : Verse.Window
 {
     protected Vector2 scrollPosition;
     protected float viewRectHeight;

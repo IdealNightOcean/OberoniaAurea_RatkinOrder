@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class OrderWindowBase : Window
+public abstract class OrderWindowBase : Verse.Window
 {
     protected override float Margin => 0f;
     protected bool HasClosed { get; set; }

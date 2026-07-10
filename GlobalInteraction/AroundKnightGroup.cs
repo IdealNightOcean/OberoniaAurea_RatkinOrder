@@ -1,4 +1,5 @@
-﻿using RimWorld.Planet;
+﻿using OberoniaAurea_Frame;
+using RimWorld.Planet;
 using System;
 using System.Linq;
 using Verse;
@@ -48,8 +49,8 @@ public class AroundKnightGroup : IExposable
         }
         catch (Exception ex)
         {
-            Source = "ERROR (；′⌒`)";
-            Destination = "ERROR (；′⌒`)";
+            Source = KeyLibrary_Misc.ErrorTip;
+            Destination = KeyLibrary_Misc.ErrorTip; ;
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"initiate {nameof(AroundKnightGroup)}'s {Source} and {Destination}.",
                 typeName: nameof(AroundKnightGroup),

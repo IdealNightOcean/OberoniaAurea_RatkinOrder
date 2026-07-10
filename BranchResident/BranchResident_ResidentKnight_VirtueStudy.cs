@@ -39,9 +39,12 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
             }
         }
 
-        float successChance = GetTrainSuccessChance(residentKnight: residentKnight,
-                                                    resultOnly: true,
-                                                    explanation: out _);
+        ResidentKnightStatRequestData_ResidentKnightStudy requestData = new(residentKnight, ResidentKnightStatDefOf.OARO_VirtueTrainSuccessChance)
+        {
+            MedalsCost = medalsCost,
+            VirtueDef = virtueDef
+        };
+        float successChance = ResidentKnightStatDefOf.OARO_VirtueTrainSuccessChance.GetStatValue(requestData);
         if (Rand.Chance(successChance))
         {
             SuccessOutcome(residentKnight, extraTextSB.ToString());
@@ -94,105 +97,6 @@ public class BranchResident_ResidentKnight_VirtueTrain : BranchResident_Resident
     private void FailureOutcome(ResidentKnight residentKnight, string extraText)
     {
         //目前先不设计失败的具体后果，后续可以考虑增加一些负面效果
-    }
-
-    public float GetTrainSuccessChance(ResidentKnight residentKnight, bool resultOnly, out string explanation)
-    {
-        explanation = string.Empty;
-        StringBuilder expSB = resultOnly ? null : new(64);
-
-        KnightChivalryDef virtueChivalry = virtueDef.chivalry;
-        float successChance = 0f;
-
-        float curStepChange = 0.2f;
-        successChance += curStepChange;
-        if (!resultOnly)
-        {
-            expSB.AppendLine("OARO_BranchResident_VirtueTrain_Base".Translate(curStepChange.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Chance)));
-        }
-
-        if (virtueChivalry.IsSameDefNonNullable(branch.HonorDef?.chivalry))
-        {
-            curStepChange = 0.2f;
-            successChance += curStepChange;
-            if (!resultOnly)
-            {
-                expSB.AppendLine("OARO_BranchResident_VirtueTrain_SameChivalryWithHonor".Translate(curStepChange.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Offset)));
-            }
-        }
-
-        foreach (BranchTradition tradition in branch.TraditionHandler.Traditions)
-        {
-            if (!virtueChivalry.IsSameDefNonNullable(tradition.Def.chivalry))
-                continue;
-
-            curStepChange = (tradition.Level * 0.05f);
-            successChance += curStepChange;
-            if (!resultOnly)
-            {
-                expSB.AppendLine("OARO_ChangeOffset_BranchTraditionDetail".Translate(
-                    tradition.Def.Named(OARO_KeyLibrary_FormatArgName.TRADITIONDEF),
-                    tradition.Level.Named(KeyLibrary_FormatArgName.Level),
-                    curStepChange.ToStringWithSign("F0").Named(KeyLibrary_FormatArgName.Offset)));
-            }
-        }
-
-        if (branch.MedalHandler.MedalRecords.TryGetValue(virtueChivalry, out BranchMedalRecord medalRecord))
-        {
-            curStepChange = (medalRecord.Count * 0.02f);
-            successChance += curStepChange;
-            if (!resultOnly)
-            {
-                expSB.AppendLine("OARO_BranchResident_VirtueTrain_SameChivalryWithMedal".Translate(
-                    virtueChivalry.Named(KeyLibrary_FormatArgName.DEF),
-                    medalRecord.Count.Named(KeyLibrary_FormatArgName.Count),
-                    curStepChange.ToStringWithSign("F0").Named(KeyLibrary_FormatArgName.Offset)));
-            }
-        }
-
-        if (virtueChivalry.IsSameDefNonNullable(residentKnight.Chivalry))
-        {
-            curStepChange = 0.3f;
-            successChance += curStepChange;
-            if (!resultOnly)
-            {
-                expSB.AppendLine("OARO_BranchResident_VirtueTrain_SameChivalryWithKnight".Translate(curStepChange.ToStringWithSign("F0").Named(KeyLibrary_FormatArgName.Offset)));
-            }
-        }
-
-        if (virtueChivalry.IsSameDefNonNullable(OARO_ModDefOf.OARO_Oath))
-        {
-            int totalMedalsCost = medalsCost.Values.Sum();
-            curStepChange = totalMedalsCost * 0.01f;
-            successChance += curStepChange;
-            if (!resultOnly)
-            {
-                expSB.AppendLine("OARO_BranchResident_VirtueTrain_Oath_MedalsCost".Translate(
-                    totalMedalsCost.Named(KeyLibrary_FormatArgName.Count),
-                    curStepChange.ToStringWithSign("F0").Named(KeyLibrary_FormatArgName.Offset)));
-            }
-        }
-
-        if (residentKnight.EffectTags.HasTag(KeyLibrary_EffectTag.StudyElite))
-        {
-            curStepChange = 2f;
-            successChance *= curStepChange;
-            if (!resultOnly)
-            {
-                expSB.AppendLine("OARO_ChangeFactor_PawnEffectTag".Translate(
-                    KeyLibrary_EffectTag.StudyElite.Named(OARO_KeyLibrary_FormatArgName.EffectTag),
-                    curStepChange.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Factor)));
-            }
-        }
-
-        successChance = Mathf.Clamp01(successChance);
-        if (!resultOnly)
-        {
-            expSB.AppendLine();
-            expSB.AppendLine("OARO_BranchResident_VirtueTrain_SuccessChance".Translate(successChance.ToStringPercent("F0").Named(KeyLibrary_FormatArgName.Chance)));
-            explanation = expSB.ToString();
-        }
-        return successChance;
     }
 
     public int GetTrainOutcomeLevel(bool resultOnly, out string explanation)

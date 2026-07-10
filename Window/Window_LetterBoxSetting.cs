@@ -3,7 +3,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public class Window_LetterBoxSetting : Window
+public class Window_LetterBoxSetting : Verse.Window
 {
     public override Vector2 InitialSize => new(450f, 300f); // inRect大小
     private OrderLetterBox LetterBox { get; }

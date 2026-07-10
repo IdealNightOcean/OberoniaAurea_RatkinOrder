@@ -168,10 +168,10 @@ public class QuestPart_CliquesManager : QuestPartActivable, ISingleBranchRelated
 
     public bool TryAddClique(QuestClique clique, bool replaceCur = false, bool defaultActive = false)
     {
-        bool added = false;
         allCliques ??= [];
         allCliquesDict ??= [];
 
+        bool added;
         if (allCliquesDict.TryGetValue(clique.Key, out QuestClique oldClique))
         {
             if (replaceCur)
