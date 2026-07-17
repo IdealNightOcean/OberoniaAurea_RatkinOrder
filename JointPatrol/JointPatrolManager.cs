@@ -214,7 +214,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
             {
                 sb.AppendLine($"{++i}. {record}");
             }
-            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(sb.ToString(), ratkinOrder);
+            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(sb.ToString(), ratkinOrder);
             Find.WindowStack.Add(nodeTree);
         }
         if (listing_Rect.ButtonText("快速进入下一阶段", widthPct: 0.5f))

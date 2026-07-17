@@ -217,7 +217,7 @@ public class MercyQuestHandler : IExposable
         GlobalInteractionManager.InteractionRecord.OffsetTagValueBy(KeyLibrary_InteractRecord.MercyQuestSucceed, 1, addIfMiss: true);
         float letterChance = 0.2f;
 
-        if (ResidentPawnsManager.RoleManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
+        if (ResidentRoleManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
         {
             letterChance += (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly).ExtraMercyQuestLetterChance(record.Pawn);
         }
@@ -265,7 +265,7 @@ public class MercyQuestHandler : IExposable
     private float GetMercyQuestChance()
     {
         float chance = mercyQuestBaseChance;
-        if (ResidentPawnsManager.RoleManager.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
+        if (ResidentRoleManager.Instance.TryGetKnightOfRole(OARO_ModDefOf.OARO_Orderly, out ResidentKnight record))
         {
             chance *= (OARO_ModDefOf.OARO_Orderly.RoleWorker as ResidentKnightRoleWorker_Orderly)?.MercyQuestChaceFactor(record.Pawn) ?? 1f;
         }

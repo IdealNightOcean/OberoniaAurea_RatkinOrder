@@ -1,6 +1,5 @@
 ﻿using RimWorld;
 using System.Runtime.CompilerServices;
-using System.Text;
 using UnityEngine;
 using Verse;
 
@@ -34,7 +33,7 @@ public static class BranchConstructUtility
             (explanation, costValue) = BranchStatDefOf.OARO_BranchBuildingCost.GetStatModifyExplanation(statRequest);
         }
 
-        return Mathf.RoundToInt(costValue?? 0f);
+        return Mathf.RoundToInt(costValue ?? 0f);
     }
 
     public static int GetBuildingTimeCost(this Branch branch, BranchBuildingDef buildingDef)

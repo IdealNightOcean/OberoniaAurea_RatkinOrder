@@ -170,7 +170,7 @@ public static class GlobalInteractionUtility
                                                                                                                 knightGroup.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                                                                                 chance.ToStringPercent().Named(KeyLibrary_FormatArgName.Chance));
 
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text,
             knightGroup.RatkinOrder,
             acceptAction: Invite);
@@ -214,7 +214,7 @@ public static class GlobalInteractionUtility
         grammarRequest.Constants.Add("isProactive", isProactive.ToString());
         TaggedString talkText = GrammarResolver.Resolve("r_text", grammarRequest);
 
-        Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(talkText, branch.RatkinOrder));
+        Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(talkText, branch.RatkinOrder));
     }
 
     /// <summary>

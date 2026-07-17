@@ -28,7 +28,7 @@ public class BranchInteractionWorker_VisitKnightCommander(BranchInteractionDef d
         privateBrew.stackCount = 5;
         CaravanInventoryUtility.GiveThing(parms.TargetCaravan, privateBrew);
 
-        Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_VisitKnightCommander_Reply".Translate(
                     parms.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                     parms.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),

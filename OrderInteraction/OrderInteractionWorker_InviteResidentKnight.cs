@@ -37,7 +37,7 @@ public class OrderInteractionWorker_InviteResidentKnight(OrderInteractionDef def
     protected override void ApplyEffect(RatkinOrder ratkinOrder, Map map)
     {
         int recommendationNeed = RecommendationUtility.RecommendationNeed_RecruitmentKnight(ratkinOrder);
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_InviteResidentKnight_Confirm".Translate(recommendationNeed.Named(KeyLibrary_FormatArgName.Count)),
             ratkinOrder: ratkinOrder,
             acceptAction: () => base.ApplyEffect(ratkinOrder, map));

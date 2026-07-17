@@ -231,19 +231,19 @@ public class Window_Branch : OrderWindowBase
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1519f, 904f);
+        Rect mainRect = OARO_UIUtility.CenterRect(inRect, 1519f, 904f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(4f);
         float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
         }
-        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawBackArrow_Corner(mainInnerRect))
         {
             Window_BranchList branchListWin = new(Branch.RatkinOrder, Map, initWithConstructTab: false);
             Find.WindowStack.Add(branchListWin);
@@ -278,7 +278,7 @@ public class Window_Branch : OrderWindowBase
         DrawLeftRect(leftRect);
 
         //右侧区域
-        Rect rightRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, middleRect.xMax + 66f, 305f, 635f);
+        Rect rightRect = OARO_UIUtility.CenterRectOnY(mainInnerRect, middleRect.xMax + 66f, 305f, 635f);
         DrawRightRect(rightRect);
 
         Text.Font = GameFont.Small;
@@ -376,17 +376,17 @@ public class Window_Branch : OrderWindowBase
     {
         float tabRectWidth = inRect.width / 3f;
         Rect constructionTabRect = new(inRect.x, inRect.y, tabRectWidth, 45f);
-        if (OARO_WindowUtility.TextButtonImage(constructionTabRect, "OARO_BranchWin_ConstructionTab".Translate(), middleTopButton, middleTopButton_Down))
+        if (OARO_UIUtility.TextButtonImage(constructionTabRect, "OARO_BranchWin_ConstructionTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Construction);
         }
         Rect demandTabRect = new(constructionTabRect.xMax, inRect.y, tabRectWidth, 45f);
-        if (OARO_WindowUtility.TextButtonImage(demandTabRect, "OARO_BranchWin_ContractTab".Translate(), middleTopButton, middleTopButton_Down))
+        if (OARO_UIUtility.TextButtonImage(demandTabRect, "OARO_BranchWin_ContractTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Contract);
         }
         Rect interactionTabRect = new(demandTabRect.xMax, inRect.y, tabRectWidth, 45f);
-        if (OARO_WindowUtility.TextButtonImage(interactionTabRect, "OARO_BranchWin_InteractionTab".Translate(), middleTopButton, middleTopButton_Down))
+        if (OARO_UIUtility.TextButtonImage(interactionTabRect, "OARO_BranchWin_InteractionTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Interaction);
         }
@@ -493,7 +493,7 @@ public class Window_Branch : OrderWindowBase
         }
 
         reusedRect = Rect.MinMaxRect(inRect.xMin, reusedRect.yMax, inRect.xMax, reusedRect.yMax + 108f);
-        Rect textureRect = OARO_WindowUtility.CenterRect(reusedRect, 96f, 86f);
+        Rect textureRect = OARO_UIUtility.CenterRect(reusedRect, 96f, 86f);
         GUI.DrawTexture(textureRect, facilityDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
         reusedRect.yMax += 32f;
@@ -623,7 +623,7 @@ public class Window_Branch : OrderWindowBase
             if (buildingDef.honorDef is not null)
             {
                 Rect ribbonRect = new(inRect.xMin, inRect.yMin - 2f, inRect.width, 55f);
-                Material tintMat = OARO_WindowUtility.GetTintMaterial(buildingDef.honorDef.color, OARO_IconLibrary.HonorRibbonMask);
+                Material tintMat = OAFrame_UIUtility.GetTintMaterial(buildingDef.honorDef.color, OARO_IconLibrary.HonorRibbonMask);
                 GenUI.DrawTextureWithMaterial(ribbonRect, OARO_IconLibrary.HonorRibbonTex, tintMat);
             }
         }
@@ -632,10 +632,10 @@ public class Window_Branch : OrderWindowBase
             GUI.DrawTexture(innerRect, upgradedBuildingLace, ScaleMode.ScaleToFit);
         }
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(innerRect, innerRect.x, 64f, 64f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnY(innerRect, innerRect.x, 64f, 64f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax, 105f, inRect.height);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax, 105f, inRect.height);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, building.Label);
         Text.Anchor = TextAnchor.UpperLeft;
@@ -678,7 +678,7 @@ public class Window_Branch : OrderWindowBase
                 DeselectConstruct();
             }
         }
-        else if (OARO_WindowUtility.TextButtonImage(
+        else if (OARO_UIUtility.TextButtonImage(
             butRect: inRect,
             label: "OARO_BranchWin_ClickToConstructBuilding".Translate(),
             baseTex: buildingConstructButton,
@@ -706,10 +706,10 @@ public class Window_Branch : OrderWindowBase
             GUI.DrawTexture(reusedRect, specialBuildingLace, ScaleMode.ScaleToFit);
         }
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x, 64f, 64f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.x, 64f, 64f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax, 105f, inRect.height);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax, 105f, inRect.height);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, buildingDef.LabelCap);
         Text.Anchor = TextAnchor.UpperLeft;
@@ -822,7 +822,7 @@ public class Window_Branch : OrderWindowBase
                         GUI.DrawTexture(reusedRect, contractButton_Down);
                         Widgets.Label(reusedRect, "OAFrame_Submit".Translate());
                     }
-                    else if (OARO_WindowUtility.TextButtonImageDisableable(
+                    else if (OARO_UIUtility.TextButtonImageDisableable(
                         butRect: reusedRect,
                         label: "OAFrame_Submit".Translate(),
                         acceptance: acceptance,
@@ -835,7 +835,7 @@ public class Window_Branch : OrderWindowBase
                     }
 
                     reusedRect = Rect.MinMaxRect(reusedRect.xMax, reusedRect.yMin, inRect.xMax - 20f, reusedRect.yMax);
-                    reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.x + 8f, 115f, 32f);
+                    reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.x + 8f, 115f, 32f);
                     GUI.DrawTexture(reusedRect, contractRequestBackground);
 
                     Rect iconRect = new(reusedRect.x + 8f, reusedRect.y, 32f, 32f);
@@ -883,12 +883,12 @@ public class Window_Branch : OrderWindowBase
 
         reusedRect.height = commonRect.height - commonEntryHeight * 2f;
         string label = "OARO_BranchWin_CommonInteraction".Translate();
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(reusedRect, label);
         Text.Anchor = TextAnchor.UpperLeft;
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
         GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallExclamation);
         TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_CommonInteractionTip".Translate(), uniqueId: 58990376);
 
@@ -925,7 +925,7 @@ public class Window_Branch : OrderWindowBase
             }
 
             (BranchInteractionDef interactionDef, AcceptanceReport acceptance) = commonInteractionAcceptances[i];
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: entryRect,
                 label: interactionDef.label,
                 acceptance: acceptance,
@@ -943,7 +943,7 @@ public class Window_Branch : OrderWindowBase
         Widgets.EndScrollView();
 
         reusedRect = new(inRect.x, commonRect.yMax + 2f, commonRect.width, 155f);
-        Rect ratkinTexRect = OARO_WindowUtility.CenterRect(reusedRect, 80f, 85f);
+        Rect ratkinTexRect = OARO_UIUtility.CenterRect(reusedRect, 80f, 85f);
         GUI.DrawTexture(ratkinTexRect, interactionRatkinTexture);
 
         Rect buildingRect = new(inRect.x, reusedRect.yMax, 579f, 164f);
@@ -954,9 +954,9 @@ public class Window_Branch : OrderWindowBase
         reusedRect.height = 43f;
         Text.Anchor = TextAnchor.MiddleCenter;
         label = "OARO_BranchWin_BuildingInteraction".Translate();
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, reusedRect.y, Text.CalcSize(label).x, reusedRect.height);
         Widgets.Label(reusedRect, label);
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 13f, 22f);
         GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallExclamation);
         TooltipHandler.TipRegion(reusedRect, () => "OARO_BranchWin_BuildingInteractionTip".Translate(), uniqueId: 98968387);
 
@@ -988,13 +988,13 @@ public class Window_Branch : OrderWindowBase
 
     private bool DrawBuildingInteractionEntry(Rect inRect, BranchBuildingComp_Interaction interactionComp, AcceptanceReport acceptance)
     {
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x + 15f, 36f, 36f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.x + 15f, 36f, 36f);
         GUI.DrawTexture(reusedRect, interactionComp.Parent.Def.iconTexture.Texture, ScaleMode.ScaleToFit);
 
         Widgets.Label(inRect, interactionComp.InteractionLabel);
 
         reusedRect = new(inRect.xMax - 72f, inRect.y, 72f, inRect.height);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_BranchWin_Interaction".Translate(),
             acceptance: acceptance,
@@ -1020,11 +1020,11 @@ public class Window_Branch : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleLeft;
         float textWidth = Text.CalcSize(Branch.Name).x;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(titleRect, titleRect.y, Mathf.Min(textWidth, 256f), 40f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(titleRect, titleRect.y, Mathf.Min(textWidth, 256f), 40f);
         reusedRect.xMax += 12f;
         reusedRect.xMin += 12f;
         Widgets.Label(reusedRect, Branch.Name);
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMin - (40f + 4f), 45f, 45f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMin - (40f + 4f), 45f, 45f);
         GUI.DrawTexture(reusedRect, leftTopSiteIcon, ScaleMode.ScaleToFit);
         if (Mouse.IsOver(reusedRect))
         {
@@ -1039,7 +1039,7 @@ public class Window_Branch : OrderWindowBase
             }
         }
 
-        reusedRect = OARO_WindowUtility.DrawBranchSummary(new Vector2(inRect.x, inRect.y), CachedBranchInfo);
+        reusedRect = OARO_UIUtility.DrawBranchSummary(new Vector2(inRect.x, inRect.y), CachedBranchInfo);
 
         inRect.ContractedBy(2f);
 
@@ -1189,9 +1189,9 @@ public class Window_Branch : OrderWindowBase
             reusedRect = new(inRectX, reusedRect.yMax, inRectWidth, 24f);
             Widgets.FillableBar(reusedRect, record.Progress, BaseContent.WhiteTex, BaseContent.BlackTex, doBorder: true);
 
-            reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
+            reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
             Text.Anchor = TextAnchor.MiddleCenter;
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
+            if (OARO_UIUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
             {
                 Dialog_NodeTree dialog_Node = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
                      text: "OARO_BranchWin_CancelConstructWarnning".Translate(),
@@ -1218,8 +1218,8 @@ public class Window_Branch : OrderWindowBase
             reusedRect = new(reusedRect.xMin - 24f, reusedRect.y, 24f, 24f);
             Widgets.ThingIcon(reusedRect, ThingDefOf.Silver, graphicIndexOverride: 2);
 
-            reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 acceptance: FacilityConstructionAcceptance.Value,
                 label: "OARO_BranchWin_StartConstruct".Translate(),
@@ -1335,8 +1335,8 @@ public class Window_Branch : OrderWindowBase
         reusedRect = new(inRectX, reusedRect.yMax, inRectWidth, 24f);
         Widgets.FillableBar(reusedRect, SelUnderConstructionBuilding.Progress, BaseContent.WhiteTex, BaseContent.BlackTex, doBorder: true);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
+        reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
+        if (OARO_UIUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
         {
             Dialog_NodeTree dialog_Node = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
                 text: "OARO_BranchWin_CancelConstructWarnning".Translate(),
@@ -1425,8 +1425,8 @@ public class Window_Branch : OrderWindowBase
         reusedRect = new(reusedRect.x, reusedRect.yMax + 8f, reusedRect.width, 80f);
         Widgets.TextArea(reusedRect, SelBuildingDefCache.BuildingDef.description, readOnly: true);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 2f, 88f, 29f);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        reusedRect = OARO_UIUtility.CenterRectOnX(inRect, reusedRect.yMax + 2f, 88f, 29f);
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_BranchWin_StartConstruct".Translate(),
             acceptance: BuildingConstructionAcceptance.Value,
@@ -1457,7 +1457,7 @@ public class Window_Branch : OrderWindowBase
     {
         BranchBuildingDef buildingDef = summaryUICache.BuildingDef;
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 64f, 64f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 64f, 64f);
         GUI.DrawTexture(reusedRect, buildingDef.iconTexture.Texture, ScaleMode.ScaleToFit);
 
         float textXMin = reusedRect.xMax + 8f;
@@ -1577,7 +1577,7 @@ public class Window_Branch : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
         return rect;
     }
 

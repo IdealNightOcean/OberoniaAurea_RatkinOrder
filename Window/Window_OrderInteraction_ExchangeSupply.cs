@@ -41,10 +41,10 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
     public override void DoWindowContents(Rect inRect)
     {
         GUI.DrawTexture(inRect, mainBackground);
-        Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1308f, 733f);
+        Rect mainRect = OARO_UIUtility.CenterRect(inRect, 1308f, 733f);
 
         Rect mainInnerRect = mainRect.ContractedBy(2f);
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
@@ -61,7 +61,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
 
         reusedRect.xMax -= 172f;
         reusedRect.xMin = reusedRect.xMax - 96f;
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount, 4f);
+        OARO_UIUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount, 4f);
 
         Rect outRect = new(mainInnerX + 172f, mainInnerY + 146f, mainInnerWidth - 172f - 172f + 16f, 488f);
         Rect viewRect = outRect;
@@ -98,7 +98,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawExchangeableSupply(Rect inRect, ExchangeableSupply supply)
@@ -108,7 +108,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
 
         Rect reusedRect = innerRect;
         reusedRect.height = 98f;
-        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 75f, 75f);
+        reusedRect = OARO_UIUtility.CenterRect(reusedRect, 75f, 75f);
         Widgets.ThingIcon(reusedRect, supply.thing, supply.stuff);
 
         reusedRect = innerRect;
@@ -121,7 +121,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         reusedRect = innerRect;
         reusedRect.yMin += 154f;
 
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             reusedRect,
             $"x {supply.needRecommendation}",
             acceptance: supply.needRecommendation <= MapRecommendationCount,

@@ -20,8 +20,11 @@ public class GameComponent_RatkinOrder : GameComponent
 
     private RatkinOrderManager ratkinOrderManager;
     private KnightPawnsManager knightPawnsManager;
-    private ResidentPawnsManager residentPawnsManager;
     private OrderStationHandler orderStationHandler;
+
+    private ResidentPawnsManager residentPawnsManager;
+    private ResidentRoleManager residentRoleManager;
+    private MentorshipManager mentorshipManager;
 
     private GlobalInteractionManager globalInteractionManager;
 
@@ -58,8 +61,10 @@ public class GameComponent_RatkinOrder : GameComponent
 
         RatkinOrderManager.ClearStaticCache();
         KnightPawnsManager.ClearStaticCache();
-        ResidentPawnsManager.ClearStaticCache();
         OrderStationHandler.ClearStaticCache();
+
+        ResidentPawnsManager.ClearStaticCache();
+        ResidentRoleManager.ClearStaticCache();
 
         GlobalInteractionManager.ClearStaticCache();
 
@@ -80,8 +85,11 @@ public class GameComponent_RatkinOrder : GameComponent
 
         Scribe_Deep.Look(ref ratkinOrderManager, nameof(ratkinOrderManager));
         Scribe_Deep.Look(ref knightPawnsManager, nameof(knightPawnsManager));
-        Scribe_Deep.Look(ref residentPawnsManager, nameof(residentPawnsManager), ctorArgs: false);
         Scribe_Deep.Look(ref orderStationHandler, nameof(orderStationHandler), ctorArgs: false);
+
+        Scribe_Deep.Look(ref residentPawnsManager, nameof(residentPawnsManager));
+        Scribe_Deep.Look(ref residentRoleManager, nameof(residentRoleManager));
+        Scribe_Deep.Look(ref mentorshipManager, nameof(mentorshipManager));
 
         Scribe_Deep.Look(ref globalInteractionManager, nameof(globalInteractionManager));
     }
@@ -110,6 +118,8 @@ public class GameComponent_RatkinOrder : GameComponent
     {
         ratkinOrderManager.Tick();
         residentPawnsManager.Tick();
+        residentRoleManager.Tick();
+        mentorshipManager.Tick();
         globalInteractionManager.Tick();
     }
 
@@ -184,21 +194,6 @@ public class GameComponent_RatkinOrder : GameComponent
 
         try
         {
-            residentPawnsManager ??= new ResidentPawnsManager(initCtor: true);
-        }
-        catch (System.Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                errorDesc: $"初始化常驻人员管理器 ({nameof(ResidentPawnsManager)})",
-                typeName: nameof(GlobalInteractionManager),
-                methodName: nameof(EnsureComponentsInit),
-                needStackTrace: true);
-            ResidentPawnsManager.ClearStaticCache();
-            residentPawnsManager = new ResidentPawnsManager(initCtor: true);
-        }
-
-        try
-        {
             orderStationHandler ??= new OrderStationHandler(initCtor: true);
         }
         catch (System.Exception ex)
@@ -210,6 +205,51 @@ public class GameComponent_RatkinOrder : GameComponent
                 needStackTrace: true);
             OrderStationHandler.ClearStaticCache();
             orderStationHandler = new OrderStationHandler(initCtor: true);
+        }
+
+        try
+        {
+            residentPawnsManager ??= new ResidentPawnsManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"初始化常驻人员管理器 ({nameof(ResidentPawnsManager)})",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            ResidentPawnsManager.ClearStaticCache();
+            residentPawnsManager = new ResidentPawnsManager();
+        }
+
+        try
+        {
+            residentRoleManager ??= new ResidentRoleManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"初始化常驻人员职位管理器 ({nameof(ResidentRoleManager)})",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            ResidentRoleManager.ClearStaticCache();
+            residentRoleManager = new ResidentRoleManager();
+        }
+
+        try
+        {
+            mentorshipManager ??= new MentorshipManager();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"初始化常驻人员职位管理器 ({nameof(MentorshipManager)})",
+                typeName: nameof(GlobalInteractionManager),
+                methodName: nameof(EnsureComponentsInit),
+                needStackTrace: true);
+            MentorshipManager.ClearStaticCache();
+            mentorshipManager = new MentorshipManager();
         }
 
         try

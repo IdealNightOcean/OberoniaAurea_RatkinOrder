@@ -70,7 +70,7 @@ public partial class Window_OrderStation : OrderWindowBase
         Rect mainInnerRect = mainRect.ContractedBy(4f);
         float mainInnerRectY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
@@ -80,18 +80,18 @@ public partial class Window_OrderStation : OrderWindowBase
         float infoRectHeight = 591f;
 
         //中部主要区域
-        Rect middleRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, infoRectY, 322f, infoRectHeight);
+        Rect middleRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, infoRectY, 322f, infoRectHeight);
         DrawBuffAndLevel(middleRect);
 
         //左|中分割线
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, middleRect.xMin - (24f + 5f), 5f, 707f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnY(mainInnerRect, middleRect.xMin - (24f + 5f), 5f, 707f);
         GUI.DrawTexture(reusedRect, bigCuttingLine);
 
         //左侧主要区域（角色框）
         Rect leftRect = new(reusedRect.xMin - (19f + 442f), infoRectY, 442f, infoRectHeight);
         DrawResidentKnights(leftRect);
         ////左侧上部角色框标题
-        reusedRect = OARO_WindowUtility.CenterRectOnX(leftRect, infoRectY - (36f + 32f), 128f, 32f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(leftRect, infoRectY - (36f + 32f), 128f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
         Widgets.Label(reusedRect, "OARO_ResidentKnights".Translate());
@@ -100,7 +100,7 @@ public partial class Window_OrderStation : OrderWindowBase
 
 
         //中|右分割线
-        reusedRect = OARO_WindowUtility.CenterRectOnY(mainInnerRect, middleRect.xMax + 24f, 5f, 707f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(mainInnerRect, middleRect.xMax + 24f, 5f, 707f);
         GUI.DrawTexture(reusedRect, bigCuttingLine);
 
         //右侧主要区域
@@ -109,19 +109,19 @@ public partial class Window_OrderStation : OrderWindowBase
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, rightRect.yMin - 36f, 256f, 36f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(rightRect, rightRect.yMin - 36f, 256f, 36f);
         Widgets.Label(reusedRect, "OARO_StationWin_AroundKnightGroupLimit".Translate(AroundKnightGroupsManager.Instance.SeasonInvitationUsed, AroundGroupSeasonInvitationLimit));
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, reusedRect.yMin - 42f, 256f, 42f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(rightRect, reusedRect.yMin - 42f, 256f, 42f);
         Widgets.Label(reusedRect, "OARO_StationWin_AroundKnightGroup".Translate());
 
         //顶部绶带
         reusedRect = new(37f, 46f, 1388f, 104f);
         GUI.DrawTexture(reusedRect, topRibbon);
         //顶部盾徽
-        reusedRect = OARO_WindowUtility.CenterRectOnX(mainRect, 0f, 215f, 211f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(mainRect, 0f, 215f, 211f);
         //盾徽绘制逻辑（未完成）
         GUI.DrawTexture(reusedRect, TopShieldTexture, ScaleMode.ScaleToFit);
 
@@ -139,7 +139,7 @@ public partial class Window_OrderStation : OrderWindowBase
         reusedRect = new(14f, inRect.yMax - 284f, 50f, 284f);
         GUI.DrawTexture(reusedRect, leftCandlestick);
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawResidentKnights(Rect inRect)
@@ -208,7 +208,7 @@ public partial class Window_OrderStation : OrderWindowBase
         reusedRect = new(innerRect.xMax - 190f, reusedRect.yMax + 2f, 190f, 95f);
         Widgets.LabelScrollable(reusedRect, PreferredBuildingsStr, ref scrollPosition_PreferredBuildingsStr);
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawBuffAndLevel(Rect inRect)
@@ -216,12 +216,12 @@ public partial class Window_OrderStation : OrderWindowBase
         GUI.DrawTexture(inRect, middleBackground);
         inRect = inRect.ContractedBy(3f);
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.y + 7f, 256f, 32f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.y + 7f, 256f, 32f);
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(reusedRect, "OARO_StationWin_CurBuff".Translate());
 
-        Rect effectRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 270f);
+        Rect effectRect = OARO_UIUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 270f);
         float entryX = effectRect.x;
         float entryY = effectRect.y;
         float entryHeight = 30f;
@@ -267,15 +267,15 @@ public partial class Window_OrderStation : OrderWindowBase
         Widgets.EndScrollView();
 
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, effectRect.yMax + 12f, 287f, 3f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(inRect, effectRect.yMax + 12f, 287f, 3f);
         GUI.DrawTexture(reusedRect, middleCuttingLine);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 256f, 32f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 256f, 32f);
         Widgets.Label(reusedRect, "OARO_StationWin_NextLevelNeed".Translate());
 
-        Rect levelRect = OARO_WindowUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 210f);
+        Rect levelRect = OARO_UIUtility.CenterRectOnX(inRect, reusedRect.yMax + 7f, 316f, 210f);
         levelRect.yMax = inRect.yMax;
         entryX = levelRect.x;
         entryY = levelRect.y;
@@ -348,7 +348,7 @@ public partial class Window_OrderStation : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawAroundKnightGroups(Rect inRect)
@@ -356,7 +356,7 @@ public partial class Window_OrderStation : OrderWindowBase
         GUI.DrawTexture(inRect, rightBackground);
         inRect = inRect.ContractedBy(3f);
 
-        Rect titleRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.y, 416f, 40f);
+        Rect titleRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.y, 416f, 40f);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Rect reusedRect = new(titleRect.x, titleRect.y, 176f, 40f);
@@ -422,7 +422,7 @@ public partial class Window_OrderStation : OrderWindowBase
         }
 
         Widgets.EndScrollView();
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private bool DrawAroundKnightGroup(Rect inRect, AroundKnightGroup group, float successRate, int index)
@@ -432,7 +432,7 @@ public partial class Window_OrderStation : OrderWindowBase
             GUI.DrawTexture(inRect, rightList_Dark);
         }
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x + 2f, 55f, 60f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.x + 2f, 55f, 60f);
         GUI.DrawTexture(reusedRect, aroundKnightGroupIcon, ScaleMode.ScaleToFit);
 
         Text.Anchor = TextAnchor.MiddleLeft;
@@ -447,7 +447,7 @@ public partial class Window_OrderStation : OrderWindowBase
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.x + 176f, 72f, 32f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.x + 176f, 72f, 32f);
         Widgets.Label(reusedRect, $"OARO_AroundKnightGroup_{group.CurBusyLevel}".Translate());
 
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -481,7 +481,7 @@ public partial class Window_OrderStation : OrderWindowBase
         }
 
         string buttonText = "OAFrame_Invite".Translate() + "\n" + successRate.ToStringPercent("F0");
-        if (OARO_WindowUtility.TextButtonImage(
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRect,
             label: buttonText,
             baseTex: aroundKnightGroupButton,

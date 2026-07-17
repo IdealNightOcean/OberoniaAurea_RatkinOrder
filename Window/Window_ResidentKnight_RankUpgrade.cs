@@ -35,11 +35,11 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
     public override void DoWindowContents(Rect inRect)
     {
         GUI.DrawTexture(inRect, mainBackground);
-        Rect innerRect = OARO_WindowUtility.CenterRect(inRect, 510f, 402f).ContractedBy(2f);
+        Rect innerRect = OARO_UIUtility.CenterRect(inRect, 510f, 402f).ContractedBy(2f);
         float innerRectX = innerRect.xMin;
         float innerRectY = innerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(innerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(innerRect))
         {
             Close();
             return;
@@ -65,7 +65,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
 
         reusedRect = new(innerRectX + 150f, innerRectY + 356f, 71f, 22f);
 
-        if (OARO_WindowUtility.TextButtonImage(butRect: reusedRect,
+        if (OARO_UIUtility.TextButtonImage(butRect: reusedRect,
             label: "Cancel".Translate(),
             baseTex: smallButton,
             downTex: smallButton_Down,
@@ -75,7 +75,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
         }
 
         reusedRect = new(innerRectX + 290f, innerRectY + 356f, 71f, 22f);
-        if (OARO_WindowUtility.TextButtonImage(
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRect,
             label: "Confirm".Translate(),
             baseTex: smallButton,
@@ -95,7 +95,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
             }
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawRankBackGround(Rect inRect)

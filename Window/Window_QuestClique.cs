@@ -69,13 +69,13 @@ public class Window_QuestClique : OrderWindowBase
         float mainInnerX = mainInnerRect.xMin;
         float mainInnerY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
         }
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerY + 2f, 473f, 164f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, mainInnerY + 2f, 473f, 164f);
         GUI.DrawTexture(reusedRect, DemandTexture, ScaleMode.ScaleToFit);
 
         Text.Font = GameFont.Medium;
@@ -88,7 +88,7 @@ public class Window_QuestClique : OrderWindowBase
         Widgets.Label(reusedRect, MainBranch.NameColored);
 
         reusedRect = new(mainInnerRect.x + 770f, reusedRect.y, 92f, 24f);
-        if (OARO_WindowUtility.TextButtonImage(
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRect,
             label: "OARO_CliqueWin_OpenSquadWin".Translate(),
             baseTex: smallButton,
@@ -110,10 +110,10 @@ public class Window_QuestClique : OrderWindowBase
         }
 
 
-        Rect topRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerY + 168f, 1021f, 249f);
+        Rect topRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, mainInnerY + 168f, 1021f, 249f);
         DrawTopRect(topRect);
 
-        Rect bottomRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerY + 464f, 1021f, 249f);
+        Rect bottomRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, mainInnerY + 464f, 1021f, 249f);
         DrawBottomRect(bottomRect);
 
         Rect cornerRect = new(bottomRect.x, mainInnerY + 725f, 432f, 89f + 24f);
@@ -152,7 +152,7 @@ public class Window_QuestClique : OrderWindowBase
             Widgets.EndScrollView();
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawTopRect(Rect inRect)
@@ -203,7 +203,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawActiveClique(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawBottomRect(Rect inRect)
@@ -276,7 +276,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawInactiveClique_Normal(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawBottomRect_Branch(Rect inRect)
@@ -323,7 +323,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawInactiveClique_Branch(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawActiveClique(Rect inRect, QuestClique clique)
@@ -335,10 +335,10 @@ public class Window_QuestClique : OrderWindowBase
         Rect reusedRect = new(inRect.xMax - 274f, inRectY, 274f, inRectHeight);
         GUI.DrawTexture(reusedRect, potencyLace);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRectX + 12f, 24f, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRectX + 12f, 24f, 24f);
         if (clique.IsBranchClique)
         {
-            OARO_WindowUtility.DrawBranchIcon(reusedRect, clique.RelatedBranch, expand: false);
+            OARO_UIUtility.DrawBranchIcon(reusedRect, clique.RelatedBranch, expand: false);
         }
         else
         {
@@ -352,8 +352,8 @@ public class Window_QuestClique : OrderWindowBase
         Widgets.LabelFit(reusedRect, clique.Name);
         TooltipHandler.TipRegion(reusedRect, () => clique.Name, uniqueId: 55454031);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, reusedRect.xMax + 4f, 30f, 25f);
-        if (OARO_WindowUtility.TextButtonImage(
+        reusedRect = OARO_UIUtility.CenterRectOnY(inRect, reusedRect.xMax + 4f, 30f, 25f);
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRect,
             label: string.Empty,
             baseTex: OARO_IconLibrary.ellipsisButton,
@@ -371,7 +371,7 @@ public class Window_QuestClique : OrderWindowBase
         reusedRect = new(inRect.xMax - 110f, inRectY, 110f, inRectHeight);
         Widgets.Label(reusedRect, clique.Potency.ToStringPercent().Colorize(clique.Potency < 0f ? ColorLibrary.RedReadable : Color.green));
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawInactiveClique_Normal(Rect inRect, QuestClique clique)
@@ -383,7 +383,7 @@ public class Window_QuestClique : OrderWindowBase
         float topRectHeight = topRect.height;
         GUI.DrawTexture(topRect, OARO_IconLibrary.DarkTex);
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
         GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
 
         Text.WordWrap = false;
@@ -400,7 +400,7 @@ public class Window_QuestClique : OrderWindowBase
         Widgets.Label(reusedRect, clique.Potency.ToStringPercent());
 
         reusedRect = new(topRectX + 725f, topRectY, 90f, topRectHeight);
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, 20f, 20f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, reusedRect.y, 20f, 20f);
         if (clique.PreferredBuilding is not null)
         {
             if (MainBranch?.BuildingHandler.HasBuilding(clique.PreferredBuilding) ?? false)
@@ -413,15 +413,15 @@ public class Window_QuestClique : OrderWindowBase
             }
         }
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, topRect.xMax - 200f, 135f, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(topRect, topRect.xMax - 200f, 135f, 24f);
         Widgets.FillableBar(reusedRect, clique.Willingness, BaseContent.GreyTex);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, reusedRect.xMax + 8f, 60f, topRectHeight);
+        reusedRect = OARO_UIUtility.CenterRectOnY(topRect, reusedRect.xMax + 8f, 60f, topRectHeight);
         Widgets.Label(reusedRect, clique.Willingness.ToStringPercent());
 
         Rect bottom = new(inRect.xMin, topRect.yMax, inRect.width, 24f);
         reusedRect = new(bottom.xMax - 92f, bottom.yMin, 92f, bottom.height);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_CliqueWin_Active".Translate(),
             acceptance: clique.CanActiveNow(directly: false, mapRecommendationCount: MapRecommendationCount.Value, resultOnly: false),
@@ -433,7 +433,7 @@ public class Window_QuestClique : OrderWindowBase
         }
 
         reusedRect = new(reusedRect.xMin - 92f, bottom.yMin, 92f, bottom.height);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_CliqueWin_Bribe".Translate(),
             acceptance: clique.CanBribable(Map, resultOnly: false),
@@ -450,7 +450,7 @@ public class Window_QuestClique : OrderWindowBase
         }
 
         reusedRect = new(reusedRect.xMin - 92f, bottom.yMin, 92f, bottom.height);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_CliqueWin_Communicate".Translate(),
             acceptance: clique.CanCommunicable(resultOnly: false),
@@ -460,7 +460,7 @@ public class Window_QuestClique : OrderWindowBase
         {
             clique.Communicate(branch: CliquesManager.Branch, map: Map);
         }
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawInactiveClique_Branch(Rect inRect, QuestClique clique)
@@ -475,8 +475,8 @@ public class Window_QuestClique : OrderWindowBase
 
         GUI.DrawTexture(topRect, OARO_IconLibrary.DarkTex);
 
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
-        OARO_WindowUtility.DrawBranchIcon(reusedRect, clique.RelatedBranch, expand: false);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
+        OARO_UIUtility.DrawBranchIcon(reusedRect, clique.RelatedBranch, expand: false);
 
         Text.WordWrap = false;
         Text.Font = GameFont.Small;
@@ -484,8 +484,8 @@ public class Window_QuestClique : OrderWindowBase
         reusedRect = new(topRectX + 45f, topRectY, 180f - 45f, topRectHeight);
         Widgets.LabelFit(reusedRect, clique.Name);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, reusedRect.xMax + 4f, 20f, 32f);
-        if (OARO_WindowUtility.TextButtonImage(
+        reusedRect = OARO_UIUtility.CenterRectOnY(topRect, reusedRect.xMax + 4f, 20f, 32f);
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRect,
             label: string.Empty,
             baseTex: OARO_IconLibrary.ellipsisButton,
@@ -494,7 +494,7 @@ public class Window_QuestClique : OrderWindowBase
 
         }
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, reusedRect.xMax + 4f, 32f, 32f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(topRect, reusedRect.xMax + 4f, 32f, 32f);
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             GUI.DrawTexture(reusedRect, friendlyHeart);
@@ -520,7 +520,7 @@ public class Window_QuestClique : OrderWindowBase
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
         {
             reusedRect = new(topRect.xMax - 138f, topRectY, 138f, topRectHeight);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: "OARO_CliqueWin_Active".Translate(),
                 acceptance: clique.CanActiveNow(directly: false, mapRecommendationCount: MapRecommendationCount.Value, resultOnly: false),
@@ -535,14 +535,14 @@ public class Window_QuestClique : OrderWindowBase
         }
         else
         {
-            reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, topRect.xMax - 200f, 135f, 24f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(topRect, topRect.xMax - 200f, 135f, 24f);
             Widgets.FillableBar(reusedRect, clique.Willingness, BaseContent.GreyTex);
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, reusedRect.xMax + 8f, 60f, topRectHeight);
+            reusedRect = OARO_UIUtility.CenterRectOnY(topRect, reusedRect.xMax + 8f, 60f, topRectHeight);
             Widgets.Label(reusedRect, clique.Willingness.ToStringPercent());
             Rect bottom = new(inRect.xMin, topRect.yMax, inRect.width, 24f);
             reusedRect = new(bottom.xMax - 92f, bottom.yMin, 92f, bottom.height);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: "OARO_CliqueWin_Active".Translate(),
                 acceptance: clique.CanActiveNow(directly: false, mapRecommendationCount: MapRecommendationCount.Value, resultOnly: false),
@@ -554,7 +554,7 @@ public class Window_QuestClique : OrderWindowBase
             }
 
             reusedRect = new(reusedRect.xMin - 92f, bottom.yMin, 92f, bottom.height);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: "OARO_CliqueWin_Communicate".Translate(),
                 acceptance: clique.CanCommunicable(resultOnly: false),
@@ -566,7 +566,7 @@ public class Window_QuestClique : OrderWindowBase
             }
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawCornerRect(Rect inRect)
@@ -603,7 +603,7 @@ public class Window_QuestClique : OrderWindowBase
                 GUI.DrawTexture(rect, smallButton_Down);
                 Widgets.Label(rect, $"OARO_CliqueWin_Corner_{cornerType}".Translate());
             }
-            else if (OARO_WindowUtility.TextButtonImage(rect, $"OARO_CliqueWin_Corner_{cornerType}".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
+            else if (OARO_UIUtility.TextButtonImage(rect, $"OARO_CliqueWin_Corner_{cornerType}".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
             {
                 CornerShowType = cornerType;
             }

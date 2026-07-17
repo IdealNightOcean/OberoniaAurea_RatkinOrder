@@ -42,11 +42,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     public IReadOnlyList<ResidentPawn> ResidentColonists => residentColonists;
     private Dictionary<Pawn, ResidentPawn> residentColonistsDict = [];
 
-    private ResidentRoleManager roleManager;
-    public static ResidentRoleManager RoleManager => Instance?.roleManager;
-
-    private MentorshipManager mentorshipManager;
-    public static MentorshipManager MentorshipManager => Instance?.mentorshipManager;
 
     private readonly ResidentPawnsCacheManager cacheManager;
     public static ResidentPawnsCacheManager CacheManager => Instance?.cacheManager;
@@ -54,7 +49,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
     private readonly TagStrToInt effectTags;
     public static TagStrToInt EffectTags => Instance?.effectTags;
 
-    internal ResidentPawnsManager(bool initCtor)
+    internal ResidentPawnsManager()
     {
         OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
         Instance = this;
@@ -62,32 +57,17 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
         cacheManager = new(this);
         effectTags = new(defaultValue: 0, removeWhenDefault: true);
-
-        if (initCtor)
-        {
-            EnsureComponentsInit();
-        }
     }
 
     public static void ClearStaticCache() => Instance = null;
-
-    private void EnsureComponentsInit()
-    {
-        roleManager ??= new ResidentRoleManager(this);
-        mentorshipManager ??= new MentorshipManager(this);
-    }
 
     public void ExposeData()
     {
         Scribe_Collections.Look(ref residentColonists, nameof(residentColonists), LookMode.Deep);
         Scribe_Collections.Look(ref residentKnights, nameof(residentKnights), LookMode.Deep);
 
-        Scribe_Deep.Look(ref roleManager, nameof(roleManager), ctorArgs: this);
-        Scribe_Deep.Look(ref mentorshipManager, nameof(mentorshipManager), ctorArgs: this);
-
         if (Scribe.mode == LoadSaveMode.PostLoadInit)
         {
-            EnsureComponentsInit();
             if (residentColonists.RemoveAll(r => r is null || r.CurState == ResidentPawnState.ForceRemove) > 0)
                 Log.Error($"[OARO] {nameof(ResidentPawnsManager)} 的部分常驻殖民者记录在加载后为null或无效，已被移除。");
 
@@ -120,7 +100,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
         }
 
         listing_Rect.Gap(12f);
-        roleManager.DrawDevWindow(listing_Rect);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -219,7 +198,6 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
             if (dailyCheck)
             {
                 DailyKnightsVirtueCheck();
-                mentorshipManager.TickDay();
             }
         }
     }
@@ -378,21 +356,20 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
             return false;
         }
         residentColonists.Remove(residentPawn);
-        mentorshipManager.RemoveStudent(residentPawn);
+        MentorshipManager.Instance.Notify_ResidentPawnRemoved(residentPawn);
         return true;
     }
 
-    private bool DeregisterKnightDirectly(ResidentKnight residentKnight, ResidentKnightRemovalReason reason)
+    private bool DeregisterKnightDirectly(ResidentKnight knight, ResidentKnightRemovalReason reason)
     {
-        if (!residentKnightsDict.Remove(residentKnight.Pawn))
+        if (!residentKnightsDict.Remove(knight.Pawn))
             return false;
 
-        residentKnights.Remove(residentKnight);
-        roleManager.OnResidentKnightDeregistered(residentKnight, reason);
-        mentorshipManager.RemoveTeacher(residentKnight);
-        mentorshipManager.RemoveStudent(residentKnight);
+        residentKnights.Remove(knight);
+        ResidentRoleManager.Instance.Notify_ResidentKnightRemoved(knight);
+        MentorshipManager.Instance.Notify_ResidentKnightRemoved(knight);
 
-        residentKnight.PostRemoved(reason);
+        knight.PostRemoved(reason);
         OnKnightsChanged();
         return true;
     }

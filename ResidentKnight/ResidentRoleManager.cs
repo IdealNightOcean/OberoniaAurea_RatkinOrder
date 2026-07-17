@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -12,7 +13,9 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class ResidentRoleManager : IExposable
 {
-    private ResidentPawnsManager Parent { get; }
+    public static ResidentRoleManager Instance { get; private set; }
+
+    private readonly int tickHashOffset;
 
     private Dictionary<ResidentKnightRoleDef, ResidentKnight> rolesToKnights = [];
     public IReadOnlyDictionary<ResidentKnightRoleDef, ResidentKnight> RolesToKnights => rolesToKnights;
@@ -20,10 +23,15 @@ public class ResidentRoleManager : IExposable
     private HediffStageModifierBuilder BuffStageTemplate { get; } = new();
     private int nextBuffStageForceRefreshTick;
 
-    public ResidentRoleManager(ResidentPawnsManager parent)
+    public ResidentRoleManager()
     {
-        Parent = parent;
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(ResidentRoleManager));
+        Instance = this;
+
+        tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
     }
+    public static void ClearStaticCache() => Instance = null;
+
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool TryGetKnightOfRole(ResidentKnightRoleDef roleDef, out ResidentKnight record) => rolesToKnights.TryGetValue(roleDef, out record);
@@ -36,15 +44,6 @@ public class ResidentRoleManager : IExposable
             return true;
         }
         return false;
-    }
-
-    public void OnResidentKnightDeregistered(ResidentKnight record, ResidentKnightRemovalReason reason)
-    {
-        if (record.CurRole is not null)
-        {
-            RemoveResidentKnightRole(record.CurRole);
-            BuffStageTemplate.MarkInvalid();
-        }
     }
 
     /// <summary>
@@ -60,11 +59,20 @@ public class ResidentRoleManager : IExposable
         return BuffStageTemplate.BuildNewHediffStage();
     }
 
-    public void TickDay()
+    public void Tick()
     {
-        if (Find.TickManager.TicksGame > nextBuffStageForceRefreshTick)
+        if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
         {
             nextBuffStageForceRefreshTick = Find.TickManager.TicksGame + 60000;
+            BuffStageTemplate.MarkInvalid();
+        }
+    }
+
+    public void Notify_ResidentKnightRemoved(ResidentKnight knight)
+    {
+        if (knight.CurRole is not null)
+        {
+            RemoveResidentKnightRole(knight.CurRole);
             BuffStageTemplate.MarkInvalid();
         }
     }
@@ -157,7 +165,7 @@ public class ResidentRoleManager : IExposable
     {
         BuffStageTemplate.ResetTemplate();
 
-        int lawOrderKnightsCount = Parent.ResidentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_LawOrder).Count();
+        int lawOrderKnightsCount = ResidentPawnsManager.Instance.ResidentKnights.Where(r => r?.Branch?.HonorDef == OARO_ModDefOf.OARO_Honor_LawOrder).Count();
         if (lawOrderKnightsCount > 0)
         {
             BuffStageTemplate.AddOffset(StatDefOf.GlobalLearningFactor, Mathf.Min(lawOrderKnightsCount * 0.12f, 0.6f));

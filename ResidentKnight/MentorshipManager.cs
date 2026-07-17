@@ -11,16 +11,23 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class MentorshipManager : IExposable
 {
-    private ResidentPawnsManager Parent { get; }
     public const int MaxStudentsPerKnight = 2;
+
+    public static MentorshipManager Instance { get; private set; }
+
+    private readonly int tickHashOffset;
 
     [Unsaved] private Dictionary<ResidentPawn, HashSet<ResidentKnight>> studentsToTeachers = [];
     [Unsaved] private Dictionary<ResidentKnight, HashSet<ResidentPawn>> teachersToStudents = [];
 
-    public MentorshipManager(ResidentPawnsManager parent)
+    public MentorshipManager()
     {
-        Parent = parent;
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(ResidentRoleManager));
+        Instance = this;
+
+        tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
     }
+    public static void ClearStaticCache() => Instance = null;
 
     public void ExposeData()
     {
@@ -160,9 +167,23 @@ public class MentorshipManager : IExposable
         return false;
     }
 
-    public void TickDay()
+    public void Tick()
     {
-        CheckMentorshipVirtueAcquisition();
+        if (TickUtility.IsHashIntervalTick(tickHashOffset, 60000))
+        {
+            CheckMentorshipVirtueAcquisition();
+        }
+    }
+
+    public void Notify_ResidentKnightRemoved(ResidentKnight knight)
+    {
+        RemoveTeacher(knight);
+        RemoveStudent(knight);
+    }
+
+    public void Notify_ResidentPawnRemoved(ResidentPawn residentPawn)
+    {
+        RemoveStudent(residentPawn);
     }
 
     /// <summary>

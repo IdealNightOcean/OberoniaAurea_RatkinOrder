@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OberoniaAurea.RatkinOrder.Window;
+﻿namespace OberoniaAurea.RatkinOrder.UI;
 
 
-public class UICache_KnightAcademic: UICacheBase
+public class UICache_KnightAcademic : UICacheBase
 {
     public ResidentKnight Knight { get; }
     public KnightAcademicDef Academic { get; }

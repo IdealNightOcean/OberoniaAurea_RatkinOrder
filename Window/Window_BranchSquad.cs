@@ -82,7 +82,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     public override void DoWindowContents(Rect inRect)
     {
-        Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1544f, 901f);
+        Rect mainRect = OARO_UIUtility.CenterRect(inRect, 1544f, 901f);
         GUI.DrawTexture(mainRect, mainBackground);
 
         Rect mainInnerRect = mainRect.ContractedBy(3f);
@@ -91,12 +91,12 @@ public class Window_BranchSquad : OrderWindowBase
         float areaRectY = mainInnerRectY + 205f;
         float areaRectHeight = 657f;
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
         }
-        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawBackArrow_Corner(mainInnerRect))
         {
             Window_RatkinOrder ratkinOrderWin = new(Map);
             ratkinOrderWin.SelectRatkinOrder(RatkinOrder);
@@ -106,14 +106,14 @@ public class Window_BranchSquad : OrderWindowBase
         }
 
         //顶部缎带
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1567f, 136f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 4f, 1567f, 136f);
         GUI.DrawTexture(reusedRect, topRibbon);
 
         //顶部标题框
-        reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 12f, 322f, 90f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 12f, 322f, 90f);
         GUI.DrawTexture(reusedRect, topTitleground);
 
-        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 128f, 64f);
+        reusedRect = OARO_UIUtility.CenterRect(reusedRect, 128f, 64f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
         Widgets.Label(reusedRect, "OARO_SquadWin_SquadWindowTitle".Translate());
@@ -121,14 +121,14 @@ public class Window_BranchSquad : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
 
         //分部名称
-        reusedRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 150f, 322f, 48f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 150f, 322f, 48f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
         Widgets.Label(reusedRect, SelSquadInfo.SquadName);
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
-        Rect middleRect = OARO_WindowUtility.CenterRectOnX(mainInnerRect, areaRectY, 583f, areaRectHeight);
+        Rect middleRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, areaRectY, 583f, areaRectHeight);
         DrawMiddleRect(middleRect);
         if (HasClosed)
         {
@@ -136,20 +136,20 @@ public class Window_BranchSquad : OrderWindowBase
         }
 
         //左|中分界线
-        reusedRect = OARO_WindowUtility.CenterRectOnY(middleRect, middleRect.x - (32f + 2f), 2f, 717f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(middleRect, middleRect.x - (32f + 2f), 2f, 717f);
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
         Rect leftRect = new(reusedRect.xMin - (12f + 415f), areaRectY, 415f, areaRectHeight);
         DrawLeftRect(leftRect);
 
         //中|右分界线
-        reusedRect = OARO_WindowUtility.CenterRectOnY(middleRect, middleRect.xMax + 32f, 2f, 717f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(middleRect, middleRect.xMax + 32f, 2f, 717f);
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
 
         Rect rightRect = new(reusedRect.xMax + 32f, areaRectY, 352f, areaRectHeight);
         //小队科技
-        reusedRect = OARO_WindowUtility.CenterRectOnX(rightRect, mainInnerRectY + 150f, 322f, 48f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(rightRect, mainInnerRectY + 150f, 322f, 48f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
         Widgets.Label(reusedRect, "OARO_SquadWin_SquadTech".Translate());
@@ -174,19 +174,19 @@ public class Window_BranchSquad : OrderWindowBase
         Rect reusedRect;
 
         //名称|内容分割线
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY, 579f, 2f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRectY, 579f, 2f);
         GUI.DrawTexture(reusedRect, middleCuttingLine);
 
         reusedRect = new(inRectX, reusedRect.yMax + 10f, 23f, 32f);
         GUI.DrawTexture(reusedRect, branchBaseSiteIcon);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 12f, 88f, 48f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 12f, 88f, 48f);
         Text.Anchor = TextAnchor.MiddleLeft;
         Widgets.Label(reusedRect, SelSquadInfo.BaseSiteName);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OAFrame_LookOver".Translate(),
             baseTex: middleCheckButton,
@@ -203,7 +203,7 @@ public class Window_BranchSquad : OrderWindowBase
         }
 
         Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRect.xMax - 192f, 192f, 32f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, inRect.xMax - 192f, 192f, 32f);
         if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, "OARO_SquadWin_SiteDistance".Translate(SelSquadInfo.Distance.ToString("F0"))
@@ -224,7 +224,7 @@ public class Window_BranchSquad : OrderWindowBase
         bool selIsHonor = honorDef is not null && SelBranch.IsBranchOfType(BranchType.Honor);
 
         //上部左侧颜色条
-        reusedRect = OARO_WindowUtility.CenterRectOnY(upInnerRect, upInnerRect.x, 6f, 144f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(upInnerRect, upInnerRect.x, 6f, 144f);
         if (selIsHonor)
         {
             GUI.DrawTexture(reusedRect, honorDef.HonorColorTex);
@@ -232,19 +232,17 @@ public class Window_BranchSquad : OrderWindowBase
 
         //上部左侧部分
         Rect areaRect = new(reusedRect.xMax, upInnerRect.y, 245f, upInnerRect.height);
-        reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.x, 240f, areaRect.height - 5f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(areaRect, areaRect.x, 240f, areaRect.height - 5f);
         if (selIsHonor)
         {
             KnightChivalryDef honorChivalry = honorDef.chivalry;
             if (honorChivalry?.medal is not null)
             {
-                Material tintMat = OARO_WindowUtility.GetTintMaterial(honorDef.color, Texture2D.redTexture);
-                GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.HonorBackgroundTex, tintMat);
-
-                reusedRect = OARO_WindowUtility.CenterRect(areaRect, 230f, 130f);
+                OAFrame_UIUtility.DrawTextureWithColor(areaRect, OARO_IconLibrary.HonorBackgroundTex, honorDef.color);
+                reusedRect = OARO_UIUtility.CenterRect(areaRect, 230f, 130f);
                 GUI.DrawTexture(reusedRect, honorChivalry.medal.honorDecorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
             }
-            reusedRect = OARO_WindowUtility.CenterRect(areaRect, 170f, 96f);
+            reusedRect = OARO_UIUtility.CenterRect(areaRect, 170f, 96f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.ExpandedTexture, ScaleMode.ScaleToFit);
 
             Text.Font = GameFont.Medium;
@@ -254,7 +252,7 @@ public class Window_BranchSquad : OrderWindowBase
         }
         else
         {
-            reusedRect = OARO_WindowUtility.CenterRect(areaRect, 62f, 68f);
+            reusedRect = OARO_UIUtility.CenterRect(areaRect, 62f, 68f);
             GUI.DrawTexture(reusedRect, OARO_IconLibrary.BigGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
 
@@ -263,7 +261,7 @@ public class Window_BranchSquad : OrderWindowBase
         DrawMedalRect(areaRect);
 
         //上部丝带
-        areaRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 70f, 629f, 101f);
+        areaRect = OARO_UIUtility.CenterRectOnX(inRect, inRectY + 70f, 629f, 101f);
         GUI.DrawTexture(areaRect, middleUpRibbon);
 
         //中部
@@ -286,7 +284,7 @@ public class Window_BranchSquad : OrderWindowBase
         float friendlyProcess;
         TaggedString friendlyExpireDate;
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 43f, 51f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 43f, 51f);
         if (SelBranch?.IsBranchOfType(BranchType.Friendly) ?? false)
         {
             GUI.DrawTexture(reusedRect, OARO_IconLibrary.BigFriendlyIcon, ScaleMode.ScaleToFit);
@@ -308,7 +306,7 @@ public class Window_BranchSquad : OrderWindowBase
         Text.Font = GameFont.Medium;
         Widgets.Label(reusedRect, relation);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
         Widgets.FillableBar(reusedRect, friendlyProcess, OARO_IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
 
         reusedRect = new(reusedRect.x, reusedRect.yMax + 4f, 120f, 32f);
@@ -325,7 +323,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect.xMin = reusedRect.xMax + 8f;
         reusedRect.xMax = areaRect.xMax - 2f;
-        if (OARO_WindowUtility.TextButtonImageDisableable(butRect: reusedRect,
+        if (OARO_UIUtility.TextButtonImageDisableable(butRect: reusedRect,
                                                           label: "OARO_SquadWin_ClickToAdd".Translate(),
                                                           baseTex: middleClickToAddButton,
                                                           downTex: middleClickToAddButton_Down,
@@ -347,33 +345,33 @@ public class Window_BranchSquad : OrderWindowBase
             switch (SelBranch.Supply)
             {
                 case < 0.2f:
-                    reusedRect = OARO_WindowUtility.CenterRectOnX(areaRect, reusedRect.yMax + 26f, 20f, 19f);
+                    reusedRect = OARO_UIUtility.CenterRectOnX(areaRect, reusedRect.yMax + 26f, 20f, 19f);
                     GUI.DrawTexture(reusedRect, branchSupplyLack);
                     break;
 
                 case < 0.8f:
-                    reusedRect = OARO_WindowUtility.CenterRectOnX(areaRect, reusedRect.yMax + 6f, 62f, 39f);
+                    reusedRect = OARO_UIUtility.CenterRectOnX(areaRect, reusedRect.yMax + 6f, 62f, 39f);
                     GUI.DrawTexture(reusedRect, branchSupplyJust);
                     break;
 
                 default:
-                    reusedRect = OARO_WindowUtility.CenterRectOnX(areaRect, reusedRect.yMax + 6f, 104f, 39f);
+                    reusedRect = OARO_UIUtility.CenterRectOnX(areaRect, reusedRect.yMax + 6f, 104f, 39f);
                     GUI.DrawTexture(reusedRect, branchSupplyEnough);
                     break;
             }
-            reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
+            reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
             Widgets.Label(reusedRect, (SelBranch.SupplyState + "   " + SelBranch.Supply.ToStringPercent("F0")));
             TooltipHandler.TipRegion(reusedRect, () => SupplyRecoveryRateExplanation.Value, uniqueId: 61486431);
         }
         else
         {
-            reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
+            reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, areaRect.yMax - (24f + 2f), 128f, 24f);
             Widgets.Label(reusedRect, "--   --%");
         }
 
         //中部中下区域
         areaRect = new(areaRect.x, middleInnerRect.yMax - middleBottomHeight, 128f, middleBottomHeight);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: areaRect,
             label: string.Empty,
             acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapSilverToSupply),
@@ -413,7 +411,7 @@ public class Window_BranchSquad : OrderWindowBase
         GUI.DrawTexture(reusedRect, middleMemberIcon);
 
         Text.Anchor = TextAnchor.MiddleRight;
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 141f, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 141f, 24f);
         TooltipHandler.TipRegion(reusedRect, () => "OARO_SquadWin_MemberCountTip".Translate(), uniqueId: 10104735);
 
         if (SelBranch.IsValid())
@@ -437,7 +435,7 @@ public class Window_BranchSquad : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(areaRect.x, areaRect.yMax - 39f, 186f, 39f);
 
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: string.Empty,
             acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_MapRecommendationToKnight, fallback: false),
@@ -464,9 +462,9 @@ public class Window_BranchSquad : OrderWindowBase
                     historical: false);
             }
         }
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 50f, 26f, 23f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, areaRect.x + 50f, 26f, 23f);
         GUI.DrawTexture(reusedRect, OARO_IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 6f, 64f, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 6f, 64f, 24f);
         Widgets.Label(reusedRect, BranchInteractionDefOf.OARO_MapRecommendationToKnight.label);
 
         //中部右下区域
@@ -476,10 +474,10 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_SquadWin_IncludeCommander".Translate());
         TooltipHandler.TipRegion(reusedRect, () => "OARO_SquadWin_IncludeCommanderTip".Translate(), uniqueId: 83834779);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, reusedRect.xMax + 10f, 29f, 27f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(areaRect, reusedRect.xMax + 10f, 29f, 27f);
         GUI.DrawTexture(reusedRect, middleCommanderIcon);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(areaRect, areaRect.xMax - 54f, 50f, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(areaRect, areaRect.xMax - 54f, 50f, 24f);
         if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, "OARO_FilledTotalFormatPeople".Translate(SelBranch.Squad.CommanderCountInt, SelSquadInfo.CommanderCeiling));
@@ -502,7 +500,7 @@ public class Window_BranchSquad : OrderWindowBase
         Color stateColor = Color.white;
         if (SelBranch.IsValid())
         {
-            OARO_WindowUtility.DrawBranchStateIcon(reusedRect, SelBranch, expand: true);
+            OARO_UIUtility.DrawBranchStateIcon(reusedRect, SelBranch, expand: true);
             stateColor = SelBranch.CurWorkState switch
             {
                 WorkStateType.Idle => Color.cyan,
@@ -513,9 +511,9 @@ public class Window_BranchSquad : OrderWindowBase
             };
         }
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 95f, 20f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 4f, 95f, 20f);
         Widgets.Label(reusedRect, "OARO_BranchWorkState".Translate());
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 16f, 95f, 20f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 16f, 95f, 20f);
         if (SelBranch.IsValid())
         {
             Widgets.Label(reusedRect, SelBranch.CurWorkStateDesc.Colorize(stateColor));
@@ -542,7 +540,7 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, BranchInteractionDefOf.OARO_RequestCombatReadiness.label);
 
         reusedRect = new(areaRect.x + 97f, areaRect.yMax - 37f, 98f, 37f);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: string.Empty,
             acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_RequestCombatReadiness, fallback: false),
@@ -570,7 +568,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
         }
 
-        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 29f, 29f);
+        reusedRect = OARO_UIUtility.CenterRect(reusedRect, 29f, 29f);
         GUI.DrawTexture(reusedRect, middleCombatReadinessButton_Icon);
 
         areaRect = new(areaRect.xMax + 2f, areaRect.y, 380f, areaRect.height);
@@ -591,7 +589,7 @@ public class Window_BranchSquad : OrderWindowBase
         if (hasSupportAuthority)
         {
             Widgets.Label(reusedRect, "OARO_Unlocked".Translate());
-            reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 227f, 11f);
+            reusedRect = OARO_UIUtility.CenterRect(reusedRect, 227f, 11f);
             GUI.DrawTexture(reusedRect, middleSupportLockLine);
         }
 
@@ -611,8 +609,8 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect.xMin = reusedRect.xMax;
         reusedRect.xMax += 140f;
 
-        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        reusedRect = OARO_UIUtility.CenterRect(reusedRect, 95f, 36f);
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_SquadWin_BombardSupport".Translate(),
             baseTex: middleSupportButton,
@@ -634,9 +632,9 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect.xMax = areaRect.xMax;
         reusedRect.xMin = areaRect.xMax - 140f;
-        reusedRect = OARO_WindowUtility.CenterRect(reusedRect, 95f, 36f);
+        reusedRect = OARO_UIUtility.CenterRect(reusedRect, 95f, 36f);
 
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_SquadWin_MilitarySupport".Translate(),
             baseTex: middleSupportButton,
@@ -653,7 +651,7 @@ public class Window_BranchSquad : OrderWindowBase
             GUI.DrawTexture(reusedRect, middleLockShade, ScaleMode.StretchToFill, alphaBlend: true);
 
             reusedRect = new(areaRect.x, supportOptRect.yMax, areaRect.width, 38f);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: string.Empty,
                 acceptance: InteractionAcceptances.Value.GetWithFallback(BranchInteractionDefOf.OARO_UnlockSupportAuthority),
@@ -681,7 +679,7 @@ public class Window_BranchSquad : OrderWindowBase
                 }
             }
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, areaRect.x + 148f, 26f, 24f);
             GUI.DrawTexture(reusedRect, OARO_IconLibrary.RecommendationIcon, ScaleMode.ScaleToFit);
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(reusedRect.xMax + 4f, reusedRect.y, 90f, 24f);
@@ -701,7 +699,7 @@ public class Window_BranchSquad : OrderWindowBase
         }
 
         //上侧勋章柱框
-        Rect reusedRect = OARO_WindowUtility.CenterRect(inRect, 300f, 112f);
+        Rect reusedRect = OARO_UIUtility.CenterRect(inRect, 300f, 112f);
         GUI.DrawTexture(reusedRect, middleUpPeristele);
 
         Text.Font = GameFont.Medium;
@@ -711,7 +709,7 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_SquadWin_MedalWall".Translate());
 
         //分部勋章
-        Rect medalOutRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.yMin + 36f, 200f, 95f);
+        Rect medalOutRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.yMin + 36f, 200f, 95f);
         float entryX = medalOutRect.x;
         float entryY = medalOutRect.y;
         float entryWidth = 90f;
@@ -794,7 +792,7 @@ public class Window_BranchSquad : OrderWindowBase
         areaRect.xMin += 8f;
         areaRect.xMax -= 80f;
 
-        Rect iconRect = OARO_WindowUtility.CenterRect(areaRect, 28f * 6, 28f);
+        Rect iconRect = OARO_UIUtility.CenterRect(areaRect, 28f * 6, 28f);
 
         float shellX = iconRect.x;
         float shellY = iconRect.y;
@@ -882,7 +880,7 @@ public class Window_BranchSquad : OrderWindowBase
         Rect reusedRect;
 
         //名称|内容分割线
-        reusedRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY, 347f, 3f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRectY, 347f, 3f);
         GUI.DrawTexture(reusedRect, rightCuttingLine);
 
         reusedRect = new(inRectX + 30f, reusedRect.yMax + 10f, 35f, 24f);
@@ -890,11 +888,11 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect = new(inRect.xMax - 64f, reusedRect.y, 58f, 24f);
         Text.Anchor = TextAnchor.LowerRight;
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount.Value);
+        OARO_UIUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount.Value);
 
         Text.Anchor = TextAnchor.MiddleCenter;
 
-        Rect mainRect = OARO_WindowUtility.CenterRectOnX(inRect, inRectY + 45f, 352f, 597f);
+        Rect mainRect = OARO_UIUtility.CenterRectOnX(inRect, inRectY + 45f, 352f, 597f);
         GUI.DrawTexture(mainRect, rightBackground);
         mainRect = mainRect.ContractedBy(2f);
 
@@ -919,7 +917,7 @@ public class Window_BranchSquad : OrderWindowBase
             }
         }
 
-        OARO_WindowUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
+        OARO_UIUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
         if (Mouse.IsOver(inRect))
         {
             Widgets.DrawHighlight(inRect);
@@ -1163,7 +1161,7 @@ public class Window_BranchSquad : OrderWindowBase
     protected override void SetInitialSizeAndPosition()
     {
         Vector2 initialSize = InitialSize;
-        windowRect = new Rect((UI.screenWidth - initialSize.x) / 2f, (UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
+        windowRect = new Rect((Verse.UI.screenWidth - initialSize.x) / 2f, (Verse.UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
         windowRect = windowRect.Rounded();
     }
 

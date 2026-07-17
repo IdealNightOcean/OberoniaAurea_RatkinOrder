@@ -49,7 +49,7 @@ public class BranchInteractionWorker_TravelRatkinTraderGroup(BranchInteractionDe
         };
 
         OAFrame_MiscUtility.AddNewQueuedIncident(incidentDef, delayTicks: 3 * 60000, incidentParms);
-        Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
+        Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
             (
                 text: "OARO_BranchInteraction_TravelRatkinTraderGroup".Translate(
                     parms.Branch.NameColored.Named(OARO_KeyLibrary_FormatArgName.BranchName),

@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -49,12 +50,12 @@ public class Window_BranchList : OrderWindowBase
 
         Rect mainInnerRect = mainRect.ContractedBy(2f);
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
         }
-        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawBackArrow_Corner(mainInnerRect))
         {
             Window_RatkinOrder ratkinOrderWin = new(Map);
             Find.WindowStack.Add(ratkinOrderWin);
@@ -62,7 +63,7 @@ public class Window_BranchList : OrderWindowBase
             return;
         }
 
-        Rect listViewRect = OARO_WindowUtility.CenterRect(mainInnerRect, 641f, 585f);
+        Rect listViewRect = OARO_UIUtility.CenterRect(mainInnerRect, 641f, 585f);
         Rect listOutRect = listViewRect;
         listOutRect.xMax += 16f;
 
@@ -82,7 +83,7 @@ public class Window_BranchList : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DarwBranchEntry(Rect inRect, BranchSummaryUICache branchSummary)
@@ -96,8 +97,7 @@ public class Window_BranchList : OrderWindowBase
         Branch branch = branchSummary.Branch;
         if (branch.HonorDef is not null)
         {
-            Material tintMat = OARO_WindowUtility.GetTintMaterial(branch.HonorDef.color, Texture2D.redTexture);
-            GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.HonorBackgroundTex, tintMat);
+            OAFrame_UIUtility.DrawTextureWithColor(reusedRect, OARO_IconLibrary.HonorBackgroundTex, branch.HonorDef.color);
         }
 
         reusedRect.xMin += 12f;
@@ -106,8 +106,8 @@ public class Window_BranchList : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleLeft;
         Rect reusedRectII = reusedRect.TopHalf();
         Widgets.Label(reusedRectII, branch.NameColored);
-        reusedRectII = OARO_WindowUtility.CenterRectOnY(reusedRectII, reusedRect.xMax - 30f, 30f, 25f);
-        if (OARO_WindowUtility.TextButtonImage(
+        reusedRectII = OARO_UIUtility.CenterRectOnY(reusedRectII, reusedRect.xMax - 30f, 30f, 25f);
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRectII,
             label: string.Empty,
             baseTex: OARO_IconLibrary.ellipsisButton,
@@ -141,7 +141,7 @@ public class Window_BranchList : OrderWindowBase
         Widgets.Label(reusedRect, branch.PopulationHandler.PublicSecurityLabel);
 
         reusedRect = new(bottomRect.xMax - 137f, bottomRect.y, 137f, bottomRect.height);
-        if (OARO_WindowUtility.TextButtonImage(
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRect,
             label: "OARO_BranchListWin_OpenSquadWin".Translate(),
             baseTex: squadButton,
@@ -165,7 +165,7 @@ public class Window_BranchList : OrderWindowBase
             DrawBranchInfo(reusedRect, branchSummary);
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawBranchInfo(Rect inRect, BranchSummaryUICache branchSummary)
@@ -187,7 +187,7 @@ public class Window_BranchList : OrderWindowBase
         Widgets.Label(reusedRect.TopHalf(), "OARO_BranchListWin_Distance".Translate());
         Widgets.Label(reusedRect.BottomHalf(), branchSummary.Distance.ToString("F0").Colorize(branchSummary.IsInAffectedRange ? Color.green : Color.white));
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawBranchConstruct(Rect inRect, BranchSummaryUICache branchSummary)
@@ -217,7 +217,7 @@ public class Window_BranchList : OrderWindowBase
         }
         else
         {
-            Rect iconRect = OARO_WindowUtility.CenterRect(reusedRect, 55f, 50f);
+            Rect iconRect = OARO_UIUtility.CenterRect(reusedRect, 55f, 50f);
             GUI.DrawTexture(iconRect, primaryReserve.Target.iconTexture.Texture);
 
             Text.Font = GameFont.Tiny;
@@ -236,7 +236,7 @@ public class Window_BranchList : OrderWindowBase
         reusedRect = new(inRect.xMax - thirdWidth, inRect.y, thirdWidth, inRect.height);
         Widgets.Label(reusedRect.TopHalf(), "No.2");
         Text.Font = GameFont.Small;
-        if (OARO_WindowUtility.TextButtonImage(
+        if (OARO_UIUtility.TextButtonImage(
             butRect: reusedRect.BottomHalf(),
             label: string.Empty,
             baseTex: reserveButton,
@@ -247,7 +247,7 @@ public class Window_BranchList : OrderWindowBase
 
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_MainBackground");

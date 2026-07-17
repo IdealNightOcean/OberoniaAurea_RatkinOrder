@@ -81,12 +81,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     {
         GUI.DrawTexture(inRect, mainBackground);
 
-        Rect mainRect = OARO_WindowUtility.CenterRect(inRect, 1308f, 695f);
+        Rect mainRect = OARO_UIUtility.CenterRect(inRect, 1308f, 695f);
         Rect mainInnerRect = mainRect.ContractedBy(2f);
         float mainInnerX = mainInnerRect.xMin;
         float mainInnerY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
@@ -101,7 +101,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         Rect academicInfoRect = Rect.MinMaxRect(pawnRect.xMax, mainRect.yMin, mainRect.xMax, mainRect.yMax);
         DarwAcademicInfo(academicInfoRect);
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DarwPawnInfo(Rect inRect)
@@ -110,24 +110,24 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         float innerX = innerRect.xMin;
         float innerY = innerRect.yMin;
         float innerWidth = innerRect.width;
-        Rect reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 20f, 75f, 75f);
+        Rect reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 20f, 75f, 75f);
         GUI.DrawTexture(reusedRect, PortraitsCache.Get(Knight.Pawn, reusedRect.size, Rot4.South));
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, reusedRect.yMax + 8f, innerWidth, 20f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, reusedRect.yMax + 8f, innerWidth, 20f);
         Widgets.Label(reusedRect, Knight.Pawn.NameShortColored);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 125f, 114f, 41f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 125f, 114f, 41f);
         DrawRankBackGround(reusedRect);
         Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{Knight.CurRank}Knight".Translate());
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 190f, innerWidth, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 190f, innerWidth, 24f);
         Widgets.Label(reusedRect, "OARO_MeditationPoints".Translate(Knight.MeditationPoints.ToString("F0").Named(KeyLibrary_FormatArgName.Count)));
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, reusedRect.yMax, innerWidth, 24f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, reusedRect.yMax, innerWidth, 24f);
         Widgets.Label(reusedRect, "OARO_NoAdditionalCostAcademicCeilingInfo".Translate(AcademicHandler.TotalAcademicLevel.Value, NoAdditionalCostAcademicCeiling));
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DarwAcademicList(Rect inRect)
@@ -150,7 +150,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             DarwAcademic(entryRect, def, activateBySelf);
         }
         Widgets.EndScrollView();
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DarwAcademic(Rect inRect, KnightAcademicDef def, bool activateBySelf)
@@ -180,7 +180,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         if (def.chivalry.IsSameDefNonNullable(Knight.Chivalry))
         {
-            reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 4f, 20f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.xMin + 4f, 20f, 20f);
             GUI.DrawTexture(reusedRect, OARO_IconLibrary.StarWhite);
             TooltipHandler.TipRegion(inRect, () => "OARO_ResidentAcademic_ResonateChivalry".Translate(), uniqueId: 3256725);
         }
@@ -211,7 +211,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         Rect reusedRect = new(innerX + 24f, innerY, innerRect.width, 32f);
         Widgets.Label(reusedRect, SelAcademicDef.LabelCap.Colorize(CheckAcademicColor));
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 180f, 968f, 198f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 180f, 968f, 198f);
         GUI.DrawTexture(reusedRect, stageBackground);
 
         Rect stageOutRect = reusedRect.ContractedBy(2f);
@@ -236,7 +236,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         if (CheckAcademicStage is null)
         {
-            OARO_WindowUtility.ResetText();
+            OAFrame_UIUtility.ResetText();
             return;
         }
 
@@ -261,8 +261,8 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                 label: "OARO_MeditationPointsSuffix".Translate(MeditationPointForSelAcademicUpgrade.ToString("F0").Named(KeyLibrary_FormatArgName.Count))
                                                     .Colorize(NoAdditionalCostAcademicCeiling < AcademicHandler.TotalAcademicLevel.Value ? ColorLibrary.RedReadable : Color.white));
 
-            reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 32f, 196f, 54f);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, reusedRect.yMax + 32f, 196f, 54f);
+            if (OARO_UIUtility.TextButtonImageDisableable(
                  butRect: reusedRect,
                  label: "OARO_Unlock".Translate(),
                  acceptance: CheckAcademicStageAcceptance,
@@ -316,7 +316,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             Widgets.Label(reusedRect, stageUnlockLabel);
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawAcademicStage(Rect inRect, int stageIndex)
@@ -348,13 +348,13 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         Widgets.Label(reusedRect, stage.label.CapitalizeFirst().Colorize(active ? Color.white : Color.gray));
 
         Text.Anchor = TextAnchor.UpperCenter;
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 65f, 190f, 45f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 65f, 190f, 45f);
         Widgets.Label(reusedRect, stage.shortDescription.CapitalizeFirst().Colorize(active ? Color.green : Color.gray));
 
 
-        reusedRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 120f, 30f, 25f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 120f, 30f, 25f);
 
-        Rect selectBoxRect = OARO_WindowUtility.CenterRectOnX(innerRect, innerY + 155f, 20f, 20f);
+        Rect selectBoxRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 155f, 20f, 20f);
 
         reusedRect = selectBoxRect.ContractedBy(2f);
         GUI.DrawTexture(reusedRect, BaseContent.BlackTex);
@@ -366,7 +366,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         if (stageLevel > 1)
         {
-            Rect leftLineRect = new(inRect.xMin, OARO_WindowUtility.CenterMinCoords(selectBoxActiveRect.yMin, selectBoxActiveRect.height, 6f), selectBoxActiveRect.xMin - inRect.xMin, 6f);
+            Rect leftLineRect = new(inRect.xMin, OARO_UIUtility.CenterMinCoords(selectBoxActiveRect.yMin, selectBoxActiveRect.height, 6f), selectBoxActiveRect.xMin - inRect.xMin, 6f);
             GUI.DrawTexture(leftLineRect, BaseContent.BlackTex);
             if (active)
             {
@@ -378,7 +378,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         if (stageLevel < SelAcademicDef.MaxStageLevel)
         {
-            Rect rightLineRect = new(selectBoxActiveRect.xMax, OARO_WindowUtility.CenterMinCoords(selectBoxActiveRect.yMin, selectBoxActiveRect.height, 6f), inRect.xMax - selectBoxActiveRect.xMax, 6f);
+            Rect rightLineRect = new(selectBoxActiveRect.xMax, OARO_UIUtility.CenterMinCoords(selectBoxActiveRect.yMin, selectBoxActiveRect.height, 6f), inRect.xMax - selectBoxActiveRect.xMax, 6f);
             GUI.DrawTexture(rightLineRect, BaseContent.BlackTex);
             if (stageLevel < SelAcademicStageLevel)
             {

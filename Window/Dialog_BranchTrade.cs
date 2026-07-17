@@ -14,7 +14,7 @@ public class Dialog_BranchTrade_SingleUse(Pawn playerNegotiator, ITrader trader,
         {
             return true;
         }
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.ConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.ConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_BranchInteraction_SingleUseTradeConfirmColse".Translate(),
             ratkinOrder: Parms.RatkinOrder,
             acceptText: "Confirm".Translate(),

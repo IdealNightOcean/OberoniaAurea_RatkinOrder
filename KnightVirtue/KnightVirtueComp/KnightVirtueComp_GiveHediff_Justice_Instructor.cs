@@ -12,7 +12,7 @@ public class KnightVirtueComp_GiveHediff_Justice_Instructor : KnightVirtueComp, 
     {
         if (this.Pawn.IsHashIntervalTick(Props.checkInterval, delta))
         {
-            if (ResidentPawnsManager.MentorshipManager.TryGetStudentsOfTeacher(this.Knight, out HashSet<ResidentPawn> students))
+            if (MentorshipManager.Instance.TryGetStudentsOfTeacher(this.Knight, out HashSet<ResidentPawn> students))
             {
                 foreach (ResidentPawn student in students)
                 {

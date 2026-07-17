@@ -239,7 +239,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
         }
 
         parms.TargetCaravan.RemoveThingsOfDef(ThingDefOf.Silver, price);
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_PurchaseKnightlyArmamentsRoot_Purchased".Translate(
                 MetallicStuff.Named("MetallicStuff"),
                 LeatheryFabricStuff.Named("LeatheryFabricStuff"),

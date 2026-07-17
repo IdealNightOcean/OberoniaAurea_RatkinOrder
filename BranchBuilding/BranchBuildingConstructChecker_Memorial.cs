@@ -39,7 +39,7 @@ public class BranchBuildingConstructChecker_Memorial : BranchBuildingConstructCh
         textBuilder.AppendLine(honorDef.LabelCap);
         textBuilder.AppendLine(honorDef.description);
 
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: textBuilder.ToTaggedString(),
             ratkinOrder: branch.RatkinOrder,
             acceptAction: () => branch.BuildingHandler.StartBuildingConstructionDirectly(constructParam));

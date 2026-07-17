@@ -102,7 +102,7 @@ public partial class Window_OrderStation
             reusedRect = new(summaryInnerRectX + 30f, summaryInnerRectY, 50f, titleRectHeight);
             Widgets.Label(reusedRect, Record.Pawn.NameShortColored);
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(tileRect, summaryInnerRectX + 105f, 45f, titleRectHeight - 2f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(tileRect, summaryInnerRectX + 105f, 45f, titleRectHeight - 2f);
             if (Record.CurRole is not null)
             {
                 GUI.DrawTexture(reusedRect, Record.CurRole.iconTexture.Texture, ScaleMode.ScaleToFit);
@@ -145,7 +145,7 @@ public partial class Window_OrderStation
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
-                    OARO_WindowUtility.ResetText();
+                    OAFrame_UIUtility.ResetText();
                 }
 
                 return bottomY;
@@ -161,7 +161,7 @@ public partial class Window_OrderStation
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                 }
-                OARO_WindowUtility.ResetText();
+                OAFrame_UIUtility.ResetText();
                 return summaryRect.yMax;
             }
         }
@@ -171,7 +171,7 @@ public partial class Window_OrderStation
             Rect inRect = new(position.x, position.y, Width, DetailHeight);
             GUI.DrawTexture(inRect, residentKnightDetail);
 
-            inRect = OARO_WindowUtility.CenterRectOnX(inRect, inRect.y, 422f, DetailHeight);
+            inRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.y, 422f, DetailHeight);
             float inRectX = inRect.xMin;
             float inRectY = inRect.yMin;
 
@@ -186,8 +186,8 @@ public partial class Window_OrderStation
             reusedRect = new(inRectX + 32f, reusedRect.yMax + 6f, 128f, 20f);
             Widgets.Label(reusedRect, "OARO_StationWin_KnightRank".Translate());
 
-            Rect buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 335f, 71f, 22f);
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            Rect buttonRect = OARO_UIUtility.CenterRectOnY(reusedRect, inRectX + 335f, 71f, 22f);
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: buttonRect,
                 label: "OARO_StationWin_UpgradeRank".Translate(),
                 acceptance: RankUpgradeAcceptance.Value,
@@ -209,10 +209,10 @@ public partial class Window_OrderStation
                 GenDate.DateFullStringAt(
                     absTicks: GenDate.TickGameToAbs(Record.ResignationTick),
                     location: Find.WorldGrid.LongLatOf(Map.Tile))));
-            buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 264f, 71f, 22f);
-            if (OARO_WindowUtility.TextButtonImage(buttonRect, "OARO_StationWin_DismissalKnight".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
+            buttonRect = OARO_UIUtility.CenterRectOnY(reusedRect, inRectX + 264f, 71f, 22f);
+            if (OARO_UIUtility.TextButtonImage(buttonRect, "OARO_StationWin_DismissalKnight".Translate(), smallButton, smallButton_Down, doMouseoverSound: true))
             {
-                Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                     text: "OARO_StationWin_DismissalKnightConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN)),
                     ratkinOrder: Record.RatkinOrder,
                     acceptAction: delegate
@@ -223,8 +223,8 @@ public partial class Window_OrderStation
                     });
                 Find.WindowStack.Add(nodeTree);
             }
-            buttonRect = OARO_WindowUtility.CenterRectOnY(reusedRect, inRectX + 335f, 71f, 22f);
-            if (OARO_WindowUtility.TextButtonImageDisableable(buttonRect,
+            buttonRect = OARO_UIUtility.CenterRectOnY(reusedRect, inRectX + 335f, 71f, 22f);
+            if (OARO_UIUtility.TextButtonImageDisableable(buttonRect,
                 label: "OARO_StationWin_PostponeResignation".Translate(),
                 acceptance: PostponeResignationAcceptance.Value,
                 baseTex: smallButton,
@@ -234,7 +234,7 @@ public partial class Window_OrderStation
                 AcceptanceReport acceptance = GlobalInteractionUtility.CanPostponeResidentKnightkResignation(Record, Map, resultOnly: false);
                 if (acceptance)
                 {
-                    Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                    Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                         text: "OARO_StationWin_PostponeResignationConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), Record.RatkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
                         ratkinOrder: Record.RatkinOrder,
                         acceptAction: delegate
@@ -261,7 +261,7 @@ public partial class Window_OrderStation
             Widgets.Label(reusedRect, $"OARO_ResidentKnightRank_{Record.CurRank}Knight".Translate().Colorize(Record.CurRank.GetColor()));
 
             reusedRect = new(inRectX + 260f, reusedRect.yMax + 6f, 128f, 20f);
-            Rect starRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMin, 18f, 18f);
+            Rect starRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMin, 18f, 18f);
             float starRectX = starRect.xMin;
             float starRectY = starRect.yMin;
             int starCount = 0;
@@ -308,7 +308,7 @@ public partial class Window_OrderStation
 
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(inRectX + 255, inRectY + 238f, 142f, 43f);
-            if (OARO_WindowUtility.TextButtonImage(
+            if (OARO_UIUtility.TextButtonImage(
                 butRect: reusedRect,
                 label: "OARO_StationWin_ArrangeAcademic".Translate(),
                 baseTex: academicButton,
@@ -340,7 +340,7 @@ public partial class Window_OrderStation
             }
             Widgets.EndScrollView();
 
-            OARO_WindowUtility.ResetText();
+            OAFrame_UIUtility.ResetText();
             return inRect.yMax;
         }
 
@@ -474,7 +474,7 @@ public partial class Window_OrderStation
             }
             else
             {
-                ResidentRoleManager roleManager = ResidentPawnsManager.RoleManager;
+                ResidentRoleManager roleManager = ResidentRoleManager.Instance;
                 foreach (ResidentKnightRoleDef roleDef in DefDatabase<ResidentKnightRoleDef>.AllDefsListForReading)
                 {
                     if (roleManager.TryGetKnightOfRole(roleDef, out ResidentKnight otherRecord))
@@ -504,7 +504,7 @@ public partial class Window_OrderStation
         private void RoleChangeConfirmDialog(ResidentKnightRoleDef roleDef, bool replaceCurRole = true)
         {
             StringBuilder sb = new(256);
-            ResidentPawnsManager.RoleManager.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
+            ResidentRoleManager.Instance.TryGetKnightOfRole(roleDef, out ResidentKnight roleRecord);
             if (roleRecord is null)
             {
                 sb.AppendLine("OARO_StationWin_RoleChangeConfirm".Translate(Record.Pawn.Named(KeyLibrary_FormatArgName.PAWN), roleDef.Named("ROLEDEF")));
@@ -519,12 +519,12 @@ public partial class Window_OrderStation
 
             sb.AppendLine();
             sb.AppendLine(roleDef.GetRoleDetailDesc());
-            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                 text: sb.ToTaggedString(),
                 Record.RatkinOrder,
                 acceptAction: delegate
                 {
-                    if (ResidentPawnsManager.RoleManager.TrySetKnightRole(Record.Pawn, roleDef, replaceCurRole: replaceCurRole))
+                    if (ResidentRoleManager.Instance.TrySetKnightRole(Record.Pawn, roleDef, replaceCurRole: replaceCurRole))
                     {
                         RoleExplanationStr.MarkDirty();
                     }

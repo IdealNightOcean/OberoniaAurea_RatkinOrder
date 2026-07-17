@@ -34,7 +34,7 @@ public class BranchInteractionWorker_SupplyAllocation(BranchInteractionDef def) 
 
         CaravanInventoryUtility.GiveThing(parms.TargetCaravan, pemmican);
 
-        Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
+        Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
         (
             text: "OARO_BranchInteraction_SupplyAllocation".Translate(
                 parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),

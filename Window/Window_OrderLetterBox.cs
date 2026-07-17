@@ -53,7 +53,7 @@ public class Window_OrderLetterBox : OrderWindowBase
 
         //左侧上部标题
         Rect leftInnerRect = leftMainRect.ContractedBy(3f);
-        reusedRect = OARO_WindowUtility.CenterRectOnX(leftInnerRect, leftInnerRect.yMin + 3f, 74f, 32f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(leftInnerRect, leftInnerRect.yMin + 3f, 74f, 32f);
 
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
@@ -62,7 +62,7 @@ public class Window_OrderLetterBox : OrderWindowBase
         Text.Anchor = TextAnchor.UpperLeft;
 
         //左侧上部（标题 | 列表）分割线
-        reusedRect = OARO_WindowUtility.CenterRectOnX(leftInnerRect, leftInnerRect.yMin + 42f, 358f, 3f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(leftInnerRect, leftInnerRect.yMin + 42f, 358f, 3f);
         GUI.DrawTexture(reusedRect, leftCuttingLine);
 
         //左侧列表
@@ -72,7 +72,7 @@ public class Window_OrderLetterBox : OrderWindowBase
         //左侧下部按钮
         reusedRect = new(leftMainRect.xMin, leftMainRect.yMax + 2f, 414f, 92f);
         Text.Font = GameFont.Medium;
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_Epistolize".Translate(),
             acceptance: false,
@@ -121,25 +121,25 @@ public class Window_OrderLetterBox : OrderWindowBase
         GUI.DrawTexture(reusedRect, rightUpCuttingLine);
 
         //右侧信件主要显示区
-        Rect letterTextRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, rightInnerRect.yMin + 130f, 564f, 408f);
+        Rect letterTextRect = OARO_UIUtility.CenterRectOnX(rightInnerRect, rightInnerRect.yMin + 130f, 564f, 408f);
         if (CurLetter is not null)
         {
             Widgets.LabelScrollable(letterTextRect, CurLetter.Text, ref scrollPosition_letterText);
         }
 
-        reusedRect = OARO_WindowUtility.CenterRect(letterTextRect, 342f, 367f);
+        reusedRect = OARO_UIUtility.CenterRect(letterTextRect, 342f, 367f);
         GUI.DrawTexture(reusedRect, rightCoatOfArms);
 
         //右侧下部分割线
-        reusedRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, letterTextRect.yMax + 24f, 642f, 9f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(rightInnerRect, letterTextRect.yMax + 24f, 642f, 9f);
         GUI.DrawTexture(reusedRect, rightDownCuttingLine);
 
         //右侧下部信件绶带
-        reusedRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, reusedRect.yMax + 10f, 652f, 130f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(rightInnerRect, reusedRect.yMax + 10f, 652f, 130f);
         GUI.DrawTexture(reusedRect, rightRibbon);
 
         //右侧下部信件信息显示
-        reusedRect = OARO_WindowUtility.CenterRectOnX(rightInnerRect, reusedRect.yMin + 10f, 340f, 113f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(rightInnerRect, reusedRect.yMin + 10f, 340f, 113f);
         Text.Font = GameFont.Medium;
         Widgets.TextArea(reusedRect, CurLetterDesc, readOnly: true);
         Text.Font = GameFont.Small;
@@ -187,7 +187,7 @@ public class Window_OrderLetterBox : OrderWindowBase
 
     private bool DrawLetterEntry(Rect inRect, int index)
     {
-        Rect reuseRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 2f, 49f, 49f);
+        Rect reuseRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.xMin + 2f, 49f, 49f);
         if (index == SelectedLetterIndex)
         {
             GUI.DrawTexture(inRect, leftLetterEntry_Sel);

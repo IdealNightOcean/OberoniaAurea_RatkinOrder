@@ -26,7 +26,7 @@ public class BranchInteractionWorker_UnlockSupportAuthority(BranchInteractionDef
         }
         else
         {
-            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                 "OARO_UnlockSupportAuthority_OutOfAffectedRange".Translate(parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName)),
                 parms.RatkinOrder,
                 acceptAction: () => base.ApplyEffect(parms));

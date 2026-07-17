@@ -13,7 +13,7 @@ public class KnightVirtue_Tenacity_BorderDefense : KnightVirtueWithComps, ITickI
         if (!this.Pawn.IsHashIntervalTick(60000, delta))
             return;
 
-        if (ResidentPawnsManager.MentorshipManager.TryGetStudentsOfTeacher(knight, out HashSet<ResidentPawn> students))
+        if (MentorshipManager.Instance.TryGetStudentsOfTeacher(knight, out HashSet<ResidentPawn> students))
         {
             foreach (ResidentPawn student in students)
             {

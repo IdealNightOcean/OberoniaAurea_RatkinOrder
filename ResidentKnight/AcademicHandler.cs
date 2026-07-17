@@ -81,10 +81,10 @@ public class AcademicHandler : IExposable
     {
         if (academic is null)
             return 0;
-        
+
         if (academics.TryGetValue(academic, out int level))
             return level;
-        
+
         return 0;
     }
 
@@ -104,8 +104,8 @@ public class AcademicHandler : IExposable
 
         if (!directly)
         {
-            float neededPoints = pointsOverride > 0f 
-                ? pointsOverride 
+            float neededPoints = pointsOverride > 0f
+                ? pointsOverride
                 : AcademicUtility.GetAcademicPointsCost(residentPawn: this.ResidentPawn,
                                                         academicDef: academicDef,
                                                         sourceLevel: academicLevel,

@@ -1,4 +1,5 @@
 using NightOcean;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -79,12 +80,12 @@ public partial class Window_BranchTask : OrderWindowBase
         float mainInnerRectX = mainInnerRect.xMin;
         float mainInnerRectY = mainInnerRect.yMin;
 
-        if (OARO_WindowUtility.DrawCloseX_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
             Close();
             return;
         }
-        if (OARO_WindowUtility.DrawBackArrow_Corner(mainInnerRect))
+        if (OARO_UIUtility.DrawBackArrow_Corner(mainInnerRect))
         {
             Window_RatkinOrder ratkinOrderWin = new(Map);
             Find.WindowStack.Add(ratkinOrderWin);
@@ -113,18 +114,18 @@ public partial class Window_BranchTask : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_RecommendationLetter".Translate());
         reusedRect.yMax += 20f;
         reusedRect.yMin = reusedRect.yMax - 20f;
-        OARO_WindowUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount.Value, 4f);
+        OARO_UIUtility.DrawRecommendationInfo(reusedRect, MapRecommendationCount.Value, 4f);
 
         reusedRect = new(mainInnerRectX + 65f, mainInnerRectY + 180f, 655f, 647f);
         DrawLeftRect(reusedRect);
 
-        reusedRect = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 28f, 2f, 673f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 28f, 2f, 673f);
         GUI.DrawTexture(reusedRect, verticalCuttingLine);
 
         reusedRect = new(reusedRect.xMax + 28f, mainInnerRectY + 180f, 510f, 647f);
         DrawRightRect(reusedRect);
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawLeftRect(Rect inRect)
@@ -154,26 +155,26 @@ public partial class Window_BranchTask : OrderWindowBase
         Rect reusedRect;
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleLeft;
-        reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 108f, 128f, 20f);
+        reusedRect = OARO_UIUtility.CenterRectOnY(titleRect, innerRectX + 108f, 128f, 20f);
         Widgets.Label(reusedRect, "OARO_TaskWin_BranchInfo".Translate());
         if (JointPatrolTab)
         {
             Text.Anchor = TextAnchor.MiddleCenter;
-            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 295f, 128f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(titleRect, innerRectX + 295f, 128f, 20f);
             Widgets.Label(reusedRect, "OARO_TaskWin_BranchJointPatrolPotency".Translate());
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 500f, 128f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(titleRect, innerRectX + 500f, 128f, 20f);
             Widgets.Label(reusedRect, "OARO_TaskWin_BranchJointPatrolKnightInfo".Translate());
         }
         else
         {
-            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 305f, 100f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(titleRect, innerRectX + 305f, 100f, 20f);
             Widgets.Label(reusedRect, "OARO_BranchPotency".Translate());
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 415f, 100f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(titleRect, innerRectX + 415f, 100f, 20f);
             Widgets.Label(reusedRect, "OARO_BranchWorkState".Translate());
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(titleRect, innerRectX + 525f, 100f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(titleRect, innerRectX + 525f, 100f, 20f);
             Widgets.Label(reusedRect, "OARO_TaskWin_BranchTaskSummary".Translate());
         }
 
@@ -211,13 +212,13 @@ public partial class Window_BranchTask : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawRightRect(Rect inRect)
     {
         Rect titleRect = new(inRect.x, inRect.y, inRect.width, 32f);
-        Rect reusedRect = OARO_WindowUtility.CenterRect(titleRect, 477f, 7f);
+        Rect reusedRect = OARO_UIUtility.CenterRect(titleRect, 477f, 7f);
         GUI.DrawTexture(reusedRect, horizontalDecorationLine);
 
         Text.Font = GameFont.Medium;
@@ -235,7 +236,7 @@ public partial class Window_BranchTask : OrderWindowBase
             DrawRightRect_JointPatrol(mainRect);
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawRightRect_Normal(Rect inRect)
@@ -247,7 +248,7 @@ public partial class Window_BranchTask : OrderWindowBase
 
 
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawRightRect_JointPatrol(Rect inRect)
@@ -293,7 +294,7 @@ public partial class Window_BranchTask : OrderWindowBase
             DrawJointPatrolTarget(mainRect);
         }
 
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
     }
 
     private void DrawJointPatrolStatic(Rect inRect)
@@ -319,7 +320,7 @@ public partial class Window_BranchTask : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleRight;
         int nonBackKnightsCount = OrderResidentKnightCount - JointPatrolManager.ParticipatingResidentKnights.Count;
         Widgets.Label(reusedRect, nonBackKnightsCount.ToString());
-        Rect reusedRectII = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 30f, 23f);
+        Rect reusedRectII = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 30f, 23f);
         GUI.DrawTexture(reusedRectII, ellipsisIcon);
         TooltipHandler.TipRegion(reusedRectII, () => JointPatrolNotParticipateInKnightStr.Value, uniqueId: 14604238);
 
@@ -328,7 +329,7 @@ public partial class Window_BranchTask : OrderWindowBase
         Widgets.Label(reusedRect, "OARO_TaskWin_BackKnights".Translate());
         Text.Anchor = TextAnchor.MiddleRight;
         Widgets.Label(reusedRect, JointPatrolManager.ParticipatingResidentKnights.Count.ToString());
-        reusedRectII = OARO_WindowUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 30f, 23f);
+        reusedRectII = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 4f, 30f, 23f);
         GUI.DrawTexture(reusedRectII, ellipsisIcon);
         TooltipHandler.TipRegion(reusedRectII, () => JointPatrolParticipateInKnightStr.Value, uniqueId: 23041468);
 
@@ -343,7 +344,7 @@ public partial class Window_BranchTask : OrderWindowBase
                                                                        .Colorize(JointPatrolManager.ParticipantsDict.Count > JointPatrolManager.BurdenCount ? ColorLibrary.RedReadable : Color.green));
 
         reusedRect = new(innerRectX + 240f, innerRect.yMax - (26f + 54f), 110f, 54f);
-        if (OARO_WindowUtility.TextButtonImageDisableable(
+        if (OARO_UIUtility.TextButtonImageDisableable(
             butRect: reusedRect,
             label: "OARO_TaskWin_KnightBackTeam".Translate(),
             acceptance: JointPatrolManager.CurState != PatrolState.Prepare ? "OARO_JointPatrol_NotInPrepareStage".Translate() : true,
@@ -357,7 +358,7 @@ public partial class Window_BranchTask : OrderWindowBase
         reusedRect = new(innerRectX + 396f, innerRect.yMax - (26f + 54f), 110f, 54f);
         string helpPolicyText = "OARO_TaskWin_HelpPolicyButton".Translate();
         helpPolicyText += ("\n" + $"OARO_JointPatrol_HelpPolicy_{JointPatrolManager.CurHelpPolicy}".Translate());
-        if (OARO_WindowUtility.TextButtonImage(reusedRect, helpPolicyText, jointPatrolButton, jointPatrolButton_Down, doMouseoverSound: true))
+        if (OARO_UIUtility.TextButtonImage(reusedRect, helpPolicyText, jointPatrolButton, jointPatrolButton_Down, doMouseoverSound: true))
         {
             JointPatrolManager.ChangeHelpPolicy();
         }
@@ -408,7 +409,7 @@ public partial class Window_BranchTask : OrderWindowBase
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleCenter;
         reusedRect = new(innerRect.xMax - 124f, innerRectY + 70f, 124f, 66f);
-        reusedRect = OARO_WindowUtility.CenterRectOnX(reusedRect, reusedRect.y, 80f, 66f);
+        reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, reusedRect.y, 80f, 66f);
         if (JointPatrolManager.CurState == PatrolState.Ongoing)
         {
             if (potencyValue < JointPatrolNeededTaskPotency.Value)

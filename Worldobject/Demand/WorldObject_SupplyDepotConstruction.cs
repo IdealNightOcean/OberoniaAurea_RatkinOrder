@@ -42,7 +42,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
 
     public override bool StartWork(Caravan caravan)
     {
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_SupplyDepot_ArrivalInfo".Translate(TicksNeeded.ToStringTicksToPeriod()),
             ratkinOrder: branch.RatkinOrder,
             acceptAction: () => base.StartWork(caravan));
@@ -96,7 +96,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
         if (constricProgress >= 800f)
         {
             this.SendWorkResolvedSignal();
-            Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+            Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                 text: "OARO_SupplyDepot_FinallyFinished".Translate(),
                 ratkinOrder: RatkinOrder));
 
@@ -120,7 +120,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
             }
             else
             {
-                Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+                Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                     text: "OARO_SupplyDepot_Finished".Translate(gainProgress.ToString("0.##")),
                     ratkinOrder: RatkinOrder));
             }
@@ -128,7 +128,7 @@ public sealed class WorldObject_SupplyDepotConstruction : WorldObject_InteractWi
     }
     protected override void InterruptWork()
     {
-        Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_SupplyDepot_InterruptWork".Translate(), RatkinOrder));
+        Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo("OARO_SupplyDepot_InterruptWork".Translate(), RatkinOrder));
     }
 
     public void Notify_BranchDestroyed(Branch branch)

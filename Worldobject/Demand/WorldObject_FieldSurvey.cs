@@ -318,7 +318,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                             nodeSB.AppendLine();
                             nodeSB.AppendLine();
                             GetRegionalFeatureDesc(nodeSB);
-                            Find.WindowStack.Add(OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(nodeSB.ToString(), branch?.RatkinOrder));
+                            Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(nodeSB.ToString(), branch?.RatkinOrder));
                         }
                     }
                     return;

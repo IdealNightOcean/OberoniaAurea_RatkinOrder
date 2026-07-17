@@ -1,4 +1,5 @@
-﻿using RimWorld;
+﻿using OberoniaAurea_Frame;
+using RimWorld;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -28,7 +29,7 @@ public abstract class OrderWindowBase : Verse.Window
     public override void Close(bool doCloseSound = true)
     {
         HasClosed = true;
-        OARO_WindowUtility.ResetText();
+        OAFrame_UIUtility.ResetText();
         base.Close(doCloseSound);
     }
 }

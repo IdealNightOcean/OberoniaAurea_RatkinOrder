@@ -54,7 +54,7 @@ public class OrderInteractionWorker_InviteBranchCreation(OrderInteractionDef def
                 return false;
             }
 
-            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+            Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
                 text: "OARO_InviteBranchCreationConfirm".Translate(ratkinOrder.Name.Named(OARO_KeyLibrary_FormatArgName.OrderName)),
                 ratkinOrder: ratkinOrder,
                 acceptAction: delegate

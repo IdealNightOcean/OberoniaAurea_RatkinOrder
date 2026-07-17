@@ -15,7 +15,7 @@ public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : O
             Log.Error($"[OARO] 援助任务数据缺失（{nameof(OrderInteraction_AssistanceQuestExtension)} 或 {nameof(OrderInteraction_AssistanceQuestExtension)}.{nameof(OrderInteraction_AssistanceQuestExtension.assistanceQuest)} 为null）");
             return;
         }
-        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_WindowUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
+        Dialog_NodeTreeWithRatkinOrderInfo nodeTree = OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo(
             text: "OARO_OrderInteraction_AssistanceQuest_Confirm".Translate(
                 ratkinOrder.NameColored.Named(OARO_KeyLibrary_FormatArgName.OrderName),
                 modEx_AssistanceQuest.assistantPawnkind.Named("PAWNKIND"),

@@ -9,36 +9,8 @@ namespace OberoniaAurea.RatkinOrder;
 
 using static OberoniaAurea.RatkinOrder.Branch;
 
-public static class OARO_WindowUtility
+public static class OARO_UIUtility
 {
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Material GetTintMaterial(Color color, Texture2D maskTex)
-    {
-        MaterialRequest req = new()
-        {
-            shader = ShaderDatabase.GrayscaleGUI,
-            color = color,
-            maskTex = maskTex ?? Texture2D.redTexture
-        };
-
-        return MaterialPool.MatFrom(req);
-    }
-
-    public static Material BlackWhiteMat
-    {
-        get
-        {
-            MaterialRequest req = new()
-            {
-                shader = ShaderDatabase.GrayscaleGUI,
-                color = Color.white,
-                maskTex = Texture2D.redTexture
-            };
-
-            return MaterialPool.MatFrom(req);
-        }
-    }
-
     /// <summary>
     /// Rect居中对应最小坐标
     /// </summary>
@@ -46,6 +18,7 @@ public static class OARO_WindowUtility
     /// <param name="outerSize">做标准Rect尺寸</param>
     /// <param name="innerSize">被居中Rect尺寸</param>
     /// <returns>Rect居中对应最小坐标</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float CenterMinCoords(float outerMinCoords, float outerSize, float innerSize) => outerMinCoords + (outerSize - innerSize) * 0.5f;
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -68,10 +41,6 @@ public static class OARO_WindowUtility
     {
         return new Dialog_NodeTreeWithRatkinOrderInfo(OAFrame_DiaUtility.ConfirmDiaNode(text, acceptText, acceptAction, rejectText, rejectAction), ratkinOrder);
     }
-
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void DrawTextureOriginalSize(Vector2 position, Texture2D texture) => GUI.DrawTexture(new(position.x, position.y, texture.width, texture.height), texture);
-
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool DrawCloseX_Corner(Rect mainRect)
@@ -228,8 +197,7 @@ public static class OARO_WindowUtility
             GUI.DrawTexture(reusedRect, honorDef.chivalry.medal.honorDecorationTexture.Texture, ScaleMode.ScaleToFit);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            Material tintMat = OARO_WindowUtility.GetTintMaterial(honorDef.color, Texture2D.redTexture);
-            GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.HonorBackgroundTex, tintMat);
+            OAFrame_UIUtility.DrawTextureWithColor(reusedRect, OARO_IconLibrary.HonorBackgroundTex, honorDef.color);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
@@ -363,78 +331,4 @@ public static class OARO_WindowUtility
         }
     }
 
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static void ResetText()
-    {
-        Text.WordWrap = true;
-        Text.Font = GameFont.Small;
-        Text.Anchor = TextAnchor.UpperLeft;
-    }
-
-    public static void DrawTextureWithMaterial(Rect rect, Texture texture, Material material, ScaleMode scaleMode = ScaleMode.StretchToFill)
-    {
-        if (material == null)
-        {
-            GUI.DrawTexture(rect, texture, scaleMode);
-        }
-        else if (Event.current.type == EventType.Repaint)
-        {
-            Color color = material.shader.SupportsMaskTex() ? GUI.color : new Color(GUI.color.r * 0.5f, GUI.color.g * 0.5f, GUI.color.b * 0.5f, GUI.color.a);
-            Rect screenRect = default;
-            Rect sorceRect = default;
-            float imageAspect = texture.width / (float)texture.height;
-            CalculateScaledTextureRects(rect, scaleMode, imageAspect, ref screenRect, ref sorceRect);
-            Graphics.DrawTexture(screenRect, texture, sorceRect, 0, 0, 0, 0, color, material);
-        }
-    }
-
-    /// <summary>
-    /// UnityEngine.GUI.CalculateScaledTextureRects的实现
-    /// </summary>
-    private static bool CalculateScaledTextureRects(Rect position, ScaleMode scaleMode, float imageAspect, ref Rect outScreenRect, ref Rect outSourceRect)
-    {
-        float positionAspect = position.width / position.height;
-        bool result = false;
-        switch (scaleMode)
-        {
-            case ScaleMode.StretchToFill:
-                outScreenRect = position;
-                outSourceRect = new Rect(0f, 0f, 1f, 1f);
-                result = true;
-                break;
-            case ScaleMode.ScaleAndCrop:
-                if (positionAspect > imageAspect)
-                {
-                    float scaleFactor = imageAspect / positionAspect;
-                    outScreenRect = position;
-                    outSourceRect = new Rect(0f, (1f - scaleFactor) * 0.5f, 1f, scaleFactor);
-                    result = true;
-                }
-                else
-                {
-                    float scaleFactor = positionAspect / imageAspect;
-                    outScreenRect = position;
-                    outSourceRect = new Rect(0.5f - scaleFactor * 0.5f, 0f, scaleFactor, 1f);
-                    result = true;
-                }
-                break;
-            case ScaleMode.ScaleToFit:
-                if (positionAspect > imageAspect)
-                {
-                    float scaleFactor = imageAspect / positionAspect;
-                    outScreenRect = new Rect(position.xMin + position.width * (1f - scaleFactor) * 0.5f, position.yMin, scaleFactor * position.width, position.height);
-                    outSourceRect = new Rect(0f, 0f, 1f, 1f);
-                    result = true;
-                }
-                else
-                {
-                    float scaleFactor = positionAspect / imageAspect;
-                    outScreenRect = new Rect(position.xMin, position.yMin + position.height * (1f - scaleFactor) * 0.5f, position.width, scaleFactor * position.height);
-                    outSourceRect = new Rect(0f, 0f, 1f, 1f);
-                    result = true;
-                }
-                break;
-        }
-        return result;
-    }
 }

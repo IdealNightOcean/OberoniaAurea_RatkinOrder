@@ -120,15 +120,15 @@ public partial class Window_BranchTask
             reusedRect.xMax = topRect.xMin + 5f;
             GUI.DrawTexture(reusedRect, Branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, innerRectX + 13f, 15f, 15f);
-            OARO_WindowUtility.DrawBranchIcon(reusedRect, Branch, expand: false);
+            reusedRect = OARO_UIUtility.CenterRectOnY(topRect, innerRectX + 13f, 15f, 15f);
+            OARO_UIUtility.DrawBranchIcon(reusedRect, Branch, expand: false);
 
             Text.Font = GameFont.Small;
             Text.Anchor = TextAnchor.MiddleLeft;
-            reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, innerRectX + 65f, 128f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(topRect, innerRectX + 65f, 128f, 20f);
             Widgets.Label(reusedRect, Branch.NameColored);
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(topRect, innerRectX + 205f, 72f, 20f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(topRect, innerRectX + 205f, 72f, 20f);
 
             if (showAsJointPatrol && JointBranchRecord.Value is not null)
             {
@@ -141,7 +141,7 @@ public partial class Window_BranchTask
 
 
             reusedRect = new(positionX + 2f, positionY + 54f, Width - 4f, 26f);
-            Rect shoeDetailTextRect = OARO_WindowUtility.CenterRectOnY(reusedRect, innerRectX + 35f, 128f, 20f);
+            Rect shoeDetailTextRect = OARO_UIUtility.CenterRectOnY(reusedRect, innerRectX + 35f, 128f, 20f);
             if (ShowDetail)
             {
                 GUI.DrawTexture(reusedRect, showDetailButton_Down);
@@ -152,7 +152,7 @@ public partial class Window_BranchTask
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
-                    OARO_WindowUtility.ResetText();
+                    OAFrame_UIUtility.ResetText();
                     return inRect.yMax;
                 }
                 else
@@ -171,7 +171,7 @@ public partial class Window_BranchTask
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                 }
-                OARO_WindowUtility.ResetText();
+                OAFrame_UIUtility.ResetText();
                 return inRect.yMax;
             }
         }
@@ -181,11 +181,11 @@ public partial class Window_BranchTask
             float inRectX = inRect.xMin;
             float inRectY = inRect.yMin;
 
-            Rect reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRectX + 325f, 40f, 20f);
+            Rect reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRectX + 325f, 40f, 20f);
             Widgets.Label(reusedRect, Branch.Potency.ToString("F0"));
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRectX + 420f, 24f, 24f);
-            OARO_WindowUtility.DrawBranchStateIcon(reusedRect, Branch, expand: false);
+            reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRectX + 420f, 24f, 24f);
+            OARO_UIUtility.DrawBranchStateIcon(reusedRect, Branch, expand: false);
 
             Text.Anchor = TextAnchor.MiddleCenter;
             reusedRect = new(inRectX + 525f, inRectY + 4f, 100f, 48f);
@@ -201,7 +201,7 @@ public partial class Window_BranchTask
             }
 
             reusedRect = new(inRectX + 495f, inRectY + 24f, 25f, 20f);
-            OARO_WindowUtility.DrawKnightChivalryIcon(reusedRect, Branch.TaskHandler.FocusedTaskChivalry, primary: Branch.TaskHandler.FocusedTaskChivalry == ProtogenicChivalry);
+            OARO_UIUtility.DrawKnightChivalryIcon(reusedRect, Branch.TaskHandler.FocusedTaskChivalry, primary: Branch.TaskHandler.FocusedTaskChivalry == ProtogenicChivalry);
         }
 
         private void DrawJointPatrol(Rect inRect)
@@ -214,16 +214,16 @@ public partial class Window_BranchTask
             if (jointPatrolProp is not null)
             {
                 GUI.DrawTexture(reusedRect, jointPatrolProp.entryBackgroundTexture.Texture);
-                Material tintMat = OARO_WindowUtility.GetTintMaterial(primaryChivalry.color, OARO_IconLibrary.JointPatrolEntryShadeMask);
+                Material tintMat = OAFrame_UIUtility.GetTintMaterial(primaryChivalry.color, OARO_IconLibrary.JointPatrolEntryShadeMask);
                 GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.JointPatrolEntryShadeTex, tintMat);
             }
 
             Text.Font = GameFont.Medium;
             Text.Anchor = TextAnchor.MiddleCenter;
-            reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRectX + 295f, 128f, 32f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRectX + 295f, 128f, 32f);
             Widgets.Label(reusedRect, JointBranchRecord.Value.TaskPotency.Value.ToString("F0"));
 
-            reusedRect = OARO_WindowUtility.CenterRectOnY(inRect, inRectX + 500f, 128f, 32f);
+            reusedRect = OARO_UIUtility.CenterRectOnY(inRect, inRectX + 500f, 128f, 32f);
             Text.Font = GameFont.Small;
             Widgets.LabelScrollable(reusedRect, BackTeamKnightsLabels.Value, ref scrollPosition_BackTeamKnights);
         }
@@ -231,7 +231,7 @@ public partial class Window_BranchTask
         private float DrawDetail(Vector2 position)
         {
             Rect inRect = new(position.x, position.y, Width, DetailRectHeight);
-            Rect innerRect = OARO_WindowUtility.CenterRectOnX(inRect, position.y, 635f, DetailRectHeight);
+            Rect innerRect = OARO_UIUtility.CenterRectOnX(inRect, position.y, 635f, DetailRectHeight);
             GUI.DrawTexture(innerRect, taskEntryBottomBackground);
             float innerRectX = innerRect.xMin;
             float innerRectY = innerRect.yMin;
@@ -329,7 +329,7 @@ public partial class Window_BranchTask
                 entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryX += entryWidth;
 
-                if (OARO_WindowUtility.TextButtonImageDisableable(
+                if (OARO_UIUtility.TextButtonImageDisableable(
                     butRect: entryRect,
                     label: $"OARO_TaskRadicalismDegree_{radicalismDegree}".Translate(),
                     acceptance: curRadicalismDegree == radicalismDegree ? false : ChangeRadicalismDegreeAcceptance.Value,
@@ -351,7 +351,7 @@ public partial class Window_BranchTask
             Widgets.Label(reusedRect, "OARO_TaskWin_Interaction".Translate());
 
             reusedRect = new(rightRectX, innerRectY + 148f, 137f, 24f);
-            OARO_WindowUtility.DrawBranchInteractionButton(
+            OARO_UIUtility.DrawBranchInteractionButton(
                 butRect: reusedRect,
                 def: BranchInteractionDefOf.OARO_RequestCombatReadiness,
                 parms: new BranchInteractionParms(Branch, Map),
@@ -362,7 +362,7 @@ public partial class Window_BranchTask
 
             reusedRect.yMax += 24f;
             reusedRect.yMin = reusedRect.yMax - 24f;
-            OARO_WindowUtility.DrawBranchInteractionButton(
+            OARO_UIUtility.DrawBranchInteractionButton(
                 butRect: reusedRect,
                 def: BranchInteractionDefOf.OARO_MapRecommendationToKnight,
                 parms: new BranchInteractionParms(Branch, Map),
@@ -373,7 +373,7 @@ public partial class Window_BranchTask
 
             reusedRect.yMax += 24f;
             reusedRect.yMin = reusedRect.yMax - 24f;
-            OARO_WindowUtility.DrawBranchInteractionButton(
+            OARO_UIUtility.DrawBranchInteractionButton(
                 butRect: reusedRect,
                 def: BranchInteractionDefOf.OARO_MapSilverToSupply,
                 parms: new BranchInteractionParms(Branch, Map),
@@ -385,7 +385,7 @@ public partial class Window_BranchTask
 
             reusedRect.yMax += 24f;
             reusedRect.yMin = reusedRect.yMax - 24f;
-            if (OARO_WindowUtility.TextButtonImage(reusedRect, "OARO_TaskWin_OpenBranchWin".Translate(), patrolInteractionButton, patrolInteractionButton_Down, doMouseoverSound: true))
+            if (OARO_UIUtility.TextButtonImage(reusedRect, "OARO_TaskWin_OpenBranchWin".Translate(), patrolInteractionButton, patrolInteractionButton_Down, doMouseoverSound: true))
             {
                 Window_Branch branchWin = new(Branch, caravan: null, Map);
                 Find.WindowStack.Add(branchWin);
@@ -401,7 +401,7 @@ public partial class Window_BranchTask
             {
                 entryRect = new(entryX, entryY, entryWidth, entryHeight);
                 entryY += entryHeight;
-                if (OARO_WindowUtility.TextButtonImageDisableable(
+                if (OARO_UIUtility.TextButtonImageDisableable(
                     butRect: entryRect,
                     label: $"OARO_PatrolInteractionType_{interactionAcceptance.Key}".Translate(),
                     acceptance: interactionAcceptance.Value,
@@ -416,7 +416,7 @@ public partial class Window_BranchTask
 
             reusedRect = new(rightRectX, innerRect.yMax - 32f, 274f, 32f);
 
-            if (OARO_WindowUtility.TextButtonImageDisableable(
+            if (OARO_UIUtility.TextButtonImageDisableable(
                 butRect: reusedRect,
                 label: JointBranchRecord is null ? "OARO_TaskWin_JoinJointPatrol".Translate() : "OARO_TaskWin_QuitJointPatrol".Translate(),
                 acceptance: ChangeJointPatrolStateAcceptance.Value,
@@ -426,7 +426,7 @@ public partial class Window_BranchTask
             {
                 ChangeJointPatrolState();
             }
-            OARO_WindowUtility.ResetText();
+            OAFrame_UIUtility.ResetText();
             return inRect.yMax;
         }
 
@@ -483,13 +483,13 @@ public partial class Window_BranchTask
                 Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
 
                 TooltipHandler.TipRegion(entryRect, () => medalChivalry.medal.effectDescription ?? string.Empty, uniqueId: 21194707);
-                Rect reusedRect = OARO_WindowUtility.CenterRectOnY(entryRect, entryX + 5f, 32f, 28f);
+                Rect reusedRect = OARO_UIUtility.CenterRectOnY(entryRect, entryX + 5f, 32f, 28f);
                 GUI.DrawTexture(
                     position: reusedRect,
                     image: primaryMedal.IsSameDefNonNullable(medalChivalry) ? medalChivalry.primaryIcon.Texture : medalChivalry.icon.Texture,
                     scaleMode: ScaleMode.ScaleToFit);
 
-                reusedRect = OARO_WindowUtility.CenterRectOnY(entryRect, entryX + 45f, 40f, 20f);
+                reusedRect = OARO_UIUtility.CenterRectOnY(entryRect, entryX + 45f, 40f, 20f);
                 Widgets.Label(reusedRect, $"× {medalRecord.Value.Count}");
 
                 if ((++column) >= 2)
@@ -505,7 +505,7 @@ public partial class Window_BranchTask
             }
 
             Widgets.EndScrollView();
-            OARO_WindowUtility.ResetText();
+            OAFrame_UIUtility.ResetText();
         }
 
         private JointBranchRecord RefreshJointBranchRecord()
@@ -649,7 +649,7 @@ public partial class Window_BranchTask
         private static bool DrawTaskTypeButton(Rect inRect, KnightChivalryDef taskChivalry, bool isActive, AcceptanceReport acceptance)
         {
 
-            bool result = OARO_WindowUtility.TextButtonImageDisableable(
+            bool result = OARO_UIUtility.TextButtonImageDisableable(
                 butRect: inRect,
                 label: taskChivalry.jointPatrol.TaskLabelCap,
                 acceptance: acceptance,
@@ -658,7 +658,7 @@ public partial class Window_BranchTask
                 doMouseoverSound: true,
                 tooltip: "OARO_JointPatrolTaskTypeTip".Translate());
 
-            Rect iconRect = OARO_WindowUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 20f, 20f);
+            Rect iconRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 20f, 20f);
             GUI.DrawTexture(iconRect, isActive ? null : null);
             if (isActive)
             {
@@ -666,7 +666,10 @@ public partial class Window_BranchTask
             }
             else
             {
-                OARO_WindowUtility.DrawTextureWithMaterial(iconRect, taskChivalry.icon.Texture, OARO_WindowUtility.BlackWhiteMat, ScaleMode.ScaleToFit);
+                OAFrame_UIUtility.DrawTextureWithMaterial(rect: iconRect,
+                                                          texture: taskChivalry.icon.Texture,
+                                                          material: BaseContent.WhiteMat,
+                                                          scaleMode: ScaleMode.ScaleToFit);
             }
             return result;
         }
