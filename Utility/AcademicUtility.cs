@@ -258,8 +258,7 @@ public static class AcademicUtility
         }
     }
 
-    public static IEnumerable<(KnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(ResidentPawn a,
-                                                                                                ResidentPawn b)
+    public static IEnumerable<(KnightAcademicDef def, int targetLevel)> GetHigherAcademicsThanB(ResidentPawn a, ResidentPawn b)
     {
         if (a is null || b is null)
             yield break;

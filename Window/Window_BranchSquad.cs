@@ -307,7 +307,7 @@ public class Window_BranchSquad : OrderWindowBase
         Widgets.Label(reusedRect, relation);
 
         reusedRect = OARO_UIUtility.CenterRectOnX(reusedRect, areaRect.y + 40f, 120f, 24f);
-        Widgets.FillableBar(reusedRect, friendlyProcess, OARO_IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
+        Widgets.FillableBar(reusedRect, friendlyProcess, OARO_ColorLibrary.GreenTex, BaseContent.BlackTex, doBorder: true);
 
         reusedRect = new(reusedRect.x, reusedRect.yMax + 4f, 120f, 32f);
         Text.Font = GameFont.Small;

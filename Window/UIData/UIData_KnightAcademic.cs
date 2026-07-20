@@ -1,7 +1,7 @@
 ﻿namespace OberoniaAurea.RatkinOrder.UI;
 
 
-public class UICache_KnightAcademic : UICacheBase
+public class UIData_KnightAcademic : UIDataBase
 {
     public ResidentKnight Knight { get; }
     public KnightAcademicDef Academic { get; }
@@ -24,7 +24,7 @@ public class UICache_KnightAcademic : UICacheBase
         }
     }
 
-    public UICache_KnightAcademic(ResidentKnight knight, KnightAcademicDef academic)
+    public UIData_KnightAcademic(ResidentKnight knight, KnightAcademicDef academic)
     {
         Knight = knight;
         Academic = academic;

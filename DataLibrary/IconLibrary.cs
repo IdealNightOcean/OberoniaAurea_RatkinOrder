@@ -40,14 +40,6 @@ public static class OARO_IconLibrary
     public static readonly Texture2D SmallGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_SmallGeneralBranchIcon");
     public static readonly Texture2D BigGeneralBranchIcon = ContentFinder<Texture2D>.Get("UI/BranchCommon/OARO_BigGeneralBranchIcon");
 
-    public static readonly Texture2D CyanTex = SolidColorMaterials.NewSolidColorTexture(Color.cyan);
-    public static readonly Texture2D GreenTex = SolidColorMaterials.NewSolidColorTexture(Color.green);
-    public static readonly Texture2D OrangeTex = SolidColorMaterials.NewSolidColorTexture(ColorLibrary.Orange);
-    public static readonly Texture2D SilverTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.75f, 0.75f, 0.75f));
-    public static readonly Texture2D DarkTex = SolidColorMaterials.NewSolidColorTexture(new Color(0.13f, 0.13f, 0.13f));
-
-    public static readonly Texture2D TransTex = SolidColorMaterials.NewSolidColorTexture(new Color(0f, 0f, 0f, 0f));
-
     /// <summary>
     /// 联巡条目背景绑带+渐变
     /// </summary>

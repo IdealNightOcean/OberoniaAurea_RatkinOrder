@@ -58,7 +58,7 @@ public class Window_QuestClique : OrderWindowBase
         }
         DemandWatcher = demandWatcher;
         MainBranch = DemandWatcher.Branch;
-        DemandTexture = DemandDef.BackgroundTexture ?? OARO_IconLibrary.TransTex;
+        DemandTexture = DemandDef.BackgroundTexture ?? BaseContent.ClearTex;
     }
 
     public override void DoWindowContents(Rect inRect)
@@ -198,7 +198,7 @@ public class Window_QuestClique : OrderWindowBase
             entryY += entryHeight;
             if (((++column) & 1) == 0)
             {
-                GUI.DrawTexture(entryRect, OARO_IconLibrary.DarkTex);
+                Widgets.DrawBoxSolid(entryRect, OARO_ColorLibrary.MediumDarkBackground);
             }
             DrawActiveClique(entryRect, clique);
         }
@@ -381,7 +381,7 @@ public class Window_QuestClique : OrderWindowBase
         float topRectY = inRect.yMin;
         topRect.height = 40f;
         float topRectHeight = topRect.height;
-        GUI.DrawTexture(topRect, OARO_IconLibrary.DarkTex);
+        Widgets.DrawBoxSolid(topRect, OARO_ColorLibrary.MediumDarkBackground);
 
         Rect reusedRect = OARO_UIUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
         GUI.DrawTexture(reusedRect, OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
@@ -473,7 +473,7 @@ public class Window_QuestClique : OrderWindowBase
         topRect.height = 40f;
         float topRectHeight = topRect.height;
 
-        GUI.DrawTexture(topRect, OARO_IconLibrary.DarkTex);
+        Widgets.DrawBoxSolid(topRect, OARO_ColorLibrary.MediumDarkBackground);
 
         Rect reusedRect = OARO_UIUtility.CenterRectOnY(topRect, topRectX + 12f, 24f, 24f);
         OARO_UIUtility.DrawBranchIcon(reusedRect, clique.RelatedBranch, expand: false);

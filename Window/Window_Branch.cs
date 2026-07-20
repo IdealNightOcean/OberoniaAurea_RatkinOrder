@@ -254,7 +254,7 @@ public class Window_Branch : OrderWindowBase
         float offsetMainInnerMidX = mainInnerRectX + 824f;
 
         Rect reusedRect = new(mainInnerRectX + 546f, mainInnerRectY + 171f, 562f, 9f);
-        Widgets.FillableBar(reusedRect, Mathf.Clamp01(FacilityHandler.TotalFacilityLevel / (AllFacilityDefCount * 4f)), OARO_IconLibrary.GreenTex, BaseContent.BlackTex, doBorder: false);
+        Widgets.FillableBar(reusedRect, Mathf.Clamp01(FacilityHandler.TotalFacilityLevel / (AllFacilityDefCount * 4f)), OARO_ColorLibrary.GreenTex, BaseContent.BlackTex, doBorder: false);
 
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleRight;

@@ -1,8 +1,10 @@
 ﻿namespace OberoniaAurea.RatkinOrder.UI;
 
-public abstract class UICacheBase
+public abstract class UIDataBase
 {
     public bool IsReady { get; protected set; }
+
+    public void MarkDirty() => IsReady = false;
 
     public void Refresh()
     {

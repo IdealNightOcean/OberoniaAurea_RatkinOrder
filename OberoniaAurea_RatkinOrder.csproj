@@ -164,6 +164,7 @@
     <Compile Include="Components\HediffStageModifierBuilder.cs" />
     <Compile Include="Components\PlayerDespawnedPawnsTempRetention.cs" />
     <Compile Include="Components\ValueCacheManager.cs" />
+    <Compile Include="DataLibrary\ColorLibrary.cs" />
     <Compile Include="DataLibrary\KeyLibrary_FormatArgName.cs" />
     <Compile Include="DefModExtension\BranchBuildingTrderSetter_Extension.cs" />
     <Compile Include="DefModExtension\ThingList_Extension.cs" />
@@ -341,18 +342,19 @@
     <Compile Include="Utility\KnightVirtueUtility.cs" />
     <Compile Include="Window\BranchTaskEntryDrawer.cs" />
     <Compile Include="Window\Dialog_BranchTrade.cs" />
-    <Compile Include="Window\Drawer\UICacheDrawer_KnightAcademic.cs" />
-    <Compile Include="Window\UICacheData\UICacheBase.cs" />
-    <Compile Include="Window\UICacheData\UICache_KnightAcademic.cs" />
-    <Compile Include="Window\UICacheData\UICache_KnightVirtue.cs" />
-    <Compile Include="Window\UICacheData\UICache_MentorshipStudent.cs" />
-    <Compile Include="Window\Drawer\UICacheDrawerBase.cs" />
+    <Compile Include="Window\UIDrawer\UIDrawer_KnightVirtue.cs" />
+    <Compile Include="Window\UIDrawer\UIDataDrawer_KnightAcademic.cs" />
+    <Compile Include="Window\UIData\UIDataBase.cs" />
+    <Compile Include="Window\UIData\UIData_KnightAcademic.cs" />
+    <Compile Include="Window\UIData\UIData_KnightVirtue.cs" />
+    <Compile Include="Window\UIData\UIData_MentorshipStudent.cs" />
+    <Compile Include="Window\UIDrawer\UIDataDrawerBase.cs" />
     <Compile Include="Window\Window_QuestClique.cs" />
     <Compile Include="Window\Window_ResidentKnight_AcademicArrange.cs" />
     <Compile Include="Window\Window_BranchDemand.cs" />
     <Compile Include="Window\OrderWindowBase.cs" />
-    <Compile Include="Window\UICacheData\SquadInfoUICache.cs" />
-    <Compile Include="Window\UICacheData\BranchSummaryUICache.cs" />
+    <Compile Include="Window\UIData\SquadInfoUICache.cs" />
+    <Compile Include="Window\UIData\BranchSummaryUICache.cs" />
     <Compile Include="Components\KnightRecord.cs" />
     <Compile Include="Components\TrackedIntValue.cs" />
     <Compile Include="Components\TrackedFloatValue.cs" />
@@ -564,8 +566,8 @@
     <Compile Include="BranchResident\BranchResidentHandler.cs" />
     <Compile Include="BranchBuilding\BranchBuilding.cs" />
     <Compile Include="Branch\BranchStoresReserveHandler.cs" />
-    <Compile Include="Window\UICacheData\BranchBuildingDefSummaryUICache.cs" />
-    <Compile Include="Window\UICacheData\BranchFacilityStageSummaryUICache.cs" />
+    <Compile Include="Window\UIData\BranchBuildingDefSummaryUICache.cs" />
+    <Compile Include="Window\UIData\BranchFacilityStageSummaryUICache.cs" />
     <Compile Include="Window\Window_BranchSquad.cs" />
     <Compile Include="Window\Window_OrderStation.cs" />
     <Compile Include="Window\Window_Branch.cs" />
@@ -693,7 +695,7 @@
     <Compile Include="WorldObject\Mercy\WorldObject_UnsalableArtcraft.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Window\UICacheData\BranchInfoUICache.cs" />
+    <Compile Include="Window\UIData\BranchInfoUICache.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
