@@ -145,7 +145,7 @@ public partial class Window_OrderStation
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
-                    OAFrame_UIUtility.ResetText();
+                    OAFrame_UIUtility.ResetToDefaultTextStyle();
                 }
 
                 return bottomY;
@@ -161,7 +161,7 @@ public partial class Window_OrderStation
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                 }
-                OAFrame_UIUtility.ResetText();
+                OAFrame_UIUtility.ResetToDefaultTextStyle();
                 return summaryRect.yMax;
             }
         }
@@ -340,7 +340,7 @@ public partial class Window_OrderStation
             }
             Widgets.EndScrollView();
 
-            OAFrame_UIUtility.ResetText();
+            OAFrame_UIUtility.ResetToDefaultTextStyle();
             return inRect.yMax;
         }
 

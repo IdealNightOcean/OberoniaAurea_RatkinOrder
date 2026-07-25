@@ -6,9 +6,11 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademic>
 {
-    public override void DrawInner(Rect inRect, UIData_KnightAcademic drawData)
+    public override Vector2 InitSize => new(260f, 94f);
+
+    public override void DrawInner(Vector2 position, UIData_KnightAcademic drawData)
     {
-        Rect boxRect = new(inRect.x, inRect.y, 260f, 94f);
+        Rect boxRect = new(position.x, position.y, InitSize.x, InitSize.y);
 
         Widgets.DrawBoxSolidWithOutline(boxRect, solidColor: OARO_ColorLibrary.DimDarkBackground, outlineColor: OARO_ColorLibrary.CommonOutline, outlineThickness: 2);
 
@@ -31,15 +33,14 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect labelRect = upperInnerRect;
         labelRect.xMin = upperInnerRect.xMin + upperInnerRect.width * 0.1f;
 
-        Text.Font = GameFont.Medium;
-        Text.Anchor = TextAnchor.MiddleLeft;
-        OAFrame_UIUtility.DrawLabel(labelRect, drawData.Academic.LabelCap, GameFont.Medium, TextAnchor.MiddleLeft);
+        GameFontText = new(GameFont.Medium, TextAnchor.MiddleLeft);
+        GameFontText.DrawLabel(labelRect, drawData.Academic.LabelCap);
 
         Rect levelRect = upperInnerRect;
         levelRect.xMax = upperInnerRect.xMax - upperInnerRect.width * 0.1f;
 
-        Text.Anchor = TextAnchor.MiddleRight;
-        OAFrame_UIUtility.DrawLabel(levelRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}", GameFont.Medium, TextAnchor.MiddleRight);
+        GameFontText = new(GameFont.Medium, TextAnchor.MiddleRight);
+        GameFontText.DrawLabel(labelRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}");
 
         Text.Font = GameFont.Small;
     }
@@ -49,11 +50,9 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect factorRect = lowerInnerRect;
         factorRect.xMin = lowerInnerRect.xMin + lowerInnerRect.width * 0.1f;
 
-        OAFrame_UIUtility.DrawLabel(factorRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}", GameFont.Medium, TextAnchor.MiddleLeft);
-        Text.Font = GameFont.Medium;
-        Text.Anchor = TextAnchor.MiddleLeft;
-
-        Widgets.Label(factorRect, OAFrame_TextUtility.ColoredFloatString(drawData.CostFactor, originPoint: 1f));
+        GameFontText = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft,
+                           guiColor: drawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green);
+        GameFontText.DrawLabel(factorRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}");
         TooltipHandler.TipRegion(factorRect, () => drawData.CostFactorExplanation, uniqueId: 876465514);
     }
 }

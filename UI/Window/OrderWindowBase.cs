@@ -1,13 +1,20 @@
 ﻿using OberoniaAurea_Frame;
 using RimWorld;
+using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-public abstract class OrderWindowBase : Verse.Window
+public abstract class OrderWindowBase : Verse.Window, IUIDrawer
 {
     protected override float Margin => 0f;
     protected bool HasClosed { get; set; }
+
+    public Vector2 InitSize => InitialSize;
+
+    public TextStyle_GameFont GameFontText { get; protected set; } = TextStyle_GameFont.DefaultStyle;
+    public TextStyle_FontSize FontSizeText { get; protected set; } = TextStyle_FontSize.DefaultStyle;
+
     public OrderWindowBase()
     {
         forcePause = true;
@@ -29,7 +36,7 @@ public abstract class OrderWindowBase : Verse.Window
     public override void Close(bool doCloseSound = true)
     {
         HasClosed = true;
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
         base.Close(doCloseSound);
     }
 }

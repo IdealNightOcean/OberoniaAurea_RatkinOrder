@@ -152,7 +152,7 @@ public class Window_QuestClique : OrderWindowBase
             Widgets.EndScrollView();
         }
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawTopRect(Rect inRect)
@@ -203,7 +203,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawActiveClique(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawBottomRect(Rect inRect)
@@ -276,7 +276,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawInactiveClique_Normal(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawBottomRect_Branch(Rect inRect)
@@ -323,7 +323,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawInactiveClique_Branch(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawActiveClique(Rect inRect, QuestClique clique)
@@ -371,7 +371,7 @@ public class Window_QuestClique : OrderWindowBase
         reusedRect = new(inRect.xMax - 110f, inRectY, 110f, inRectHeight);
         Widgets.Label(reusedRect, clique.Potency.ToStringPercent().Colorize(clique.Potency < 0f ? ColorLibrary.RedReadable : Color.green));
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawInactiveClique_Normal(Rect inRect, QuestClique clique)
@@ -460,7 +460,7 @@ public class Window_QuestClique : OrderWindowBase
         {
             clique.Communicate(branch: CliquesManager.Branch, map: Map);
         }
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawInactiveClique_Branch(Rect inRect, QuestClique clique)
@@ -566,7 +566,7 @@ public class Window_QuestClique : OrderWindowBase
             }
         }
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawCornerRect(Rect inRect)

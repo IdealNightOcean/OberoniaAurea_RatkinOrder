@@ -238,7 +238,7 @@ public class Window_BranchSquad : OrderWindowBase
             KnightChivalryDef honorChivalry = honorDef.chivalry;
             if (honorChivalry?.medal is not null)
             {
-                OAFrame_UIUtility.DrawTextureWithColor(areaRect, OARO_IconLibrary.HonorBackgroundTex, honorDef.color);
+                OAFrame_Widgets.DrawTextureWithColor(areaRect, OARO_IconLibrary.HonorBackgroundTex, honorDef.color);
                 reusedRect = OARO_UIUtility.CenterRect(areaRect, 230f, 130f);
                 GUI.DrawTexture(reusedRect, honorChivalry.medal.honorDecorationTexture.ExpandedTexture, ScaleMode.ScaleToFit);
             }

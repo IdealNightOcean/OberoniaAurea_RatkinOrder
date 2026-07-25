@@ -6,14 +6,24 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIDrawer_KnightVirtue
+public class UIDrawer_KnightVirtue : IUIDrawer
 {
+    public Vector2 InitSize => new(362f, 182f);
+    public TextStyle_GameFont GameFontText { get; set; } = TextStyle_GameFont.DefaultStyle;
+    public TextStyle_FontSize FontSizeText { get; set; } = TextStyle_FontSize.DefaultStyle;
+
     public ResidentKnight Knight { get; }
     public KnightVirtue Virtue { get; }
 
-    public void Draw(Rect inRect)
+    public UIDrawer_KnightVirtue(ResidentKnight knight, KnightVirtue virtue)
     {
-        Rect boxRect = new(inRect.x, inRect.y, 362f, 182f);
+        this.Knight = knight;
+        this.Virtue = virtue;
+    }
+
+    public void Draw(Vector2 position)
+    {
+        Rect boxRect = new(position.x, position.y, InitSize.x, InitSize.y);
         Widgets.DrawBoxSolidWithOutline(rect: boxRect,
                                         solidColor: OARO_ColorLibrary.MediumDarkBackground,
                                         outlineColor: OARO_ColorLibrary.CommonOutline);
@@ -39,11 +49,11 @@ public class UIDrawer_KnightVirtue
                          width: 1f);
 
 
-
         Rect labelRect = innerBoxRect;
         labelRect.xMax = verticalLineX;
 
-        OAFrame_UIUtility.DrawLabel(labelRect, this.Virtue.Def.LabelCap, GameFont.Medium, TextAnchor.MiddleCenter);
+        GameFontText = new(GameFont.Medium, TextAnchor.MiddleCenter);
+        GameFontText.DrawLabel(labelRect, this.Virtue.Def.LabelCap);
 
         float levelRectHeight = innerBoxRect.height / 3f;
         for (int i = 0; i < this.Virtue.Def.maxLevel; i++)
@@ -77,7 +87,8 @@ public class UIDrawer_KnightVirtue
 
         if (this.Virtue.Level < level)
         {
-            OAFrame_UIUtility.DrawLabel(traitInfoRect, "OARO_NotUnlocked".Translate(), GameFont.Medium, TextAnchor.MiddleCenter);
+            GameFontText = new(GameFont.Medium, TextAnchor.MiddleCenter);
+            GameFontText.DrawLabel(traitInfoRect, "OARO_NotUnlocked".Translate());
             return;
         }
 
@@ -94,18 +105,47 @@ public class UIDrawer_KnightVirtue
         }
         else
         {
-            OAFrame_UIUtility.DrawLabel(traitInfoRect, "None".Translate(), OARO_ColorLibrary.DimInactive, GameFont.Medium, TextAnchor.MiddleCenter);
+            GameFontText = new(OARO_ColorLibrary.DimInactive, GameFont.Medium, TextAnchor.MiddleCenter);
+            GameFontText.DrawLabel(traitInfoRect, "None".Translate());
         }
     }
 
     private void DarwVirtueTaritInfo(Rect inRect, KnightVirtueTraitDef virtueTrait)
     {
-        throw new NotImplementedException();
+        Rect iconRect = inRect;
+        iconRect.width *= 0.24f;
+
+
+        Rect descRect = inRect;
+        descRect.xMin = iconRect.xMax;
+        GameFontText = new(GameFont.Small, TextAnchor.MiddleCenter);
+        GameFontText.DrawLabel(descRect, virtueTrait.description);
     }
 
     private void DarwVirtueTaritSelection(Rect inRect, int level)
     {
-        KnightVirtueTraitGroups traitGroup = this.Virtue.Def.traitGroups[level - 1];
+
+    }
+}
+
+public class Window_VirtueTaritSelection : OrderWindowBase
+{
+    public ResidentKnight Knight { get; }
+    public KnightVirtue Virtue { get; }
+    public int Level { get; }
+    public KnightVirtueTraitGroups TraitGroup { get; }
+
+    public Window_VirtueTaritSelection(ResidentKnight knight, KnightVirtue virtue, int level) : base()
+    {
+        this.Knight = knight;
+        this.Virtue = virtue;
+        this.Level = level;
+        this.TraitGroup = virtue.Def.traitGroups[level - 1];
+    }
+
+    public override void DoWindowContents(Rect inRect)
+    {
         throw new NotImplementedException();
     }
+
 }

@@ -98,7 +98,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawExchangeableSupply(Rect inRect, ExchangeableSupply supply)

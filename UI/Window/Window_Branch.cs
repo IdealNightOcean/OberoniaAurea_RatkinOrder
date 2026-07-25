@@ -376,10 +376,18 @@ public class Window_Branch : OrderWindowBase
     {
         float tabRectWidth = inRect.width / 3f;
         Rect constructionTabRect = new(inRect.x, inRect.y, tabRectWidth, 45f);
+
+        if (Widgets.ButtonImageFitted(constructionTabRect, middleTopButton, Color.white, Color.gray))
+        {
+            SwitchTab(TabType.Construction);
+        }
+
+        /*
         if (OARO_UIUtility.TextButtonImage(constructionTabRect, "OARO_BranchWin_ConstructionTab".Translate(), middleTopButton, middleTopButton_Down))
         {
             SwitchTab(TabType.Construction);
         }
+        */
         Rect demandTabRect = new(constructionTabRect.xMax, inRect.y, tabRectWidth, 45f);
         if (OARO_UIUtility.TextButtonImage(demandTabRect, "OARO_BranchWin_ContractTab".Translate(), middleTopButton, middleTopButton_Down))
         {
@@ -1577,7 +1585,7 @@ public class Window_Branch : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
         return rect;
     }
 

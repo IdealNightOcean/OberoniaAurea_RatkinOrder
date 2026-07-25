@@ -152,7 +152,7 @@ public partial class Window_BranchTask
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
-                    OAFrame_UIUtility.ResetText();
+                    OAFrame_UIUtility.ResetToDefaultTextStyle();
                     return inRect.yMax;
                 }
                 else
@@ -171,7 +171,7 @@ public partial class Window_BranchTask
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                 }
-                OAFrame_UIUtility.ResetText();
+                OAFrame_UIUtility.ResetToDefaultTextStyle();
                 return inRect.yMax;
             }
         }
@@ -426,7 +426,7 @@ public partial class Window_BranchTask
             {
                 ChangeJointPatrolState();
             }
-            OAFrame_UIUtility.ResetText();
+            OAFrame_UIUtility.ResetToDefaultTextStyle();
             return inRect.yMax;
         }
 
@@ -505,7 +505,7 @@ public partial class Window_BranchTask
             }
 
             Widgets.EndScrollView();
-            OAFrame_UIUtility.ResetText();
+            OAFrame_UIUtility.ResetToDefaultTextStyle();
         }
 
         private JointBranchRecord RefreshJointBranchRecord()
@@ -666,10 +666,10 @@ public partial class Window_BranchTask
             }
             else
             {
-                OAFrame_UIUtility.DrawTextureWithMaterial(rect: iconRect,
-                                                          texture: taskChivalry.icon.Texture,
-                                                          material: BaseContent.WhiteMat,
-                                                          scaleMode: ScaleMode.ScaleToFit);
+                OAFrame_Widgets.DrawTextureWithMaterial(rect: iconRect,
+                                                        texture: taskChivalry.icon.Texture,
+                                                        material: BaseContent.WhiteMat,
+                                                        scaleMode: ScaleMode.ScaleToFit);
             }
             return result;
         }

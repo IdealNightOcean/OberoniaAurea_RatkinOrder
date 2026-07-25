@@ -217,7 +217,7 @@ public class Window_BranchDemand : OrderWindowBase
         Rect rightRect = new(reusedRect.xMax + 18f, mainInnerRect.y + 167f, 379f, 667f);
         DrawRightRect(rightRect);
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawLeftText(Rect inRect)
@@ -251,7 +251,7 @@ public class Window_BranchDemand : OrderWindowBase
         reusedRect.xMax = inRect.xMax;
         Widgets.Label(reusedRect, "OARO_CriticalDemandFulfillCount".Translate() + ": " + RatkinOrder.BranchManager.CriticalDemandFulfillCount);
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawDemandListRect(Rect inRect)
@@ -295,7 +295,7 @@ public class Window_BranchDemand : OrderWindowBase
             Widgets.Label(inRect, "OARO_DemandWin_NoDemandNow".Translate().Colorize(Color.gray));
         }
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void DrawRightRect(Rect inRect)
@@ -388,7 +388,7 @@ public class Window_BranchDemand : OrderWindowBase
             DrawRightRect_AcceptedCritical(reusedRect);
         }
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     /// <summary>
@@ -482,7 +482,7 @@ public class Window_BranchDemand : OrderWindowBase
         reusedRect = OARO_UIUtility.CenterRectOnX(potencyRect, reusedRect.yMax + 24f, potencyRect.width, 32f);
         Widgets.Label(reusedRect, cliqueManager.TotalPotency.Value.ToStringPercentSigned());
 
-        OAFrame_UIUtility.ResetText();
+        OAFrame_UIUtility.ResetToDefaultTextStyle();
     }
 
     private void SelctDemand(Branch branch, bool isCritical)

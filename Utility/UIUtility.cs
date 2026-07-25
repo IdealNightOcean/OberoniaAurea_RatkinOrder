@@ -9,6 +9,11 @@ namespace OberoniaAurea.RatkinOrder;
 
 using static OberoniaAurea.RatkinOrder.Branch;
 
+public static class OARO_Widgets
+{
+
+}
+
 public static class OARO_UIUtility
 {
     /// <summary>
@@ -59,13 +64,10 @@ public static class OARO_UIUtility
     public static bool ButtonImage(Rect butRect, Texture2D baseTex, Texture2D downTex, bool doMouseoverSound = true, string tooltip = null)
     {
         if (Mouse.IsOver(butRect))
-        {
             GUI.DrawTexture(butRect, downTex);
-        }
         else
-        {
             GUI.DrawTexture(butRect, baseTex);
-        }
+
 
         if (!String.IsNullOrEmpty(tooltip))
         {
@@ -197,7 +199,7 @@ public static class OARO_UIUtility
             GUI.DrawTexture(reusedRect, honorDef.chivalry.medal.honorDecorationTexture.Texture, ScaleMode.ScaleToFit);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x, 225f, 87f);
-            OAFrame_UIUtility.DrawTextureWithColor(reusedRect, OARO_IconLibrary.HonorBackgroundTex, honorDef.color);
+            OAFrame_Widgets.DrawTextureWithColor(reusedRect, OARO_IconLibrary.HonorBackgroundTex, honorDef.color);
 
             reusedRect = CenterRectOnY(leftRect, leftRect.x + 10f, 90f, 65f);
             GUI.DrawTexture(reusedRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
