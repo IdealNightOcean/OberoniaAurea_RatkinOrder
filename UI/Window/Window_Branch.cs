@@ -1585,7 +1585,7 @@ public class Window_Branch : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
         return rect;
     }
 

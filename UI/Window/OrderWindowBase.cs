@@ -12,8 +12,7 @@ public abstract class OrderWindowBase : Verse.Window, IUIDrawer
 
     public Vector2 InitSize => InitialSize;
 
-    public TextStyle_GameFont GameFontText { get; protected set; } = TextStyle_GameFont.DefaultStyle;
-    public TextStyle_FontSize FontSizeText { get; protected set; } = TextStyle_FontSize.DefaultStyle;
+    public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;
 
     public OrderWindowBase()
     {
@@ -36,7 +35,7 @@ public abstract class OrderWindowBase : Verse.Window, IUIDrawer
     public override void Close(bool doCloseSound = true)
     {
         HasClosed = true;
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
         base.Close(doCloseSound);
     }
 }

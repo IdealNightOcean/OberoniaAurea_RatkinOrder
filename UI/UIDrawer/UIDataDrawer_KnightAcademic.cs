@@ -10,9 +10,8 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
 
     public override void DrawInner(Vector2 position, UIData_KnightAcademic drawData)
     {
-        Rect boxRect = new(position.x, position.y, InitSize.x, InitSize.y);
-
-        Widgets.DrawBoxSolidWithOutline(boxRect, solidColor: OARO_ColorLibrary.DimDarkBackground, outlineColor: OARO_ColorLibrary.CommonOutline, outlineThickness: 2);
+        Rect boxRect = new(position, InitSize);
+        OARO_Widgets.DrawDefaultBoxSolidWithOutline(boxRect, outlineThickness: 2);
 
         Rect innerBoxRect = boxRect.ContractedBy(2f);
 
@@ -33,14 +32,14 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect labelRect = upperInnerRect;
         labelRect.xMin = upperInnerRect.xMin + upperInnerRect.width * 0.1f;
 
-        GameFontText = new(GameFont.Medium, TextAnchor.MiddleLeft);
-        GameFontText.DrawLabel(labelRect, drawData.Academic.LabelCap);
+        this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleLeft);
+        OAFrame_Widgets.DrawLabel(labelRect, drawData.Academic.LabelCap, this.TextStyle);
 
         Rect levelRect = upperInnerRect;
         levelRect.xMax = upperInnerRect.xMax - upperInnerRect.width * 0.1f;
 
-        GameFontText = new(GameFont.Medium, TextAnchor.MiddleRight);
-        GameFontText.DrawLabel(labelRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}");
+        this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleRight);
+        OAFrame_Widgets.DrawLabel(levelRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}", this.TextStyle);
 
         Text.Font = GameFont.Small;
     }
@@ -50,9 +49,9 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect factorRect = lowerInnerRect;
         factorRect.xMin = lowerInnerRect.xMin + lowerInnerRect.width * 0.1f;
 
-        GameFontText = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft,
-                           guiColor: drawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green);
-        GameFontText.DrawLabel(factorRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}");
+        this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft,
+                             guiColor: drawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green);
+        OAFrame_Widgets.DrawLabel(factorRect, drawData.CostFactor.ToStringPercent("0.##"), this.TextStyle);
         TooltipHandler.TipRegion(factorRect, () => drawData.CostFactorExplanation, uniqueId: 876465514);
     }
 }

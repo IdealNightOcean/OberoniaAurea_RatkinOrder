@@ -95,7 +95,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
             }
         }
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRankBackGround(Rect inRect)

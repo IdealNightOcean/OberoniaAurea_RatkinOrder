@@ -231,7 +231,7 @@ public class Window_RatkinOrder : MainTabWindow
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     public void SelectRatkinOrder(RatkinOrder ratkinOrder)
@@ -405,7 +405,7 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = new(inRectX + 63f, inRectY + 796f, 373f, 75f);
         DrawNormalInteraction(reusedRect);
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawNormalInteraction(Rect inRect)
@@ -453,7 +453,7 @@ public class Window_RatkinOrder : MainTabWindow
         }
 
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawMiddleRect(Rect inRect)
@@ -557,7 +557,7 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = new(inRectX, inRectY + 801f, inRectWidth - 35f, 20f);
         Widgets.Label(reusedRect, "OARO_OrderWin_CompletedDemandsInfo".Translate(SelectedOrder.BranchManager.CriticalDemandFulfillCount.ToString(), SelectedOrder.BranchManager.NormalDemandFulfillCount.ToString()));
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawTaskSummary(Rect inRect)
@@ -628,7 +628,7 @@ public class Window_RatkinOrder : MainTabWindow
                 }
         }
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawFollowedBranchList(Rect inRect)
@@ -679,7 +679,7 @@ public class Window_RatkinOrder : MainTabWindow
         {
             FollowedBranchesFloatMenu();
         }
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawFollowedBranch(Rect inRect, Branch branch)
@@ -857,7 +857,7 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRectY + 505f, 372f, 320f);
         DrawReformation(reusedRect);
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawStoresReserveRect(Rect inRect, Branch branch, BranchStoresReserveHandler.ReserveRecord reserveRecord)
@@ -897,7 +897,7 @@ public class Window_RatkinOrder : MainTabWindow
         reusedRect = OARO_UIUtility.CenterRectOnY(progressRect, progressRect.xMin + 50f, 50f, 48f);
         GUI.DrawTexture(reusedRect, reserveRecord.Target.iconTexture.Texture, ScaleMode.ScaleToFit);
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawReformation(Rect inRect)
@@ -905,7 +905,7 @@ public class Window_RatkinOrder : MainTabWindow
         Text.Font = GameFont.Medium;
         Text.Anchor = TextAnchor.MiddleCenter;
         Widgets.Label(inRect, "OARO_ReformationNotFinished".Translate().Colorize(Color.gray));
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void FollowedBranchesFloatMenu()

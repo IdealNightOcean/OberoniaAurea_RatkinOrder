@@ -1,4 +1,5 @@
 using NightOcean;
+using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -42,8 +43,10 @@ public class Window_BranchSquad : OrderWindowBase
     private TabType CurTab { get; set; } = TabType.All;
     private List<TabRecord> Tabs { get; } = new(3);
 
-    private List<BranchSummaryUICache> BranchSummaryCaches { get; }
-    private List<BranchSummaryUICache> TabSummaryCaches { get; }
+    private List<UIData_SquadSummary> BranchSummaryCaches { get; }
+    private List<UIData_SquadSummary> TabSummaryCaches { get; }
+
+    private UIDataDrawer_SquadSummary SquadSummaryDrawer { get; } = new();
 
     private LazyMutable<string> SupplyRecoveryRateExplanation { get; }
     private LazyMutable<int> BombardSupportCeiling { get; }
@@ -850,11 +853,13 @@ public class Window_BranchSquad : OrderWindowBase
         int usedCount = Mathf.Max(7, squadCount);
         Rect entryRect;
 
+        float entryWidth = SquadSummaryDrawer.InitSize.x;
+        float entryHeight = SquadSummaryDrawer.InitSize.y;
         Text.Anchor = TextAnchor.MiddleCenter;
         for (int i = 0; i < squadCount; i++)
         {
-            entryRect = new(entryX, entryY, 393f, 91f);
-            entryY += 89f;
+            entryRect = new(entryX, entryY, entryWidth, entryHeight);
+            entryY += entryHeight;
 
             DrawSquadEntry(entryRect, TabSummaryCaches[i], i);
         }
@@ -863,8 +868,8 @@ public class Window_BranchSquad : OrderWindowBase
         {
             for (int i = squadCount; i < usedCount; i++)
             {
-                entryRect = new(entryX, entryY, 393f, 91f);
-                entryY += 89f;
+                entryRect = new(entryX, entryY, entryWidth, entryHeight);
+                entryY += entryHeight;
 
                 GUI.DrawTexture(entryRect, OARO_IconLibrary.BranchSummaryBackground);
             }
@@ -902,7 +907,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     }
 
-    private void DrawSquadEntry(Rect inRect, BranchSummaryUICache entry, int index)
+    private void DrawSquadEntry(Rect inRect, UIData_SquadSummary entry, int index)
     {
         Rect summaryRect = inRect.ContractedBy(2f);
         if (Widgets.ButtonInvisible(summaryRect))
@@ -917,7 +922,8 @@ public class Window_BranchSquad : OrderWindowBase
             }
         }
 
-        OARO_UIUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
+        SquadSummaryDrawer.Draw(new(inRect.x, inRect.y), entry);
+        //OARO_UIUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
         if (Mouse.IsOver(inRect))
         {
             Widgets.DrawHighlight(inRect);
@@ -971,7 +977,7 @@ public class Window_BranchSquad : OrderWindowBase
             try
             {
                 BranchSummaryUICache summaryUICache = new(branch, Map);
-                BranchSummaryCaches.Add(new BranchSummaryUICache(branch, Map));
+                BranchSummaryCaches.Add(new UIData_SquadSummary(branch, Map));
             }
             catch (Exception ex)
             {
@@ -984,7 +990,7 @@ public class Window_BranchSquad : OrderWindowBase
         }
         if (BranchSummaryCaches.Count > 0)
         {
-            BranchSummaryCaches.Sort(new BranchSummaryUICache.UIEntryComparer());
+            // BranchSummaryCaches.Sort(new BranchSummaryUICache.UIEntryComparer());
             GetCurTapBranchSummary();
         }
     }

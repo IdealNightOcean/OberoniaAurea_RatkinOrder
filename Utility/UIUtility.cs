@@ -9,11 +9,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 using static OberoniaAurea.RatkinOrder.Branch;
 
-public static class OARO_Widgets
-{
-
-}
-
 public static class OARO_UIUtility
 {
     /// <summary>

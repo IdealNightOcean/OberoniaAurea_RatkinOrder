@@ -139,7 +139,7 @@ public partial class Window_OrderStation : OrderWindowBase
         reusedRect = new(14f, inRect.yMax - 284f, 50f, 284f);
         GUI.DrawTexture(reusedRect, leftCandlestick);
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawResidentKnights(Rect inRect)
@@ -208,7 +208,7 @@ public partial class Window_OrderStation : OrderWindowBase
         reusedRect = new(innerRect.xMax - 190f, reusedRect.yMax + 2f, 190f, 95f);
         Widgets.LabelScrollable(reusedRect, PreferredBuildingsStr, ref scrollPosition_PreferredBuildingsStr);
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawBuffAndLevel(Rect inRect)
@@ -348,7 +348,7 @@ public partial class Window_OrderStation : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawAroundKnightGroups(Rect inRect)
@@ -422,7 +422,7 @@ public partial class Window_OrderStation : OrderWindowBase
         }
 
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private bool DrawAroundKnightGroup(Rect inRect, AroundKnightGroup group, float successRate, int index)

@@ -83,7 +83,7 @@ public class Window_BranchList : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DarwBranchEntry(Rect inRect, BranchSummaryUICache branchSummary)
@@ -165,7 +165,7 @@ public class Window_BranchList : OrderWindowBase
             DrawBranchInfo(reusedRect, branchSummary);
         }
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawBranchInfo(Rect inRect, BranchSummaryUICache branchSummary)
@@ -187,7 +187,7 @@ public class Window_BranchList : OrderWindowBase
         Widgets.Label(reusedRect.TopHalf(), "OARO_BranchListWin_Distance".Translate());
         Widgets.Label(reusedRect.BottomHalf(), branchSummary.Distance.ToString("F0").Colorize(branchSummary.IsInAffectedRange ? Color.green : Color.white));
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawBranchConstruct(Rect inRect, BranchSummaryUICache branchSummary)
@@ -247,7 +247,7 @@ public class Window_BranchList : OrderWindowBase
 
         }
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_MainBackground");

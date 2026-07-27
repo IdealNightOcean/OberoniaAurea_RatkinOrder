@@ -9,8 +9,7 @@ namespace OberoniaAurea.RatkinOrder.UI;
 public class UIDrawer_KnightVirtue : IUIDrawer
 {
     public Vector2 InitSize => new(362f, 182f);
-    public TextStyle_GameFont GameFontText { get; set; } = TextStyle_GameFont.DefaultStyle;
-    public TextStyle_FontSize FontSizeText { get; set; } = TextStyle_FontSize.DefaultStyle;
+    public TextStyle TextStyle { get; set; } = TextStyle.DefaultStyle;
 
     public ResidentKnight Knight { get; }
     public KnightVirtue Virtue { get; }
@@ -52,8 +51,8 @@ public class UIDrawer_KnightVirtue : IUIDrawer
         Rect labelRect = innerBoxRect;
         labelRect.xMax = verticalLineX;
 
-        GameFontText = new(GameFont.Medium, TextAnchor.MiddleCenter);
-        GameFontText.DrawLabel(labelRect, this.Virtue.Def.LabelCap);
+        this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(labelRect, this.Virtue.Def.LabelCap, this.TextStyle);
 
         float levelRectHeight = innerBoxRect.height / 3f;
         for (int i = 0; i < this.Virtue.Def.maxLevel; i++)
@@ -87,8 +86,8 @@ public class UIDrawer_KnightVirtue : IUIDrawer
 
         if (this.Virtue.Level < level)
         {
-            GameFontText = new(GameFont.Medium, TextAnchor.MiddleCenter);
-            GameFontText.DrawLabel(traitInfoRect, "OARO_NotUnlocked".Translate());
+            this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleCenter);
+            OAFrame_Widgets.DrawLabel(traitInfoRect, "OARO_NotUnlocked".Translate(), this.TextStyle);
             return;
         }
 
@@ -105,8 +104,8 @@ public class UIDrawer_KnightVirtue : IUIDrawer
         }
         else
         {
-            GameFontText = new(OARO_ColorLibrary.DimInactive, GameFont.Medium, TextAnchor.MiddleCenter);
-            GameFontText.DrawLabel(traitInfoRect, "None".Translate());
+            this.TextStyle = new(OARO_ColorLibrary.DimInactive, GameFont.Medium, TextAnchor.MiddleCenter);
+            OAFrame_Widgets.DrawLabel(traitInfoRect, "None".Translate(), this.TextStyle);
         }
     }
 
@@ -118,8 +117,8 @@ public class UIDrawer_KnightVirtue : IUIDrawer
 
         Rect descRect = inRect;
         descRect.xMin = iconRect.xMax;
-        GameFontText = new(GameFont.Small, TextAnchor.MiddleCenter);
-        GameFontText.DrawLabel(descRect, virtueTrait.description);
+        this.TextStyle = new(GameFont.Small, TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(descRect, virtueTrait.description, this.TextStyle);
     }
 
     private void DarwVirtueTaritSelection(Rect inRect, int level)

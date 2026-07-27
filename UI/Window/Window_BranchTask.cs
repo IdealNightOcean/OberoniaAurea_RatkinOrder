@@ -125,7 +125,7 @@ public partial class Window_BranchTask : OrderWindowBase
         reusedRect = new(reusedRect.xMax + 28f, mainInnerRectY + 180f, 510f, 647f);
         DrawRightRect(reusedRect);
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawLeftRect(Rect inRect)
@@ -212,7 +212,7 @@ public partial class Window_BranchTask : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRightRect(Rect inRect)
@@ -236,7 +236,7 @@ public partial class Window_BranchTask : OrderWindowBase
             DrawRightRect_JointPatrol(mainRect);
         }
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRightRect_Normal(Rect inRect)
@@ -248,7 +248,7 @@ public partial class Window_BranchTask : OrderWindowBase
 
 
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRightRect_JointPatrol(Rect inRect)
@@ -294,7 +294,7 @@ public partial class Window_BranchTask : OrderWindowBase
             DrawJointPatrolTarget(mainRect);
         }
 
-        OAFrame_UIUtility.ResetToDefaultTextStyle();
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawJointPatrolStatic(Rect inRect)

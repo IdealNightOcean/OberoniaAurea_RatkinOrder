@@ -47,7 +47,7 @@
       <Private>False</Private>
     </Reference>
     <Reference Include="NightOcean">
-      <HintPath>..\..\RimWorldReference\NightOcean\NightOcean.dll</HintPath>
+      <HintPath>E:\ProgramFiles\Steam\steamapps\common\RimWorld\Mods\[OA]Oberonia Aurea Framework\1.6\Assemblies\NightOcean.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="NightOcean.SimpleAIClient">
@@ -334,6 +334,9 @@
     <Compile Include="Thought\ThoughtWorker_Situational_Virtue.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Thought\Thought_Situational_Virtue.cs" />
+    <Compile Include="UI\UIData\UIData_SquadSummary.cs" />
+    <Compile Include="UI\UIDrawer\UIDataDrawer_SquadSummary.cs" />
+    <Compile Include="UI\Widgets.cs" />
     <Compile Include="UI\IUIDrawer.cs" />
     <Compile Include="Utility\AcademicUtility.cs" />
     <Compile Include="Utility\StatExplanationUtility.cs" />

@@ -152,7 +152,7 @@ public partial class Window_BranchTask
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
-                    OAFrame_UIUtility.ResetToDefaultTextStyle();
+                    OAFrame_UIUtility.ResetTextStyleToDefault();
                     return inRect.yMax;
                 }
                 else
@@ -171,7 +171,7 @@ public partial class Window_BranchTask
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                 }
-                OAFrame_UIUtility.ResetToDefaultTextStyle();
+                OAFrame_UIUtility.ResetTextStyleToDefault();
                 return inRect.yMax;
             }
         }
@@ -426,7 +426,7 @@ public partial class Window_BranchTask
             {
                 ChangeJointPatrolState();
             }
-            OAFrame_UIUtility.ResetToDefaultTextStyle();
+            OAFrame_UIUtility.ResetTextStyleToDefault();
             return inRect.yMax;
         }
 
@@ -505,7 +505,7 @@ public partial class Window_BranchTask
             }
 
             Widgets.EndScrollView();
-            OAFrame_UIUtility.ResetToDefaultTextStyle();
+            OAFrame_UIUtility.ResetTextStyleToDefault();
         }
 
         private JointBranchRecord RefreshJointBranchRecord()
