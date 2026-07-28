@@ -1,4 +1,5 @@
 using NightOcean;
+using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
@@ -33,7 +34,7 @@ public class Window_Branch : OrderWindowBase
     private Branch Branch { get; }
     private BranchFacilityHandler FacilityHandler { get; }
     private BranchBuildingHandler BuildingHandler { get; }
-    private BranchInfoUICache CachedBranchInfo { get; set; }
+    private UIData_BrnchInfo CachedBranchInfo { get; set; }
     private Caravan Caravan { get; }
     private Map Map { get; }
 
@@ -41,6 +42,9 @@ public class Window_Branch : OrderWindowBase
 
     private SelectType CurSelectType { get; set; } = SelectType.None;
     private int AllFacilityDefCount { get; }
+
+
+    public UIDataDrawer_SquadSummary SquadSummaryDrawer { get; } = new();
 
     /*
         建设部分缓存
@@ -1047,8 +1051,9 @@ public class Window_Branch : OrderWindowBase
             }
         }
 
-        reusedRect = OARO_UIUtility.DrawBranchSummary(new Vector2(inRect.x, inRect.y), CachedBranchInfo);
-
+        Vector2 squadSummaryPos = new(inRect.xMin, inRect.yMin);
+        SquadSummaryDrawer.Draw(squadSummaryPos, CachedBranchInfo);
+        reusedRect = new(squadSummaryPos, SquadSummaryDrawer.DefaultSize);
         inRect.ContractedBy(2f);
 
         Text.Font = GameFont.Medium;
@@ -1072,14 +1077,8 @@ public class Window_Branch : OrderWindowBase
         Text.Anchor = TextAnchor.MiddleRight;
         Text.Font = GameFont.Medium;
         reusedRect = new(inRect.xMax - (12f + 100f), reusedRect.yMax + 2f, 100f, 24f);
-        int growthBottom = CachedBranchInfo.DailyPopulationGrowth_Bottom.Value;
-        int growthCeiling = CachedBranchInfo.DailyPopulationGrowth_Ceiling.Value;
-        if (growthBottom > growthCeiling)
-        {
-            (growthBottom, growthCeiling) = (growthCeiling, growthBottom);
-        }
-        Widgets.Label(reusedRect, "OARO_NumberRangePeople".Translate(growthBottom.ToString(), growthCeiling.ToString())
-                                                          .Colorize(growthBottom > 0 ? Color.green : ColorLibrary.RedReadable));
+        Widgets.Label(reusedRect, "OARO_NumberRangePeople".Translate(CachedBranchInfo.DailyPopulationGrowthBoundary.bottom.ToString(), CachedBranchInfo.DailyPopulationGrowthBoundary.ceiling.ToString())
+                                                          .Colorize(CachedBranchInfo.DailyPopulationGrowth > 0 ? Color.green : ColorLibrary.RedReadable));
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 

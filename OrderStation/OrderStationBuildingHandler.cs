@@ -7,7 +7,7 @@ namespace OberoniaAurea.RatkinOrder;
 /// <summary>
 /// 骑士驻地建筑处理器 - 负责管理骑士驻地内的建筑相关信息，包括课业家具数量、各骑士精神偏好建筑等信息的缓存和更新
 /// </summary>
-public class OrderStationBuildingHandler
+public class OrderStationBuildingHandler : IExposable
 {
     private const int BuildingsRecacheInterval = 30000;
 
@@ -37,6 +37,8 @@ public class OrderStationBuildingHandler
             return preferBuildingDefsByChivalry;
         }
     }
+
+    public void ExposeData() { }
 
     private void RecacheBuildings()
     {

@@ -357,7 +357,7 @@
     <Compile Include="UI\Window\Window_ResidentKnight_AcademicArrange.cs" />
     <Compile Include="UI\Window\Window_BranchDemand.cs" />
     <Compile Include="UI\Window\OrderWindowBase.cs" />
-    <Compile Include="UI\UIData\SquadInfoUICache.cs" />
+    <Compile Include="UI\UIData\UIData_SquadInfo.cs" />
     <Compile Include="UI\UIData\BranchSummaryUICache.cs" />
     <Compile Include="Components\KnightRecord.cs" />
     <Compile Include="Components\TrackedIntValue.cs" />
@@ -699,7 +699,7 @@
     <Compile Include="WorldObject\Mercy\WorldObject_UnsalableArtcraft.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UI\UIData\BranchInfoUICache.cs" />
+    <Compile Include="UI\UIData\UIData_BrnchInfo.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

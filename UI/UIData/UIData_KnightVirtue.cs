@@ -13,14 +13,12 @@ public class UIData_KnightVirtue : UIDataBase
 
     public List<UIData_MentorshipStudent> studentUICache;
 
-
     public UIData_KnightVirtue(ResidentKnight knight)
     {
         this.Knight = knight;
         this.VirtueHandler = knight.VirtueHandler;
         this.AcademicHandler = knight.AcademicHandler;
     }
-
 
     protected override void RefreshInner()
     {

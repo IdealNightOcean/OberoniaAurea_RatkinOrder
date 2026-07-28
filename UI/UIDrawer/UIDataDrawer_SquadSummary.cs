@@ -8,11 +8,11 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
 {
-    public override Vector2 InitSize => new(392f, 90f);
+    public override Vector2 DefaultSize => new(392f, 90f);
 
     public override void DrawInner(Vector2 position, UIData_SquadSummary drawData)
     {
-        Rect boxRect = new(position, InitSize);
+        Rect boxRect = new(position, DefaultSize);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.DimDarkBackground);
 
         Rect innerBoxRect = RectUtils.ContractedBy(boxRect, 2f);
@@ -35,7 +35,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
     public void DrawLeftRect(Rect inRect, UIData_SquadSummary drawData)
     {
         Rect honorColorRect = inRect;
-        honorColorRect.width = 4f;
+        honorColorRect.width = 5f;
 
         Rect innerRect = inRect;
         innerRect.xMin = honorColorRect.xMax; //标准大约为(226f, 86f)
@@ -52,14 +52,12 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
 
             OAFrame_Widgets.DrawTextureWithColor(innerRect, OARO_IconLibrary.HonorBackgroundTex, honorDef.color);
 
-            Rect honorIconRect = new(0f, 0f, innerRect.width * 0.4f, innerRect.height * 0.75f);
-            honorIconRect = honorIconRect.CenteredIn(branchIconRect);
+            Rect honorIconRect = branchIconRect.CenterSegment(0.8f, 0.75f);
             GUI.DrawTexture(honorIconRect, honorDef.iconTexture.Texture, ScaleMode.ScaleToFit);
         }
         else
         {
-            Rect normalBranchIconRect = new(0f, 0f, innerRect.width * 0.4f, innerRect.height * 0.4f);
-            normalBranchIconRect = normalBranchIconRect.CenteredIn(branchIconRect);
+            Rect normalBranchIconRect = branchIconRect.CenterSegment(0.5f, 0.5f);
             GUI.DrawTexture(normalBranchIconRect, OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
 
@@ -70,7 +68,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
         infoRect.xMin = branchIconRect.xMax;
 
         Rect squadNameRect = infoRect.TopPart(0.35f);
-        this.TextStyle = new(guiColor: drawData.Branch.Color, font: GameFont.Medium, anchor: TextAnchor.MiddleCenter);
+        this.TextStyle = new(guiColor: drawData.Branch.Color, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
         if (OAFrame_Widgets.DrawLabelEllipses(squadNameRect, drawData.SquadName, this.TextStyle))
         {
             TooltipHandler.TipRegion(squadNameRect, drawData.SquadName);
@@ -102,7 +100,8 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
 
         Rect workStateStrRect = workStateRect.BottomPart(0.3f);
         string workState = drawData.Branch.CurWorkStateDesc;
-        this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
+        this.TextStyle = new(guiColor: drawData.Branch.CurWorkState == WorkStateType.Idle ? Color.white : Color.green,
+                             font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
         if (OAFrame_Widgets.DrawLabelEllipses(workStateStrRect, workState, this.TextStyle))
         {
             TooltipHandler.TipRegion(workStateStrRect, workState);
@@ -112,13 +111,19 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
     public void DrawRightRect(Rect inRect, UIData_SquadSummary drawData)
     {
         float partRectHeight = inRect.height * (1f / 3f);
-        Rect topRect = new(inRect.xMin, inRect.yMin, inRect.width, partRectHeight);
-
+        Rect topRect = Rect.MinMaxRect(Mathf.Min(inRect.xMin + 24f, inRect.xMax - inRect.width * 0.9f),
+                                       inRect.y,
+                                       inRect.xMax,
+                                       inRect.yMin + partRectHeight);
+        this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.MiddleLeft);
+        OAFrame_Widgets.DrawLabel(topRect, "OARO_AllCrewCountShortInfo".Translate(drawData.Squad.AllCrewCountInt), this.TextStyle);
 
         Rect centerRect = RectUtils.OffsetVertical(topRect, partRectHeight);
-        Widgets.DrawBoxSolid(centerRect, OARO_ColorLibrary.MediumDarkBackground);
+        Widgets.DrawBoxSolid(inRect.CenterSegmentOnY((1f / 3f)), OARO_ColorLibrary.MediumDarkBackground);
+        OAFrame_Widgets.DrawLabel(centerRect, "OARO_BranchPotencyShortInfo".Translate(drawData.Branch.Potency.ToString("0.##")), this.TextStyle);
 
         Rect bottomRect = RectUtils.OffsetVertical(centerRect, partRectHeight);
+        OAFrame_Widgets.DrawLabel(bottomRect, $"{"OARO_BranchSupplyState".Translate()}: {drawData.Branch.SupplyState}", this.TextStyle);
     }
 }
 

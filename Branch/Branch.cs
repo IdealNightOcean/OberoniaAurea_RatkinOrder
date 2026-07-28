@@ -132,7 +132,7 @@ public class Branch : IExposable, ILoadReferenceable
 
     [Unsaved] private WorkStateType curWorkState = WorkStateType.Idle;
     [Unsaved] private string curWorkStateDesc = string.Empty;
-    private bool WorkStateDirty { get; set; }
+    private bool WorkStateDirty { get; set; } = true;
 
     public WorkStateType CurWorkState
     {
@@ -153,7 +153,6 @@ public class Branch : IExposable, ILoadReferenceable
             if (WorkStateDirty)
             {
                 UpdateWorkState();
-                WorkStateDirty = false;
             }
             return curWorkStateDesc;
         }
@@ -471,32 +470,41 @@ public class Branch : IExposable, ILoadReferenceable
     {
         CooldownManager.RegisterRecord(KeyLibrary_CDRecord.BranchWorkState, cdTicks: 6 * 2500);
 
-        if (taskHandler.HasTask)
+        try
         {
-            curWorkState = taskHandler.CurTask.Def.isAbroadTask ? WorkStateType.AbroadTask : WorkStateType.OnBaseTask;
-            curWorkStateDesc = taskHandler.CurTask.Label;
-            return;
-        }
+            if (taskHandler.HasTask)
+            {
+                curWorkState = taskHandler.CurTask.Def.isAbroadTask ? WorkStateType.AbroadTask : WorkStateType.OnBaseTask;
+                curWorkStateDesc = taskHandler.CurTask.Label;
+                return;
+            }
 
-        if (this.IsOnJointPatrol())
-        {
-            curWorkState = WorkStateType.AbroadTask;
-            curWorkStateDesc = "OARO_BranchWorkState_JointPatrol".Translate();
-            return;
-        }
+            if (this.IsOnJointPatrol())
+            {
+                curWorkState = WorkStateType.AbroadTask;
+                curWorkStateDesc = "OARO_BranchWorkState_JointPatrol".Translate();
+                return;
+            }
 
-        curWorkState = WorkStateType.Idle;
-        int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
-        if (hourOfDay <= 5 || hourOfDay >= 21)
-        {
-            curWorkStateDesc = "OARO_BranchWorkState_Rest".Translate();
+            curWorkState = WorkStateType.Idle;
+            int hourOfDay = GenLocalDate.HourOfDay(baseSite.Tile);
+            if (hourOfDay <= 5 || hourOfDay >= 21)
+            {
+                curWorkStateDesc = "OARO_BranchWorkState_Rest".Translate();
+            }
+            else
+            {
+                curWorkStateDesc = "OARO_BranchWorkState_Idle".Translate();
+            }
         }
-        else
+        catch
         {
-            curWorkStateDesc = "OARO_BranchWorkState_Idle".Translate();
+            curWorkStateDesc = KeyLibrary_Misc.ErrorTipWithColor;
         }
-
-        WorkStateDirty = false;
+        finally
+        {
+            WorkStateDirty = false;
+        }
     }
 
     private float GetCurPotency()

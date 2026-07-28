@@ -10,7 +10,7 @@ public abstract class OrderWindowBase : Verse.Window, IUIDrawer
     protected override float Margin => 0f;
     protected bool HasClosed { get; set; }
 
-    public Vector2 InitSize => InitialSize;
+    public Vector2 DefaultSize => InitialSize;
 
     public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;
 

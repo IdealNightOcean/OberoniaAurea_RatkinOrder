@@ -37,7 +37,7 @@ public class Window_BranchSquad : OrderWindowBase
     private LazyMutable<int> MapRecommendationCount { get; }
 
     private int SelBranchIndex { get; set; }
-    private SquadInfoUICache SelSquadInfo { get; set; }
+    private UIData_SquadInfo SelSquadInfo { get; set; }
     private Branch SelBranch => SelSquadInfo?.Branch;
 
     private TabType CurTab { get; set; } = TabType.All;
@@ -127,7 +127,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_UIUtility.CenterRectOnX(mainInnerRect, mainInnerRectY + 150f, 322f, 48f);
         Text.Anchor = TextAnchor.MiddleCenter;
         Text.Font = GameFont.Medium;
-        Widgets.Label(reusedRect, SelSquadInfo.SquadName);
+        Widgets.Label(reusedRect, SelSquadInfo?.SquadName ?? "---");
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.UpperLeft;
 
@@ -185,7 +185,7 @@ public class Window_BranchSquad : OrderWindowBase
 
         reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 12f, 88f, 48f);
         Text.Anchor = TextAnchor.MiddleLeft;
-        Widgets.Label(reusedRect, SelSquadInfo.BaseSiteName);
+        Widgets.Label(reusedRect, SelSquadInfo?.BaseSiteName ?? "---");
 
         reusedRect = OARO_UIUtility.CenterRectOnY(reusedRect, reusedRect.xMax + 24f, 60f, 32f);
         Text.Anchor = TextAnchor.MiddleCenter;
@@ -853,8 +853,8 @@ public class Window_BranchSquad : OrderWindowBase
         int usedCount = Mathf.Max(7, squadCount);
         Rect entryRect;
 
-        float entryWidth = SquadSummaryDrawer.InitSize.x;
-        float entryHeight = SquadSummaryDrawer.InitSize.y;
+        float entryWidth = SquadSummaryDrawer.DefaultSize.x;
+        float entryHeight = SquadSummaryDrawer.DefaultSize.y;
         Text.Anchor = TextAnchor.MiddleCenter;
         for (int i = 0; i < squadCount; i++)
         {
@@ -1081,7 +1081,8 @@ public class Window_BranchSquad : OrderWindowBase
                 return;
             }
             SelBranchIndex = index;
-            SelSquadInfo = new(branch, Map);
+            if (SelSquadInfo is null) SelSquadInfo = new(branch, Map);
+            else SelSquadInfo.ResetData(branch, Map);
 
             RefreshBranchStatCache();
             RefreshBranchAcceptance();
@@ -1110,9 +1111,9 @@ public class Window_BranchSquad : OrderWindowBase
         RefreshBranchStatCache();
         RefreshBranchAcceptance();
 
-        SelSquadInfo?.ClearCache();
+        SelSquadInfo?.MarkDirty();
         SelBranchIndex = -1;
-        SelSquadInfo = new();
+        SelSquadInfo = null;
     }
 
     private string RefreshSupplyRecoveryRateExplanation()

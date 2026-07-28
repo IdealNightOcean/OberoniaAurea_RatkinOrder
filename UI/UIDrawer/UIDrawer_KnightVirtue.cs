@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDrawer_KnightVirtue : IUIDrawer
 {
-    public Vector2 InitSize => new(362f, 182f);
+    public Vector2 DefaultSize => new(362f, 182f);
     public TextStyle TextStyle { get; set; } = TextStyle.DefaultStyle;
 
     public ResidentKnight Knight { get; }
@@ -22,31 +22,13 @@ public class UIDrawer_KnightVirtue : IUIDrawer
 
     public void Draw(Vector2 position)
     {
-        Rect boxRect = new(position.x, position.y, InitSize.x, InitSize.y);
-        Widgets.DrawBoxSolidWithOutline(rect: boxRect,
-                                        solidColor: OARO_ColorLibrary.MediumDarkBackground,
-                                        outlineColor: OARO_ColorLibrary.CommonOutline);
-
+        Rect boxRect = new(position.x, position.y, DefaultSize.x, DefaultSize.y);
         Rect innerBoxRect = boxRect.ContractedBy(1f);
+        Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.MediumDarkBackground);
 
         float verticalLineX = innerBoxRect.xMin + innerBoxRect.width * (1f / 3f);
-        Widgets.DrawLine(start: new Vector2(verticalLineX, innerBoxRect.yMin),
-                         end: new Vector2(verticalLineX, innerBoxRect.yMax),
-                         color: OARO_ColorLibrary.CommonOutline,
-                         width: 1f);
-
         float horizontalLine2Y = innerBoxRect.yMin + innerBoxRect.height * (1f / 3f);
-        Widgets.DrawLine(start: new Vector2(verticalLineX, horizontalLine2Y),
-                         end: new Vector2(innerBoxRect.xMax, horizontalLine2Y),
-                         color: OARO_ColorLibrary.CommonOutline,
-                         width: 1f);
-
         float horizontalLine3Y = innerBoxRect.yMin + innerBoxRect.height * (2f / 3f);
-        Widgets.DrawLine(start: new Vector2(verticalLineX, horizontalLine3Y),
-                         end: new Vector2(innerBoxRect.xMax, horizontalLine3Y),
-                         color: OARO_ColorLibrary.CommonOutline,
-                         width: 1f);
-
 
         Rect labelRect = innerBoxRect;
         labelRect.xMax = verticalLineX;
@@ -61,13 +43,27 @@ public class UIDrawer_KnightVirtue : IUIDrawer
             levelRect.yMin = innerBoxRect.yMin + i * levelRectHeight;
             levelRect.yMax = levelRect.yMin + levelRectHeight;
 
-            Widgets.DrawLine(start: new Vector2(verticalLineX, levelRect.yMax),
-                             end: new Vector2(innerBoxRect.xMax, levelRect.yMax),
-                             color: OARO_ColorLibrary.CommonOutline,
-                             width: 1f);
-
             DrawVirtueTrait(inRect: levelRect, level: i + 1);
+
+            OAFrame_Widgets.DrawLineHorizontal(new Vector2(levelRect.xMin, levelRect.yMax), levelRect.width, OARO_ColorLibrary.CommonOutline);
         }
+
+        OAFrame_Widgets.DrawBox(boxRect, OARO_ColorLibrary.CommonOutline, thickness: 1);
+
+        Widgets.DrawLine(start: new Vector2(verticalLineX, innerBoxRect.yMin),
+                 end: new Vector2(verticalLineX, innerBoxRect.yMax),
+                 color: OARO_ColorLibrary.CommonOutline,
+                 width: 1f);
+
+        Widgets.DrawLine(start: new Vector2(verticalLineX, horizontalLine2Y),
+                 end: new Vector2(innerBoxRect.xMax, horizontalLine2Y),
+                 color: OARO_ColorLibrary.CommonOutline,
+                 width: 1f);
+
+        Widgets.DrawLine(start: new Vector2(verticalLineX, horizontalLine3Y),
+                 end: new Vector2(innerBoxRect.xMax, horizontalLine3Y),
+                 color: OARO_ColorLibrary.CommonOutline,
+                 width: 1f);
     }
 
     private void DrawVirtueTrait(Rect inRect, int level)

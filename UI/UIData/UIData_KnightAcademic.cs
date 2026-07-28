@@ -1,4 +1,6 @@
-﻿namespace OberoniaAurea.RatkinOrder.UI;
+﻿using NightOcean;
+
+namespace OberoniaAurea.RatkinOrder.UI;
 
 
 public class UIData_KnightAcademic : UIDataBase
@@ -10,24 +12,14 @@ public class UIData_KnightAcademic : UIDataBase
 
     public float CostFactor { get; private set; }
 
-    private string costFactorExplanation;
-
-    public string CostFactorExplanation
-    {
-        get
-        {
-            if (costFactorExplanation is null)
-            {
-                RefreshCostFactorExplanation();
-            }
-            return costFactorExplanation;
-        }
-    }
+    public LazyMutable<string> CostFactorExplanation { get; }
 
     public UIData_KnightAcademic(ResidentKnight knight, KnightAcademicDef academic)
     {
         Knight = knight;
         Academic = academic;
+
+        CostFactorExplanation = new(refreshFunc: RefreshCostFactorExplanation);
     }
 
     protected override void RefreshInner()
@@ -36,16 +28,18 @@ public class UIData_KnightAcademic : UIDataBase
         ResidentKnightStatRequestData_Academic requestData = new(Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
 
         CostFactor = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatValue(requestData);
-        costFactorExplanation = null;
+        CostFactorExplanation.Reset();
     }
 
 
-    private void RefreshCostFactorExplanation()
+    private string RefreshCostFactorExplanation()
     {
         ResidentKnightStatRequestData_Academic requestData = new(Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
 
-        (costFactorExplanation, float? costFactorNullabel) = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatModifyExplanation(requestData);
+        (string explanation, float? resultNullabel) = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatModifyExplanation(requestData);
 
-        CostFactor = costFactorNullabel ?? ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.baseValue;
+        CostFactor = resultNullabel ?? ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.baseValue;
+
+        return explanation;
     }
 }

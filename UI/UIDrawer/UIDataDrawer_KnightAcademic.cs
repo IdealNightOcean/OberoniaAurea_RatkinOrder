@@ -6,11 +6,11 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademic>
 {
-    public override Vector2 InitSize => new(260f, 94f);
+    public override Vector2 DefaultSize => new(260f, 94f);
 
     public override void DrawInner(Vector2 position, UIData_KnightAcademic drawData)
     {
-        Rect boxRect = new(position, InitSize);
+        Rect boxRect = new(position, DefaultSize);
         OARO_Widgets.DrawDefaultBoxSolidWithOutline(boxRect, outlineThickness: 2);
 
         Rect innerBoxRect = boxRect.ContractedBy(2f);
@@ -52,6 +52,6 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft,
                              guiColor: drawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green);
         OAFrame_Widgets.DrawLabel(factorRect, drawData.CostFactor.ToStringPercent("0.##"), this.TextStyle);
-        TooltipHandler.TipRegion(factorRect, () => drawData.CostFactorExplanation, uniqueId: 876465514);
+        TooltipHandler.TipRegion(factorRect, () => drawData.CostFactorExplanation.Value, uniqueId: 876465514);
     }
 }

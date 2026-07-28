@@ -6,8 +6,9 @@ public class UIData_SquadSummary : UIDataBase
 {
     public Branch Branch { get; protected set; }
     public Map Map { get; protected set; }
+    public BranchSquad Squad { get; protected set; }
 
-    public string SquadName { get; protected set; } = string.Empty;
+    public string SquadName => Squad.Name;
     public string BaseSiteName { get; protected set; } = string.Empty;
     public float Distance { get; protected set; } = -1f;
     public float AffectedRange { get; protected set; } = -1f;
@@ -22,19 +23,19 @@ public class UIData_SquadSummary : UIDataBase
     {
         this.Branch = branch;
         this.Map = map;
+        this.Squad = branch.Squad;
     }
 
     public void ResetData(Branch branch, Map map)
     {
         this.Branch = branch;
         this.Map = map;
+        this.Squad = branch.Squad;
         IsReady = false;
     }
 
     protected override void RefreshInner()
     {
-        SquadName = Branch.Squad.Name;
-
         BaseSiteName = BranchUtility.GetBranchSiteName(Branch);
 
         Distance = Branch.DistanceTo(Map.Tile);

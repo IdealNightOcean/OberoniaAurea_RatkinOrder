@@ -22,7 +22,7 @@ public class MentorshipManager : IExposable
 
     public MentorshipManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(ResidentRoleManager));
+        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(MentorshipManager));
         Instance = this;
 
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();

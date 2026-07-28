@@ -65,6 +65,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
         ResidentPawnsManager.ClearStaticCache();
         ResidentRoleManager.ClearStaticCache();
+        MentorshipManager.ClearStaticCache();
 
         GlobalInteractionManager.ClearStaticCache();
 
@@ -116,11 +117,70 @@ public class GameComponent_RatkinOrder : GameComponent
 
     public override void GameComponentTick()
     {
-        ratkinOrderManager.Tick();
-        residentPawnsManager.Tick();
-        residentRoleManager.Tick();
-        mentorshipManager.Tick();
-        globalInteractionManager.Tick();
+        try
+        {
+            ratkinOrderManager.Tick();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"骑士团管理器Tick ({nameof(RatkinOrderManager)})",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(GameComponentTick),
+                needStackTrace: true);
+        }
+
+        try
+        {
+            residentPawnsManager.Tick();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"常驻人员管理器Tick ({nameof(ResidentPawnsManager)})",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(GameComponentTick),
+                needStackTrace: true);
+        }
+
+        try
+        {
+            residentRoleManager.Tick();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"常驻人员职位管理器Tick ({nameof(ResidentRoleManager)})",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(GameComponentTick),
+                needStackTrace: true);
+        }
+
+        try
+        {
+            mentorshipManager.Tick();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"教导关系管理器Tick ({nameof(MentorshipManager)})",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(GameComponentTick),
+                needStackTrace: true);
+        }
+
+        try
+        {
+            globalInteractionManager.Tick();
+        }
+        catch (System.Exception ex)
+        {
+            ModUtility.LogExceptionError(ex,
+                errorDesc: $"全局交互管理器Tick ({nameof(GlobalInteractionManager)})",
+                typeName: nameof(GameComponent_RatkinOrder),
+                methodName: nameof(GameComponentTick),
+                needStackTrace: true);
+        }
     }
 
     /// <summary>
@@ -200,7 +260,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化骑士驻地管理器 ({nameof(OrderStationHandler)})",
-                typeName: nameof(GlobalInteractionManager),
+                typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
             OrderStationHandler.ClearStaticCache();
@@ -215,7 +275,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化常驻人员管理器 ({nameof(ResidentPawnsManager)})",
-                typeName: nameof(GlobalInteractionManager),
+                typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
             ResidentPawnsManager.ClearStaticCache();
@@ -230,7 +290,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化常驻人员职位管理器 ({nameof(ResidentRoleManager)})",
-                typeName: nameof(GlobalInteractionManager),
+                typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
             ResidentRoleManager.ClearStaticCache();
@@ -244,8 +304,8 @@ public class GameComponent_RatkinOrder : GameComponent
         catch (System.Exception ex)
         {
             ModUtility.LogExceptionError(ex,
-                errorDesc: $"初始化常驻人员职位管理器 ({nameof(MentorshipManager)})",
-                typeName: nameof(GlobalInteractionManager),
+                errorDesc: $"初始化常驻人员教导关系管理器 ({nameof(MentorshipManager)})",
+                typeName: nameof(GameComponent_RatkinOrder),
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
             MentorshipManager.ClearStaticCache();

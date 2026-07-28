@@ -5,6 +5,6 @@ namespace OberoniaAurea.RatkinOrder;
 
 public interface IUIDrawer
 {
-    Vector2 InitSize { get; }
+    Vector2 DefaultSize { get; }
     TextStyle TextStyle { get; }
 }
