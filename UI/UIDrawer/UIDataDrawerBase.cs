@@ -12,6 +12,7 @@ public abstract class UIDataDrawerBase<T> : IUIDrawer where T : UIDataBase
     {
         drawData.Refresh();
         DrawInner(position, drawData);
+        OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     public abstract void DrawInner(Vector2 position, T drawData);

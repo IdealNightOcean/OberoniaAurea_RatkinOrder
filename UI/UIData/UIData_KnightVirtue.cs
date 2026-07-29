@@ -2,10 +2,9 @@
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIData_KnightVirtue : UIDataBase
+public class UIData_AllVirtuesOfKnight : UIDataBase
 {
     public ResidentKnight Knight { get; }
-
     public AcademicHandler AcademicHandler { get; }
     public KnightVirtueHandler VirtueHandler { get; }
 
@@ -13,7 +12,7 @@ public class UIData_KnightVirtue : UIDataBase
 
     public List<UIData_MentorshipStudent> studentUICache;
 
-    public UIData_KnightVirtue(ResidentKnight knight)
+    public UIData_AllVirtuesOfKnight(ResidentKnight knight)
     {
         this.Knight = knight;
         this.VirtueHandler = knight.VirtueHandler;

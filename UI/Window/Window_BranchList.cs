@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea.RatkinOrder.UI;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
@@ -16,7 +17,7 @@ public class Window_BranchList : OrderWindowBase
     private Map Map { get; }
     private bool ConstructTab { get; set; }
     private List<TabRecord> Tabs { get; } = new(2);
-    private List<BranchSummaryUICache> BranchSummaryUICaches { get; }
+    private List<UIData_BranchSummary> BranchSummaryUICaches { get; }
 
     public Window_BranchList(RatkinOrder ratkinOrder, Map map, bool initWithConstructTab)
     {
@@ -27,7 +28,7 @@ public class Window_BranchList : OrderWindowBase
         BranchSummaryUICaches = new(RatkinOrder.BranchManager.AllBranchesCount);
         foreach (Branch branch in RatkinOrder.BranchManager.AllBranches)
         {
-            BranchSummaryUICaches.Add(new BranchSummaryUICache(branch, Map));
+            BranchSummaryUICaches.Add(new UIData_BranchSummary(branch, Map));
         }
     }
 
@@ -75,18 +76,18 @@ public class Window_BranchList : OrderWindowBase
         listViewRect.height = BranchSummaryUICaches.Count * entryHeight + 10f;
 
         Widgets.BeginScrollView(listOutRect, ref scrollPosition_Branch, listViewRect);
-        foreach (BranchSummaryUICache branchSummary in BranchSummaryUICaches)
+        foreach (UIData_BranchSummary squadSummary in BranchSummaryUICaches)
         {
             Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
             entryY += entryHeight;
-            DarwBranchEntry(entryRect, branchSummary);
+            DarwBranchEntry(entryRect, squadSummary);
         }
         Widgets.EndScrollView();
 
         OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
-    private void DarwBranchEntry(Rect inRect, BranchSummaryUICache branchSummary)
+    private void DarwBranchEntry(Rect inRect, UIData_BranchSummary branchSummary)
     {
         GUI.DrawTexture(inRect, entryBackground);
         Rect innerRect = inRect.ContractedBy(2f);
@@ -168,7 +169,7 @@ public class Window_BranchList : OrderWindowBase
         OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
-    private void DrawBranchInfo(Rect inRect, BranchSummaryUICache branchSummary)
+    private void DrawBranchInfo(Rect inRect, UIData_BranchSummary branchSummary)
     {
         Branch branch = branchSummary.Branch;
         float thirdWidth = inRect.width / 3f;
@@ -190,7 +191,7 @@ public class Window_BranchList : OrderWindowBase
         OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
-    private void DrawBranchConstruct(Rect inRect, BranchSummaryUICache branchSummary)
+    private void DrawBranchConstruct(Rect inRect, UIData_BranchSummary branchSummary)
     {
         Branch branch = branchSummary.Branch;
         BranchStoresReserveHandler.ReserveRecord primaryReserve = branch.StoresReserveHandler.PrimaryReserve;

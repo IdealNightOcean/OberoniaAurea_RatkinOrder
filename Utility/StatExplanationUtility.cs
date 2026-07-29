@@ -12,9 +12,9 @@ public static class OARO_StatExplanationUtility
     {
         return statDef.statType switch
         {
-            BranchStatDef.StatType.Integer => (string)"OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()).Colorize(Color.yellow),
-            BranchStatDef.StatType.Float => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign(format)).Colorize(Color.yellow),
-            BranchStatDef.StatType.Percent => (string)"OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent(format)).Colorize(Color.yellow),
+            BranchStatDef.StatType.Integer => "OARO_StatExplain_BaseValue".Translate(((int)baseValue).ToStringWithSign()).Colorize(Color.yellow),
+            BranchStatDef.StatType.Float => "OARO_StatExplain_BaseValue".Translate(baseValue.ToStringWithSign(format)).Colorize(Color.yellow),
+            BranchStatDef.StatType.Percent => "OARO_StatExplain_BaseValue".Translate(baseValue.ToStringPercent(format)).Colorize(Color.yellow),
             _ => KeyLibrary_Misc.ErrorTipWithColor,
         };
     }

@@ -1,4 +1,5 @@
 ﻿using NightOcean;
+using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -547,7 +548,7 @@ public class Window_BranchDemand : OrderWindowBase
 
         public Branch Branch { get; }
         private Map Map { get; }
-        public BranchSummaryUICache SummaryUICache { get; }
+        public UIData_BranchSummary SummaryUICache { get; }
 
         private Vector2 scrollPosition_Medals;
         private Vector2 scrollPosition_Tags;

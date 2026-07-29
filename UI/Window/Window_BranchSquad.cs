@@ -43,8 +43,8 @@ public class Window_BranchSquad : OrderWindowBase
     private TabType CurTab { get; set; } = TabType.All;
     private List<TabRecord> Tabs { get; } = new(3);
 
-    private List<UIData_SquadSummary> BranchSummaryCaches { get; }
-    private List<UIData_SquadSummary> TabSummaryCaches { get; }
+    private List<UIData_BranchSummary> BranchSummaryCaches { get; }
+    private List<UIData_BranchSummary> TabSummaryCaches { get; }
 
     private UIDataDrawer_SquadSummary SquadSummaryDrawer { get; } = new();
 
@@ -907,7 +907,7 @@ public class Window_BranchSquad : OrderWindowBase
 
     }
 
-    private void DrawSquadEntry(Rect inRect, UIData_SquadSummary entry, int index)
+    private void DrawSquadEntry(Rect inRect, UIData_BranchSummary entry, int index)
     {
         Rect summaryRect = inRect.ContractedBy(2f);
         if (Widgets.ButtonInvisible(summaryRect))
@@ -976,8 +976,8 @@ public class Window_BranchSquad : OrderWindowBase
         {
             try
             {
-                BranchSummaryUICache summaryUICache = new(branch, Map);
-                BranchSummaryCaches.Add(new UIData_SquadSummary(branch, Map));
+                UIData_BranchSummary summaryUICache = new(branch, Map);
+                BranchSummaryCaches.Add(new UIData_BranchSummary(branch, Map));
             }
             catch (Exception ex)
             {
@@ -990,7 +990,7 @@ public class Window_BranchSquad : OrderWindowBase
         }
         if (BranchSummaryCaches.Count > 0)
         {
-            // BranchSummaryCaches.Sort(new BranchSummaryUICache.UIEntryComparer());
+            BranchSummaryCaches.Sort(new SquadEntryComparer());
             GetCurTapBranchSummary();
         }
     }
@@ -1143,10 +1143,7 @@ public class Window_BranchSquad : OrderWindowBase
         RefreshBranchAcceptance();
         MapRecommendationCount.MarkDirty();
         // 交互可能影响分部核心数据，重建缓存
-        if (SelBranch.IsValid())
-        {
-            SelSquadInfo = new(SelBranch, Map);
-        }
+        SelSquadInfo?.MarkDirty();
     }
 
     private void BindBranchCallback()
@@ -1170,6 +1167,39 @@ public class Window_BranchSquad : OrderWindowBase
         Vector2 initialSize = InitialSize;
         windowRect = new Rect((Verse.UI.screenWidth - initialSize.x) / 2f, (Verse.UI.screenHeight - initialSize.y) / 2f, initialSize.x, initialSize.y);
         windowRect = windowRect.Rounded();
+    }
+
+    private class SquadEntryComparer : IComparer<UIData_BranchSummary>
+    {
+        public int Compare(UIData_BranchSummary x, UIData_BranchSummary y)
+        {
+            Branch xBranch = x?.Branch;
+            Branch yBranch = y?.Branch;
+
+            if (xBranch is null && yBranch is null) return 0;
+            if (xBranch is not null && yBranch is null) return -1;
+            if (xBranch is null && yBranch is not null) return 1;
+            if (x.IsInAffectedRange != y.IsInAffectedRange)
+            {
+                return x.IsInAffectedRange ? -1 : 1;
+            }
+
+            bool xIsFriendly = xBranch.IsBranchOfType(BranchType.Friendly);
+            bool yIsFriendly = yBranch.IsBranchOfType(BranchType.Friendly);
+            if (xIsFriendly != yIsFriendly)
+            {
+                return xIsFriendly ? -1 : 1;
+            }
+
+            bool xIsHonor = xBranch.IsBranchOfType(BranchType.Honor);
+            bool yIsHonor = yBranch.IsBranchOfType(BranchType.Honor);
+            if (xIsHonor != yIsHonor)
+            {
+                return xIsHonor ? -1 : 1;
+            }
+
+            return x.Distance.CompareTo(y.Distance);
+        }
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/BranchSquad/OARO_MainBackground");

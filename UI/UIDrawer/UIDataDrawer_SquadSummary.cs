@@ -6,11 +6,11 @@ using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
+public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 {
     public override Vector2 DefaultSize => new(392f, 90f);
 
-    public override void DrawInner(Vector2 position, UIData_SquadSummary drawData)
+    public override void DrawInner(Vector2 position, UIData_BranchSummary drawData)
     {
         Rect boxRect = new(position, DefaultSize);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.DimDarkBackground);
@@ -32,7 +32,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
     }
 
     /// <remarks>标准大约为(230f, 86f)</remarks>
-    public void DrawLeftRect(Rect inRect, UIData_SquadSummary drawData)
+    public void DrawLeftRect(Rect inRect, UIData_BranchSummary drawData)
     {
         Rect honorColorRect = inRect;
         honorColorRect.width = 5f;
@@ -108,13 +108,13 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
         }
     }
 
-    public void DrawRightRect(Rect inRect, UIData_SquadSummary drawData)
+    public void DrawRightRect(Rect inRect, UIData_BranchSummary drawData)
     {
         float partRectHeight = inRect.height * (1f / 3f);
-        Rect topRect = Rect.MinMaxRect(Mathf.Min(inRect.xMin + 24f, inRect.xMax - inRect.width * 0.9f),
-                                       inRect.y,
-                                       inRect.xMax,
-                                       inRect.yMin + partRectHeight);
+        Rect topRect = Rect.MinMaxRect(xmin: Mathf.Min(inRect.xMin + 24f, inRect.xMax - inRect.width * 0.9f),
+                                       ymin: inRect.y,
+                                       xmax: inRect.xMax,
+                                       ymax: inRect.yMin + partRectHeight);
         this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.MiddleLeft);
         OAFrame_Widgets.DrawLabel(topRect, "OARO_AllCrewCountShortInfo".Translate(drawData.Squad.AllCrewCountInt), this.TextStyle);
 
@@ -123,7 +123,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_SquadSummary>
         OAFrame_Widgets.DrawLabel(centerRect, "OARO_BranchPotencyShortInfo".Translate(drawData.Branch.Potency.ToString("0.##")), this.TextStyle);
 
         Rect bottomRect = RectUtils.OffsetVertical(centerRect, partRectHeight);
-        OAFrame_Widgets.DrawLabel(bottomRect, $"{"OARO_BranchSupplyState".Translate()}: {drawData.Branch.SupplyState}", this.TextStyle);
+        OAFrame_Widgets.DrawLabel(bottomRect, "OARO_BranchSupplyStateInfo".Translate(drawData.Branch.SupplyState), this.TextStyle);
     }
 }
 

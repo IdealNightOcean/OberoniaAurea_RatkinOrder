@@ -6,7 +6,7 @@ using static OberoniaAurea.RatkinOrder.Branch;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIData_SquadInfo : UIData_SquadSummary
+public class UIData_SquadInfo : UIData_BranchSummary
 {
     public float FriendlyProcess { get; protected set; }
     public string FriendlyExpireDateStr { get; protected set; } = string.Empty;

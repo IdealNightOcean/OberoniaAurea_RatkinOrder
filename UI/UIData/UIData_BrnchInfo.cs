@@ -6,7 +6,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIData_BrnchInfo : UIData_SquadSummary
+public class UIData_BrnchInfo : UIData_BranchSummary
 {
     public int PopulationCeiling { get; protected set; }
     public int BuildingCeiling { get; protected set; }

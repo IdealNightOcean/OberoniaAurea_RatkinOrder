@@ -1,6 +1,6 @@
-﻿using OberoniaAurea_Frame;
+﻿using NightOcean.Utility;
+using OberoniaAurea_Frame;
 using RimWorld;
-using System;
 using UnityEngine;
 using Verse;
 
@@ -23,7 +23,7 @@ public class UIDrawer_KnightVirtue : IUIDrawer
     public void Draw(Vector2 position)
     {
         Rect boxRect = new(position.x, position.y, DefaultSize.x, DefaultSize.y);
-        Rect innerBoxRect = boxRect.ContractedBy(1f);
+        Rect innerBoxRect = GenUI.ContractedBy(boxRect, 1f);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.MediumDarkBackground);
 
         float verticalLineX = innerBoxRect.xMin + innerBoxRect.width * (1f / 3f);
@@ -96,7 +96,12 @@ public class UIDrawer_KnightVirtue : IUIDrawer
 
         if (level < this.Virtue.Def.traitGroups.Count + 1)
         {
-            DarwVirtueTaritSelection(traitInfoRect, level);
+            Rect traitInfoButRect = traitInfoRect.CenterSegment(0.6f, 0.6f);
+            if (OARO_Widgets.DefaultTextButton(traitInfoButRect, "OARO_SelectVirtueTrait".Translate()))
+            {
+                Window_VirtueTaritSelection taritSelectionWin = new(this.Knight, this.Virtue, level);
+                Find.WindowStack.Add(taritSelectionWin);
+            }
         }
         else
         {
@@ -116,31 +121,4 @@ public class UIDrawer_KnightVirtue : IUIDrawer
         this.TextStyle = new(GameFont.Small, TextAnchor.MiddleCenter);
         OAFrame_Widgets.DrawLabel(descRect, virtueTrait.description, this.TextStyle);
     }
-
-    private void DarwVirtueTaritSelection(Rect inRect, int level)
-    {
-
-    }
-}
-
-public class Window_VirtueTaritSelection : OrderWindowBase
-{
-    public ResidentKnight Knight { get; }
-    public KnightVirtue Virtue { get; }
-    public int Level { get; }
-    public KnightVirtueTraitGroups TraitGroup { get; }
-
-    public Window_VirtueTaritSelection(ResidentKnight knight, KnightVirtue virtue, int level) : base()
-    {
-        this.Knight = knight;
-        this.Virtue = virtue;
-        this.Level = level;
-        this.TraitGroup = virtue.Def.traitGroups[level - 1];
-    }
-
-    public override void DoWindowContents(Rect inRect)
-    {
-        throw new NotImplementedException();
-    }
-
 }

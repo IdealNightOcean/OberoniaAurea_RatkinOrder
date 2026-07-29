@@ -2,7 +2,7 @@
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIData_SquadSummary : UIDataBase
+public class UIData_BranchSummary : UIDataBase
 {
     public Branch Branch { get; protected set; }
     public Map Map { get; protected set; }
@@ -19,7 +19,7 @@ public class UIData_SquadSummary : UIDataBase
     public bool IsInAffectedRange => AffectedRange >= Distance;
     public int AllCrewCount => Branch?.Squad.AllCrewCountInt ?? 0;
 
-    public UIData_SquadSummary(Branch branch, Map map)
+    public UIData_BranchSummary(Branch branch, Map map)
     {
         this.Branch = branch;
         this.Map = map;

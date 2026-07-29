@@ -334,10 +334,11 @@
     <Compile Include="Thought\ThoughtWorker_Situational_Virtue.cs" />
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Thought\Thought_Situational_Virtue.cs" />
-    <Compile Include="UI\UIData\UIData_SquadSummary.cs" />
+    <Compile Include="UI\UIData\UIData_BranchSummary.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_SquadSummary.cs" />
     <Compile Include="UI\Widgets.cs" />
     <Compile Include="UI\IUIDrawer.cs" />
+    <Compile Include="UI\Window\Window_VirtueTaritSelection.cs" />
     <Compile Include="Utility\AcademicUtility.cs" />
     <Compile Include="Utility\StatExplanationUtility.cs" />
     <Compile Include="Utility\StatUtility.cs" />
@@ -358,7 +359,6 @@
     <Compile Include="UI\Window\Window_BranchDemand.cs" />
     <Compile Include="UI\Window\OrderWindowBase.cs" />
     <Compile Include="UI\UIData\UIData_SquadInfo.cs" />
-    <Compile Include="UI\UIData\BranchSummaryUICache.cs" />
     <Compile Include="Components\KnightRecord.cs" />
     <Compile Include="Components\TrackedIntValue.cs" />
     <Compile Include="Components\TrackedFloatValue.cs" />

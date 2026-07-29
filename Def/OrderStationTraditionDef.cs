@@ -4,7 +4,7 @@ using Verse;
 namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
-/// 骑士驻地传统Def - 定义了骑士驻地可能激活的传统效果，包括激活条件、相关骑士精神等信息
+/// 骑士驻地传统<see cref="Def"/> - 定义了骑士驻地可能激活的传统效果，包括激活条件、相关骑士精神等信息
 /// </summary>
 public class OrderStationTraditionDef : Def
 {
@@ -30,12 +30,12 @@ public class OrderStationTraditionDef : Def
     public int requiredKnightCount;
 
     /// <summary>
-    /// 传统激活后给予殖民者的Hediff
+    /// 传统激活后给予殖民者的<see cref="HediffDef"/>
     /// </summary>
     public HediffDef colonistHediff;
 
     /// <summary>
-    /// 传统激活后给予骑士的Hediff
+    /// 传统激活后给予骑士的<see cref="HediffDef"/>
     /// </summary>
     public HediffDef knightHediff;
 
