@@ -5,7 +5,7 @@ using System.Runtime.CompilerServices;
 using Verse;
 using Verse.AI.Group;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class TalkActionUtility
 {

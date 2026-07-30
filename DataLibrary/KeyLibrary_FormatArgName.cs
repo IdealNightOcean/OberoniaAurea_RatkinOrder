@@ -1,4 +1,4 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿namespace OberoniaAurea.RatkinOrder.DataLibrary;
 
 public static class OARO_KeyLibrary_FormatArgName
 {

@@ -1,4 +1,5 @@
-﻿using RimWorld.QuestGen;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+using RimWorld.QuestGen;
 using System.Collections.Generic;
 using Verse;
 using static OberoniaAurea.RatkinOrder.BranchDemand;

@@ -1,4 +1,5 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
 /// 骑士美德类型

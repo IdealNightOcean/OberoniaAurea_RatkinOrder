@@ -1,11 +1,12 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.UI;
 
 using static OberoniaAurea.RatkinOrder.Branch;
 

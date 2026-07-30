@@ -1,4 +1,6 @@
-﻿using RimWorld;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea.RatkinOrder.Utility;
+using RimWorld;
 using RimWorld.Planet;
 using System.Text;
 using Verse;

@@ -1,4 +1,6 @@
 ﻿using HarmonyLib;
+using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea.RatkinOrder.Utility;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;

@@ -1,4 +1,5 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;
 
 public class BranchStatRequestData_BranchFacility : BranchStatRequestData_BranchConstruction<BranchFacilityDef>
 {

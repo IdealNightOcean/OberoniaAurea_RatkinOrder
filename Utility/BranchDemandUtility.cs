@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 using static OberoniaAurea.RatkinOrder.Branch;
 using static OberoniaAurea.RatkinOrder.BranchDemand;

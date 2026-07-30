@@ -1,1 +1,2 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;

@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
@@ -8,7 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class OARO_QuestUtility
 {

@@ -1,7 +1,7 @@
 ﻿using System.Runtime.CompilerServices;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class TickUtility
 {

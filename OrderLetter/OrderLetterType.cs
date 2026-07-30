@@ -1,4 +1,5 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;
 
 public enum OrderLetterType : byte
 {

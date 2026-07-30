@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class KnightVirtueUtility
 {

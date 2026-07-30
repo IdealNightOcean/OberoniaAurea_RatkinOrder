@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 

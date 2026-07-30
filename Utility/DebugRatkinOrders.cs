@@ -6,7 +6,7 @@ using System.Linq;
 using Verse;
 using Verse.Utility;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class DebugRatkinOrders
 {

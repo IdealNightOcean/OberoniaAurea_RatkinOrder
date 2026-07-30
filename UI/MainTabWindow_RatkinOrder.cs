@@ -2,6 +2,7 @@
 using UnityEngine;
 using Verse;
 
+using OberoniaAurea.RatkinOrder.DataLibrary;using OberoniaAurea.RatkinOrder.Utility;using OberoniaAurea.RatkinOrder.UI;
 namespace OberoniaAurea.RatkinOrder;
 
 public class MainTabWindow_RatkinOrder : MainTabWindow

@@ -1,4 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder;
+using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea.RatkinOrder.Utility;
 using RimWorld;
 using RimWorld.QuestGen;
 using System;

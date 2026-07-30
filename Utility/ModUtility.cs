@@ -1,3 +1,4 @@
+using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
@@ -9,7 +10,7 @@ using System.Text;
 using Verse;
 using Verse.Grammar;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 [StaticConstructorOnStartup]
 public static class ModUtility

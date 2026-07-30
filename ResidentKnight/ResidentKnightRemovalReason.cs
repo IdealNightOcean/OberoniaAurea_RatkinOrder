@@ -1,4 +1,5 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;
 
 /// <summary>
 /// 常驻骑士移除原因

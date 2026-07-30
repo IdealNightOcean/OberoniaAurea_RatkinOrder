@@ -1,4 +1,6 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+
+namespace OberoniaAurea.RatkinOrder;
 
 public class KnightVirtueComp_StatModifiesBy_MercyQuestSucceed : KnightVirtueComp_StatModifiesByValue
 {

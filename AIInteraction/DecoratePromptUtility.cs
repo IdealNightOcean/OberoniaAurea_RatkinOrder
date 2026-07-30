@@ -1,4 +1,6 @@
 ﻿using NightOcean.SimpleAIClient;
+using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea.RatkinOrder.Utility;
 using RimWorld;
 using System;
 using System.Collections.Generic;

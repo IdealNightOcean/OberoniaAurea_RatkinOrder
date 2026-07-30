@@ -1,3 +1,5 @@
+using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System.Runtime.CompilerServices;
@@ -7,7 +9,7 @@ using Verse;
 using Verse.Grammar;
 using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class GlobalInteractionUtility
 {

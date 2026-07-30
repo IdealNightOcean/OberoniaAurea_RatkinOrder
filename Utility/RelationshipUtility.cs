@@ -1,4 +1,5 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using System;
@@ -8,7 +9,7 @@ using UnityEngine;
 using Verse;
 using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class RelationshipUtility
 {

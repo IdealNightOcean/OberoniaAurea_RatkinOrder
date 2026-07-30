@@ -1,3 +1,4 @@
+using OberoniaAurea.RatkinOrder.DataLibrary;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -7,7 +8,7 @@ using Verse;
 using Verse.AI.Group;
 using static OberoniaAurea.RatkinOrder.EsteemHandler;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class BranchSupportUtility
 {

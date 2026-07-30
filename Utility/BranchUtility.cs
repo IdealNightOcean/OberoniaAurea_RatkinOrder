@@ -1,3 +1,4 @@
+using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
@@ -8,7 +9,7 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class BranchUtility
 {

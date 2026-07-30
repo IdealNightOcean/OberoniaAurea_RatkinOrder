@@ -1,6 +1,6 @@
 ﻿using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.DataLibrary;
 
 [StaticConstructorOnStartup]
 public static class KeyLibrary_EffectTag

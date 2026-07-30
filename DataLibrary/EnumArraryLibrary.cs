@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.DataLibrary;
 
 public static class EnumArraryLibrary
 {

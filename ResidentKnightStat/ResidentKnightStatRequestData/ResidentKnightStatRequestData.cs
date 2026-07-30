@@ -1,4 +1,5 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;
 
 public class ResidentKnightStatRequestData : StatRequestData<ResidentKnightStatDef, ResidentKnight>
 {

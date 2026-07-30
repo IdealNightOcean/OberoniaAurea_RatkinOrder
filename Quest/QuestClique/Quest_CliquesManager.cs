@@ -1,4 +1,6 @@
 using NightOcean;
+using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
@@ -8,6 +10,7 @@ using System.Linq;
 using System.Text;
 using UnityEngine;
 using Verse;
+
 namespace OberoniaAurea.RatkinOrder;
 
 public class QuestNode_CliquesManager : QuestNode

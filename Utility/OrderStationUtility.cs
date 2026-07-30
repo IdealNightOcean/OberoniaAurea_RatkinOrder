@@ -5,7 +5,7 @@ using System.Linq;
 using UnityEngine;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 public static class OrderStationUtility
 {

@@ -1,9 +1,10 @@
+using OberoniaAurea.RatkinOrder.DataLibrary;
 using RimWorld;
 using System;
 using System.Collections.Generic;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 using RelatedLetterType = OrderLetter.RelatedLetterType;
 

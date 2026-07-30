@@ -1,4 +1,6 @@
-﻿namespace OberoniaAurea.RatkinOrder.UI;
+﻿
+
+namespace OberoniaAurea.RatkinOrder.UI;
 
 public abstract class UIDataBase
 {

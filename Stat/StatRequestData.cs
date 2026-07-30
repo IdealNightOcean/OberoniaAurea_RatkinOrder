@@ -1,4 +1,5 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;
 
 public class StatRequestData<TDef, UEntity> where TDef : OAROStatDefBase
 {

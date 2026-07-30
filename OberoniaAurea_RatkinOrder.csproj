@@ -339,6 +339,7 @@
     <Compile Include="UI\UIDrawer\UIDataDrawer_SquadSummary.cs" />
     <Compile Include="UI\UIDrawer\UIDrawerBase.cs" />
     <Compile Include="UI\UIDrawer\UIDrawer_KnightVirtueTable.cs" />
+    <Compile Include="UI\UIUtility.cs" />
     <Compile Include="UI\Widgets.cs" />
     <Compile Include="UI\IUIDrawer.cs" />
     <Compile Include="UI\Window\Window_VirtueTaritSelection.cs" />
@@ -493,7 +494,6 @@
     <Compile Include="Utility\BranchConstructUtility.cs" />
     <Compile Include="DataLibrary\EnumArraryLibrary.cs" />
     <Compile Include="DataLibrary\IconLibrary.cs" />
-    <Compile Include="Utility\UIUtility.cs" />
     <Compile Include="Utility\PawnUtility.cs" />
     <Compile Include="Utility\QuestUtility.cs" />
     <Compile Include="Utility\RelationshipUtility.cs" />

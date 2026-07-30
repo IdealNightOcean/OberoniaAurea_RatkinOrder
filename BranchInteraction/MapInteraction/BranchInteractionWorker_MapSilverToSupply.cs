@@ -1,4 +1,5 @@
-﻿namespace OberoniaAurea.RatkinOrder;
+﻿
+namespace OberoniaAurea.RatkinOrder;
 
 public class BranchInteractionWorker_MapSilverToSupply(BranchInteractionDef def) : BranchInteractionWorker_MapOnly(def)
 {

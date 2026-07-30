@@ -1,4 +1,5 @@
-﻿using RimWorld.QuestGen;
+﻿using OberoniaAurea.RatkinOrder.Utility;
+using RimWorld.QuestGen;
 using System;
 using Verse;
 

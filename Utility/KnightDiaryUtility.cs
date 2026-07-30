@@ -5,7 +5,7 @@ using System.Text;
 using UnityEngine;
 using Verse;
 
-namespace OberoniaAurea.RatkinOrder;
+namespace OberoniaAurea.RatkinOrder.Utility;
 
 /// <summary>
 /// 骑士日记工具类
