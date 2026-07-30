@@ -3,6 +3,7 @@
 public abstract class UIDataBase
 {
     public bool IsReady { get; protected set; }
+    public abstract bool IsValid { get; }
 
     public void MarkDirty() => IsReady = false;
 
@@ -10,7 +11,10 @@ public abstract class UIDataBase
     {
         if (!IsReady)
         {
-            RefreshInner();
+            if (IsValid)
+            {
+                RefreshInner();
+            }
             IsReady = true;
         }
     }

@@ -13,7 +13,7 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
 
     public override void DrawInner(Vector2 position, UIData_KnightAcademic drawData)
     {
-        Rect boxRect = new(position, DefaultSize);
+        Rect boxRect = new(position, DrawSize);
         OARO_Widgets.DrawDefaultBoxSolidWithOutline(boxRect, outlineThickness: 2);
 
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, 2f); //标准大约为(256f, 90f)
@@ -34,11 +34,14 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect labelRect = inRect.LeftPart(0.9f);
 
         this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleLeft);
-        OAFrame_Widgets.DrawLabel(labelRect, drawData.Academic.LabelCap, this.TextStyle);
+        OAFrame_Widgets.DrawLabel(labelRect, DrawDataValid ? drawData.Academic.LabelCap : "---", this.TextStyle);
 
         Rect levelRect = inRect.RightPart(0.9f);
         this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleRight);
-        OAFrame_Widgets.DrawLabel(levelRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}", this.TextStyle);
+        if (DrawDataValid)
+            OAFrame_Widgets.DrawLabel(levelRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}", this.TextStyle);
+        else
+            OAFrame_Widgets.DrawLabel(levelRect, "0/0", this.TextStyle);
     }
 
     private void DrawLowerInner(Rect inRect, UIData_KnightAcademic drawData)
@@ -47,14 +50,15 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         this.TextStyle = new(guiColor: drawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green,
                              font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
         OAFrame_Widgets.DrawLabel(factorRect, drawData.CostFactor.ToStringPercent("0.##"), this.TextStyle);
-        TooltipHandler.TipRegion(factorRect, () => drawData.CostFactorExplanation.Value, uniqueId: 876465514);
+        if (DrawDataValid)
+            TooltipHandler.TipRegion(factorRect, () => drawData.CostFactorExplanation.Value, uniqueId: 876465514);
 
         Rect levelStarGroupRect = inRect.CenterSegmentOnY((1f / 3f));
         levelStarGroupRect.width *= 0.4f;
         levelStarGroupRect.MoveTo(inRect.xMax - 0.1f * inRect.width - levelStarGroupRect.width, levelStarGroupRect.yMin);
 
-        int maxStageLevel = drawData.Academic.MaxStageLevel;
-        int curStageLevel = drawData.Level;
+        int maxStageLevel = DrawDataValid ? drawData.Academic.MaxStageLevel : 0;
+        int curStageLevel = DrawDataValid ? drawData.Level : 0;
 
         float single‌StartWidth = levelStarGroupRect.width / 6f;
         Rect levelStarGroupViewRect = levelStarGroupRect;

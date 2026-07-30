@@ -1,50 +1,56 @@
-﻿using System.Collections.Generic;
-using System.Linq;
+﻿using NightOcean;
+using System.Collections.Generic;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIData_MentorshipStudent : UIDataBase
 {
-    public ResidentKnight Teacher { get; }
-    public ResidentPawn Student { get; }
+    public ResidentKnight Teacher { get; private set; }
+    public ResidentPawn Student { get; private set; }
+    public override bool IsValid => Student is not null && Teacher is not null;
 
-    public List<(KnightAcademicDef def, int targetLevel)> TaughtableAcademics { get; private set; }
-    public int TaughtableAcademicsCount => TaughtableAcademics.Count;
+    public (int s2t, int t2s) RelationBetweenEach { get; private set; } = (0, 0);
 
     public float DailyTutoringSuccessChance { get; private set; }
 
-    private string dailyTutoringSuccessChanceExplanation;
-    public string DailyTutoringSuccessChanceExplanation
-    {
-        get
-        {
-            if (dailyTutoringSuccessChanceExplanation is null)
-            {
-                RefreshDailyTutoringSuccessChanceExplanation();
-            }
-            return dailyTutoringSuccessChanceExplanation;
-        }
-    }
+    public LazyMutable<string> DailyTutoringSuccessChanceExplanation { get; }
 
-    public int RelationBetweenEach { get; private set; }
+
+    public List<(KnightAcademicDef def, int targetLevel)> TaughtableAcademics { get; } = [];
+    public int TaughtableAcademicsCount => TaughtableAcademics.Count;
+
 
     public UIData_MentorshipStudent(ResidentKnight teacher, ResidentPawn student)
     {
-        Teacher = teacher;
-        Student = student;
+        this.Teacher = teacher;
+        this.Student = student;
+
+        DailyTutoringSuccessChanceExplanation = new(refreshFunc: RefreshDailyTutoringSuccessChanceExplanation);
+    }
+
+    public void ResetData(ResidentKnight teacher, ResidentPawn student)
+    {
+        this.Teacher = teacher;
+        this.Student = student;
+
+        IsReady = false;
     }
 
     protected override void RefreshInner()
     {
-        TaughtableAcademics = AcademicUtility.GetHigherAcademicsThanB(Teacher, Student).ToList();
-
+        TaughtableAcademics.Clear();
+        TaughtableAcademics.AddRange(AcademicUtility.GetHigherAcademicsThanB(Teacher, Student));
         DailyTutoringSuccessChance = AcademicUtility.GetDailyTutoringSuccessChance(Teacher, Student.Pawn, resultOnly: true, out _);
-        dailyTutoringSuccessChanceExplanation = null;
-        RelationBetweenEach = Student.Pawn.relations.OpinionOf(Teacher.Pawn);
+        DailyTutoringSuccessChanceExplanation.MarkDirty();
+        RelationBetweenEach = (Student.Pawn.relations.OpinionOf(Teacher.Pawn), Teacher.Pawn.relations.OpinionOf(Student.Pawn));
     }
 
-    private void RefreshDailyTutoringSuccessChanceExplanation()
+    private string RefreshDailyTutoringSuccessChanceExplanation()
     {
-        DailyTutoringSuccessChance = AcademicUtility.GetDailyTutoringSuccessChance(Teacher, Student.Pawn, resultOnly: false, out dailyTutoringSuccessChanceExplanation);
+        if (!IsValid)
+            return string.Empty;
+
+        DailyTutoringSuccessChance = AcademicUtility.GetDailyTutoringSuccessChance(Teacher, Student.Pawn, resultOnly: false, out string dailyTutoringSuccessChanceExplanation);
+        return dailyTutoringSuccessChanceExplanation;
     }
 }

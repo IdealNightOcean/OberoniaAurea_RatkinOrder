@@ -10,7 +10,9 @@ public abstract class OrderWindowBase : Verse.Window, IUIDrawer
     protected override float Margin => 0f;
     protected bool HasClosed { get; set; }
 
+    protected Vector2? sizeOverride;
     public Vector2 DefaultSize => InitialSize;
+    public Vector2 DrawSize => sizeOverride ?? InitialSize;
 
     public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;
 
@@ -31,6 +33,8 @@ public abstract class OrderWindowBase : Verse.Window, IUIDrawer
         soundAppear = SoundDefOf.CommsWindow_Open;
         soundClose = SoundDefOf.CommsWindow_Close;
     }
+
+    public void SetDrawSize(Vector2 size) => sizeOverride = size;
 
     public override void Close(bool doCloseSound = true)
     {

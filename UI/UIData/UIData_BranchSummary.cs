@@ -1,4 +1,5 @@
-﻿using Verse;
+﻿using OberoniaAurea_Frame;
+using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
@@ -6,9 +7,11 @@ public class UIData_BranchSummary : UIDataBase
 {
     public Branch Branch { get; protected set; }
     public Map Map { get; protected set; }
-    public BranchSquad Squad { get; protected set; }
+    public override bool IsValid => Branch is not null && Map is not null;
 
-    public string SquadName => Squad.Name;
+    public BranchSquad Squad { get; protected set; }
+    public string SquadName => Squad?.Name ?? KeyLibrary_Misc.ErrorTipWithColor;
+
     public string BaseSiteName { get; protected set; } = string.Empty;
     public float Distance { get; protected set; } = -1f;
     public float AffectedRange { get; protected set; } = -1f;
@@ -16,32 +19,32 @@ public class UIData_BranchSummary : UIDataBase
     public int CommanderCeiling { get; protected set; }
     public int CrewCeiling => MemberCeiling + CommanderCeiling;
 
-    public bool IsInAffectedRange => AffectedRange >= Distance;
-    public int AllCrewCount => Branch?.Squad.AllCrewCountInt ?? 0;
+    public bool IsInAffectedRange => AffectedRange >= 0f && AffectedRange >= Distance;
+    public int AllCrewCount => Squad?.AllCrewCountInt ?? 0;
 
     public UIData_BranchSummary(Branch branch, Map map)
     {
         this.Branch = branch;
         this.Map = map;
-        this.Squad = branch.Squad;
+        this.Squad = branch?.Squad;
     }
 
     public void ResetData(Branch branch, Map map)
     {
         this.Branch = branch;
         this.Map = map;
-        this.Squad = branch.Squad;
+        this.Squad = branch?.Squad;
         IsReady = false;
     }
 
     protected override void RefreshInner()
     {
-        BaseSiteName = BranchUtility.GetBranchSiteName(Branch);
+        BaseSiteName = BranchUtility.GetBranchSiteName(this.Branch);
 
-        Distance = Branch.DistanceTo(Map.Tile);
-        AffectedRange = Branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
-        MemberCeiling = (int)Branch.Squad.MemberCeiling;
-        CommanderCeiling = (int)Branch.Squad.CommanderCeiling;
+        Distance = this.Branch.DistanceTo(Map.Tile);
+        AffectedRange = this.Branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
+        MemberCeiling = (int)this.Squad.MemberCeiling;
+        CommanderCeiling = (int)this.Squad.CommanderCeiling;
     }
 
 }

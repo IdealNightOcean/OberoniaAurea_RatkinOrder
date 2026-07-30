@@ -110,6 +110,11 @@ public static class OARO_ModDefOf
     /// </summary>
     public static KnightChivalryDef OARO_Oath;
 
+    /// <summary>
+    /// 骑士美德词条 - 基础
+    /// </summary>
+    public static KnightVirtueTraitDef OARO_BaseTrait;
+
 
     static OARO_ModDefOf()
     {

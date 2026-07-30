@@ -7,6 +7,7 @@ public class UIData_KnightAcademic : UIDataBase
 {
     public ResidentKnight Knight { get; }
     public KnightAcademicDef Academic { get; }
+    public override bool IsValid => Knight is not null && Academic is not null;
 
     public int Level { get; private set; }
 
@@ -24,17 +25,19 @@ public class UIData_KnightAcademic : UIDataBase
 
     protected override void RefreshInner()
     {
-        Level = Knight.AcademicHandler.GetAcademicLevel(Academic);
-        ResidentKnightStatRequestData_Academic requestData = new(Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
-
+        Level = this.Knight.AcademicHandler.GetAcademicLevel(Academic);
+        ResidentKnightStatRequestData_Academic requestData = new(this.Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
         CostFactor = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatValue(requestData);
-        CostFactorExplanation.Reset();
+        CostFactorExplanation.MarkDirty();
     }
 
 
     private string RefreshCostFactorExplanation()
     {
-        ResidentKnightStatRequestData_Academic requestData = new(Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
+        if (!IsValid)
+            return string.Empty;
+
+        ResidentKnightStatRequestData_Academic requestData = new(this.Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
 
         (string explanation, float? resultNullabel) = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatModifyExplanation(requestData);
 

@@ -185,6 +185,12 @@ public static class OARO_UIUtility
 
     public static void DrawBranchStateIcon(Rect inRect, Branch branch, bool expand)
     {
+        if (branch is null)
+        {
+            GUI.DrawTexture(inRect, expand ? OARO_IconLibrary.BigIdleIcon : OARO_IconLibrary.SmallIdleIcon, ScaleMode.ScaleToFit);
+            return;
+        }
+
         switch (branch.CurWorkState)
         {
             case WorkStateType.Idle:

@@ -12,7 +12,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 
     public override void DrawInner(Vector2 position, UIData_BranchSummary drawData)
     {
-        Rect boxRect = new(position, DefaultSize);
+        Rect boxRect = new(position, DrawSize);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.DimDarkBackground);
 
         Rect innerBoxRect = RectUtils.ContractedBy(boxRect, 2f);
@@ -42,9 +42,9 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 
         Rect branchIconRect = innerRect.LeftPart(0.45f);//标准大约为(100f, 86f)
 
-        BranchHonorDef honorDef = drawData.Branch.HonorDef;
-        if (honorDef is not null)
+        if (DrawDataValid && drawData.Branch.HonorDef is not null)
         {
+            BranchHonorDef honorDef = drawData.Branch.HonorDef;
             GUI.DrawTexture(honorColorRect, honorDef.HonorColorTex);
 
             Rect honorDecorationRect = RectUtils.ContractedBy(innerRect, 10f);
@@ -68,11 +68,20 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         infoRect.xMin = branchIconRect.xMax;
 
         Rect squadNameRect = infoRect.TopPart(0.35f);
-        this.TextStyle = new(guiColor: drawData.Branch.Color, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
-        if (OAFrame_Widgets.DrawLabelEllipses(squadNameRect, drawData.SquadName, this.TextStyle))
+        if (DrawDataValid)
         {
-            TooltipHandler.TipRegion(squadNameRect, drawData.SquadName);
+            this.TextStyle = new(guiColor: drawData.Branch.Color, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
+            if (OAFrame_Widgets.DrawLabelEllipses(squadNameRect, drawData.SquadName, this.TextStyle))
+            {
+                TooltipHandler.TipRegion(squadNameRect, drawData.SquadName);
+            }
         }
+        else
+        {
+            this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
+            OAFrame_Widgets.DrawLabelEllipses(squadNameRect, "---", this.TextStyle);
+        }
+
 
         Rect stateRect = infoRect;
         stateRect.yMin = squadNameRect.yMax;
@@ -81,7 +90,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         Rect friendlyIconRect = GenUI.ContractedBy(friendlyRect.TopPart(0.7f), 4f);
 
         Rect friendlyStrRect = friendlyRect.BottomPart(0.3f);
-        if (drawData.Branch.IsBranchOfType(BranchType.Friendly))
+        if (DrawDataValid && drawData.Branch.IsBranchOfType(BranchType.Friendly))
         {
             GUI.DrawTexture(friendlyIconRect, OARO_IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
             this.TextStyle = new(guiColor: Color.green, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
@@ -99,9 +108,19 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         OARO_UIUtility.DrawBranchStateIcon(workStateIconRect, drawData.Branch, expand: false);
 
         Rect workStateStrRect = workStateRect.BottomPart(0.3f);
-        string workState = drawData.Branch.CurWorkStateDesc;
-        this.TextStyle = new(guiColor: drawData.Branch.CurWorkState == WorkStateType.Idle ? Color.white : Color.green,
-                             font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
+        string workState;
+        if (DrawDataValid)
+        {
+            workState = drawData.Branch.CurWorkStateDesc;
+            this.TextStyle = new(guiColor: drawData.Branch.CurWorkState == WorkStateType.Idle ? Color.white : Color.green,
+                                 font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
+        }
+        else
+        {
+            workState = "OARO_BranchWorkState_Idle".Translate();
+            this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
+        }
+
         if (OAFrame_Widgets.DrawLabelEllipses(workStateStrRect, workState, this.TextStyle))
         {
             TooltipHandler.TipRegion(workStateStrRect, workState);
