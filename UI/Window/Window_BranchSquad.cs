@@ -924,7 +924,8 @@ public class Window_BranchSquad : OrderWindowBase
             }
         }
 
-        SquadSummaryDrawer.Draw(new(inRect.x, inRect.y), entry);
+        SquadSummaryDrawer.SetDrawData(entry);
+        SquadSummaryDrawer.Draw(new(inRect.x, inRect.y));
         //OARO_UIUtility.DrawBranchSummary(new(inRect.x, inRect.y), entry);
         if (Mouse.IsOver(inRect))
         {

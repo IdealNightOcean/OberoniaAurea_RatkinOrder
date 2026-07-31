@@ -11,6 +11,4 @@ public abstract class UIDrawerBase : IUIDrawer
     public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;
 
     public void SetDrawSize(Vector2 size) => sizeOverride = size;
-
-    public abstract void Draw(Vector2 position);
 }

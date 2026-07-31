@@ -1,8 +1,6 @@
-﻿
+﻿namespace OberoniaAurea.RatkinOrder.UI;
 
-namespace OberoniaAurea.RatkinOrder.UI;
-
-public abstract class UIDataBase
+public abstract class UIDataBase : IUIData
 {
     public bool IsReady { get; protected set; }
     public abstract bool IsValid { get; }

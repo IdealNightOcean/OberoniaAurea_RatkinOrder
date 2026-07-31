@@ -39,7 +39,7 @@ public class AssistanceRequestWorker_AcademicRequired : AssistanceRequestWorker
                     if (virtues[i].Def.relatedAcademicDef == request.RelatedAcademic)
                     {
                         hasAcademic = true;
-                        if (virtues[i].Level >= virtues[i].Def.maxLevel)
+                        if (virtues[i].Level >= virtues[i].Def.MaxLevel)
                         {
                             hasCompleted = true;
                         }

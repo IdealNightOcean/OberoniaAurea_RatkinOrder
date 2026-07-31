@@ -63,11 +63,11 @@ public class UIDrawer_KnightVirtueTable : IUIDrawer
         headerRect.height = 32f;
         BuildTableRaw(headerRect);
         this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
-        OAFrame_Widgets.DrawLabel(reusedRectArr[0], "OARO_KnightVirtueLabel".Translate(), this.TextStyle);
-        OAFrame_Widgets.DrawLabel(reusedRectArr[1], "OARO_KnightVirtueUnlockMethod".Translate(), this.TextStyle);
-        OAFrame_Widgets.DrawLabel(reusedRectArr[2], "OARO_KnightVirtueDesc".Translate(), this.TextStyle);
-        OAFrame_Widgets.DrawLabel(reusedRectArr[3], $"{"OARO_MaxKnightVirtueTrait".Translate()} I", this.TextStyle);
-        OAFrame_Widgets.DrawLabel(reusedRectArr[4], $"{"OARO_MaxKnightVirtueTrait".Translate()} II", this.TextStyle);
+        OAFrame_Widgets.DrawLabel(reusedRectArr[0], "OARO_KnightVirtue_Label".Translate(), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(reusedRectArr[1], "OARO_KnightVirtue_UnlockMethod".Translate(), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(reusedRectArr[2], "OARO_KnightVirtue_Desc".Translate(), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(reusedRectArr[3], $"{"OARO_KnightVirtue_MaxTrait".Translate()} I", this.TextStyle);
+        OAFrame_Widgets.DrawLabel(reusedRectArr[4], $"{"OARO_KnightVirtue_MaxTrait".Translate()} II", this.TextStyle);
 
         float rowHeight = 64f;
 
@@ -97,11 +97,11 @@ public class UIDrawer_KnightVirtueTable : IUIDrawer
         bool actived = this.Knight is null || this.ActivedVirtues.Contains(virtueDef);
         this.TextStyle = new(guiColor: actived ? Color.white : Color.gray, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
         OAFrame_Widgets.DrawLabel(reusedRectArr[0], virtueDef.LabelCap, this.TextStyle);
-        OAFrame_Widgets.DrawLabel(reusedRectArr[1], $"OARO_KnightVirtueUnlockMethod_{virtueDef.virtueType}".Translate(), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(reusedRectArr[1], $"OARO_KnightVirtue_UnlockMethod_{virtueDef.virtueType}".Translate(), this.TextStyle);
         OAFrame_Widgets.DrawLabel(reusedRectArr[2], virtueDef.description, this.TextStyle);
 
         this.TextStyle = new(guiColor: actived ? Color.green : Color.gray, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
-        IReadOnlyList<KnightVirtueTraitDef> maxTraitOptions = virtueDef.GetTraitOptionsForLevel(virtueDef.maxLevel);
+        IReadOnlyList<KnightVirtueTraitDef> maxTraitOptions = virtueDef.GetTraitOptionsForLevel(virtueDef.MaxLevel);
         KnightVirtueTraitDef optTrait1 = maxTraitOptions.ElementAtOrDefault(0) ?? OARO_ModDefOf.OARO_BaseTrait;
         OAFrame_Widgets.DrawLabel(reusedRectArr[3], optTrait1.description, this.TextStyle);
         KnightVirtueTraitDef optTrait2 = maxTraitOptions.ElementAtOrDefault(0) ?? OARO_ModDefOf.OARO_BaseTrait;

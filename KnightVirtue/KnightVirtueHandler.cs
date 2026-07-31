@@ -62,7 +62,7 @@ public class KnightVirtueHandler : IExposable
         get
         {
             foreach (KnightVirtue virtue in virtues)
-                if (virtue.Level < virtue.Def.maxLevel)
+                if (virtue.Level < virtue.Def.MaxLevel)
                     return true;
             return false;
         }
@@ -383,7 +383,7 @@ public class KnightVirtueHandler : IExposable
     /// <returns>升级后的新等级，返回 -1 表示升级失败</returns>
     private int UpgradeVirtue(KnightVirtue virtue, int upgrade)
     {
-        if (virtue.Level >= virtue.Def.maxLevel)
+        if (virtue.Level >= virtue.Def.MaxLevel)
         {
             return -1;
         }

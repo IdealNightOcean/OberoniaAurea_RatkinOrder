@@ -1,4 +1,5 @@
-﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+﻿using NightOcean.Utility;
+using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System;
@@ -211,6 +212,24 @@ public static class OARO_UIUtility
                 }
             default: return;
         }
+    }
+
+    public static void DrawStarGroup(Rect outRect, Vector2 starSize, float interval, int totalStarNum, int activeStarNum, ref Vector2 scrollPosition)
+    {
+        Rect viewRect = outRect;
+        starSize.x = starSize.x > 4f ? starSize.x : 4f;
+        starSize.y = starSize.y > 4f ? starSize.y : 4f;
+
+        viewRect.width = starSize.x * totalStarNum;
+
+        Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect, showScrollbars: false);
+        Rect starRect = new(viewRect.x, viewRect.y, starSize.x, starSize.y);
+        for (int i = 0; i < totalStarNum; i++)
+        {
+            GUI.DrawTexture(starRect, i <= activeStarNum ? OARO_IconLibrary.StarWhite : OARO_IconLibrary.StarBlack, ScaleMode.ScaleToFit);
+            starRect.OffsetHorizontal(starSize.x + interval);
+        }
+        Widgets.EndScrollView();
     }
 
     public static void DrawKnightChivalryIcon(Rect inRect, KnightChivalryDef taskChivalry, bool primary)

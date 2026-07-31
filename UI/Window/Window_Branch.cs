@@ -1054,7 +1054,8 @@ public class Window_Branch : OrderWindowBase
         }
 
         Vector2 squadSummaryPos = new(inRect.xMin, inRect.yMin);
-        SquadSummaryDrawer.Draw(squadSummaryPos, CachedBranchInfo);
+        SquadSummaryDrawer.SetDrawData(CachedBranchInfo);
+        SquadSummaryDrawer.Draw(squadSummaryPos);
         reusedRect = new(squadSummaryPos, SquadSummaryDrawer.DefaultSize);
         inRect.ContractedBy(2f);
 

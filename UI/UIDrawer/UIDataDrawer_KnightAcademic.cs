@@ -12,7 +12,7 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
 
     private Vector2 scrollPosition_LevelStar;
 
-    public override void DrawInner(Vector2 position, UIData_KnightAcademic drawData)
+    public override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         OARO_Widgets.DrawDefaultBoxSolidWithOutline(boxRect, outlineThickness: 2);
@@ -20,59 +20,50 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, 2f); //标准大约为(256f, 90f)
 
         Rect upperInnerRect = innerBoxRect.TopPart(0.6f);
-        DrawUpperInner(upperInnerRect, drawData);
+        DrawUpperInner(upperInnerRect);
 
         float divideLineRectY = upperInnerRect.yMax;
         OAFrame_Widgets.DrawLineHorizontal(new Vector2(innerBoxRect.xMin + 4f, divideLineRectY), innerBoxRect.width - 8f, OARO_ColorLibrary.DivideLine);
 
         Rect lowerInnerRect = innerBoxRect.BottomPart(0.4f);
         lowerInnerRect.yMin = divideLineRectY + 1f;
-        DrawLowerInner(lowerInnerRect, drawData);
+        DrawLowerInner(lowerInnerRect);
     }
 
-    private void DrawUpperInner(Rect inRect, UIData_KnightAcademic drawData)
+    private void DrawUpperInner(Rect inRect)
     {
         Rect labelRect = inRect.LeftPart(0.9f);
 
         this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleLeft);
-        OAFrame_Widgets.DrawLabel(labelRect, DrawDataValid ? drawData.Academic.LabelCap : "---", this.TextStyle);
+        OAFrame_Widgets.DrawLabel(labelRect, DrawDataValid ? DrawData.Academic.LabelCap : "---", this.TextStyle);
 
         Rect levelRect = inRect.RightPart(0.9f);
         this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleRight);
         if (DrawDataValid)
-            OAFrame_Widgets.DrawLabel(levelRect, $"{drawData.Level}/{drawData.Academic.MaxStageLevel}", this.TextStyle);
+            OAFrame_Widgets.DrawLabel(levelRect, $"{DrawData.Level}/{DrawData.Academic.MaxStageLevel}", this.TextStyle);
         else
             OAFrame_Widgets.DrawLabel(levelRect, "0/0", this.TextStyle);
     }
 
-    private void DrawLowerInner(Rect inRect, UIData_KnightAcademic drawData)
+    private void DrawLowerInner(Rect inRect)
     {
         Rect factorRect = inRect.LeftPart(0.9f);
-        this.TextStyle = new(guiColor: drawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green,
+        this.TextStyle = new(guiColor: DrawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green,
                              font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
-        OAFrame_Widgets.DrawLabel(factorRect, drawData.CostFactor.ToStringPercent("0.##"), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(factorRect, DrawData.CostFactor.ToStringPercent("0.##"), this.TextStyle);
         if (DrawDataValid)
-            TooltipHandler.TipRegion(factorRect, () => drawData.CostFactorExplanation.Value, uniqueId: 876465514);
+            TooltipHandler.TipRegion(factorRect, () => DrawData.CostFactorExplanation.Value, uniqueId: 876465514);
 
         Rect levelStarGroupRect = inRect.CenterSegmentOnY((1f / 3f));
         levelStarGroupRect.width *= 0.4f;
         levelStarGroupRect.MoveTo(inRect.xMax - 0.1f * inRect.width - levelStarGroupRect.width, levelStarGroupRect.yMin);
+        float starSize = Mathf.Min(levelStarGroupRect.height, levelStarGroupRect.width / 6f);
 
-        int maxStageLevel = DrawDataValid ? drawData.Academic.MaxStageLevel : 0;
-        int curStageLevel = DrawDataValid ? drawData.Level : 0;
-
-        float single‌StartWidth = levelStarGroupRect.width / 6f;
-        Rect levelStarGroupViewRect = levelStarGroupRect;
-        levelStarGroupRect.width = single‌StartWidth * maxStageLevel;
-
-        float startSize = Mathf.Min(levelStarGroupRect.height, single‌StartWidth);
-        Widgets.BeginScrollView(levelStarGroupRect, ref scrollPosition_LevelStar, levelStarGroupViewRect, showScrollbars: false);
-        Rect levelStarRect = new(levelStarGroupViewRect.x, levelStarGroupViewRect.y, startSize, startSize);
-        for (int i = 0; i < maxStageLevel; i++)
-        {
-            GUI.DrawTexture(levelStarRect, i <= curStageLevel ? OARO_IconLibrary.StarWhite : OARO_IconLibrary.StarBlack, ScaleMode.ScaleToFit);
-            levelStarRect.OffsetHorizontal(single‌StartWidth);
-        }
-        Widgets.EndScrollView();
+        OARO_UIUtility.DrawStarGroup(outRect: levelStarGroupRect,
+                                     starSize: new(starSize, starSize),
+                                     interval: 3f,
+                                     totalStarNum: DrawDataValid ? DrawData.Academic.MaxStageLevel : 0,
+                                     activeStarNum: DrawDataValid ? DrawData.Level : 0,
+                                     scrollPosition: ref scrollPosition_LevelStar);
     }
 }

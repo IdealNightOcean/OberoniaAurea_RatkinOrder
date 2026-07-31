@@ -59,7 +59,7 @@ public class AssistanceRequestWorker_KnightVirtueRequired : AssistanceRequestWor
                 if (virtue is not null)
                 {
                     progress += 100f;
-                    if (virtue.Level >= virtue.Def.maxLevel)
+                    if (virtue.Level >= virtue.Def.MaxLevel)
                     {
                         progress += 100f;
                     }

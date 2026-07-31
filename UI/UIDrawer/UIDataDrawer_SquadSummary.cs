@@ -11,7 +11,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 {
     public override Vector2 DefaultSize => new(392f, 90f);
 
-    public override void DrawInner(Vector2 position, UIData_BranchSummary drawData)
+    public override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.DimDarkBackground);
@@ -22,18 +22,18 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 
         Rect leftRect = innerBoxRect;
         leftRect.xMax = verticalLineX;
-        DrawLeftRect(leftRect, drawData);
+        DrawLeftRect(leftRect);
 
         Rect rightRect = innerBoxRect;
         rightRect.xMin = verticalLineX + 2f;
-        DrawRightRect(rightRect, drawData);
+        DrawRightRect(rightRect);
 
         OAFrame_Widgets.DrawLineVertical(new(verticalLineX, innerBoxRect.yMin), innerBoxRect.height, OARO_ColorLibrary.CommonOutline, 2);
         OAFrame_Widgets.DrawBox(boxRect, OARO_ColorLibrary.CommonOutline, thickness: 2);
     }
 
     /// <remarks>标准大约为(230f, 86f)</remarks>
-    public void DrawLeftRect(Rect inRect, UIData_BranchSummary drawData)
+    public void DrawLeftRect(Rect inRect)
     {
         Rect honorColorRect = inRect;
         honorColorRect.width = 5f;
@@ -43,9 +43,9 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 
         Rect branchIconRect = innerRect.LeftPart(0.45f);//标准大约为(100f, 86f)
 
-        if (DrawDataValid && drawData.Branch.HonorDef is not null)
+        if (DrawDataValid && DrawData.Branch.HonorDef is not null)
         {
-            BranchHonorDef honorDef = drawData.Branch.HonorDef;
+            BranchHonorDef honorDef = DrawData.Branch.HonorDef;
             GUI.DrawTexture(honorColorRect, honorDef.HonorColorTex);
 
             Rect honorDecorationRect = RectUtils.ContractedBy(innerRect, 10f);
@@ -62,8 +62,8 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
             GUI.DrawTexture(normalBranchIconRect, OARO_IconLibrary.SmallGeneralBranchIcon, ScaleMode.ScaleToFit);
         }
 
-        this.TextStyle = new(guiColor: drawData.IsInAffectedRange ? Color.green : Color.white, font: GameFont.Small, anchor: TextAnchor.UpperLeft);
-        OAFrame_Widgets.DrawLabel(innerRect, drawData.Distance.ToString("F0"), this.TextStyle);
+        this.TextStyle = new(guiColor: DrawData.IsInAffectedRange ? Color.green : Color.white, font: GameFont.Small, anchor: TextAnchor.UpperLeft);
+        OAFrame_Widgets.DrawLabel(innerRect, DrawData.Distance.ToString("F0"), this.TextStyle);
 
         Rect infoRect = innerRect;
         infoRect.xMin = branchIconRect.xMax;
@@ -71,10 +71,10 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         Rect squadNameRect = infoRect.TopPart(0.35f);
         if (DrawDataValid)
         {
-            this.TextStyle = new(guiColor: drawData.Branch.Color, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
-            if (OAFrame_Widgets.DrawLabelEllipses(squadNameRect, drawData.SquadName, this.TextStyle))
+            this.TextStyle = new(guiColor: DrawData.Branch.Color, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
+            if (OAFrame_Widgets.DrawLabelEllipses(squadNameRect, DrawData.SquadName, this.TextStyle))
             {
-                TooltipHandler.TipRegion(squadNameRect, drawData.SquadName);
+                TooltipHandler.TipRegion(squadNameRect, DrawData.SquadName);
             }
         }
         else
@@ -91,7 +91,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         Rect friendlyIconRect = GenUI.ContractedBy(friendlyRect.TopPart(0.7f), 4f);
 
         Rect friendlyStrRect = friendlyRect.BottomPart(0.3f);
-        if (DrawDataValid && drawData.Branch.IsBranchOfType(BranchType.Friendly))
+        if (DrawDataValid && DrawData.Branch.IsBranchOfType(BranchType.Friendly))
         {
             GUI.DrawTexture(friendlyIconRect, OARO_IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
             this.TextStyle = new(guiColor: Color.green, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
@@ -106,14 +106,14 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 
         Rect workStateRect = stateRect.RightHalf();
         Rect workStateIconRect = GenUI.ContractedBy(workStateRect.TopPart(0.7f), 4f);
-        OARO_UIUtility.DrawBranchStateIcon(workStateIconRect, drawData.Branch, expand: false);
+        OARO_UIUtility.DrawBranchStateIcon(workStateIconRect, DrawData.Branch, expand: false);
 
         Rect workStateStrRect = workStateRect.BottomPart(0.3f);
         string workState;
         if (DrawDataValid)
         {
-            workState = drawData.Branch.CurWorkStateDesc;
-            this.TextStyle = new(guiColor: drawData.Branch.CurWorkState == WorkStateType.Idle ? Color.white : Color.green,
+            workState = DrawData.Branch.CurWorkStateDesc;
+            this.TextStyle = new(guiColor: DrawData.Branch.CurWorkState == WorkStateType.Idle ? Color.white : Color.green,
                                  font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
         }
         else
@@ -128,7 +128,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         }
     }
 
-    public void DrawRightRect(Rect inRect, UIData_BranchSummary drawData)
+    public void DrawRightRect(Rect inRect)
     {
         float partRectHeight = inRect.height * (1f / 3f);
         Rect topRect = Rect.MinMaxRect(xmin: Mathf.Min(inRect.xMin + 24f, inRect.xMax - inRect.width * 0.9f),
@@ -136,14 +136,14 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
                                        xmax: inRect.xMax,
                                        ymax: inRect.yMin + partRectHeight);
         this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.MiddleLeft);
-        OAFrame_Widgets.DrawLabel(topRect, "OARO_AllCrewCountShortInfo".Translate(drawData.Squad.AllCrewCountInt), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(topRect, "OARO_AllCrewCountShortInfo".Translate(DrawData.Squad.AllCrewCountInt), this.TextStyle);
 
         Rect centerRect = RectUtils.OffsetVertical(topRect, partRectHeight);
         Widgets.DrawBoxSolid(inRect.CenterSegmentOnY((1f / 3f)), OARO_ColorLibrary.MediumDarkBackground);
-        OAFrame_Widgets.DrawLabel(centerRect, "OARO_BranchPotencyShortInfo".Translate(drawData.Branch.Potency.ToString("0.##")), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(centerRect, "OARO_BranchPotencyShortInfo".Translate(DrawData.Branch.Potency.ToString("0.##")), this.TextStyle);
 
         Rect bottomRect = RectUtils.OffsetVertical(centerRect, partRectHeight);
-        OAFrame_Widgets.DrawLabel(bottomRect, "OARO_BranchSupplyStateInfo".Translate(drawData.Branch.SupplyState), this.TextStyle);
+        OAFrame_Widgets.DrawLabel(bottomRect, "OARO_BranchSupplyStateInfo".Translate(DrawData.Branch.SupplyState), this.TextStyle);
     }
 }
 

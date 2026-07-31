@@ -19,11 +19,6 @@ public class KnightVirtueDef : Def
     public KnightChivalryDef chivalry;
 
     /// <summary>
-    /// 最高美德等级（默认4级）
-    /// </summary>
-    public int maxLevel = 4;
-
-    /// <summary>
     /// 骑士美德类型
     /// </summary>
     public KnightVirtueType virtueType = KnightVirtueType.Normal;
@@ -42,6 +37,10 @@ public class KnightVirtueDef : Def
     /// </summary>
     public List<KnightVirtueTraitGroups> traitGroups = [];
 
+    /// <summary>
+    /// 最高美德等级
+    /// </summary>
+    public int MaxLevel => traitGroups.Count;
 
     public List<RimWorld.StatModifier> statOffsets;
 
@@ -61,9 +60,9 @@ public class KnightVirtueDef : Def
 
     public IReadOnlyList<KnightVirtueTraitDef> GetTraitOptionsForLevel(int level)
     {
-        if (level < 1 || level > maxLevel)
+        if (level < 1 || level > MaxLevel)
         {
-            Log.Error($"[OARO] Invalid virtue level: {level}. Valid range is 1 to {maxLevel}.");
+            Log.Error($"[OARO] Invalid virtue level: {level}. Valid range is 1 to {MaxLevel}.");
             return [];
         }
 

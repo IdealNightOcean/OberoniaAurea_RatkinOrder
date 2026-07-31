@@ -6,11 +6,14 @@ namespace OberoniaAurea.RatkinOrder.DataLibrary;
 [StaticConstructorOnStartup]
 public static class OARO_IconLibrary
 {
+    public static Texture2D Placeholer { get; } = ContentFinder<Texture2D>.Get("UI/Common/OARO_DefaultButton_Inactive");
+
     public static readonly Texture2D DefaultButton_Inactive = ContentFinder<Texture2D>.Get("UI/Common/OARO_DefaultButton_Inactive");
     public static readonly Texture2D DefaultButton_Active = ContentFinder<Texture2D>.Get("UI/Common/OARO_DefaultButton_Active");
 
     public static readonly Texture2D ColseX = ContentFinder<Texture2D>.Get("UI/Common/OARO_ColseX");
     public static readonly Texture2D BackArrow = ContentFinder<Texture2D>.Get("UI/Common/OARO_BackArrow");
+    public static readonly Texture2D PlusSign = ContentFinder<Texture2D>.Get("UI/Common/OARO_PlusSign");
 
     public static readonly Texture2D SmallExclamation = ContentFinder<Texture2D>.Get("UI/Common/OARO_SmallExclamation");
 

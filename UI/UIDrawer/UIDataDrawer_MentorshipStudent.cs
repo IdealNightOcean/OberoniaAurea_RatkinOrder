@@ -11,7 +11,7 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
 {
     public override Vector2 DefaultSize => new(328f, 114f);
 
-    public override void DrawInner(Vector2 position, UIData_MentorshipStudent drawData)
+    public override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, 4f); //标准大约(320f,106f);
@@ -19,7 +19,7 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         Rect portraitRect = new(0f, 0f, innerBoxRect.width * 0.25f, innerBoxRect.height * 0.7f);
         portraitRect = portraitRect.MoveTo(innerBoxRect.TopLeftCorner());
         if (DrawDataValid)
-            GUI.DrawTexture(position: portraitRect, image: PortraitsCache.Get(drawData.Student.Pawn, portraitRect.size, Rot4.South));
+            GUI.DrawTexture(position: portraitRect, image: PortraitsCache.Get(DrawData.Student.Pawn, portraitRect.size, Rot4.South));
         else
             throw new NotImplementedException();
 
@@ -28,16 +28,16 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
         OAFrame_Widgets.DrawLabel(
             rect: nameRect,
-            label: DrawDataValid ? drawData.Student.Pawn.NameShortColored : "OARO_MentorshipStudent_UnkownStudent".Translate(),
+            label: DrawDataValid ? DrawData.Student.Pawn.NameShortColored : "OARO_MentorshipStudent_UnkownStudent".Translate(),
             textStyle: this.TextStyle);
 
         Rect relationRect = nameRect.MoveTo(nameRect.xMax, nameRect.yMin);
         if (DrawDataValid)
         {
-            this.TextStyle = new(guiColor: drawData.RelationBetweenEach.s2t > 0 ? Color.green : ColorLibrary.RedReadable,
+            this.TextStyle = new(guiColor: DrawData.RelationBetweenEach.s2t > 0 ? Color.green : ColorLibrary.RedReadable,
                                  font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
             OAFrame_Widgets.DrawLabel(rect: relationRect,
-                                      label: $"{drawData.RelationBetweenEach.s2t.ToStringWithSign()} ({drawData.RelationBetweenEach.t2s.ToStringWithSign()})",
+                                      label: $"{DrawData.RelationBetweenEach.s2t.ToStringWithSign()} ({DrawData.RelationBetweenEach.t2s.ToStringWithSign()})",
                                       textStyle: this.TextStyle);
         }
         else
@@ -71,14 +71,14 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
             OAFrame_Widgets.DrawLabel(
                 rect: taughtableCountRect,
                 label: "OARO_MentorshipStudent_TaughtableCount".Translate(
-                    drawData.TaughtableAcademicsCount.ToString()
+                    DrawData.TaughtableAcademicsCount.ToString()
                                                      .Colorize(Color.green)
                                                      .Named(KeyLibrary_FormatArgName.Count)),
                 textStyle: this.TextStyle);
             OAFrame_Widgets.DrawLabel(
                 rect: dailyTutoringSuccessChanceRect,
                 label: "OARO_MentorshipStudent_DailyTutoringSuccessChance".Translate(
-                    drawData.DailyTutoringSuccessChance.ToStringPercent()
+                    DrawData.DailyTutoringSuccessChance.ToStringPercent()
                                                        .Colorize(Color.green)
                                                        .Named(KeyLibrary_FormatArgName.Chance)),
                 textStyle: this.TextStyle);

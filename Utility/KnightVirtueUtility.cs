@@ -134,7 +134,7 @@ public static class KnightVirtueUtility
         {
             foreach (KnightVirtue virtue in virtueHandler.Virtues)
             {
-                if (virtue.Level < virtue.Def.maxLevel)
+                if (virtue.Level < virtue.Def.MaxLevel)
                     yield return virtue.Def;
             }
         }
@@ -142,7 +142,7 @@ public static class KnightVirtueUtility
         {
             foreach (KnightVirtue virtue in virtueHandler.Virtues)
             {
-                if (virtue.Level < virtue.Def.maxLevel && predicate(virtue.Def))
+                if (virtue.Level < virtue.Def.MaxLevel && predicate(virtue.Def))
                     yield return virtue.Def;
             }
         }

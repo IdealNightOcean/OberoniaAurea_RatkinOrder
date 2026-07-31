@@ -1,5 +1,6 @@
 ﻿using NightOcean.Utility;
 using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
@@ -9,20 +10,11 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIDrawer_KnightVirtue : UIDrawerBase
+public class UIDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
 {
-    public ResidentKnight Knight { get; }
-    public KnightVirtue Virtue { get; }
-
-    public UIDrawer_KnightVirtue(ResidentKnight knight, KnightVirtue virtue)
+    public override void DrawInner(Vector2 position)
     {
-        this.Knight = knight;
-        this.Virtue = virtue;
-    }
-
-    public override void Draw(Vector2 position)
-    {
-        Rect boxRect = new(position.x, position.y, DefaultSize.x, DefaultSize.y);
+        Rect boxRect = new(position, DefaultSize);
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, 1f);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.MediumDarkBackground);
 
@@ -33,11 +25,11 @@ public class UIDrawer_KnightVirtue : UIDrawerBase
         Rect labelRect = innerBoxRect;
         labelRect.xMax = verticalLineX;
 
-        this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleCenter);
-        OAFrame_Widgets.DrawLabel(labelRect, this.Virtue.Def.LabelCap, this.TextStyle);
+        TextStyle = new(GameFont.Medium, TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(labelRect, DrawData.VirtueDef.LabelCap, TextStyle);
 
         float levelRectHeight = innerBoxRect.height / 3f;
-        for (int i = 0; i < this.Virtue.Def.maxLevel; i++)
+        for (int i = 0; i < DrawData.Virtue.Def.MaxLevel; i++)
         {
             Rect levelRect = innerBoxRect;
             levelRect.yMin = innerBoxRect.yMin + i * levelRectHeight;
@@ -76,41 +68,50 @@ public class UIDrawer_KnightVirtue : UIDrawerBase
 
         Rect levelLabeleRect = inRect;
         levelLabeleRect.xMax = verticalLineX;
+        TextStyle = new(GameFont.Medium, TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(levelLabeleRect, RomanNumeralHelper.ToRoman(level), TextStyle);
 
         Rect traitInfoRect = inRect;
         traitInfoRect.xMin = verticalLineX + 1f;
 
-        if (this.Virtue.Level < level)
+        if (DrawData.Virtue.Level < level)
         {
-            this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleCenter);
-            OAFrame_Widgets.DrawLabel(traitInfoRect, "OARO_NotUnlocked".Translate(), this.TextStyle);
+            TextStyle = new(GameFont.Medium, TextAnchor.MiddleCenter);
+            OAFrame_Widgets.DrawLabel(traitInfoRect, "OARO_NotUnlocked".Translate(), TextStyle);
             return;
         }
 
-        KnightVirtueTraitDef virtueTrait = this.Virtue.GetTraitOfLevel(level);
+        KnightVirtueTraitDef virtueTrait = DrawData.Virtue.GetTraitOfLevel(level);
         if (virtueTrait is not null)
         {
-            DarwVirtueTaritInfo(traitInfoRect, virtueTrait);
+            DrawVirtueTaritInfo(traitInfoRect, virtueTrait);
             return;
         }
 
-        if (level < this.Virtue.Def.traitGroups.Count + 1)
+        if (level <= DrawData.VirtueDef.MaxLevel)
         {
-            Rect traitInfoButRect = traitInfoRect.CenterSegment(0.6f, 0.6f);
-            if (OARO_Widgets.DefaultTextButton(traitInfoButRect, "OARO_SelectVirtueTrait".Translate()))
+            if (DrawData.Virtue.Def.GetTraitOptionsForLevel(level).Count <= 2)
             {
-                Window_VirtueTaritSelection taritSelectionWin = new(this.Knight, this.Virtue, level);
-                Find.WindowStack.Add(taritSelectionWin);
+                DrawVirtueTaritSelection(traitInfoRect, level);
+            }
+            else
+            {
+                Rect traitInfoButRect = traitInfoRect.CenterSegment(0.6f, 0.6f);
+                if (OARO_Widgets.DefaultTextButton(traitInfoButRect, "OARO_KnightVirtue_SelectTrait".Translate()))
+                {
+                    Window_VirtueTaritSelection taritSelectionWin = new(DrawData, level);
+                    Find.WindowStack.Add(taritSelectionWin);
+                }
             }
         }
         else
         {
-            this.TextStyle = new(OARO_ColorLibrary.DimInactive, GameFont.Medium, TextAnchor.MiddleCenter);
-            OAFrame_Widgets.DrawLabel(traitInfoRect, "None".Translate(), this.TextStyle);
+            TextStyle = new(OARO_ColorLibrary.DimInactive, GameFont.Medium, TextAnchor.MiddleCenter);
+            OAFrame_Widgets.DrawLabel(traitInfoRect, "None".Translate(), TextStyle);
         }
     }
 
-    private void DarwVirtueTaritInfo(Rect inRect, KnightVirtueTraitDef virtueTrait)
+    private void DrawVirtueTaritInfo(Rect inRect, KnightVirtueTraitDef virtueTrait)
     {
         Rect iconRect = inRect;
         iconRect.width *= 0.24f;
@@ -118,25 +119,25 @@ public class UIDrawer_KnightVirtue : UIDrawerBase
 
         Rect descRect = inRect;
         descRect.xMin = iconRect.xMax;
-        this.TextStyle = new(GameFont.Small, TextAnchor.MiddleCenter);
-        OAFrame_Widgets.DrawLabel(descRect, virtueTrait.description, this.TextStyle);
+        TextStyle = new(GameFont.Small, TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(descRect, virtueTrait.description, TextStyle);
     }
 
-    private void DarwVirtueTaritSelection(Rect inRect, int level)
+    private void DrawVirtueTaritSelection(Rect inRect, int level)
     {
         Rect infoRect = inRect.CenterSegmentOnX(0.85f);
 
         Rect labelRect = infoRect.CenterSegmentOnX(0.33f);
-        this.TextStyle = new(GameFont.Small, TextAnchor.MiddleCenter);
-        OAFrame_Widgets.DrawLabel(labelRect, "OARO_SelectVirtueTrait".Translate(), this.TextStyle);
+        TextStyle = new(GameFont.Small, TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(labelRect, "OARO_KnightVirtue_SelectTrait".Translate(), TextStyle);
 
-        IReadOnlyList<KnightVirtueTraitDef> traitOptions = this.Virtue.Def.GetTraitOptionsForLevel(level);
+        IReadOnlyList<KnightVirtueTraitDef> traitOptions = DrawData.VirtueDef.GetTraitOptionsForLevel(level);
         Rect opt1Rect = infoRect.LeftPart(0.33f);
         KnightVirtueTraitDef optTrait1 = traitOptions.ElementAtOrDefault(0) ?? OARO_ModDefOf.OARO_BaseTrait;
         TooltipHandler.TipRegion(opt1Rect, optTrait1.description);
         if (OARO_Widgets.DefaultTextButton(opt1Rect, string.Empty))
         {
-            this.Virtue.TrySelectTraitForLevel(optTrait1, level);
+            DrawData.Virtue.TrySelectTraitForLevel(optTrait1, level);
         }
 
         KnightVirtueTraitDef optTrait2 = traitOptions.ElementAtOrDefault(1) ?? OARO_ModDefOf.OARO_BaseTrait;
@@ -144,7 +145,7 @@ public class UIDrawer_KnightVirtue : UIDrawerBase
         TooltipHandler.TipRegion(opt2Rect, optTrait2.description);
         if (OARO_Widgets.DefaultTextButton(opt2Rect, string.Empty))
         {
-            this.Virtue.TrySelectTraitForLevel(optTrait2, level);
+            DrawData.Virtue.TrySelectTraitForLevel(optTrait2, level);
         }
 
     }

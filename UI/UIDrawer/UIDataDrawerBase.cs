@@ -4,31 +4,27 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public abstract class UIDataDrawerBase<T> : IUIDrawer where T : UIDataBase
+public abstract class UIDataDrawerBase<T> : UIDrawerBase where T : IUIData
 {
-    protected Vector2? sizeOverride;
-    public virtual Vector2 DefaultSize { get; } = new(800, 600);
-    public Vector2 DrawSize => sizeOverride ?? DefaultSize;
-    public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;
-
+    protected T DrawData { get; private set; }
     protected bool DrawDataValid { get; private set; }
 
-    public void SetDrawSize(Vector2 size) => sizeOverride = size;
+    public void SetDrawData(T drawData) => this.DrawData = drawData;
 
-    public void Draw(Vector2 position, T drawData)
+    public void Draw(Vector2 position)
     {
-        if (drawData is null)
+        if (this.DrawData is null)
         {
-            Log.Error("[OARO] 绘制数据源 drawData 不能为空，请传入有效的 UIData 实例");
+            Log.Error("[OARO] 绘制数据源 DrawData 不能为空，请先设置有效的 DrawData 实例");
             return;
         }
 
-        drawData.Refresh();
-        DrawDataValid = drawData.IsValid;
-        DrawInner(position, drawData);
+        this.DrawData.Refresh();
+        DrawDataValid = this.DrawData.IsValid;
+        DrawInner(position);
         OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
-    public abstract void DrawInner(Vector2 position, T drawData);
+    public abstract void DrawInner(Vector2 position);
 
 }

@@ -41,7 +41,7 @@ public class KnightVirtue : IExposable
         get => level;
         set
         {
-            level = Mathf.Clamp(value, 1, def.maxLevel);
+            level = Mathf.Clamp(value, 1, def.MaxLevel);
         }
     }
 
@@ -57,7 +57,7 @@ public class KnightVirtue : IExposable
         KnightVirtue virtue = Activator.CreateInstance(def.virtueClass) as KnightVirtue;
         virtue.knight = knight;
         virtue.def = def;
-        virtue.level = Mathf.Clamp(level, 1, def.maxLevel);
+        virtue.level = Mathf.Clamp(level, 1, def.MaxLevel);
         return virtue;
     }
 
@@ -128,7 +128,7 @@ public class KnightVirtue : IExposable
 
     private bool SelectTraitForLevel(KnightVirtueTraitDef traitDef, int traitLevel, bool replaceCur = false)
     {
-        if (traitLevel < 1 || traitLevel > def.maxLevel)
+        if (traitLevel < 1 || traitLevel > def.MaxLevel)
         {
             Log.Error($"尝试为骑士美德 '{def?.defName ?? "UNKNOWN"}' 选择词条失败：等级 {traitLevel} 无效");
             return false;
@@ -158,7 +158,7 @@ public class KnightVirtue : IExposable
 
     private int GetTraitOfLevelIndex(int traitLevel)
     {
-        if (traitLevel < 1 || traitLevel > def.maxLevel)
+        if (traitLevel < 1 || traitLevel > def.MaxLevel)
             return -1;
 
         int left = 0;

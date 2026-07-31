@@ -1,21 +1,21 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
 public class Window_VirtueTaritSelection : OrderWindowBase
 {
-    public ResidentKnight Knight { get; }
+    public UIData_KnightVirtue DrawData { get; }
     public KnightVirtue Virtue { get; }
     public int TargetLevel { get; }
-    public KnightVirtueTraitGroups TraitGroup { get; }
+    public IReadOnlyList<KnightVirtueTraitDef> TraitOptions { get; }
 
-    public Window_VirtueTaritSelection(ResidentKnight knight, KnightVirtue virtue, int level) : base()
+    public Window_VirtueTaritSelection(UIData_KnightVirtue drawData, int level) : base()
     {
-        this.Knight = knight;
-        this.Virtue = virtue;
+        this.DrawData = drawData;
         this.TargetLevel = level;
-        this.TraitGroup = virtue.Def.traitGroups[level - 1];
+        this.TraitOptions = drawData.Virtue.Def.GetTraitOptionsForLevel(level);
     }
 
     public override void DoWindowContents(Rect inRect)

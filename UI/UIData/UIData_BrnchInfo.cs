@@ -38,9 +38,9 @@ public class UIData_BrnchInfo : UIData_BranchSummary
     protected override void RefreshInner()
     {
         base.RefreshInner();
-        PopulationCeiling = (int)Branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling, immediateUpdate: true);
-        BuildingCeiling = (int)Branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling, immediateUpdate: true);
-        DailyPopulationGrowth = (int)Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth, immediateUpdate: true);
+        PopulationCeiling = (int)this.Branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling, immediateUpdate: true);
+        BuildingCeiling = (int)this.Branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling, immediateUpdate: true);
+        DailyPopulationGrowth = (int)this.Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth, immediateUpdate: true);
 
         DailyPopulationGrowthExplanation.MarkDirty();
     }
