@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
     private (Faction parentFaction, Faction subFaction) GetFactions()
     {
         Faction parentFaction = QuestGen.slate.Get<Faction>(OARO_KeyLibrary_SlateStoreAs.parentFaction);
-        parentFaction ??= OAFrame_FactionUtility.FirstAvailableFactionOf(validationParams: FactionValidationParams.NonHostileNormalFaction,
+        parentFaction ??= OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.FirstAvailableFactionOf(validationParams: FactionValidationParams.NonHostileNormalFaction,
                                                                          predicater: f => f.IsRatkinKindomFaction());
         if (parentFaction is null)
         {
@@ -106,7 +107,7 @@ internal sealed class QuestNode_Root_TaxCollectorCome : QuestNode
         string inSignalRemovePawn = QuestGenUtility.HardcodedSignalWithQuestID("Pawns_RemovePawn");
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            negativeSiganls = OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "pawns"),
+            negativeSiganls = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "pawns"),
             outOnlyOnce = false,
             outSignal = inSignalRemovePawn
         };

@@ -1,5 +1,4 @@
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -17,7 +16,7 @@ public class RatkinOrderManager : IExposable
 
     public RatkinOrderManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AroundKnightGroupsManager));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AroundKnightGroupsManager));
         Instance = this;
     }
     public static void ClearStaticCache() => Instance = null;

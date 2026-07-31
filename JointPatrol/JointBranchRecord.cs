@@ -76,7 +76,7 @@ public class JointBranchRecord : IExposable
             _ => -1
         };
 
-        if (neededSilver > 0 && !OAFrame_MapUtility.HasEnoughThingsOfDef(map, ThingDefOf.Silver, neededSilver))
+        if (neededSilver > 0 && !OberoniaAurea_Frame.Utility.OAFrame_MapUtility.HasEnoughThingsOfDef(map, ThingDefOf.Silver, neededSilver))
         {
             return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, neededSilver);
         }

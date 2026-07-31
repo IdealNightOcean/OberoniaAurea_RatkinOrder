@@ -117,9 +117,12 @@ public class QuestPart_OrderCrewAidDelay : QuestPart_Delay
             enableTick = Find.TickManager.TicksGame;
             delayTicks = 60;
             TaggedString treeText = "OARO_PersuadeToStayInfo".Translate(RatkinOrder.Name, RatkinOrder.Faction);
-            Dialog_NodeTree persuadeTree = OberoniaAurea_Frame.OAFrame_DiaUtility.ConfirmDiaNodeTree(treeText,
-                                                                                                     "OARO_PersuadeToStay".Translate(), PersuadeToStay,
-                                                                                                     "OARO_NotPersuadeToStay".Translate(), NotPersuadeToStay);
+            Dialog_NodeTree persuadeTree = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNodeTree(
+                text: treeText,
+                acceptText: "OARO_PersuadeToStay".Translate(),
+                acceptAction: PersuadeToStay,
+                rejectText: "OARO_NotPersuadeToStay".Translate(),
+                rejectAction: NotPersuadeToStay);
             Find.WindowStack.Add(persuadeTree);
         }
     }

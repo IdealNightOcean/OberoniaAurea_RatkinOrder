@@ -26,7 +26,7 @@ public class BranchInteractionWorker_RandomTrade(BranchInteractionDef def) : Bra
             return (false, false);
         }
 
-        Faction faction = OAFrame_FactionUtility.RandomAvailableFactionOf(FactionValidationParams.DefaultFaction, HasTrader);
+        Faction faction = OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOf(FactionValidationParams.DefaultFaction, HasTrader);
         if (faction is null)
             return (false, false);
 

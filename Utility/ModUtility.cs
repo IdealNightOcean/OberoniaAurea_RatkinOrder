@@ -46,7 +46,7 @@ public static class ModUtility
             parentFactionDef = parentFaction.def;
 
         if (parentFactionDef is not null && parentFaction is null)
-            parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(parentFactionDef, FactionValidationParams.DefaultFaction);
+            parentFaction = OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOfDef(parentFactionDef, FactionValidationParams.DefaultFaction);
 
         FactionGeneratorParms parms = new(subFactionDef, default, hidden: true);
         if (ModsConfig.IdeologyActive)
@@ -112,7 +112,7 @@ public static class ModUtility
         {
             foreach (Pawn p in pawns)
             {
-                OAFrame_PawnUtility.MakePawnJoinPlayer(p);
+                OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.MakePawnJoinPlayer(p);
             }
         }
         pawnsArrivalModeDef.Worker.Arrive(pawns, arrivalParms);

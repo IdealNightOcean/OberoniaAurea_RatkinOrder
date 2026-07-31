@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
@@ -85,7 +86,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
             slate.Set("collector", talkWith);
 
 
-            OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Mercy_TaxCollectorTreat, slate, forced: true);
+            OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Mercy_TaxCollectorTreat, slate, forced: true);
             return true;
         }
         catch (System.Exception ex)
@@ -119,7 +120,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 DeregisterTalkAction(clearTalkWith: true);
             };
-            briberyOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+            briberyOpt.linkLateBind = () => OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNode(
                 text: "OARO_TalkWithTaxCollector_BriberyReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                 acceptText: "Confirm".Translate());
         }
@@ -133,7 +134,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                 TalkActionUtility.DisableLordJobTalk(talkWith, dismiss: true);
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
             };
-            threatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+            threatOpt.linkLateBind = () => OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNode(
                 text: "OARO_TalkWithTaxCollector_NoOrderStationLeave".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                 acceptText: "Confirm".Translate());
         }
@@ -145,7 +146,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
                 QuestUtility.SendQuestTargetSignals(talkWith.questTags, "LeaveByOpt");
                 DeregisterTalkAction(clearTalkWith: true);
             };
-            threatOpt.linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+            threatOpt.linkLateBind = () => OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNode(
                text: "OARO_TalkWithTaxCollector_ThreatReply".Translate(talkWith.Named(KeyLibrary_FormatArgName.TALKWITH)),
                acceptText: "Confirm".Translate());
 
@@ -179,7 +180,7 @@ internal sealed class QuestPart_LordJob_TaxCollector : QuestPart_LordJob_CommomT
         rootNode.options.Add(rejectOpt);
 
         if (canPostpone)
-            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+            rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         Dialog_NodeTreeWithFactionInfo nodeTree = new(rootNode, talkWith.Faction);
         Find.WindowStack.Add(nodeTree);

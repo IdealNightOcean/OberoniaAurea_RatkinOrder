@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using UnityEngine;
+﻿using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
@@ -22,7 +21,7 @@ public abstract class UIDataDrawerBase<T> : UIDrawerBase where T : IUIData
         this.DrawData.Refresh();
         DrawDataValid = this.DrawData.IsValid;
         DrawInner(position);
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     public abstract void DrawInner(Vector2 position);

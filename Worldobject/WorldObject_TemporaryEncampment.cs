@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -110,7 +110,7 @@ public class WorldObject_TemporaryEncampment : WorldObject_InteractWithFixedCara
         }
         Find.WindowStack.Add(Dialog_MessageBox.CreateConfirmation("CommandFulfillTradeOfferConfirm".Translate(GenLabel.ThingLabel(requestDef, null, requestCount)), delegate
         {
-            OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, requestDef, requestCount);
+            OberoniaAurea_Frame.Utility.OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, requestDef, requestCount);
             QuestUtility.SendQuestTargetSignals(questTags, "TradeRequestFulfilled", this.Named(KeyLibrary_FormatArgName.SUBJECT), caravan.Named("CARAVAN"));
             hasSupplyRequest = false;
         }));

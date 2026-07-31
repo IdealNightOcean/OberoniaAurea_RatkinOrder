@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using UnityEngine;
+﻿using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -66,11 +65,11 @@ public class DevWindow_Order : DevWindowBase
         listing_Rect.Label("————————————————");
         if (listing_Rect.ButtonText("效果标志 EffectTags", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.EffectTags.GetDetailString()));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.EffectTags.GetDetailString()));
         }
         if (listing_Rect.ButtonText("修正 StatTransformers", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.TransformerHandler.GetDetailString()));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(ratkinOrder.TransformerHandler.GetDetailString()));
         }
 
         listing_Rect.Gap(6f);

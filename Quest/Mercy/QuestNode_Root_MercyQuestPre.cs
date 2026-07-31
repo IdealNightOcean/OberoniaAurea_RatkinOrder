@@ -148,7 +148,7 @@ public class QuestNode_Root_MercyQuestPre : QuestNode
 
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            negativeSiganls = OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "helpSeeker"),
+            negativeSiganls = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "helpSeeker"),
             outSignal = inSignalPawnNegative,
             outOnlyOnce = true
         };

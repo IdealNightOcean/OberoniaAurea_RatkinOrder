@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea_Frame.UI;
 using RimWorld;
 using UnityEngine;
 using Verse;
@@ -39,7 +39,7 @@ public abstract class OrderWindowBase : Verse.Window, IUIDrawer
     public override void Close(bool doCloseSound = true)
     {
         HasClosed = true;
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
         base.Close(doCloseSound);
     }
 }

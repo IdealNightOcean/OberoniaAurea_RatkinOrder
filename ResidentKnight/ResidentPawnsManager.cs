@@ -1,5 +1,4 @@
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -52,7 +51,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
     internal ResidentPawnsManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
 

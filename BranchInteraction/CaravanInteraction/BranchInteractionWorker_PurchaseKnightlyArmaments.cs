@@ -2,6 +2,7 @@ using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -53,7 +54,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
             rootNode.options.Add(stuffOpt);
         }
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
 
         return rootNode;
     }
@@ -95,7 +96,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
             resolveTree = false
         };
         rootNode.options.Add(goBackOpt);
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
 
         return rootNode;
     }
@@ -162,7 +163,7 @@ public class BranchInteractionWorker_PurchaseKnightlyArmaments(BranchInteraction
             }
         }
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
 
         DiaOption backOpt = new("GoBack".Translate())
         {

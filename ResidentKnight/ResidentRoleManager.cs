@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -26,7 +25,7 @@ public class ResidentRoleManager : IExposable
 
     public ResidentRoleManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(ResidentRoleManager));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(ResidentRoleManager));
         Instance = this;
 
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();

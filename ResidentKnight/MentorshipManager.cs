@@ -1,6 +1,6 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -24,7 +24,7 @@ public class MentorshipManager : IExposable
 
     public MentorshipManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(MentorshipManager));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(MentorshipManager));
         Instance = this;
 
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();

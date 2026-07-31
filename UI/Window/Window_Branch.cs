@@ -2,7 +2,6 @@ using NightOcean;
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -637,7 +636,7 @@ public class Window_Branch : OrderWindowBase
             if (buildingDef.honorDef is not null)
             {
                 Rect ribbonRect = new(inRect.xMin, inRect.yMin - 2f, inRect.width, 55f);
-                Material tintMat = OAFrame_UIUtility.GetTintMaterial(buildingDef.honorDef.color, OARO_IconLibrary.HonorRibbonMask);
+                Material tintMat = OberoniaAurea_Frame.UI.OAFrame_UIUtility.GetTintMaterial(buildingDef.honorDef.color, OARO_IconLibrary.HonorRibbonMask);
                 GenUI.DrawTextureWithMaterial(ribbonRect, OARO_IconLibrary.HonorRibbonTex, tintMat);
             }
         }
@@ -1203,7 +1202,7 @@ public class Window_Branch : OrderWindowBase
             Text.Anchor = TextAnchor.MiddleCenter;
             if (OARO_UIUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
             {
-                Dialog_NodeTree dialog_Node = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
+                Dialog_NodeTree dialog_Node = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
                      text: "OARO_BranchWin_CancelConstructWarnning".Translate(),
                      acceptAction: () => FacilityHandler.CancelFacilityConstruction(record.TargetDef));
                 Find.WindowStack.Add(dialog_Node);
@@ -1348,7 +1347,7 @@ public class Window_Branch : OrderWindowBase
         reusedRect = OARO_UIUtility.CenterRectOnX(inRect, inRect.yMax - 28f, 89f, 28f);
         if (OARO_UIUtility.TextButtonImage(reusedRect, "OARO_BranchWin_CancelConstruct".Translate(), constructButton, constructButton_Down, doMouseoverSound: true))
         {
-            Dialog_NodeTree dialog_Node = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
+            Dialog_NodeTree dialog_Node = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
                 text: "OARO_BranchWin_CancelConstructWarnning".Translate(),
                 acceptAction: () => BuildingHandler.CancelBuildingConstruction(SelUnderConstructionBuilding.TargetDef));
             Find.WindowStack.Add(dialog_Node);
@@ -1587,7 +1586,7 @@ public class Window_Branch : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
         return rect;
     }
 

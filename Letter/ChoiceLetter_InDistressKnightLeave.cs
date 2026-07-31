@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using System.Collections.Generic;
 using Verse;
 
@@ -87,7 +86,7 @@ internal class ChoiceLetter_InDistressKnightLeave : ChoiceLetter_RatkinOrder
             Pawns.RemoveAll(p => p.DestroyedOrNull());
             foreach (Pawn p in Pawns)
             {
-                OAFrame_PawnUtility.MakePawnJoinPlayer(p);
+                OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.MakePawnJoinPlayer(p);
                 ResidentPawnsManager.Instance.TryRegisterKnight(p);
             }
         }

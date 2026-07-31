@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System.Collections.Generic;
 using Verse;
@@ -50,7 +50,7 @@ internal class Hediff_RecruitKnight : HediffWithComps
             return;
         }
         int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(kRecord.RatkinOrder);
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
             "OARO_RecruitKnight_Confirm".Translate(pawn.Named(KeyLibrary_FormatArgName.PAWN),
             needRecommendation.Named(KeyLibrary_FormatArgName.Count)),
             acceptAction: RecruitKnight));

@@ -99,7 +99,7 @@ public class QuestNode_Root_KnightAssistanceCommon : QuestNode_Root_RefugeeKnigh
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("Lodger_Negative");
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            negativeSiganls = OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "lodgers"),
+            negativeSiganls = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "lodgers"),
             outSignal = inSignalPawnNegative,
             outOnlyOnce = false
         };

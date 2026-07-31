@@ -1,4 +1,5 @@
 ﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using Verse;
 
@@ -15,7 +16,7 @@ public class JointPatrolCaravanHelpWorker_TouristAreaPatrol : JointPatrolCaravan
                 p.needs.mood?.thoughts.memories.TryGainMemory(OARO_ThoughtDefOf.OARO_Thought_TouristAreaPatrol);
             }
 
-            (Pawn maxSkillPawn, _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(fixedCaravan.PawnsListForReading, SkillDefOf.Artistic);
+            (Pawn maxSkillPawn, _) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(fixedCaravan.PawnsListForReading, SkillDefOf.Artistic);
             if (maxSkillPawn?.mindState?.inspirationHandler?.TryStartInspiration(InspirationDefOf.Inspired_Creativity, Def.label) ?? false)
             {
                 extraRewardText.AppendLine();

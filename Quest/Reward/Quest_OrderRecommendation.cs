@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
@@ -123,7 +122,7 @@ public class QuestPart_OrderRecommendation : QuestPart, IOnRatkinOrderRemoved
             }
             else
             {
-                MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
+                MapParent = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
                 if (MapParent is not null)
                 {
                     RecommendationUtility.GiveRecommendationsToPlayerMap(MapParent.Map, count: Count, sendStandLetter: true, ratkinOrder: RatkinOrder, dropPod: true);

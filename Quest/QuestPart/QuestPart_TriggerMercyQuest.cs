@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
-using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using Verse;
@@ -68,7 +67,7 @@ public class QuestPart_TriggerMercyQuest : QuestPart
     protected bool TryTriggerQuest()
     {
         Slate slate = GenerateQuestSlate();
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, MercyQuestDef.mainQuestDef, slate, forced: true);
+        return OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, MercyQuestDef.mainQuestDef, slate, forced: true);
     }
 
     protected virtual Slate GenerateQuestSlate()

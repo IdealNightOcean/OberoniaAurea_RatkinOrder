@@ -1,7 +1,8 @@
 ﻿using NightOcean.Utility;
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
+using OberoniaAurea_Frame.UI;
 using UnityEngine;
 using Verse;
 

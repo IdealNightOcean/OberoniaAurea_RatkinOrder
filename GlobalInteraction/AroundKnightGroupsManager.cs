@@ -38,7 +38,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
 
     public AroundKnightGroupsManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AroundKnightGroupsManager));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AroundKnightGroupsManager));
         Instance = this;
     }
     public static void ClearStaticCache() => Instance = null;
@@ -135,7 +135,7 @@ public class AroundKnightGroupsManager : IExposable, IOnBranchDestroyed
             };
             slate.Set(OARO_KeyLibrary_SlateStoreAs.visitingKnightsDuration, duration);
 
-            result = OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
+            result = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_KnightsVisit, slate, forced: false);
         }
 
         if (result || removeWhenInvalid)

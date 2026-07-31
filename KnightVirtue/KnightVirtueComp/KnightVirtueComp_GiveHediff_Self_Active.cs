@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea_Frame;
-
 namespace OberoniaAurea.RatkinOrder;
 
 public abstract class KnightVirtueComp_GiveHediff_Self_Active : KnightVirtueComp

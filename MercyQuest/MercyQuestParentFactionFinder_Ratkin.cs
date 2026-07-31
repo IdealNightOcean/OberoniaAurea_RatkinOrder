@@ -10,13 +10,13 @@ public class MercyQuestParentFactionFinder_Ratkin : MercyQuestParentFactionFinde
         factionParams ??= FactionValidationParams.NonHostileNormalFaction;
         if (fixedParentFactionDef is not null && fixedParentFactionDef.IsRatkinFaction())
         {
-            return OAFrame_FactionUtility.RandomAvailableFactionOfDef(
+            return OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOfDef(
                 def: fixedParentFactionDef,
                 validationParams: factionParams.Value);
         }
         else
         {
-            return OAFrame_FactionUtility.RandomAvailableFactionOf(
+            return OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOf(
                 validationParams: factionParams.Value,
                 predicater: f => f.IsRatkinFaction());
         }

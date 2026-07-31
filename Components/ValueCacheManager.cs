@@ -19,7 +19,7 @@ public class ValueCacheManager
 
     public ValueCacheManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
     }
 

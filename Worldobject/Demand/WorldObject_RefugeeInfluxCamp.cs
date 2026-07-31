@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -289,7 +290,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             }
         }
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
         return rootNode;
     }
 
@@ -464,7 +465,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         {
             case WorkType.Hunting:
                 {
-                    int maxAnimalsLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
+                    int maxAnimalsLevel = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
                     int totalShootingLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Shooting);
                     float famineRiskChange = (maxAnimalsLevel * 0.002f + totalShootingLevel * 0.0001f) * Rand.Range(0.5f, 1.5f);
                     if (HasQuestEffectTag("HuntingGround"))
@@ -472,14 +473,14 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
                         famineRiskChange *= 1.5f;
                     }
                     FamineRisk -= famineRiskChange;
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_HuntingResult".Translate(famineRiskChange.ToStringPercent("0.##"))));
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_HuntingResult".Translate(famineRiskChange.ToStringPercent("0.##"))));
                     break;
                 }
             case WorkType.AssistPacify:
                 {
                     float willingnessChange = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social) * 0.001f;
                     AdjuestRefugeeWillingness(willingnessChange);
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_PacifyResult".Translate(willingnessChange.ToStringPercent("0.##"))));
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_PacifyResult".Translate(willingnessChange.ToStringPercent("0.##"))));
                     break;
                 }
             default: break;
@@ -505,7 +506,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         AdjuestRefugeeWillingness(-0.25f);
         AdjustPopulation(-100);
 
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_ExileResult".Translate(100, 0.25f.ToStringPercent("0.##"))));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_ExileResult".Translate(100, 0.25f.ToStringPercent("0.##"))));
     }
 
     private void MilitaryControl()
@@ -517,7 +518,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
         {
             EndWork(interrupt: true);
         }
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_MilitarySupervisionResult".Translate()));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_MilitarySupervisionResult".Translate()));
     }
 
     private DiaNode DistributionNode(Caravan caravan)
@@ -581,7 +582,7 @@ public class WorldObject_RefugeeInfluxCamp : WorldObject_CriticalBranchDemand
             cooldownManager.RegisterRecord("DistributionFood", cdTicks: 5 * 60000, removeWhenExpired: true);
             FamineRisk -= 0.55f;
             AdjuestRefugeeWillingness(0.2f);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_DistributionFoodResult".Translate(0.55f.ToStringPercent("0.##"), 0.2f.ToStringPercent("0.##"))));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_RefugeeInflux_DistributionFoodResult".Translate(0.55f.ToStringPercent("0.##"), 0.2f.ToStringPercent("0.##"))));
         }
     }
 

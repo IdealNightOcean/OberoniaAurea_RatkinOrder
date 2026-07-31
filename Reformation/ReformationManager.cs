@@ -1,5 +1,4 @@
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -55,7 +54,7 @@ public class ReformationManager(RatkinOrder ratkinOrder) : IExposable
 
         if (listing_Rect.ButtonText("自新详细信息", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllActiveReformationString()));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllActiveReformationString()));
         }
     }
 

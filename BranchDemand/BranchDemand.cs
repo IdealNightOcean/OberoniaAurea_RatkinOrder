@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.QuestGen;
 using System;
@@ -78,7 +77,7 @@ public class BranchDemand : IExposable
     public virtual void OnAccepted(Branch branch)
     {
         Slate slate = GenerateQuestSlate(branch);
-        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out relatedQuest, def.relatedQuestDef, slate, forced: true))
+        if (OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out relatedQuest, def.relatedQuestDef, slate, forced: true))
         {
             curState = DemandState.Ongoing;
         }

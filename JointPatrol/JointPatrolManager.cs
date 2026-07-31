@@ -782,7 +782,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         }
         catch { }
 
-        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_JointPatrolCaravanHelp, slate, forced: true))
+        if (OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_JointPatrolCaravanHelp, slate, forced: true))
         {
             curHelpCount++;
         }
@@ -828,7 +828,7 @@ public partial class JointPatrolManager : IExposable, IThingHolder, IPawnRetenti
         Slate slate = new();
         slate.SetBasicOrderSlateVar(ratkinOrder);
         slate.Set(nameof(residentKnights), residentKnights);
-        OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnightBackPlayer, slate, forced: true);
+        OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_ResidentKnightBackPlayer, slate, forced: true);
 
         innerContainer.Clear();
     }

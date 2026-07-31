@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -42,7 +41,7 @@ public class QuestPart_MercyQuestPre_DangerConfirm : QuestPart
         {
             if (!CheckSafeVisitability(Map, SubFaction, out string notSafeReason))
             {
-                Dialog_NodeTree nodeTree = OAFrame_DiaUtility.ConfirmDiaNodeTree(
+                Dialog_NodeTree nodeTree = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNodeTree(
                    text: "OARO_MercyQuestPre_DangerConfirmInfo".Translate(notSafeReason.Named("NotSafeReason")),
                    acceptText: "OARO_MercyQuestPre_EnsureSafe".Translate(),
                    acceptAction: null,

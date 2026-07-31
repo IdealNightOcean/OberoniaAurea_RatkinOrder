@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
@@ -26,7 +25,7 @@ public class GlobalInteractionManager : IExposable, IOnRatkinOrderRemoved, IOnBr
 
     public GlobalInteractionManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
 
         simpleInteractRecord = new();

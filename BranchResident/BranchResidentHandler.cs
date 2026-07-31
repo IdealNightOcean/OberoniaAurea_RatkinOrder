@@ -1,6 +1,7 @@
 ﻿using NightOcean.Collection;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -166,7 +167,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
             {
                 if (pawn.Faction != Faction.OfPlayer)
                 {
-                    OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+                    OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
                 }
 
                 caravan.AddPawn(pawn, addCarriedPawnToWorldPawnsIfAny: true);
@@ -207,7 +208,7 @@ public class BranchResidentHandler : IExposable, IThingHolder, IPawnRetentionHol
         {
             if (pawn.Faction != Faction.OfPlayer)
             {
-                OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+                OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
             }
         }
         Caravan residentCaravan = CaravanMaker.MakeCaravan(pawns, Faction.OfPlayer, branch.BaseSite.Tile, addToWorldPawnsIfNotAlready: true);

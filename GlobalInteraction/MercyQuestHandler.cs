@@ -1,6 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.QuestGen;
 using System;
@@ -28,7 +28,7 @@ public class MercyQuestHandler : IExposable
 
     public MercyQuestHandler()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(MercyQuestHandler));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(MercyQuestHandler));
         Instance = this;
     }
 
@@ -125,7 +125,7 @@ public class MercyQuestHandler : IExposable
             return false;
         }
         // 善行任务的派系Test时未生成，只好强制触发了
-        if (OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(
+        if (OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(
             quest: out Quest quest,
             scriptDef: mercyQuestDef.needPreQuest ? mercyQuestDef.preQuestDef : mercyQuestDef.mainQuestDef,
             slate: slate,

@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -14,7 +13,7 @@ public abstract class BranchResident_ResidentKnightStudy : BranchResident
     public override void StartResidency(Branch branch)
     {
         base.StartResidency(branch);
-        OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+        OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
     }
 
     public void MedalsCostAdd(KnightChivalryDef chivalry, int cost)

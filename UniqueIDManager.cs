@@ -1,4 +1,3 @@
-using OberoniaAurea_Frame;
 using System.Collections.Generic;
 using Verse;
 
@@ -20,7 +19,7 @@ public class UniqueIDManager : IExposable
 
     public UniqueIDManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
     }
     public static void ClearStaticCache() => Instance = null;

@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System.Runtime.CompilerServices;
 using Verse;
@@ -31,7 +31,7 @@ public static class RecommendationUtility
         return totalCount;
     }
 
-    public static bool HasEnoughRecommendation(IThingHolder thingHolder, int count) => OAFrame_ThingUtility.HasEnoughThingsOfDef(thingHolder, OARO_ThingDefOf.OARO_OrderRecommendation, count);
+    public static bool HasEnoughRecommendation(IThingHolder thingHolder, int count) => OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.HasEnoughThingsOfDef(thingHolder, OARO_ThingDefOf.OARO_OrderRecommendation, count);
 
     public static bool GiveRecommendationsToPlayer(IThingHolder thingHolder, int count, bool sendStandLetter = true, RatkinOrder ratkinOrder = null)
     {
@@ -40,7 +40,7 @@ public static class RecommendationUtility
 
         OrderRecommendation recommendations = MakeRecommendationForPlayer(count);
 
-        if (!OAFrame_ThingUtility.GiveThingToPlayer(recommendations, thingHolder))
+        if (!OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GiveThingToPlayer(recommendations, thingHolder))
             return false;
 
         if (sendStandLetter)
@@ -86,7 +86,7 @@ public static class RecommendationUtility
     }
 
     /// <returns>实际使用数</returns>
-    public static int UseRecommendationOfPlayer(IThingHolder thingHolder, int useCount) => OAFrame_ThingUtility.RemoveThingsOfDef(thingHolder, OARO_ThingDefOf.OARO_OrderRecommendation, useCount);
+    public static int UseRecommendationOfPlayer(IThingHolder thingHolder, int useCount) => OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.RemoveThingsOfDef(thingHolder, OARO_ThingDefOf.OARO_OrderRecommendation, useCount);
 
     /// <summary>
     /// 提升到新等级需要的推荐信数量

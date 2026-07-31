@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
             {
                 AllyHostile = false
             };
-            parentFaction = OAFrame_FactionUtility.RandomAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, validationParams);
+            parentFaction = OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, validationParams);
         }
 
         QuestPart_MercyQuestWatcher questPart_MercyQuestWatcher = new()
@@ -110,7 +111,7 @@ public class QuestNode_Root_LostItemsOfTrader : QuestNode
         string inSignalPawnNegative = QuestGenUtility.HardcodedSignalWithQuestID("CollectionTeam_Negative");
         QuestPart_PawnNegativeSiganl questPart_PawnNegativeSiganl = new()
         {
-            negativeSiganls = OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "collectionTeam"),
+            negativeSiganls = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.GetCommonPawnNegativeSiganls(addTag: true, tagToAdd: "collectionTeam"),
             outOnlyOnce = false,
             outSignal = inSignalPawnNegative
         };

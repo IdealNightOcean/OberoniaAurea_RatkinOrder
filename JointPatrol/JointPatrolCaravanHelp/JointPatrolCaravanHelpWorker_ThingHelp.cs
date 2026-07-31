@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld.Planet;
 using Verse;
 
@@ -56,7 +57,7 @@ public class JointPatrolCaravanHelpWorker_ThingHelp : JointPatrolCaravanHelpWork
             resolveTree = true
         };
         rootNode.options.Add(giveOpt);
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
         return rootNode;
     }
 }

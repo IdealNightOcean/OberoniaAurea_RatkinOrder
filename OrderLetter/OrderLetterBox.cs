@@ -1,6 +1,5 @@
 using NightOcean.Collection;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,7 +34,7 @@ public class OrderLetterBox : IExposable
 
     public OrderLetterBox()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance));
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
     }

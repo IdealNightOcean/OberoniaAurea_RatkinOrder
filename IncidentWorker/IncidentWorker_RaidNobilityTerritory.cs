@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -139,7 +138,7 @@ internal sealed class IncidentWorker_RaidNobilityTerritory : IncidentWorker
                 customLetterText = "OARO_NobilityTerritory_CivilianRaidText".Translate(),
                 forced = true
             };
-            OAFrame_MiscUtility.AddNewQueuedIncident(IncidentDefOf.RaidEnemy, delayTicks: Rand.RangeInclusive(1250, 2500), civilianRaidParms);
+            OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.AddNewQueuedIncident(IncidentDefOf.RaidEnemy, delayTicks: Rand.RangeInclusive(1250, 2500), civilianRaidParms);
         }
 
         return true;

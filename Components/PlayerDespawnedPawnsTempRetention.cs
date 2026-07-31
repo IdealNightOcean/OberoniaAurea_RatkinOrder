@@ -14,7 +14,7 @@ public class PlayerDespawnedPawnsTempRetention : IExposable, IPawnRetentionHolde
 
     public PlayerDespawnedPawnsTempRetention()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(PlayerDespawnedPawnsTempRetention));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(PlayerDespawnedPawnsTempRetention));
         Instance = this;
         tickHashOffset = Rand.Range(0, int.MaxValue).HashOffset();
         pawns = new();

@@ -1,7 +1,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.QuestGen;
 using Verse;
@@ -40,7 +40,7 @@ public class OrderInteractionWorker_AssistanceQuest(OrderInteractionDef def) : O
         slate.SetBasicOrderSlateVar(ratkinOrder);
         modEx_AssistanceQuest.SetSlateValue(slate);
         slate.Set("map", map);
-        bool succeeded = OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, modEx_AssistanceQuest.assistanceQuest, slate, forced: true);
+        bool succeeded = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, modEx_AssistanceQuest.assistanceQuest, slate, forced: true);
         return (succeeded, true);
     }
 }

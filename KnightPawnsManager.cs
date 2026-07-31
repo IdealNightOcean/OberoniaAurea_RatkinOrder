@@ -1,5 +1,4 @@
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Verse;
@@ -28,7 +27,7 @@ public class KnightPawnsManager : IExposable
 
     public KnightPawnsManager()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(KnightPawnsManager));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(KnightPawnsManager));
         Instance = this;
     }
     public static void ClearStaticCache() => Instance = null;

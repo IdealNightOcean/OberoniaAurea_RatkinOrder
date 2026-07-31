@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -47,18 +47,18 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
             }
 
             int count = associatedFixedCaravan.PawnsListForReading.Count * 10;
-            List<Thing> rewards = OAFrame_ThingUtility.GenerateThingListSplitByStack(OARO_ThingDefOf.RK_StrawberryBeer, count);
+            List<Thing> rewards = OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GenerateThingListSplitByStack(OARO_ThingDefOf.RK_StrawberryBeer, count);
 
-            OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
+            OberoniaAurea_Frame.Utility.OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
 
-            (Pawn maxSocialPawn, int maxSocialSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
+            (Pawn maxSocialPawn, int maxSocialSkill) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
 
             maxSocialPawn ??= associatedFixedCaravan.PawnsListForReading.RandomElement();
             maxSocialPawn.skills?.Learn(SkillDefOf.Social, 6000f);
             TaggedString text = "OARO_CelebrationHost_Finish".Translate(maxSocialPawn.Named(KeyLibrary_FormatArgName.PAWN))
                 + "\n"
                 + "OAFrame_PawnGainSkillXp".Translate(maxSocialPawn, SkillDefOf.Social.LabelCap, 6000);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(text, Faction));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(text, Faction));
         }
 
         this.SendWorkResolvedSignal();
@@ -67,7 +67,7 @@ public sealed class WorldObject_CelebrationHost : WorldObject_InteractWithFixedC
 
     protected override void InterruptWork()
     {
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_CelebrationHost_Interrupt".Translate(), Faction));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_CelebrationHost_Interrupt".Translate(), Faction));
         this.SafeDestroy();
     }
 }

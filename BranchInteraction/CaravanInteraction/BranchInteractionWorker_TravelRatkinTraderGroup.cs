@@ -2,6 +2,7 @@
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using Verse;
 
@@ -16,7 +17,7 @@ public class BranchInteractionWorker_TravelRatkinTraderGroup(BranchInteractionDe
         {
             return resultOnly ? false : "OARO_NoAvailablePlayerHomeMap".Translate();
         }
-        if (OARO_ModDefOf.Rakinia_TravelRatkin is null || OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, FactionValidationParams.NonHostileNormalFaction) is null)
+        if (OARO_ModDefOf.Rakinia_TravelRatkin is null || OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, FactionValidationParams.NonHostileNormalFaction) is null)
         {
             return resultOnly ? false : "OARO_NoNonHostileTravelRatkin".Translate();
         }
@@ -38,7 +39,7 @@ public class BranchInteractionWorker_TravelRatkinTraderGroup(BranchInteractionDe
             return (false, false);
         }
 
-        Faction faction = OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, FactionValidationParams.NonHostileNormalFaction);
+        Faction faction = OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_TravelRatkin, FactionValidationParams.NonHostileNormalFaction);
         if (faction is null)
         {
             return (false, false);
@@ -51,7 +52,7 @@ public class BranchInteractionWorker_TravelRatkinTraderGroup(BranchInteractionDe
             forced = true
         };
 
-        OAFrame_MiscUtility.AddNewQueuedIncident(incidentDef, delayTicks: 3 * 60000, incidentParms);
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.AddNewQueuedIncident(incidentDef, delayTicks: 3 * 60000, incidentParms);
         Find.WindowStack.Add(OARO_UIUtility.DefaultConfirmDiaNodeTreeWithRatkinOrderInfo
             (
                 text: "OARO_BranchInteraction_TravelRatkinTraderGroup".Translate(

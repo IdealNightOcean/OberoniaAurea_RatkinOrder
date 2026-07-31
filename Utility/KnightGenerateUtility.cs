@@ -51,7 +51,7 @@ public static class KnightGenerateUtility
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static PawnGenerationRequest DefaultKnightGenerationRequest(PawnKindDef pawnKind, Faction faction, PlanetTile? tile = null, bool forceNew = true)
     {
-        PawnGenerationRequest generationRequest = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile, forceNew: forceNew);
+        PawnGenerationRequest generationRequest = OberoniaAurea_Frame.Utility.OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile, forceNew: forceNew);
         generationRequest.ForcedTraits = [OARO_ModDefOf.OARO_OrderKnight];
         generationRequest.AllowAddictions = false;
         return generationRequest;
@@ -140,7 +140,7 @@ public static class KnightGenerateUtility
 
             if (parms.NonKnightCount > 0)
             {
-                PawnGroupMaker nonKnightMaker = OAFrame_PawnGenerateUtility.GetRandomPawnGroupMakerOfFaction(faction, PawnGroupKindDefOf.Combat, (g) => !g.options.NullOrEmpty());
+                PawnGroupMaker nonKnightMaker = OberoniaAurea_Frame.Utility.OAFrame_PawnGenerateUtility.GetRandomPawnGroupMakerOfFaction(faction, PawnGroupKindDefOf.Combat, (g) => !g.options.NullOrEmpty());
                 if (nonKnightMaker is not null)
                 {
                     for (int i = 0; i < parms.NonKnightCount; i++)
@@ -148,7 +148,7 @@ public static class KnightGenerateUtility
                         try
                         {
                             PawnKindDef pawnKind = nonKnightMaker.options.RandomElementByWeight(g => g.selectionWeight).kind;
-                            PawnGenerationRequest generationRequest = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile: mapTile);
+                            PawnGenerationRequest generationRequest = OberoniaAurea_Frame.Utility.OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile: mapTile);
                             Pawn pawn = PawnGenerator.GeneratePawn(generationRequest);
                             pawns.Add(pawn);
                         }

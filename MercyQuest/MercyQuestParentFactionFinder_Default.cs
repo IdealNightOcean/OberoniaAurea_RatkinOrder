@@ -10,13 +10,13 @@ public class MercyQuestParentFactionFinder_Default : MercyQuestParentFactionFind
         factionParams ??= FactionValidationParams.NonHostileNormalFaction;
         if (fixedParentFactionDef is not null)
         {
-            return OAFrame_FactionUtility.RandomAvailableFactionOfDef(
+            return OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOfDef(
                 def: fixedParentFactionDef,
                 validationParams: factionParams.Value);
         }
         else
         {
-            return OAFrame_FactionUtility.RandomAvailableFactionOf(factionParams.Value);
+            return OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOf(factionParams.Value);
         }
     }
 }

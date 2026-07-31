@@ -1,6 +1,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -22,7 +23,7 @@ public class AcceptedBranchDemandHandler : IExposable, IOnRatkinOrderRemoved
 
     public AcceptedBranchDemandHandler()
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(AcceptedBranchDemandHandler));
         Instance = this;
     }
     public static void ClearStaticCache() => Instance = null;

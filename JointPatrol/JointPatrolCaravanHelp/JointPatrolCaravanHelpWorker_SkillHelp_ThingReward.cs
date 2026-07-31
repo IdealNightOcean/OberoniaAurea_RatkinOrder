@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using System;
 using UnityEngine;
 using Verse;
@@ -21,7 +22,7 @@ public abstract class JointPatrolCaravanHelpWorker_SkillHelp_ThingReward : Joint
                 Thing rewardThing = ThingMaker.MakeThing(rewardThingDef);
                 int rewardThingCount = Mathf.Max(1, GetRewardThingCount(fixedCaravan, branch, rewardThingDef));
                 rewardThing.stackCount = rewardThingCount;
-                OAFrame_FixedCaravanUtility.GiveThing(fixedCaravan, rewardThing);
+                OberoniaAurea_Frame.Utility.OAFrame_FixedCaravanUtility.GiveThing(fixedCaravan, rewardThing);
                 extraRewardText.AppendLine();
                 extraRewardText.AppendLine("OAFrame_CarvanGetThing".Translate(rewardThingDef.Named(KeyLibrary_FormatArgName.THING), rewardThingCount.Named(KeyLibrary_FormatArgName.Count)));
             }

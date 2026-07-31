@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -39,7 +40,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
             rootNode.options.Add(tDefOpt);
         }
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
         return rootNode;
     }
 
@@ -61,7 +62,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
             linkLateBind = () => WeaponNode(parms)
         };
         rootNode.options.Add(backOpt);
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
         return rootNode;
     }
 
@@ -89,7 +90,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
             linkLateBind = () => StuffNode(parms, thingDef)
         };
         rootNode.options.Add(backOpt);
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
 
         return rootNode;
     }
@@ -98,7 +99,7 @@ public class BranchInteractionWorker_CustomizedArmaments(BranchInteractionDef de
     {
         int needSilver = GetPrice(thingDef, stuffDef, quality);
         int coolingDays = GetDelayDays(quality);
-        return OAFrame_DiaUtility.ConfirmDiaNode(
+        return OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNode(
             text: "OARO_CustomizedArmaments_Confirm".Translate(
                 thingDef.Named(KeyLibrary_FormatArgName.THING),
                 stuffDef.Named(KeyLibrary_FormatArgName.STUFF),

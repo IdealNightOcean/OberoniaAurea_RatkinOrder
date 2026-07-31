@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea_Frame.DataLibrary;
 using System.Runtime.CompilerServices;
 using System.Text;
 using UnityEngine;
@@ -28,13 +28,13 @@ public static class OARO_StatExplanationUtility
         switch (statDef.statType)
         {
             case BranchStatDef.StatType.Integer:
-                modifyExplain.AppendLine("OARO_StatExplain_ResultInt".Translate(OAFrame_TextUtility.ColoredFloatString(finalValue, format: "F0", originPoint: baseValue, reverse: statDef.reverse)));
+                modifyExplain.AppendLine("OARO_StatExplain_ResultInt".Translate(OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredFloatString(finalValue, format: "F0", originPoint: baseValue, reverse: statDef.reverse)));
                 break;
             case BranchStatDef.StatType.Float:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OAFrame_TextUtility.ColoredFloatString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
+                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredFloatString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
                 break;
             case BranchStatDef.StatType.Percent:
-                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OAFrame_TextUtility.ColoredPercentString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
+                modifyExplain.AppendLine("OARO_StatExplain_Result".Translate(OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredPercentString(finalValue, originPoint: baseValue, reverse: statDef.reverse)));
                 break;
             default: break;
         }
@@ -46,29 +46,29 @@ public static class OARO_StatExplanationUtility
     public static NamedArgument OffsetNamedArgument(float offset, OAROStatDefBase statDef, string format = "0.##")
     {
         return statDef.statType == BranchStatDef.StatType.Percent ?
-            OAFrame_TextUtility.PercentNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true) :
-            OAFrame_TextUtility.FloatNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true);
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.PercentNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true) :
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.FloatNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true);
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static NamedArgument ColoredOffsetNamedArgument(float offset, OAROStatDefBase statDef, string format = "0.##", float originPoint = 0f)
     {
         return statDef.statType == BranchStatDef.StatType.Percent ?
-            OAFrame_TextUtility.ColoredPercentNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true, originPoint: originPoint, reverse: statDef.reverse) :
-            OAFrame_TextUtility.ColoredFloatNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true, originPoint: originPoint, reverse: statDef.reverse);
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredPercentNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true, originPoint: originPoint, reverse: statDef.reverse) :
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredFloatNamedArgument(offset, KeyLibrary_FormatArgName.Offset, format: format, includeSign: true, originPoint: originPoint, reverse: statDef.reverse);
     }
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static NamedArgument FactorNamedArgument(float factor, OAROStatDefBase statDef, string format = "0.##")
     {
         return statDef.statType == BranchStatDef.StatType.Percent ?
-            OAFrame_TextUtility.PercentNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false) :
-            OAFrame_TextUtility.FloatNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false);
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.PercentNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false) :
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.FloatNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false);
     }
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static NamedArgument ColoredFactorNamedArgument(float factor, OAROStatDefBase statDef, string format = "0.##", float originPoint = 1f)
     {
         return statDef.statType == BranchStatDef.StatType.Percent ?
-            OAFrame_TextUtility.ColoredPercentNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false, originPoint: originPoint, reverse: statDef.reverse) :
-            OAFrame_TextUtility.ColoredFloatNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false, originPoint: originPoint, reverse: statDef.reverse);
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredPercentNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false, originPoint: originPoint, reverse: statDef.reverse) :
+            OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredFloatNamedArgument(factor, KeyLibrary_FormatArgName.Factor, format: format, includeSign: false, originPoint: originPoint, reverse: statDef.reverse);
     }
 }

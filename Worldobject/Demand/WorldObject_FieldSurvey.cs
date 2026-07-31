@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -305,7 +306,7 @@ public sealed class WorldObject_FieldSurvey : WorldObject_InteractWithFixedCarav
                         return;
                     }
 
-                    float eventChace = 0.1f + OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Intellectual) * 0.04f;
+                    float eventChace = 0.1f + OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Intellectual) * 0.04f;
                     if (Rand.Chance(eventChace))
                     {
                         occurSpecialEvent++;

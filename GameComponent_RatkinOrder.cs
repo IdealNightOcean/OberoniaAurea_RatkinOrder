@@ -46,7 +46,7 @@ public class GameComponent_RatkinOrder : GameComponent
     /// <param name="game"></param>
     public GameComponent_RatkinOrder(Game game)
     {
-        // OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance)); 
+        // OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(Instance)); 
         if (Instance != this)
         {
             Log.Message($"[OARO] {nameof(GameComponent_RatkinOrder)} 实例已正确切换。".Colorize(Color.cyan));

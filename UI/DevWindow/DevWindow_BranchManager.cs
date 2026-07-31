@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnityEngine;
@@ -63,11 +62,11 @@ public class DevWindow_BranchManager : DevWindowBase
         listing_Rect.Gap(6f);
         if (listing_Rect.ButtonText("荣誉分队", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllBranchesOfTypeName(Branch.BranchType.Honor)));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllBranchesOfTypeName(Branch.BranchType.Honor)));
         }
         if (listing_Rect.ButtonText("友好分队", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllBranchesOfTypeName(Branch.BranchType.Friendly)));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetAllBranchesOfTypeName(Branch.BranchType.Friendly)));
         }
 
         listing_Rect.Gap(6f);

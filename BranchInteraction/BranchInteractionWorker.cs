@@ -1,6 +1,6 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using Verse;
@@ -111,7 +111,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
         {
             return resultOnly ? false : "OARO_Insufficient_CurRecommendation".Translate(Def.needRecommendation.Named(KeyLibrary_FormatArgName.Count));
         }
-        if (Def.needSilver > 0 && !OAFrame_ThingUtility.HasEnoughThingsOfDef(parms.Target, ThingDefOf.Silver, Def.needSilver))
+        if (Def.needSilver > 0 && !OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.HasEnoughThingsOfDef(parms.Target, ThingDefOf.Silver, Def.needSilver))
         {
             return resultOnly ? false : "OAFrame_NeedCountOfThing".Translate(ThingDefOf.Silver.label, Def.needSilver);
         }
@@ -138,7 +138,7 @@ public abstract class BranchInteractionWorker(BranchInteractionDef def)
             }
             if (Def.needSilver > 0)
             {
-                OAFrame_ThingUtility.RemoveThingsOfDef(parms.Target, ThingDefOf.Silver, Def.needSilver);
+                OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.RemoveThingsOfDef(parms.Target, ThingDefOf.Silver, Def.needSilver);
             }
         }
     }

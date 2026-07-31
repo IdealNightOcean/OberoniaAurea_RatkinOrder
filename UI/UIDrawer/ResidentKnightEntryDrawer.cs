@@ -2,7 +2,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -148,7 +148,7 @@ public partial class Window_OrderStation
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
-                    OAFrame_UIUtility.ResetTextStyleToDefault();
+                    OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
                 }
 
                 return bottomY;
@@ -164,7 +164,7 @@ public partial class Window_OrderStation
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                 }
-                OAFrame_UIUtility.ResetTextStyleToDefault();
+                OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
                 return summaryRect.yMax;
             }
         }
@@ -343,7 +343,7 @@ public partial class Window_OrderStation
             }
             Widgets.EndScrollView();
 
-            OAFrame_UIUtility.ResetTextStyleToDefault();
+            OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
             return inRect.yMax;
         }
 

@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -306,7 +307,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
         ;
         rootNode.options.Add(buyOpt);
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
         return rootNode;
     }
 
@@ -453,7 +454,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
                     string cliqueKey = RandomResidentCliqueKey;
                     CliquesManager.AdjustCliqueWillingness(cliqueKey, 0.05f);
 
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_AssistInvitationResult".Translate(populationGain, CliquesManager.GetCliqueName(cliqueKey), 0.05f.ToStringPercent("0.##"))));
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_AssistInvitationResult".Translate(populationGain, CliquesManager.GetCliqueName(cliqueKey), 0.05f.ToStringPercent("0.##"))));
                     break;
                 }
             case WorkType.AssistConstruction:
@@ -461,7 +462,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
                     int workProgressGain = associatedFixedCaravan.PawnsCount + Mathf.CeilToInt(OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Construction) * 0.25f);
                     (workProgressGain, bool abnormalRegress) = GetWorkProgressChangeUsed(workProgressGain);
                     AdjuestWorkProgress(workProgressGain, abnormalRegress);
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_AssistConstructionResult".Translate(workProgressGain)));
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_AssistConstructionResult".Translate(workProgressGain)));
                     break;
                 }
             default: break;
@@ -486,12 +487,12 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
 
     private void DeliveryResult(Caravan caravan)
     {
-        int giveCount = OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, OARO_ThingDefOf.OARO_DesignDrawing, int.MaxValue);
+        int giveCount = OberoniaAurea_Frame.Utility.OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, OARO_ThingDefOf.OARO_DesignDrawing, int.MaxValue);
         if (giveCount > 0)
         {
             float designPerfectionGain = giveCount * 0.04f;
             DesignPerfection += designPerfectionGain;
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_DeliveryResult".Translate(giveCount, OARO_ThingDefOf.OARO_DesignDrawing.label, designPerfectionGain.ToStringPercent("0.##"))));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_DeliveryResult".Translate(giveCount, OARO_ThingDefOf.OARO_DesignDrawing.label, designPerfectionGain.ToStringPercent("0.##"))));
         }
     }
 
@@ -505,7 +506,7 @@ public sealed class WorldObject_TownConstruction : WorldObject_CriticalBranchDem
         }
         (int workProgressGain, _) = GetWorkProgressChangeUsed(Mathf.RoundToInt(totalTakeCount * 0.1f), canRegress: false);
         AdjuestWorkProgress(workProgressGain, abnormalRegress: false);
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_SupplyResult".Translate(totalTakeCount, workProgressGain)));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_TownUnderConstruction_SupplyResult".Translate(totalTakeCount, workProgressGain)));
 
         int TakeStoneCount(Thing t)
         {

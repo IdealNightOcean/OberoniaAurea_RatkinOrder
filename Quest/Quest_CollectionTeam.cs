@@ -1,6 +1,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
@@ -485,7 +486,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         {
             return false;
         }
-        MapParent = OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
+        MapParent = OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.GetAvailableMapParent(quest, MapParent);
         if (MapParent is null)
         {
             return false;
@@ -559,7 +560,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
                 }
                 else
                 {
-                    pawn = PawnGenerator.GeneratePawn(OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile: mapTile));
+                    pawn = PawnGenerator.GeneratePawn(OberoniaAurea_Frame.Utility.OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile: mapTile));
                 }
                 if (!pawn.IsWorldPawn())
                 {
@@ -660,7 +661,7 @@ public class QuestPart_CollectionTeam : QuestPartActivable, IOnBranchDestroyed, 
         rootNode.options.Add(rejectOpt);
         if (canPostpone)
         {
-            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+            rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
         }
 
         return new Dialog_NodeTreeWithRatkinOrderInfo(rootNode, RatkinOrder);

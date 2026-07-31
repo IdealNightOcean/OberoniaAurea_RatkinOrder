@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using Verse;
@@ -71,7 +71,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
                 },
                 resolveTree = true,
             };
-            if (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) < 10)
+            if (OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) < 10)
             {
                 establishObservationOpt.Disable("OAFrame_MissSkillSatisfiedPawn".Translate(
                     SkillDefOf.Animals.Named(KeyLibrary_FormatArgName.SKILL),
@@ -96,7 +96,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
             rootNode.options.Add(establishObservationOpt);
         }
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         Dialog_NodeTreeWithFactionInfo nodeTree = new(rootNode, Faction);
         Find.WindowStack.Add(nodeTree);
@@ -109,7 +109,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
         int count = caravan.PawnsListForReading.Count * 4;
         meal.stackCount = count;
         CaravanInventoryUtility.GiveThing(caravan, meal);
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                        text: "OARO_WolfDisasterPoint_SuppliesObtained".Translate(count.Named(KeyLibrary_FormatArgName.Count)),
                        faction: Faction));
     }
@@ -122,7 +122,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
                 {
                     observationEstablished = true;
                     QuestUtility.SendQuestTargetSignals(questTags, "ObservationEstablished");
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterPoint_EstablishObservation_Finished".Translate(),
                         faction: Faction));
                     return;
@@ -135,7 +135,7 @@ internal sealed class WorldObject_WolfDisasterPoint : WorldObject_InteractWithFi
                         watcher.GainIntelligence(1);
                     }
                     QuestUtility.SendQuestTargetSignals(questTags, "IntelligenceObtained");
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterPoint_ObtainIntelligence_Finished".Translate(),
                         faction: Faction));
                     return;

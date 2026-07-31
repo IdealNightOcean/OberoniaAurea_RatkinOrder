@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -73,7 +74,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
     public override bool StartWork(Caravan caravan)
     {
-        float sucessChange = 0.2f + OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) * 0.05f;
+        float sucessChange = 0.2f + OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, SkillDefOf.Animals) * 0.05f;
         Messages.Message(
             text: "OARO_WolfDisasterGossipPoint_SearchStarted".Translate(
                 this.Named(KeyLibrary_FormatArgName.WORLDOBJECT),
@@ -87,7 +88,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
     protected override void FinishWork()
     {
-        int maxSkillLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
+        int maxSkillLevel = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
         SearchSuccessful = Rand.Chance(0.2f + maxSkillLevel * 0.05f);
     }
 
@@ -172,7 +173,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
     private DiaNode IntuitionRootNode(Caravan caravan)
     {
-        (Pawn maxSkillPawn, _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(caravan.PawnsListForReading, SkillDefOf.Animals);
+        (Pawn maxSkillPawn, _) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(caravan.PawnsListForReading, SkillDefOf.Animals);
         DiaNode rootNode = new("OARO_WolfDisasterGossipPoint_IntuitionRoot".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN)));
 
         foreach (IntuitionDirection direction in EnumUtility.GetValues<IntuitionDirection>())
@@ -187,7 +188,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
                 {
                     this.SafeDestroy();
                     GainIntelligence();
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterGossipPoint_Intuition_RightDirection".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN)),
                         Faction));
                 };
@@ -201,7 +202,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
                     berries.stackCount = 300;
                     CaravanInventoryUtility.GiveThing(caravan, berries);
 
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterGossipPoint_Intuition_WrongDirection".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN), 300.Named(KeyLibrary_FormatArgName.Count)),
                         Faction));
                 };
@@ -214,7 +215,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
     private DiaNode HabitatRootNode(Caravan caravan)
     {
-        (Pawn maxSkillPawn, int maxSkillLevel) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(caravan.PawnsListForReading, SkillDefOf.Animals);
+        (Pawn maxSkillPawn, int maxSkillLevel) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(caravan.PawnsListForReading, SkillDefOf.Animals);
         DiaNode rootNode = new("OARO_WolfDisasterGossipPoint_HabitatRoot".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN)));
         DiaOption passOpt = new("OARO_WolfDisasterGossipPoint_Habitat_Pass".Translate())
         {
@@ -227,7 +228,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
         {
             action = delegate
             {
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                     text: "OARO_WolfDisasterGossipPoint_HabitatNotPass_Reply".Translate(),
                     faction: Faction));
             },
@@ -247,7 +248,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
                 {
                     p.skills?.Learn(SkillDefOf.Animals, 1000f);
                 }
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                     text: "OARO_WolfDisasterGossipPoint_HabitatPass_Sucess".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN))
                         + "\n\n"
                         + "OAFrame_AllCarvanMemberGetXP".Translate(SkillDefOf.Animals.Named(KeyLibrary_FormatArgName.SKILL), 1000.Named(KeyLibrary_FormatArgName.Count)),
@@ -262,7 +263,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
                     p.skills?.Learn(SkillDefOf.Animals, 1000f);
                 }
 
-                Find.WindowStack.Add(OAFrame_DiaUtility.ConfirmDiaNodeTreeWithFactionInfo(
+                Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNodeTreeWithFactionInfo(
                     text: "OARO_WolfDisasterGossipPoint_HabitatPass_Fail".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN))
                         + "\n\n"
                         + "OAFrame_AllCarvanMemberGetXP".Translate(SkillDefOf.Animals.Named(KeyLibrary_FormatArgName.SKILL), 1000.Named(KeyLibrary_FormatArgName.Count)),
@@ -298,7 +299,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
     private DiaNode AbandonedWolfDenRootNode(Caravan caravan)
     {
-        return OAFrame_DiaUtility.ConfirmDiaNode(
+        return OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNode(
              text: "OARO_WolfDisasterGossipPoint_AbandonedWolfDenRoot".Translate()
                  + "\n\n"
                  + "OAFrame_AllCarvanMemberGetXP".Translate(SkillDefOf.Animals.Named(KeyLibrary_FormatArgName.SKILL), 2000.Named(KeyLibrary_FormatArgName.Count)),
@@ -316,7 +317,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
 
     private DiaNode DeliberateTracesRootNode(Caravan caravan)
     {
-        (Pawn maxSkillPawn, int maxSkillLevel) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(caravan.PawnsListForReading, SkillDefOf.Animals);
+        (Pawn maxSkillPawn, int maxSkillLevel) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(caravan.PawnsListForReading, SkillDefOf.Animals);
         DiaNode rootNode = new("OARO_WolfDisasterGossipPoint_DeliberateTracesRoot".Translate(maxSkillPawn.Named(KeyLibrary_FormatArgName.PAWN)));
         float successChance = 1f;
 
@@ -328,14 +329,14 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
                 {
                     this.SafeDestroy();
                     GainIntelligence(1);
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterGossipPoint_DeliberateTraces_Success".Translate(),
                         faction: Faction));
                 }
                 else
                 {
                     GainIntelligence(-1);
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_WolfDisasterGossipPoint_DeliberateTraces_Fail".Translate(),
                         faction: Faction));
                 }
@@ -349,7 +350,7 @@ internal class WorldObject_WolfDisasterGossipPoint : WorldObject_InteractWithFix
         {
             action = delegate
             {
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                          text: "OARO_WolfDisasterGossipPoint_DeliberateTraces_NotCheckReply".Translate(),
                          faction: Faction));
             },

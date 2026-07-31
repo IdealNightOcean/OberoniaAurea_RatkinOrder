@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -200,7 +201,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         }
         rootNode.options.Add(preciseOpt);
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         return new Dialog_NodeTreeWithFactionInfo(rootNode, Faction);
     }
@@ -228,12 +229,12 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                     }
                     else
                     {
-                        float maxStat = OAFrame_PawnUtility.GetMaxStatOfPawns(associatedFixedCaravan.PawnsListForReading, StatDefOf.NegotiationAbility);
+                        float maxStat = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxStatOfPawns(associatedFixedCaravan.PawnsListForReading, StatDefOf.NegotiationAbility);
                         gainedTrust = 0.05f + Mathf.Max(maxStat, 0f) / 0.3f * 0.01f;
                     }
                     curTrust = Mathf.Clamp01(curTrust + gainedTrust);
                     gainTrustCount++;
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_GainTrust".Translate(gainedTrust.ToString("0.##"), curTrust.ToString("0.##")), Faction));
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_GainTrust".Translate(gainedTrust.ToString("0.##"), curTrust.ToString("0.##")), Faction));
                     return;
                 }
             case WorkType.PryInfo:
@@ -241,11 +242,11 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                     if (Rand.Chance(curTrust))
                     {
                         validInfoCount++;
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_PryInfoSuccess".Translate(), Faction));
+                        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_PryInfoSuccess".Translate(), Faction));
                     }
                     else
                     {
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_PryInfoFail".Translate(), Faction));
+                        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_PryInfoFail".Translate(), Faction));
                     }
                     return;
                 }
@@ -272,7 +273,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                             p.needs.food.CurLevelPercentage += 1f;
                         }
                     }
-                    Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_FeastFinished".Translate(), Faction));
+                    Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_FeastFinished".Translate(), Faction));
                     this.SafeDestroy();
                     return;
                 }
@@ -290,7 +291,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
             case WorkType.Precise:
                 if (HasFeastLater)
                 {
-                    Dialog_NodeTreeWithFactionInfo nodeTree = OAFrame_DiaUtility.ConfirmDiaNodeTreeWithFactionInfo(
+                    Dialog_NodeTreeWithFactionInfo nodeTree = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNodeTreeWithFactionInfo(
                         text: "OARO_FamineVillage_FeastStart".Translate(),
                         faction: Faction,
                         acceptText: "Accept".Translate(),
@@ -301,7 +302,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
                 }
                 if (requestCountLeft > 0)
                 {
-                    Dialog_NodeTreeWithFactionInfo nodeTree = OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+                    Dialog_NodeTreeWithFactionInfo nodeTree = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                        text: "OARO_FamineVillage_FeastNonFinished".Translate(requestDef.label, requestCount - requestCountLeft, requestCountLeft),
                        faction: Faction);
 
@@ -324,7 +325,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
     {
         if (curWorkType == WorkType.Feast)
         {
-            OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_FeastPlayerInterrupt".Translate(), Faction);
+            OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_FeastPlayerInterrupt".Translate(), Faction);
         }
     }
 
@@ -348,7 +349,7 @@ public sealed class WorldObject_FamineVillage : WorldObject_InteractWithFixedCar
         }
         else
         {
-            OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_WorkInterrupt".Translate(), Faction);
+            OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo("OARO_FamineVillage_WorkInterrupt".Translate(), Faction);
         }
     }
 

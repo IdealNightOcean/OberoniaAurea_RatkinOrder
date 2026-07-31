@@ -1,4 +1,3 @@
-using OberoniaAurea_Frame;
 using RimWorld;
 using RimWorld.BaseGen;
 using RimWorld.Planet;
@@ -18,7 +17,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
     private IEnumerable<Pawn> GenerateEnemies(MapParent_NobilityTerritory nobilityTerritory)
     {
         Faction faction = nobilityTerritory.Faction;
-        PawnGroupMaker groupMaker = OAFrame_PawnGenerateUtility.GetRandomPawnGroupMakerOfFaction(faction, PawnGroupKindDefOf.Combat, predicater: (g) => !g.options.NullOrEmpty());
+        PawnGroupMaker groupMaker = OberoniaAurea_Frame.Utility.OAFrame_PawnGenerateUtility.GetRandomPawnGroupMakerOfFaction(faction, PawnGroupKindDefOf.Combat, predicater: (g) => !g.options.NullOrEmpty());
         if (groupMaker is null)
         {
             yield break;
@@ -28,7 +27,7 @@ internal sealed class GenStep_NobilityTerritoryPawns : GenStep
         for (int i = 0; i < enemyCount; i++)
         {
             PawnKindDef pawnKind = groupMaker.options.RandomElementByWeight(p => p.selectionWeight).kind;
-            PawnGenerationRequest generationRequest = OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile);
+            PawnGenerationRequest generationRequest = OberoniaAurea_Frame.Utility.OAFrame_PawnGenerateUtility.CommonPawnGenerationRequest(pawnKind, faction, tile);
             // generationRequest.MustBeCapableOfViolence = true;
 
             yield return PawnGenerator.GeneratePawn(generationRequest);

@@ -8,7 +8,7 @@ public class MercyQuestParentFactionFinder_RatkinOrder : MercyQuestParentFaction
     public override Faction FindParentFaction(MercyQuestDef mercyDef, FactionValidationParams? factionParams = null, FactionDef fixedParentFactionDef = null)
     {
         factionParams ??= FactionValidationParams.NonHostileNormalFaction;
-        return OAFrame_FactionUtility.RandomAvailableFactionOf(
+        return OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.RandomAvailableFactionOf(
             validationParams: factionParams.Value,
             predicater: delegate (Faction f)
             {

@@ -1,4 +1,4 @@
-﻿using OberoniaAurea_Frame;
+﻿using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
@@ -76,7 +76,7 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         rootNode.options.Add(giveOpt);
         rootNode.options.Add(rejectOpt);
         if (canPostpone)
-            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+            rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(rootNode, RatkinOrder);
         return nodeTree;
@@ -87,7 +87,7 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         ThingDef requestDef = requestThingDefCounts[0].thingDef;
         int requestCount = requestThingDefCounts[0].count;
 
-        List<Thing> takeThings = OAFrame_MapUtility.TakeThingsOfDef(map, requestDef, requestCount, out int actualTakeCount);
+        List<Thing> takeThings = OberoniaAurea_Frame.Utility.OAFrame_MapUtility.TakeThingsOfDef(map, requestDef, requestCount, out int actualTakeCount);
         int remainingCount = requestCount - actualTakeCount;
         if (remainingCount <= 0)
         {
@@ -114,7 +114,7 @@ internal sealed class QuestPart_CollectionTeam_SuperHeavyHowitzer : QuestPart_Co
         ThingDef requestDef = requestThingDefCounts[0].thingDef;
         int requestCount = requestThingDefCounts[0].count;
 
-        List<Thing> takeThings = OAFrame_MapUtility.TakeThingsOfDef(map, requestDef, requestCount, out int actualTakeCount);
+        List<Thing> takeThings = OberoniaAurea_Frame.Utility.OAFrame_MapUtility.TakeThingsOfDef(map, requestDef, requestCount, out int actualTakeCount);
         List<Thing> toCheck = [];
         toCheck.AddRange(takeThings);
 

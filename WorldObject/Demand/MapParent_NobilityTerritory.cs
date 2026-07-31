@@ -83,7 +83,7 @@ public sealed class MapParent_NobilityTerritory : MapParent_Enterable
                 faction = Faction,
                 forced = true
             };
-            OAFrame_MiscUtility.AddNewQueuedIncident(OARO_ModDefOf.OARO_RaidNobilityTerritory, delayTicks: 60, parms);
+            OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.AddNewQueuedIncident(OARO_ModDefOf.OARO_RaidNobilityTerritory, delayTicks: 60, parms);
         }
         catch (Exception ex)
         {

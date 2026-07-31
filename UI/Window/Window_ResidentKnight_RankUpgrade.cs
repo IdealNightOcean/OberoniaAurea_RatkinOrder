@@ -1,6 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using UnityEngine;
@@ -97,7 +97,7 @@ public class Window_ResidentKnight_RankUpgrade : OrderWindowBase
             }
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRankBackGround(Rect inRect)

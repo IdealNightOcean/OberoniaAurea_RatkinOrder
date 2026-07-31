@@ -80,7 +80,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         if (pawn.needs.mood is not null)
             pawn.needs.mood.CurLevelPercentage = 0.8f;
 
-        OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
+        OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.TakeNonLethalDamage(pawn, Rand.RangeInclusive(2, 4), DamageDefOf.Blunt);
 
         pawn.workSettings.EnableAndInitializeIfNotAlreadyInitialized();
         pawn.workSettings.DisableAll();
@@ -96,7 +96,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
 
         Reward_Items reward_Items = new()
         {
-            items = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 280)
+            items = OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 280)
         };
 
         Reward_OrderEsteem reward_OrderEsteem = new()
@@ -231,7 +231,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
         quest.AddPart(questPart_SetBranchToFriendly_PerfectSuccess);
 
         quest.DropPods(mapParent: questParameter.map.Parent,
-                       contents: OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 580),
+                       contents: OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 580),
                        useTradeDropSpot: true,
                        inSignal: inSignalPerfectSuccess,
                        faction: questParameter.faction);
@@ -259,7 +259,7 @@ internal sealed class QuestNode_Root_PostWarConvalescence : QuestNode_Root_Refug
                 quest.AddPart(questPart_OrderRecommendation_NormalSuccess);
 
                 quest.DropPods(mapParent: questParameter.map.Parent,
-                               contents: OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 280),
+                               contents: OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, questParameter.LodgerCount * 280),
                                useTradeDropSpot: true,
                                faction: questParameter.faction);
             },

@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
@@ -110,7 +111,7 @@ internal sealed class QuestNode_Root_LittleApprentice : QuestNode_Root_RefugeeBa
         }
         else
         {
-            OAFrame_TileFinderUtility.TryFindNewAvaliableTile(out PlanetTile tile, questParameter.map.Parent.Tile, 4, 15);
+            OberoniaAurea_Frame.Utility.OAFrame_TileFinderUtility.TryFindNewAvaliableTile(out PlanetTile tile, questParameter.map.Parent.Tile, 4, 15);
             WorldObject_ApprenticeHome apprenticeHome = (WorldObject_ApprenticeHome)WorldObjectMaker.MakeWorldObject(OARO_WorldObjectDefOf.OARO_WO_ApprenticeHome);
             apprenticeHome.Tile = tile;
             apprenticeHome.Apprentice = apprentice;

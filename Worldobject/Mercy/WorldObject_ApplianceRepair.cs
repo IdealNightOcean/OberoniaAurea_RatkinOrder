@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -84,7 +84,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
 
     protected override void FinishWork()
     {
-        (Pawn maxPawn, int _) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Construction);
+        (Pawn maxPawn, int _) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Construction);
         TaggedString taggedString;
 
         if (hasFoundReason)
@@ -113,12 +113,12 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
             }
         }
 
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(taggedString, Faction));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(taggedString, Faction));
     }
 
     protected override void InterruptWork()
     {
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
             text: hasFoundReason ? "OARO_ApplianceRepair_Interrupt_HasFoundReason".Translate()
                                  : "OARO_ApplianceRepair_Interrupt_NotFoundReason".Translate(),
             faction: Faction));
@@ -141,7 +141,7 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
             }
             repairNode.options.Add(option);
         }
-        repairNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        repairNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         Find.WindowStack.Add(new Dialog_NodeTreeWithFactionInfo(repairNode, Faction));
     }
@@ -151,20 +151,20 @@ public sealed class WorldObject_ApplianceRepair : WorldObject_InteractWithFixedC
         this.repairType = repairType;
         if (repairType == FaultType.Component)
         {
-            OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.ComponentIndustrial, 2);
+            OberoniaAurea_Frame.Utility.OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.ComponentIndustrial, 2);
         }
         base.StartWork(caravan);
     }
 
     private float GetReasonFindChance(IEnumerable<Pawn> pawns)
     {
-        int maxSuccessChance = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Construction);
+        int maxSuccessChance = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Construction);
         return 0.25f + 0.05f * maxSuccessChance;
     }
 
     private float GetRepairChance(IEnumerable<Pawn> pawns)
     {
-        int maxConstructionSkill = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Construction);
+        int maxConstructionSkill = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(pawns, SkillDefOf.Construction);
         float successChance = maxConstructionSkill * 0.05f;
         successChance *= faultType switch
         {

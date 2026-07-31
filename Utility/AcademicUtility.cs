@@ -1,4 +1,4 @@
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -84,7 +84,7 @@ public static class AcademicUtility
             baseNeededPoints = Mathf.Round(baseNeededPoints * costFactor);
             if (!resultOnly)
             {
-                explanationBuilder.AppendLine($"{ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.LabelCap}: {OAFrame_TextUtility.ColoredFloatString(costFactor, originPoint: 1f, reverse: ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.reverse)}");
+                explanationBuilder.AppendLine($"{ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.LabelCap}: {OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredFloatString(costFactor, originPoint: 1f, reverse: ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.reverse)}");
             }
         }
 

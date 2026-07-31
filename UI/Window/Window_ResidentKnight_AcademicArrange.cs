@@ -2,6 +2,7 @@
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -104,7 +105,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         Rect academicInfoRect = Rect.MinMaxRect(pawnRect.xMax, mainRect.yMin, mainRect.xMax, mainRect.yMax);
         DarwAcademicInfo(academicInfoRect);
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DarwPawnInfo(Rect inRect)
@@ -130,7 +131,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, reusedRect.yMax, innerWidth, 24f);
         Widgets.Label(reusedRect, "OARO_NoAdditionalCostAcademicCeilingInfo".Translate(AcademicHandler.TotalAcademicLevel.Value, NoAdditionalCostAcademicCeiling));
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DarwAcademicList(Rect inRect)
@@ -153,7 +154,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             DarwAcademic(entryRect, def, activateBySelf);
         }
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DarwAcademic(Rect inRect, KnightAcademicDef def, bool activateBySelf)
@@ -239,7 +240,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         if (CheckAcademicStage is null)
         {
-            OAFrame_UIUtility.ResetTextStyleToDefault();
+            OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
             return;
         }
 
@@ -319,7 +320,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             Widgets.Label(reusedRect, stageUnlockLabel);
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawAcademicStage(Rect inRect, int stageIndex)

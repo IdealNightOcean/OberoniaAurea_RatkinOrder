@@ -2,7 +2,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -155,7 +155,7 @@ public class Window_QuestClique : OrderWindowBase
             Widgets.EndScrollView();
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawTopRect(Rect inRect)
@@ -206,7 +206,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawActiveClique(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawBottomRect(Rect inRect)
@@ -279,7 +279,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawInactiveClique_Normal(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawBottomRect_Branch(Rect inRect)
@@ -326,7 +326,7 @@ public class Window_QuestClique : OrderWindowBase
             DrawInactiveClique_Branch(entryRect, clique);
         }
         Widgets.EndScrollView();
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawActiveClique(Rect inRect, QuestClique clique)
@@ -374,7 +374,7 @@ public class Window_QuestClique : OrderWindowBase
         reusedRect = new(inRect.xMax - 110f, inRectY, 110f, inRectHeight);
         Widgets.Label(reusedRect, clique.Potency.ToStringPercent().Colorize(clique.Potency < 0f ? ColorLibrary.RedReadable : Color.green));
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawInactiveClique_Normal(Rect inRect, QuestClique clique)
@@ -445,7 +445,7 @@ public class Window_QuestClique : OrderWindowBase
             doMouseoverSound: true,
             tooltip: clique.IsBribable ? "OARO_CliqueWin_BribeTip".Translate(clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)) : null))
         {
-            Dialog_NodeTree nodeTree = OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
+            Dialog_NodeTree nodeTree = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(
                 text: "OARO_Clique_BriberyConfirm".Translate(clique.Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName), clique.BriberyCost.Named(KeyLibrary_FormatArgName.Count)),
                 acceptAction: () => clique.Bribery(map: Map));
 
@@ -463,7 +463,7 @@ public class Window_QuestClique : OrderWindowBase
         {
             clique.Communicate(branch: CliquesManager.Branch, map: Map);
         }
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawInactiveClique_Branch(Rect inRect, QuestClique clique)
@@ -569,7 +569,7 @@ public class Window_QuestClique : OrderWindowBase
             }
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawCornerRect(Rect inRect)

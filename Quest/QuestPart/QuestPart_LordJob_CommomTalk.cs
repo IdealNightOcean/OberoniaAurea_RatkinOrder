@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using Verse;
 using Verse.AI.Group;

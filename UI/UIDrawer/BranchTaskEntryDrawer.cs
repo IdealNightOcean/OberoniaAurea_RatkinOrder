@@ -3,6 +3,7 @@ using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.UI;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -155,7 +156,7 @@ public partial class Window_BranchTask
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
                     Parent.OnShowDrawerDetailChanged(this);
-                    OAFrame_UIUtility.ResetTextStyleToDefault();
+                    OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
                     return inRect.yMax;
                 }
                 else
@@ -174,7 +175,7 @@ public partial class Window_BranchTask
                 {
                     Parent.OnShowDrawerDetailChanged(this);
                 }
-                OAFrame_UIUtility.ResetTextStyleToDefault();
+                OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
                 return inRect.yMax;
             }
         }
@@ -217,7 +218,7 @@ public partial class Window_BranchTask
             if (jointPatrolProp is not null)
             {
                 GUI.DrawTexture(reusedRect, jointPatrolProp.entryBackgroundTexture.Texture);
-                Material tintMat = OAFrame_UIUtility.GetTintMaterial(primaryChivalry.color, OARO_IconLibrary.JointPatrolEntryShadeMask);
+                Material tintMat = OberoniaAurea_Frame.UI.OAFrame_UIUtility.GetTintMaterial(primaryChivalry.color, OARO_IconLibrary.JointPatrolEntryShadeMask);
                 GenUI.DrawTextureWithMaterial(reusedRect, OARO_IconLibrary.JointPatrolEntryShadeTex, tintMat);
             }
 
@@ -429,7 +430,7 @@ public partial class Window_BranchTask
             {
                 ChangeJointPatrolState();
             }
-            OAFrame_UIUtility.ResetTextStyleToDefault();
+            OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
             return inRect.yMax;
         }
 
@@ -508,7 +509,7 @@ public partial class Window_BranchTask
             }
 
             Widgets.EndScrollView();
-            OAFrame_UIUtility.ResetTextStyleToDefault();
+            OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
         }
 
         private JointBranchRecord RefreshJointBranchRecord()

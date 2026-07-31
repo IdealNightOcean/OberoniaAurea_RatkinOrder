@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using RimWorld.QuestGen;
@@ -84,7 +84,7 @@ internal sealed class QuestPart_TownConstructionWatcher : QuestPart
         if (map is not null)
         {
             int rewardSilverCountInt = Mathf.RoundToInt(rewardSilverCount);
-            IntVec3 dropCell = OAFrame_DropPodUtility.DefaultDropThingOfDef(ThingDefOf.Silver, rewardSilverCountInt, map, faction, sendLetter: false);
+            IntVec3 dropCell = OberoniaAurea_Frame.Utility.OAFrame_DropPodUtility.DefaultDropThingOfDef(ThingDefOf.Silver, rewardSilverCountInt, map, faction, sendLetter: false);
             Find.LetterStack.ReceiveLetter(
                 label: "OARO_TownUnderConstruction_ExtraRewardSilverLabel".Translate(),
                 text: "OARO_TownUnderConstruction_ExtraRewardSilverText".Translate(rewardSilverCountInt),

@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.QuestGen;
 using System;
@@ -244,7 +244,7 @@ public static class RelationshipUtility
         slate.Set(OARO_KeyLibrary_SlateStoreAs.orderRelationship, ratkinOrder.Relationship);
         slate.Set("map", map);
 
-        return OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_OrderRelationshipUpgrade, slate, forced: true);
+        return OberoniaAurea_Frame.Utility.OAFrame_QuestUtility.TryGenerateQuestAndMakeAvailable(out _, OARO_QuestScriptDefOf.OARO_Quest_OrderRelationshipUpgrade, slate, forced: true);
     }
 
     /// <summary>

@@ -1,6 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -100,7 +99,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawExchangeableSupply(Rect inRect, ExchangeableSupply supply)
@@ -137,7 +136,7 @@ public class Window_OrderInteraction_ExchangeSupply : OrderWindowBase
             Thing thing = ThingMaker.MakeThing(supply.thing, supply.stuff);
             thing.stackCount = supply.count;
             thing.TryGetComp<CompQuality>()?.SetQuality(QualityCategory.Excellent, ArtGenerationContext.Outsider);
-            OAFrame_DropPodUtility.DefaultDropThing([thing], Map, RatkinOrder.Faction);
+            OberoniaAurea_Frame.Utility.OAFrame_DropPodUtility.DefaultDropThing([thing], Map, RatkinOrder.Faction);
         }
     }
 

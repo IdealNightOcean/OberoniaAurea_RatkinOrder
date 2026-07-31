@@ -1,6 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.UI;
 using RimWorld;
 using System.Collections.Generic;
 using UnityEngine;
@@ -85,7 +85,7 @@ public class Window_BranchList : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DarwBranchEntry(Rect inRect, UIData_BranchSummary branchSummary)
@@ -167,7 +167,7 @@ public class Window_BranchList : OrderWindowBase
             DrawBranchInfo(reusedRect, branchSummary);
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawBranchInfo(Rect inRect, UIData_BranchSummary branchSummary)
@@ -189,7 +189,7 @@ public class Window_BranchList : OrderWindowBase
         Widgets.Label(reusedRect.TopHalf(), "OARO_BranchListWin_Distance".Translate());
         Widgets.Label(reusedRect.BottomHalf(), branchSummary.Distance.ToString("F0").Colorize(branchSummary.IsInAffectedRange ? Color.green : Color.white));
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawBranchConstruct(Rect inRect, UIData_BranchSummary branchSummary)
@@ -249,7 +249,7 @@ public class Window_BranchList : OrderWindowBase
 
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private static readonly Texture2D mainBackground = ContentFinder<Texture2D>.Get("UI/RatkinOrder/BranchList/OARO_MainBackground");

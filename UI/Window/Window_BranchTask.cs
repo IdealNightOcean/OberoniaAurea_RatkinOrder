@@ -1,7 +1,6 @@
 using NightOcean;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -127,7 +126,7 @@ public partial class Window_BranchTask : OrderWindowBase
         reusedRect = new(reusedRect.xMax + 28f, mainInnerRectY + 180f, 510f, 647f);
         DrawRightRect(reusedRect);
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawLeftRect(Rect inRect)
@@ -214,7 +213,7 @@ public partial class Window_BranchTask : OrderWindowBase
         }
         Widgets.EndScrollView();
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRightRect(Rect inRect)
@@ -238,7 +237,7 @@ public partial class Window_BranchTask : OrderWindowBase
             DrawRightRect_JointPatrol(mainRect);
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRightRect_Normal(Rect inRect)
@@ -250,7 +249,7 @@ public partial class Window_BranchTask : OrderWindowBase
 
 
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawRightRect_JointPatrol(Rect inRect)
@@ -296,7 +295,7 @@ public partial class Window_BranchTask : OrderWindowBase
             DrawJointPatrolTarget(mainRect);
         }
 
-        OAFrame_UIUtility.ResetTextStyleToDefault();
+        OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
     private void DrawJointPatrolStatic(Rect inRect)

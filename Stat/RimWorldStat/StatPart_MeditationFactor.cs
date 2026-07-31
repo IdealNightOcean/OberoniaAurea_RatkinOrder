@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -86,7 +86,7 @@ public class StatPart_MeditationFactor : StatPart
         if (branch.RatkinOrder.ReformationManager.HasReformation(OrderReformationDefOf.OARO_ReformationPlaceholder))
             sb.AppendLine("OARO_ChangeOffset_Reformation".Translate(
                 OrderReformationDefOf.OARO_ReformationPlaceholder.Named(KeyLibrary_FormatArgName.DEF),
-                OAFrame_TextUtility.ColoredPercentNamedArgument(0.25f, KeyLibrary_FormatArgName.Offset, includeSign: true)));
+                OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredPercentNamedArgument(0.25f, KeyLibrary_FormatArgName.Offset, includeSign: true)));
 
         if (branch.IsBranchOfType(Branch.BranchType.Friendly))
         {

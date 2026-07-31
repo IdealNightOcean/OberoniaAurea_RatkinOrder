@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using System.Text;
 using Verse;
 
@@ -52,7 +53,7 @@ public class ResidentKnightStatWorker_AcademicPointsCostFactor(ResidentKnightSta
                 explanation.AppendLineWithSeparator(
                     text: "OARO_AcademicCost_ExceedCeiling".Translate(
                         academicCeiling.Named(KeyLibrary_FormatArgName.Count),
-                        OAFrame_TextUtility.ColoredFloatNamedArgument(3f, KeyLibrary_FormatArgName.Factor, originPoint: 1f)),
+                        OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredFloatNamedArgument(3f, KeyLibrary_FormatArgName.Factor, originPoint: 1f)),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }
@@ -87,7 +88,7 @@ public class ResidentKnightStatWorker_AcademicPointsCostFactor(ResidentKnightSta
             {
                 explanation.AppendLineWithSeparator(
                     text: "OARO_AcademicCost_StationTradition"
-                    .Translate(OAFrame_TextUtility.FloatNamedArgument(traditionFactor, KeyLibrary_FormatArgName.Factor))
+                    .Translate(OberoniaAurea_Frame.Utility.OAFrame_TextUtility.FloatNamedArgument(traditionFactor, KeyLibrary_FormatArgName.Factor))
                     .ColorizeStrByFactor(traditionFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
@@ -104,7 +105,7 @@ public class ResidentKnightStatWorker_AcademicPointsCostFactor(ResidentKnightSta
                     .Translate(
                         academicRequestData.AcademicDef.Named(KeyLibrary_FormatArgName.DEF),
                         academicChivalry.Named(OARO_KeyLibrary_FormatArgName.CHIVALRY),
-                        OAFrame_TextUtility.FloatNamedArgument(knightFactor, KeyLibrary_FormatArgName.Factor))
+                        OberoniaAurea_Frame.Utility.OAFrame_TextUtility.FloatNamedArgument(knightFactor, KeyLibrary_FormatArgName.Factor))
                     .ColorizeStrByFactor(knightFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
@@ -122,7 +123,7 @@ public class ResidentKnightStatWorker_AcademicPointsCostFactor(ResidentKnightSta
                     .Translate(
                         academicRequestData.AcademicDef.Named(KeyLibrary_FormatArgName.DEF),
                         academicChivalry.Named(OARO_KeyLibrary_FormatArgName.CHIVALRY),
-                        OAFrame_TextUtility.FloatNamedArgument(branchHonorFactor, KeyLibrary_FormatArgName.Factor))
+                        OberoniaAurea_Frame.Utility.OAFrame_TextUtility.FloatNamedArgument(branchHonorFactor, KeyLibrary_FormatArgName.Factor))
                     .ColorizeStrByFactor(branchHonorFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
@@ -138,7 +139,7 @@ public class ResidentKnightStatWorker_AcademicPointsCostFactor(ResidentKnightSta
                 explanation.AppendLineWithSeparator(
                     text: "OARO_ChangeFactor_SameChivalryWithDef".Translate(
                         virtueCount.Named(KeyLibrary_FormatArgName.Count),
-                        OAFrame_TextUtility.FloatNamedArgument(virtueFactor, KeyLibrary_FormatArgName.Factor))
+                        OberoniaAurea_Frame.Utility.OAFrame_TextUtility.FloatNamedArgument(virtueFactor, KeyLibrary_FormatArgName.Factor))
                     .ColorizeStrByFactor(academicChivalryFactor, reverse: true),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }

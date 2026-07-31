@@ -1,6 +1,5 @@
 ﻿using NightOcean.Collection;
 using OberoniaAurea.RatkinOrder.DataLibrary;
-using OberoniaAurea_Frame;
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
@@ -78,12 +77,12 @@ public class FundHandler(RatkinOrder ratkinOrder) : IExposable
         listing_Rect.Gap(6f);
         if (listing_Rect.ButtonText("资金事件", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetFundEventsDetailString()));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetFundEventsDetailString()));
         }
         listing_Rect.Gap(6f);
         if (listing_Rect.ButtonText("资金变化细节", null, 0.8f))
         {
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetFundChangeDetail()));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(GetFundChangeDetail()));
         }
     }
 

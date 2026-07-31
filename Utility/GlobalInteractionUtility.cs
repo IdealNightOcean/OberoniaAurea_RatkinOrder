@@ -1,6 +1,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -54,7 +55,7 @@ public static class GlobalInteractionUtility
         int needRecommendation = RecommendationUtility.RecommendationNeed_RecruitmentKnight(kRecord.RatkinOrder);
 
         RecommendationUtility.UseRecommendationOfPlayer(map, needRecommendation);
-        OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
+        OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.MakePawnJoinPlayer(pawn);
         pawn.RemoveFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_RecruitKnight);
         ResidentPawnsManager.Instance.TryRegisterKnight(pawn, kRecord);
     }
@@ -265,7 +266,7 @@ public static class GlobalInteractionUtility
             if (!resultOnly)
                 sb.AppendLine("OARO_ChangeOffset_Reformation".Translate(
                     OrderReformationDefOf.OARO_ReformationPlaceholder.Named(KeyLibrary_FormatArgName.DEF),
-                    OAFrame_TextUtility.ColoredPercentNamedArgument(0.2f, KeyLibrary_FormatArgName.Offset, includeSign: true)
+                    OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredPercentNamedArgument(0.2f, KeyLibrary_FormatArgName.Offset, includeSign: true)
                     ).Colorize(Color.green));
         }
 

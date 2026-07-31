@@ -1,6 +1,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -33,7 +34,7 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
             Log.Error($"[OARO] {nameof(JointPatrolCaravanHelp_SkillHelpExtension)} 中的 {nameof(SkillRequirement)} 为null");
             return false;
         }
-        else if (modEx_SkillHelp.minLevel > OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, modEx_SkillHelp.requireSkill))
+        else if (modEx_SkillHelp.minLevel > OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(caravan.PawnsListForReading, modEx_SkillHelp.requireSkill))
         {
             Messages.Message(
                 text: "OAFrame_MissSkillSatisfiedPawn".Translate(modEx_SkillHelp.requireSkill.Named(KeyLibrary_FormatArgName.SKILL),
@@ -109,7 +110,7 @@ public class JointPatrolCaravanHelpWorker_FixedCaravan_SkillHelp : JointPatrolCa
             }
 
             JointPatrolCaravanHelp_SkillHelpExtension modEx_SkillHelp = Def.GetModExtension<JointPatrolCaravanHelp_SkillHelpExtension>();
-            float successChance = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(fixedCaravan.PawnsListForReading, modEx_SkillHelp.requireSkill) * 0.06f;
+            float successChance = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(fixedCaravan.PawnsListForReading, modEx_SkillHelp.requireSkill) * 0.06f;
             if (Rand.Chance(successChance))
             {
                 HelpSucceed(fixedCaravan, branch, incidentSite);

@@ -1,6 +1,7 @@
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using System.Collections.Generic;
@@ -126,7 +127,7 @@ public class QuestPart_LordJob_HelpSeeker : QuestPart_LordJob_CommomTalk
         rootNode.options.Add(transferOpt);
         rootNode.options.Add(transferWithHelpOpt);
         if (canPostpone)
-            rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+            rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         Dialog_NodeTreeWithFactionInfo nodeTree = new(rootNode, talkWith.Faction);
         Find.WindowStack.Add(nodeTree);

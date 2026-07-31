@@ -47,7 +47,7 @@ public class OrderStationHandler : IExposable
 
     internal OrderStationHandler(bool initCtor)
     {
-        OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(OrderStationHandler));
+        OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(OrderStationHandler));
         Instance = this;
         orderStationLevelCache = new SimpleValueCache<int>(cacheInterval: StationLevelRecacheInterval,
                                                         defaultValue: 0,

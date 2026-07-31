@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using RimWorld;
+﻿using RimWorld;
 using RimWorld.QuestGen;
 using System.Collections.Generic;
 using System.Text;
@@ -91,6 +90,6 @@ public class QuestPart_EffectTags : QuestPart
         {
             sb.AppendInNewLine(tag.ToString());
         }
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(sb.ToTaggedString()));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(sb.ToTaggedString()));
     }
 }

@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -348,7 +349,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             rootNode.options.Add(negotiateOpt);
         }
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         return rootNode;
     }
@@ -407,8 +408,8 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
     private void InfiltrateResult()
     {
         float osmolityGain = 0.05f + Mathf.Max(0f, TotalPotency * 0.2f);
-        osmolityGain += 0.25f * (OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Melee)
-                              + OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Intellectual));
+        osmolityGain += 0.25f * (OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Melee)
+                              + OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Intellectual));
         osmolityGain += nobilityType switch
         {
             NobilityType.Deceitful => -0.08f,
@@ -426,7 +427,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         {
             osmolityGain += 0.05f;
         }
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                "OARO_NobilityTerritory_InfiltrateResult".Translate(osmolityGain.ToStringPercent("0.##")),
                Faction));
         AdjustOsmolity(osmolityGain);
@@ -438,7 +439,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         if (CliquesManager.GetCliqueWillingness(NobilityCliqueKey) < 0.3f)
         {
             CliquesManager.AdjustCliqueWillingness(NobilityCliqueKey, 0.1f);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                 "OARO_NobilityTerritory_CommunicationResultLow".Translate(nobilityName, 0.1f.ToStringPercent("0.##")),
                 Faction));
         }
@@ -452,7 +453,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
 
             float willingnessChange = 0.05f
                 + TotalPotency * 0.1f
-                + 0.005f * OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
+                + 0.005f * OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Social);
 
             willingnessChange += nobilityType switch
             {
@@ -473,7 +474,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             willingnessChange = Mathf.Max(0f, willingnessChange);
 
             CliquesManager.AdjustCliqueWillingness(NobilityCliqueKey, willingnessChange);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTreeWithFactionInfo(
                 "OARO_NobilityTerritory_CommunicationResult".Translate(nobilityName, willingnessChange.ToStringPercent("0.##")),
                 Faction));
         }
@@ -487,7 +488,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         if (willingness > 0.999f && (nobilityType == NobilityType.Justice || nobilityType == NobilityType.Kindness))
         {
             ransomPlayer = -1;
-            Dialog_NodeTree nodeTree = OAFrame_DiaUtility.ConfirmDiaNodeTree("OARO_NobilityTerritory_NegotiateResult_NoRansom".Translate(nobilityName), "Accept".Translate(), NobilityYield);
+            Dialog_NodeTree nodeTree = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNodeTree("OARO_NobilityTerritory_NegotiateResult_NoRansom".Translate(nobilityName), "Accept".Translate(), NobilityYield);
             Find.WindowStack.Add(nodeTree);
         }
         else
@@ -506,7 +507,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
             {
                 ransomPlayer = -1;
                 int ransomInt = Mathf.Max(1, Mathf.FloorToInt(ransom));
-                Dialog_NodeTree nodeTree = OAFrame_DiaUtility.ConfirmDiaNodeTree(
+                Dialog_NodeTree nodeTree = OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNodeTree(
                     text: "OARO_NobilityTerritory_NegotiateResult_ReadyRansom".Translate(nobilityName, ransomInt),
                     acceptText: "Accept".Translate(),
                     acceptAction: NobilityYield);
@@ -595,7 +596,7 @@ public sealed class WorldObject_NobilityTerritory : WorldObject_CriticalBranchDe
         };
         diaNode.options.Add(independentOpt);
 
-        diaNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        diaNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         return diaNode;
     }

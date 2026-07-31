@@ -1,5 +1,6 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using System.Text;
 using UnityEngine;
 using Verse;
@@ -38,7 +39,7 @@ public class BranchStatWorker_BuildingCeiling(BranchStatDef statDef) : BranchSta
             if (!resultOnly)
             {
                 explanation.AppendLineWithSeparator(
-                    text: "OARO_ChangeOffset_BranchPopulation".Translate(OAFrame_TextUtility.ColoredIntNamedArgument(offset, KeyLibrary_FormatArgName.Offset, includeSign: true, reverse: StatDef.reverse)),
+                    text: "OARO_ChangeOffset_BranchPopulation".Translate(OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredIntNamedArgument(offset, KeyLibrary_FormatArgName.Offset, includeSign: true, reverse: StatDef.reverse)),
                     separator: KeyLibrary_Misc.SpaceCap4);
             }
         }

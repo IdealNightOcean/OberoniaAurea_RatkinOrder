@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System;
@@ -243,14 +244,14 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             {
                 case WorkType.Cure:
                     {
-                        int maxMedicineLevel = OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
+                        int maxMedicineLevel = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelOfPawns(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
                         int totalMedicineLevel = OARO_PawnUtility.GetTotalSkillLevelOf(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
                         float controlAdd = maxMedicineLevel + totalMedicineLevel * 0.2f;
                         if (HasQuestEffectTag(StrangePlague))
                         {
                             controlAdd *= 0.5f;
                         }
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(controlAdd.ToString("0.##"))));
+                        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(controlAdd.ToString("0.##"))));
                         AdjustPlagueControl(controlAdd);
                         return;
                     }
@@ -263,7 +264,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                             spreadReduce *= 0.5f;
                         }
                         PlagueSpread -= spreadReduce;
-                        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(spreadReduce.ToStringPercent("0.##"))));
+                        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree($"OARO_PlagueVillage_{curWork}Result".Translate(spreadReduce.ToStringPercent("0.##"))));
                         return;
                     }
                 default: return;
@@ -315,7 +316,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             }
         }
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
         return rootNode;
     }
 
@@ -374,7 +375,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             }
             PlagueSpread -= spreadChange;
             caravan.RemoveThingsOfDef(thingDef, 25);
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_DispatchResult".Translate(spreadChange.ToString("0.##"))));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_DispatchResult".Translate(spreadChange.ToString("0.##"))));
         }
     }
 
@@ -411,13 +412,13 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
             PlagueSpread -= spreadChange;
             caravan.RemoveThingsOfDef(thingDef, 25);
             int silverGain = (int)thingDef.GetStatValueAbstract(StatDefOf.MarketValue) * 25 * 4;
-            List<Thing> silverList = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, silverGain);
+            List<Thing> silverList = OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, silverGain);
             foreach (Thing thing in silverList)
             {
                 CaravanInventoryUtility.GiveThing(caravan, thing);
             }
 
-            Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_SellResult".Translate(spreadChange.ToString("0.##"), silverGain)));
+            Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PlagueVillage_SellResult".Translate(spreadChange.ToString("0.##"), silverGain)));
         }
     }
 
@@ -452,7 +453,7 @@ public class WorldObject_PlagueVillage : WorldObject_CriticalBranchDemand
                         {
                             Thing thing = ThingMaker.MakeThing(OARO_ThingDefOf.OARO_PlagueSample);
                             thing.TryGetComp<CompPlagueSample>()?.InitSample(quest, this, HasQuestEffectTag(StrangePlague));
-                            OAFrame_DropPodUtility.DefaultDropSingleThing(thing, map, branch?.RatkinOrder?.Faction, sendLetter: false);
+                            OberoniaAurea_Frame.Utility.OAFrame_DropPodUtility.DefaultDropSingleThing(thing, map, branch?.RatkinOrder?.Faction, sendLetter: false);
 
                             Find.LetterStack.ReceiveLetter(
                                 label: "OARO_PlagueVillage_SampleCollectionLabel".Translate(),

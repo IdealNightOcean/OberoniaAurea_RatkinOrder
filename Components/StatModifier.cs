@@ -1,5 +1,4 @@
-﻿using OberoniaAurea_Frame;
-using System.Xml;
+﻿using System.Xml;
 using UnityEngine;
 using Verse;
 
@@ -26,11 +25,11 @@ public class StatModifier<T> where T : OAROStatDefBase
         }
         if (statDef.statType == BranchStatDef.StatType.Percent)
         {
-            return statDef.label + ": " + OAFrame_TextUtility.ColoredPercentString(value, includeSign: true, reverse: statDef.reverse);
+            return statDef.label + ": " + OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredPercentString(value, includeSign: true, reverse: statDef.reverse);
         }
         else
         {
-            return statDef.label + ": " + OAFrame_TextUtility.ColoredFloatString(value, includeSign: true, reverse: statDef.reverse);
+            return statDef.label + ": " + OberoniaAurea_Frame.Utility.OAFrame_TextUtility.ColoredFloatString(value, includeSign: true, reverse: statDef.reverse);
         }
     }
 

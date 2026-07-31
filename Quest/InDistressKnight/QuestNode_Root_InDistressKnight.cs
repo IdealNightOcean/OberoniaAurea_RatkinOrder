@@ -89,7 +89,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
     protected override void PostPawnGenerated(Pawn pawn, string lodgerRecruitedSignal)
     {
         base.PostPawnGenerated(pawn, lodgerRecruitedSignal);
-        OAFrame_PawnUtility.TakeNonLethalDamage(pawn, injuriesCount: 6, fixedDamageDef: DamageDefOf.Blunt);
+        OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.TakeNonLethalDamage(pawn, injuriesCount: 6, fixedDamageDef: DamageDefOf.Blunt);
         pawn.health.AddHediff(OARO_HediffDefOf.OARO_Hediff_InDistressKnight);
     }
 
@@ -141,7 +141,7 @@ public class QuestNode_Root_InDistressKnight : QuestNode_Root_RefugeeKnightBase
                 RelatedBranch = Branch,
             };
             questPart_OrderLetter.InitLetterTextRequest("[helpThankLetterLabel]", "[helpThankLetterText]", Branch.NameColored);
-            List<Thing> rewards = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, 500);
+            List<Thing> rewards = OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.Silver, 500);
 
             OrderRecommendation recommendation = RecommendationUtility.MakeRecommendationForPlayer(count: 1);
             rewards.Add(recommendation);

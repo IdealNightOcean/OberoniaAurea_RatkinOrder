@@ -1,4 +1,5 @@
 ﻿using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -88,7 +89,7 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
         }
         rootNode.options.Add(totalOpt);
 
-        rootNode.options.Add(OAFrame_DiaUtility.DefaultPostponeOption);
+        rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultPostponeOption);
 
         Find.WindowStack.Add(new Dialog_NodeTreeWithFactionInfo(rootNode, Faction));
 
@@ -132,8 +133,8 @@ public sealed class WorldObject_UnsalableArtcraft : WorldObject_Interactive_Name
             sculptures.Remove(t);
             CaravanInventoryUtility.GiveThing(caravan, t);
         }
-        OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, (int)usedSilver);
-        OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_UnsalableArtcraft_PurchaseResult".Translate(
+        OberoniaAurea_Frame.Utility.OAFrame_CaravanUtility.RemoveThingsOfDef(caravan, ThingDefOf.Silver, (int)usedSilver);
+        OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_UnsalableArtcraft_PurchaseResult".Translate(
             takeSculptures.Count.Named(KeyLibrary_FormatArgName.Count),
             usedSilver.ToString("F0").Named("Price")));
 

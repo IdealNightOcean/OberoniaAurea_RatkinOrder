@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +16,7 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
 
     protected override AcceptanceReport TargetValidate(BranchInteractionParms parms, bool resultOnly)
     {
-        if (OARO_ModDefOf.Rakinia_RockRatkin is null || OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_RockRatkin, FactionValidationParams.NonHostileNormalFaction) is null)
+        if (OARO_ModDefOf.Rakinia_RockRatkin is null || OberoniaAurea_Frame.Utility.OAFrame_FactionUtility.FirstAvailableFactionOfDef(OARO_ModDefOf.Rakinia_RockRatkin, FactionValidationParams.NonHostileNormalFaction) is null)
         {
             return resultOnly ? false : "OARO_NoNonHostileRockRatkin".Translate();
         }
@@ -37,13 +38,13 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
         else
         {
             IEnumerable<ThingDef> metallicDefs = DefDatabase<ThingDef>.AllDefsListForReading.Where(IsMetallic);
-            rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+            rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
             foreach (ThingDef metallicDef in metallicDefs)
             {
                 DiaOption metallicOpt = new(metallicDef.label)
                 {
                     action = () => MetallicDelivery(parms, metallicDef),
-                    linkLateBind = () => OAFrame_DiaUtility.ConfirmDiaNode(
+                    linkLateBind = () => OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.ConfirmDiaNode(
                         text: "OARO_MiningExploration_Reply".Translate(parms.Branch.Name.Named(OARO_KeyLibrary_FormatArgName.BranchName),
                                                                        metallicDef.Named(KeyLibrary_FormatArgName.THING)),
                         acceptText: "Confirm".Translate()),
@@ -51,7 +52,7 @@ public class BranchInteractionWorker_MiningExploration(BranchInteractionDef def)
                 };
                 rootNode.options.Add(metallicOpt);
             }
-            rootNode.options.Add(OAFrame_DiaUtility.DefaultCancelOption);
+            rootNode.options.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultCancelOption);
         }
 
         Dialog_NodeTreeWithRatkinOrderInfo nodeTree = new(rootNode, parms.RatkinOrder);

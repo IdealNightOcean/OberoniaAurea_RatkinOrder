@@ -1,6 +1,7 @@
 ﻿using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using UnityEngine;
@@ -323,7 +324,7 @@ public class QuestClique : IExposable
         }
 
         AdjustCliqueWillingness(willingnessGain);
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(text.Translate()));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(text.Translate()));
 
         if (CanActiveNow(directly: false, resultOnly: true))
         {
@@ -336,7 +337,7 @@ public class QuestClique : IExposable
         map.DestroyThingsOfDef(ThingDefOf.Silver, BriberyCost);
         AdjustCliqueWillingness(1f - Willingness + 0.1f);
 
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName))));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_Clique_BribeInfo".Translate(Name.Named(OARO_KeyLibrary_FormatArgName.CliqueName))));
 
         if (CanActiveNow(directly: false, resultOnly: true))
         {

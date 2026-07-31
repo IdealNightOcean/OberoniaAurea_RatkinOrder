@@ -1,5 +1,4 @@
 ﻿using OberoniaAurea_Frame;
-
 namespace OberoniaAurea.RatkinOrder;
 
 public class KnightVirtueCompProperties_HediffGiver : KnightVirtueCompProperties

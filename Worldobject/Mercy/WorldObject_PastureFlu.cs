@@ -1,5 +1,5 @@
 ﻿using OberoniaAurea.RatkinOrder.Utility;
-using OberoniaAurea_Frame;
+using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using RimWorld.Planet;
 using System.Collections.Generic;
@@ -41,16 +41,16 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
     {
         if (associatedFixedCaravan is not null)
         {
-            (Pawn maxMedicinePawn, int maxMedicineSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
+            (Pawn maxMedicinePawn, int maxMedicineSkill) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Medicine);
 
             if (maxMedicineSkill < 8)
             {
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PastureFlu_Fail".Translate()));
+                Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PastureFlu_Fail".Translate()));
             }
             else if (maxMedicineSkill < 15)
             {
                 this.SendWorkResolvedSignal();
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PastureFlu_Success".Translate(maxMedicinePawn)));
+                Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PastureFlu_Success".Translate(maxMedicinePawn)));
             }
             else
             {
@@ -58,21 +58,21 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
                 EsteemUtility.AdjustAllOrdersEsteem(2, byPlayer: true, reason: "OARO_ResolvedFlu".Translate());
                 StringBuilder sb = new("OARO_PastureFlu_BigSuccess".Translate(maxMedicinePawn.Named(KeyLibrary_FormatArgName.PAWN), 2.Named(KeyLibrary_FormatArgName.Count)));
 
-                (Pawn maxIntellectualPawn, int maxIntellectualSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Intellectual);
+                (Pawn maxIntellectualPawn, int maxIntellectualSkill) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Intellectual);
                 if (maxIntellectualSkill >= 10)
                 {
                     sb.AppendInNewLine("OARO_PastureFlu_Conspiracy".Translate(maxIntellectualPawn.Named(KeyLibrary_FormatArgName.PAWN)));
                 }
 
-                (Pawn maxAnimalsPawn, int maxAnimalsSkill) = OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
+                (Pawn maxAnimalsPawn, int maxAnimalsSkill) = OberoniaAurea_Frame.Utility.OAFrame_PawnUtility.GetMaxSkillLevelPawn(associatedFixedCaravan.PawnsListForReading, SkillDefOf.Animals);
                 if (maxAnimalsSkill >= 10)
                 {
                     int herbalCount = Rand.RangeInclusive(90, 150);
-                    List<Thing> rewards = OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.MedicineHerbal, herbalCount);
-                    OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
+                    List<Thing> rewards = OberoniaAurea_Frame.Utility.OAFrame_ThingUtility.GenerateThingListSplitByStack(ThingDefOf.MedicineHerbal, herbalCount);
+                    OberoniaAurea_Frame.Utility.OAFrame_FixedCaravanUtility.GiveThings(associatedFixedCaravan, rewards);
                     sb.AppendInNewLine("OARO_PastureFlu_Herbal".Translate(maxAnimalsPawn.Named(KeyLibrary_FormatArgName.PAWN), herbalCount.Named(KeyLibrary_FormatArgName.Count)));
                 }
-                Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(sb.ToString()));
+                Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree(sb.ToString()));
             }
         }
 
@@ -81,7 +81,7 @@ public sealed class WorldObject_PastureFlu : WorldObject_InteractWithFixedCarava
 
     protected override void InterruptWork()
     {
-        Find.WindowStack.Add(OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PastureFlu_Interrupt".Translate()));
+        Find.WindowStack.Add(OberoniaAurea_Frame.Utility.OAFrame_DiaUtility.DefaultConfirmDiaNodeTree("OARO_PastureFlu_Interrupt".Translate()));
         this.SafeDestroy();
     }
 }
