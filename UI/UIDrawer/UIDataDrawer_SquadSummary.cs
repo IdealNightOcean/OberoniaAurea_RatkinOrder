@@ -9,27 +9,31 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 {
-    public override Vector2 DefaultSize => new(392f, 90f);
+    public UIDataDrawer_SquadSummary()
+    {
+        DefaultSize = new(392f, 90f);
+        OutlineThickness = 2;
+    }
 
     public override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.DimDarkBackground);
 
-        Rect innerBoxRect = RectUtils.ContractedBy(boxRect, 2f);
+        Rect innerBoxRect = RectUtils.ContractedBy(boxRect, OutlineThickness);
 
-        float verticalLineX = innerBoxRect.xMin + innerBoxRect.width * 0.6f - 2f;
+        float verticalLineX = innerBoxRect.xMin + innerBoxRect.width * 0.6f - OutlineThickness;
 
         Rect leftRect = innerBoxRect;
         leftRect.xMax = verticalLineX;
         DrawLeftRect(leftRect);
 
         Rect rightRect = innerBoxRect;
-        rightRect.xMin = verticalLineX + 2f;
+        rightRect.xMin = verticalLineX + OutlineThickness;
         DrawRightRect(rightRect);
 
         OAFrame_Widgets.DrawLineVertical(new(verticalLineX, innerBoxRect.yMin), innerBoxRect.height, OARO_ColorLibrary.CommonOutline, 2);
-        OAFrame_Widgets.DrawBox(boxRect, OARO_ColorLibrary.CommonOutline, thickness: 2);
+        OAFrame_Widgets.DrawBox(boxRect, OARO_ColorLibrary.CommonOutline, thickness: OutlineThickness);
     }
 
     /// <remarks>标准大约为(230f, 86f)</remarks>

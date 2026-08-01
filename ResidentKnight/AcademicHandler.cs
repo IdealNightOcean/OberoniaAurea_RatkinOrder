@@ -30,39 +30,6 @@ public class AcademicHandler : IExposable
         TotalAcademicLevel = new(refreshFunc: () => academics?.Values.Sum() ?? 0);
     }
 
-    public AcademicHandler(ResidentKnight knight)
-    {
-        ResidentPawn = knight;
-        TotalAcademicLevel = new(refreshFunc: () => academics?.Values.Sum() ?? 0);
-
-        try
-        {
-            /*
-            KnightAcademicDef initAcademicDef;
-            if (Chivalry != KnightChivalry.None && OrderDefDatabase.ResidentKnightAcademicGroupByChivalry.TryGetValue(Chivalry, out List<KnightAcademicDef> potentialAcademics))
-            {
-                initAcademicDef = potentialAcademics.RandomElement();
-            }
-            else
-            {
-                initAcademicDef = DefDatabase<KnightAcademicDef>.AllDefsListForReading
-                    .Where(d => d.academicType == KnightAcademicDef.AcademicType.Geneal)
-                    .RandomElement();
-            }
-            UpgradeAcademicLevel(initAcademicDef, usePoints: false);
-            */
-        }
-        catch (Exception ex)
-        {
-            ModUtility.LogExceptionError(ex,
-                $"initialize {nameof(AcademicHandler)} for a knight.",
-                typeName: nameof(AcademicHandler),
-                methodName: nameof(AcademicHandler),
-                needStackTrace: true);
-        }
-
-    }
-
     public void ExposeData()
     {
         Scribe_Collections.Look(ref academics, nameof(academics), LookMode.Def, LookMode.Value);

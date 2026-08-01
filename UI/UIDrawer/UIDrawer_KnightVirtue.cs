@@ -12,10 +12,16 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
 {
+    public UIDrawer_KnightVirtue()
+    {
+        DefaultSize = new(260f, 94f);
+        OutlineThickness = 1;
+    }
+
     public override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DefaultSize);
-        Rect innerBoxRect = GenUI.ContractedBy(boxRect, 1f);
+        Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.MediumDarkBackground);
 
         float verticalLineX = innerBoxRect.xMin + innerBoxRect.width * (1f / 3f);
@@ -45,17 +51,17 @@ public class UIDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
         Widgets.DrawLine(start: new Vector2(verticalLineX, innerBoxRect.yMin),
                  end: new Vector2(verticalLineX, innerBoxRect.yMax),
                  color: OARO_ColorLibrary.CommonOutline,
-                 width: 1f);
+                 width: OutlineThickness);
 
         Widgets.DrawLine(start: new Vector2(verticalLineX, horizontalLine2Y),
                  end: new Vector2(innerBoxRect.xMax, horizontalLine2Y),
                  color: OARO_ColorLibrary.CommonOutline,
-                 width: 1f);
+                 width: OutlineThickness);
 
         Widgets.DrawLine(start: new Vector2(verticalLineX, horizontalLine3Y),
                  end: new Vector2(innerBoxRect.xMax, horizontalLine3Y),
                  color: OARO_ColorLibrary.CommonOutline,
-                 width: 1f);
+                 width: OutlineThickness);
     }
 
     private void DrawVirtueTrait(Rect inRect, int level)

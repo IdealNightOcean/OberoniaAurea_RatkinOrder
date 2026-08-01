@@ -16,6 +16,8 @@ public abstract class OrderWindowBase : Verse.Window, IUIDrawer
 
     public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;
 
+    public int OutlineThickness { get; protected set; } = 1;
+
     public OrderWindowBase()
     {
         forcePause = true;

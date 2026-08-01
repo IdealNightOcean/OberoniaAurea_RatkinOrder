@@ -340,7 +340,7 @@
     <Compile Include="UI\UIDrawer\UIDataDrawer_MentorshipStudent.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_SquadSummary.cs" />
     <Compile Include="UI\UIDrawer\UIDrawerBase.cs" />
-    <Compile Include="UI\UIDrawer\UIDrawer_KnightVirtueProgressBar.cs" />
+    <Compile Include="UI\UIDrawer\UIDataDrawer_KnightVirtueProgressBar.cs" />
     <Compile Include="UI\UIDrawer\UIDrawer_KnightVirtueTable.cs" />
     <Compile Include="UI\UIUtility.cs" />
     <Compile Include="UI\Widgets.cs" />

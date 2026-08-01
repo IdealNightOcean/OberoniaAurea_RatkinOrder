@@ -15,7 +15,7 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class ResidentKnight : ResidentPawn
 {
-    protected override bool IsDisabled => base.IsDisabled || !Branch.IsValid();
+    protected override bool IsDisabled => base.IsDisabled || !this.Branch.IsValid();
 
     private KnightRecord knightRecord;
     public KnightRecord KnightRecord => knightRecord;
@@ -51,11 +51,10 @@ public class ResidentKnight : ResidentPawn
     public ResidentKnightRoleDef CurRole => curRole;
     public int NextRoleChangeableTick => nextRoleChangeableTick;
 
-    private KnightVirtueHandler knightVirtueHandler;
-    public KnightVirtueHandler VirtueHandler => knightVirtueHandler;
+    private KnightVirtueHandler virtueHandler;
+    public KnightVirtueHandler VirtueHandler => virtueHandler;
 
-    private TagStrToInt effectTags = new(defaultValue: 0, removeWhenDefault: true);
-    public TagStrToInt EffectTags => effectTags;
+    public TagStrToInt EffectTags { get; } = new(defaultValue: 0, removeWhenDefault: true);
 
     public override void ExposeData()
     {
@@ -71,8 +70,7 @@ public class ResidentKnight : ResidentPawn
         Scribe_Values.Look(ref residenceStartTick, nameof(residenceStartTick), defaultValue: -1);
         Scribe_Values.Look(ref resignationTick, nameof(resignationTick), defaultValue: -1);
 
-        Scribe_Deep.Look(ref academicHandler, nameof(academicHandler));
-        Scribe_Deep.Look(ref knightVirtueHandler, nameof(knightVirtueHandler), ctorArgs: this);
+        Scribe_Deep.Look(ref virtueHandler, nameof(virtueHandler), ctorArgs: this);
     }
 
     private ResidentKnight() : base() { }
@@ -82,7 +80,7 @@ public class ResidentKnight : ResidentPawn
         this.pawn = knightRecord.Pawn ?? throw new ArgumentNullException(nameof(knightRecord.Pawn));
 
         academicHandler = new(this);
-        knightVirtueHandler = new(this);
+        virtueHandler = new(this);
 
         loadID = UniqueIDManager.GetUniqueID(nameof(ResidentKnight));
     }
@@ -97,9 +95,8 @@ public class ResidentKnight : ResidentPawn
     public void ChangeRole(ResidentKnightRoleDef newRole)
     {
         if (newRole == curRole)
-        {
             return;
-        }
+
         ResidentKnightRoleDef oldRole = curRole;
         curRole = newRole;
 
@@ -127,6 +124,8 @@ public class ResidentKnight : ResidentPawn
         {
             ResignationTick = Find.TickManager.TicksGame + 2 * 60 * 60000;
         }
+
+        _ = virtueHandler.BuffHediff;
     }
 
     public void PostRemoved(ResidentKnightRemovalReason reason)

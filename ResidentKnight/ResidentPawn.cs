@@ -21,14 +21,12 @@ public class ResidentPawn : IExposable, ILoadReferenceable
     {
         get
         {
-            if (pawn.DestroyedOrNull())
-            {
-                return ResidentPawnState.ForceRemove;
-            }
             if (forceState.HasValue)
-            {
                 return forceState.Value;
-            }
+
+            if (pawn.DestroyedOrNull())
+                return ResidentPawnState.ForceRemove;
+
             if (removalTick > 0)
             {
                 if (Find.TickManager.TicksGame >= removalTick)
@@ -41,10 +39,10 @@ public class ResidentPawn : IExposable, ILoadReferenceable
                     return ResidentPawnState.PendingRemoval;
                 }
             }
+
             if (IsDisabled)
-            {
                 return ResidentPawnState.Disabled;
-            }
+
             return ResidentPawnState.Normal;
         }
     }

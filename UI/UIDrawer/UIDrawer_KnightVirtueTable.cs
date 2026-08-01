@@ -13,6 +13,7 @@ public class UIDrawer_KnightVirtueTable : IUIDrawer
     protected Vector2? sizeOverride;
     public Vector2 DefaultSize => new(915f + 18f, 558f);
     public Vector2 DrawSize => sizeOverride ?? DefaultSize;
+    public int OutlineThickness => 0;
 
     public TextStyle TextStyle { get; set; } = TextStyle.DefaultStyle;
 

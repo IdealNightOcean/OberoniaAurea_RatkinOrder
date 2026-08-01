@@ -1,5 +1,6 @@
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
@@ -87,7 +88,7 @@ public class GameComponent_RatkinOrder : GameComponent
 
         Scribe_Deep.Look(ref ratkinOrderManager, nameof(ratkinOrderManager));
         Scribe_Deep.Look(ref knightPawnsManager, nameof(knightPawnsManager));
-        Scribe_Deep.Look(ref orderStationHandler, nameof(orderStationHandler), ctorArgs: false);
+        Scribe_Deep.Look(ref orderStationHandler, nameof(orderStationHandler));
 
         Scribe_Deep.Look(ref residentPawnsManager, nameof(residentPawnsManager));
         Scribe_Deep.Look(ref residentRoleManager, nameof(residentRoleManager));
@@ -105,7 +106,6 @@ public class GameComponent_RatkinOrder : GameComponent
         globalInteractionManager.Notify_GameStart();
     }
 
-
     /// <summary>
     /// 会在PostLoadInit加载阶段之后调用
     /// </summary>
@@ -122,7 +122,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             ratkinOrderManager.Tick();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"骑士团管理器Tick ({nameof(RatkinOrderManager)})",
@@ -135,7 +135,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             residentPawnsManager.Tick();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"常驻人员管理器Tick ({nameof(ResidentPawnsManager)})",
@@ -148,7 +148,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             residentRoleManager.Tick();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"常驻人员职位管理器Tick ({nameof(ResidentRoleManager)})",
@@ -161,7 +161,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             mentorshipManager.Tick();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"教导关系管理器Tick ({nameof(MentorshipManager)})",
@@ -174,7 +174,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             globalInteractionManager.Tick();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"全局交互管理器Tick ({nameof(GlobalInteractionManager)})",
@@ -197,7 +197,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             uniqueIDManager ??= new UniqueIDManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化唯一ID管理器 ({nameof(UniqueIDManager)})",
@@ -212,7 +212,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             playerDespawnedPawnsTempRetention ??= new PlayerDespawnedPawnsTempRetention();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化玩家已消失角色临时保留管理器 ({nameof(PlayerDespawnedPawnsTempRetention)})",
@@ -227,7 +227,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             ratkinOrderManager ??= new RatkinOrderManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化骑士团管理器 ({nameof(RatkinOrderManager)})",
@@ -242,7 +242,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             knightPawnsManager ??= new KnightPawnsManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化骑士角色管理器 ({nameof(KnightPawnsManager)})",
@@ -255,9 +255,9 @@ public class GameComponent_RatkinOrder : GameComponent
 
         try
         {
-            orderStationHandler ??= new OrderStationHandler(initCtor: true);
+            orderStationHandler ??= new OrderStationHandler();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化骑士驻地管理器 ({nameof(OrderStationHandler)})",
@@ -265,14 +265,14 @@ public class GameComponent_RatkinOrder : GameComponent
                 methodName: nameof(EnsureComponentsInit),
                 needStackTrace: true);
             OrderStationHandler.ClearStaticCache();
-            orderStationHandler = new OrderStationHandler(initCtor: true);
+            orderStationHandler = new OrderStationHandler();
         }
 
         try
         {
             residentPawnsManager ??= new ResidentPawnsManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化常驻人员管理器 ({nameof(ResidentPawnsManager)})",
@@ -287,7 +287,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             residentRoleManager ??= new ResidentRoleManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化常驻人员职位管理器 ({nameof(ResidentRoleManager)})",
@@ -302,7 +302,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             mentorshipManager ??= new MentorshipManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化常驻人员教导关系管理器 ({nameof(MentorshipManager)})",
@@ -317,7 +317,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             globalInteractionManager ??= new GlobalInteractionManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化全局交互管理器 ({nameof(GlobalInteractionManager)})",
@@ -332,7 +332,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             aiInteractionHandler ??= new AIInteractionHandler();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化AI交互处理器 ({nameof(AIInteractionHandler)})",
@@ -347,7 +347,7 @@ public class GameComponent_RatkinOrder : GameComponent
         {
             valueCacheManager ??= new ValueCacheManager();
         }
-        catch (System.Exception ex)
+        catch (Exception ex)
         {
             ModUtility.LogExceptionError(ex,
                 errorDesc: $"初始化值缓存管理器 ({nameof(ValueCacheManager)})",

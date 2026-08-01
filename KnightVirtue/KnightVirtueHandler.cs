@@ -23,12 +23,17 @@ public class KnightVirtueHandler : IExposable
     {
         get
         {
+            if (Scribe.mode != LoadSaveMode.Inactive)
+            {
+                Log.Error($"[OARO] 加载/保存过程中不应获取骑士美德处理器buff，已返回 null。骑士: {knight?.Pawn?.ToString() ?? "UNKNOWN"}");
+                return null;
+            }
+
             if (buffHediff is null)
             {
                 buffHediff = (Hediff_KnightVirtue)this.Pawn.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_KnightVirtue);
                 buffHediff.InitVirtueHandler(knight, force: true);
             }
-
             return buffHediff;
         }
     }
@@ -98,6 +103,33 @@ public class KnightVirtueHandler : IExposable
     private HediffStageModifierBuilder BuffStageTemplate { get; } = new();
     private string BuffDetailExplanation { get; set; }
 
+    public KnightVirtueHandler(ResidentKnight knight)
+    {
+        this.knight = knight ?? throw new ArgumentNullException(nameof(knight));
+
+        VirtueStatValueCache = new(cacheInterval: 30000,
+                                   defaultValue: 0f,
+                                   checker: () => this.Pawn.GetStatValue(OARO_ModDefOf.OARO_Stat_PawnVirtue));
+    }
+
+    public void ExposeData()
+    {
+        Scribe_References.Look(ref buffHediff, nameof(buffHediff));
+        Scribe_Collections.Look(ref virtues, nameof(virtues), LookMode.Deep);
+        if (Scribe.mode == LoadSaveMode.PostLoadInit)
+        {
+            if (virtues.RemoveAll(v => v is null || v.Def is null) > 0)
+            {
+                Log.Error($"[OARO] 在加载骑士美德处理器时发现无效的美德数据，已将其移除。骑士: {knight?.Pawn?.ToString() ?? "UNKNOWN"}");
+            }
+
+            foreach (KnightVirtue virtue in virtues)
+            {
+                ActiveVirtue(virtue);
+            }
+        }
+    }
+
     public void TickInterval(int delta)
     {
         if (knight.CurState != ResidentPawnState.Normal)
@@ -113,48 +145,6 @@ public class KnightVirtueHandler : IExposable
 
         if (knight.Pawn.IsHashIntervalTick(2500))
             CheckKnightCreed();
-    }
-
-    public KnightVirtueHandler(ResidentKnight knight)
-    {
-        this.knight = knight ?? throw new ArgumentNullException(nameof(knight));
-
-        VirtueStatValueCache = new(cacheInterval: 30000,
-                                   checker: () => Pawn.GetStatValue(OARO_ModDefOf.OARO_Stat_PawnVirtue));
-    }
-
-    public void ExposeData()
-    {
-        Scribe_References.Look(ref buffHediff, nameof(buffHediff));
-        Scribe_Collections.Look(ref virtues, nameof(virtues), LookMode.Deep);
-        if (Scribe.mode == LoadSaveMode.PostLoadInit)
-        {
-            if (virtues.RemoveAll(v => v is null || v.Def is null) > 0)
-            {
-                Log.Error($"[OARO] 在加载骑士美德处理器时发现无效的美德数据，已将其移除。骑士: {knight?.Pawn?.ToString() ?? "UNKNOWN"}");
-            }
-
-            if (buffHediff is null)
-            {
-                _ = BuffHediff;
-            }
-
-            foreach (KnightVirtue virtue in virtues)
-            {
-                try
-                {
-                    ActiveVirtue(virtue);
-                }
-                catch (Exception ex)
-                {
-                    ModUtility.LogExceptionError(ex: ex,
-                                                 errorDesc: $"在加载骑士美德处理器时激活美德 {virtue?.Def?.LabelCap ?? "UNKNOWN"} 失败",
-                                                 typeName: nameof(KnightVirtueHandler),
-                                                 methodName: nameof(ExposeData),
-                                                 needStackTrace: true);
-                }
-            }
-        }
     }
 
     public KnightVirtue GetVirtue(KnightVirtueDef virtue)
@@ -347,12 +337,24 @@ public class KnightVirtueHandler : IExposable
 
     private void ActiveVirtue(KnightVirtue virtue)
     {
-        if (virtue is ITickInterval tickIntervalProcessor)
+        try
         {
-            RegisterTickIntervalProcessor(tickIntervalProcessor);
+            if (virtue is ITickInterval tickIntervalProcessor)
+            {
+                RegisterTickIntervalProcessor(tickIntervalProcessor);
+            }
+
+            virtue.PostActive();
+        }
+        catch (Exception ex)
+        {
+            ModUtility.LogExceptionError(ex: ex,
+                                         errorDesc: $"在加载骑士美德处理器时激活美德 {virtue?.Def?.LabelCap ?? "UNKNOWN"} 失败",
+                                         typeName: nameof(KnightVirtueHandler),
+                                         methodName: nameof(ActiveVirtue),
+                                         needStackTrace: true);
         }
 
-        virtue.PostActive();
     }
 
     private bool RemoveVirtue(KnightVirtueDef virtueDef)

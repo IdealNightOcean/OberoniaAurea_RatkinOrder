@@ -10,10 +10,14 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_KnightVirtue>
 {
-    public override Vector2 DefaultSize => new(600f, 70f);
-
     private Vector2 scrollPosition_TraitBar;
     private Vector2 scrollPosition_StarGroup;
+
+    public UIDataDrawer_KnightVirtueProgressBar()
+    {
+        DefaultSize = new(600f, 70f);
+        OutlineThickness = 0;
+    }
 
     public override void DrawInner(Vector2 position)
     {

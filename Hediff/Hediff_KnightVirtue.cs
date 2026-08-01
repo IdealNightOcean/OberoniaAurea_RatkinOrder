@@ -25,7 +25,7 @@ public class Hediff_KnightVirtue : HediffWithComps
         {
             if (!force && this.knight != knight)
             {
-                Log.Error("[OARO] ");
+                Log.Error($"[OARO] {nameof(Hediff_KnightVirtue)}已绑定骑士 {this.knight?.Pawn?.ToString() ?? "UNKNOWN"}，尝试以不同骑士 {knight?.Pawn?.ToString() ?? "UNKNOWN"} 重新初始化。如需覆盖请使用强制模式。");
             }
         }
 

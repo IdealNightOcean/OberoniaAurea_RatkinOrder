@@ -44,7 +44,7 @@ public class ResidentPawnsManager : IExposable, IOnBranchDestroyed
 
 
     private readonly ResidentPawnsCacheManager cacheManager;
-    public static ResidentPawnsCacheManager CacheManager => Instance?.cacheManager;
+    public static ResidentPawnsCacheManager CacheManager => Instance.cacheManager;
 
     private readonly TagStrToInt effectTags;
     public static TagStrToInt EffectTags => Instance?.effectTags;

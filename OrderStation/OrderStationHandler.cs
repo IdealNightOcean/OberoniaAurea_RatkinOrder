@@ -45,7 +45,7 @@ public class OrderStationHandler : IExposable
     private OrderStationTraditionsManager traditionsManager;
     public static OrderStationTraditionsManager TraditionsManager => Instance.traditionsManager;
 
-    internal OrderStationHandler(bool initCtor)
+    internal OrderStationHandler()
     {
         OberoniaAurea_Frame.Utility.OAFrame_MiscUtility.ValidateSingleton(Instance, nameof(OrderStationHandler));
         Instance = this;
@@ -54,10 +54,6 @@ public class OrderStationHandler : IExposable
                                                         checker: () => OrderStationUtility.GetOrderStationLevel());
 
         buildingHandler = new();
-        if (initCtor)
-        {
-
-        }
     }
 
     public static void ClearStaticCache() => Instance = null;

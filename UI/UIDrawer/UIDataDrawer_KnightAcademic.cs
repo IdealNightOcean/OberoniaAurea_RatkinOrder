@@ -8,16 +8,21 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademic>
 {
-    public override Vector2 DefaultSize => new(260f, 94f);
 
     private Vector2 scrollPosition_LevelStar;
+
+    public UIDataDrawer_KnightAcademic()
+    {
+        DefaultSize = new(260f, 94f);
+        OutlineThickness = 2;
+    }
 
     public override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
-        OARO_Widgets.DrawDefaultBoxSolidWithOutline(boxRect, outlineThickness: 2);
+        OARO_Widgets.DrawDefaultBoxSolidWithOutline(boxRect, outlineThickness: OutlineThickness);
 
-        Rect innerBoxRect = GenUI.ContractedBy(boxRect, 2f); //标准大约为(256f, 90f)
+        Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness); //标准大约为(256f, 90f)
 
         Rect upperInnerRect = innerBoxRect.TopPart(0.6f);
         DrawUpperInner(upperInnerRect);

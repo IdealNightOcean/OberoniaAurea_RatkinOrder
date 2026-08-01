@@ -1,4 +1,5 @@
-﻿using OberoniaAurea.RatkinOrder.DataLibrary;
+﻿using NightOcean.Utility;
+using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame;
@@ -39,7 +40,12 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     private Texture2D CheckAcademicColorTex { get; set; }
     private AcceptanceReport CheckAcademicStageAcceptance { get; set; }
 
-    private IReadOnlyList<(KnightAcademicDef, bool)> AllAvailableAcademics { get; set; }
+    /*
+     * 新字段
+     */
+    private UIDataDrawer_KnightAcademic AcademicEntryDrawer { get; } = new();
+    private List<UIData_KnightAcademic> AvailableAcademics { get; } = [];
+
 
     public Window_ResidentKnight_AcademicArrange(ResidentKnight record) : base()
     {
@@ -48,24 +54,23 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         BranchHonor = record.Branch.HonorDef;
         NoAdditionalCostAcademicCeiling = AcademicUtility.GetNoAdditionalCostAcademicCeiling(Knight.CurRank);
 
+        AvailableAcademics.Capacity = AcademicHandler.Academics.Count;
         HashSet<KnightAcademicDef> academicHash = new(AcademicHandler.Academics.Count);
-        List<(KnightAcademicDef, bool)> allAvailableAcademics = new(AcademicHandler.Academics.Count);
         foreach (KnightAcademicDef academicDef in AcademicUtility.GetAllActivateAcademicsBySelf(Knight))
         {
             academicHash.Add(academicDef);
-            allAvailableAcademics.Add((academicDef, true));
+            AvailableAcademics.Add(new UIData_KnightAcademic(this.Knight, academicDef));
         }
         foreach (KnightAcademicDef academicDef in AcademicHandler.Academics.Keys)
         {
             if (academicHash.Add(academicDef))
             {
-                allAvailableAcademics.Add((academicDef, false));
+                AvailableAcademics.Add(new UIData_KnightAcademic(this.Knight, academicDef));
             }
         }
 
-        AllAvailableAcademics = allAvailableAcademics;
         academicHash = null;
-        if (AllAvailableAcademics.Count > 0)
+        if (AvailableAcademics.Count > 0)
         {
             SwitchAcademic(AcademicHandler.Academics.First().Key);
         }
@@ -86,7 +91,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         GUI.DrawTexture(inRect, mainBackground);
 
         Rect mainRect = OARO_UIUtility.CenterRect(inRect, 1308f, 695f);
-        Rect mainInnerRect = mainRect.ContractedBy(2f);
+        Rect mainInnerRect = GenUI.ContractedBy(mainRect, 2f);
         float mainInnerX = mainInnerRect.xMin;
         float mainInnerY = mainInnerRect.yMin;
 
@@ -110,7 +115,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     private void DarwPawnInfo(Rect inRect)
     {
-        Rect innerRect = inRect.ContractedBy(2f);
+        Rect innerRect = GenUI.ContractedBy(inRect, 2f);
         float innerX = innerRect.xMin;
         float innerY = innerRect.yMin;
         float innerWidth = innerRect.width;
@@ -142,16 +147,27 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         float entryX = viewRect.xMin;
         float entryY = viewRect.yMin;
-        float entryWidth = 198f;
-        float entryHeight = 70f;
-        viewRect.height = (AllAvailableAcademics.Count + 1) * entryHeight;
+        Vector2 entryDrawSize = AcademicEntryDrawer.DrawSize;
+        viewRect.height = (AvailableAcademics.Count + 1) * entryDrawSize.y;
 
         Widgets.BeginScrollView(inRect, ref scrollPosition_Academic, viewRect, showScrollbars: false);
-        foreach ((KnightAcademicDef def, bool activateBySelf) in AllAvailableAcademics)
+        Rect entryRect = new(entryX, entryY, entryDrawSize.x, entryDrawSize.y);
+        foreach (UIData_KnightAcademic academicData in AvailableAcademics)
         {
-            Rect entryRect = new(entryX, entryY, entryWidth, entryHeight);
-            entryY += entryHeight;
-            DarwAcademic(entryRect, def, activateBySelf);
+            AcademicEntryDrawer.SetDrawData(academicData);
+            AcademicEntryDrawer.Draw(entryRect.TopRightCorner());
+
+            if (SelAcademicDef == academicData.Academic)
+            {
+                Widgets.DrawBox(inRect);
+                Widgets.DrawHighlightSelected(inRect);
+            }
+            if (Widgets.ButtonInvisible(inRect))
+            {
+                SwitchAcademic(academicData.Academic);
+            }
+
+            entryRect.OffsetVertical(entryDrawSize.y - AcademicEntryDrawer.OutlineThickness);
         }
         Widgets.EndScrollView();
         OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
@@ -169,7 +185,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             Texture2D honorDecorationTexture = BranchHonor?.chivalry?.medal?.honorDecorationTexture?.Texture;
             if (honorDecorationTexture is not null)
             {
-                GUI.DrawTexture(inRect.ContractedBy(3f), honorDecorationTexture, ScaleMode.ScaleToFit);
+                GUI.DrawTexture(GenUI.ContractedBy(inRect, 3f), honorDecorationTexture, ScaleMode.ScaleToFit);
             }
             Widgets.Label(reusedRect, def.LabelCap.Colorize(BranchHonor.color));
         }
@@ -206,7 +222,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             return;
         }
 
-        Rect innerRect = inRect.ContractedBy(2f);
+        Rect innerRect = GenUI.ContractedBy(inRect, 2f);
         float innerX = innerRect.xMin;
         float innerY = innerRect.yMin;
 
@@ -218,7 +234,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 180f, 968f, 198f);
         GUI.DrawTexture(reusedRect, stageBackground);
 
-        Rect stageOutRect = reusedRect.ContractedBy(2f);
+        Rect stageOutRect = GenUI.ContractedBy(reusedRect, 2f);
         Rect stageViewRect = stageOutRect;
         stageViewRect.height -= 16f;
 
@@ -360,9 +376,9 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         Rect selectBoxRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 155f, 20f, 20f);
 
-        reusedRect = selectBoxRect.ContractedBy(2f);
+        reusedRect = GenUI.ContractedBy(selectBoxRect, 2f);
         GUI.DrawTexture(reusedRect, BaseContent.BlackTex);
-        Rect selectBoxActiveRect = reusedRect.ContractedBy(2f);
+        Rect selectBoxActiveRect = GenUI.ContractedBy(reusedRect, 2f);
         if (active)
         {
             GUI.DrawTexture(selectBoxActiveRect, CheckAcademicColorTex);

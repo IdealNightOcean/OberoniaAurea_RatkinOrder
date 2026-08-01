@@ -10,12 +10,16 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_MentorshipStudent>
 {
-    public override Vector2 DefaultSize => new(328f, 114f);
+    public UIDataDrawer_MentorshipStudent()
+    {
+        DefaultSize = new(328f, 114f);
+        OutlineThickness = 2;
+    }
 
     public override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
-        Rect innerBoxRect = GenUI.ContractedBy(boxRect, 4f); //标准大约(320f,106f);
+        Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness); //标准大约(320f,106f);
 
         Rect portraitRect = new(0f, 0f, innerBoxRect.width * 0.25f, innerBoxRect.height * 0.7f);
         portraitRect = portraitRect.MoveTo(innerBoxRect.TopLeftCorner());

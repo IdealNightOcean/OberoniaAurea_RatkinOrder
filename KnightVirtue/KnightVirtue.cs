@@ -10,24 +10,6 @@ namespace OberoniaAurea.RatkinOrder;
 /// </summary>
 public class KnightVirtue : IExposable
 {
-    public struct KnightVirtueTrait : IExposable
-    {
-        public KnightVirtueTraitDef def;
-        public int level;
-
-        public KnightVirtueTrait(KnightVirtueTraitDef def, int level)
-        {
-            this.def = def ?? throw new System.ArgumentNullException(nameof(def));
-            this.level = level > 0 ? level : 1;
-        }
-
-        public void ExposeData()
-        {
-            Scribe_Defs.Look(ref def, nameof(def));
-            Scribe_Values.Look(ref level, nameof(level), defaultValue: 1);
-        }
-    }
-
     private KnightVirtueDef def;
     public KnightVirtueDef Def => def;
     public KnightChivalryDef Chivalry => def.chivalry;
@@ -178,5 +160,23 @@ public class KnightVirtue : IExposable
         }
 
         return ~left;
+    }
+
+    public struct KnightVirtueTrait : IExposable
+    {
+        public KnightVirtueTraitDef def;
+        public int level;
+
+        public KnightVirtueTrait(KnightVirtueTraitDef def, int level)
+        {
+            this.def = def ?? throw new System.ArgumentNullException(nameof(def));
+            this.level = level > 0 ? level : 1;
+        }
+
+        public void ExposeData()
+        {
+            Scribe_Defs.Look(ref def, nameof(def));
+            Scribe_Values.Look(ref level, nameof(level), defaultValue: 1);
+        }
     }
 }
