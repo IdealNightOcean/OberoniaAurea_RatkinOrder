@@ -337,7 +337,9 @@
     <Compile Include="UI\UIData\IUIData.cs" />
     <Compile Include="UI\UIData\UIData_BranchSummary.cs" />
     <Compile Include="UI\UIData\UIData_KnightVirtue.cs" />
+    <Compile Include="UI\UIDrawer\UIDataDrawer_KnightAcademicProgressBar.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_MentorshipStudent.cs" />
+    <Compile Include="UI\UIDrawer\UIDataDrawer_SelectableList.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_SquadSummary.cs" />
     <Compile Include="UI\UIDrawer\UIDrawerBase.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_KnightVirtueProgressBar.cs" />
