@@ -13,7 +13,7 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
 
     public UIDataDrawer_KnightAcademic()
     {
-        DefaultSize = new(260f, 94f);
+        DrawSize = new(260f, 94f);
         OutlineThickness = 2;
     }
 
@@ -45,7 +45,7 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect levelRect = inRect.RightPart(0.9f);
         this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleRight);
         if (DrawDataValid)
-            OAFrame_Widgets.DrawLabel(levelRect, $"{DrawData.Level}/{DrawData.Academic.MaxStageLevel}", this.TextStyle);
+            OAFrame_Widgets.DrawLabel(levelRect, $"{DrawData.StageLevel}/{DrawData.Academic.MaxStageLevel}", this.TextStyle);
         else
             OAFrame_Widgets.DrawLabel(levelRect, "0/0", this.TextStyle);
     }
@@ -68,7 +68,7 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
                                      starSize: new(starSize, starSize),
                                      interval: 3f,
                                      totalStarNum: DrawDataValid ? DrawData.Academic.MaxStageLevel : 0,
-                                     activeStarNum: DrawDataValid ? DrawData.Level : 0,
+                                     activeStarNum: DrawDataValid ? DrawData.StageLevel : 0,
                                      scrollPosition: ref scrollPosition_LevelStar);
     }
 }

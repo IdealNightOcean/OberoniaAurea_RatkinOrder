@@ -15,13 +15,13 @@ public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_Knig
 
     public UIDataDrawer_KnightVirtueProgressBar()
     {
-        DefaultSize = new(600f, 70f);
+        DrawSize = new(600f, 70f);
         OutlineThickness = 0;
     }
 
     public override void DrawInner(Vector2 position)
     {
-        Rect boxRect = new(position, DefaultSize);
+        Rect boxRect = new(position, DrawSize);
 
         Rect virtueSummaryRect = boxRect;
         virtueSummaryRect.width *= 0.25f;

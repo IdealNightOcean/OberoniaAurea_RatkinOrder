@@ -336,6 +336,7 @@
     <Compile Include="Thought\Thought_Situational_Virtue.cs" />
     <Compile Include="UI\UIData\IUIData.cs" />
     <Compile Include="UI\UIData\UIData_BranchSummary.cs" />
+    <Compile Include="UI\UIData\UIData_KnightAcademicStage.cs" />
     <Compile Include="UI\UIData\UIData_KnightVirtue.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_KnightAcademicProgressBar.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_MentorshipStudent.cs" />

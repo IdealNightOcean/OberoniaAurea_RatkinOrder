@@ -37,11 +37,6 @@ public class BranchHonorDef : Def
     /// 荣誉颜色
     /// </summary>
     public Color color;
-    protected Texture2D honorColorTex;
-    /// <summary>
-    /// 荣誉颜色标识图标，颜色使用<see cref="color"/>
-    /// </summary>
-    public Texture2D HonorColorTex => honorColorTex ??= SolidColorMaterials.NewSolidColorTexture(color);
 
     /// <summary>
     /// 荣誉图标

@@ -12,7 +12,7 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
 {
     public UIDataDrawer_MentorshipStudent()
     {
-        DefaultSize = new(328f, 114f);
+        DrawSize = new(328f, 114f);
         OutlineThickness = 2;
     }
 

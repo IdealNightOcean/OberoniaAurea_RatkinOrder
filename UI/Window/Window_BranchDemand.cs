@@ -571,7 +571,7 @@ public class Window_BranchDemand : OrderWindowBase
             Rect reusedRect = new(inRect.x, inRect.y + 2f, 5f, innerRect.height);
             if (SummaryUICache.Branch.HonorDef is not null)
             {
-                GUI.DrawTexture(reusedRect, Branch.HonorDef.HonorColorTex);
+                Widgets.DrawBoxSolid(reusedRect, Branch.HonorDef.color);
             }
             else
             {

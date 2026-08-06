@@ -12,6 +12,7 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
     public UIDataDrawerBase<T> Drawer { get; set; }
     public IList<T> DrawDatas { get; protected set; }
     public int SelectedIndex { get; protected set; } = -1;
+    public bool HasSelectedItem => SelectedIndex >= 0 && SelectedIndex < DrawDatas.Count;
     public T SelectedItem
     {
         get
@@ -31,15 +32,10 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
 
     protected Vector2 scrollPosition = Vector2.zero;
 
-    public UIDataDrawer_SelectableList(UIDataDrawerBase<T> drawer, IList<T> drawDatas, Vector2 parentSize)
+    public UIDataDrawer_SelectableList(UIDataDrawerBase<T> drawer, IList<T> drawDatas, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
     {
         Drawer = drawer;
         DrawDatas = drawDatas;
-        sizeOverride = parentSize;
-    }
-
-    public UIDataDrawer_SelectableList(UIDataDrawerBase<T> drawer, IList<T> drawDatas, Vector2 parentSize, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false) : this(drawer, drawDatas, parentSize)
-    {
         RowLimit = rowLimit;
         ColumnLimit = columnLimit;
         HorizontalWarp = horizontalWarp;
@@ -68,6 +64,13 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
         {
             SelectedIndex = -1;
         }
+    }
+
+    public void UseRecommendOutRectSize()
+    {
+        Vector2 recommendSize = GetRecommendOutRectSize();
+        if (recommendSize != Vector2.zero)
+            SetDrawSize(recommendSize);
     }
 
     public Vector2 GetRecommendOutRectSize()
@@ -102,7 +105,6 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
                 outRectSize.x += ScrollBarThickness;
             }
         }
-
         return outRectSize;
     }
 
@@ -215,7 +217,10 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
             SelectItem(dataIndex);
 
         if (SelectedIndex == dataIndex)
+        {
             Widgets.DrawBox(inRect);
+            Widgets.DrawHighlightSelected(inRect);
+        }
         else if (Mouse.IsOver(inRect))
             Widgets.DrawHighlight(inRect);
     }

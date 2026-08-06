@@ -131,7 +131,7 @@ public class Window_BranchList : OrderWindowBase
         Rect bottomRect = new(innerX, innerRect.yMax - 25f, innerRect.width, 25f);
         reusedRect = bottomRect;
         reusedRect.width = 4f;
-        GUI.DrawTexture(reusedRect, branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
+        Widgets.DrawBoxSolid(reusedRect, branch.HonorDef?.color ?? Color.white);
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleLeft;

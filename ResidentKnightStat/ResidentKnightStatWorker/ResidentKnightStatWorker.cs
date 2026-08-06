@@ -13,7 +13,7 @@ public class ResidentKnightStatWorker(ResidentKnightStatDef statDef) : StatWorke
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     protected override float GetNewStatValue(ResidentKnightStatRequestData requestData, float? baseValueOverride)
     {
-        return requestData.GetStatValue(baseValueOverride);
+        return requestData.GetNewStatValue(baseValueOverride);
     }
 
     public override bool TransformModify(ResidentKnightStatRequestData requestData,

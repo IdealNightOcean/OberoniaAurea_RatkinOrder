@@ -306,7 +306,7 @@ public partial class Window_OrderStation
 
                 float honorAcademicProgress = AcademicHandler.GetAcademicLevel(HonorAcademicDef) / (float)HonorAcademicDef.MaxStageLevel;
                 reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
-                Widgets.FillableBar(reusedRect, honorAcademicProgress, honorDef.HonorColorTex);
+                //  Widgets.FillableBar(reusedRect, honorAcademicProgress, honorDef.HonorColorTex);
             }
 
             Text.Anchor = TextAnchor.MiddleCenter;

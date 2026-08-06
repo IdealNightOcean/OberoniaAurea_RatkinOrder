@@ -122,7 +122,7 @@ public partial class Window_BranchTask
 
             Rect reusedRect = topRect;
             reusedRect.xMax = topRect.xMin + 5f;
-            GUI.DrawTexture(reusedRect, Branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
+            Widgets.DrawBoxSolid(reusedRect, Branch.HonorDef?.color ?? Color.white);
 
             reusedRect = OARO_UIUtility.CenterRectOnY(topRect, innerRectX + 13f, 15f, 15f);
             OARO_UIUtility.DrawBranchIcon(reusedRect, Branch, expand: false);
@@ -319,7 +319,7 @@ public partial class Window_BranchTask
                 }
                 if (isActive)
                 {
-                    Widgets.DrawBox(entryRect, lineTexture: Branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
+                    OAFrame_Widgets.DrawBox(entryRect, Branch.HonorDef?.color ?? Color.white);
                 }
             }
 
@@ -347,7 +347,7 @@ public partial class Window_BranchTask
                 }
                 if (curRadicalismDegree == radicalismDegree)
                 {
-                    Widgets.DrawBox(entryRect, lineTexture: Branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
+                    OAFrame_Widgets.DrawBox(entryRect, Branch.HonorDef?.color ?? Color.white);
                 }
             }
 

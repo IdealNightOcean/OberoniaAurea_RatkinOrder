@@ -1055,7 +1055,7 @@ public class Window_Branch : OrderWindowBase
         Vector2 squadSummaryPos = new(inRect.xMin, inRect.yMin);
         SquadSummaryDrawer.SetDrawData(CachedBranchInfo);
         SquadSummaryDrawer.Draw(squadSummaryPos);
-        reusedRect = new(squadSummaryPos, SquadSummaryDrawer.DefaultSize);
+        reusedRect = new(squadSummaryPos, SquadSummaryDrawer.DrawSize);
         inRect.ContractedBy(2f);
 
         Text.Font = GameFont.Medium;

@@ -14,13 +14,13 @@ public class UIDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
 {
     public UIDrawer_KnightVirtue()
     {
-        DefaultSize = new(260f, 94f);
+        DrawSize = new(260f, 94f);
         OutlineThickness = 1;
     }
 
     public override void DrawInner(Vector2 position)
     {
-        Rect boxRect = new(position, DefaultSize);
+        Rect boxRect = new(position, DrawSize);
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.MediumDarkBackground);
 

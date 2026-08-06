@@ -11,7 +11,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 {
     public UIDataDrawer_SquadSummary()
     {
-        DefaultSize = new(392f, 90f);
+        DrawSize = new(392f, 90f);
         OutlineThickness = 2;
     }
 
@@ -50,7 +50,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         if (DrawDataValid && DrawData.Branch.HonorDef is not null)
         {
             BranchHonorDef honorDef = DrawData.Branch.HonorDef;
-            GUI.DrawTexture(honorColorRect, honorDef.HonorColorTex);
+            Widgets.DrawBoxSolid(honorColorRect, honorDef.color);
 
             Rect honorDecorationRect = RectUtils.ContractedBy(innerRect, 10f);
             GUI.DrawTexture(honorDecorationRect, honorDef.chivalry.medal.honorDecorationTexture.Texture, ScaleMode.ScaleToFit);

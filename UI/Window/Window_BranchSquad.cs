@@ -234,7 +234,7 @@ public class Window_BranchSquad : OrderWindowBase
         reusedRect = OARO_UIUtility.CenterRectOnY(upInnerRect, upInnerRect.x, 6f, 144f);
         if (selIsHonor)
         {
-            GUI.DrawTexture(reusedRect, honorDef.HonorColorTex);
+            Widgets.DrawBoxSolid(reusedRect, honorDef.color);
         }
 
         //上部左侧部分
@@ -857,8 +857,8 @@ public class Window_BranchSquad : OrderWindowBase
         int usedCount = Mathf.Max(7, squadCount);
         Rect entryRect;
 
-        float entryWidth = SquadSummaryDrawer.DefaultSize.x;
-        float entryHeight = SquadSummaryDrawer.DefaultSize.y;
+        float entryWidth = SquadSummaryDrawer.DrawSize.x;
+        float entryHeight = SquadSummaryDrawer.DrawSize.y;
         Text.Anchor = TextAnchor.MiddleCenter;
         for (int i = 0; i < squadCount; i++)
         {

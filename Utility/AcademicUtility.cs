@@ -37,9 +37,7 @@ public static class AcademicUtility
         StringBuilder explanationBuilder = resultOnly ? null : new(64);
 
         if (targetLevel < 1 || targetLevel <= sourceLevel)
-        {
-            return 0f;
-        }
+            return -1f;
 
         if (targetLevel > academicDef.MaxStageLevel)
         {
@@ -47,7 +45,7 @@ public static class AcademicUtility
             {
                 explanationBuilder.AppendLine("OARO_AlreadyAtMaxAcademicLevel".Translate());
             }
-            return float.PositiveInfinity;
+            return -1f;
         }
 
         float baseUnitCost = academicDef.academicType == KnightAcademicDef.AcademicType.Honor ? 500f : 250f;
@@ -113,6 +111,9 @@ public static class AcademicUtility
 
     public static AcceptanceReport CanActivateAcademicBySelf(ResidentKnight record, KnightAcademicDef academic, bool resultOnly)
     {
+        if (record is null || academic is null)
+            return false;
+
         Branch branch = record.Branch;
         if (branch is null)
             return false;

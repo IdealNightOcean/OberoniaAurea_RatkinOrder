@@ -689,7 +689,7 @@ public class Window_RatkinOrder : MainTabWindow
         float inRectX = inRect.x;
 
         Rect reusedRect = new(inRectX, inRect.y + 1f, 5f, inRect.height - 2f);
-        GUI.DrawTexture(reusedRect, branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
+        Widgets.DrawBoxSolid(reusedRect, branch.HonorDef?.color ?? Color.white);
 
         Text.Font = GameFont.Small;
         Text.Anchor = TextAnchor.MiddleLeft;
@@ -867,7 +867,7 @@ public class Window_RatkinOrder : MainTabWindow
         GUI.DrawTexture(inRect, rightUpFrame);
 
         Rect reusedRect = new(inRect.x, inRect.y + 2f, 2f, inRect.height - 4f);
-        GUI.DrawTexture(reusedRect, branch.HonorDef?.HonorColorTex ?? BaseContent.WhiteTex);
+        Widgets.DrawBoxSolid(reusedRect, branch.HonorDef?.color ?? Color.white);
 
         Rect innerRect = inRect.ContractedBy(2f);
         float innerRectX = innerRect.xMin;
