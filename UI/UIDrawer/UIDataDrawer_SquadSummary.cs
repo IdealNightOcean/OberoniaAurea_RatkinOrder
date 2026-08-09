@@ -47,7 +47,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 
         Rect branchIconRect = innerRect.LeftPart(0.45f);//标准大约为(100f, 86f)
 
-        if (DrawDataValid && DrawData.Branch.HonorDef is not null)
+        if (DrawData.IsDataValid && DrawData.Branch.HonorDef is not null)
         {
             BranchHonorDef honorDef = DrawData.Branch.HonorDef;
             Widgets.DrawBoxSolid(honorColorRect, honorDef.color);
@@ -73,7 +73,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         infoRect.xMin = branchIconRect.xMax;
 
         Rect squadNameRect = infoRect.TopPart(0.35f);
-        if (DrawDataValid)
+        if (DrawData.IsDataValid)
         {
             this.TextStyle = new(guiColor: DrawData.Branch.Color, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
             if (OAFrame_Widgets.DrawLabelEllipses(squadNameRect, DrawData.SquadName, this.TextStyle))
@@ -95,7 +95,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         Rect friendlyIconRect = GenUI.ContractedBy(friendlyRect.TopPart(0.7f), 4f);
 
         Rect friendlyStrRect = friendlyRect.BottomPart(0.3f);
-        if (DrawDataValid && DrawData.Branch.IsBranchOfType(BranchType.Friendly))
+        if (DrawData.IsDataValid && DrawData.Branch.IsBranchOfType(BranchType.Friendly))
         {
             GUI.DrawTexture(friendlyIconRect, OARO_IconLibrary.SmallFriendlyIcon, ScaleMode.ScaleToFit);
             this.TextStyle = new(guiColor: Color.green, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
@@ -114,7 +114,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
 
         Rect workStateStrRect = workStateRect.BottomPart(0.3f);
         string workState;
-        if (DrawDataValid)
+        if (DrawData.IsDataValid)
         {
             workState = DrawData.Branch.CurWorkStateDesc;
             this.TextStyle = new(guiColor: DrawData.Branch.CurWorkState == WorkStateType.Idle ? Color.white : Color.green,

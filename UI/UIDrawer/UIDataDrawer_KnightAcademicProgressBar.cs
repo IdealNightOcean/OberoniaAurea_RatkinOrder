@@ -1,123 +1,72 @@
-﻿using OberoniaAurea_Frame.UI;
-using System;
-using System.Collections.Generic;
+﻿using NightOcean.Utility;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-
-public class UIDataDrawer_KnightAcademicProgressBar : UIDataDrawerBase<UIData_KnightAcademic>
+public class UIDataDrawer_KnightAcademicProgressBar : UIDataDrawerBase<UIData_KnightAcademicWithStage>
 {
-    private int SelectedStage { get; set; } = -1;
+    private int SelectedStageLevel => (AcademicStagesListDrawer?.SelectedIndex ?? -1) + 1;
+
+    private UIDataDrawer_KnightAcademicProgressBar_Stage StageDrawer { get; } = new();
+    private UIDataDrawer_SelectableList_KnightAcademicStage AcademicStagesListDrawer { get; }
+
+
+    private bool AcademicStageDrawerDatasInited { get; set; }
 
     public UIDataDrawer_KnightAcademicProgressBar()
     {
         DrawSize = new Vector2(968f, 198f);
+        OutlineThickness = 2;
+
+        this.AcademicStagesListDrawer = new(drawer: StageDrawer, drawDatas: [], parentAcademicData: null, rowLimit: 1, columnLimit: 4);
+    }
+
+    public override void SetDrawData(UIData_KnightAcademicWithStage drawData)
+    {
+        base.SetDrawData(drawData);
+        AcademicStageDrawerDatasInited = false;
+    }
+
+    private void InitAcademicStageDrawerDatas(Rect drawRect)
+    {
+        AcademicStagesListDrawer.SetDrawDatas(DrawData.StagesDatas);
+        AcademicStagesListDrawer.SetParentAcademicData(DrawData);
+        AcademicStagesListDrawer.SetDrawSize(drawRect.size);
+        AcademicStageDrawerDatasInited = true;
     }
 
     public override void DrawInner(Vector2 position)
     {
-        throw new NotImplementedException();
+        Rect boxRect = new(position, DrawSize);
+        Widgets.DrawBox(boxRect);
+
+        Rect innerRect = GenUI.ContractedBy(boxRect, OutlineThickness);
+
+        Rect topRect = innerRect.TopHalf();
+        Rect bottomRect = innerRect.BottomHalf();
+
+        Rect labelRect = topRect.TopPart(1f / 3f);
+
+        float stagesRectHeight = topRect.height * (2f / 3f);
+        StageDrawer.SetDrawSizeByHeight(stagesRectHeight - 2f - 20f);
+        Rect stagesRect = new(0f, topRect.yMax - stagesRectHeight, topRect.width * 0.92f, stagesRectHeight);
+        stagesRect = GenUI.CenteredOnXIn(stagesRect, topRect);
+        DrawStages(stagesRect);
+
     }
-}
 
-
-
-public class UIDataDrawer_SelectableList_KnightAcademicStage : UIDataDrawer_SelectableList<UIData_KnightAcademicStage>
-{
-    private UIData_KnightAcademic ParentAcademicData { get; }
-    private int SelectedStage { get; set; } = -1;
-
-
-    public UIDataDrawer_SelectableList_KnightAcademicStage(UIDataDrawerBase<UIData_KnightAcademicStage> drawer, IList<UIData_KnightAcademicStage> drawDatas, UIData_KnightAcademic parentAcademicData, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false) : base(drawer, drawDatas, rowLimit, columnLimit, horizontalWarp)
+    private void DrawStages(Rect inRect)
     {
-        ParentAcademicData = parentAcademicData;
+        Widgets.DrawBox(inRect);
+        Rect innerRect = GenUI.ContractedBy(inRect, 1);
+
+        if (!AcademicStageDrawerDatasInited)
+        {
+            InitAcademicStageDrawerDatas(inRect);
+        }
+
+        AcademicStagesListDrawer.Draw(innerRect.TopLeftCorner());
     }
 
-
-    protected override void DrawEntry(Rect inRect, int dataIndex)
-    {
-        UIData_KnightAcademicStage drawData = DrawDatas[dataIndex];
-        if (drawData is null || !drawData.IsValid)
-            return;
-
-        bool isActiveStage = drawData.StageLevel <= ParentAcademicData.StageLevel;
-        Color labelColor = isActiveStage ? Color.white : Color.gray;
-
-        Rect innerRect = inRect;
-        innerRect.xMax -= 2f;
-        float innerX = innerRect.xMin;
-        float innerY = innerRect.yMin;
-        float innerWidth = innerRect.width;
-
-        Rect reusedRect;
-
-        if (drawData.StageLevel < drawData.Academic.MaxStageLevel)
-        {
-            reusedRect = inRect;
-            reusedRect.xMin = reusedRect.xMax - 2f;
-            reusedRect.yMin += 4f;
-            reusedRect.yMax -= 4f;
-            // GUI.DrawTexture(reusedRect, academicCuttingLine);
-        }
-
-        Text.Font = GameFont.Small;
-        Text.Anchor = TextAnchor.MiddleCenter;
-        reusedRect = new(innerX, innerY + 32f, innerWidth, 20f);
-        this.TextStyle = new(guiColor: labelColor, font: GameFont.Small, anchor: TextAnchor.MiddleCenter);
-        OAFrame_Widgets.DrawLabel(reusedRect, drawData.Stage.label.CapitalizeFirst(), this.TextStyle);
-
-        Text.Anchor = TextAnchor.UpperCenter;
-        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 65f, 190f, 45f);
-        this.TextStyle = new(guiColor: labelColor, font: GameFont.Small, anchor: TextAnchor.UpperCenter);
-        OAFrame_Widgets.DrawLabel(reusedRect, drawData.Stage.shortDescription.CapitalizeFirst(), this.TextStyle);
-
-        reusedRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 120f, 30f, 25f);
-
-        Rect selectBoxRect = OARO_UIUtility.CenterRectOnX(innerRect, innerY + 155f, 20f, 20f);
-
-        reusedRect = GenUI.ContractedBy(selectBoxRect, 2f);
-        GUI.DrawTexture(reusedRect, BaseContent.BlackTex);
-        Rect selectBoxActiveRect = GenUI.ContractedBy(reusedRect, 2f);
-        if (isActiveStage)
-        {
-            Widgets.DrawBoxSolid(selectBoxActiveRect, ParentAcademicData.Color);
-        }
-
-        if (drawData.StageLevel > 1)
-        {
-            Rect leftLineRect = new(inRect.xMin, OARO_UIUtility.CenterMinCoords(selectBoxActiveRect.yMin, selectBoxActiveRect.height, 6f), selectBoxActiveRect.xMin - inRect.xMin, 6f);
-            GUI.DrawTexture(leftLineRect, BaseContent.BlackTex);
-            if (isActiveStage)
-            {
-                leftLineRect.yMin += 2f;
-                leftLineRect.yMax -= 2f;
-                Widgets.DrawBoxSolid(leftLineRect, ParentAcademicData.Color);
-            }
-        }
-
-        if (drawData.StageLevel < drawData.Academic.MaxStageLevel)
-        {
-            Rect rightLineRect = new(selectBoxActiveRect.xMax, OARO_UIUtility.CenterMinCoords(selectBoxActiveRect.yMin, selectBoxActiveRect.height, 6f), inRect.xMax - selectBoxActiveRect.xMax, 6f);
-            GUI.DrawTexture(rightLineRect, BaseContent.BlackTex);
-            if (drawData.StageLevel < ParentAcademicData.StageLevel)
-            {
-                rightLineRect.yMin += 2f;
-                rightLineRect.yMax -= 2f;
-                Widgets.DrawBoxSolid(rightLineRect, ParentAcademicData.Color);
-            }
-        }
-
-        if (Widgets.ButtonInvisible(inRect))
-            SelectItem(dataIndex);
-
-        if (SelectedIndex == dataIndex)
-        {
-            Widgets.DrawBox(inRect);
-            Widgets.DrawHighlightSelected(inRect);
-        }
-        else if (Mouse.IsOver(inRect))
-            Widgets.DrawHighlight(inRect);
-    }
 }

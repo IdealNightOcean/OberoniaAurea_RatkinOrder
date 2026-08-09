@@ -10,5 +10,43 @@ public abstract class UIDrawerBase : IUIDrawer
 
     public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;
 
-    public void SetDrawSize(Vector2 size) => DrawSize = size;
+    /// <summary>
+    /// 设置绘制尺寸
+    /// </summary>
+    public void SetDrawSize(Vector2 size)
+    {
+        if (size.x > 1e-6f && size.y > 1e-6f)
+            DrawSize = size;
+    }
+
+    /// <summary>
+    /// 固定宽度，按原始宽高比自动计算高度
+    /// </summary>
+    public void SetDrawSizeByWidth(float width)
+    {
+        if (DrawSize.x < 1e-6f || width < 1e-6f)
+            return;
+
+        DrawSize = new Vector2(width, DrawSize.y * width / DrawSize.x);
+    }
+
+    /// <summary>
+    /// 固定高度，按原始宽高比自动计算宽度
+    /// </summary>
+    public void SetDrawSizeByHeight(float height)
+    {
+        if (DrawSize.x < 1e-6f || height < 1e-6f)
+            return;
+
+        DrawSize = new Vector2(DrawSize.x * height / DrawSize.y, height);
+    }
+
+    /// <summary>
+    /// 按缩放系数整体缩放DrawSize
+    /// </summary>
+    public void ScaleDrawSize(float scaleFactor)
+    {
+        if (scaleFactor > 1e-6f)
+            DrawSize *= scaleFactor;
+    }
 }

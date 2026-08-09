@@ -3,6 +3,7 @@ using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame.DataLibrary;
+using OberoniaAurea_Frame.UI;
 using RimWorld;
 using System.Collections.Generic;
 using System.Linq;
@@ -306,7 +307,7 @@ public partial class Window_OrderStation
 
                 float honorAcademicProgress = AcademicHandler.GetAcademicLevel(HonorAcademicDef) / (float)HonorAcademicDef.MaxStageLevel;
                 reusedRect = new(inRectX + 260, inRectY + 226f, 128f, 22f);
-                //  Widgets.FillableBar(reusedRect, honorAcademicProgress, honorDef.HonorColorTex);
+                OAFrame_Widgets.FillableBar(reusedRect, honorAcademicProgress, honorDef.color);
             }
 
             Text.Anchor = TextAnchor.MiddleCenter;

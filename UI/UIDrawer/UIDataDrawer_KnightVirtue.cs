@@ -10,9 +10,9 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
+public class UIDataDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
 {
-    public UIDrawer_KnightVirtue()
+    public UIDataDrawer_KnightVirtue()
     {
         DrawSize = new(260f, 94f);
         OutlineThickness = 1;

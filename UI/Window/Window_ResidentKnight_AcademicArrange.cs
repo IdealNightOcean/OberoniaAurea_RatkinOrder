@@ -15,7 +15,6 @@ using static KnightAcademicDef;
 
 public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 {
-
     public override Vector2 InitialSize => new(1402f, 789f);
     private Vector2 scrollPosition_Academic;
     private Vector2 scrollPosition_AcademicStage;
@@ -42,7 +41,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     /*
      * 新字段
      */
-    private UIDataDrawer_SelectableList<UIData_KnightAcademic> AcademicListDrawer { get; }
+    private UIDataDrawer_SelectableList<UIData_KnightAcademic, UIDataDrawer_KnightAcademic> AcademicListDrawer { get; }
     private UIDataDrawer_KnightAcademic AcademicEntryDrawer { get; } = new();
     private List<UIData_KnightAcademic> AvailableAcademics { get; } = [];
 
@@ -74,7 +73,6 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
                 AvailableAcademics.Add(new UIData_KnightAcademic(this.Knight, academicDef));
             }
         }
-
 
         UIDataDrawer_KnightAcademic academicEntryDrawer = new();
         AcademicListDrawer = new(academicEntryDrawer, AvailableAcademics, rowLimit: 5, columnLimit: 1, horizontalWarp: true);

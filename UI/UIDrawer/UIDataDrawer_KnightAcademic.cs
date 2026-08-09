@@ -40,11 +40,11 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         Rect labelRect = inRect.LeftPart(0.9f);
 
         this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleLeft);
-        OAFrame_Widgets.DrawLabel(labelRect, DrawDataValid ? DrawData.Academic.LabelCap : "---", this.TextStyle);
+        OAFrame_Widgets.DrawLabel(labelRect, DrawData.IsDataValid ? DrawData.Academic.LabelCap : "---", this.TextStyle);
 
         Rect levelRect = inRect.RightPart(0.9f);
         this.TextStyle = new(GameFont.Medium, TextAnchor.MiddleRight);
-        if (DrawDataValid)
+        if (DrawData.IsDataValid)
             OAFrame_Widgets.DrawLabel(levelRect, $"{DrawData.StageLevel}/{DrawData.Academic.MaxStageLevel}", this.TextStyle);
         else
             OAFrame_Widgets.DrawLabel(levelRect, "0/0", this.TextStyle);
@@ -56,7 +56,7 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         this.TextStyle = new(guiColor: DrawData.CostFactor > 1f ? ColorLibrary.RedReadable : Color.green,
                              font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
         OAFrame_Widgets.DrawLabel(factorRect, DrawData.CostFactor.ToStringPercent("0.##"), this.TextStyle);
-        if (DrawDataValid)
+        if (DrawData.IsDataValid)
             TooltipHandler.TipRegion(factorRect, () => DrawData.CostFactorExplanation.Value, uniqueId: 876465514);
 
         Rect levelStarGroupRect = inRect.CenterSegmentOnY((1f / 3f));
@@ -67,8 +67,8 @@ public class UIDataDrawer_KnightAcademic : UIDataDrawerBase<UIData_KnightAcademi
         OARO_UIUtility.DrawStarGroup(outRect: levelStarGroupRect,
                                      starSize: new(starSize, starSize),
                                      interval: 3f,
-                                     totalStarNum: DrawDataValid ? DrawData.Academic.MaxStageLevel : 0,
-                                     activeStarNum: DrawDataValid ? DrawData.StageLevel : 0,
+                                     totalStarNum: DrawData.IsDataValid ? DrawData.Academic.MaxStageLevel : 0,
+                                     activeStarNum: DrawData.IsDataValid ? DrawData.StageLevel : 0,
                                      scrollPosition: ref scrollPosition_LevelStar);
     }
 }

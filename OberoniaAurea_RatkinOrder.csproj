@@ -335,12 +335,16 @@
     <Compile Include="Thought\ThoughtWorker_ResidentKnight_OrderFund.cs" />
     <Compile Include="Thought\Thought_Situational_Virtue.cs" />
     <Compile Include="UI\UIData\IUIData.cs" />
+    <Compile Include="UI\UIData\UIDataState.cs" />
     <Compile Include="UI\UIData\UIData_BranchSummary.cs" />
     <Compile Include="UI\UIData\UIData_KnightAcademicStage.cs" />
+    <Compile Include="UI\UIData\UIData_KnightAcademicWithStage.cs" />
     <Compile Include="UI\UIData\UIData_KnightVirtue.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_KnightAcademicProgressBar.cs" />
+    <Compile Include="UI\UIDrawer\UIDataDrawer_KnightAcademicProgressBar_Stage.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_MentorshipStudent.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_SelectableList.cs" />
+    <Compile Include="UI\UIDrawer\UIDataDrawer_SelectableList_KnightAcademicStage.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_SquadSummary.cs" />
     <Compile Include="UI\UIDrawer\UIDrawerBase.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_KnightVirtueProgressBar.cs" />
@@ -358,7 +362,7 @@
     <Compile Include="Utility\KnightVirtueUtility.cs" />
     <Compile Include="UI\UIDrawer\BranchTaskEntryDrawer.cs" />
     <Compile Include="UI\Dialog_BranchTrade.cs" />
-    <Compile Include="UI\UIDrawer\UIDrawer_KnightVirtue.cs" />
+    <Compile Include="UI\UIDrawer\UIDataDrawer_KnightVirtue.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_KnightAcademic.cs" />
     <Compile Include="UI\UIData\UIDataBase.cs" />
     <Compile Include="UI\UIData\UIData_KnightAcademic.cs" />

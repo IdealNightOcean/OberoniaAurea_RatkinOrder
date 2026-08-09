@@ -23,7 +23,7 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
 
         Rect portraitRect = new(0f, 0f, innerBoxRect.width * 0.25f, innerBoxRect.height * 0.7f);
         portraitRect = portraitRect.MoveTo(innerBoxRect.TopLeftCorner());
-        if (DrawDataValid)
+        if (DrawData.IsDataValid)
             GUI.DrawTexture(position: portraitRect, image: PortraitsCache.Get(DrawData.Student.Pawn, portraitRect.size, Rot4.South));
         else
             throw new NotImplementedException();
@@ -33,11 +33,11 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
         OAFrame_Widgets.DrawLabel(
             rect: nameRect,
-            label: DrawDataValid ? DrawData.Student.Pawn.NameShortColored : "OARO_MentorshipStudent_UnkownStudent".Translate(),
+            label: DrawData.IsDataValid ? DrawData.Student.Pawn.NameShortColored : "OARO_MentorshipStudent_UnkownStudent".Translate(),
             textStyle: this.TextStyle);
 
         Rect relationRect = nameRect.MoveTo(nameRect.xMax, nameRect.yMin);
-        if (DrawDataValid)
+        if (DrawData.IsDataValid)
         {
             this.TextStyle = new(guiColor: DrawData.RelationBetweenEach.s2t > 0 ? Color.green : ColorLibrary.RedReadable,
                                  font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
@@ -57,7 +57,7 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         Rect taughtableCountRect = infoRect.TopHalf();
         Rect dailyTutoringSuccessChanceRect = infoRect.TopHalf();
         this.TextStyle = new(GameFont.Medium, anchor: TextAnchor.MiddleLeft);
-        if (DrawDataValid)
+        if (DrawData.IsDataValid)
         {
             OAFrame_Widgets.DrawLabel(
                 rect: taughtableCountRect,

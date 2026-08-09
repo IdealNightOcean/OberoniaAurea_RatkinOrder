@@ -21,9 +21,12 @@ public class UIData_SquadInfo : UIData_BranchSummary
         MemberRecoveryRateExplanation = new(refreshFunc: RefreshMemberRecoveryRateExplanation);
     }
 
-    protected override void RefreshInner()
+    protected override UIDataState RefreshInner()
     {
-        base.RefreshInner();
+        UIDataState dataState = base.RefreshInner();
+        if (dataState != UIDataState.Ready)
+            return dataState;
+
         if (this.Branch.IsBranchOfType(BranchType.Friendly))
         {
             FriendlyProcess = Mathf.Clamp01(this.Branch.FriendlyDaysLeft / (float)BranchUtility.GetDefaultFriendlyDurationDays(this.Branch));
@@ -32,6 +35,8 @@ public class UIData_SquadInfo : UIData_BranchSummary
 
         MemberRecoveryRate = this.Branch.GetStatValue(BranchStatDefOf.OARO_SquadMemberRecoveryRate, immediateUpdate: true);
         MemberRecoveryRateExplanation.MarkDirty();
+
+        return UIDataState.Ready;
     }
 
     private string RefreshMemberRecoveryRateExplanation()

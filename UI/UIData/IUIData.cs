@@ -2,8 +2,8 @@
 
 public interface IUIData
 {
-    bool IsReady { get; }
-    bool IsValid { get; }
+    UIDataState DataState { get; }
+    bool CanDraw { get; }
 
     void MarkDirty();
     void Refresh();

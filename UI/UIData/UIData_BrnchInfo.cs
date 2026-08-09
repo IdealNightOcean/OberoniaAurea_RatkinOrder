@@ -35,14 +35,19 @@ public class UIData_BrnchInfo : UIData_BranchSummary
         DailyPopulationGrowthExplanation = new(refreshFunc: GetDailyPopulationGrowthExplanation);
     }
 
-    protected override void RefreshInner()
+    protected override UIDataState RefreshInner()
     {
-        base.RefreshInner();
+        UIDataState dataState = base.RefreshInner();
+        if (dataState != UIDataState.Ready)
+            return dataState;
+
         PopulationCeiling = (int)this.Branch.GetStatValue(BranchStatDefOf.OARO_NaturalPopulationCeiling, immediateUpdate: true);
         BuildingCeiling = (int)this.Branch.GetStatValue(BranchStatDefOf.OARO_BuildingCeiling, immediateUpdate: true);
         DailyPopulationGrowth = (int)this.Branch.GetStatValue(BranchStatDefOf.OARO_DailyPopulationGrowth, immediateUpdate: true);
 
         DailyPopulationGrowthExplanation.MarkDirty();
+
+        return UIDataState.Ready;
     }
 
     private string GetDailyPopulationGrowthExplanation()

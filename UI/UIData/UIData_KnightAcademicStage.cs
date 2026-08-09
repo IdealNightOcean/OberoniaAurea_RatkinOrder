@@ -8,16 +8,21 @@ public class UIData_KnightAcademicStage : UIDataBase
     public int StageLevel { get; private set; }
     public ResidentKnightAcademicStage Stage { get; private set; }
 
-    public override bool IsValid => Academic is not null && StageLevel >= 0;
-
     public UIData_KnightAcademicStage(KnightAcademicDef academic, int stageLevel)
     {
         Academic = academic;
-        StageLevel = Mathf.Clamp(stageLevel, 0, Academic.MaxStageLevel);
+        if (academic is not null)
+            StageLevel = Mathf.Clamp(stageLevel, 0, Academic.MaxStageLevel);
     }
 
-    protected override void RefreshInner()
+    protected override UIDataState RefreshInner()
     {
+        if (Academic is null)
+            return UIDataState.Empty;
+
         Stage = Academic.GetStage(StageLevel);
+
+        StageLevel = Mathf.Clamp(StageLevel, 0, Academic.MaxStageLevel);
+        return UIDataState.Ready;
     }
 }

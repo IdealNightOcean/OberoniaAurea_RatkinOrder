@@ -8,7 +8,6 @@ public class UIData_BranchSummary : UIDataBase
 {
     public Branch Branch { get; protected set; }
     public Map Map { get; protected set; }
-    public override bool IsValid => Branch is not null && Map is not null;
 
     public BranchSquad Squad { get; protected set; }
     public string SquadName => Squad?.Name ?? KeyLibrary_Misc.ErrorTipWithColor;
@@ -35,17 +34,22 @@ public class UIData_BranchSummary : UIDataBase
         this.Branch = branch;
         this.Map = map;
         this.Squad = branch?.Squad;
-        IsReady = false;
+        MarkDirty();
     }
 
-    protected override void RefreshInner()
+    protected override UIDataState RefreshInner()
     {
+        if (this.Branch is null || this.Map is null)
+            return UIDataState.Empty;
+
         BaseSiteName = BranchUtility.GetBranchSiteName(this.Branch);
 
         Distance = this.Branch.DistanceTo(Map.Tile);
         AffectedRange = this.Branch.GetStatValue(BranchStatDefOf.OARO_AffectRadius);
         MemberCeiling = (int)this.Squad.MemberCeiling;
         CommanderCeiling = (int)this.Squad.CommanderCeiling;
+
+        return UIDataState.Ready;
     }
 
 }

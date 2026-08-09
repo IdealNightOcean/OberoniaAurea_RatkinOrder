@@ -10,9 +10,7 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDrawer_KnightVirtueTable : IUIDrawer
 {
-    protected Vector2? sizeOverride;
-    public Vector2 DefaultSize => new(915f + 18f, 558f);
-    public Vector2 DrawSize => sizeOverride ?? DefaultSize;
+    public Vector2 DrawSize { get; protected set; } = new(915f + 18f, 558f);
     public int OutlineThickness => 0;
 
     public TextStyle TextStyle { get; set; } = TextStyle.DefaultStyle;
@@ -24,7 +22,7 @@ public class UIDrawer_KnightVirtueTable : IUIDrawer
     public ResidentKnight Knight { get; }
     public HashSet<KnightVirtueDef> ActivedVirtues { get; } = [];
 
-    public void SetDrawSize(Vector2 size) => sizeOverride = size;
+    public void SetDrawSize(Vector2 size) => DrawSize = size;
 
     public UIDrawer_KnightVirtueTable() { }
     public UIDrawer_KnightVirtueTable(ResidentKnight knight)

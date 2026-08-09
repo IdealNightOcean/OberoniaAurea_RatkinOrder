@@ -8,7 +8,6 @@ public class UIData_MentorshipStudent : UIDataBase
 {
     public ResidentKnight Teacher { get; private set; }
     public ResidentPawn Student { get; private set; }
-    public override bool IsValid => Student is not null && Teacher is not null;
 
     public (int s2t, int t2s) RelationBetweenEach { get; private set; } = (0, 0);
 
@@ -34,21 +33,26 @@ public class UIData_MentorshipStudent : UIDataBase
         this.Teacher = teacher;
         this.Student = student;
 
-        IsReady = false;
+        MarkDirty();
     }
 
-    protected override void RefreshInner()
+    protected override UIDataState RefreshInner()
     {
+        if (Student is null || Teacher is null)
+            return UIDataState.Empty;
+
         TaughtableAcademics.Clear();
         TaughtableAcademics.AddRange(AcademicUtility.GetHigherAcademicsThanB(Teacher, Student));
         DailyTutoringSuccessChance = AcademicUtility.GetDailyTutoringSuccessChance(Teacher, Student.Pawn, resultOnly: true, out _);
         DailyTutoringSuccessChanceExplanation.MarkDirty();
         RelationBetweenEach = (Student.Pawn.relations.OpinionOf(Teacher.Pawn), Teacher.Pawn.relations.OpinionOf(Student.Pawn));
+
+        return UIDataState.Ready;
     }
 
     private string RefreshDailyTutoringSuccessChanceExplanation()
     {
-        if (!IsValid)
+        if (!IsDataValid)
             return string.Empty;
 
         DailyTutoringSuccessChance = AcademicUtility.GetDailyTutoringSuccessChance(Teacher, Student.Pawn, resultOnly: false, out string dailyTutoringSuccessChanceExplanation);

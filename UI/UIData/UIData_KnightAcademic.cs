@@ -10,7 +10,6 @@ public class UIData_KnightAcademic : UIDataBase
 {
     public ResidentKnight Knight { get; }
     public KnightAcademicDef Academic { get; }
-    public override bool IsValid => Knight is not null && Academic is not null;
 
     public Color Color { get; private set; }
 
@@ -25,7 +24,7 @@ public class UIData_KnightAcademic : UIDataBase
     {
         get
         {
-            if (!IsValid)
+            if (!IsDataValid)
                 return 1f;
             if (!costFactor.HasValue)
             {
@@ -44,7 +43,7 @@ public class UIData_KnightAcademic : UIDataBase
     {
         get
         {
-            if (!IsValid && !CanActiveBySelf)
+            if (!IsDataValid && !CanActiveBySelf)
                 return -1f;
 
             if (!upgradePointsCost.HasValue)
@@ -70,8 +69,11 @@ public class UIData_KnightAcademic : UIDataBase
         UpgradePointsCostExplanation = new(refreshFunc: RefreshUpgradePointsCostExplanation);
     }
 
-    protected override void RefreshInner()
+    protected override UIDataState RefreshInner()
     {
+        if (Knight is null && Academic is null)
+            return UIDataState.Empty;
+
         Color = Knight?.Branch?.HonorDef?.color ?? Academic?.chivalry?.color ?? Color.white;
         StageLevel = this.Knight.AcademicHandler.GetAcademicLevel(Academic);
         Stage = Academic.GetStage(StageLevel);
@@ -82,12 +84,14 @@ public class UIData_KnightAcademic : UIDataBase
 
         upgradePointsCost = null;
         UpgradePointsCostExplanation.MarkDirty();
+
+        return UIDataState.Ready;
     }
 
 
     private string RefreshCostFactorExplanation()
     {
-        if (!IsValid)
+        if (!IsDataValid)
             return string.Empty;
 
         ResidentKnightStatRequestData_Academic requestData = new(this.Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
@@ -101,7 +105,7 @@ public class UIData_KnightAcademic : UIDataBase
 
     private string RefreshUpgradePointsCostExplanation()
     {
-        if (!IsValid)
+        if (!IsDataValid)
             return string.Empty;
 
         upgradePointsCost = AcademicUtility.GetAcademicPointsCost(residentPawn: Knight,

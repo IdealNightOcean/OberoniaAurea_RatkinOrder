@@ -6,10 +6,10 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
+public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData where U : UIDataDrawerBase<T>
 {
     private const float ScrollBarThickness = 16f;
-    public UIDataDrawerBase<T> Drawer { get; set; }
+    public U Drawer { get; protected set; }
     public IList<T> DrawDatas { get; protected set; }
     public int SelectedIndex { get; protected set; } = -1;
     public bool HasSelectedItem => SelectedIndex >= 0 && SelectedIndex < DrawDatas.Count;
@@ -32,7 +32,7 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
 
     protected Vector2 scrollPosition = Vector2.zero;
 
-    public UIDataDrawer_SelectableList(UIDataDrawerBase<T> drawer, IList<T> drawDatas, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
+    public UIDataDrawer_SelectableList(U drawer, IList<T> drawDatas, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
     {
         Drawer = drawer;
         DrawDatas = drawDatas;
@@ -41,10 +41,21 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
         HorizontalWarp = horizontalWarp;
     }
 
-    public void SetDrawDatas(IList<T> drawDatas)
+    public virtual void SetDrawer(U drawer)
+    {
+        Drawer = drawer;
+        ResetSelection();
+    }
+
+    public virtual void SetDrawDatas(IList<T> drawDatas)
     {
         DrawDatas = drawDatas;
-        SelectedIndex = -1;
+        ResetSelection();
+    }
+
+    public virtual void ResetSelection()
+    {
+        SelectItem(-1);
     }
 
     public void SetScorllLimit(int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
@@ -56,7 +67,7 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
 
     public virtual void SelectItem(int index)
     {
-        if (index >= 0 && index < DrawDatas.Count)
+        if (index >= 0 && DrawDatas is not null && index < DrawDatas.Count)
         {
             SelectedIndex = SelectedIndex == index ? -1 : index;
         }
@@ -134,8 +145,8 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
             totalCols = Mathf.CeilToInt((float)totalCount / totalRows);
         }
 
-        float totalWidth = totalCols * stepX + outlineThickness;
-        float totalHeight = totalRows * stepY + outlineThickness;
+        float totalWidth = Mathf.Max(1e-6f, totalCols * stepX + outlineThickness);
+        float totalHeight = Mathf.Max(1e-6f, totalRows * stepY + outlineThickness);
 
         return new Rect(0f, 0f, totalWidth, totalHeight);
     }
@@ -216,7 +227,7 @@ public class UIDataDrawer_SelectableList<T> : UIDrawerBase where T : IUIData
         if (Widgets.ButtonInvisible(inRect))
             SelectItem(dataIndex);
 
-        if (SelectedIndex == dataIndex)
+        if (dataIndex == SelectedIndex)
         {
             Widgets.DrawBox(inRect);
             Widgets.DrawHighlightSelected(inRect);

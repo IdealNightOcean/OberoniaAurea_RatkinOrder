@@ -31,7 +31,7 @@ public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_Knig
         traitBarRect.xMin = virtueSummaryRect.xMax;
 
         float traitItemRectWidth = traitBarRect.width * (1f / 3f) - 0.1f;
-        int traitItemCount = DrawDataValid ? DrawData.VirtueDef.MaxLevel : 3;
+        int traitItemCount = DrawData.IsDataValid ? DrawData.VirtueDef.MaxLevel : 3;
 
         Rect traitBarViewRect = traitBarRect;
         traitBarViewRect.width = traitItemCount * traitItemRectWidth;
@@ -54,8 +54,8 @@ public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_Knig
         Rect topRect = innerRect.TopPart(0.55f);
         Rect labelRect = topRect.CenterSegmentOnX(0.8f);
         this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleRight);
-        OAFrame_Widgets.DrawLabel(labelRect, DrawDataValid ? DrawData.VirtueDef.LabelCap : "OARO_KnightVirtue_Unkown".Translate(), this.TextStyle);
-        if (DrawDataValid)
+        OAFrame_Widgets.DrawLabel(labelRect, DrawData.IsDataValid ? DrawData.VirtueDef.LabelCap : "OARO_KnightVirtue_Unkown".Translate(), this.TextStyle);
+        if (DrawData.IsDataValid)
         {
             this.TextStyle = new(font: GameFont.Small, anchor: TextAnchor.UpperLeft);
             OAFrame_Widgets.DrawLabel(labelRect, RomanNumeralHelper.ToRoman(DrawData.Virtue.Level), TextStyle);
@@ -71,8 +71,8 @@ public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_Knig
         OARO_UIUtility.DrawStarGroup(outRect: starGroupRect,
                                      starSize: new(starSize, starSize),
                                      interval: 2f,
-                                     totalStarNum: DrawDataValid ? DrawData.VirtueDef.MaxLevel : 0,
-                                     activeStarNum: DrawDataValid ? DrawData.Virtue.Level : 0,
+                                     totalStarNum: DrawData.IsDataValid ? DrawData.VirtueDef.MaxLevel : 0,
+                                     activeStarNum: DrawData.IsDataValid ? DrawData.Virtue.Level : 0,
                                      scrollPosition: ref scrollPosition_StarGroup);
     }
 
@@ -82,7 +82,7 @@ public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_Knig
         OAFrame_Widgets.DrawLineHorizontal(horizontalLineRect.TopRightCorner(), horizontalLineRect.width, OARO_ColorLibrary.DeepInactive, thickness: 2);
         OAFrame_Widgets.DrawLineHorizontal(new(horizontalLineRect.xMin, horizontalLineRect.yMax - 2f), horizontalLineRect.width, OARO_ColorLibrary.DeepInactive, thickness: 2);
 
-        bool hasUnlocked = DrawDataValid && level <= DrawData.Virtue.Level;
+        bool hasUnlocked = DrawData.IsDataValid && level <= DrawData.Virtue.Level;
         Color traitColor = hasUnlocked ? DrawData.VirtueDef.chivalry.color : Color.black;
 
         Rect horizontalLineInnerRect = GenUI.ContractedBy(horizontalLineRect, 2f);
@@ -103,7 +103,7 @@ public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_Knig
             GUI.DrawTexture(traitIconRect, OARO_IconLibrary.Placeholer, ScaleMode.ScaleToFit);
             TooltipHandler.TipRegion(traitIconInnerBoxRect, () => DrawData?.Virtue?.GetTraitOfLevel(level)?.description ?? KeyLibrary_Misc.ErrorTipWithColor, uniqueId: 324257570);
         }
-        else if (DrawDataValid && level == DrawData.Virtue.Level + 1)
+        else if (DrawData.IsDataValid && level == DrawData.Virtue.Level + 1)
         {
             GUI.DrawTexture(traitIconRect, OARO_IconLibrary.PlusSign, ScaleMode.ScaleToFit);
 

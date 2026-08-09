@@ -6,9 +6,9 @@ namespace OberoniaAurea.RatkinOrder.UI;
 public abstract class UIDataDrawerBase<T> : UIDrawerBase where T : IUIData
 {
     protected T DrawData { get; private set; }
-    protected bool DrawDataValid { get; private set; }
 
-    public void SetDrawData(T drawData) => this.DrawData = drawData;
+
+    public virtual void SetDrawData(T drawData) => this.DrawData = drawData;
 
     public void Draw(Vector2 position)
     {
@@ -18,9 +18,12 @@ public abstract class UIDataDrawerBase<T> : UIDrawerBase where T : IUIData
             return;
         }
 
-        this.DrawData.Refresh();
-        DrawDataValid = this.DrawData.IsValid;
-        DrawInner(position);
+        if (this.DrawData.DataState == UIDataState.Dirty)
+            this.DrawData.Refresh();
+
+        if (this.DrawData.CanDraw)
+            DrawInner(position);
+
         OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
