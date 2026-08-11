@@ -4,39 +4,45 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIDataDrawer_KnightAcademicProgressBar : UIDataDrawerBase<UIData_KnightAcademicWithStage>
+public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_KnightAcademicWithStage>
 {
-    private int SelectedStageLevel => (AcademicStagesListDrawer?.SelectedIndex ?? -1) + 1;
+    private int SelectedStageIndex => AcademicStagesListDrawer.SelectedIndex;
 
-    private UIDataDrawer_KnightAcademicProgressBar_Stage StageDrawer { get; } = new();
+    private UIDataDrawer_KnightAcademicProgressBar_Stage StageDrawer { get; }
     private UIDataDrawer_SelectableList_KnightAcademicStage AcademicStagesListDrawer { get; }
 
 
     private bool AcademicStageDrawerDatasInited { get; set; }
 
-    public UIDataDrawer_KnightAcademicProgressBar()
+    public UIDataDrawer_KnightAcademicProgress()
     {
-        DrawSize = new Vector2(968f, 198f);
+        DrawSize = new Vector2(1384f, 714f);
         OutlineThickness = 2;
 
+        this.StageDrawer = new();
         this.AcademicStagesListDrawer = new(drawer: StageDrawer, drawDatas: [], parentAcademicData: null, rowLimit: 1, columnLimit: 4);
     }
 
     public override void SetDrawData(UIData_KnightAcademicWithStage drawData)
     {
         base.SetDrawData(drawData);
+        AcademicStagesListDrawer.ResetSelection();
         AcademicStageDrawerDatasInited = false;
     }
 
     private void InitAcademicStageDrawerDatas(Rect drawRect)
     {
+        if (DrawData is null)
+            SetDrawData(UIData_KnightAcademicWithStage.EmptyData);
+
+        DrawData.Refresh();
         AcademicStagesListDrawer.SetDrawDatas(DrawData.StagesDatas);
         AcademicStagesListDrawer.SetParentAcademicData(DrawData);
         AcademicStagesListDrawer.SetDrawSize(drawRect.size);
         AcademicStageDrawerDatasInited = true;
     }
 
-    public override void DrawInner(Vector2 position)
+    protected override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         Widgets.DrawBox(boxRect);
@@ -64,7 +70,9 @@ public class UIDataDrawer_KnightAcademicProgressBar : UIDataDrawerBase<UIData_Kn
         if (!AcademicStageDrawerDatasInited)
         {
             InitAcademicStageDrawerDatas(inRect);
+            Log.Message($"{AcademicStagesListDrawer.DrawDatas.Count} | {AcademicStagesListDrawer.Drawer is null} | {AcademicStagesListDrawer.DrawSize}");
         }
+
 
         AcademicStagesListDrawer.Draw(innerRect.TopLeftCorner());
     }

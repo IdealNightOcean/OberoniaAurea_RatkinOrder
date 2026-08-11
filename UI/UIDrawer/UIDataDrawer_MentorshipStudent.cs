@@ -16,7 +16,7 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         OutlineThickness = 2;
     }
 
-    public override void DrawInner(Vector2 position)
+    protected override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness); //标准大约(320f,106f);

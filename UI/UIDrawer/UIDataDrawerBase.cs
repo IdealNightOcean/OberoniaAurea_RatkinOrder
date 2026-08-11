@@ -14,7 +14,7 @@ public abstract class UIDataDrawerBase<T> : UIDrawerBase where T : IUIData
     {
         if (this.DrawData is null)
         {
-            Log.Error("[OARO] 绘制数据源 DrawData 不能为空，请先设置有效的 DrawData 实例");
+            Log.ErrorOnce("[OARO] 绘制数据源 DrawData 不能为空，请先设置有效的 DrawData 实例", key: 78433286);
             return;
         }
 
@@ -27,6 +27,6 @@ public abstract class UIDataDrawerBase<T> : UIDrawerBase where T : IUIData
         OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
 
-    public abstract void DrawInner(Vector2 position);
+    protected abstract void DrawInner(Vector2 position);
 
 }

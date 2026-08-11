@@ -5,18 +5,14 @@ using OberoniaAurea_Frame.DataLibrary;
 using RimWorld;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder;
 
-using static KnightAcademicDef;
-
 public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 {
     public override Vector2 InitialSize => new(1402f, 789f);
-    private Vector2 scrollPosition_Academic;
     private Vector2 scrollPosition_AcademicStage;
     private Vector2 scrollPosition_AcademicDesc;
 
@@ -28,32 +24,30 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     private int NoAdditionalCostAcademicCeiling { get; }
 
 
-
     private KnightAcademicDef SelAcademicDef { get; set; }
     private int SelAcademicStageLevel { get; set; }
     private float MeditationPointForSelAcademicUpgrade { get; set; }
 
     private ResidentKnightAcademicStage CheckAcademicStage { get; set; }
     private int CheckAcademicStageLevel { get; set; }
-    private Color CheckAcademicColor { get; set; }
     private AcceptanceReport CheckAcademicStageAcceptance { get; set; }
 
     /*
      * 新字段
      */
-    private UIDataDrawer_SelectableList<UIData_KnightAcademic, UIDataDrawer_KnightAcademic> AcademicListDrawer { get; }
-    private UIDataDrawer_KnightAcademic AcademicEntryDrawer { get; } = new();
     private List<UIData_KnightAcademic> AvailableAcademics { get; } = [];
 
-    private UIData_KnightAcademic SelAcademicData => AcademicListDrawer.SelectedItem;
+    private UIDataDrawer_SelectableList<UIData_KnightAcademic, UIDataDrawer_KnightAcademic> AcademicListDrawer { get; }
 
+    private UIDataDrawer_KnightAcademicProgress AcademicProgressBarDrawer { get; }
+
+    private UIData_KnightAcademicWithStage SelAcademicData { get; set; }
 
     public Window_ResidentKnight_AcademicArrange(ResidentKnight record) : base()
     {
-        Knight = record;
-        AcademicHandler = record.AcademicHandler;
+        Knight = record ?? throw new ArgumentNullException(nameof(record));
+        AcademicHandler = record.AcademicHandler ?? throw new ArgumentNullException(nameof(AcademicHandler));
         BranchHonor = record.Branch.HonorDef;
-
 
         NoAdditionalCostAcademicCeiling = AcademicUtility.GetNoAdditionalCostAcademicCeiling(Knight.CurRank);
 
@@ -76,16 +70,20 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
         UIDataDrawer_KnightAcademic academicEntryDrawer = new();
         AcademicListDrawer = new(academicEntryDrawer, AvailableAcademics, rowLimit: 5, columnLimit: 1, horizontalWarp: true);
+        AcademicProgressBarDrawer = new();
+    }
+
+    public override void PreOpen()
+    {
+        base.PreOpen();
         AcademicListDrawer.UseRecommendOutRectSize();
-        academicHash = null;
-        if (AvailableAcademics.Count > 0)
-        {
-            SwitchAcademic(AvailableAcademics.First().Academic);
-        }
-        else
-        {
-            SwitchAcademic(DefDatabase<KnightAcademicDef>.AllDefs.First(d => d.academicType == AcademicType.Geneal));
-        }
+        AcademicListDrawer.SetDrawSizeByWidth(AcademicListDrawer.Drawer.DrawSize.x + 20f);
+        AcademicListDrawer.OnSelectedItem.Register(SwitchAcademic);
+
+        AcademicProgressBarDrawer.SetDrawData(UIData_KnightAcademicWithStage.EmptyData);
+        AcademicListDrawer.SelectItem(0);
+
+
     }
 
     public override void Close(bool doCloseSound = true)
@@ -116,7 +114,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         AcademicListDrawer.Draw(inRect.TopLeftCorner());
 
         Rect academicInfoRect = Rect.MinMaxRect(pawnRect.xMax, mainRect.yMin, mainRect.xMax, mainRect.yMax);
-        DarwAcademicInfo(academicInfoRect);
+        AcademicProgressBarDrawer.Draw(academicInfoRect.TopLeftCorner());
 
         OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
@@ -149,11 +147,9 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     private void DarwAcademicInfo(Rect inRect)
     {
-        if (SelAcademicDef is null)
-        {
-            return;
-        }
+        AcademicProgressBarDrawer.Draw(inRect.TopLeftCorner());
 
+        /*
         Rect innerRect = GenUI.ContractedBy(inRect, 2f);
         float innerX = innerRect.xMin;
         float innerY = innerRect.yMin;
@@ -269,21 +265,33 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
 
         OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
+        */
     }
 
-    private void SwitchAcademic(KnightAcademicDef academicDef)
+    private void SwitchAcademic(int index, bool selectedIndexChanged)
     {
-        if (SelAcademicDef == academicDef)
+        if (!selectedIndexChanged)
             return;
 
-        SelAcademicDef = academicDef;
-        CheckAcademicColor = (academicDef.academicType == AcademicType.Honor) ? BranchHonor.color : SelAcademicDef.chivalry.color;
+        if (index == -1)
+        {
+            SelAcademicData = UIData_KnightAcademicWithStage.EmptyData;
+        }
+        else
+        {
+            UIData_KnightAcademic selAcademicBaseData = AcademicListDrawer.SelectedItem;
+            selAcademicBaseData?.Refresh();
+            if (selAcademicBaseData is null || !selAcademicBaseData.IsDataValid)
+            {
+                SelAcademicData = UIData_KnightAcademicWithStage.EmptyData;
+            }
+            else
+            {
+                SelAcademicData = new(selAcademicBaseData.Knight, selAcademicBaseData.Academic);
+            }
+        }
 
-
-        CheckAcademicStage = null;
-        CheckAcademicStageLevel = -1;
-
-        RefreshSelStageLevel();
+        AcademicProgressBarDrawer.SetDrawData(SelAcademicData);
     }
 
     private void SwithAcademicStage(ResidentKnightAcademicStage stage, int stageIndex)

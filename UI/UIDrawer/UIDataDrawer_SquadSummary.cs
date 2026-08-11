@@ -15,7 +15,7 @@ public class UIDataDrawer_SquadSummary : UIDataDrawerBase<UIData_BranchSummary>
         OutlineThickness = 2;
     }
 
-    public override void DrawInner(Vector2 position)
+    protected override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         Widgets.DrawBoxSolid(boxRect, OARO_ColorLibrary.DimDarkBackground);

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using NightOcean.Utility;
+using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
@@ -29,20 +30,15 @@ public class UIDataDrawer_SelectableList_KnightAcademicStage : UIDataDrawer_Sele
 
     protected override void DrawEntry(Rect inRect, int dataIndex)
     {
-        UIData_KnightAcademicStage drawData = DrawDatas[dataIndex];
-        if (drawData is null || !drawData.CanDraw)
-            return;
-
-        Drawer.SetDrawData(drawData, isSelected: dataIndex == SelectedIndex);
+        Drawer.SetDrawData(DrawDatas[dataIndex], isSelected: dataIndex == SelectedIndex);
+        Drawer.Draw(inRect.TopLeftCorner());
 
         if (Widgets.ButtonInvisible(inRect))
             SelectItem(dataIndex);
 
         if (dataIndex == SelectedIndex)
-        {
-            Widgets.DrawBox(inRect);
             Widgets.DrawHighlightSelected(inRect);
-        }
+
         else if (Mouse.IsOver(inRect))
             Widgets.DrawHighlight(inRect);
     }

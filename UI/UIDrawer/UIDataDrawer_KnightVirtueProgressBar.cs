@@ -19,7 +19,7 @@ public class UIDataDrawer_KnightVirtueProgressBar : UIDataDrawerBase<UIData_Knig
         OutlineThickness = 0;
     }
 
-    public override void DrawInner(Vector2 position)
+    protected override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
 

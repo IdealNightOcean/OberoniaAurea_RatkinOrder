@@ -8,8 +8,8 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIData_KnightAcademic : UIDataBase
 {
-    public ResidentKnight Knight { get; }
-    public KnightAcademicDef Academic { get; }
+    public ResidentKnight Knight { get; private set; }
+    public KnightAcademicDef Academic { get; private set; }
 
     public Color Color { get; private set; }
 
@@ -71,10 +71,10 @@ public class UIData_KnightAcademic : UIDataBase
 
     protected override UIDataState RefreshInner()
     {
-        if (Knight is null && Academic is null)
+        if (Knight is null || Academic is null)
             return UIDataState.Empty;
 
-        Color = Knight?.Branch?.HonorDef?.color ?? Academic?.chivalry?.color ?? Color.white;
+        Color = this.Knight.Branch?.HonorDef?.color ?? Academic.chivalry?.color ?? Color.white;
         StageLevel = this.Knight.AcademicHandler.GetAcademicLevel(Academic);
         Stage = Academic.GetStage(StageLevel);
         canActiveBySelf = null;

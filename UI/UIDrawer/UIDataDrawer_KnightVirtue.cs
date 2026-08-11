@@ -18,7 +18,7 @@ public class UIDataDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
         OutlineThickness = 1;
     }
 
-    public override void DrawInner(Vector2 position)
+    protected override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness);

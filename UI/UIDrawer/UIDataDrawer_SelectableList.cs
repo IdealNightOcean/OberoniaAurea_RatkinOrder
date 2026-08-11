@@ -31,6 +31,12 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
     public bool HorizontalWarp { get; protected set; } = false;
 
     protected Vector2 scrollPosition = Vector2.zero;
+    protected bool onSelecting = false;
+
+    /// <summary>
+    /// int：当前的选择索引，bool：索引是否发生了变化
+    /// </summary>
+    public EventDispatcher<Action<int, bool>> OnSelectedItem { get; } = new();
 
     public UIDataDrawer_SelectableList(U drawer, IList<T> drawDatas, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
     {
@@ -65,16 +71,46 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         HorizontalWarp = horizontalWarp;
     }
 
-    public virtual void SelectItem(int index)
+    /// <returns>选择索引是否发生变化</returns>
+    public bool SelectItem(int index, bool applySelectionEvent = true)
+    {
+        if (onSelecting)
+            return false;
+
+        onSelecting = true;
+        bool result = DoSelectItem(index, applySelectionEvent);
+        onSelecting = false;
+        return result;
+    }
+
+
+    /// <returns>选择索引是否发生变化</returns>
+    protected virtual bool DoSelectItem(int index, bool applySelectionEvent = true)
     {
         if (index >= 0 && DrawDatas is not null && index < DrawDatas.Count)
         {
             SelectedIndex = SelectedIndex == index ? -1 : index;
+            if (applySelectionEvent)
+                ApplyOnSelectedItem(selectedIndexChanged: true);
+            return true;
         }
-        else
+        else if (SelectedIndex != -1)
         {
             SelectedIndex = -1;
+            if (applySelectionEvent)
+                ApplyOnSelectedItem(selectedIndexChanged: false);
+            return true;
         }
+
+        return false;
+    }
+
+    /// <summary>
+    /// 触发 <see cref="OnSelectedItem"/> 事件
+    /// </summary>
+    public void ApplyOnSelectedItem(bool selectedIndexChanged)
+    {
+        OnSelectedItem.Raise(handler => handler(SelectedIndex, selectedIndexChanged));
     }
 
     public void UseRecommendOutRectSize()

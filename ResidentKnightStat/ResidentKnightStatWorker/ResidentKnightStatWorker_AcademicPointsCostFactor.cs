@@ -74,11 +74,13 @@ public class ResidentKnightStatWorker_AcademicPointsCostFactor(ResidentKnightSta
         ResidentKnight knight = academicRequestData.Target;
 
         float traditionReduction = 0f;
+        /*
         foreach (OrderStationTraditionDef tradition in OrderStationHandler.TraditionsManager.ActiveTraditions)
         {
             if (academicChivalry.IsSameDefNonNullable(tradition.Chivalry))
                 traditionReduction += tradition.academicCostReduction;
         }
+        */
 
         if (traditionReduction > 0f)
         {

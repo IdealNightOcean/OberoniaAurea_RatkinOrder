@@ -6,6 +6,8 @@ public class UIData_KnightAcademicWithStage : UIData_KnightAcademic
 {
     public List<UIData_KnightAcademicStage> StagesDatas { get; } = [];
 
+    public static UIData_KnightAcademicWithStage EmptyData => new(null, null);
+
     public UIData_KnightAcademicWithStage(ResidentKnight knight, KnightAcademicDef academic) : base(knight, academic) { }
 
     protected override UIDataState RefreshInner()
