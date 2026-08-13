@@ -6,6 +6,7 @@ namespace OberoniaAurea.RatkinOrder.UI;
 public abstract class UIDrawerBase : IUIDrawer
 {
     public Vector2 DrawSize { get; protected set; } = new(800, 600);
+    public Vector2 ValidDrawSize => new(DrawSize.x - 2 * OutlineThickness, DrawSize.y - 2 * OutlineThickness);
     public int OutlineThickness { get; protected set; } = 1;
 
     public TextStyle TextStyle { get; protected set; } = TextStyle.DefaultStyle;

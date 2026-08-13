@@ -69,21 +69,23 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
 
         UIDataDrawer_KnightAcademic academicEntryDrawer = new();
-        AcademicListDrawer = new(academicEntryDrawer, AvailableAcademics, rowLimit: 5, columnLimit: 1, horizontalWarp: true);
+        AcademicListDrawer = new(academicEntryDrawer, AvailableAcademics)
+        {
+            RowLimit = 5,
+            ColumnLimit = 1,
+            HorizontalScroll = false,
+            LayoutStrategy = ScrollLayoutStrategy.ViewGivenItemAdapt
+        };
         AcademicProgressBarDrawer = new();
     }
 
     public override void PreOpen()
     {
         base.PreOpen();
-        AcademicListDrawer.UseRecommendOutRectSize();
-        AcademicListDrawer.SetDrawSizeByWidth(AcademicListDrawer.Drawer.DrawSize.x + 20f);
         AcademicListDrawer.OnSelectedItem.Register(SwitchAcademic);
 
         AcademicProgressBarDrawer.SetDrawData(UIData_KnightAcademicWithStage.EmptyData);
         AcademicListDrawer.SelectItem(0);
-
-
     }
 
     public override void Close(bool doCloseSound = true)

@@ -9,7 +9,7 @@ public class UIDataDrawer_SelectableList_KnightAcademicStage : UIDataDrawer_Sele
 {
     private UIData_KnightAcademic ParentAcademicData { get; set; }
 
-    public UIDataDrawer_SelectableList_KnightAcademicStage(UIDataDrawer_KnightAcademicProgressBar_Stage drawer, IList<UIData_KnightAcademicStage> drawDatas, UIData_KnightAcademic parentAcademicData, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false) : base(drawer, drawDatas, rowLimit, columnLimit, horizontalWarp)
+    public UIDataDrawer_SelectableList_KnightAcademicStage(UIDataDrawer_KnightAcademicProgressBar_Stage drawer, IList<UIData_KnightAcademicStage> drawDatas, UIData_KnightAcademic parentAcademicData) : base(drawer, drawDatas)
     {
         ParentAcademicData = parentAcademicData;
         Drawer?.SetParentKnightAcademic(ParentAcademicData);

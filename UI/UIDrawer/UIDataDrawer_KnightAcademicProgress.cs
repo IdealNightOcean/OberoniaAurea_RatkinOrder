@@ -20,7 +20,13 @@ public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_Knigh
         OutlineThickness = 2;
 
         this.StageDrawer = new();
-        this.AcademicStagesListDrawer = new(drawer: StageDrawer, drawDatas: [], parentAcademicData: null, rowLimit: 1, columnLimit: 4);
+        this.AcademicStagesListDrawer = new(drawer: StageDrawer, drawDatas: [], parentAcademicData: null)
+        {
+            RowLimit = 1,
+            ColumnLimit = 4,
+            HorizontalScroll = true,
+            LayoutStrategy = ScrollLayoutStrategy.ViewGivenItemAdapt
+        };
     }
 
     public override void SetDrawData(UIData_KnightAcademicWithStage drawData)
@@ -39,6 +45,7 @@ public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_Knigh
         AcademicStagesListDrawer.SetDrawDatas(DrawData.StagesDatas);
         AcademicStagesListDrawer.SetParentAcademicData(DrawData);
         AcademicStagesListDrawer.SetDrawSize(drawRect.size);
+
         AcademicStageDrawerDatasInited = true;
     }
 

@@ -25,31 +25,85 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         }
     }
 
-    public int RowLimit { get; protected set; } = -1;
-    public int ColumnLimit { get; protected set; } = -1;
+    private int rowLimit = -1;
+    public int RowLimit
+    {
+        get => rowLimit;
+        set
+        {
+            rowLimit = value;
+            LayoutSizeChanged = true;
+        }
+    }
+    private int columnLimit = -1;
+    public int ColumnLimit
+    {
+        get => columnLimit;
+        set
+        {
+            columnLimit = value;
+            LayoutSizeChanged = true;
+        }
+    }
 
-    public bool HorizontalWarp { get; protected set; } = false;
+    private bool horizontalScroll = false;
+    public bool HorizontalScroll
+    {
+        get => horizontalScroll;
+        set
+        {
+            horizontalScroll = value;
+            LayoutSizeChanged = true;
+        }
+    }
+
+    private bool showScrollBar = true;
+    public bool ShowScrollBar
+    {
+        get => showScrollBar;
+        set
+        {
+            showScrollBar = value;
+            LayoutSizeChanged = true;
+        }
+    }
+
+    private ScrollLayoutStrategy layoutStrategy = ScrollLayoutStrategy.ViewGiven;
+    public ScrollLayoutStrategy LayoutStrategy
+    {
+        get => layoutStrategy;
+        set
+        {
+            layoutStrategy = value;
+            LayoutSizeChanged = true;
+        }
+    }
+
+    protected bool LayoutSizeChanged { get; set; } = true;
 
     protected Vector2 scrollPosition = Vector2.zero;
     protected bool onSelecting = false;
+
+    protected Vector2 outRectSize = Vector2.zero;
+    protected Vector2 entryDrawSize = Vector2.zero;
+
 
     /// <summary>
     /// int：当前的选择索引，bool：索引是否发生了变化
     /// </summary>
     public EventDispatcher<Action<int, bool>> OnSelectedItem { get; } = new();
 
-    public UIDataDrawer_SelectableList(U drawer, IList<T> drawDatas, int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
+    public UIDataDrawer_SelectableList(U drawer, IList<T> drawDatas)
     {
         Drawer = drawer;
         DrawDatas = drawDatas;
-        RowLimit = rowLimit;
-        ColumnLimit = columnLimit;
-        HorizontalWarp = horizontalWarp;
+        LayoutSizeChanged = true;
     }
 
     public virtual void SetDrawer(U drawer)
     {
         Drawer = drawer;
+        LayoutSizeChanged = true;
         ResetSelection();
     }
 
@@ -64,11 +118,18 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         SelectItem(-1);
     }
 
+    public void SetLayout(ScrollLayoutStrategy layoutStrategy)
+    {
+        LayoutStrategy = layoutStrategy;
+        LayoutSizeChanged = true;
+    }
+
     public void SetScorllLimit(int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
     {
         RowLimit = rowLimit;
         ColumnLimit = columnLimit;
-        HorizontalWarp = horizontalWarp;
+        HorizontalScroll = horizontalWarp;
+        LayoutSizeChanged = true;
     }
 
     /// <returns>选择索引是否发生变化</returns>
@@ -113,46 +174,118 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         OnSelectedItem.Raise(handler => handler(SelectedIndex, selectedIndexChanged));
     }
 
-    public void UseRecommendOutRectSize()
+
+
+    public Vector2 GetOutRectSize()
     {
-        Vector2 recommendSize = GetRecommendOutRectSize();
-        if (recommendSize != Vector2.zero)
-            SetDrawSize(recommendSize);
+        if (!LayoutSizeChanged)
+            return outRectSize;
+
+        Vector2 newOutRectSize = Vector2.zero;
+        switch (LayoutStrategy)
+        {
+            case ScrollLayoutStrategy.ViewGiven or ScrollLayoutStrategy.ViewGivenItemAdapt: { newOutRectSize = ValidDrawSize; break; }
+            case ScrollLayoutStrategy.ViewDerivedByRowCol:
+                {
+                    Vector2 entrySize = Drawer.DrawSize;
+                    float outlineThickness = Drawer.OutlineThickness;
+                    float stepX = entrySize.x - outlineThickness;
+                    float stepY = entrySize.y - outlineThickness;
+
+                    if (stepX <= 0f || stepY <= 0f)
+                        break;
+
+                    newOutRectSize = ValidDrawSize;
+
+                    if (ColumnLimit > 0)
+                        newOutRectSize.x = ColumnLimit * stepX + outlineThickness;
+                    if (RowLimit > 0)
+                        newOutRectSize.y = RowLimit * stepY + outlineThickness;
+
+                    Rect viewRect = GetViewRect();
+                    if (ShowScrollBar)
+                    {
+                        if (HorizontalScroll)
+                        {
+                            if (viewRect.width > newOutRectSize.x)
+                            {
+                                newOutRectSize.x += ScrollBarThickness;
+                            }
+                        }
+                        else
+                        {
+                            if (viewRect.height > newOutRectSize.y)
+                            {
+                                newOutRectSize.y += ScrollBarThickness;
+                            }
+                        }
+                    }
+
+                    break;
+                }
+
+            default: { newOutRectSize = ValidDrawSize; break; }
+        }
+
+        if (showScrollBar)
+        {
+            if (HorizontalScroll)
+                newOutRectSize.y = Mathf.Max(newOutRectSize.y, ScrollBarThickness);
+            else
+                newOutRectSize.x = Mathf.Min(newOutRectSize.x, ScrollBarThickness);
+        }
+        else
+        {
+            newOutRectSize.x = Mathf.Max(newOutRectSize.x, 0f);
+            newOutRectSize.y = Mathf.Max(newOutRectSize.x, 0f);
+        }
+
+        outRectSize = newOutRectSize;
+        return outRectSize;
     }
 
-    public Vector2 GetRecommendOutRectSize()
+    public Vector2 GetEntryDrawSize()
     {
-        Vector2 entrySize = Drawer.DrawSize;
-        float outlineThickness = Drawer.OutlineThickness;
-        float stepX = entrySize.x - outlineThickness;
-        float stepY = entrySize.y - outlineThickness;
+        if (!LayoutSizeChanged)
+            return Drawer?.DrawSize ?? Vector2.zero;
 
-        if (stepX <= 0f || stepY <= 0f)
+        if (LayoutStrategy != ScrollLayoutStrategy.ViewGivenItemAdapt)
+            return Drawer?.DrawSize ?? Vector2.zero;
+
+        if (Drawer is null)
             return Vector2.zero;
 
-        Vector2 outRectSize = DrawSize;
-
-        if (ColumnLimit > 0)
-            outRectSize.x = ColumnLimit * stepX + outlineThickness;
-        if (RowLimit > 0)
-            outRectSize.y = RowLimit * stepY + outlineThickness;
-
-        Rect viewRect = GetViewRect();
-        if (HorizontalWarp)
+        Vector2 outRectSize = ValidDrawSize;
+        if (ShowScrollBar)
         {
-            if (viewRect.height > outRectSize.y)
+            if (HorizontalScroll)
+                outRectSize.y -= ScrollBarThickness;
+            else
+                outRectSize.x -= ScrollBarThickness;
+        }
+
+        if (outRectSize.x < 0f || outRectSize.y < 0f)
+            return Vector2.zero;
+
+
+        if (HorizontalScroll)
+        {
+            if (RowLimit > 0)
             {
-                outRectSize.y += ScrollBarThickness;
+                float enrtyHeight = outRectSize.y / RowLimit;
+                Drawer.SetDrawSizeByHeight(enrtyHeight);
             }
         }
         else
         {
-            if (viewRect.width > outRectSize.x)
+            if (ColumnLimit > 0)
             {
-                outRectSize.x += ScrollBarThickness;
+                float enrtyWidth = outRectSize.x / RowLimit;
+                Drawer.SetDrawSizeByWidth(enrtyWidth);
             }
         }
-        return outRectSize;
+
+        return Drawer.DrawSize;
     }
 
     public Rect GetViewRect()
@@ -170,15 +303,15 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
 
         int totalCount = DrawDatas.Count;
         int totalCols, totalRows;
-        if (HorizontalWarp)
-        {
-            totalCols = ColumnLimit > 0 ? Math.Min(ColumnLimit, totalCount) : totalCount;
-            totalRows = Mathf.CeilToInt((float)totalCount / totalCols);
-        }
-        else
+        if (HorizontalScroll)
         {
             totalRows = RowLimit > 0 ? Math.Min(RowLimit, totalCount) : totalCount;
             totalCols = Mathf.CeilToInt((float)totalCount / totalRows);
+        }
+        else
+        {
+            totalCols = ColumnLimit > 0 ? Math.Min(ColumnLimit, totalCount) : totalCount;
+            totalRows = Mathf.CeilToInt((float)totalCount / totalCols);
         }
 
         float totalWidth = Mathf.Max(1e-6f, totalCols * stepX + outlineThickness);
@@ -192,7 +325,10 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         if (Drawer is null || DrawDatas is null || DrawDatas.Count == 0)
             return;
 
-        Rect outRect = new(position, DrawSize);
+        if (LayoutSizeChanged)
+            RefreshLayoutSize();
+
+        Rect outRect = new(position, outRectSize);
         Rect viewRect = GetViewRect();
 
         Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
@@ -222,7 +358,7 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
 
         void UpdateNextPosition()
         {
-            if (HorizontalWarp)
+            if (HorizontalScroll)
             {
                 if (ColumnLimit > 0 && curColumn >= ColumnLimit)
                 {
@@ -253,6 +389,13 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
                 }
             }
         }
+    }
+
+    protected void RefreshLayoutSize()
+    {
+        GetOutRectSize();
+        GetEntryDrawSize();
+        LayoutSizeChanged = false;
     }
 
     protected virtual void DrawEntry(Rect inRect, int dataIndex)

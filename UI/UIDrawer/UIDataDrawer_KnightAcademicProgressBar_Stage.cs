@@ -41,7 +41,7 @@ public class UIDataDrawer_KnightAcademicProgressBar_Stage : UIDataDrawerBase<UID
 
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness);
 
-        Rect topRect = innerBoxRect.BottomPart(0.875f);
+        Rect topRect = innerBoxRect.TopPart(0.875f);
         Rect bottomRect = innerBoxRect;
         bottomRect.yMin = topRect.yMax;
 
