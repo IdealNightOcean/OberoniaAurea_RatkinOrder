@@ -7,7 +7,6 @@ public abstract class UIDataDrawerBase<T> : UIDrawerBase where T : IUIData
 {
     protected T DrawData { get; private set; }
 
-
     public virtual void SetDrawData(T drawData) => this.DrawData = drawData;
 
     public void Draw(Vector2 position)

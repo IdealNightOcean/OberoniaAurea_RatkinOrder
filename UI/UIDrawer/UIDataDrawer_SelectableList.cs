@@ -8,7 +8,7 @@ namespace OberoniaAurea.RatkinOrder.UI;
 
 public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData where U : UIDataDrawerBase<T>
 {
-    private const float ScrollBarThickness = 16f;
+    private const float ScrollBarThickness = 20f;
     public U Drawer { get; protected set; }
     public IList<T> DrawDatas { get; protected set; }
     public int SelectedIndex { get; protected set; } = -1;
@@ -84,8 +84,32 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
     protected Vector2 scrollPosition = Vector2.zero;
     protected bool onSelecting = false;
 
-    protected Vector2 outRectSize = Vector2.zero;
-    protected Vector2 entryDrawSize = Vector2.zero;
+    private Vector2 outRectSize = new(-1f, -1f);
+    protected Vector2 OutRectSize
+    {
+        get
+        {
+            if (outRectSize.x < 0f || outRectSize.y < 0f)
+            {
+                RefreshOutRectSize();
+            }
+
+            return outRectSize;
+        }
+    }
+    protected Vector2 entryDrawSize = new(-1f, -1f);
+    protected Vector2 EntryDrawSize
+    {
+        get
+        {
+            if (outRectSize.x < 0f || outRectSize.y < 0f)
+            {
+                RefreshEntryDrawSize();
+            }
+
+            return outRectSize;
+        }
+    }
 
 
     /// <summary>
@@ -116,20 +140,6 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
     public virtual void ResetSelection()
     {
         SelectItem(-1);
-    }
-
-    public void SetLayout(ScrollLayoutStrategy layoutStrategy)
-    {
-        LayoutStrategy = layoutStrategy;
-        LayoutSizeChanged = true;
-    }
-
-    public void SetScorllLimit(int rowLimit = -1, int columnLimit = -1, bool horizontalWarp = false)
-    {
-        RowLimit = rowLimit;
-        ColumnLimit = columnLimit;
-        HorizontalScroll = horizontalWarp;
-        LayoutSizeChanged = true;
     }
 
     /// <returns>选择索引是否发生变化</returns>
@@ -174,118 +184,106 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         OnSelectedItem.Raise(handler => handler(SelectedIndex, selectedIndexChanged));
     }
 
-
-
-    public Vector2 GetOutRectSize()
+    private void RefreshOutRectSize()
     {
-        if (!LayoutSizeChanged)
-            return outRectSize;
-
-        Vector2 newOutRectSize = Vector2.zero;
-        switch (LayoutStrategy)
+        Vector2 newOutRectSize = ValidDrawSize;
+        if (LayoutStrategy != ScrollLayoutStrategy.ViewDerivedByRowCol)
         {
-            case ScrollLayoutStrategy.ViewGiven or ScrollLayoutStrategy.ViewGivenItemAdapt: { newOutRectSize = ValidDrawSize; break; }
-            case ScrollLayoutStrategy.ViewDerivedByRowCol:
-                {
-                    Vector2 entrySize = Drawer.DrawSize;
-                    float outlineThickness = Drawer.OutlineThickness;
-                    float stepX = entrySize.x - outlineThickness;
-                    float stepY = entrySize.y - outlineThickness;
-
-                    if (stepX <= 0f || stepY <= 0f)
-                        break;
-
-                    newOutRectSize = ValidDrawSize;
-
-                    if (ColumnLimit > 0)
-                        newOutRectSize.x = ColumnLimit * stepX + outlineThickness;
-                    if (RowLimit > 0)
-                        newOutRectSize.y = RowLimit * stepY + outlineThickness;
-
-                    Rect viewRect = GetViewRect();
-                    if (ShowScrollBar)
-                    {
-                        if (HorizontalScroll)
-                        {
-                            if (viewRect.width > newOutRectSize.x)
-                            {
-                                newOutRectSize.x += ScrollBarThickness;
-                            }
-                        }
-                        else
-                        {
-                            if (viewRect.height > newOutRectSize.y)
-                            {
-                                newOutRectSize.y += ScrollBarThickness;
-                            }
-                        }
-                    }
-
-                    break;
-                }
-
-            default: { newOutRectSize = ValidDrawSize; break; }
-        }
-
-        if (showScrollBar)
-        {
-            if (HorizontalScroll)
-                newOutRectSize.y = Mathf.Max(newOutRectSize.y, ScrollBarThickness);
-            else
-                newOutRectSize.x = Mathf.Min(newOutRectSize.x, ScrollBarThickness);
+            outRectSize = newOutRectSize;
+            return;
         }
         else
         {
-            newOutRectSize.x = Mathf.Max(newOutRectSize.x, 0f);
-            newOutRectSize.y = Mathf.Max(newOutRectSize.x, 0f);
-        }
+            Vector2 entrySize = Drawer.DrawSize;
+            float outlineThickness = Drawer.OutlineThickness;
+            float stepX = entrySize.x - outlineThickness;
+            float stepY = entrySize.y - outlineThickness;
 
-        outRectSize = newOutRectSize;
-        return outRectSize;
+            if (stepX <= 0f || stepY <= 0f)
+            {
+                outRectSize = newOutRectSize;
+                return;
+            }
+
+            if (ColumnLimit > 0)
+                newOutRectSize.x = ColumnLimit * stepX + outlineThickness;
+            if (RowLimit > 0)
+                newOutRectSize.y = RowLimit * stepY + outlineThickness;
+
+            Rect viewRect = GetViewRect();
+            if (ShowScrollBar)
+            {
+                if (HorizontalScroll)
+                {
+                    if (viewRect.width > newOutRectSize.x)
+                    {
+                        newOutRectSize.y += ScrollBarThickness;
+                    }
+                }
+                else
+                {
+                    if (viewRect.height > newOutRectSize.y)
+                    {
+                        newOutRectSize.x += ScrollBarThickness;
+                    }
+                }
+            }
+
+            if (ShowScrollBar)
+            {
+                if (HorizontalScroll)
+                    newOutRectSize.y = Mathf.Max(newOutRectSize.y, ScrollBarThickness);
+                else
+                    newOutRectSize.x = Mathf.Max(newOutRectSize.x, ScrollBarThickness);
+            }
+            else
+            {
+                newOutRectSize.x = Mathf.Max(newOutRectSize.x, 0f);
+                newOutRectSize.y = Mathf.Max(newOutRectSize.y, 0f);
+            }
+
+            outRectSize = newOutRectSize;
+        }
     }
 
-    public Vector2 GetEntryDrawSize()
+    public void RefreshEntryDrawSize()
     {
-        if (!LayoutSizeChanged)
-            return Drawer?.DrawSize ?? Vector2.zero;
-
         if (LayoutStrategy != ScrollLayoutStrategy.ViewGivenItemAdapt)
-            return Drawer?.DrawSize ?? Vector2.zero;
+            entryDrawSize = Drawer?.DrawSize ?? Vector2.zero;
 
         if (Drawer is null)
-            return Vector2.zero;
+            entryDrawSize = Vector2.zero;
 
-        Vector2 outRectSize = ValidDrawSize;
+        Vector2 validOutRectSize = ValidDrawSize;
         if (ShowScrollBar)
         {
             if (HorizontalScroll)
-                outRectSize.y -= ScrollBarThickness;
+                validOutRectSize.y -= ScrollBarThickness;
             else
-                outRectSize.x -= ScrollBarThickness;
+                validOutRectSize.x -= ScrollBarThickness;
         }
 
-        if (outRectSize.x < 0f || outRectSize.y < 0f)
-            return Vector2.zero;
-
+        if (validOutRectSize.x < 0f || validOutRectSize.y < 0f)
+            entryDrawSize = Vector2.zero;
 
         if (HorizontalScroll)
         {
             if (RowLimit > 0)
             {
-                float enrtyHeight = outRectSize.y / RowLimit;
-                Drawer.SetDrawSizeByHeight(enrtyHeight);
+                float enrtyHeight = validOutRectSize.y / RowLimit;
+                Drawer.SetDrawSizeAspectFit(new(validOutRectSize.x, enrtyHeight));
             }
         }
         else
         {
             if (ColumnLimit > 0)
             {
-                float enrtyWidth = outRectSize.x / RowLimit;
-                Drawer.SetDrawSizeByWidth(enrtyWidth);
+                float enrtyWidth = validOutRectSize.x / ColumnLimit;
+                Drawer.SetDrawSizeAspectFit(new(enrtyWidth, validOutRectSize.y));
             }
         }
 
-        return Drawer.DrawSize;
+        entryDrawSize = Drawer.DrawSize;
     }
 
     public Rect GetViewRect()
@@ -326,7 +324,10 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
             return;
 
         if (LayoutSizeChanged)
+        {
+            ResetLayoutSize();
             RefreshLayoutSize();
+        }
 
         Rect outRect = new(position, outRectSize);
         Rect viewRect = GetViewRect();
@@ -360,21 +361,6 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         {
             if (HorizontalScroll)
             {
-                if (ColumnLimit > 0 && curColumn >= ColumnLimit)
-                {
-                    curColumn = 1;
-                    curRow++;
-                    entryPos.x = 0f;
-                    entryPos.y += offsetY;
-                }
-                else
-                {
-                    curColumn++;
-                    entryPos.x += offsetX;
-                }
-            }
-            else
-            {
                 if (RowLimit > 0 && curRow >= RowLimit)
                 {
                     curRow = 1;
@@ -388,14 +374,36 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
                     entryPos.y += offsetY;
                 }
             }
+            else
+            {
+                if (ColumnLimit > 0 && curColumn >= ColumnLimit)
+                {
+                    curColumn = 1;
+                    curRow++;
+                    entryPos.x = 0f;
+                    entryPos.y += offsetY;
+                }
+                else
+                {
+                    curColumn++;
+                    entryPos.x += offsetX;
+                }
+            }
         }
     }
 
     protected void RefreshLayoutSize()
     {
-        GetOutRectSize();
-        GetEntryDrawSize();
+        RefreshOutRectSize();
+        RefreshEntryDrawSize();
         LayoutSizeChanged = false;
+    }
+
+    public void ResetLayoutSize()
+    {
+        LayoutSizeChanged = true;
+        outRectSize = new(-1f, -1f);
+        entryDrawSize = new(-1f, -1f);
     }
 
     protected virtual void DrawEntry(Rect inRect, int dataIndex)

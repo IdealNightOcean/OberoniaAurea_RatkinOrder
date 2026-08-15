@@ -1,4 +1,6 @@
 ﻿using NightOcean.Utility;
+using OberoniaAurea.RatkinOrder.DataLibrary;
+using OberoniaAurea_Frame.UI;
 using UnityEngine;
 using Verse;
 
@@ -7,6 +9,7 @@ namespace OberoniaAurea.RatkinOrder.UI;
 public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_KnightAcademicWithStage>
 {
     private int SelectedStageIndex => AcademicStagesListDrawer.SelectedIndex;
+    private UIData_KnightAcademicStage SelectedStage => AcademicStagesListDrawer.SelectedItem;
 
     private UIDataDrawer_KnightAcademicProgressBar_Stage StageDrawer { get; }
     private UIDataDrawer_SelectableList_KnightAcademicStage AcademicStagesListDrawer { get; }
@@ -52,7 +55,7 @@ public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_Knigh
     protected override void DrawInner(Vector2 position)
     {
         Rect boxRect = new(position, DrawSize);
-        Widgets.DrawBox(boxRect);
+        OAFrame_Widgets.DrawBox(boxRect, OARO_ColorLibrary.CommonOutline);
 
         Rect innerRect = GenUI.ContractedBy(boxRect, OutlineThickness);
 
@@ -60,12 +63,17 @@ public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_Knigh
         Rect bottomRect = innerRect.BottomHalf();
 
         Rect labelRect = topRect.TopPart(1f / 3f);
+        this.TextStyle = new(guiColor: DrawData.Color, fontSize: 40, anchor: TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(labelRect, DrawData.IsDataValid ? DrawData.Academic.LabelCap : "---", this.TextStyle);
 
         float stagesRectHeight = topRect.height * (2f / 3f);
         StageDrawer.SetDrawSizeByHeight(stagesRectHeight - 2f - 20f);
         Rect stagesRect = new(0f, topRect.yMax - stagesRectHeight, topRect.width * 0.92f, stagesRectHeight);
         stagesRect = GenUI.CenteredOnXIn(stagesRect, topRect);
         DrawStages(stagesRect);
+
+
+        DrawBottom(bottomRect);
 
     }
 
@@ -77,11 +85,52 @@ public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_Knigh
         if (!AcademicStageDrawerDatasInited)
         {
             InitAcademicStageDrawerDatas(inRect);
-            Log.Message($"{AcademicStagesListDrawer.DrawDatas.Count} | {AcademicStagesListDrawer.Drawer is null} | {AcademicStagesListDrawer.DrawSize}");
         }
 
-
         AcademicStagesListDrawer.Draw(innerRect.TopLeftCorner());
+    }
+
+    private void DrawBottom(Rect inRect)
+    {
+        Rect validRect = inRect.CenterSegment(0.85f);
+        UIData_KnightAcademicStage selectedStage = SelectedStage;
+        bool isStageValid = selectedStage is not null && selectedStage.IsDataValid;
+
+        Rect descRect = validRect.LeftHalf();
+        Rect descLabelRect = descRect.TopPart((1f / 3f));
+        Rect descInfoRect = descRect;
+        descInfoRect.yMin = descLabelRect.yMax;
+
+        this.TextStyle = new(guiColor: DrawData.Color, fontSize: 30, anchor: TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(descLabelRect, isStageValid ? selectedStage.Stage.label : "---", this.TextStyle);
+
+        this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleCenter);
+        OAFrame_Widgets.DrawLabel(descInfoRect, isStageValid ? selectedStage.Stage.shortDescription : "---", this.TextStyle);
+
+        Rect unlockRect = validRect.RightHalf();
+        Rect unlockPointRect = unlockRect.TopPart((1f / 3f));
+        Rect unlockButtonRect = unlockRect;
+        unlockButtonRect.yMin = unlockPointRect.yMax;
+
+        if (DrawData.IsDataValid && isStageValid)
+        {
+            if (selectedStage.StageLevel <= DrawData.StageLevel)
+            {
+                this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleCenter);
+                OAFrame_Widgets.DrawLabel(unlockButtonRect, "OARO_Unlocked".Translate(), this.TextStyle);
+            }
+            else if (selectedStage.StageLevel == DrawData.StageLevel + 1)
+            {
+                this.TextStyle = new(fontSize: 30, anchor: TextAnchor.MiddleCenter);
+                OAFrame_Widgets.DrawLabel(unlockPointRect, DrawData.UpgradePointsCost.ToString("F0"), this.TextStyle);
+                TooltipHandler.TipRegion(unlockPointRect, () => DrawData?.UpgradePointsCostExplanation.Value ?? string.Empty, 325832412);
+            }
+            else
+            {
+                this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleCenter);
+                OAFrame_Widgets.DrawLabel(unlockButtonRect, "OARO_NeedPreAcademicLevel".Translate(), this.TextStyle);
+            }
+        }
     }
 
 }

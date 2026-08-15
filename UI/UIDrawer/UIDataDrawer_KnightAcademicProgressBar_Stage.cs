@@ -80,7 +80,6 @@ public class UIDataDrawer_KnightAcademicProgressBar_Stage : UIDataDrawerBase<UID
 
         Rect validTopRect = validRect.TopHalf();
 
-        Log.Message(validRect.height);
         float boxSize = Mathf.Max(20f, validRect.height * 0.5f);
         Rect boxRect = new(0f, 0f, boxSize, boxSize);
         boxRect = boxRect.CenteredIn(validTopRect);

@@ -12,7 +12,7 @@ namespace OberoniaAurea.RatkinOrder;
 
 public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 {
-    public override Vector2 InitialSize => new(1402f, 789f);
+    public override Vector2 InitialSize => new(1736f, 926f);
     private Vector2 scrollPosition_AcademicStage;
     private Vector2 scrollPosition_AcademicDesc;
 
@@ -20,7 +20,6 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     private ResidentKnight Knight { get; }
     public AcademicHandler AcademicHandler { get; }
-    private BranchHonorDef BranchHonor { get; }
     private int NoAdditionalCostAcademicCeiling { get; }
 
 
@@ -39,7 +38,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     private UIDataDrawer_SelectableList<UIData_KnightAcademic, UIDataDrawer_KnightAcademic> AcademicListDrawer { get; }
 
-    private UIDataDrawer_KnightAcademicProgress AcademicProgressBarDrawer { get; }
+    private UIDataDrawer_KnightAcademicProgress AcademicProgressDrawer { get; }
 
     private UIData_KnightAcademicWithStage SelAcademicData { get; set; }
 
@@ -47,7 +46,6 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
     {
         Knight = record ?? throw new ArgumentNullException(nameof(record));
         AcademicHandler = record.AcademicHandler ?? throw new ArgumentNullException(nameof(AcademicHandler));
-        BranchHonor = record.Branch.HonorDef;
 
         NoAdditionalCostAcademicCeiling = AcademicUtility.GetNoAdditionalCostAcademicCeiling(Knight.CurRank);
 
@@ -69,22 +67,23 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
         }
 
         UIDataDrawer_KnightAcademic academicEntryDrawer = new();
+        academicEntryDrawer.SetDrawSize(new(260f, 94f));
         AcademicListDrawer = new(academicEntryDrawer, AvailableAcademics)
         {
             RowLimit = 5,
             ColumnLimit = 1,
             HorizontalScroll = false,
-            LayoutStrategy = ScrollLayoutStrategy.ViewGivenItemAdapt
+            LayoutStrategy = ScrollLayoutStrategy.ViewDerivedByRowCol
         };
-        AcademicProgressBarDrawer = new();
+        AcademicListDrawer.SetDrawSize(new(280f, 560f));
+
+        AcademicProgressDrawer = new();
     }
 
     public override void PreOpen()
     {
         base.PreOpen();
         AcademicListDrawer.OnSelectedItem.Register(SwitchAcademic);
-
-        AcademicProgressBarDrawer.SetDrawData(UIData_KnightAcademicWithStage.EmptyData);
         AcademicListDrawer.SelectItem(0);
     }
 
@@ -96,12 +95,11 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     public override void DoWindowContents(Rect inRect)
     {
-        GUI.DrawTexture(inRect, mainBackground);
+        //Rect mainRect = OARO_UIUtility.CenterRect(inRect, 1308f, 695f);
+        Rect mainRect = inRect;
+        GUI.DrawTexture(mainRect, mainBackground, ScaleMode.StretchToFill);
 
-        Rect mainRect = OARO_UIUtility.CenterRect(inRect, 1308f, 695f);
-        Rect mainInnerRect = GenUI.ContractedBy(mainRect, 2f);
-        float mainInnerX = mainInnerRect.xMin;
-        float mainInnerY = mainInnerRect.yMin;
+        Rect mainInnerRect = GenUI.ContractedBy(inRect, 3f); // (1730f,920f)
 
         if (OARO_UIUtility.DrawCloseX_Corner(mainInnerRect))
         {
@@ -109,14 +107,14 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             return;
         }
 
-        Rect pawnRect = new(mainRect.xMin, mainRect.yMin, 198f, 272f);
+        Rect pawnRect = new(mainInnerRect.xMin, mainInnerRect.yMin, 198f, 272f);
         DarwPawnInfo(pawnRect);
 
-        Rect academicRect = Rect.MinMaxRect(mainRect.xMin, pawnRect.yMax, mainRect.xMin + 198f, mainRect.yMax);
-        AcademicListDrawer.Draw(inRect.TopLeftCorner());
+        Rect academicRect = new(mainInnerRect.xMin, mainInnerRect.yMax - 560f, 280f, 560f);
+        AcademicListDrawer.Draw(academicRect.TopLeftCorner());
 
-        Rect academicInfoRect = Rect.MinMaxRect(pawnRect.xMax, mainRect.yMin, mainRect.xMax, mainRect.yMax);
-        AcademicProgressBarDrawer.Draw(academicInfoRect.TopLeftCorner());
+        Rect academicInfoRect = new(academicRect.xMax + 36f, mainInnerRect.yMin + mainInnerRect.height * 0.125f, AcademicProgressDrawer.DrawSize.x, AcademicProgressDrawer.DrawSize.y);
+        AcademicProgressDrawer.Draw(academicInfoRect.TopLeftCorner());
 
         OberoniaAurea_Frame.UI.OAFrame_UIUtility.ResetTextStyleToDefault();
     }
@@ -149,7 +147,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     private void DarwAcademicInfo(Rect inRect)
     {
-        AcademicProgressBarDrawer.Draw(inRect.TopLeftCorner());
+        AcademicProgressDrawer.Draw(inRect.TopLeftCorner());
 
         /*
         Rect innerRect = GenUI.ContractedBy(inRect, 2f);
@@ -293,7 +291,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             }
         }
 
-        AcademicProgressBarDrawer.SetDrawData(SelAcademicData);
+        AcademicProgressDrawer.SetDrawData(SelAcademicData);
     }
 
     private void SwithAcademicStage(ResidentKnightAcademicStage stage, int stageIndex)
