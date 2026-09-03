@@ -451,6 +451,42 @@ public static class DebugRatkinOrders
         Find.WindowStack.Add(new Dialog_DebugOptionListLister(mercyQuestOptions));
     }
 
+    /// <summary>
+    /// 生成骑士团推荐信
+    /// </summary>
+    [DebugAction(category: category,
+                 name: "给予骑士美德",
+                 displayPriority: 850,
+                 actionType = DebugActionType.Action,
+                 allowedGameStates = AllowedGameStates.PlayingOnMap)]
+    private static void GiveVirtueToKnight()
+    {
+        List<DebugMenuOption> virtueOptions = new List<DebugMenuOption>();
+        foreach (KnightVirtueDef virtueDef in DefDatabase<KnightVirtueDef>.AllDefs)
+        {
+            virtueOptions.Add(new DebugMenuOption(virtueDef.label, DebugMenuOptionMode.Tool, delegate
+            {
+                foreach (Pawn t in Verse.UI.MouseCell().GetThingList(Find.CurrentMap).OfType<Pawn>()
+                    .ToList())
+                {
+                    if (t is not Pawn pawn)
+                        continue;
+
+                    if (!ResidentPawnsManager.Instance.TryGetKnightRecord(pawn, out ResidentKnight record))
+                        continue;
+
+                    if (!record.CanAcquireVirtue(virtueDef, force: true))
+                        continue;
+
+                    record.VirtueHandler.TryAddVirtue(virtueDef, 1, string.Empty);
+                    Log.Message("Added");
+                    break;
+                }
+            }));
+        }
+        Find.WindowStack.Add(new Dialog_DebugOptionListLister(virtueOptions));
+    }
+
     private static void RatkinOrderOptions(Action<RatkinOrder> orderAction)
     {
         List<DebugMenuOption> orderOptions = [];

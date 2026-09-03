@@ -9,20 +9,23 @@ public static class KnightVirtueUtility
     public const float MentorshipVirtueChance_Base = 0.04f;
     public const float MentorshipVirtueChance_Resonate = 0.10f;
 
-    public static bool CanAcquireVirtue(this ResidentKnight knight, KnightVirtueDef virtueDef)
+    public static bool CanAcquireVirtue(this ResidentKnight knight, KnightVirtueDef virtueDef, bool force = false)
     {
         if (knight is null || virtueDef is null)
             return false;
 
         KnightVirtueHandler virtueHandler = knight.VirtueHandler;
 
-        if (virtueHandler.TotalVirtueCount >= virtueHandler.CurVirtueCountLimit)
-            return false;
+        if (!force)
+        {
+            if (virtueHandler.TotalVirtueCount >= virtueHandler.CurVirtueCountLimit)
+                return false;
 
-        if (virtueHandler.HasVirtue(virtueDef))
-            return false;
+            if (!knight.IsVirtueUnlockedForKnight(virtueDef))
+                return false;
+        }
 
-        return knight.IsVirtueUnlockedForKnight(virtueDef);
+        return !virtueHandler.HasVirtue(virtueDef);
     }
 
     public static bool IsVirtueUnlockedForKnight(this ResidentKnight knight, KnightVirtueDef virtueDef)

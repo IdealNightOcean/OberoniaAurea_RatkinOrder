@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea.RatkinOrder.Utility;
 using RimWorld;
 using UnityEngine;
@@ -43,9 +43,9 @@ public class UIData_SquadInfo : UIData_BranchSummary
     {
         BranchStatRequestData requestData = new(this.Branch, BranchStatDefOf.OARO_SquadMemberRecoveryRate);
 
-        (string explanation, float? resultNullabel) = BranchStatDefOf.OARO_SquadMemberRecoveryRate.GetStatModifyExplanation(requestData);
+        (string explanation, float? resultNullable) = BranchStatDefOf.OARO_SquadMemberRecoveryRate.GetStatModifyExplanation(requestData);
 
-        MemberRecoveryRate = resultNullabel ?? ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.baseValue;
+        MemberRecoveryRate = resultNullable ?? ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.baseValue;
 
         return explanation;
     }

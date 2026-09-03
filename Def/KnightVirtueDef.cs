@@ -62,7 +62,7 @@ public class KnightVirtueDef : Def
     {
         if (level < 1 || level > MaxLevel)
         {
-            Log.Error($"[OARO] Invalid virtue level: {level}. Valid range is 1 to {MaxLevel}.");
+            //Log.Error($"[OARO] Invalid virtue level for {defName ?? KeyLibrary_Misc.UNKOWN}: {level}. Valid range is 1 to {MaxLevel}.");
             return [];
         }
 

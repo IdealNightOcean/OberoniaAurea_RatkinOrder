@@ -19,6 +19,10 @@ public class KnightVirtueHandler : IExposable
     public Pawn Pawn => knight.Pawn;
 
     private Hediff_KnightVirtue buffHediff;
+    /// <summary>
+    /// 获取骑士美德Buff Hediff；首次访问时若Pawn身上尚无对应Hediff，则会先赋值字段再AddHediff，
+    /// 避免AddHediff同步触发CurStage回调时字段为null导致重复初始化或时序异常
+    /// </summary>
     public Hediff_KnightVirtue BuffHediff
     {
         get
@@ -31,8 +35,18 @@ public class KnightVirtueHandler : IExposable
 
             if (buffHediff is null)
             {
-                buffHediff = (Hediff_KnightVirtue)this.Pawn.GetOrAddHediff(OARO_HediffDefOf.OARO_Hediff_KnightVirtue);
-                buffHediff.InitVirtueHandler(knight, force: true);
+                Hediff existingBuffHediff = Pawn.health.hediffSet.GetFirstHediffOfDef(OARO_HediffDefOf.OARO_Hediff_KnightVirtue);
+                if (existingBuffHediff is not null)
+                {
+                    buffHediff = (Hediff_KnightVirtue)existingBuffHediff;
+                    buffHediff.InitVirtueHandler(knight, force: true);
+                }
+                else
+                {
+                    buffHediff = (Hediff_KnightVirtue)HediffMaker.MakeHediff(OARO_HediffDefOf.OARO_Hediff_KnightVirtue, Pawn);
+                    buffHediff.InitVirtueHandler(knight, force: true);
+                    Pawn.health.AddHediff(buffHediff);
+                }
             }
             return buffHediff;
         }
@@ -132,6 +146,7 @@ public class KnightVirtueHandler : IExposable
 
     public void TickInterval(int delta)
     {
+        Log.Message("Start TickInterval");
         if (knight.CurState != ResidentPawnState.Normal)
             return;
 
@@ -167,9 +182,6 @@ public class KnightVirtueHandler : IExposable
 
     public bool TryAddVirtue(KnightVirtueDef virtueDef, int level, string reason)
     {
-        if (virtues.Count >= CurVirtueCountLimit)
-            return false;
-
         if (!AddVirtue(virtueDef, level))
             return false;
 
@@ -324,9 +336,8 @@ public class KnightVirtueHandler : IExposable
     private bool AddVirtue(KnightVirtueDef virtueDef, int level)
     {
         if (HasVirtue(virtueDef))
-        {
             return false;
-        }
+
         KnightVirtue virtue = KnightVirtue.GenerateKnightVirtue(knight, virtueDef, level);
         virtues.Add(virtue);
         virtue.PostAdd();

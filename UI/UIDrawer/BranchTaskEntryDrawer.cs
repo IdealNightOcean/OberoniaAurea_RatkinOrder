@@ -140,18 +140,18 @@ public partial class Window_BranchTask
             }
             else
             {
-                DrawNoramlTask(topRect);
+                DrawNormalTask(topRect);
             }
 
 
             reusedRect = new(positionX + 2f, positionY + 54f, Width - 4f, 26f);
-            Rect shoeDetailTextRect = OARO_UIUtility.CenterRectOnY(reusedRect, innerRectX + 35f, 128f, 20f);
+            Rect showDetailTextRect = OARO_UIUtility.CenterRectOnY(reusedRect, innerRectX + 35f, 128f, 20f);
             if (ShowDetail)
             {
                 GUI.DrawTexture(reusedRect, showDetailButton_Down);
                 Text.Font = GameFont.Small;
                 Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label(shoeDetailTextRect, "OARO_TaskWin_ShowDetail".Translate());
+                Widgets.Label(showDetailTextRect, "OARO_TaskWin_ShowDetail".Translate());
                 Text.Anchor = TextAnchor.MiddleCenter;
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
@@ -169,7 +169,7 @@ public partial class Window_BranchTask
                 GUI.DrawTexture(reusedRect, showDetailButton);
                 Text.Font = GameFont.Small;
                 Text.Anchor = TextAnchor.MiddleLeft;
-                Widgets.Label(shoeDetailTextRect, "OARO_TaskWin_ShowDetail".Translate());
+                Widgets.Label(showDetailTextRect, "OARO_TaskWin_ShowDetail".Translate());
                 Text.Anchor = TextAnchor.MiddleCenter;
                 if (Widgets.ButtonInvisible(reusedRect, doMouseoverSound: true))
                 {
@@ -180,7 +180,7 @@ public partial class Window_BranchTask
             }
         }
 
-        private void DrawNoramlTask(Rect inRect)
+        private void DrawNormalTask(Rect inRect)
         {
             float inRectX = inRect.xMin;
             float inRectY = inRect.yMin;
@@ -663,7 +663,7 @@ public partial class Window_BranchTask
                 tooltip: "OARO_JointPatrolTaskTypeTip".Translate());
 
             Rect iconRect = OARO_UIUtility.CenterRectOnY(inRect, inRect.xMin + 8f, 20f, 20f);
-            GUI.DrawTexture(iconRect, isActive ? null : null);
+            //GUI.DrawTexture(iconRect, isActive ? null : null);
             if (isActive)
             {
                 GUI.DrawTexture(iconRect, taskChivalry.icon.Texture, ScaleMode.ScaleToFit);

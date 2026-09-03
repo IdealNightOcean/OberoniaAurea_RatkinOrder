@@ -1,4 +1,4 @@
-﻿using NightOcean.Utility;
+using NightOcean.Utility;
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea_Frame.UI;
 using UnityEngine;
@@ -44,14 +44,6 @@ public class UIDataDrawer_KnightAcademicProgressBar_Stage : UIDataDrawerBase<UID
         Rect topRect = innerBoxRect.TopPart(0.875f);
         Rect bottomRect = innerBoxRect;
         bottomRect.yMin = topRect.yMax;
-
-        if (DrawData.IsDataValid && DrawData.StageLevel < DrawData.Academic.MaxStageLevel)
-        {
-            Rect verticalDividingLine = topRect;
-            verticalDividingLine.xMin = topRect.xMax - 2f;
-
-
-        }
 
         Rect validTopRect = topRect;
         validTopRect.xMax -= 2f;

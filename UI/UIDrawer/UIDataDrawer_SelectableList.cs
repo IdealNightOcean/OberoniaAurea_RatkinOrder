@@ -1,11 +1,13 @@
-﻿using NightOcean.Utility;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
+/// <summary>
+/// 可选择列表绘制器，将 <see cref="DrawDatas"/> 按网格布局绘制并支持单选（再次点击取消选择）
+/// </summary>
 public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData where U : UIDataDrawerBase<T>
 {
     private const float ScrollBarThickness = 20f;
@@ -68,6 +70,17 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         }
     }
 
+    private Vector2 itemInterval = Vector2.zero;
+    public Vector2 ItemInterval
+    {
+        get => itemInterval;
+        set
+        {
+            itemInterval = value;
+            LayoutSizeChanged = true;
+        }
+    }
+
     private ScrollLayoutStrategy layoutStrategy = ScrollLayoutStrategy.ViewGiven;
     public ScrollLayoutStrategy LayoutStrategy
     {
@@ -102,12 +115,12 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
     {
         get
         {
-            if (outRectSize.x < 0f || outRectSize.y < 0f)
+            if (entryDrawSize.x < 0f || entryDrawSize.y < 0f)
             {
                 RefreshEntryDrawSize();
             }
 
-            return outRectSize;
+            return entryDrawSize;
         }
     }
 
@@ -187,6 +200,12 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
     private void RefreshOutRectSize()
     {
         Vector2 newOutRectSize = ValidDrawSize;
+        if (Drawer is null)
+        {
+            outRectSize = newOutRectSize;
+            return;
+        }
+
         if (LayoutStrategy != ScrollLayoutStrategy.ViewDerivedByRowCol)
         {
             outRectSize = newOutRectSize;
@@ -196,8 +215,8 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         {
             Vector2 entrySize = Drawer.DrawSize;
             float outlineThickness = Drawer.OutlineThickness;
-            float stepX = entrySize.x - outlineThickness;
-            float stepY = entrySize.y - outlineThickness;
+            float stepX = entrySize.x + ItemInterval.x - outlineThickness;
+            float stepY = entrySize.y + ItemInterval.y - outlineThickness;
 
             if (stepX <= 0f || stepY <= 0f)
             {
@@ -249,10 +268,16 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
     public void RefreshEntryDrawSize()
     {
         if (LayoutStrategy != ScrollLayoutStrategy.ViewGivenItemAdapt)
+        {
             entryDrawSize = Drawer?.DrawSize ?? Vector2.zero;
+            return;
+        }
 
         if (Drawer is null)
+        {
             entryDrawSize = Vector2.zero;
+            return;
+        }
 
         Vector2 validOutRectSize = ValidDrawSize;
         if (ShowScrollBar)
@@ -263,23 +288,41 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
                 validOutRectSize.x -= ScrollBarThickness;
         }
 
-        if (validOutRectSize.x < 0f || validOutRectSize.y < 0f)
+        if (validOutRectSize.x < 1e-6f || validOutRectSize.y < 1e-6f)
+        {
             entryDrawSize = Vector2.zero;
+            return;
+        }
+
 
         if (HorizontalScroll)
         {
             if (RowLimit > 0)
             {
-                float enrtyHeight = validOutRectSize.y / RowLimit;
-                Drawer.SetDrawSizeAspectFit(new(validOutRectSize.x, enrtyHeight));
+                float validHeight = validOutRectSize.y - itemInterval.y * (RowLimit - 1);
+                if (validHeight <= 1e-6f)
+                {
+                    entryDrawSize = Vector2.zero;
+                    return;
+                }
+
+                float entryHeight = validHeight / RowLimit;
+                Drawer.SetDrawSizeAspectFit(new(validOutRectSize.x, entryHeight));
             }
         }
         else
         {
             if (ColumnLimit > 0)
             {
-                float enrtyWidth = validOutRectSize.x / ColumnLimit;
-                Drawer.SetDrawSizeAspectFit(new(enrtyWidth, validOutRectSize.y));
+                float validWidth = validOutRectSize.x - itemInterval.x * (ColumnLimit - 1);
+                if (validWidth <= 1e-6f)
+                {
+                    entryDrawSize = Vector2.zero;
+                    return;
+                }
+
+                float entryWidth = validWidth / ColumnLimit;
+                Drawer.SetDrawSizeAspectFit(new(entryWidth, validOutRectSize.y));
             }
         }
 
@@ -288,13 +331,13 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
 
     public Rect GetViewRect()
     {
-        if (DrawDatas is null || DrawDatas.Count == 0)
+        if (DrawDatas is null || DrawDatas.Count == 0 || Drawer is null)
             return Rect.zero;
 
         Vector2 entrySize = Drawer.DrawSize;
         float outlineThickness = Drawer.OutlineThickness;
-        float stepX = entrySize.x - outlineThickness;
-        float stepY = entrySize.y - outlineThickness;
+        float stepX = entrySize.x + ItemInterval.x - outlineThickness;
+        float stepY = entrySize.y + ItemInterval.y - outlineThickness;
 
         if (stepX <= 0f || stepY <= 0f)
             return Rect.zero;
@@ -344,13 +387,10 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         for (int i = 0; i < DrawDatas.Count; i++)
         {
             Rect entryRect = new(entryPos, entrySize);
-            if (!entryRect.Overlaps(visibleRect))
+            if (entryRect.Overlaps(visibleRect))
             {
-                UpdateNextPosition();
-                continue;
+                DrawEntry(entryRect, i);
             }
-
-            DrawEntry(entryRect, i);
 
             UpdateNextPosition();
         }
@@ -409,7 +449,7 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
     protected virtual void DrawEntry(Rect inRect, int dataIndex)
     {
         Drawer.SetDrawData(DrawDatas[dataIndex]);
-        Drawer.Draw(inRect.TopLeftCorner());
+        Drawer.Draw(inRect.position);
 
         if (Widgets.ButtonInvisible(inRect))
             SelectItem(dataIndex);

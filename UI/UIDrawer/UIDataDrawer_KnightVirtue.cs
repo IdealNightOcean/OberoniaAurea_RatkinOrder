@@ -1,4 +1,4 @@
-﻿using NightOcean.Utility;
+using NightOcean.Utility;
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.Utility;
 using OberoniaAurea_Frame.UI;
@@ -90,7 +90,7 @@ public class UIDataDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
         KnightVirtueTraitDef virtueTrait = DrawData.Virtue.GetTraitOfLevel(level);
         if (virtueTrait is not null)
         {
-            DrawVirtueTaritInfo(traitInfoRect, virtueTrait);
+            DrawVirtueTraitInfo(traitInfoRect, virtueTrait);
             return;
         }
 
@@ -98,15 +98,15 @@ public class UIDataDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
         {
             if (DrawData.Virtue.Def.GetTraitOptionsForLevel(level).Count <= 2)
             {
-                DrawVirtueTaritSelection(traitInfoRect, level);
+                DrawVirtueTraitSelection(traitInfoRect, level);
             }
             else
             {
                 Rect traitInfoButRect = traitInfoRect.CenterSegment(0.6f, 0.6f);
                 if (OARO_Widgets.DefaultTextButton(traitInfoButRect, "OARO_KnightVirtue_SelectTrait".Translate()))
                 {
-                    Window_VirtueTaritSelection taritSelectionWin = new(DrawData, level);
-                    Find.WindowStack.Add(taritSelectionWin);
+                    Window_VirtueTraitSelection traitSelectionWin = new(DrawData, level);
+                    Find.WindowStack.Add(traitSelectionWin);
                 }
             }
         }
@@ -117,7 +117,7 @@ public class UIDataDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
         }
     }
 
-    private void DrawVirtueTaritInfo(Rect inRect, KnightVirtueTraitDef virtueTrait)
+    private void DrawVirtueTraitInfo(Rect inRect, KnightVirtueTraitDef virtueTrait)
     {
         Rect iconRect = inRect;
         iconRect.width *= 0.24f;
@@ -129,7 +129,7 @@ public class UIDataDrawer_KnightVirtue : UIDataDrawerBase<UIData_KnightVirtue>
         OAFrame_Widgets.DrawLabel(descRect, virtueTrait.description, TextStyle);
     }
 
-    private void DrawVirtueTaritSelection(Rect inRect, int level)
+    private void DrawVirtueTraitSelection(Rect inRect, int level)
     {
         Rect infoRect = inRect.CenterSegmentOnX(0.85f);
 

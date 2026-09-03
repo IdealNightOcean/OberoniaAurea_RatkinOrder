@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea.RatkinOrder.Utility;
 using UnityEngine;
 using Verse;
@@ -96,9 +96,9 @@ public class UIData_KnightAcademic : UIDataBase
 
         ResidentKnightStatRequestData_Academic requestData = new(this.Knight, ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor, Academic);
 
-        (string explanation, float? resultNullabel) = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatModifyExplanation(requestData);
+        (string explanation, float? resultNullable) = ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.GetStatModifyExplanation(requestData);
 
-        costFactor = resultNullabel ?? ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.baseValue;
+        costFactor = resultNullable ?? ResidentKnightStatDefOf.OARO_AcademicPointsCostFactor.baseValue;
 
         return explanation;
     }

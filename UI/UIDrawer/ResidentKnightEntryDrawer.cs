@@ -1,4 +1,4 @@
-﻿using NightOcean;
+using NightOcean;
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea.RatkinOrder.UI;
 using OberoniaAurea.RatkinOrder.Utility;
@@ -22,7 +22,7 @@ public partial class Window_OrderStation
         public const float SummaryHeight = 63f;
         public const float DetailHeight = 288f;
 
-        private Vector2 scrollPosition_GenealAcademic;
+        private Vector2 scrollPosition_GeneralAcademic;
         public Window_OrderStation Parent { get; }
         public Map Map { get; }
 
@@ -335,12 +335,12 @@ public partial class Window_OrderStation
             float entryWidth = academicViewRect.width;
             academicViewRect.height = (AcademicHandler.Academics.Count + 1) * entryHeight;
 
-            Widgets.BeginScrollView(academicRect, ref scrollPosition_GenealAcademic, academicViewRect, showScrollbars: false);
+            Widgets.BeginScrollView(academicRect, ref scrollPosition_GeneralAcademic, academicViewRect, showScrollbars: false);
             foreach (KeyValuePair<KnightAcademicDef, int> kv in AcademicHandler.Academics)
             {
                 Vector2 entryPos = new(entryX, entryY);
                 entryY += entryHeight;
-                DrawGenealAcademic(entryPos, kv.Key, kv.Value);
+                DrawGeneralAcademic(entryPos, kv.Key, kv.Value);
             }
             Widgets.EndScrollView();
 
@@ -348,7 +348,7 @@ public partial class Window_OrderStation
             return inRect.yMax;
         }
 
-        private void DrawGenealAcademic(Vector2 position, KnightAcademicDef academicDef, int academicLevel)
+        private void DrawGeneralAcademic(Vector2 position, KnightAcademicDef academicDef, int academicLevel)
         {
             Text.Font = GameFont.Tiny;
             Text.Anchor = TextAnchor.MiddleLeft;

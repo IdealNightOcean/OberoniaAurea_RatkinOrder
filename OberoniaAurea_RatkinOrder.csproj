@@ -340,6 +340,7 @@
     <Compile Include="UI\UIData\UIData_KnightAcademicStage.cs" />
     <Compile Include="UI\UIData\UIData_KnightAcademicWithStage.cs" />
     <Compile Include="UI\UIData\UIData_KnightVirtue.cs" />
+    <Compile Include="UI\UIDrawer\FileName.cs" />
     <Compile Include="UI\UIDrawer\ScrollLayoutStrategy.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_KnightAcademicProgress.cs" />
     <Compile Include="UI\UIDrawer\UIDataDrawer_KnightAcademicProgressBar_Stage.cs" />
@@ -353,7 +354,7 @@
     <Compile Include="UI\UIUtility.cs" />
     <Compile Include="UI\Widgets.cs" />
     <Compile Include="UI\IUIDrawer.cs" />
-    <Compile Include="UI\Window\Window_VirtueTaritSelection.cs" />
+    <Compile Include="UI\Window\Window_VirtueTraitSelection.cs" />
     <Compile Include="Utility\AcademicUtility.cs" />
     <Compile Include="Utility\RomanNumeralHelper.cs" />
     <Compile Include="Utility\StatExplanationUtility.cs" />
@@ -713,7 +714,7 @@
     <Compile Include="WorldObject\Mercy\WorldObject_UnsalableArtcraft.cs" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="UI\UIData\UIData_BrnchInfo.cs" />
+    <Compile Include="UI\UIData\UIData_BranchInfo.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

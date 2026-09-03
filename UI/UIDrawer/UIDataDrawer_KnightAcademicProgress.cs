@@ -1,4 +1,4 @@
-﻿using NightOcean.Utility;
+using NightOcean.Utility;
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea_Frame.UI;
 using UnityEngine;
@@ -19,7 +19,7 @@ public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_Knigh
 
     public UIDataDrawer_KnightAcademicProgress()
     {
-        DrawSize = new Vector2(1384f, 714f);
+        DrawSize = new Vector2(1384f, 736f);
         OutlineThickness = 2;
 
         this.StageDrawer = new();
@@ -87,7 +87,7 @@ public class UIDataDrawer_KnightAcademicProgress : UIDataDrawerBase<UIData_Knigh
             InitAcademicStageDrawerDatas(inRect);
         }
 
-        AcademicStagesListDrawer.Draw(innerRect.TopLeftCorner());
+        AcademicStagesListDrawer.Draw(innerRect.position);
     }
 
     private void DrawBottom(Rect inRect)

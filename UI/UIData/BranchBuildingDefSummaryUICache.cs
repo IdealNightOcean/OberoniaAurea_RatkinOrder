@@ -1,4 +1,4 @@
-﻿using OberoniaAurea.RatkinOrder.Utility;
+using OberoniaAurea.RatkinOrder.Utility;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,7 +25,7 @@ public class BranchBuildingDefSummaryUICache
     public string BaseEffectDescJoint => baseEffectDescJoint ??= JointEffectDesc(BaseEffectDesc);
 
     private string advancedEffectDescJoint;
-    public string AvancedEffectDescJoint => advancedEffectDescJoint ??= JointEffectDesc(AdvancedEffectDesc);
+    public string AdvancedEffectDescJoint => advancedEffectDescJoint ??= JointEffectDesc(AdvancedEffectDesc);
 
     public BranchBuildingDefSummaryUICache() { }
     public BranchBuildingDefSummaryUICache(BranchBuildingDef buildingDef, Branch branch)

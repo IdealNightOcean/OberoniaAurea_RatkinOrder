@@ -1,4 +1,4 @@
-﻿using NightOcean.Utility;
+using NightOcean.Utility;
 using OberoniaAurea.RatkinOrder.DataLibrary;
 using OberoniaAurea_Frame.UI;
 using System.Collections.Generic;
@@ -19,19 +19,22 @@ public class UIDrawer_KnightVirtueTable : IUIDrawer
 
     private readonly Rect[] reusedRectArr = new Rect[5];
 
-    public ResidentKnight Knight { get; }
+    public ResidentKnight Knight { get; protected set; }
     public HashSet<KnightVirtueDef> ActivedVirtues { get; } = [];
 
     public void SetDrawSize(Vector2 size) => DrawSize = size;
 
     public UIDrawer_KnightVirtueTable() { }
-    public UIDrawer_KnightVirtueTable(ResidentKnight knight)
+
+    public void SetKnight(ResidentKnight knight)
     {
         this.Knight = knight;
+        ActivedVirtues.Clear();
         if (knight is not null)
         {
             ActivedVirtues.AddRange(knight.VirtueHandler.Virtues.Select(v => v.Def));
         }
+
     }
 
     public void Draw(Vector2 position)
@@ -40,12 +43,12 @@ public class UIDrawer_KnightVirtueTable : IUIDrawer
         Rect titleRect = boxRect;
         titleRect.height = 32f;
 
-        int allVirtuesCount = DefDatabase<KnightVirtueDef>.DefCount;
+        List<KnightVirtueDef> allVirtueDefs = DefDatabase<KnightVirtueDef>.AllDefsListForReading;
 
         this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleCenter);
         if (this.Knight is not null)
         {
-            OAFrame_Widgets.DrawLabel(titleRect, $"{"OARO_KnightVirtueTableTitle".Translate()}  {ActivedVirtues.Count}/{allVirtuesCount}", this.TextStyle);
+            OAFrame_Widgets.DrawLabel(titleRect, $"{"OARO_KnightVirtueTableTitle".Translate()}  {ActivedVirtues.Count}/{allVirtueDefs.Count}", this.TextStyle);
         }
         else
         {
@@ -73,18 +76,22 @@ public class UIDrawer_KnightVirtueTable : IUIDrawer
         Rect bodyOutRect = tableOutRect;
         bodyOutRect.yMin = headerRect.yMax - 1f;
 
-        Rect bodyViewRect = tableRect;
-        bodyViewRect.yMin = headerRect.yMax - 1f;
-        bodyViewRect.height = rowHeight * allVirtuesCount - (allVirtuesCount - 1) + 8f;
+        float entryInterval = rowHeight - 1f; //上下边界要重叠
+        Rect bodyViewRect = new(0f, 0f, tableRect.width, allVirtueDefs.Count * entryInterval + 8f);
 
         Widgets.BeginScrollView(bodyOutRect, ref scrollPosition_TableBody, bodyViewRect);
 
-        List<KnightVirtueDef> allVirtueDefs = DefDatabase<KnightVirtueDef>.AllDefsListForReading;
-        Rect rowRect = new(bodyViewRect.xMin, bodyViewRect.yMin, bodyViewRect.width, rowHeight);
+        Rect visibleRect = new(scrollPosition_TableBody, bodyOutRect.size);
+        Rect rowRect = new(0f, 0f, bodyViewRect.width, rowHeight);
+
         for (int i = 0; i < allVirtueDefs.Count; i++)
         {
-            DrawTableRow(rowRect, allVirtueDefs[i]);
-            rowRect.OffsetVertical(rowHeight - 1f); //上下边界要重叠
+            if (visibleRect.Overlaps(rowRect))
+            {
+                DrawTableRow(rowRect, allVirtueDefs[i]);
+            }
+
+            rowRect = rowRect.OffsetVertical(entryInterval);
         }
 
         Widgets.EndScrollView();

@@ -7,7 +7,7 @@ using Verse;
 
 namespace OberoniaAurea.RatkinOrder.UI;
 
-public class UIData_BrnchInfo : UIData_BranchSummary
+public class UIData_BranchInfo : UIData_BranchSummary
 {
     public int PopulationCeiling { get; protected set; }
     public int BuildingCeiling { get; protected set; }
@@ -30,7 +30,7 @@ public class UIData_BrnchInfo : UIData_BranchSummary
 
     public LazyMutable<string> DailyPopulationGrowthExplanation { get; }
 
-    public UIData_BrnchInfo(Branch branch, Map map) : base(branch, map)
+    public UIData_BranchInfo(Branch branch, Map map) : base(branch, map)
     {
         DailyPopulationGrowthExplanation = new(refreshFunc: GetDailyPopulationGrowthExplanation);
     }
@@ -54,9 +54,9 @@ public class UIData_BrnchInfo : UIData_BranchSummary
     {
         try
         {
-            (string growthExplanation, float? resultNullabel) = BranchStatDefOf.OARO_DailyPopulationGrowth.GetStatModifyExplanation(new BranchStatRequestData(this.Branch));
+            (string growthExplanation, float? resultNullable) = BranchStatDefOf.OARO_DailyPopulationGrowth.GetStatModifyExplanation(new BranchStatRequestData(this.Branch));
 
-            DailyPopulationGrowth = resultNullabel ?? BranchStatDefOf.OARO_DailyPopulationGrowth.baseValue;
+            DailyPopulationGrowth = resultNullable ?? BranchStatDefOf.OARO_DailyPopulationGrowth.baseValue;
 
             StringBuilder growthExplanationBuilder = new(growthExplanation);
             growthExplanationBuilder.Append("    ");

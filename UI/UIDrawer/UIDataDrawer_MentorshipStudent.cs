@@ -22,7 +22,7 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         Rect innerBoxRect = GenUI.ContractedBy(boxRect, OutlineThickness); //标准大约(320f,106f);
 
         Rect portraitRect = new(0f, 0f, innerBoxRect.width * 0.25f, innerBoxRect.height * 0.7f);
-        portraitRect = portraitRect.MoveTo(innerBoxRect.TopLeftCorner());
+        portraitRect = portraitRect.MoveTo(innerBoxRect.position);
         if (DrawData.IsDataValid)
             GUI.DrawTexture(position: portraitRect, image: PortraitsCache.Get(DrawData.Student.Pawn, portraitRect.size, Rot4.South));
         else
@@ -61,20 +61,6 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         {
             OAFrame_Widgets.DrawLabel(
                 rect: taughtableCountRect,
-                label: "OARO_MentorshipStudent_TaughtableCountN".Translate(),
-                textStyle: this.TextStyle);
-            OAFrame_Widgets.DrawLabel(
-                rect: dailyTutoringSuccessChanceRect,
-                label: "OARO_MentorshipStudent_DailyTutoringSuccessChance".Translate(
-                    0f.ToStringPercent()
-                      .Colorize(Color.gray)
-                      .Named(KeyLibrary_FormatArgName.Chance)),
-                textStyle: this.TextStyle);
-        }
-        else
-        {
-            OAFrame_Widgets.DrawLabel(
-                rect: taughtableCountRect,
                 label: "OARO_MentorshipStudent_TaughtableCount".Translate(
                     DrawData.TaughtableAcademicsCount.ToString()
                                                      .Colorize(Color.green)
@@ -86,6 +72,21 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
                     DrawData.DailyTutoringSuccessChance.ToStringPercent()
                                                        .Colorize(Color.green)
                                                        .Named(KeyLibrary_FormatArgName.Chance)),
+                textStyle: this.TextStyle);
+
+        }
+        else
+        {
+            OAFrame_Widgets.DrawLabel(
+                rect: taughtableCountRect,
+                label: "OARO_MentorshipStudent_TaughtableCountN".Translate(),
+                textStyle: this.TextStyle);
+            OAFrame_Widgets.DrawLabel(
+                rect: dailyTutoringSuccessChanceRect,
+                label: "OARO_MentorshipStudent_DailyTutoringSuccessChance".Translate(
+                    0f.ToStringPercent()
+                      .Colorize(Color.gray)
+                      .Named(KeyLibrary_FormatArgName.Chance)),
                 textStyle: this.TextStyle);
         }
     }

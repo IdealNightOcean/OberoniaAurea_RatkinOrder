@@ -8,8 +8,35 @@ public class Hediff_KnightVirtue : HediffWithComps
     private KnightVirtueHandler virtueHandler;
 
     private HediffStage buffStage;
+    private static readonly HediffStage EmptyStage = new();
+    private bool curStageCalculating;
 
-    public override HediffStage CurStage => buffStage ??= virtueHandler?.GetNewBuffStage();
+    /// <summary>
+    /// 可重入保护：CurStage 刷新期间如果框架因 GetStatValue 回调再次访问本属性，
+    /// 直接返回空 HediffStage 以打断 CurStage→GetStatValue→CurStage 的无限递归
+    /// </summary>
+    public override HediffStage CurStage
+    {
+        get
+        {
+            if (curStageCalculating)
+                return EmptyStage;
+
+            if (buffStage is not null || virtueHandler is null)
+                return buffStage;
+
+            curStageCalculating = true;
+            try
+            {
+                buffStage = virtueHandler.GetNewBuffStage();
+                return buffStage ?? EmptyStage;
+            }
+            finally
+            {
+                curStageCalculating = false;
+            }
+        }
+    }
 
     public override int CurStageIndex => 0;
 

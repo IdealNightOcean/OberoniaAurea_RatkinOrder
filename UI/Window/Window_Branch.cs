@@ -35,7 +35,7 @@ public class Window_Branch : OrderWindowBase
     private Branch Branch { get; }
     private BranchFacilityHandler FacilityHandler { get; }
     private BranchBuildingHandler BuildingHandler { get; }
-    private UIData_BrnchInfo CachedBranchInfo { get; set; }
+    private UIData_BranchInfo CachedBranchInfo { get; set; }
     private Caravan Caravan { get; }
     private Map Map { get; }
 
