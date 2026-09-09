@@ -40,7 +40,7 @@ public class KnightVirtueDef : Def
     /// <summary>
     /// 最高美德等级
     /// </summary>
-    public int MaxLevel => traitGroups.Count;
+    public int MaxLevel => traitGroups.Count + 1;
 
     public List<RimWorld.StatModifier> statOffsets;
 

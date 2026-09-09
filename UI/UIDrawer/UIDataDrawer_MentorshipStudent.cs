@@ -2,7 +2,6 @@
 using OberoniaAurea_Frame.DataLibrary;
 using OberoniaAurea_Frame.UI;
 using RimWorld;
-using System;
 using UnityEngine;
 using Verse;
 
@@ -26,7 +25,8 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
         if (DrawData.IsDataValid)
             GUI.DrawTexture(position: portraitRect, image: PortraitsCache.Get(DrawData.Student.Pawn, portraitRect.size, Rot4.South));
         else
-            throw new NotImplementedException();
+            GUI.DrawTexture(position: portraitRect, image: IconLibrary.InsertPawnIcon);
+
 
         Rect nameRect = innerBoxRect.BottomPart(0.3f);
         nameRect.width *= 0.3f;

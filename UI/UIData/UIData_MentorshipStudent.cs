@@ -19,6 +19,7 @@ public class UIData_MentorshipStudent : UIDataBase
     public List<(KnightAcademicDef def, int targetLevel)> TaughtableAcademics { get; } = [];
     public int TaughtableAcademicsCount => TaughtableAcademics.Count;
 
+    public static UIData_MentorshipStudent EmptyData => new(teacher: null, student: null);
 
     public UIData_MentorshipStudent(ResidentKnight teacher, ResidentPawn student)
     {
@@ -26,14 +27,6 @@ public class UIData_MentorshipStudent : UIDataBase
         this.Student = student;
 
         DailyTutoringSuccessChanceExplanation = new(refreshFunc: RefreshDailyTutoringSuccessChanceExplanation);
-    }
-
-    public void ResetData(ResidentKnight teacher, ResidentPawn student)
-    {
-        this.Teacher = teacher;
-        this.Student = student;
-
-        MarkDirty();
     }
 
     protected override UIDataState RefreshInner()
