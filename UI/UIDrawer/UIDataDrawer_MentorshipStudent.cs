@@ -22,43 +22,32 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
 
         Rect portraitRect = new(0f, 0f, innerBoxRect.width * 0.25f, innerBoxRect.height * 0.7f);
         portraitRect = portraitRect.MoveTo(innerBoxRect.position);
-        if (DrawData.IsDataValid)
-            GUI.DrawTexture(position: portraitRect, image: PortraitsCache.Get(DrawData.Student.Pawn, portraitRect.size, Rot4.South));
-        else
-            GUI.DrawTexture(position: portraitRect, image: IconLibrary.InsertPawnIcon);
-
 
         Rect nameRect = innerBoxRect.BottomPart(0.3f);
         nameRect.width *= 0.3f;
-        this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
-        OAFrame_Widgets.DrawLabel(
-            rect: nameRect,
-            label: DrawData.IsDataValid ? DrawData.Student.Pawn.NameShortColored : "OARO_MentorshipStudent_UnkownStudent".Translate(),
-            textStyle: this.TextStyle);
 
         Rect relationRect = nameRect.MoveTo(nameRect.xMax, nameRect.yMin);
-        if (DrawData.IsDataValid)
-        {
-            this.TextStyle = new(guiColor: DrawData.RelationBetweenEach.s2t > 0 ? Color.green : ColorLibrary.RedReadable,
-                                 font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
-            OAFrame_Widgets.DrawLabel(rect: relationRect,
-                                      label: $"{DrawData.RelationBetweenEach.s2t.ToStringWithSign()} ({DrawData.RelationBetweenEach.t2s.ToStringWithSign()})",
-                                      textStyle: this.TextStyle);
-        }
-        else
-        {
-            this.TextStyle = new(guiColor: Color.gray, font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
-            OAFrame_Widgets.DrawLabel(relationRect, "0 (0)", this.TextStyle);
-        }
 
         Rect infoRect = innerBoxRect.RightPart(0.65f);
         infoRect.yMax = portraitRect.yMax;
 
         Rect taughtableCountRect = infoRect.TopHalf();
-        Rect dailyTutoringSuccessChanceRect = infoRect.TopHalf();
-        this.TextStyle = new(GameFont.Medium, anchor: TextAnchor.MiddleLeft);
+        Rect dailyTutoringSuccessChanceRect = infoRect.BottomHalf();
+
         if (DrawData.IsDataValid)
         {
+            GUI.DrawTexture(position: portraitRect, image: PortraitsCache.Get(DrawData.Student.Pawn, portraitRect.size, Rot4.South));
+
+            this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
+            OAFrame_Widgets.DrawLabel(nameRect, DrawData.Student.Pawn.NameShortColored, this.TextStyle);
+
+            this.TextStyle = new(guiColor: DrawData.RelationBetweenEach.s2t > 0 ? Color.green : ColorLibrary.RedReadable,
+                                 font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
+            OAFrame_Widgets.DrawLabel(rect: relationRect,
+                                      label: $"{DrawData.RelationBetweenEach.s2t.ToStringWithSign()} ({DrawData.RelationBetweenEach.t2s.ToStringWithSign()})",
+                                      textStyle: this.TextStyle);
+
+            this.TextStyle = new(GameFont.Medium, anchor: TextAnchor.MiddleLeft);
             OAFrame_Widgets.DrawLabel(
                 rect: taughtableCountRect,
                 label: "OARO_MentorshipStudent_TaughtableCount".Translate(
@@ -73,10 +62,18 @@ public class UIDataDrawer_MentorshipStudent : UIDataDrawerBase<UIData_Mentorship
                                                        .Colorize(Color.green)
                                                        .Named(KeyLibrary_FormatArgName.Chance)),
                 textStyle: this.TextStyle);
-
         }
         else
         {
+            GUI.DrawTexture(position: portraitRect, image: IconLibrary.InsertPawnIcon);
+
+            this.TextStyle = new(font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
+            OAFrame_Widgets.DrawLabel(nameRect, "OARO_MentorshipStudent_UnkownStudent".Translate(), this.TextStyle);
+
+            this.TextStyle = new(guiColor: Color.gray, font: GameFont.Medium, anchor: TextAnchor.MiddleLeft);
+            OAFrame_Widgets.DrawLabel(relationRect, "0 (0)", this.TextStyle);
+
+            this.TextStyle = new(GameFont.Medium, anchor: TextAnchor.MiddleLeft);
             OAFrame_Widgets.DrawLabel(
                 rect: taughtableCountRect,
                 label: "OARO_MentorshipStudent_TaughtableCountN".Translate(),

@@ -92,6 +92,7 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
             RowLimit = 4,
             ColumnLimit = 1,
             HorizontalScroll = false,
+            ItemInterval = new(0f, 48f),
             LayoutStrategy = ScrollLayoutStrategy.ViewDerivedByRowCol
         };
 
@@ -228,13 +229,17 @@ public class Window_ResidentKnight_AcademicArrange : OrderWindowBase
 
     private void DrawPawnInfo(Rect inRect)
     {
-        Rect virtueProgressRect = inRect.LeftPart(0.6f);
+        Rect leftRect = inRect.LeftPart(0.55f);
+
+        Rect virtueProgressOutRect = leftRect.BottomPart(0.7f);
+        Rect virtueProgressRect = virtueProgressOutRect.CenterSegment(0.75f, 0.8f);
         virtueProgressListDrawer.SetDrawSize(virtueProgressRect.size);
         virtueProgressListDrawer.Draw(virtueProgressRect.position);
 
-
-        Rect studentsRect = inRect.RightPart(0.4f);
-        studentsDrawer.SetDrawSizeAspectFit(studentsRect.size);
+        Rect rightRect = inRect.RightPart(0.45f);
+        Rect studentsOutRect = rightRect.TopPart(0.6f);
+        Rect studentsRect = studentsOutRect.CenterSegment(0.6f, 0.8f);
+        studentsDrawer.SetDrawSize(studentsRect.size);
         studentsDrawer.Draw(studentsRect.position);
     }
 

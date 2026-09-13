@@ -378,8 +378,8 @@ public class UIDataDrawer_SelectableList<T, U> : UIDrawerBase where T : IUIData 
         Widgets.BeginScrollView(outRect, ref scrollPosition, viewRect);
         Vector2 entryPos = Vector2.zero;
         Vector2 entrySize = Drawer.DrawSize;
-        float offsetX = entrySize.x - Drawer.OutlineThickness;
-        float offsetY = entrySize.y - Drawer.OutlineThickness;
+        float offsetX = entrySize.x + itemInterval.x - Drawer.OutlineThickness;
+        float offsetY = entrySize.y + itemInterval.y - Drawer.OutlineThickness;
         int curRow = 1;
         int curColumn = 1;
 
